@@ -53,10 +53,9 @@ import org.jscience.util.persistence.Persistent;
  * Represents an artist (painter, sculptor, musician, etc.) as a specialized social role.
  * This class captures the artist's biographical data, media of expertise,
  * nationality, and belonging to artistic movements.
- *
+ * * @version 2.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.1
  * @since 1.0
  */
 @Persistent

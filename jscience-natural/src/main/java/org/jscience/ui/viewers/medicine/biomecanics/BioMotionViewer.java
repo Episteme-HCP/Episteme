@@ -31,7 +31,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,10 +60,10 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     private List<Parameter<?>> parameters = new ArrayList<>();
 
     @Override
-    public String getName() { return I18n.getInstance().get("viewer.biomotionviewer.name", "BioMotion Viewer"); }
+    public String getName() { return I18N.getInstance().get("viewer.biomotionviewer.name", "BioMotion Viewer"); }
     
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.medicine", "Medicine"); }
+    public String getCategory() { return I18N.getInstance().get("category.medicine", "Medicine"); }
 
     public BioMotionViewer() {
         setupParameters();
@@ -83,9 +83,9 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter(I18n.getInstance().get("biomotion.gravity", "Gravity"), "Simulation Gravity", 0, 20, 0.1, gravity, v -> gravity = v));
-        parameters.add(new NumericParameter(I18n.getInstance().get("biomotion.muscle", "Muscle Tone"), "Muscle Strength", 0, 5, 0.1, muscleStrength, v -> muscleStrength = v));
-        parameters.add(new NumericParameter(I18n.getInstance().get("biomotion.speed", "Speed"), "Simulation Speed", 0.1, 5.0, 0.1, speed, v -> speed = v));
+        parameters.add(new NumericParameter(I18N.getInstance().get("biomotion.gravity", "Gravity"), "Simulation Gravity", 0, 20, 0.1, gravity, v -> gravity = v));
+        parameters.add(new NumericParameter(I18N.getInstance().get("biomotion.muscle", "Muscle Tone"), "Muscle Strength", 0, 5, 0.1, muscleStrength, v -> muscleStrength = v));
+        parameters.add(new NumericParameter(I18N.getInstance().get("biomotion.speed", "Speed"), "Simulation Speed", 0.1, 5.0, 0.1, speed, v -> speed = v));
     }
 
     private void initUI() {
@@ -199,7 +199,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
         Link(Node n1, Node n2, double length) { this.n1 = n1; this.n2 = n2; this.length = length; }
     }
 
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.biomotionviewer.desc", "Physics-based biological motion simulator."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.biomotionviewer.longdesc", "Simulates biological movement using a spring-mass ragdoll model."); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.biomotionviewer.desc", "Physics-based biological motion simulator."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.biomotionviewer.longdesc", "Simulates biological movement using a spring-mass ragdoll model."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

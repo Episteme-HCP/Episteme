@@ -42,9 +42,7 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
- * @see <a href="http://en.wikipedia.org/wiki/Hexadecimal_time">Hexadecimal Time (Wikipedia)</a>
  */
 @Persistent
 public class HexadecimalTime extends org.jscience.history.time.Time {

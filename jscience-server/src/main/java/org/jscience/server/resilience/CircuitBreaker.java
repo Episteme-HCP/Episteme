@@ -41,6 +41,9 @@ import java.util.function.Supplier;
  * - HALF_OPEN: Testing if service recovered
  * 
  * Thread-safe implementation using atomic primitives.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class CircuitBreaker {
 

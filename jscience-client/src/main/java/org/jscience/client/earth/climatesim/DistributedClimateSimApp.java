@@ -50,6 +50,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Advanced Climate Simulation Client (GCM) with VTK Export.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedClimateSimApp extends Application implements org.jscience.ui.App {
 
@@ -70,7 +73,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.title", "🌍 General Circulation Model (GCM) - JScience Grid"));
+        stage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.title", "🌍 General Circulation Model (GCM) - JScience Grid"));
         mapCanvas = new Canvas(WIDTH, HEIGHT);
         gc = mapCanvas.getGraphicsContext2D();
         task = new GeneralCirculationModelTask(60, 120);
@@ -82,28 +85,28 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
         overlay.setPadding(new Insets(15));
         overlay.getStyleClass().add("section-box");
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.header", "Advanced GCM Dynamics"));
+        Label title = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.header", "Advanced GCM Dynamics"));
         title.getStyleClass().add("header-label-white");
-        avgTempLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.temp_label", "Avg Surface Temp: -- K"));
+        avgTempLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.temp_label", "Avg Surface Temp: -- K"));
         avgTempLabel.getStyleClass().add("label-white");
-        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.status.init", "Status: Initializing..."));
+        statusLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.status.init", "Status: Initializing..."));
         statusLabel.getStyleClass().add("label-muted");
 
-        CheckBox distCheck = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.chk.grid", "Grid computing enabled"));
+        CheckBox distCheck = new CheckBox(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.chk.grid", "Grid computing enabled"));
         distCheck.setSelected(true);
         distCheck.getStyleClass().add("check-box-custom");
         distCheck.setOnAction(e -> distributed = distCheck.isSelected());
 
-        Button exportBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.btn.export_vtk", "Export VTK"));
+        Button exportBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.btn.export_vtk", "Export VTK"));
         exportBtn.setOnAction(e -> exportToVtk(stage));
 
-        Button exportJsonBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.btn.export_json", "Export JSON"));
-        exportJsonBtn.setOnAction(e -> exportToJson(stage));
+        Button exportJSONBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.btn.export_json", "Export JSON"));
+        exportJSONBtn.setOnAction(e -> exportToJSON(stage));
 
-        Button loadJsonBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.btn.load_json", "Load JSON"));
-        loadJsonBtn.setOnAction(e -> loadFromJson(stage));
+        Button loadJSONBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.btn.load_json", "Load JSON"));
+        loadJSONBtn.setOnAction(e -> loadFromJSON(stage));
 
-        HBox controls = new HBox(10, distCheck, exportBtn, exportJsonBtn, loadJsonBtn);
+        HBox controls = new HBox(10, distCheck, exportBtn, exportJSONBtn, loadJSONBtn);
         overlay.getChildren().addAll(title, avgTempLabel, new Separator(), controls, statusLabel);
         overlay.setMaxWidth(450);
         root.setTop(overlay);
@@ -122,7 +125,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
                     runDistributedStep();
                 else {
                     task.step(86400);
-                    statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.status.local", "Mode: Local Core (Heavy Compute)"));
+                    statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.status.local", "Mode: Local Core (Heavy Compute)"));
                     render();
                 }
             }
@@ -134,10 +137,10 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
             channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
             blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
             serverAvailable = true;
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.status.connected", "Status: Connected to Grid ✅"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.status.connected", "Status: Connected to Grid ✅"));
         } catch (Exception e) {
             serverAvailable = false;
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.status.offline", "Status: Grid Offline (Local Fallback)"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.status.offline", "Status: Grid Offline (Local Fallback)"));
         }
     }
 
@@ -166,7 +169,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
                         // Simple update for demonstration
                         render();
                     });
-                    statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.status.dist_mode", "Mode: Distributed GCM Grid"));
+                    statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.status.dist_mode", "Mode: Distributed GCM Grid"));
                     return;
                 }
             }
@@ -175,24 +178,24 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
         } catch (Exception e) {
             task.step(86400);
             render();
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.status.fallback", "Mode: Local Fallback (Grid Delay)"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.status.fallback", "Mode: Local Fallback (Grid Delay)"));
         }
     }
 
     private void exportToVtk(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.file.save.vtk", "Save VTK Export"), org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.file.vtk", "VTK Files"), "*.vtk");
+        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.save.vtk", "Save VTK Export"), org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.vtk", "VTK Files"), "*.vtk");
         if (file != null) {
             try {
                 new VTKWriter().save(task.getSurfaceTemperature(), file.getAbsolutePath());
-                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.success", "Export successful: {0}", file.getName())).show();
+                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.success", "Export successful: {0}", file.getName())).show();
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
             }
         }
     }
 
-    private void exportToJson(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.file.save.json", "Save JSON State"), org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
+    private void exportToJSON(Stage stage) {
+        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.save.json", "Save JSON State"), org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
                 "*.json");
         if (file != null) {
             try {
@@ -204,15 +207,15 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
                 new ClimateDataWriter().save(
                         new ClimateDataReader.ClimateState(temps, task.getHumidity()),
                         file.getAbsolutePath());
-                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.success", "Export successful: {0}", file.getName())).show();
+                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.success", "Export successful: {0}", file.getName())).show();
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
             }
         }
     }
 
-    private void loadFromJson(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.file.load.json", "Load JSON State"), org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
+    private void loadFromJSON(Stage stage) {
+        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.load.json", "Load JSON State"), org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
                 "*.json");
         if (file != null) {
             try {
@@ -220,9 +223,9 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
                         .load(file.getAbsolutePath());
                 task.updateState(state.temperature, state.humidity);
                 render();
-                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.alert.load.success", "Loaded state from: {0}", file.getName())).show();
+                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.alert.load.success", "Loaded state from: {0}", file.getName())).show();
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.alert.load.error", "Load failed: {0}", e.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.alert.load.error", "Load failed: {0}", e.getMessage())).show();
             }
         }
     }
@@ -253,7 +256,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
                 gc.fillRect(j * cellW, i * cellH, cellW, cellH);
             }
         }
-        avgTempLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.temp_format", "Global Avg Surface Temp: %.2f K"), totalTemp / (rows * cols)));
+        avgTempLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.temp_format", "Global Avg Surface Temp: %.2f K"), totalTemp / (rows * cols)));
     }
 
     private Color getColor(double tempK) {
@@ -278,16 +281,16 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.earthsciences", "Earth Sciences"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.earthsciences", "Earth Sciences"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.name", "Distributed Climate Sim App"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.name", "Distributed Climate Sim App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.desc", "Global circulation model (GCM) for planetary climate simulation using the JScience grid."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.desc", "Global circulation model (GCM) for planetary climate simulation using the JScience grid."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedclimatesimapp.longdesc", "Advanced climate modeling system that simulates atmospheric dynamics, heat transfer, and humidity across a planetary grid. It leverages distributed computing to process complex fluid dynamics equations at scale, with VTK export support for detailed scientific visualization."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.longdesc", "Advanced climate modeling system that simulates atmospheric dynamics, heat transfer, and humidity across a planetary grid. It leverages distributed computing to process complex fluid dynamics equations at scale, with VTK export support for detailed scientific visualization."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

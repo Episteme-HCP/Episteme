@@ -34,10 +34,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a document or textual passage, composed of a sequence of sentences.
  * Provides analytical utilities for word count and linguistic density.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

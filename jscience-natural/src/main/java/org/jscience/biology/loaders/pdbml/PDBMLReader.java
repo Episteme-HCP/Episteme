@@ -45,11 +45,10 @@ import java.io.*;
  *   <li>Experimental details (resolution, method)</li>
  * </ul>
  * </p>
- *
+ * * @see <a href="https://www.rcsb.org/">RCSB PDB</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://www.rcsb.org/">RCSB PDB</a>
  */
 public class PDBMLReader extends AbstractResourceReader<PDBMLStructure> {
 

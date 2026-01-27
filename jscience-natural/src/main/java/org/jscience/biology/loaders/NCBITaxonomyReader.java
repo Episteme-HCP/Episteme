@@ -50,17 +50,17 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomyreader.desc", "Detailed NCBI Taxonomy Database Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.ncbitaxonomyreader.desc", "Detailed NCBI Taxonomy Database Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomyreader.longdesc", "Connects to NCBI Taxonomy API (E-Utils) to search and retrieve full species classification trees and metadata.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.ncbitaxonomyreader.longdesc", "Connects to NCBI Taxonomy API (E-Utils) to search and retrieve full species classification trees and metadata.");
     }
 
     @Override
@@ -124,7 +124,7 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return parseXmlResponse(response.body(), taxId);
+                return parseXMLResponse(response.body(), taxId);
             }
         } catch (Exception e) {
             System.err.println("NCBI fetch failed: " + e.getMessage());
@@ -164,12 +164,12 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
         return ids;
     }
 
-    private Optional<org.jscience.biology.taxonomy.Species> parseXmlResponse(String xml, long taxId) {
+    private Optional<org.jscience.biology.taxonomy.Species> parseXMLResponse(String xml, long taxId) {
         // Simple XML parsing - extract key fields
-        String scientificName = extractXmlValue(xml, "ScientificName");
-        String rank = extractXmlValue(xml, "Rank");
-        String lineage = extractXmlValue(xml, "Lineage");
-        String division = extractXmlValue(xml, "Division");
+        String scientificName = extractXMLValue(xml, "ScientificName");
+        String rank = extractXMLValue(xml, "Rank");
+        String lineage = extractXMLValue(xml, "Lineage");
+        String division = extractXMLValue(xml, "Division");
 
         if (scientificName != null) {
             org.jscience.biology.taxonomy.Species s = new org.jscience.biology.taxonomy.Species(scientificName,
@@ -190,7 +190,7 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
         return Optional.empty();
     }
 
-    private String extractXmlValue(String xml, String tag) {
+    private String extractXMLValue(String xml, String tag) {
         String open = "<" + tag + ">";
         String close = "</" + tag + ">";
         int start = xml.indexOf(open);
@@ -227,11 +227,11 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
 
             if (root.isArray()) {
                 for (JsonNode node : root) {
-                    speciesList.add(parseSpeciesJson(node));
+                    speciesList.add(parseSpeciesJSON(node));
                 }
             } else if (root.has("species")) {
                 for (JsonNode node : root.get("species")) {
-                    speciesList.add(parseSpeciesJson(node));
+                    speciesList.add(parseSpeciesJSON(node));
                 }
             }
 
@@ -242,7 +242,7 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
         }
     }
 
-    private org.jscience.biology.taxonomy.Species parseSpeciesJson(JsonNode node) {
+    private org.jscience.biology.taxonomy.Species parseSpeciesJSON(JsonNode node) {
         String commonName = node.has("commonName") ? node.get("commonName").asText()
                 : (node.has("common_name") ? node.get("common_name").asText() : "");
 
@@ -276,6 +276,6 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomyreader.name", "NCBI Taxonomy Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.ncbitaxonomyreader.name", "NCBI Taxonomy Reader");
     }
 }

@@ -96,7 +96,7 @@ public class SpinValveApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spinvalveapp.name", "Spin Valve Simulation");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.spinvalveapp.name", "Spin Valve Simulation");
     }
 
     @Override
@@ -581,16 +581,16 @@ public class SpinValveApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spinvalveapp.desc", "Simulate Giant Magnetoresistance (GMR), Spin-Orbit Torque, and Spin Transfer Torque oscillators.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.spinvalveapp.desc", "Simulate Giant Magnetoresistance (GMR), Spin-Orbit Torque, and Spin Transfer Torque oscillators.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spinvalveapp.longdesc", "Advanced 3D spintronics simulation laboratory. Includes modules for Giant Magnetoresistance (GMR) effect, Spin-Orbit Torque (SOT), Spin Transfer Torque (STT) oscillators, and interactive magnetic field visualization.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.spinvalveapp.longdesc", "Advanced 3D spintronics simulation laboratory. Includes modules for Giant Magnetoresistance (GMR) effect, Spin-Orbit Torque (SOT), Spin Transfer Torque (STT) oscillators, and interactive magnetic field visualization.");
     }
 }

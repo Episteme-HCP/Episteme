@@ -117,7 +117,7 @@ public class CompoundInfo {
      * 
      * @return IUPAC name
      */
-    public String getIupacName() {
+    public String getIUPACName() {
         return iupacName;
     }
 

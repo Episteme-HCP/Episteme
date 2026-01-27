@@ -29,6 +29,9 @@ import java.util.Arrays;
 /**
  * Multicore CPU implementation of SPH Fluid Provider.
  * Uses Java Streams for parallelization.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MulticoreSPHFluidProvider implements SPHFluidProvider {
 

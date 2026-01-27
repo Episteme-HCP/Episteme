@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for VMD (Visual Molecular Dynamics).
  * VMD is an external application for biomolecular simulations.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class VMDMolecularBackendProvider implements BackendProvider {
 

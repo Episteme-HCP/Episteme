@@ -41,12 +41,10 @@ import java.util.List;
  * JScience {@link Taxon} objects. It supports the standard ITIS XML format
  * for scientific names, ranks, and common names.
  * </p>
- *
+ * * @see <a href="https://www.itis.gov/">ITIS.gov</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
- * @see <a href="https://www.itis.gov/">ITIS.gov</a>
  */
 public class ITISReader extends AbstractResourceReader<List<Taxon>> {
 

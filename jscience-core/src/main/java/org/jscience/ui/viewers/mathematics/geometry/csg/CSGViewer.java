@@ -27,7 +27,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.ChoiceParameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.theme.ThemeColors;
 
 import java.util.List;
@@ -62,9 +62,9 @@ public class CSGViewer extends AbstractViewer {
 
     private void setupParameters() {
         List<String> ops = List.of("Show Both", "A Union B", "A Subtract B", "A Intersect B");
-        parameters.add(new ChoiceParameter("csg.operation", I18n.getInstance().get("csg.operation", "Boolean Operation"), ops, "Show Both", this::updateCSG));
+        parameters.add(new ChoiceParameter("csg.operation", I18N.getInstance().get("csg.operation", "Boolean Operation"), ops, "Show Both", this::updateCSG));
         
-        parameters.add(new NumericParameter("csg.offset", I18n.getInstance().get("csg.offset", "Offset"), 0, 10, 0.1, 5.0, v -> {
+        parameters.add(new NumericParameter("csg.offset", I18N.getInstance().get("csg.offset", "Offset"), 0, 10, 0.1, 5.0, v -> {
             if (sphere != null) sphere.setTranslateX(v);
         }));
     }
@@ -113,9 +113,9 @@ public class CSGViewer extends AbstractViewer {
         }
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.mathematics", "Mathematics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.csgviewer.name", "CSG Viewer"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.csgviewer.desc", "CSG operations in 3D."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.csgviewer.longdesc", "Explore boolean operations on solids."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.mathematics", "Mathematics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.csgviewer.name", "CSG Viewer"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.csgviewer.desc", "CSG operations in 3D."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.csgviewer.longdesc", "Explore boolean operations on solids."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

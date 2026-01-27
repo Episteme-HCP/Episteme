@@ -25,8 +25,11 @@ package org.jscience.util.identity;
 
 /**
  * Interface for identification generators.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
-public interface IDGenerator {
+public interface IdGenerator {
     Identification generate();
     String getFormat();
 }

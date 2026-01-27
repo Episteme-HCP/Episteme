@@ -94,7 +94,7 @@ public final class PhysicalConstants {
         public static final Quantity<Entropy> BOLTZMANN_CONSTANT = BOLTZMANN_REF.toQuantity();
         public static final Real k_B = BOLTZMANN_REF.getValue();
 
-        public static final PhysicalConstant<?> AVOGADRO_REF = new PhysicalConstant<Quantity<?>>(
+        public static final PhysicalConstant<?> AVOGADRO_REF = new PhysicalConstant<>(
                         "Avogadro constant",
                         6.02214076e23,
                         Units.MOLE.inverse(),
@@ -110,7 +110,7 @@ public final class PhysicalConstants {
 
         // Gravitational constant
         // 6.674 30(15) x 10^-11
-        public static final PhysicalConstant<?> GRAVITATIONAL_REF = new PhysicalConstant<Quantity<?>>(
+        public static final PhysicalConstant<?> GRAVITATIONAL_REF = new PhysicalConstant<>(
                         "Newtonian constant of gravitation",
                         6.67430e-11,
                         (Unit<?>) Units.CUBIC_METER.divide(Units.KILOGRAM).divide(Units.SECOND.pow(2)),

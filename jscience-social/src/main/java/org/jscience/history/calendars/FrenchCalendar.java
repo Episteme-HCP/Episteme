@@ -2,9 +2,6 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * Originally based on code from Mark E. Shoulson <mark@kli.org>
- * http://web.meson.org/calendars/
- *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -38,12 +35,9 @@ package org.jscience.history.calendars;
  *   <li>12 months of 30 days + 5-6 complementary days</li>
  * </ul>
  *
- * @author Mark E. Shoulson (original implementation)
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
- * @see ModifiedFrenchCalendar
  */
 public class FrenchCalendar extends ModifiedFrenchCalendar {
 

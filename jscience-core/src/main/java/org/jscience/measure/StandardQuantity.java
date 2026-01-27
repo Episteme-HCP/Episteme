@@ -29,7 +29,8 @@ import org.jscience.mathematics.numbers.real.Real;
  * Standard implementation of {@link Quantity}.
  * 
  * @param <Q> the quantity type
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

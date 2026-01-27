@@ -44,7 +44,6 @@ import java.io.InputStream;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
  */
 public class ThermoMLReader extends AbstractResourceReader<ThermoMLDataReport> {
 

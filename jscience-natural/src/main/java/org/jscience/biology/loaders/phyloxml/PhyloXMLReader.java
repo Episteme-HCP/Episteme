@@ -48,11 +48,10 @@ import java.util.logging.Logger;
  *   <li>Confidence values (bootstrap, posterior probability)</li>
  * </ul>
  * </p>
- *
+ * * @see <a href="http://www.phyloxml.org/">PhyloXML.org</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="http://www.phyloxml.org/">PhyloXML.org</a>
  */
 public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
 

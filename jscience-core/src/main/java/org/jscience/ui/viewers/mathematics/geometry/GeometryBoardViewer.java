@@ -48,12 +48,12 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.name", "Geometry Board");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.name", "Geometry Board");
     }
 
     @Override public void play() { /* No animation */ }
@@ -93,7 +93,7 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
         this.getStyleClass().add("viewer-root");
         this.showGrid = new BooleanParameter(
             "Show Grid",
-            org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.param.showgrid", "Show Grid"), 
+            org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.param.showgrid", "Show Grid"), 
             true, 
             val -> draw());
 
@@ -104,14 +104,14 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
 
         ToggleGroup group = new ToggleGroup();
         toolbar.getChildren().addAll(
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.tool.point", "Point"), Tool.POINT, group),
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.tool.line", "Line"), Tool.LINE, group),
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.tool.circle", "Circle"), Tool.CIRCLE, group),
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.tool.triangle", "Triangle"), Tool.TRIANGLE, group),
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.tool.select", "Select"), Tool.SELECT, group),
+                createToolBtn(org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.tool.point", "Point"), Tool.POINT, group),
+                createToolBtn(org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.tool.line", "Line"), Tool.LINE, group),
+                createToolBtn(org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.tool.circle", "Circle"), Tool.CIRCLE, group),
+                createToolBtn(org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.tool.triangle", "Triangle"), Tool.TRIANGLE, group),
+                createToolBtn(org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.tool.select", "Select"), Tool.SELECT, group),
                 new Separator(),
                 new Separator(),
-                new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.button.clear", "Clear")) {
+                new Button(org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.button.clear", "Clear")) {
                     {
                         setOnAction(e -> {
                             objects.clear();
@@ -163,7 +163,7 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
         sidebar.setPrefWidth(200);
         sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.getChildren()
-                .add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.text.help", "Help: Select a tool and click/drag on the canvas.")));
+                .add(new Label(org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.text.help", "Help: Select a tool and click/drag on the canvas.")));
         setRight(sidebar);
     }
 
@@ -297,12 +297,12 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.desc", "Interactive 2D geometry board for drawing and exploring intersections.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.desc", "Interactive 2D geometry board for drawing and exploring intersections.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.longdesc", "GeoGebra-style geometry board for creating points, lines, circles, and triangles. Automatically calculates intersections and properties in a 2D coordinate system.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.geometryboardviewer.longdesc", "GeoGebra-style geometry board for creating points, lines, circles, and triangles. Automatically calculates intersections and properties in a 2D coordinate system.");
     }
 }
 

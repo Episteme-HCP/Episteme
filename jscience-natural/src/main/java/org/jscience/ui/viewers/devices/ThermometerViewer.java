@@ -157,26 +157,26 @@ public class ThermometerViewer extends AbstractDeviceViewer<TemperatureProbe> {
         }
     }
 
-    // --- Mandatory Abstract Methods (I18n) ---
+    // --- Mandatory Abstract Methods (I18N) ---
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.measure", "Measurement");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.name", "Thermometer");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.thermometer.name", "Thermometer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.desc", "A thermometer viewer for temperature display.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.thermometer.desc", "A thermometer viewer for temperature display.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.longdesc", "Classic mercury-style thermometer that visualizes temperature values with a dynamic liquid column. Features adjustable scale ranges and precise temperature readouts in Celsius and Kelvin.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.thermometer.longdesc", "Classic mercury-style thermometer that visualizes temperature values with a dynamic liquid column. Features adjustable scale ranges and precise temperature readouts in Celsius and Kelvin.");
     }
 }
 

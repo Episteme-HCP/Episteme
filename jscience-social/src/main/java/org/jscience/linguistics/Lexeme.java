@@ -36,10 +36,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a lexeme—an abstract unit of the lexicon in a language that 
  * encompasses all inflected forms of a single word. For example, the lexeme 
  * 'run' includes the forms 'run', 'runs', 'ran', and 'running'.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

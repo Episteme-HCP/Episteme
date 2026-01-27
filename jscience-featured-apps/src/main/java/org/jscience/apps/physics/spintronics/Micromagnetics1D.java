@@ -49,9 +49,10 @@ import org.jscience.mathematics.numbers.real.Real;
  *     <i>Europhys. Lett.</i>, 69(6), 990. 
  *     <a href="https://doi.org/10.1209/epl/i2004-10452-6">DOI: 10.1209/epl/i2004-10452-6</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Micromagnetics1D {
 

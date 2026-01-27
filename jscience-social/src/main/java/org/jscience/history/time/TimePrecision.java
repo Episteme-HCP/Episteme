@@ -33,7 +33,7 @@ import org.jscience.util.ExtensibleEnum;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.1
+ * @since 1.0
  */
 public class TimePrecision extends ExtensibleEnum {
 

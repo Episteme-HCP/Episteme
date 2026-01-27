@@ -59,11 +59,10 @@ import org.xml.sax.SAXException;
  * This implementation uses standard DOM parsing to remove dependencies on
  * external schemas (org.astm).
  * </p>
- *
+ * * @see <a href="https://www.astm.org/e2077-22.html">ASTM E2077 AnIML Standard</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://www.astm.org/e2077-22.html">ASTM E2077 AnIML Standard</a>
  */
 public class AnIMLReader {
     

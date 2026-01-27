@@ -35,7 +35,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18NManager;
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.FeaturedAppBase;
 import java.text.MessageFormat;
@@ -87,7 +87,7 @@ public class TitrationApp extends FeaturedAppBase {
 
         @Override
         public String toString() {
-            return I18nManager.getInstance().get(key, def);
+            return I18NManager.getInstance().get(key, def);
         }
     }
 
@@ -134,7 +134,7 @@ public class TitrationApp extends FeaturedAppBase {
 
         @Override
         public String toString() {
-            return I18nManager.getInstance().get(key, def);
+            return I18NManager.getInstance().get(key, def);
         }
     }
 
@@ -142,7 +142,7 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.titrationapp.name", "Acid-Base Titration");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.titrationapp.name", "Acid-Base Titration");
     }
 
     @Override
@@ -152,12 +152,12 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.titrationapp.desc", "Simulate titration experiments with various acids and indicators.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.titrationapp.desc", "Simulate titration experiments with various acids and indicators.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.titrationapp.longdesc", "Virtual chemistry laboratory for performing acid-base titrations. Supports monoprotic and multi-protic acids (HCl, H2SO4, H3PO4, etc.) with a range of indicators including Phenolphthalein and Methyl Orange. Features real-time pH curve plotting and laboratory equipment visualization.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.titrationapp.longdesc", "Virtual chemistry laboratory for performing acid-base titrations. Supports monoprotic and multi-protic acids (HCl, H2SO4, H3PO4, etc.) with a range of indicators including Phenolphthalein and Methyl Orange. Features real-time pH curve plotting and laboratory equipment visualization.");
     }
 
     @Override
@@ -578,6 +578,6 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 }

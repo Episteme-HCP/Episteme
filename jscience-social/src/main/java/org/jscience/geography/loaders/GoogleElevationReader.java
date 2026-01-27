@@ -34,7 +34,7 @@ import java.time.Duration;
 
 /**
  * Reader for Google Maps Elevation API.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -50,17 +50,17 @@ public class GoogleElevationReader extends AbstractResourceReader<Double> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.desc", "Google Elevation API Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.googleelevation.desc", "Google Elevation API Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.longdesc", "Retrieves elevation data from the Google Maps Elevation API.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.googleelevation.longdesc", "Retrieves elevation data from the Google Maps Elevation API.");
     }
 
     @Override
@@ -119,5 +119,5 @@ public class GoogleElevationReader extends AbstractResourceReader<Double> {
         return 0.0;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.name", "Google Elevation Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.googleelevation.name", "Google Elevation Reader"); }
 }

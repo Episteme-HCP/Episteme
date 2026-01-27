@@ -32,11 +32,6 @@ import org.jscience.measure.quantity.Length;
  * Analytical tool for calculating wind loads on architectural structures in 
  * accordance with Eurocode 1 (EN 1991-1-4). It accounts for terrain roughness, 
  * orography, turbulence, and structural coefficients.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class WindLoadCalculator {
 
@@ -44,7 +39,10 @@ public final class WindLoadCalculator {
 
     /**
      * Categories of terrain roughness for wind velocity profiles.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum TerrainCategory {
         /** Open sea or coastal area exposed to the open sea. */
         SEA_COAST(0.003, 1.0),

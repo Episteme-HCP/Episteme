@@ -30,7 +30,7 @@ import org.jscience.chemistry.ChemicalReactionParser;
 import org.jscience.chemistry.ChemicalReactionParser.Formula;
 import org.jscience.chemistry.ChemicalReactionParser.Reaction;
 import org.jscience.ui.AbstractViewer;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.StringParameter;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Chemical Reaction Viewer and Parser.
  * Refactored to be parameter-based.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -53,10 +53,10 @@ public class ChemicalReactionViewer extends AbstractViewer {
     private List<Parameter<?>> parameters = new ArrayList<>();
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.chemistry", "Chemistry"); }
+    public String getCategory() { return I18N.getInstance().get("category.chemistry", "Chemistry"); }
     
     @Override
-    public String getName() { return I18n.getInstance().get("viewer.chemicalreactionviewer.name", "Chemical Reaction Parser"); }
+    public String getName() { return I18N.getInstance().get("viewer.chemicalreactionviewer.name", "Chemical Reaction Parser"); }
 
     public ChemicalReactionViewer() {
         setupParameters();
@@ -65,8 +65,8 @@ public class ChemicalReactionViewer extends AbstractViewer {
     }
 
     private void setupParameters() {
-        parameters.add(new StringParameter(I18n.getInstance().get("chemical.label.eqn", "Equation"), 
-            I18n.getInstance().get("chemical.prompt.eqn", "Enter chemical equation"), 
+        parameters.add(new StringParameter(I18N.getInstance().get("chemical.label.eqn", "Equation"), 
+            I18N.getInstance().get("chemical.prompt.eqn", "Enter chemical equation"), 
             equation, true, v -> {
                 equation = v;
                 parseReaction();
@@ -82,7 +82,7 @@ public class ChemicalReactionViewer extends AbstractViewer {
         outputBox.setPadding(new Insets(10));
         outputBox.getStyleClass().add("viewer-sidebar");
 
-        Label outputLabel = new Label(I18n.getInstance().get("chemical.label.results", "Results"));
+        Label outputLabel = new Label(I18N.getInstance().get("chemical.label.results", "Results"));
         outputLabel.getStyleClass().add("description-label");
 
         outputArea = new TextArea();
@@ -103,12 +103,12 @@ public class ChemicalReactionViewer extends AbstractViewer {
         formulaPanel.getStyleClass().add("viewer-sidebar");
         formulaPanel.setPrefWidth(250);
 
-        Label formulaTitle = new Label(I18n.getInstance().get("chemical.label.quick", "Quick Formula"));
+        Label formulaTitle = new Label(I18N.getInstance().get("chemical.label.quick", "Quick Formula"));
         formulaTitle.getStyleClass().add("header-label");
         formulaTitle.setStyle("-fx-font-size: 14px;");
 
         TextField formulaInput = new TextField();
-        formulaInput.setPromptText(I18n.getInstance().get("chemical.prompt.formula", "e.g., Ca(OH)2"));
+        formulaInput.setPromptText(I18N.getInstance().get("chemical.prompt.formula", "e.g., Ca(OH)2"));
 
         TextArea formulaOutput = new TextArea();
         formulaOutput.setEditable(false);
@@ -116,21 +116,21 @@ public class ChemicalReactionViewer extends AbstractViewer {
         formulaOutput.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 11px;");
         formulaOutput.getStyleClass().add("description-label");
 
-        Button parseFormulaBtn = new Button(I18n.getInstance().get("chemical.btn.formula", "Parse Formula"));
+        Button parseFormulaBtn = new Button(I18N.getInstance().get("chemical.btn.formula", "Parse Formula"));
         parseFormulaBtn.setMaxWidth(Double.MAX_VALUE);
         parseFormulaBtn.setOnAction(e -> {
             try {
                 Formula f = ChemicalReactionParser.parseFormula(formulaInput.getText());
                 StringBuilder sb = new StringBuilder();
-                sb.append(I18n.getInstance().get("chemical.label.formula", "Formula: {0}", f.toString())).append("\n");
-                sb.append(I18n.getInstance().get("chemical.label.coefficient", "Coefficient: {0}", (long) f.getCoefficient())).append("\n");
-                sb.append(I18n.getInstance().get("chemical.label.elements", "Elements:")).append("\n");
+                sb.append(I18N.getInstance().get("chemical.label.formula", "Formula: {0}", f.toString())).append("\n");
+                sb.append(I18N.getInstance().get("chemical.label.coefficient", "Coefficient: {0}", (long) f.getCoefficient())).append("\n");
+                sb.append(I18N.getInstance().get("chemical.label.elements", "Elements:")).append("\n");
                 for (var entry : f.getElements().entrySet()) sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
-                if (f.getState() != null) sb.append(I18n.getInstance().get("chemical.label.state", "State: {0}", f.getState())).append("\n");
-                if (f.getCharge() != 0) sb.append(I18n.getInstance().get("chemical.label.charge", "Charge: {0}", (long) f.getCharge())).append("\n");
+                if (f.getState() != null) sb.append(I18N.getInstance().get("chemical.label.state", "State: {0}", f.getState())).append("\n");
+                if (f.getCharge() != 0) sb.append(I18N.getInstance().get("chemical.label.charge", "Charge: {0}", (long) f.getCharge())).append("\n");
                 formulaOutput.setText(sb.toString());
             } catch (Exception ex) {
-                formulaOutput.setText(I18n.getInstance().get("chemical.status.error", "Error: {0}", ex.getMessage()));
+                formulaOutput.setText(I18N.getInstance().get("chemical.status.error", "Error: {0}", ex.getMessage()));
             }
         });
 
@@ -142,7 +142,7 @@ public class ChemicalReactionViewer extends AbstractViewer {
         if (outputArea == null) return;
         String input = equation.trim();
         if (input.isEmpty()) {
-            outputArea.setText(I18n.getInstance().get("chemical.msg.enter", "Please enter a reaction equation."));
+            outputArea.setText(I18N.getInstance().get("chemical.msg.enter", "Please enter a reaction equation."));
             return;
         }
 
@@ -151,56 +151,56 @@ public class ChemicalReactionViewer extends AbstractViewer {
 
             StringBuilder sb = new StringBuilder();
             sb.append("══════════════════════════════════════\n");
-            sb.append(I18n.getInstance().get("chemical.header.parsed", "PARSED REACTION")).append("\n");
+            sb.append(I18N.getInstance().get("chemical.header.parsed", "PARSED REACTION")).append("\n");
             sb.append("══════════════════════════════════════\n\n");
-            sb.append(I18n.getInstance().get("chemical.label.formated", "Formatted: {0}", reaction.toString())).append("\n\n");
+            sb.append(I18N.getInstance().get("chemical.label.formated", "Formatted: {0}", reaction.toString())).append("\n\n");
 
-            sb.append("─── ").append(I18n.getInstance().get("chemical.header.reactants", "REACTANTS")).append(" ───\n");
+            sb.append("─── ").append(I18N.getInstance().get("chemical.header.reactants", "REACTANTS")).append(" ───\n");
             for (Formula f : reaction.getReactants()) {
                 sb.append("  ").append(formatFormula(f)).append("\n");
             }
 
-            sb.append("\n─── ").append(I18n.getInstance().get("chemical.header.products", "PRODUCTS")).append(" ───\n");
+            sb.append("\n─── ").append(I18N.getInstance().get("chemical.header.products", "PRODUCTS")).append(" ───\n");
             for (Formula f : reaction.getProducts()) {
                 sb.append("  ").append(formatFormula(f)).append("\n");
             }
 
-            sb.append("\n─── ").append(I18n.getInstance().get("chemical.header.balance", "ELEMENT BALANCE")).append(" ───\n");
+            sb.append("\n─── ").append(I18N.getInstance().get("chemical.header.balance", "ELEMENT BALANCE")).append(" ───\n");
             sb.append(reaction.getElementBalance());
 
             boolean balanced = reaction.isBalanced();
             sb.append("\n══════════════════════════════════════\n");
-            sb.append(I18n.getInstance().get("chemical.result.prefix", "RESULT: "))
-                    .append(balanced ? I18n.getInstance().get("chemical.result.balanced", "✓ BALANCED")
-                            : I18n.getInstance().get("chemical.result.unbalanced", "✗ NOT BALANCED"))
+            sb.append(I18N.getInstance().get("chemical.result.prefix", "RESULT: "))
+                    .append(balanced ? I18N.getInstance().get("chemical.result.balanced", "✓ BALANCED")
+                            : I18N.getInstance().get("chemical.result.unbalanced", "✗ NOT BALANCED"))
                     .append("\n");
             sb.append("══════════════════════════════════════\n");
 
             outputArea.setText(sb.toString());
 
             if (balanced) {
-                statusLabel.setText(I18n.getInstance().get("chemical.status.balanced", "Balanced"));
+                statusLabel.setText(I18N.getInstance().get("chemical.status.balanced", "Balanced"));
             } else {
-                statusLabel.setText(I18n.getInstance().get("chemical.status.unbalanced", "Unbalanced"));
+                statusLabel.setText(I18N.getInstance().get("chemical.status.unbalanced", "Unbalanced"));
             }
 
         } catch (Exception e) {
-            outputArea.setText(I18n.getInstance().get("chemical.error.parse", "Error parsing equation:\n{0}", e.getMessage()));
-            statusLabel.setText(I18n.getInstance().get("chemical.status.error", "Error"));
+            outputArea.setText(I18N.getInstance().get("chemical.error.parse", "Error parsing equation:\n{0}", e.getMessage()));
+            statusLabel.setText(I18N.getInstance().get("chemical.status.error", "Error"));
         }
     }
 
     private String formatFormula(Formula f) {
         StringBuilder sb = new StringBuilder();
         sb.append(f.toString());
-        sb.append(I18n.getInstance().get("chemical.out.elements", " \u2192 Elements: "));
+        sb.append(I18N.getInstance().get("chemical.out.elements", " \u2192 Elements: "));
         for (var e : f.getTotalElements().entrySet()) {
             sb.append(e.getKey()).append("=").append(e.getValue()).append(" ");
         }
         return sb.toString();
     }
 
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.chemicalreactionviewer.desc", "Parse and analyze chemical equations."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.chemicalreactionviewer.longdesc", "Advanced chemical equation analyzer."); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.chemicalreactionviewer.desc", "Parse and analyze chemical equations."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.chemicalreactionviewer.longdesc", "Advanced chemical equation analyzer."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

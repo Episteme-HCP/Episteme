@@ -38,7 +38,7 @@ import org.jscience.mathematics.linearalgebra.matrices.storage.DenseMatrixStorag
 import org.jscience.mathematics.linearalgebra.vectors.GenericVector;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

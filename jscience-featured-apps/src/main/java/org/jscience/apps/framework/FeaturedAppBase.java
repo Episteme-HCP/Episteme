@@ -23,7 +23,7 @@
 
 package org.jscience.apps.framework;
 
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18NManager;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -66,7 +66,7 @@ public abstract class FeaturedAppBase extends Application implements App {
     protected Label statusLabel;
     protected ProgressBar progressBar;
 
-    protected I18nManager i18n = I18nManager.getInstance();
+    protected I18NManager i18n = I18NManager.getInstance();
     protected Preferences prefs;
     protected File currentFile;
     protected boolean isDirty = false;
@@ -78,7 +78,7 @@ public abstract class FeaturedAppBase extends Application implements App {
 
     protected FeaturedAppBase() {
         // Register bundle in constructor so getName() / getCategory() work for launchers
-        I18nManager.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
+        I18NManager.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
     }
 
     @Override
@@ -124,7 +124,7 @@ public abstract class FeaturedAppBase extends Application implements App {
         onAppReady();
 
         // Listen for locale changes
-        I18nManager.getInstance().addListener(this::handleLocaleChange);
+        I18NManager.getInstance().addListener(this::handleLocaleChange);
     }
 
     private void handleLocaleChange(java.util.Locale locale) {
@@ -175,23 +175,23 @@ public abstract class FeaturedAppBase extends Application implements App {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.featured_apps", "Featured Apps");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.featured_apps", "Featured Apps");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("app." + getClass().getSimpleName().toLowerCase() + ".name", getAppTitle().replace(" - JScience", ""));
+        return org.jscience.ui.i18n.I18N.getInstance().get("app." + getClass().getSimpleName().toLowerCase() + ".name", getAppTitle().replace(" - JScience", ""));
     }
 
     @Override
     public String getDescription() {
         // Standardized key based on class name, e.g., "CrystalStructureApp.desc"
-        return org.jscience.ui.i18n.I18n.getInstance().get(getClass().getSimpleName() + ".desc", "Featured Scientific Application");
+        return org.jscience.ui.i18n.I18N.getInstance().get(getClass().getSimpleName() + ".desc", "Featured Scientific Application");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get(getClass().getSimpleName() + ".longdesc", "A comprehensive scientific simulation and visualization application part of the JScience suite.");
+        return org.jscience.ui.i18n.I18N.getInstance().get(getClass().getSimpleName() + ".longdesc", "A comprehensive scientific simulation and visualization application part of the JScience suite.");
     }
 
     @Override

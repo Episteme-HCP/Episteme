@@ -25,7 +25,7 @@ package org.jscience.bibliography.loaders;
 
 import org.jscience.io.cache.ResourceCache;
 import org.jscience.io.AbstractResourceReader;
-import org.jscience.util.SimpleJson;
+import org.jscience.util.SimpleJSON;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -45,7 +45,6 @@ import java.util.Optional;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
  */
 public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
 
@@ -72,7 +71,7 @@ public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
             }
         }
 
-        return parseCitationJson(json, doi);
+        return parseCitationJSON(json, doi);
     }
 
     private static String fetchUrl(String urlStr) throws Exception {
@@ -96,9 +95,9 @@ public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
     }
 
     @SuppressWarnings("unchecked")
-    private static CitationInfo parseCitationJson(String json, String doi) {
+    private static CitationInfo parseCitationJSON(String json, String doi) {
         try {
-            Map<String, Object> root = (Map<String, Object>) SimpleJson.parse(json);
+            Map<String, Object> root = (Map<String, Object>) SimpleJSON.parse(json);
             Map<String, Object> message = (Map<String, Object>) root.get("message");
             if (message == null) return null;
 

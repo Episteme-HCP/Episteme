@@ -29,7 +29,8 @@ import org.jscience.mathematics.context.MathContext;
 /**
  * Natural number backed by a 64-bit {@code long}.
  * Package-private implementation detail - users work with {@link Natural}.
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

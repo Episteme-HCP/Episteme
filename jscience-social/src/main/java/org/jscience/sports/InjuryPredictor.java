@@ -31,17 +31,16 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Provides injury risk prediction and training load analysis for athletes.
  * Includes implementations for Acute:Chronic Workload Ratio (ACWR).
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class InjuryPredictor {
 
     private InjuryPredictor() {}
 
-    /** Categories of common athletic injuries. */
+    /** Categories of common athletic injuries.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum InjuryType {
         MUSCLE_STRAIN, LIGAMENT_SPRAIN, STRESS_FRACTURE, 
         TENDINITIS, CONCUSSION, OVERUSE

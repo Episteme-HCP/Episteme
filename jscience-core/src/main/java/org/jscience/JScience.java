@@ -511,9 +511,9 @@ public final class JScience {
         StringBuilder sb = new StringBuilder();
         String line = "================================================================================\n";
         
-        // Use I18n for the main title as before
+        // Use I18N for the main title as before
         sb.append(line);
-        sb.append("   " + org.jscience.ui.i18n.I18n.getInstance().get("report.title", "JScience Configuration Report") + "\n");
+        sb.append("   " + org.jscience.ui.i18n.I18N.getInstance().get("report.title", "JScience Configuration Report") + "\n");
         sb.append(line);
 
         // 1. SYSTEM INFO
@@ -757,7 +757,7 @@ public final class JScience {
                 ComputeMode mode = ComputeMode.valueOf(modeProp.toUpperCase());
                 setComputeMode(mode);
             } catch (IllegalArgumentException e) {
-                System.err.println(org.jscience.ui.i18n.I18n.getInstance().get("cli.invalid_mode", "Invalid compute mode") + ": " + modeProp);
+                System.err.println(org.jscience.ui.i18n.I18N.getInstance().get("cli.invalid_mode", "Invalid compute mode") + ": " + modeProp);
             }
         }
 
@@ -777,11 +777,11 @@ public final class JScience {
 
         // Launch Master Control
         try {
-            System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("cli.launching", "Launching JScience Master Control..."));
+            System.out.println(org.jscience.ui.i18n.I18N.getInstance().get("cli.launching", "Launching JScience Master Control..."));
             javafx.application.Application.launch(org.jscience.ui.JScienceMasterControl.class, args);
             return;
         } catch (Throwable e) {
-            System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("cli.launch_error", "JScience Master Control not available or JavaFX missing. Showing CLI report.") + " " + e.getMessage());
+            System.out.println(org.jscience.ui.i18n.I18N.getInstance().get("cli.launch_error", "JScience Master Control not available or JavaFX missing. Showing CLI report.") + " " + e.getMessage());
         }
 
         System.out.println(getConfigurationReport());

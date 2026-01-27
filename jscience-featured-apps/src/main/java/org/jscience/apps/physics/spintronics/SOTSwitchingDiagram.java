@@ -29,6 +29,9 @@ import javafx.scene.chart.XYChart;
 /**
  * SOT Switching Phase Diagram calculator.
  * Determines the critical current and field combinations for magnetization reversal.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SOTSwitchingDiagram {
 

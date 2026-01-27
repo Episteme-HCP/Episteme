@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractSimulationDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.physics.astronomy.StarSystemViewer;
 
 /**
  * Star System Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -41,10 +41,10 @@ public class StarSystemDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("starsystem.title", "Star System 3D"); }
+    public String getName() { return I18N.getInstance().get("starsystem.title", "Star System 3D"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("starsystem.desc", "3D Solar System Visualization"); }
+    public String getDescription() { return I18N.getInstance().get("starsystem.desc", "3D Solar System Visualization"); }
 
     @Override
     public String getLongDescription() {

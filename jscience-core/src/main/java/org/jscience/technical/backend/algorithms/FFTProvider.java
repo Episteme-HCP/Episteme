@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Interface for Fast Fourier Transform providers.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

@@ -49,6 +49,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Wave Equation Solver with Distributed support.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedWaveSimApp extends Application implements org.jscience.ui.App {
 
@@ -71,7 +74,7 @@ public class DistributedWaveSimApp extends Application implements org.jscience.u
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.title", "🌊 Wave Equation - Distributed JScience"));
+        stage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.title", "🌊 Wave Equation - Distributed JScience"));
 
         canvas = new Canvas(WIDTH * SCALE, HEIGHT * SCALE);
         gc = canvas.getGraphicsContext2D();
@@ -82,7 +85,7 @@ public class DistributedWaveSimApp extends Application implements org.jscience.u
         controls.getStyleClass().add("viewer-sidebar");
         controls.setPrefWidth(250);
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.header", "Wave Equation"));
+        Label title = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.header", "Wave Equation"));
         title.getStyleClass().add("header-label-white");
 
         Slider speedSlider = new Slider(0.1, 0.9, 0.5);
@@ -93,24 +96,24 @@ public class DistributedWaveSimApp extends Application implements org.jscience.u
         dampSlider.getStyleClass().add("slider-custom");
         dampSlider.valueProperty().addListener((obs, old, val) -> task.setDamping(val.doubleValue()));
 
-        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.status.connected", "Status: Connected to Grid"));
+        statusLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.status.connected", "Status: Connected to Grid"));
         statusLabel.getStyleClass().add("label-muted");
 
-        CheckBox distCheck = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.chk.dist", "Distributed Mode"));
+        CheckBox distCheck = new CheckBox(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.chk.dist", "Distributed Mode"));
         distCheck.setSelected(true);
         distCheck.getStyleClass().add("check-box-custom");
         distCheck.setOnAction(e -> distributed = distCheck.isSelected());
 
-        Button startBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.btn.start", "▶ Start"));
+        Button startBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.btn.start", "▶ Start"));
         startBtn.getStyleClass().add("accent-button-green");
         startBtn.setPrefWidth(220);
         startBtn.setOnAction(e -> {
             running = !running;
-            startBtn.setText(running ? org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.btn.pause", "⏸ Pause") : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.btn.resume", "▶ Resume"));
+            startBtn.setText(running ? org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.btn.pause", "⏸ Pause") : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.btn.resume", "▶ Resume"));
             startBtn.getStyleClass().setAll("button", running ? "accent-button-red" : "accent-button-green");
         });
 
-        controls.getChildren().addAll(title, new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.lbl.speed", "Speed:")), speedSlider, new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.lbl.damping", "Damping:")), dampSlider,
+        controls.getChildren().addAll(title, new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.lbl.speed", "Speed:")), speedSlider, new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.lbl.damping", "Damping:")), dampSlider,
                 new Separator(), distCheck, statusLabel, startBtn);
 
         canvas.setOnMouseClicked(e -> createDrop((int) (e.getX() / SCALE), (int) (e.getY() / SCALE), 15));
@@ -151,7 +154,7 @@ public class DistributedWaveSimApp extends Application implements org.jscience.u
                     runDistributedStep();
                 else {
                     task.step();
-                    statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.status.local", "Status: Local Performance"));
+                    statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.status.local", "Status: Local Performance"));
                     render();
                 }
             }
@@ -175,7 +178,7 @@ public class DistributedWaveSimApp extends Application implements org.jscience.u
                             .next();
                     if (result.getStatus() == Status.COMPLETED) {
                         applyWave(result.getSerializedData().toByteArray());
-                        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.status.dist", "Status: Grid Computed ✅"));
+                        statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.status.dist", "Status: Grid Computed ✅"));
                         render();
                         return;
                     }
@@ -184,11 +187,11 @@ public class DistributedWaveSimApp extends Application implements org.jscience.u
             }
             task.step();
             render();
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.status.queued", "Status: Grid Queued ⏳"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.status.queued", "Status: Grid Queued ⏳"));
         } catch (Exception e) {
             task.step();
             render();
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.status.offline", "Status: Grid Offline ❌"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.status.offline", "Status: Grid Offline ❌"));
         }
     }
 
@@ -262,16 +265,16 @@ public class DistributedWaveSimApp extends Application implements org.jscience.u
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.physics", "Physics"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.name", "Distributed Wave Sim App"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.name", "Distributed Wave Sim App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.desc", "Distributed 2D wave equation solver for physics simulations."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.desc", "Distributed 2D wave equation solver for physics simulations."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedwavesimapp.longdesc", "Simulate wave propagation in 2D media. This application uses the JScience computing cluster to parallelize the numerical integration of the wave equation, allowing for real-time high-resolution simulations and complex boundary condition analysis."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwavesimapp.longdesc", "Simulate wave propagation in 2D media. This application uses the JScience computing cluster to parallelize the numerical integration of the wave equation, allowing for real-time high-resolution simulations and complex boundary condition analysis."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

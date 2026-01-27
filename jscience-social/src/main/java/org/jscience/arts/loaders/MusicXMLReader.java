@@ -40,7 +40,6 @@ import org.w3c.dom.*;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
  */
 public class MusicXMLReader extends CompositionLoader {
 

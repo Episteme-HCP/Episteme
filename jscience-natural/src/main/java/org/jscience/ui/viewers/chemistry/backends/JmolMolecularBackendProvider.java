@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for Jmol molecular renderer.
  * Available only when Jmol library is on the classpath.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JmolMolecularBackendProvider implements BackendProvider {
 

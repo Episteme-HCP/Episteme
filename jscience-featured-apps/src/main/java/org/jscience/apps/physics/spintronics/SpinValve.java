@@ -27,6 +27,9 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a high-precision Spin Valve structure.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SpinValve {
     private final FerromagneticLayer pinnedLayer;

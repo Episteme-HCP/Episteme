@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -62,7 +62,7 @@ public class GaltonBoardDemo extends AbstractSimulationDemo {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galtonboarddemo.desc", "A demonstration of the Galton Board.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.galtonboarddemo.desc", "A demonstration of the Galton Board.");
     }
 
     @Override
@@ -209,7 +209,7 @@ public class GaltonBoardDemo extends AbstractSimulationDemo {
         }
     
         
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galtonboarddemo.desc"); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("viewer.galtonboarddemo.desc"); }
     @Override public String getLongDescription() { return getDescription(); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

@@ -34,11 +34,6 @@ import java.util.Optional;
  * Analytical engine designed to evaluate artworks against historical technical standards.
  * It can detect anachronisms and verify if techniques used in an artwork were 
  * available during its purported production period.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class ArtCritiqueEngine {
 
@@ -46,7 +41,10 @@ public final class ArtCritiqueEngine {
 
     /**
      * Categories of technical analysis for artworks.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum TechniqueCategory {
         PIGMENTS, PERSPECTIVE, COMPOSITION, BRUSHWORK, MEDIUM, SUBJECT_MATTER
     }

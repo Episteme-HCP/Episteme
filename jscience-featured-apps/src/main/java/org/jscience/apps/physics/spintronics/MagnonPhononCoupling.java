@@ -54,7 +54,7 @@ import java.util.List;
  *   <li><b>An, K. et al.</b> (2020). "Coherent long-range transfer of angular momentum".
  *       <i>Physical Review B</i>, 101(6), 060407.</li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

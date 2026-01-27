@@ -51,17 +51,17 @@ public class HorizonsEphemerisReader extends AbstractResourceReader<List<Horizon
 
 
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.horizonsephemerisreader.desc", "JPL Horizons Ephemeris Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.horizonsephemerisreader.desc", "JPL Horizons Ephemeris Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.horizonsephemerisreader.longdesc", "Loads ephemerides from JPL Horizons system (Text format), supporting Cartesian coordinates.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.horizonsephemerisreader.longdesc", "Loads ephemerides from JPL Horizons system (Text format), supporting Cartesian coordinates.");
     }
 
     @Override
@@ -182,6 +182,6 @@ public class HorizonsEphemerisReader extends AbstractResourceReader<List<Horizon
         return points;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.horizonsephemerisreader.name", "Horizons Ephemeris Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.horizonsephemerisreader.name", "Horizons Ephemeris Reader"); }
 }
 

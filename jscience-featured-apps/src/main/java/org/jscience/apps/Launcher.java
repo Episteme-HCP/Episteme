@@ -42,9 +42,9 @@ public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Register the apps bundle to ensure launcher strings are found
-        org.jscience.ui.i18n.I18n.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
+        org.jscience.ui.i18n.I18N.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
         
-        String title = org.jscience.ui.i18n.I18n.getInstance().get("app.launcher.name", "JScience Featured Apps");
+        String title = org.jscience.ui.i18n.I18N.getInstance().get("app.launcher.name", "JScience Featured Apps");
         Label label = new Label(title);
         label.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 24px; -fx-font-weight: bold;
 

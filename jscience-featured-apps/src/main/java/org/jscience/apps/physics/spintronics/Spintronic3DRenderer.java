@@ -37,6 +37,9 @@ import org.jscience.apps.framework.JScienceTheme;
 
 /**
  * 3D Renderer for Spintronics structures using JavaFX 3D.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Spintronic3DRenderer {
 

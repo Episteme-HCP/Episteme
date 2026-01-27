@@ -28,7 +28,8 @@ import java.math.BigDecimal;
 /**
  * Real number backed by a 32-bit {@code float}.
  * Package-private implementation detail.
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -34,6 +34,9 @@ import javafx.scene.transform.Translate;
 
 /**
  * Manages 3D camera navigation: Orbit, Zoom, Pan, and Framing.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @SuppressWarnings("unused")
 public class CameraController {

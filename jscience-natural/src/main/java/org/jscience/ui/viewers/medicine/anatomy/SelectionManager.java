@@ -33,6 +33,9 @@ import java.util.Map;
 
 /**
  * Manages selection, highlighting, and isolation of 3D anatomical parts.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SelectionManager {
 

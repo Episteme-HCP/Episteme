@@ -30,6 +30,9 @@ import org.jscience.distributed.TaskRegistry;
 
 /**
  * Wave Equation Simulation Task.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
 

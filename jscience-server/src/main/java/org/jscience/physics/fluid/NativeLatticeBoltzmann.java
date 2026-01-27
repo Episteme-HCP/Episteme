@@ -27,6 +27,9 @@ package org.jscience.physics.fluid;
  * Native (double-based) implementation of Lattice Boltzmann Method for
  * Server/Worker usage.
  * Supports CPU and OpenCL (GPU) execution.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class NativeLatticeBoltzmann {
 

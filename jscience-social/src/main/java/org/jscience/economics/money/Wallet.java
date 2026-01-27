@@ -25,6 +25,7 @@ package org.jscience.economics.money;
 
 import org.jscience.economics.Bank;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.UnavailableDataException;
 import org.jscience.util.persistence.Persistent;
 
 import java.io.Serializable;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a wallet for storing money.
@@ -93,8 +95,9 @@ public final class Wallet implements Serializable {
      * @param bank           the bank for currency conversion
      * @param resultCurrency the target currency
      * @return the total value
+     * @throws UnavailableDataException if exchange rate data cannot be retrieved
      */
-    public Money getValue(Bank bank, Currency resultCurrency) {
+    public Money getValue(Bank bank, Currency resultCurrency) throws UnavailableDataException {
         Objects.requireNonNull(bank, "Bank cannot be null");
         Objects.requireNonNull(resultCurrency, "Result currency cannot be null");
         
@@ -103,8 +106,9 @@ public final class Wallet implements Serializable {
             if (amount.getCurrency().equals(resultCurrency)) {
                 result = result.add(amount);
             } else {
-                // In a full implementation, this uses bank.getExchangeRate()
-                result = result.add(amount); 
+                Real rate = bank.getExchangeRate(amount.getCurrency(), resultCurrency);
+                Real convertedValue = amount.getValue().multiply(rate);
+                result = result.add(Money.valueOf(convertedValue, resultCurrency));
             }
         }
         return result;
@@ -125,7 +129,7 @@ public final class Wallet implements Serializable {
      * Returns all currencies in the wallet.
      * @return set of currencies
      */
-    public java.util.Set<Currency> getCurrencies() {
+    public Set<Currency> getCurrencies() {
         return Collections.unmodifiableSet(balances.keySet());
     }
 

@@ -27,7 +27,7 @@ import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.geometry.GeometryBoardViewer;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -36,17 +36,17 @@ public class GeometryBoardDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.name");
+        return org.jscience.ui.i18n.I18N.getInstance().get("demo.geometryboarddemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.desc");
+        return org.jscience.ui.i18n.I18N.getInstance().get("demo.geometryboarddemo.desc");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class GeometryBoardDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.longdesc");
+         return org.jscience.ui.i18n.I18N.getInstance().get("demo.geometryboarddemo.longdesc");
     }
 }
 

@@ -77,7 +77,7 @@ Matrix<CudaFloat> gpu = Matrix.create(data, new CudaScalar());
 
 ## Module Structure
 
-```
+```text
 jscience/
 ├── jscience-core/          # Mathematics, I/O, common utilities
 │   ├── mathematics/        # Linear algebra, calculus, statistics
@@ -105,7 +105,7 @@ jscience/
 **59 interactive scientific demonstrations** across 4 modules:
 
 | Module | Demos | Examples |
-|--------|-------|----------|
+| --- | --- | --- |
 | jscience-core | 4 | Matrix Viewer, Function Plotter, 3D Surfaces |
 | jscience-natural | 34 | Mandelbrot, Game of Life, Stellar Sky, Pendulum |
 | jscience-social | 11 | GIS Maps, Voting Systems, GDP Models |
@@ -126,7 +126,7 @@ run_demos.bat
 External data sources with built-in caching (TTL: 24h):
 
 | Module | Loaders |
-|--------|---------|
+| --- | --- |
 | Astronomy | `NasaExoplanets`, `SimbadLoader`, `SimbadCatalog` |
 | Biology | `GbifTaxonomy`, `GenBank`, `NcbiTaxonomy` |
 | Chemistry | `PubChem` |
@@ -157,15 +157,13 @@ mvn test -Dtestfx.headless=true -Dprism.order=sw -Djava.awt.headless=true
 Full support for English, French, Spanish, and German:
 
 | Module | EN | FR |
-|--------|----|----|
+| --- | --- | --- |
 | jscience-core | ✅ | ✅ |
 | jscience-natural | ✅ | ✅ |
 | jscience-social | ✅ | ✅ |
 | jscience-killer-apps | ✅ | ✅ |
 
 Switch language via `Preferences > Language` menu.
-
-
 
 ## Architecture
 

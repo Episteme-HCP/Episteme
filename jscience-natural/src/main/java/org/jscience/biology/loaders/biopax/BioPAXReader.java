@@ -45,11 +45,10 @@ import java.io.*;
  *   <li>Cross-references to external databases</li>
  * </ul>
  * </p>
- *
+ * * @see <a href="http://www.biopax.org/">BioPAX.org</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="http://www.biopax.org/">BioPAX.org</a>
  */
 public class BioPAXReader extends AbstractResourceReader<BioPAXModel> {
 

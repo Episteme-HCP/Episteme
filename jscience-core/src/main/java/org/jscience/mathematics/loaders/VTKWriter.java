@@ -30,6 +30,9 @@ import java.io.IOException;
 
 /**
  * Writer for VTK (Visualization Toolkit) Structured Points files.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class VTKWriter extends AbstractResourceWriter<double[][]> {
     

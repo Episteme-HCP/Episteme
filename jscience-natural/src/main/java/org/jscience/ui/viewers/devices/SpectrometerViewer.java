@@ -66,25 +66,25 @@ public class SpectrometerViewer extends AbstractDeviceViewer<Spectrometer> {
         // dynamic update
     }
 
-    // --- Mandatory Abstract Methods (I18n) ---
+    // --- Mandatory Abstract Methods (I18N) ---
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.name", "Spectrometer");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.spectrometer.name", "Spectrometer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.desc", "A spectrometer viewer for spectral analysis.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.spectrometer.desc", "A spectrometer viewer for spectral analysis.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.longdesc", "Captures and analyzes light spectra to identify chemical compositions and physical properties. features a high-resolution spectral chart with automatic peak detection and reference library comparison.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.spectrometer.longdesc", "Captures and analyzes light spectra to identify chemical compositions and physical properties. features a high-resolution spectral chart with automatic peak detection and reference library comparison.");
     }
 }

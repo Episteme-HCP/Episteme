@@ -39,6 +39,9 @@ import java.util.function.BinaryOperator;
  * - Sum, Count, Average aggregations
  * - Custom reducers
  * - Grouped aggregations
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ResultAggregator<K, V> {
 

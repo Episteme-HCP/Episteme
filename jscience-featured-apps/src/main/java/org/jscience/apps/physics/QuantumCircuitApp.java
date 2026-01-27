@@ -25,12 +25,15 @@ package org.jscience.apps.physics;
 
 import javafx.scene.layout.Region;
 import org.jscience.apps.framework.FeaturedAppBase;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.physics.quantum.QuantumCircuitViewer;
 
 /**
  * Featured Application for Quantum Circuit Design.
  * Wraps the QuantumCircuitViewer.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class QuantumCircuitApp extends FeaturedAppBase {
 
@@ -38,7 +41,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return I18n.getInstance().get("viewer.quantumcircuitapp.name", "Quantum Circuit Designer");
+        return I18N.getInstance().get("viewer.quantumcircuitapp.name", "Quantum Circuit Designer");
     }
 
     @Override
@@ -48,12 +51,12 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("viewer.quantumcircuitapp.desc", "Design and simulate basic quantum circuits.");
+        return I18N.getInstance().get("viewer.quantumcircuitapp.desc", "Design and simulate basic quantum circuits.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("viewer.quantumcircuitapp.longdesc", "Interactive quantum circuit designer for exploring fundamental quantum computing concepts.");
+        return I18N.getInstance().get("viewer.quantumcircuitapp.longdesc", "Interactive quantum circuit designer for exploring fundamental quantum computing concepts.");
     }
 
     @Override
@@ -86,7 +89,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
     
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.physics", "Physics");
+        return I18N.getInstance().get("category.physics", "Physics");
     }
 
     public static void main(String[] args) {

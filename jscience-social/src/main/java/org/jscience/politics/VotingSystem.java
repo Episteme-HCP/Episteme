@@ -31,10 +31,9 @@ import java.util.Map;
 /**
  * Defines various voting systems and methods for determining winners in an election.
  * Refactored to use the extensible {@link VotingMethod} registry.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class VotingSystem {
@@ -157,10 +156,11 @@ public class VotingSystem {
             winners.add(ElectoralSimulations.resolveApproval(ballots));
         } else if (method == VotingMethod.PROPORTIONAL || method == VotingMethod.DHONDT || method == VotingMethod.SAINTE_LAGUE
                 || method == VotingMethod.MODIFIED_SAINTE_LAGUE || method == VotingMethod.LARGEST_REMAINDER_HARE
-                || method == VotingMethod.LARGEST_REMAINDER_DROOP || method == VotingMethod.SNTV || method == VotingMethod.CUMULATIVE) {
+                || method == VotingMethod.LARGEST_REMAINDER_DROOP || method == VotingMethod.SNTV || method == VotingMethod.CUMULATIVE
+                || method == VotingMethod.HUNTINGTON_HILL) {
             return determineWinners(aggregateFirstPreferences(ballots), method, seatsAvailable);
         } else {
-            throw new UnsupportedOperationException("Voting method not supported with ballots: " + method);
+            throw new IllegalArgumentException("Voting method not supported with ballots: " + method);
         }
         return winners;
     }
@@ -183,7 +183,7 @@ public class VotingSystem {
         } else if (method == VotingMethod.MAJORITY_JUDGMENT) {
             winners.add(ElectoralSimulations.resolveMajorityJudgment(data));
         } else {
-            throw new UnsupportedOperationException("Method " + method + " not supported with cardinal data.");
+            throw new IllegalArgumentException("Method " + method + " not supported with cardinal data.");
         }
         return winners;
     }

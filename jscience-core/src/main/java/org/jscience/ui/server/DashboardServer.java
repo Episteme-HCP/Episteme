@@ -50,7 +50,7 @@ public class DashboardServer {
         setupRoutes();
 
         app.start(port);
-        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("server.running.msg", port));
+        System.out.println(org.jscience.ui.i18n.I18N.getInstance().get("server.running.msg", port));
     }
 
     private void setupRoutes() {

@@ -29,7 +29,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.AbstractDeviceViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,7 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
             maxRPM = device.getMaxRPM().doubleValue();
         } catch (Exception e) {}
 
-        parameters.add(new NumericParameter("centrifuge.rpm", I18n.getInstance().get("centrifuge.rpm", "Target RPM"), 0, maxRPM, 10, 0, v -> {
+        parameters.add(new NumericParameter("centrifuge.rpm", I18N.getInstance().get("centrifuge.rpm", "Target RPM"), 0, maxRPM, 10, 0, v -> {
             device.start(Real.of(v));
             rpmLabel.setText(String.format("%.0f RPM", v));
         }));
@@ -72,10 +72,10 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
     public void update() {
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.measure", "Measurement"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.centrifuge.name", "Centrifuge"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.centrifuge.desc", "A centrifuge viewer."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.centrifuge.longdesc", "Monitors and controls laboratory centrifuges."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.measure", "Measurement"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.centrifuge.name", "Centrifuge"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.centrifuge.desc", "A centrifuge viewer."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.centrifuge.longdesc", "Monitors and controls laboratory centrifuges."); }
     
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

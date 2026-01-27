@@ -19,12 +19,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- 
- * <p>
- * <b>Reference:</b><br>
- * Zeigler, B. P., Praehofer, H., & Kim, T. G. (2000). <i>Theory of Modeling and Simulation</i>. Academic Press.
- * </p>
- *
  */
 
 package org.jscience.social;
@@ -49,14 +43,14 @@ public class SimulationEnginesTest {
         Economy eco = Economy.usa();
         MacroModel model = new MacroModel(eco);
 
-        double initialGdp = eco.getGdp().getAmount().doubleValue();
+        double initialGDP = eco.getGDP().getAmount().doubleValue();
         model.simulateYear();
 
         assertTrue(eco.getInflationRate().doubleValue() >= 0);
         assertTrue(eco.getUnemploymentRate().doubleValue() >= 0);
 
         double prediction = model.predictGDP(10, Real.of(0.03)).getAmount().doubleValue();
-        assertTrue(prediction > initialGdp);
+        assertTrue(prediction > initialGDP);
     }
 
     @Test

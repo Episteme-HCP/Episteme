@@ -26,6 +26,9 @@ package org.jscience.io;
 /**
  * Interface for components that read/load resources.
  * Replaces InputLoader.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface ResourceReader<T> extends ResourceIO<T> {
 

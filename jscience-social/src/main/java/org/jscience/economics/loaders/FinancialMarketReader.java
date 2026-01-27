@@ -26,7 +26,7 @@ package org.jscience.economics.loaders;
 import org.jscience.economics.money.Money;
 import org.jscience.history.time.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.io.AbstractResourceReader;
 
 import java.io.BufferedReader;
@@ -37,6 +37,9 @@ import java.util.List;
 
 /**
  * Reads financial market data from various formats.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class FinancialMarketReader extends AbstractResourceReader<List<FinancialMarketReader.Candle>> {
 
@@ -92,22 +95,22 @@ public class FinancialMarketReader extends AbstractResourceReader<List<Financial
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.financial.name", "Financial Market Reader");
+        return I18N.getInstance().get("reader.financial.name", "Financial Market Reader");
     }
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.economics", "Economics");
+        return I18N.getInstance().get("category.economics", "Economics");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.financial.desc", "Financial Market Data Reader.");
+        return I18N.getInstance().get("reader.financial.desc", "Financial Market Data Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.financial.longdesc", "Parses financial market data candlesticks (Open, High, Low, Close, Volume) from CSV sources.");
+        return I18N.getInstance().get("reader.financial.longdesc", "Parses financial market data candlesticks (Open, High, Low, Close, Volume) from CSV sources.");
     }
 
     @Override

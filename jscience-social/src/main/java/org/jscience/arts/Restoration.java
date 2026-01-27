@@ -31,10 +31,9 @@ import org.jscience.history.time.TimeCoordinate;
  * Represents a restoration event or conservation treatment performed on an artwork.
  * Tracks the technical process, the restorer's identity, and the outcome of the 
  * intervention.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class Restoration implements Serializable {

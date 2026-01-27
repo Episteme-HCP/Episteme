@@ -36,11 +36,6 @@ import org.jscience.mathematics.numbers.real.Real;
  * Analytical tool for tracing and evaluating structural load paths within a building.
  * It simulates how forces travel from points of application through beams, 
  * columns, and slabs down to the foundation.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class StructuralLoadPath {
 
@@ -48,7 +43,10 @@ public final class StructuralLoadPath {
 
     /**
      * Common types of structural building members.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum MemberType {
         BEAM, COLUMN, SLAB, WALL, FOUNDATION, TRUSS, BRACE
     }

@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.circuit.ResistorColorCodeViewer;
 
 /**
@@ -38,7 +38,7 @@ import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.circuit.
 public class ResistorColorCodeDemo extends AbstractDemo {
 
     @Override
-    public String getName() { return I18n.getInstance().get("resistor.title", "Resistor Color Code"); }
+    public String getName() { return I18N.getInstance().get("resistor.title", "Resistor Color Code"); }
 
     @Override
     public String getCategory() { return "Physics"; }
@@ -50,7 +50,7 @@ public class ResistorColorCodeDemo extends AbstractDemo {
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("ResistorColorCodeDemo.desc", "ResistorColorCodeDemo description");
+        return I18N.getInstance().get("ResistorColorCodeDemo.desc", "ResistorColorCodeDemo description");
     }
 
     @Override

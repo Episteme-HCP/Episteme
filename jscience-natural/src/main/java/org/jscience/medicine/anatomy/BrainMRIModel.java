@@ -28,6 +28,9 @@ import org.jscience.mathematics.geometry.volume.VoxelModel;
 
 /**
  * A mock MRI model for brain anatomy visualization.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class BrainMRIModel implements VoxelModel {
     private final int w=64, h=64, d=64;

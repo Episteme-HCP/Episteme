@@ -20,13 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
 package org.jscience.biology.genetics;
 
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Pairwise Sequence Alignment using Needleman-Wunsch algorithm with high-precision scores.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SequenceAligner {
 

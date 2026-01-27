@@ -25,31 +25,31 @@ package org.jscience.ui.demos;
  
  import org.jscience.ui.AbstractDemo;
  import org.jscience.ui.viewers.arts.ArtsColorTheoryViewer;
- import org.jscience.ui.i18n.I18n;
+ import org.jscience.ui.i18n.I18N;
  
  /**
   * Demo for Arts & Color Theory.
   * Uses ArtsColorTheoryViewer.
   *
-  * @author Silvere Martin-Michiellot
-  * @author Gemini AI (Google DeepMind)
-  * @since 1.0
-  */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
  public class ArtsColorTheoryDemo extends AbstractDemo {
  
      @Override
      public String getCategory() {
-         return I18n.getInstance().get("category.arts", "Arts");
+         return I18N.getInstance().get("category.arts", "Arts");
      }
  
      @Override
      public String getName() {
-         return I18n.getInstance().get("demo.artscolortheorydemo.name", "Color Theory");
+         return I18N.getInstance().get("demo.artscolortheorydemo.name", "Color Theory");
      }
  
      @Override
      public String getDescription() {
-         return I18n.getInstance().get("demo.artscolortheorydemo.desc", "Explore color harmonies and palettes.");
+         return I18N.getInstance().get("demo.artscolortheorydemo.desc", "Explore color harmonies and palettes.");
      }
  
      @Override
@@ -59,6 +59,6 @@ package org.jscience.ui.demos;
      
      @Override
      public String getLongDescription() {
-          return I18n.getInstance().get("demo.artscolortheorydemo.longdesc", "Interactive tool for exploring color theory concepts like complementary, analogous, and triadic harmonies.");
+          return I18N.getInstance().get("demo.artscolortheorydemo.longdesc", "Interactive tool for exploring color theory concepts like complementary, analogous, and triadic harmonies.");
      }
  }

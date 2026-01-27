@@ -23,7 +23,7 @@
 
 package org.jscience.ui.demos;
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 // import javafx.scene.layout.HBox;
 import org.jscience.ui.AbstractDemo;
 
@@ -36,17 +36,17 @@ public class PoliticsVotingDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return I18n.getInstance().get("category.politics", "Politics"); 
+        return I18N.getInstance().get("category.politics", "Politics"); 
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.politicsvotingdemo.name", "Voting Systems");
+        return I18N.getInstance().get("demo.politicsvotingdemo.name", "Voting Systems");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.politicsvotingdemo.desc", "Compare voting methods (FPTP vs PR).");
+        return I18N.getInstance().get("demo.politicsvotingdemo.desc", "Compare voting methods (FPTP vs PR).");
     }
 
     @Override
@@ -59,6 +59,6 @@ public class PoliticsVotingDemo extends AbstractDemo {
     
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.politicsvotingdemo.longdesc", "Simulate and compare different voting systems like First-Past-The-Post and Proportional Representation.");
+        return I18N.getInstance().get("demo.politicsvotingdemo.longdesc", "Simulate and compare different voting systems like First-Past-The-Post and Proportional Representation.");
     }
 }

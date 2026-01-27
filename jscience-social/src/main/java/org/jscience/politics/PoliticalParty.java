@@ -34,10 +34,9 @@ import org.jscience.util.identity.Identification;
 /**
  * Represents a political party organized for democratic participation and governance.
  * A political party is an internal organization within a jurisdiction (Country/Nation).
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class PoliticalParty extends Organization {

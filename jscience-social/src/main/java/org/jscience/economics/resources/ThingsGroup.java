@@ -31,10 +31,9 @@ import java.util.Set;
 /**
  * Represents a logical grouping of physical things that act or move together.
  * Examples: Parts of an engine, furniture set.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class ThingsGroup implements Serializable {

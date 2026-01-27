@@ -30,10 +30,9 @@ import java.util.TimerTask;
 /**
  * A time server that synchronizes with a network source (e.g., NTP server).
  * Periodically fetches time from the specified host and notifies listeners.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class NetworkTimeServer extends TimeServer {

@@ -60,11 +60,10 @@ import java.util.logging.Logger;
  * MathMLMathElement math = doc.getMathElement();
  * }</pre>
  * </p>
- *
+ * * @see <a href="https://www.w3.org/Math/">W3C MathML</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://www.w3.org/Math/">W3C MathML</a>
  */
 public class MathMLReader extends AbstractResourceReader<MathMLDocument> {
 

@@ -36,6 +36,9 @@ import org.jscience.distributed.TaskRegistry;
  * Simulates international relations, trade, and stability between nations.
  * Uses a modified Correlates of War (COW) inspired model for conflict
  * simulation.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class GeopoliticalEngineTask implements Serializable {
 

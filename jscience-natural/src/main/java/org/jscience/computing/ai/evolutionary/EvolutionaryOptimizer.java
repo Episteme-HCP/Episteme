@@ -34,13 +34,12 @@ import java.util.Arrays;
  * Evolutionary algorithm inspired by natural selection.
  * Handles complex, multimodal, non-differentiable objective functions.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Nocedal, J., & Wright, S. J. (2006). <i>Numerical Optimization</i>. Springer.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

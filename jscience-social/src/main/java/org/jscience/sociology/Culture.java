@@ -46,10 +46,9 @@ import org.jscience.util.persistence.Relation;
  * A culture encompasses values (beliefs), norms (rituals), and societal artifacts,
  * as well as identifying traits like language and technological sophistication.
  * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
- *
+ * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
  */
 @Persistent

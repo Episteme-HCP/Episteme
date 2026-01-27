@@ -29,13 +29,12 @@ package org.jscience.mathematics.analysis.ode;
  * Symplectic integrator: conserves energy over long simulations.
  * Better for Hamiltonian systems than Runge-Kutta.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Verlet, L. (1967). Computer 'experiments' on classical fluids. I. Thermodynamical properties of Lennard-Jones molecules. <i>Physical Review</i>, 159(1), 98.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

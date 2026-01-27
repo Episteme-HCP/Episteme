@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics.loaders;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,7 +29,7 @@ import org.jscience.economics.money.Money;
 import org.jscience.economics.money.Quote;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.Configuration;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +53,10 @@ import java.time.Instant;
  *   <li>Configuration property: {@code api.alphavantage.key}</li>
  *   <li>Environment variable: {@code ALPHAVANTAGE_API_KEY}</li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 5.0
+ * @since 1.0
  */
 public class AlphaVantageQuoteReader extends AbstractResourceReader<Quote> {
 
@@ -84,22 +85,22 @@ public class AlphaVantageQuoteReader extends AbstractResourceReader<Quote> {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.alphavantage.name", "Alpha Vantage Quote Reader");
+        return I18N.getInstance().get("reader.alphavantage.name", "Alpha Vantage Quote Reader");
     }
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.economics", "Economics");
+        return I18N.getInstance().get("category.economics", "Economics");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.alphavantage.desc", "Stock quote reader using Alpha Vantage API.");
+        return I18N.getInstance().get("reader.alphavantage.desc", "Stock quote reader using Alpha Vantage API.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.alphavantage.longdesc", 
+        return I18N.getInstance().get("reader.alphavantage.longdesc", 
             "Fetches real-time and historical stock quotes from Alpha Vantage. " +
             "Requires a free API key from alphavantage.co.");
     }

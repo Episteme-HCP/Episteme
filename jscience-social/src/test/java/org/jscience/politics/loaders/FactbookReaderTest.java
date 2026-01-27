@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FactbookReaderTest {
 
     @Test
-    void testLoad_ValidXml() throws Exception {
+    void testLoad_ValidXML() throws Exception {
         String xml = """
                 <countries>
                     <country name="Testland" code="TST">
@@ -84,7 +84,7 @@ class FactbookReaderTest {
     }
 
     @Test
-    void testLoad_MalformedXml() {
+    void testLoad_MalformedXML() {
         String xml = "<countries><country>Unclosed Tag";
 
         FactbookReader loader = new FactbookReader();

@@ -33,7 +33,7 @@ import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.physics.astronomy.*;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
@@ -56,22 +56,22 @@ public class GalaxyDemo extends AbstractSimulationDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics");
+        return I18N.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics.");
+        return I18N.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics.");
     }
 
     @Override
     public String getLongDescription() { 
-        return I18n.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); 
+        return I18N.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); 
     }
 
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
+    public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
 
     @Override
     public javafx.scene.Node createViewerNode() {
@@ -148,13 +148,13 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         }
 
         private void setupParameters() {
-            parameters.add(new NumericParameter(I18n.getInstance().get("viewer.galaxydemo.zoom", "Zoom"), "View Zoom", 0.1, 5.0, 0.1, zoom, v -> zoom = v));
-            parameters.add(new BooleanParameter("viewer.galaxydemo.collision", I18n.getInstance().get("viewer.galaxydemo.collision", "Collision Mode"), collisionMode, v -> {
+            parameters.add(new NumericParameter(I18N.getInstance().get("viewer.galaxydemo.zoom", "Zoom"), "View Zoom", 0.1, 5.0, 0.1, zoom, v -> zoom = v));
+            parameters.add(new BooleanParameter("viewer.galaxydemo.collision", I18N.getInstance().get("viewer.galaxydemo.collision", "Collision Mode"), collisionMode, v -> {
                 if (v && !collisionMode) triggerCollision();
                 collisionMode = v;
             }));
             
-            parameters.add(new Parameter<>("viewer.galaxydemo.engine", I18n.getInstance().get("viewer.galaxydemo.mode", "Simulator Mode"), "Primitive", v -> {
+            parameters.add(new Parameter<>("viewer.galaxydemo.engine", I18N.getInstance().get("viewer.galaxydemo.mode", "Simulator Mode"), "Primitive", v -> {
                  if ("Scientific".equals(v)) {
                     simulator = new ObjectGalaxySimulator();
                 } else {
@@ -169,7 +169,7 @@ public class GalaxyDemo extends AbstractSimulationDemo {
             long cur = System.nanoTime();
             if (frameCount % 30 == 0 && lastFrameTime > 0) {
                 double fps = 30.0 * 1e9 / (cur - lastFrameTime);
-                if (fpsLabel != null) fpsLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.fps", "FPS: {0}"), String.format("%.1f", fps)));
+                if (fpsLabel != null) fpsLabel.setText(MessageFormat.format(I18N.getInstance().get("viewer.galaxydemo.fps", "FPS: {0}"), String.format("%.1f", fps)));
                 lastFrameTime = cur;
             } else if (lastFrameTime == 0) {
                 lastFrameTime = cur;
@@ -180,7 +180,7 @@ public class GalaxyDemo extends AbstractSimulationDemo {
             update();
             render();
             simulationTime++;
-            if (timeLabel != null) timeLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), simulationTime / 10));
+            if (timeLabel != null) timeLabel.setText(MessageFormat.format(I18N.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), simulationTime / 10));
         }
 
         private void resetGalaxy(int typeIndex) {
@@ -274,11 +274,11 @@ public class GalaxyDemo extends AbstractSimulationDemo {
             }
             gc.setGlobalBlendMode(BlendMode.SRC_OVER);
             gc.setFill(Color.WHITE);
-            gc.fillText(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.zoom", "Zoom: {0}"), String.format("%.2f", zoom)), 10, 60);
+            gc.fillText(MessageFormat.format(I18N.getInstance().get("viewer.galaxydemo.zoom", "Zoom: {0}"), String.format("%.2f", zoom)), 10, 60);
         }
 
-        @Override public String getName() { return I18n.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics"); }
-        @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
+        @Override public String getName() { return I18N.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics"); }
+        @Override public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
         
         // Simulatable
         @Override public void play() { running = true; }
@@ -288,8 +288,8 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         @Override public void setSpeed(double s) { }
         @Override public boolean isPlaying() { return running; }
     
-        @Override public String getDescription() { return I18n.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics."); }
-        @Override public String getLongDescription() { return I18n.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); }
+        @Override public String getDescription() { return I18N.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics."); }
+        @Override public String getLongDescription() { return I18N.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); }
         @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
     }
 }

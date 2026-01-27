@@ -41,13 +41,11 @@ import java.util.stream.Collectors;
  * NP (Noun Phrase), VP (Verb Phrase), etc. They contain other nodes (daughters) 
  * which can be either terminals (T) or non-terminals (NT).
  * </p>
- *
+ * * @see GraphNode
+ * @see T
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
- * @see GraphNode
- * @see T
  */
 public class NT extends GraphNode {
 
@@ -221,7 +219,7 @@ public class NT extends GraphNode {
         }
     }
 
-    public void print2Xml(FileWriter out) throws IOException {
+    public void print2XML(FileWriter out) throws IOException {
         out.write(" <nt id=\"" + getId() + "\" cat=\"" + cat + "\">\n");
         for (GraphNode d : daughters) {
             out.write("  <edge label=\"" + d.getEdge2Mother() + "\" idref=\"" + d.getId() + "\"/>\n");

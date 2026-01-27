@@ -41,11 +41,11 @@ import java.util.List;
 public class AcidBaseReader {
 
     public static String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 
     public static String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.acidbase.desc", "Acid-Base Data Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.acidbase.desc", "Acid-Base Data Reader.");
     }
 
     public static class Acid {

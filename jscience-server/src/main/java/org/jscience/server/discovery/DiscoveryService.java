@@ -37,6 +37,9 @@ import java.net.InetAddress;
 
 /**
  * mDNS/Zeroconf Service for auto-discovery of the JScience Grid.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @Service
 public class DiscoveryService {

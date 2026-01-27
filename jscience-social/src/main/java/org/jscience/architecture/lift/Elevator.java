@@ -35,10 +35,9 @@ import java.util.Objects;
  *
  * <p>Reference: Knuth, D. E. (1973). The Art of Computer Programming, Vol. 1. 
  * Fundamental Algorithms.</p>
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class Elevator implements Serializable {

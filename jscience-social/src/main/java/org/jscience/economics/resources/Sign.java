@@ -28,10 +28,9 @@ import java.util.Locale;
 /**
  * Interface for objects that convey information via signs/visuals.
  * Supports localization.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public interface Sign {

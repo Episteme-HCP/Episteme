@@ -37,17 +37,17 @@ public class LorenzDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenzdemo.name", "Lorenz Attractor");
+        return org.jscience.ui.i18n.I18N.getInstance().get("demo.lorenzdemo.name", "Lorenz Attractor");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenzdemo.desc", "Visualization of the chaotic Lorenz attractor system.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("demo.lorenzdemo.desc", "Visualization of the chaotic Lorenz attractor system.");
     }
 
     @Override
@@ -57,6 +57,6 @@ public class LorenzDemo extends AbstractSimulationDemo {
 
     @Override
     public String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenzdemo.longdesc", "Real-time simulation of the Lorenz system displaying chaotic behavior.");
+         return org.jscience.ui.i18n.I18N.getInstance().get("demo.lorenzdemo.longdesc", "Real-time simulation of the Lorenz system displaying chaotic behavior.");
     }
 }

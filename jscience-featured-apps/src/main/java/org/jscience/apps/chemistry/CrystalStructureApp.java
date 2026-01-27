@@ -38,7 +38,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import org.jscience.apps.framework.FeaturedAppBase;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -111,14 +111,14 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
         @Override
         public String toString() {
-            return I18n.getInstance().get(key, def);
+            return I18N.getInstance().get(key, def);
         }
 
     }
 
     @Override
     protected String getAppTitle() {
-        return I18n.getInstance().get("viewer.crystalstructureapp.name", "Crystal Structure Viewer");
+        return I18N.getInstance().get("viewer.crystalstructureapp.name", "Crystal Structure Viewer");
     }
 
     @Override
@@ -128,12 +128,12 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("viewer.crystalstructureapp.desc", "3D visualization of crystal lattices.");
+        return I18N.getInstance().get("viewer.crystalstructureapp.desc", "3D visualization of crystal lattices.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("viewer.crystalstructureapp.longdesc", "Advanced 3D visualization tool for exploring crystalline structures at the atomic level. Supports standard lattice types including Simple Cubic, BCC, FCC, HCP, Diamond, NaCl, and CsCl. Features custom CIF file import, interactive 3D rotation and zoom, and configurable display of atoms, bonds, and unit cell boundaries.");
+        return I18N.getInstance().get("viewer.crystalstructureapp.longdesc", "Advanced 3D visualization tool for exploring crystalline structures at the atomic level. Supports standard lattice types including Simple Cubic, BCC, FCC, HCP, Diamond, NaCl, and CsCl. Features custom CIF file import, interactive 3D rotation and zoom, and configurable display of atoms, bonds, and unit cell boundaries.");
     }
 
     @Override
@@ -698,6 +698,6 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 }

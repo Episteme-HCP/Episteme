@@ -27,10 +27,10 @@ package org.jscience.ui.demos;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.geometry.csg.CSGViewer;
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -39,17 +39,17 @@ public class CSGDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.mathematics");
+        return I18N.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.csgdemo.name");
+        return I18N.getInstance().get("demo.csgdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.csgdemo.desc");
+        return I18N.getInstance().get("demo.csgdemo.desc");
     }
 
     @Override
@@ -59,7 +59,7 @@ public class CSGDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.csgdemo.longdesc");
+        return I18N.getInstance().get("demo.csgdemo.longdesc");
     }
 }
 

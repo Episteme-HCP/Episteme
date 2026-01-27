@@ -27,7 +27,7 @@ import org.jscience.io.AbstractResourceReader;
 
 /**
  * Reader for ETOPO1 data (Global Relief Model).
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -36,17 +36,17 @@ public class ETOPOElevationReader extends AbstractResourceReader<Double> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.etopo.desc", "ETOPO1 Global Relief Model Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.etopo.desc", "ETOPO1 Global Relief Model Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.etopo.longdesc", "Reads global relief model data from ETOPO1, including ice surface and bedrock elevation.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.etopo.longdesc", "Reads global relief model data from ETOPO1, including ice surface and bedrock elevation.");
     }
 
     @Override
@@ -103,5 +103,5 @@ public class ETOPOElevationReader extends AbstractResourceReader<Double> {
         }
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.etopoelevation.name", "ETOPO1 Elevation Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.etopoelevation.name", "ETOPO1 Elevation Reader"); }
 }

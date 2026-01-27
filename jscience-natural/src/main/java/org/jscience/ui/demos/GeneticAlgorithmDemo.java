@@ -36,7 +36,7 @@ import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +44,12 @@ import java.util.Random;
 
 /**
  * Genetic Algorithm Demo.
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -60,10 +59,10 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Computing"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("geneticalgo.title", "Genetic Algorithm"); }
+    public String getName() { return I18N.getInstance().get("geneticalgo.title", "Genetic Algorithm"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("geneticalgo.desc", "Evolving Pathfinders using Genetic Algorithm"); }
+    public String getDescription() { return I18N.getInstance().get("geneticalgo.desc", "Evolving Pathfinders using Genetic Algorithm"); }
 
     @Override
     public String getLongDescription() {
@@ -103,19 +102,19 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
             sidebar.setPrefWidth(180);
             sidebar.getStyleClass().add("viewer-sidebar");
 
-            Label title = new Label(I18n.getInstance().get("geneticalgo.stats", "Statistics"));
+            Label title = new Label(I18N.getInstance().get("geneticalgo.stats", "Statistics"));
             title.getStyleClass().add("header-label");
 
-            genLabel = new Label(I18n.getInstance().get("generated.geneticalgorithm.generation.1", "Generation: 1"));
+            genLabel = new Label(I18N.getInstance().get("generated.geneticalgorithm.generation.1", "Generation: 1"));
             genLabel.getStyleClass().add("description-label");
 
-            fitLabel = new Label(I18n.getInstance().get("generated.geneticalgorithm.fitness.000", "Fitness: 0.00"));
+            fitLabel = new Label(I18N.getInstance().get("generated.geneticalgorithm.fitness.000", "Fitness: 0.00"));
             fitLabel.getStyleClass().add("description-label");
 
             reachLabel = new Label("Reached: 0/" + popSize);
             reachLabel.getStyleClass().add("description-label");
             
-            Label info = new Label(I18n.getInstance().get("generated.geneticalgorithm.controls.below", "Controls below."));
+            Label info = new Label(I18N.getInstance().get("generated.geneticalgorithm.controls.below", "Controls below."));
             info.getStyleClass().add("description-label");
 
             sidebar.getChildren().addAll(title, new Separator(), genLabel, fitLabel, reachLabel, new Separator(), info);
@@ -133,7 +132,7 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
                 }
                 if (closest != null) {
                     Alert a = new Alert(Alert.AlertType.INFORMATION);
-                    a.setTitle(I18n.getInstance().get("generated.geneticalgorithm.genome.detail", "Genome Detail")); a.setHeaderText(I18n.getInstance().get("generated.geneticalgorithm.dna.info", "DNA Info"));
+                    a.setTitle(I18N.getInstance().get("generated.geneticalgorithm.genome.detail", "Genome Detail")); a.setHeaderText(I18N.getInstance().get("generated.geneticalgorithm.dna.info", "DNA Info"));
                     a.setContentText(String.format("Fitness: %.4f\nReached: %b\nCrashed: %b", closest.fitness, closest.reached, closest.crashed));
                     a.showAndWait();
                 }
@@ -162,9 +161,9 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
         }
         
         private void updateLabels() {
-            genLabel.setText(I18n.getInstance().get("geneticalgo.generation", "Generation") + " " + generation);
+            genLabel.setText(I18N.getInstance().get("geneticalgo.generation", "Generation") + " " + generation);
             fitLabel.setText(String.format("Best Fitness: %.2f", bestFitness));
-            reachLabel.setText(I18n.getInstance().get("geneticalgo.reached", "Reached") + " " + reachedCount + "/" + popSize);
+            reachLabel.setText(I18N.getInstance().get("geneticalgo.reached", "Reached") + " " + reachedCount + "/" + popSize);
         }
 
         private void restart() {

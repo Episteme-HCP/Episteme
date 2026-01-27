@@ -33,11 +33,6 @@ import org.jscience.mathematics.numbers.real.Real;
  * Analytical model for the Urban Heat Island (UHI) effect. It estimates the 
  * temperature differential between urban and rural areas based on land cover, 
  * geometry (sky view factor), and anthropogenic heat sources.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class UrbanHeatIslandModel {
 
@@ -45,7 +40,10 @@ public final class UrbanHeatIslandModel {
 
     /**
      * Categories of urban land cover with their associated thermal properties.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum LandCover {
         /** Natural vegetation, high evapotranspiration and moderate albedo. */
         VEGETATION(0.25, 0.40), 

@@ -188,15 +188,12 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
      * @return the corresponding tensor
      */
     default org.jscience.mathematics.linearalgebra.tensors.Tensor<E> toTensor() {
-        // Basic default implementation
-        // This is inefficient but functional for general case.
-        // Specific implementations (DenseMatrix, etc.) should override this.
         if (rows() == 0 || cols() == 0) {
-            throw new UnsupportedOperationException(
-                    "Cannot convert empty matrix to tensor (type inference limitation)");
+            @SuppressWarnings("unchecked")
+            Class<E> type = (Class<E>) getScalarRing().zero().getClass();
+            return org.jscience.mathematics.linearalgebra.tensors.TensorFactory.zeros(type, rows(), cols());
         }
 
-        // We need class of E. Hack: get(0,0)
         E sample = get(0, 0);
         @SuppressWarnings("unchecked")
         Class<E> type = (Class<E>) sample.getClass();

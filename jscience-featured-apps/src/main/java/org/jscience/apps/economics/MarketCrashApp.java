@@ -82,7 +82,7 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.marketcrashapp.name", "Market Crash Analysis");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.name", "Market Crash Analysis");
     }
 
     @Override
@@ -92,12 +92,12 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.marketcrashapp.desc", "Financial market simulation and technical analysis.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.desc", "Financial market simulation and technical analysis.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.marketcrashapp.longdesc", "Sophisticated financial simulator designed to analyze market trends and predict potential crashes. Includes technical indicators like Simple Moving Average (SMA), Relative Strength Index (RSI), and Bollinger Bands, with real-time risk assessment and historical data playback.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.longdesc", "Sophisticated financial simulator designed to analyze market trends and predict potential crashes. Includes technical indicators like Simple Moving Average (SMA), Relative Strength Index (RSI), and Bollinger Bands, with real-time risk assessment and historical data playback.");
     }
 
     @Override
@@ -613,6 +613,6 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.economics", "Economics");
     }
 }

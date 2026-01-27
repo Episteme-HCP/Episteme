@@ -34,10 +34,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a cultural or religious celebration (feast, rite of passage, festival).
  * Celebrations are specialized social situations with identifying motives and designated participants.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

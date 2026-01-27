@@ -30,10 +30,7 @@ import java.util.Random;
 /**
  * Standard Genetic Algorithm implementation.
  * Uses Elitism, Tournament Selection, and Uniform Crossover.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- *         <p>
+ * *         <p>
  *         References:
  *         <ul>
  *         <li>Holland, J. H. (1975). Adaptation in Natural and Artificial
@@ -44,6 +41,9 @@ import java.util.Random;
  *         Machine Learning. Addison-Wesley.</li>
  *         </ul>
  *         </p>
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class GeneticAlgorithm<T> {
 

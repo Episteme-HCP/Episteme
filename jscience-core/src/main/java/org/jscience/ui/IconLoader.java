@@ -40,6 +40,9 @@ import java.util.List;
 /**
  * Loads Lucide SVG icons (or simple SVGs) into JavaFX Nodes.
  * Handles common SVG shapes: path, circle, rect, line, polyline, polygon.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class IconLoader {
 

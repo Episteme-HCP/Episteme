@@ -35,11 +35,6 @@ import org.jscience.util.persistence.Relation;
 /**
  * Models and visualizes the evolution of political borders over historical time.
  * Provides tools for spatial-temporal queries regarding sovereignty and territorial changes.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class BorderEvolution {
 
@@ -103,7 +98,10 @@ public final class BorderEvolution {
 
     /**
      * Types of events that cause border modifications.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum ChangeType {
         CONQUEST, CESSION, PURCHASE, UNION, DISSOLUTION, 
         TREATY, INDEPENDENCE, PARTITION, ANNEXATION

@@ -25,7 +25,7 @@ package org.jscience.util.identity;
 
 import java.util.UUID;
 
-public class UUIDGenerator implements IDGenerator {
+public class UUIDGenerator implements IdGenerator {
     @Override
     public Identification generate() {
         return new UUIDIdentification(UUID.randomUUID().toString());

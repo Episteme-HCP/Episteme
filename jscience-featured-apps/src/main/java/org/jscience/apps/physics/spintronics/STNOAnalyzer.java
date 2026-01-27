@@ -43,9 +43,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * 
  * @see <a href="https://doi.org/10.1038/nature02050">Kiselev et al., Nature
  *      425, 380 (2003)</a>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class STNOAnalyzer {
 

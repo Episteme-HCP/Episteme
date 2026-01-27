@@ -32,13 +32,12 @@ import java.util.*;
  * greedily adds them if they don't create a cycle.
  * Uses Union-Find data structure. O(E log E) time.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Kruskal, J. B. (1956). On the shortest spanning subtree of a graph and the traveling salesman problem. <i>Proceedings of the American Mathematical Society</i>, 7(1), 48-50.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

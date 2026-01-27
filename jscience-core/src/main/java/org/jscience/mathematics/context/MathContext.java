@@ -45,19 +45,15 @@ package org.jscience.mathematics.context;
  * });
  * }</pre>
  * 
- * * @author Silvere Martin-Michiellot
- * 
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+ * * */
 public final class MathContext {
 
     /**
-     * 
-     * @author Silvere Martin-Michiellot
-     * @author Gemini AI (Google DeepMind)
-     * @since 1.0
-     */
+     *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum RealPrecision {
         /** Fast mode - uses float (7 digits, GPU-friendly) */
         FAST,

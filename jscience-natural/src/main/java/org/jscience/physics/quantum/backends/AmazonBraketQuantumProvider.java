@@ -35,14 +35,14 @@ import java.util.Map;
 /**
  * Amazon Braket backend implementation for JScience.
  * Allows execution on AWS quantum hardware and simulators.
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class AmazonBraketQuantumProvider implements QuantumBackend {
 

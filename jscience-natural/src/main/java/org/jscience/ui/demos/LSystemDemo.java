@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractSimulationDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.biology.lsystems.LSystemViewer;
 
 /**
  * L-System Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -46,10 +46,10 @@ public class LSystemDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("LSystem.title", "L-Systems"); }
+    public String getName() { return I18N.getInstance().get("LSystem.title", "L-Systems"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("LSystem.desc", "Visualizing plant growth with Lindenmayer systems."); }
+    public String getDescription() { return I18N.getInstance().get("LSystem.desc", "Visualizing plant growth with Lindenmayer systems."); }
 
     @Override
     public String getLongDescription() {

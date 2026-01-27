@@ -32,13 +32,12 @@ import org.jscience.mathematics.numbers.real.Real;
  * Solves Ax = b where A is symmetric positive definite.
  * Efficient for large sparse matrices: O(n) memory vs O(nÃ‚Â²) for direct methods.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Hestenes, M. R., & Stiefel, E. (1952). Methods of Conjugate Gradients for Solving Linear Systems. <i>Journal of Research of the National Bureau of Standards</i>, 49(6), 409-436.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

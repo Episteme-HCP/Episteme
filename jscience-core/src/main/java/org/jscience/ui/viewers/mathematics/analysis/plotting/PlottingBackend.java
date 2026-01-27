@@ -24,7 +24,7 @@
 package org.jscience.ui.viewers.mathematics.analysis.plotting;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

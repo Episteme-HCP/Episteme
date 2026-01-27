@@ -27,10 +27,9 @@ import java.util.EventListener;
 
 /**
  * Listener interface for receiving chronological update events from a {@link TimeServer}.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @FunctionalInterface

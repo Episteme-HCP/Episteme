@@ -33,7 +33,7 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SimpleJson {
+public class SimpleJSON {
 
     public static Object parse(String json) {
         return new Parser(json).parseValue();

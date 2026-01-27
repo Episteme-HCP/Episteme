@@ -36,10 +36,9 @@ import org.jscience.sociology.RoleKind;
  * individual, a household, or a firm. Economic agents are defined by their 
  * ability to own resources, accumulate capital in a wallet, and interact 
  * within markets.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class EconomicAgent extends Role {

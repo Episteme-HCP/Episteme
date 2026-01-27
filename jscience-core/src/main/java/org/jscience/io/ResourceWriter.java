@@ -26,6 +26,9 @@ package org.jscience.io;
 /**
  * Interface for writing/exporting resources.
  * Replaces OutputLoader.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface ResourceWriter<T> extends ResourceIO<T> {
 

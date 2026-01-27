@@ -27,7 +27,7 @@ import org.jscience.mathematics.geometry.Vector4D;
 
 /**
  * Interface for Maxwell's Equations providers.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

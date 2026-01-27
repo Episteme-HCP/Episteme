@@ -32,10 +32,9 @@ import org.jscience.measure.Quantity;
 
 /**
  * Models human labor and expertise as an economic resource.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class HumanResource extends Resource implements Property {

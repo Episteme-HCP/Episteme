@@ -255,21 +255,21 @@ public class ObjMeshReader extends AbstractResourceReader<Group> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.objmeshreader.name", "OBJ Mesh Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.objmeshreader.name", "OBJ Mesh Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.objmeshreader.desc", "Simple Wavefront OBJ loader for JavaFX 3D.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.objmeshreader.desc", "Simple Wavefront OBJ loader for JavaFX 3D.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.objmeshreader.longdesc", "Parses OBJ files and creates JavaFX TriangleMesh objects. Supports vertices, texture coordinates, and normals.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.objmeshreader.longdesc", "Parses OBJ files and creates JavaFX TriangleMesh objects. Supports vertices, texture coordinates, and normals.");
     }
 }

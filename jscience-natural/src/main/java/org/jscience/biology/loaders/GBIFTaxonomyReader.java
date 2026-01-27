@@ -59,7 +59,7 @@ public class GBIFTaxonomyReader extends AbstractResourceReader<String> {
         // resourceId can be name or usageKey
         try {
             int key = Integer.parseInt(resourceId);
-            return getSpeciesJson(key);
+            return getSpeciesJSON(key);
         } catch (NumberFormatException e) {
             return search(resourceId);
         }
@@ -122,7 +122,7 @@ public class GBIFTaxonomyReader extends AbstractResourceReader<String> {
      * @param usageKey the unique GBIF identifier
      * @return raw JSON response string
      */
-    public static String getSpeciesJson(int usageKey) {
+    public static String getSpeciesJSON(int usageKey) {
         return fetchUrl(API_BASE + "/" + usageKey);
     }
 
@@ -156,21 +156,21 @@ public class GBIFTaxonomyReader extends AbstractResourceReader<String> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gbiftaxonomyreader.name", "GBIF Taxonomy Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.gbiftaxonomyreader.name", "GBIF Taxonomy Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gbiftaxonomyreader.desc", "Connector to the Global Biodiversity Information Facility (GBIF) API.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.gbiftaxonomyreader.desc", "Connector to the Global Biodiversity Information Facility (GBIF) API.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gbiftaxonomyreader.longdesc", "Provides access to the GBIF taxonomy backbone, allowing search and retrieval of biological species data.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.gbiftaxonomyreader.longdesc", "Provides access to the GBIF taxonomy backbone, allowing search and retrieval of biological species data.");
     }
 }

@@ -27,7 +27,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.ChoiceParameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -60,16 +60,16 @@ public class DistributionsViewer extends AbstractViewer {
 
     private void setupParameters() {
         List<String> types = List.of("Normal", "Poisson", "Binomial");
-        parameters.add(new ChoiceParameter("dist.type", I18n.getInstance().get("distributions.type", "Distribution Type"), types, "Normal", v -> {
+        parameters.add(new ChoiceParameter("dist.type", I18N.getInstance().get("distributions.type", "Distribution Type"), types, "Normal", v -> {
             currentType = v;
             updateChart();
         }));
 
-        parameters.add(new NumericParameter("dist.mu", I18n.getInstance().get("distributions.mean", "Normal: Mean"), -5, 5, 0.1, mu, v -> { mu = v; updateChart(); }));
-        parameters.add(new NumericParameter("dist.sigma", I18n.getInstance().get("distributions.std", "Normal: Std Dev"), 0.1, 5, 0.1, sigma, v -> { sigma = v; updateChart(); }));
-        parameters.add(new NumericParameter("dist.lambda", I18n.getInstance().get("distributions.lambda", "Poisson: Lambda"), 0.1, 20, 0.5, lambda, v -> { lambda = v; updateChart(); }));
-        parameters.add(new NumericParameter("dist.n", I18n.getInstance().get("distributions.trials", "Binomial: n"), 1, 40, 1, (double)n, v -> { n = v.intValue(); updateChart(); }));
-        parameters.add(new NumericParameter("dist.p", I18n.getInstance().get("distributions.prob", "Binomial: p"), 0.01, 1, 0.01, p, v -> { p = v; updateChart(); }));
+        parameters.add(new NumericParameter("dist.mu", I18N.getInstance().get("distributions.mean", "Normal: Mean"), -5, 5, 0.1, mu, v -> { mu = v; updateChart(); }));
+        parameters.add(new NumericParameter("dist.sigma", I18N.getInstance().get("distributions.std", "Normal: Std Dev"), 0.1, 5, 0.1, sigma, v -> { sigma = v; updateChart(); }));
+        parameters.add(new NumericParameter("dist.lambda", I18N.getInstance().get("distributions.lambda", "Poisson: Lambda"), 0.1, 20, 0.5, lambda, v -> { lambda = v; updateChart(); }));
+        parameters.add(new NumericParameter("dist.n", I18N.getInstance().get("distributions.trials", "Binomial: n"), 1, 40, 1, (double)n, v -> { n = v.intValue(); updateChart(); }));
+        parameters.add(new NumericParameter("dist.p", I18N.getInstance().get("distributions.prob", "Binomial: p"), 0.01, 1, 0.01, p, v -> { p = v; updateChart(); }));
     }
 
     private void initUI() {
@@ -143,9 +143,9 @@ public class DistributionsViewer extends AbstractViewer {
         return res;
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.mathematics", "Mathematics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.distributionsviewer.name", "Statistical Distributions"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.distributionsviewer.desc", "Statistical distributions explorer."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.distributionsviewer.longdesc", "Detailed visualization of various statistical distributions including Normal, Poisson, and Binomial. Interactively adjust parameters like mean, standard deviation, and lambda to see how they affect the shape and characteristics of the distribution curves."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.mathematics", "Mathematics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.distributionsviewer.name", "Statistical Distributions"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.distributionsviewer.desc", "Statistical distributions explorer."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.distributionsviewer.longdesc", "Detailed visualization of various statistical distributions including Normal, Poisson, and Binomial. Interactively adjust parameters like mean, standard deviation, and lambda to see how they affect the shape and characteristics of the distribution curves."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

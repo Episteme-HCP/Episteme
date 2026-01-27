@@ -38,7 +38,7 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.1
+ * @since 1.0
  */
 @Persistent
 public class Film extends Artwork {

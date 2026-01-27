@@ -36,11 +36,14 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.*;
 import org.jscience.mathematics.numbers.real.Real;
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 /**
  * Car Traffic Simulation Demo.
  * Merged implementation of Viewer and Demo.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class CarTrafficDemo extends AbstractSimulationDemo {
 
@@ -56,16 +59,16 @@ public class CarTrafficDemo extends AbstractSimulationDemo {
     // private Label jamStatusLabel; // Removed unused field
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.architecture", "Architecture"); }
+    public String getCategory() { return I18N.getInstance().get("category.architecture", "Architecture"); }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.cartrafficdemo.name", "Car Traffic Simulation");
+        return I18N.getInstance().get("demo.cartrafficdemo.name", "Car Traffic Simulation");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.cartrafficdemo.desc", "Simulates traffic flow and phantom jams using the Intelligent Driver Model (IDM).");
+        return I18N.getInstance().get("demo.cartrafficdemo.desc", "Simulates traffic flow and phantom jams using the Intelligent Driver Model (IDM).");
     }
 
     @Override
@@ -108,18 +111,18 @@ public class CarTrafficDemo extends AbstractSimulationDemo {
     protected VBox createControlPanel() {
         VBox panel = super.createControlPanel();
         
-        // I18n i18n = I18n.getInstance(); // No local var needed
+        // I18N i18n = I18N.getInstance(); // No local var needed
         
         panel.getChildren().add(new Separator());
 
-        Button resetBtn = new Button(I18n.getInstance().get("demo.cartrafficdemo.button.reset", "Reset Sim"));
+        Button resetBtn = new Button(I18N.getInstance().get("demo.cartrafficdemo.button.reset", "Reset Sim"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.getStyleClass().add("text-light");
         resetBtn.setOnAction(e -> {
             reset(30); 
         });
 
-        Button perturbBtn = new Button(I18n.getInstance().get("demo.cartrafficdemo.button.perturb", "Perturb Traffic"));
+        Button perturbBtn = new Button(I18N.getInstance().get("demo.cartrafficdemo.button.perturb", "Perturb Traffic"));
         perturbBtn.setMaxWidth(Double.MAX_VALUE);
         perturbBtn.getStyleClass().add("text-light");
         perturbBtn.setOnAction(e -> {
@@ -197,6 +200,6 @@ public class CarTrafficDemo extends AbstractSimulationDemo {
 
     @Override
     public String getLongDescription() {
-         return I18n.getInstance().get("demo.cartrafficdemo.longdesc", "Analytic simulation of traffic flow demonstrating phantom jams and congestion dynamics using the Intelligent Driver Model.");
+         return I18N.getInstance().get("demo.cartrafficdemo.longdesc", "Analytic simulation of traffic flow demonstrating phantom jams and congestion dynamics using the Intelligent Driver Model.");
     }
 }

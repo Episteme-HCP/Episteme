@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for XChart 2D plotting.
  * Available when XChart library is on classpath.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class XChartPlot2DBackendProvider implements BackendProvider {
 

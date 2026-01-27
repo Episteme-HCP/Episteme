@@ -30,10 +30,9 @@ import java.util.UUID;
  * Represents an individual agent utilizing a vertical transportation system. 
  * Tracks waiting time, transit time, and movement through various logical 
  * states of a trip.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class Passenger implements Serializable {

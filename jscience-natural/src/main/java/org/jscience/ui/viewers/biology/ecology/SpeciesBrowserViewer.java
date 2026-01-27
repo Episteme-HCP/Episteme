@@ -28,7 +28,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.ImageView;
 import org.jscience.ui.AbstractViewer;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.biology.loaders.GbifService;
 import org.jscience.biology.loaders.GbifService.GbifSpecies;
 import javafx.scene.image.Image;
@@ -63,8 +63,8 @@ public class SpeciesBrowserViewer extends AbstractViewer {
     }
 
     private void setupParameters() {
-        parameters.add(new StringParameter("species.query", I18n.getInstance().get("species.label.species", "Search Scientific Name"), searchQuery, v -> searchQuery = v));
-        parameters.add(new BooleanParameter("species.search", I18n.getInstance().get("species.btn.search", "Perform Search"), false, v -> {
+        parameters.add(new StringParameter("species.query", I18N.getInstance().get("species.label.species", "Search Scientific Name"), searchQuery, v -> searchQuery = v));
+        parameters.add(new BooleanParameter("species.search", I18N.getInstance().get("species.btn.search", "Perform Search"), false, v -> {
             if (v) performSearch();
         }));
     }
@@ -83,7 +83,7 @@ public class SpeciesBrowserViewer extends AbstractViewer {
         
         VBox details = new VBox(10);
         details.setPadding(new Insets(0, 0, 0, 10));
-        detailArea = new TextArea(I18n.getInstance().get("species.prompt.search", "Search for a species to view details from GBIF..."));
+        detailArea = new TextArea(I18N.getInstance().get("species.prompt.search", "Search for a species to view details from GBIF..."));
         detailArea.setEditable(false);
         detailArea.setWrapText(true);
         detailArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
@@ -92,7 +92,7 @@ public class SpeciesBrowserViewer extends AbstractViewer {
         imageView.setFitWidth(300);
         imageView.setPreserveRatio(true);
 
-        details.getChildren().addAll(progress, new Label(I18n.getInstance().get("species.label.taxonomy", "Taxonomy & Details:")), detailArea, imageView);
+        details.getChildren().addAll(progress, new Label(I18N.getInstance().get("species.label.taxonomy", "Taxonomy & Details:")), detailArea, imageView);
 
         split.getItems().addAll(resultList, details);
         split.setDividerPositions(0.35);
@@ -151,9 +151,9 @@ public class SpeciesBrowserViewer extends AbstractViewer {
                 });
     }
 
-    @Override public String getName() { return I18n.getInstance().get("viewer.speciesbrowserviewer.name", "Species Browser"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.speciesbrowserviewer.desc", "Explore biological species."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.speciesbrowserviewer.longdesc", "GBIF Species Browser."); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.speciesbrowserviewer.name", "Species Browser"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.biology", "Biology"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.speciesbrowserviewer.desc", "Explore biological species."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.speciesbrowserviewer.longdesc", "GBIF Species Browser."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

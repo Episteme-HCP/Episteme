@@ -29,7 +29,8 @@ import org.jscience.mathematics.context.MathContext;
 /**
  * Integer backed by a 64-bit {@code long}.
  * Package-private implementation detail.
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

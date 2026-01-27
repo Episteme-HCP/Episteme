@@ -29,6 +29,9 @@ import org.jscience.distributed.TaskRegistry;
 
 /**
  * Provider for Mandelbrot tasks, supporting both Primitive (double) and Real (arbitrary precision) modes.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MandelbrotTaskProvider implements TaskProvider<MandelbrotTask, MandelbrotTask> {
 

@@ -35,7 +35,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 public class EconomicsMarketDemo extends AbstractDemo {
 
@@ -45,16 +45,16 @@ public class EconomicsMarketDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.economics", "Economics"); }
+    public String getCategory() { return I18N.getInstance().get("category.economics", "Economics"); }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.economicsmarketdemo.name", "Market Equilibrium");
+        return I18N.getInstance().get("demo.economicsmarketdemo.name", "Market Equilibrium");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.economicsmarketdemo.desc", "Interactive Supply and Demand graph visualization determining market equilibrium.");
+        return I18N.getInstance().get("demo.economicsmarketdemo.desc", "Interactive Supply and Demand graph visualization determining market equilibrium.");
     }
 
     @Override
@@ -74,21 +74,21 @@ public class EconomicsMarketDemo extends AbstractDemo {
 
         // Axes
         NumberAxis xAxis = new NumberAxis(
-                I18n.getInstance().get("demo.economicsmarketdemo.axis.quantity", "Quantity"),
+                I18N.getInstance().get("demo.economicsmarketdemo.axis.quantity", "Quantity"),
                 0, 100, 10);
-        NumberAxis yAxis = new NumberAxis(I18n.getInstance().get("demo.economicsmarketdemo.axis.price", "Price"),
+        NumberAxis yAxis = new NumberAxis(I18N.getInstance().get("demo.economicsmarketdemo.axis.price", "Price"),
                 0,
                 100, 10);
 
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle(I18n.getInstance().get("demo.economicsmarketdemo.chart.title", "Supply and Demand"));
+        lineChart.setTitle(I18N.getInstance().get("demo.economicsmarketdemo.chart.title", "Supply and Demand"));
         lineChart.setAnimated(false); // crucial for smooth slider updates
 
         XYChart.Series<Number, Number> supplySeries = new XYChart.Series<>();
-        supplySeries.setName(I18n.getInstance().get("demo.economicsmarketdemo.series.supply", "Supply"));
+        supplySeries.setName(I18N.getInstance().get("demo.economicsmarketdemo.series.supply", "Supply"));
 
         XYChart.Series<Number, Number> demandSeries = new XYChart.Series<>();
-        demandSeries.setName(I18n.getInstance().get("demo.economicsmarketdemo.series.demand", "Demand"));
+        demandSeries.setName(I18N.getInstance().get("demo.economicsmarketdemo.series.demand", "Demand"));
 
         lineChart.getData().add(supplySeries);
         lineChart.getData().add(demandSeries);
@@ -135,9 +135,9 @@ public class EconomicsMarketDemo extends AbstractDemo {
         updateGraph.run(); // Init
 
         VBox controls = new VBox(10,
-                new Label(I18n.getInstance().get("demo.economicsmarketdemo.label.shift_supply", "Shift Supply:")),
+                new Label(I18N.getInstance().get("demo.economicsmarketdemo.label.shift_supply", "Shift Supply:")),
                 supplyShift,
-                new Label(I18n.getInstance().get("demo.economicsmarketdemo.label.shift_demand", "Shift Demand:")),
+                new Label(I18N.getInstance().get("demo.economicsmarketdemo.label.shift_demand", "Shift Demand:")),
                 demandShift);
         controls.getStyleClass().add("viewer-controls");
 
@@ -149,6 +149,6 @@ public class EconomicsMarketDemo extends AbstractDemo {
     
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.economicsmarketdemo.longdesc", "Visualize and manipulate supply and demand curves to observe market equilibrium shifts.");
+        return I18N.getInstance().get("demo.economicsmarketdemo.longdesc", "Visualize and manipulate supply and demand curves to observe market equilibrium shifts.");
     }
 }

@@ -31,11 +31,6 @@ import org.jscience.util.persistence.Persistent;
 /**
  * Assists in dating and identifying historical manuscripts based on paleographic analysis of writing styles.
  * Classifies scripts into established historical types and maps diagnostic features to time periods.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class PaleographyAssistant {
 
@@ -45,7 +40,10 @@ public final class PaleographyAssistant {
 
     /**
      * Major historical Western European script types.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum ScriptType {
         ROMAN_CAPITALS(1, 500, "Capitalis monumentalis"),
         RUSTIC_CAPITALS(100, 600, "Capitalis rustica"),

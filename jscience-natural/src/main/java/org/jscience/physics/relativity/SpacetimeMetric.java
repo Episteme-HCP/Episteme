@@ -32,13 +32,12 @@ import org.jscience.mathematics.geometry.Vector4D;
  * Interface representing a metric tensor field in spacetime.
  * <p>
  * Implementations define how the metric varies with coordinates.
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Fréchet, M. (1906). Sur quelques points du calcul fonctionnel. <i>Rendiconti del Circolo Matematico di Palermo</i>.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

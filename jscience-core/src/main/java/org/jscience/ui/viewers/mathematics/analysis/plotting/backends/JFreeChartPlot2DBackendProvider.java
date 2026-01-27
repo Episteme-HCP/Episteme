@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for JFreeChart 2D plotting.
  * Available when JFreeChart library is on classpath.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JFreeChartPlot2DBackendProvider implements BackendProvider {
 

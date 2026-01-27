@@ -26,10 +26,9 @@ package org.jscience.sociology;
 /**
  * Represents a formalized traditional behavior or sequence of actions (e.g., handshaking, bowing).
  * Rituals are generally shorter and less organizationally complex than {@link Celebration} instances.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Ritual extends Situation {

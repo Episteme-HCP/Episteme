@@ -32,11 +32,10 @@ import org.jscience.sociology.survey.QuestionType;
 
 /**
  * A Swing-based viewer for rendering a Survey.
- *
+ * * @version 1.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.0
- * @since 2.0
+ * @since 1.0
  */
 public class SurveyViewer extends JPanel {
 

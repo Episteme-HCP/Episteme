@@ -28,7 +28,7 @@ import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.circuit.CircuitSimulatorViewer;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -37,12 +37,12 @@ public class CircuitSimulatorDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("circuit.title", "Circuit Simulator");
+        return org.jscience.ui.i18n.I18N.getInstance().get("circuit.title", "Circuit Simulator");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("circuit.desc", "Real-time electronic circuit simulation.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("circuit.desc", "Real-time electronic circuit simulation.");
     }
 
     @Override
@@ -52,7 +52,7 @@ public class CircuitSimulatorDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("circuit.long_desc", "Simulates ideal electronic components including resistors, capacitors, inductors, and voltage sources.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("circuit.long_desc", "Simulates ideal electronic components including resistors, capacitors, inductors, and voltage sources.");
     }
 
     @Override

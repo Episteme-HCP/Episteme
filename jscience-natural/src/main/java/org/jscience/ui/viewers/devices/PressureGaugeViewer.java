@@ -36,7 +36,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.AbstractDeviceViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -44,6 +44,9 @@ import java.util.ArrayList;
 /**
  * An analog gauge viewer for pressure display.
  * Refactored to be parameter-based.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PressureGaugeViewer extends AbstractDeviceViewer<PressureGauge> {
 
@@ -65,8 +68,8 @@ public class PressureGaugeViewer extends AbstractDeviceViewer<PressureGauge> {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("pressure.min", I18n.getInstance().get("pressure.min", "Min Pressure"), -1, 100, 1, minPressure, v -> { minPressure = v; draw(); }));
-        parameters.add(new NumericParameter("pressure.max", I18n.getInstance().get("pressure.max", "Max Pressure"), 1, 1000, 1, maxPressure, v -> { maxPressure = v; draw(); }));
+        parameters.add(new NumericParameter("pressure.min", I18N.getInstance().get("pressure.min", "Min Pressure"), -1, 100, 1, minPressure, v -> { minPressure = v; draw(); }));
+        parameters.add(new NumericParameter("pressure.max", I18N.getInstance().get("pressure.max", "Max Pressure"), 1, 1000, 1, maxPressure, v -> { maxPressure = v; draw(); }));
     }
 
     @Override
@@ -101,8 +104,8 @@ public class PressureGaugeViewer extends AbstractDeviceViewer<PressureGauge> {
         gc.fillText(device.getName(), cx, cy + 60);
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.measure", "Measurement"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.pressuregauge.name", "Pressure Gauge"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.pressuregauge.desc", "Pressure gauge viewer."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.measure", "Measurement"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.pressuregauge.name", "Pressure Gauge"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.pressuregauge.desc", "Pressure gauge viewer."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

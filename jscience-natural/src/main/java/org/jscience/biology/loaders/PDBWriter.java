@@ -33,6 +33,9 @@ import java.util.Locale;
 
 /**
  * Writer for PDB files.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PDBWriter extends AbstractResourceWriter<Protein> {
 
@@ -89,25 +92,25 @@ public class PDBWriter extends AbstractResourceWriter<Protein> {
         }
     }
 
-    // --- Mandatory Abstract Methods (I18n) ---
+    // --- Mandatory Abstract Methods (I18N) ---
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdbwriter.name", "PDB Writer");
+        return org.jscience.ui.i18n.I18N.getInstance().get("writer.pdbwriter.name", "PDB Writer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdbwriter.desc", "Writes protein structures to PDB format.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("writer.pdbwriter.desc", "Writes protein structures to PDB format.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdbwriter.longdesc", "Exports protein structure data to standard PDB file format.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("writer.pdbwriter.longdesc", "Exports protein structure data to standard PDB file format.");
     }
 }

@@ -33,10 +33,9 @@ import org.jscience.util.Commented;
  * Represents the structured chronological sequence of events spanning an individual's lifetime.
  * A biography is composed of multiple parallel {@link HumanTimeline} instances categorized by 
  * specific domains of life (e.g., work, health, social).
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Biography implements Commented, Serializable {

@@ -34,11 +34,6 @@ import java.util.Set;
  * Analytical engine for simulating the natural aging and chemical degradation 
  * of artworks over time, as well as the corrective impacts of various 
  * conservation and restoration treatments.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class RestorationSimulator {
 
@@ -46,7 +41,10 @@ public final class RestorationSimulator {
 
     /**
      * Common forms of chemical and physical degradation in fine art materials.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum DegradationType {
         /** Oxidation leading to yellowing of natural resin varnishes. */
         VARNISH_YELLOWING, 

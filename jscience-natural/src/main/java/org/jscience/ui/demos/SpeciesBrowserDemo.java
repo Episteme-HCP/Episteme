@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.biology.ecology.SpeciesBrowserViewer;
 
 /**
  * Species Browser Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -41,13 +41,13 @@ public class SpeciesBrowserDemo extends AbstractDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.biology"); }
+    public String getCategory() { return I18N.getInstance().get("category.biology"); }
 
     @Override
-    public String getName() { return I18n.getInstance().get("SpeciesBrowser.title", "Species Browser"); }
+    public String getName() { return I18N.getInstance().get("SpeciesBrowser.title", "Species Browser"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("SpeciesBrowser.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API."); }
+    public String getDescription() { return I18N.getInstance().get("SpeciesBrowser.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API."); }
     
     @Override
     public String getLongDescription() {

@@ -35,7 +35,7 @@ import java.util.*;
 /**
  * High-performance JavaFX-based network/graph renderer.
  * Features an interactive force-directed layout using Real precision.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

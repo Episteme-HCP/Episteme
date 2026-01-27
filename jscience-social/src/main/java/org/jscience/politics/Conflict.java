@@ -40,10 +40,9 @@ import org.jscience.util.Temporal;
 /**
  * Represents a political or social conflict between multiple populations or groups.
  * Tracks temporal span, geographical location, and participating parties.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Conflict implements Named, Commented, Positioned<Place>, Temporal<Instant>, Serializable {

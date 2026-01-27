@@ -36,7 +36,7 @@ import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.ChoiceParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.biology.loaders.FASTAReader;
 
 import java.util.*;
@@ -80,18 +80,18 @@ public class GeneticsViewer extends AbstractViewer {
 
     private void setupParameters() {
         // Drift Category
-        parameters.add(new NumericParameter("genetics.drift.pop", I18n.getInstance().get("genetics.popsize", "Drift: Pop Size"), 10, 1000, 10, popSize, v -> popSize = v.intValue()));
-        parameters.add(new NumericParameter("genetics.drift.gen", I18n.getInstance().get("genetics.generations", "Drift: Generations"), 50, 500, 50, generations, v -> {
+        parameters.add(new NumericParameter("genetics.drift.pop", I18N.getInstance().get("genetics.popsize", "Drift: Pop Size"), 10, 1000, 10, popSize, v -> popSize = v.intValue()));
+        parameters.add(new NumericParameter("genetics.drift.gen", I18N.getInstance().get("genetics.generations", "Drift: Generations"), 50, 500, 50, generations, v -> {
             generations = v.intValue();
             history = new double[generations];
         }));
-        parameters.add(new NumericParameter("genetics.drift.freq", I18n.getInstance().get("genetics.initialfreq", "Drift: Initial Freq"), 0.01, 0.99, 0.01, initialFreq, v -> initialFreq = v));
-        parameters.add(new BooleanParameter("genetics.drift.run", I18n.getInstance().get("genetics.run", "Drift: Run Simulation"), false, v -> { if(v) runDriftSimulation(); }));
+        parameters.add(new NumericParameter("genetics.drift.freq", I18N.getInstance().get("genetics.initialfreq", "Drift: Initial Freq"), 0.01, 0.99, 0.01, initialFreq, v -> initialFreq = v));
+        parameters.add(new BooleanParameter("genetics.drift.run", I18N.getInstance().get("genetics.run", "Drift: Run Simulation"), false, v -> { if(v) runDriftSimulation(); }));
 
         // Mendel Category
         List<String> genotypes = List.of("AA", "Aa", "aa");
-        parameters.add(new ChoiceParameter("genetics.mendel.p1", I18n.getInstance().get("genetics.mendel.parent1", "Mendel: Parent 1"), genotypes, parent1, v -> { parent1 = v; calculatePunnettSquare(); }));
-        parameters.add(new ChoiceParameter("genetics.mendel.p2", I18n.getInstance().get("genetics.mendel.parent2", "Mendel: Parent 2"), genotypes, parent2, v -> { parent2 = v; calculatePunnettSquare(); }));
+        parameters.add(new ChoiceParameter("genetics.mendel.p1", I18N.getInstance().get("genetics.mendel.parent1", "Mendel: Parent 1"), genotypes, parent1, v -> { parent1 = v; calculatePunnettSquare(); }));
+        parameters.add(new ChoiceParameter("genetics.mendel.p2", I18N.getInstance().get("genetics.mendel.parent2", "Mendel: Parent 2"), genotypes, parent2, v -> { parent2 = v; calculatePunnettSquare(); }));
         
         // Sequence Category
         // Note: Free text parameter not yet available in JScience UI standard parameters?
@@ -103,15 +103,15 @@ public class GeneticsViewer extends AbstractViewer {
         TabPane tabPane = new TabPane();
         tabPane.getStyleClass().add("demo-tab-pane");
 
-        Tab driftTab = new Tab(I18n.getInstance().get("genetics.tab.drift", "Genetic Drift"));
+        Tab driftTab = new Tab(I18N.getInstance().get("genetics.tab.drift", "Genetic Drift"));
         driftTab.setContent(createDriftTab());
         driftTab.setClosable(false);
 
-        Tab mendelTab = new Tab(I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
+        Tab mendelTab = new Tab(I18N.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
         mendelTab.setContent(createMendelTab());
         mendelTab.setClosable(false);
 
-        Tab sequenceTab = new Tab(I18n.getInstance().get("genetics.tab.sequence", "Sequence Browser"));
+        Tab sequenceTab = new Tab(I18N.getInstance().get("genetics.tab.sequence", "Sequence Browser"));
         sequenceTab.setContent(createSequenceTab());
         sequenceTab.setClosable(false);
 
@@ -236,9 +236,9 @@ public class GeneticsViewer extends AbstractViewer {
         return root;
     }
 
-    @Override public String getName() { return I18n.getInstance().get("viewer.geneticsviewer.name", "Genetics Viewer"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.geneticsviewer.desc", "Genetics simulation viewer."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.geneticsviewer.longdesc", "Drift and Mendelian simulation."); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.geneticsviewer.name", "Genetics Viewer"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.biology", "Biology"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.geneticsviewer.desc", "Genetics simulation viewer."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.geneticsviewer.longdesc", "Drift and Mendelian simulation."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

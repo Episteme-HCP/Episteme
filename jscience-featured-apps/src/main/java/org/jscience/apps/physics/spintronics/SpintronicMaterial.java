@@ -27,9 +27,10 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a material with advanced spintronic properties.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SpintronicMaterial {
     private final String name;

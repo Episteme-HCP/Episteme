@@ -30,10 +30,9 @@ import org.jscience.earth.Place;
  * Represents a nuclear or extended family group.
  * A family is a specialized {@link Group} where members typically share genetic 
  * or formal kinship bonds.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Family extends Group {

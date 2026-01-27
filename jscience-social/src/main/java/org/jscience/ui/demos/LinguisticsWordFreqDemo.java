@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer;
 
 public class LinguisticsWordFreqDemo extends AbstractDemo {
@@ -36,17 +36,17 @@ public class LinguisticsWordFreqDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return I18n.getInstance().get("category.linguistics", "Linguistics"); 
+        return I18N.getInstance().get("category.linguistics", "Linguistics"); 
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.linguisticswordfreqdemo.name", "Word Frequency");
+        return I18N.getInstance().get("demo.linguisticswordfreqdemo.name", "Word Frequency");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.linguisticswordfreqdemo.desc", "Text word frequency analyzer.");
+        return I18N.getInstance().get("demo.linguisticswordfreqdemo.desc", "Text word frequency analyzer.");
     }
 
     @Override
@@ -64,7 +64,7 @@ public class LinguisticsWordFreqDemo extends AbstractDemo {
     
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.linguisticswordfreqdemo.longdesc", "Analyze text to determine word frequency distributions (Zipf's Law).");
+        return I18N.getInstance().get("demo.linguisticswordfreqdemo.longdesc", "Analyze text to determine word frequency distributions (Zipf's Law).");
     }
 }
 

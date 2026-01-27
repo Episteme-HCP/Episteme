@@ -34,7 +34,7 @@ import org.jscience.ui.Simulatable;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,22 +52,22 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("fluid.title", "Fluid Dynamics");
+        return I18N.getInstance().get("fluid.title", "Fluid Dynamics");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("fluid.info", "Fluid simulation using simplified Navier-Stokes equations.");
+        return I18N.getInstance().get("fluid.info", "Fluid simulation using simplified Navier-Stokes equations.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("fluid.long_desc", "Real-time fluid simulation with particle visualization and controls.");
+        return I18N.getInstance().get("fluid.long_desc", "Real-time fluid simulation with particle visualization and controls.");
     }
 
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
+    public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
 
     @Override
     public javafx.scene.Node createViewerNode() {
@@ -139,12 +139,12 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
         }
 
         private void setupParameters() {
-            parameters.add(new NumericParameter(I18n.getInstance().get("fluid.viscosity", "Viscosity"), "Fluid Viscosity", 0.0, 0.05, 0.0001, viscosity, v -> viscosity = v));
-            parameters.add(new BooleanParameter("viewer.fluiddynamics.show_field", I18n.getInstance().get("fluid.check.field", "Show Flow"), showField, v -> showField = v));
-            parameters.add(new BooleanParameter("viewer.fluiddynamics.show_particles", I18n.getInstance().get("fluid.check.particles", "Show Particles"), showParticles, v -> showParticles = v));
-            parameters.add(new NumericParameter(I18n.getInstance().get("fluid.speed", "Speed"), "Simulation Speed", 0.1, 5.0, 0.1, simSpeed, v -> simSpeed = v));
+            parameters.add(new NumericParameter(I18N.getInstance().get("fluid.viscosity", "Viscosity"), "Fluid Viscosity", 0.0, 0.05, 0.0001, viscosity, v -> viscosity = v));
+            parameters.add(new BooleanParameter("viewer.fluiddynamics.show_field", I18N.getInstance().get("fluid.check.field", "Show Flow"), showField, v -> showField = v));
+            parameters.add(new BooleanParameter("viewer.fluiddynamics.show_particles", I18N.getInstance().get("fluid.check.particles", "Show Particles"), showParticles, v -> showParticles = v));
+            parameters.add(new NumericParameter(I18N.getInstance().get("fluid.speed", "Speed"), "Simulation Speed", 0.1, 5.0, 0.1, simSpeed, v -> simSpeed = v));
             
-            parameters.add(new Parameter<>("viewer.fluiddynamics.engine", I18n.getInstance().get("fluid.solver", "Solver Engine"), "Primitive", v -> {
+            parameters.add(new Parameter<>("viewer.fluiddynamics.engine", I18N.getInstance().get("fluid.solver", "Solver Engine"), "Primitive", v -> {
                 if ("Scientific".equals(v)) {
                     solver = new ObjectFluidSolver();
                 } else {
@@ -259,13 +259,13 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
         @Override public void setSpeed(double s) { this.simSpeed = s; }
         @Override public boolean isPlaying() { return running; }
         
-        @Override public String getName() { return I18n.getInstance().get("viewer.fluiddynamics.name", "Fluid Viewer"); }
+        @Override public String getName() { return I18N.getInstance().get("viewer.fluiddynamics.name", "Fluid Viewer"); }
         @Override
-        public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
+        public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
         @Override
-        public String getDescription() { return I18n.getInstance().get("viewer.fluiddynamics.desc", "Fluid Dynamics Viewer"); }
+        public String getDescription() { return I18N.getInstance().get("viewer.fluiddynamics.desc", "Fluid Dynamics Viewer"); }
 
-        @Override public String getLongDescription() { return I18n.getInstance().get("viewer.fluiddynamicsdemo.longdesc", "Advanced fluid simulation."); }
+        @Override public String getLongDescription() { return I18N.getInstance().get("viewer.fluiddynamicsdemo.longdesc", "Advanced fluid simulation."); }
         @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
     }
 

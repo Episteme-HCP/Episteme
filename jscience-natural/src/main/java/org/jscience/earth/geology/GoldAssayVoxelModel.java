@@ -28,6 +28,9 @@ import org.jscience.mathematics.geometry.volume.VoxelModel;
 
 /**
  * A VoxelModel simulating a mineral deposit (e.g., Gold Assay) for Geoscience visualization.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class GoldAssayVoxelModel implements VoxelModel {
     private final int w=80, h=40, d=80; // Large but shallow area

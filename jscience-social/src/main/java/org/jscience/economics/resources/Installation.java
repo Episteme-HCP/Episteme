@@ -33,10 +33,9 @@ import org.jscience.util.identity.Identification;
 /**
  * Represents a large-scale structure or artwork installed in a specific location.
  * Distinguished from Buildings by purpose (often artistic or infrastructural).
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Installation extends Artifact {

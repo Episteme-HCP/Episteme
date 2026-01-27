@@ -38,7 +38,7 @@ import org.jscience.mathematics.analysis.fem.QuadraturePoint;
 
 /**
  * Multicore implementation of FEMProvider.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

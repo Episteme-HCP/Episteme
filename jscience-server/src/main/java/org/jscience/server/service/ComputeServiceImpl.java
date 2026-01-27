@@ -42,6 +42,9 @@ import java.util.concurrent.*;
 
 /**
  * gRPC Service for Compute Task Management.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @GrpcService
 public class ComputeServiceImpl extends ComputeServiceGrpc.ComputeServiceImplBase {

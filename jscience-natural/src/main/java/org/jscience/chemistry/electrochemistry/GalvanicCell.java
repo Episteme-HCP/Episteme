@@ -29,7 +29,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.ElectricPotential;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

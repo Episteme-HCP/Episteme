@@ -31,7 +31,7 @@ import org.jscience.util.ExtensibleEnum;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @since 1.0
  */
 public class HumanRole extends ExtensibleEnum {
 

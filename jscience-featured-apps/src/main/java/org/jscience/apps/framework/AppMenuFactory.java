@@ -23,7 +23,7 @@
 
 package org.jscience.apps.framework;
 
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18NManager;
 
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -37,11 +37,13 @@ import java.util.Locale;
  * Provides consistent menu structure across all killer apps.
  *
  * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class AppMenuFactory {
 
     private final FeaturedAppBase app;
-    private final I18nManager i18n = I18nManager.getInstance();
+    private final I18NManager i18n = I18NManager.getInstance();
 
     public AppMenuFactory(FeaturedAppBase app) {
         this.app = app;
@@ -217,7 +219,7 @@ public class AppMenuFactory {
         // Language submenu
         Menu langMenu = new Menu(i18n.get("framework.menu.preferences.language"), org.jscience.ui.IconLoader.getIcon("globe"));
         ToggleGroup langGroup = new ToggleGroup();
-        for (Locale locale : I18nManager.getSupportedLocales()) {
+        for (Locale locale : I18NManager.getSupportedLocales()) {
             String name = locale.getDisplayLanguage(locale);
             if (name.length() > 1) {
                 name = name.substring(0, 1).toUpperCase(locale) + name.substring(1);

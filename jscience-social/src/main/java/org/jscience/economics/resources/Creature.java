@@ -31,10 +31,9 @@ import org.jscience.measure.Quantity;
 
 /**
  * Represents a living biological resource (animal, plant, etc.).
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Creature extends Natural {

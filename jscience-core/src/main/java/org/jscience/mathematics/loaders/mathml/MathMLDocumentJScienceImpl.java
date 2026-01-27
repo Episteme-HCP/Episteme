@@ -43,9 +43,9 @@ import java.util.Iterator;
  * Encapsulates an entire MathML document and provides methods to create 
  * MathML elements from JScience objects.
  *
- * @author Mark Hale
- * @author Silvere Martin-Michiellot (Modernization)
- * @version 1.1
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MathMLDocumentJScienceImpl extends MathMLDocumentImpl {
 

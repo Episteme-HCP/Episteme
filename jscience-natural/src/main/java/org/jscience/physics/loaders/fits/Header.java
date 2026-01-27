@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

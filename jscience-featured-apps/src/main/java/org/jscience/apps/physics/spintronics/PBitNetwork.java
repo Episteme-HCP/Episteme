@@ -34,9 +34,10 @@ import java.util.Random;
  * Implements a network of interacting p-bits for combinatorial optimization,
  * sampling from probability distributions, and neural network inference.
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PBitNetwork {
 

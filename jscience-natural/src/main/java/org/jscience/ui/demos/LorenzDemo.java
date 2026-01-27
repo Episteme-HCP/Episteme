@@ -26,11 +26,11 @@ package org.jscience.ui.demos;
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.analysis.chaos.LorenzViewer;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 /**
  * Lorenz Attractor Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -44,12 +44,12 @@ public class LorenzDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("Lorenz.title");
+        return I18N.getInstance().get("Lorenz.title");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("Lorenz.desc");
+        return I18N.getInstance().get("Lorenz.desc");
     }
 
     @Override
@@ -59,6 +59,6 @@ public class LorenzDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("Lorenz.desc");
+        return I18N.getInstance().get("Lorenz.desc");
     }
 }

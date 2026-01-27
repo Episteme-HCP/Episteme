@@ -44,6 +44,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Data Lake Browser - Visualize streaming Genome and Star data from the server.
  * Demonstrates the efficiency of gRPC streaming for large scientific datasets.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedDataLakeApp extends Application implements org.jscience.ui.App {
 
@@ -86,7 +89,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
 
         Scene scene = new Scene(root, 1000, 700);
         ThemeManager.getInstance().applyTheme(scene);
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.title", "JScience - Data Lake Explorer"));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.title", "JScience - Data Lake Explorer"));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -97,27 +100,27 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
         header.getStyleClass().add("header-box");
         header.setAlignment(Pos.CENTER_LEFT);
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.title", "Data Lake Browser"));
+        Label title = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.title", "Data Lake Browser"));
         title.getStyleClass().add("header-label-white");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
         // Stream controls
-        streamGenomeBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.btn.genome", "Stream Genome"));
+        streamGenomeBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.btn.genome", "Stream Genome"));
         streamGenomeBtn.getStyleClass().add("accent-button-red");
         streamGenomeBtn.setOnAction(e -> streamGenomeData());
 
-        streamStarsBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.btn.stream_stars", "Stream Stars"));
+        streamStarsBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.btn.stream_stars", "Stream Stars"));
         streamStarsBtn.getStyleClass().add("accent-button-green");
         streamStarsBtn.setOnAction(e -> streamStarData());
 
-        Button clearBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.btn.clear", "Clear"));
+        Button clearBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.btn.clear", "Clear"));
         clearBtn.getStyleClass().add("accent-button-gray");
         clearBtn.setOnAction(e -> {
             outputArea.clear();
             progressBar.setProgress(0);
-            statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.ready", "Ready"));
+            statsLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.status.ready", "Ready"));
         });
 
         header.getChildren().addAll(title, spacer, streamGenomeBtn, streamStarsBtn, clearBtn);
@@ -129,7 +132,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
         pane.setPadding(new Insets(10));
         pane.getStyleClass().add("section-box-transparent");
 
-        Label label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.lbl.output", "Streaming Data Output"));
+        Label label = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.lbl.output", "Streaming Data Output"));
         label.getStyleClass().add("label-white");
 
         outputArea = new TextArea();
@@ -151,13 +154,13 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
         footer.setPadding(new Insets(10, 20, 10, 20));
         footer.getStyleClass().add("status-bar");
 
-        statsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.ready", "Ready"));
+        statsLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.status.ready", "Ready"));
         statsLabel.getStyleClass().add("label-green");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        throughputLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.throughput.default", "Throughput: 0 items/s"));
+        throughputLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.throughput.default", "Throughput: 0 items/s"));
         throughputLabel.getStyleClass().add("label-muted");
 
         footer.getChildren().addAll(statsLabel, spacer, throughputLabel);
@@ -186,7 +189,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             @Override
             public void onNext(GenomeChunk chunk) {
                 int c = count.incrementAndGet();
-                buffer.append(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.msg.chunk_format", "[{0}] Position: {1}, Sequence: {2}...",
+                buffer.append(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.msg.chunk_format", "[{0}] Position: {1}, Sequence: {2}...",
                         c, chunk.getStartBase(),
                         chunk.getSequence().length() > 50 ? chunk.getSequence().substring(0, 50)
                                 : chunk.getSequence())).append("\n");
@@ -196,11 +199,11 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
                         outputArea.appendText(buffer.toString());
                         buffer.setLength(0);
                         progressBar.setProgress(Math.min(c / 100.0, 1.0));
-                        statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.received_chunks", "Received: {0} chunks", c));
+                        statsLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.status.received_chunks", "Received: {0} chunks", c));
 
                         long elapsed = System.currentTimeMillis() - startTime.get();
                         double throughput = c / (elapsed / 1000.0);
-                        throughputLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.throughput.chunks", "Throughput: {0} chunks/s", String.format("%.1f", throughput)));
+                        throughputLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.throughput.chunks", "Throughput: {0} chunks/s", String.format("%.1f", throughput)));
                     });
                 }
             }
@@ -209,7 +212,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             public void onError(Throwable t) {
                 Platform.runLater(() -> {
                     outputArea.appendText("\nError: " + t.getMessage() + "\n");
-                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.error_short", "Error"));
+                    statsLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.status.error_short", "Error"));
                     isStreaming = false;
                     streamGenomeBtn.setDisable(false);
                     streamStarsBtn.setDisable(false);
@@ -263,11 +266,11 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
                         outputArea.appendText(buffer.toString());
                         buffer.setLength(0);
                         progressBar.setProgress(Math.min(c / 100.0, 1.0));
-                        statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.received_stars", "Received: {0} stars", c));
+                        statsLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.status.received_stars", "Received: {0} stars", c));
 
                         long elapsed = System.currentTimeMillis() - startTime.get();
                         double throughput = c / (elapsed / 1000.0);
-                        throughputLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.throughput.stars", "Throughput: {0} stars/s", String.format("%.1f", throughput)));
+                        throughputLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.throughput.stars", "Throughput: {0} stars/s", String.format("%.1f", throughput)));
                     });
                 }
             }
@@ -276,7 +279,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             public void onError(Throwable t) {
                 Platform.runLater(() -> {
                     outputArea.appendText("\nError: " + t.getMessage() + "\n");
-                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.error_short", "Error"));
+                    statsLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.status.error_short", "Error"));
                     isStreaming = false;
                     streamGenomeBtn.setDisable(false);
                     streamStarsBtn.setDisable(false);
@@ -316,16 +319,16 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.general", "General"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.general", "General"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.name", "Distributed Data Lake App"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.name", "Distributed Data Lake App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.desc", "Explore massive scientific datasets via high-speed gRPC streaming."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.desc", "Explore massive scientific datasets via high-speed gRPC streaming."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.longdesc", "The Data Lake Browser provides a real-time window into the JScience storage cluster. It demonstrates efficient streaming of genomic sequences and astronomical catalogs, supporting multi-gigabyte datasets with minimal memory overhead."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddatalakeapp.longdesc", "The Data Lake Browser provides a real-time window into the JScience storage cluster. It demonstrates efficient streaming of genomic sequences and astronomical catalogs, supporting multi-gigabyte datasets with minimal memory overhead."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

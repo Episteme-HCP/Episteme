@@ -84,21 +84,21 @@ public class VotingMachineViewer extends AbstractDeviceViewer<VotingMachine> {
 
     @Override
     public String getName() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.votingmachine.name", "Voting Machine");
+         return org.jscience.ui.i18n.I18N.getInstance().get("viewer.votingmachine.name", "Voting Machine");
     }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.social_sciences", "Social Sciences");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.social_sciences", "Social Sciences");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.votingmachine.desc", "A voting machine viewer for monitoring election results.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.votingmachine.desc", "A voting machine viewer for monitoring election results.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.votingmachine.longdesc", "Digital ballot box visualization that provides real-time monitoring of vote tallies, voter turnout, and machine status ensuring transparency and accuracy in the electoral process.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.votingmachine.longdesc", "Digital ballot box visualization that provides real-time monitoring of vote tallies, voter turnout, and machine status ensuring transparency and accuracy in the electoral process.");
     }
 }

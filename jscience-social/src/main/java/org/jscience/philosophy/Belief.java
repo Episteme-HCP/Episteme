@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.philosophy;
 
 import java.util.Collections;
@@ -43,10 +44,9 @@ import org.jscience.util.persistence.Relation;
  * <p> Beliefs are the core units of conviction that form the basis of larger 
  *     philosophical frameworks and argumentations.</p>
  * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
- *
+ * * @version 7.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 7.0
  * @since 1.0
  */
 @Persistent

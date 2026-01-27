@@ -40,13 +40,12 @@ import org.jscience.mathematics.geometry.Vector4D;
  * $ds^2 = -(1 - r_s/r)(c dt)^2 + (1 - r_s/r)^{-1} dr^2 + r^2 d\Omega^2$
  * using $(-+++)$ signature.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Schwarzschild, K. (1916). Über das Gravitationsfeld eines Massenpunktes nach der Einsteinschen Theorie. <i>Sitzungsberichte der Königlich Preussischen Akademie der Wissenschaften</i>.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

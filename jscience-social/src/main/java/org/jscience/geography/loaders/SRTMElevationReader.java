@@ -27,7 +27,7 @@ import org.jscience.io.AbstractResourceReader;
 
 /**
  * Reader for SRTM (Shuttle Radar Topography Mission) data.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -36,17 +36,17 @@ public class SRTMElevationReader extends AbstractResourceReader<Double> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.srtmelevation.desc", "SRTM Data Reader (HGT format).");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.srtmelevation.desc", "SRTM Data Reader (HGT format).");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.srtmelevation.longdesc", "Reads high-resolution elevation data from the Shuttle Radar Topography Mission (SRTM) files in HGT format.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.srtmelevation.longdesc", "Reads high-resolution elevation data from the Shuttle Radar Topography Mission (SRTM) files in HGT format.");
     }
 
     @Override
@@ -110,5 +110,5 @@ public class SRTMElevationReader extends AbstractResourceReader<Double> {
         }
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.srtmelevation.name", "SRTM Elevation Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.srtmelevation.name", "SRTM Elevation Reader"); }
 }

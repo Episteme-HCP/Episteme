@@ -29,6 +29,9 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Spring Data JPA Repository for Jobs.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @Repository
 public interface JobRepository extends JpaRepository<Job, String> {

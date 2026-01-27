@@ -34,6 +34,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * Fourier, J. (1822). <i>Théorie analytique de la chaleur</i>. Firmin Didot.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class HeatEquationSolver {
 

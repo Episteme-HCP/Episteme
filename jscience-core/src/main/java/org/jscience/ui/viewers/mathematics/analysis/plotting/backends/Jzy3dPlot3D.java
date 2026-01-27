@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * Jzy3d implementation for 3D plotting.
  * Compatible with Jzy3d 1.0.0.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

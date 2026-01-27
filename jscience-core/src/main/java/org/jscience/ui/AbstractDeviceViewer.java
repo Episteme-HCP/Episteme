@@ -55,7 +55,7 @@ public abstract class AbstractDeviceViewer<T extends Device> extends AbstractVie
         this.nameLabel = new Label(device.getName());
         this.nameLabel.getStyleClass().add("header-label");
 
-        this.statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("device.status.connected", "Status: Connected"));
+        this.statusLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("device.status.connected", "Status: Connected"));
         this.statusLabel.getStyleClass().add("status-label");
 
         container.getChildren().addAll(nameLabel, statusLabel);
@@ -76,19 +76,19 @@ public abstract class AbstractDeviceViewer<T extends Device> extends AbstractVie
     @Override
     public String getName() {
         return java.text.MessageFormat.format(
-            org.jscience.ui.i18n.I18n.getInstance().get("device.viewer.title.fmt", "{0} Viewer"), 
+            org.jscience.ui.i18n.I18N.getInstance().get("device.viewer.title.fmt", "{0} Viewer"), 
             device.getName());
     }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.devices", "Devices");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.devices", "Devices");
     }
 
     @Override
     public String getDescription() {
         return java.text.MessageFormat.format(
-            org.jscience.ui.i18n.I18n.getInstance().get("device.control.desc.fmt", "Control interface for {0}"), 
+            org.jscience.ui.i18n.I18N.getInstance().get("device.control.desc.fmt", "Control interface for {0}"), 
             device.getName());
     }
 

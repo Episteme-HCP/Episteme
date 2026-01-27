@@ -25,6 +25,9 @@ package org.jscience.ui.viewers.chemistry.backends;
 
 /**
  * Standard styles for molecular visualization.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public enum RenderStyle {
     /**

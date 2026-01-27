@@ -35,7 +35,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import javafx.stage.Stage;
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18NManager;
 
 @ExtendWith(ApplicationExtension.class)
 public class CivilizationAppTest {
@@ -51,8 +51,8 @@ public class CivilizationAppTest {
 
         // Enforce English locale for deterministic testing
         java.util.Locale.setDefault(java.util.Locale.ENGLISH);
-        // Also reset the I18nManager singleton to use English
-        I18nManager.getInstance().setLocale(java.util.Locale.ENGLISH);
+        // Also reset the I18NManager singleton to use English
+        I18NManager.getInstance().setLocale(java.util.Locale.ENGLISH);
     }
 
     @Start
@@ -61,7 +61,7 @@ public class CivilizationAppTest {
     }
 
     @Test
-    public void testLaunchAndI18n(FxRobot robot) {
+    public void testLaunchAndI18N(FxRobot robot) {
         // Verify that the status label is correctly localized
         String expectedStatus = "STABLE";
         org.hamcrest.MatcherAssert.assertThat(robot.lookup(hasText(expectedStatus)).query(), isVisible());
@@ -69,7 +69,7 @@ public class CivilizationAppTest {
 
     @Test
     public void testMenuPresence(FxRobot robot) {
-        I18nManager i18n = I18nManager.getInstance();
+        I18NManager i18n = I18NManager.getInstance();
 
         // Verify "Run" button exists (localized)
         String runText = i18n.get("civilization.button.run");
@@ -92,7 +92,7 @@ public class CivilizationAppTest {
 
     @Test
     public void testDynamicLanguageSwitch(FxRobot robot) throws InterruptedException {
-        I18nManager i18n = I18nManager.getInstance();
+        I18NManager i18n = I18NManager.getInstance();
 
         // 1. Switch to French
         // Note: runLater is used by listener, but we are in test thread?

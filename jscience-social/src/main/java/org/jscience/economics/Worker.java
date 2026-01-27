@@ -52,10 +52,9 @@ import java.util.stream.Collectors;
  * <p>A worker is an {@link EconomicAgent} that has a specific job function, 
  * earns an income, and exists within a professional hierarchy of chiefs and 
  * subalterns.</p>
- *
+ * * @version 6.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.1
  * @since 1.0
  */
 @Persistent

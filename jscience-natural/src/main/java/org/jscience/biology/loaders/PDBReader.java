@@ -31,7 +31,7 @@ import java.io.*;
 /**
  * Protein Data Bank (PDB) loader and exporter.
  * Supports loading from RCSB API and saving to PDB format.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -40,17 +40,17 @@ public class PDBReader extends AbstractResourceReader<Protein> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdbreader.desc", "Protein Data Bank (PDB) Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.pdbreader.desc", "Protein Data Bank (PDB) Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdbreader.longdesc", "Reads protein structures from PDB format files or RCSB PDB API.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.pdbreader.longdesc", "Reads protein structures from PDB format files or RCSB PDB API.");
     }
 
     @Override
@@ -183,5 +183,5 @@ public class PDBReader extends AbstractResourceReader<Protein> {
         return protein;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdbreader.name", "PDB Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.pdbreader.name", "PDB Reader"); }
 }

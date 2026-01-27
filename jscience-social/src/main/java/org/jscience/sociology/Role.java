@@ -40,10 +40,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a social role assumed by an individual within a specific situation.
  * Roles define expected behaviors and relations (e.g., Client/Server, Supervisor, Observer).
- *
+ * * @version 2.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.1
  * @since 1.0
  */
 @Persistent

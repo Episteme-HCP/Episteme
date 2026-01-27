@@ -27,7 +27,7 @@ import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.logic.MetamathViewer;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -40,17 +40,17 @@ public class MetamathDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.metamathdemo.name");
+        return org.jscience.ui.i18n.I18N.getInstance().get("demo.metamathdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.metamathdemo.desc");
+        return org.jscience.ui.i18n.I18N.getInstance().get("demo.metamathdemo.desc");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class MetamathDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.metamathdemo.longdesc");
+         return org.jscience.ui.i18n.I18N.getInstance().get("demo.metamathdemo.longdesc");
     }
 }
 

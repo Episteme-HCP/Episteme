@@ -39,6 +39,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * - Per-method rate limiting
  * - Token bucket algorithm
  * - Configurable limits
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RateLimiterInterceptor implements ServerInterceptor {
 

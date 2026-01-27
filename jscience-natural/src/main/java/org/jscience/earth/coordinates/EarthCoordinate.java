@@ -36,7 +36,7 @@ import org.jscience.measure.quantity.Length;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public interface EarthCoordinate extends Positioned<EarthCoordinate> {
 

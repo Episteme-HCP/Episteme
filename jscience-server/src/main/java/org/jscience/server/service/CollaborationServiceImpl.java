@@ -37,6 +37,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * gRPC Service for Collaboration.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @GrpcService
 public class CollaborationServiceImpl extends CollaborationServiceGrpc.CollaborationServiceImplBase {

@@ -38,10 +38,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a human language as a systematic linguistic entity.
  * It tracks grammatical properties, writing systems (graphemes), and 
  * phonetic inventories (phonemes).
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

@@ -38,6 +38,9 @@ import java.util.function.Consumer;
  * - Topological ordering
  * - Parallel execution of independent tasks
  * - Completion tracking
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class TaskDependencyGraph<T> {
 

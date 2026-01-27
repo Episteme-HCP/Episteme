@@ -30,7 +30,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.jscience.ui.JScienceDemosApp;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,6 +57,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * UI Crawler for JScienceDemosApp (run-demos.bat).
  * Iterates through all discovered demos and checks for missing translations.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @ExtendWith(ApplicationExtension.class)
 public class DemosAppCrawlerTest {
@@ -77,13 +80,13 @@ public class DemosAppCrawlerTest {
         new File(SCREENSHOT_DIR).mkdirs();
         // Force English for stable lookups
         Locale.setDefault(Locale.ENGLISH);
-        org.jscience.ui.i18n.I18n.getInstance().setLocale(Locale.ENGLISH);
+        org.jscience.ui.i18n.I18N.getInstance().setLocale(Locale.ENGLISH);
     }
 
     @Start
     private void start(Stage stage) {
         this.mainStage = stage;
-        I18n.setTestMode(true);
+        I18N.setTestMode(true);
         new JScienceDemosApp().start(stage);
     }
 

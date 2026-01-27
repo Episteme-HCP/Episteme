@@ -35,9 +35,10 @@ import org.jscience.mathematics.numbers.real.Real;
  *   <li>Switch at THz frequencies (ultrafast)</li>
  * </ul>
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class AntiferromagneticMaterial {
 

@@ -42,9 +42,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * $$ L \frac{dI}{dt} + R_{total} I + \frac{Q}{C} = V_{DC} $$
  * where $R_{total} = R_{load} + R_{spinvalve}(\theta)$
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SpintronicCircuit {
 

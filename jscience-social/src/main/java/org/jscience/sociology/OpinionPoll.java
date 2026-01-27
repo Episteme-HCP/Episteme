@@ -30,10 +30,9 @@ import java.util.Random;
 /**
  * A simulated Opinion Poll "device" for gauging public sentiment.
  * Provides methods to simulate polling a population on various topics or options.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class OpinionPoll {

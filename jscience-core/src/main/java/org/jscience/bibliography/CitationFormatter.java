@@ -26,7 +26,7 @@ package org.jscience.bibliography;
 import java.util.Map;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

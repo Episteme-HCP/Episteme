@@ -29,6 +29,9 @@ import java.util.function.Predicate;
  * Represents a testable hypothesis.
  * 
  * @param <T> The type of the result to be validated against the hypothesis
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface Hypothesis<T> extends Predicate<T> {
     

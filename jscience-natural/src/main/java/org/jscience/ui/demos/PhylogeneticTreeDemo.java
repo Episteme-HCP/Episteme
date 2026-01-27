@@ -25,18 +25,17 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.biology.phylogeny.PhylogeneticTreeViewer;
 
 /**
  * Phylogenetic Tree Demo.
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -49,10 +48,10 @@ public class PhylogeneticTreeDemo extends AbstractDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("PhylogeneticTree.title", "Phylogenetic Tree"); }
+    public String getName() { return I18N.getInstance().get("PhylogeneticTree.title", "Phylogenetic Tree"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("PhylogeneticTree.desc", "Visualizes evolutionary relationships."); }
+    public String getDescription() { return I18N.getInstance().get("PhylogeneticTree.desc", "Visualizes evolutionary relationships."); }
     
     @Override
     public String getLongDescription() { 

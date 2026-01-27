@@ -45,13 +45,12 @@ import org.jscience.measure.quantity.Time;
  * dI/dt = ÃÆ’E - ÃŽÂ³I
  * dR/dt = ÃŽÂ³I
  * </pre>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Zeigler, B. P., Praehofer, H., & Kim, T. G. (2000). <i>Theory of Modeling and Simulation</i>. Academic Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

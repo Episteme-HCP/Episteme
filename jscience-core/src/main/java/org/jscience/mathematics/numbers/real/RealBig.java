@@ -29,7 +29,8 @@ import java.math.MathContext;
 /**
  * Real number backed by arbitrary-precision {@link BigDecimal}.
  * Package-private implementation detail.
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

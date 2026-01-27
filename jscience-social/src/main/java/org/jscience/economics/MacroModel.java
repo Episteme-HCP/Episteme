@@ -28,13 +28,12 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Simulates macroeconomic factors over time.
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Zeigler, B. P., Praehofer, H., & Kim, T. G. (2000). <i>Theory of Modeling and Simulation</i>. Academic Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -60,10 +59,10 @@ public class MacroModel {
                 .add(Real.of(random.nextGaussian() * 0.2)); // Okun's Law approx
 
         // Update GDP
-        if (economy.getGdp() != null) {
-            org.jscience.economics.money.Money currentGdp = economy.getGdp();
-            org.jscience.economics.money.Money newGdp = currentGdp.multiply(Real.ONE.add(gdpGrowth));
-            economy.setGdp(newGdp);
+        if (economy.getGDP() != null) {
+            org.jscience.economics.money.Money currentGDP = economy.getGDP();
+            org.jscience.economics.money.Money newGDP = currentGDP.multiply(Real.ONE.add(gdpGrowth));
+            economy.setGDP(newGDP);
         }
 
         // Update Rates
@@ -86,9 +85,9 @@ public class MacroModel {
      * Predicts GDP for next N years based on constant growth.
      */
     public org.jscience.economics.money.Money predictGDP(int years, Real assumedGrowthRate) {
-        if (economy.getGdp() == null)
+        if (economy.getGDP() == null)
             return org.jscience.economics.money.Money.usd(0.0);
-        return economy.getGdp().multiply(Real.ONE.add(assumedGrowthRate).pow(Real.of(years)));
+        return economy.getGDP().multiply(Real.ONE.add(assumedGrowthRate).pow(Real.of(years)));
     }
 }
 

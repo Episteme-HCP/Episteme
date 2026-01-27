@@ -26,7 +26,7 @@ package org.jscience.linguistics;
 import java.util.*;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

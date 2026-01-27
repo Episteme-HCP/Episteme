@@ -36,7 +36,7 @@ import javafx.scene.text.Font;
 
 import org.jscience.ui.AbstractDeviceViewer;
 import org.jscience.device.transducers.Telescope;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.ChoiceParameter;
@@ -79,11 +79,11 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("telescope.target.ra", I18n.getInstance().get("generated.telescope.target.ra.h", "Target RA (h)"), 0, 24, 0.01, targetRA, v -> targetRA = v));
-        parameters.add(new NumericParameter("telescope.target.dec", I18n.getInstance().get("generated.telescope.target.dec", "Target Dec (°)"), -90, 90, 0.1, targetDec, v -> targetDec = v));
+        parameters.add(new NumericParameter("telescope.target.ra", I18N.getInstance().get("generated.telescope.target.ra.h", "Target RA (h)"), 0, 24, 0.01, targetRA, v -> targetRA = v));
+        parameters.add(new NumericParameter("telescope.target.dec", I18N.getInstance().get("generated.telescope.target.dec", "Target Dec (°)"), -90, 90, 0.1, targetDec, v -> targetDec = v));
         
         List<String> presets = List.of("None", "Polaris", "Vega", "Betelgeuse", "Sirius");
-        parameters.add(new ChoiceParameter("telescope.preset", I18n.getInstance().get("telescope.target", "Preset Target"), presets, "None", v -> {
+        parameters.add(new ChoiceParameter("telescope.preset", I18N.getInstance().get("telescope.target", "Preset Target"), presets, "None", v -> {
             switch(v) {
                 case "Polaris" -> { targetRA = 2.53; targetDec = 89.26; }
                 case "Vega" -> { targetRA = 18.62; targetDec = 38.78; }
@@ -92,7 +92,7 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
             }
         }));
 
-        parameters.add(new BooleanParameter("telescope.slew", I18n.getInstance().get("telescope.btn.slew", "Slew to Target"), false, v -> {
+        parameters.add(new BooleanParameter("telescope.slew", I18N.getInstance().get("telescope.btn.slew", "Slew to Target"), false, v -> {
             if (v) slewToTarget();
             else stopSlew();
         }));
@@ -120,7 +120,7 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
         infoPanel.setPadding(new Insets(10));
         infoPanel.setPrefWidth(200);
         infoPanel.getStyleClass().add("viewer-sidebar");
-        Label helpLabel = new Label(I18n.getInstance().get("viewer.telescope.desc", "Use parameters to slew."));
+        Label helpLabel = new Label(I18N.getInstance().get("viewer.telescope.desc", "Use parameters to slew."));
         helpLabel.setWrapText(true);
         infoPanel.getChildren().add(helpLabel);
         setRight(infoPanel);
@@ -128,7 +128,7 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
 
     private HBox createStatusPanel() {
         VBox raBox = new VBox(2);
-        Label raTitle = new Label(I18n.getInstance().get("telescope.ra.title", "Current RA"));
+        Label raTitle = new Label(I18N.getInstance().get("telescope.ra.title", "Current RA"));
         raTitle.setFont(Font.font("System", 10));
         raLabel = new Label("0.00h");
         raLabel.getStyleClass().add("font-bold");
@@ -136,7 +136,7 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
         raBox.setAlignment(Pos.CENTER);
 
         VBox decBox = new VBox(2);
-        Label decTitle = new Label(I18n.getInstance().get("telescope.dec.title", "Current Dec"));
+        Label decTitle = new Label(I18N.getInstance().get("telescope.dec.title", "Current Dec"));
         decTitle.setFont(Font.font("System", 10));
         decLabel = new Label("0.00°");
         decLabel.getStyleClass().add("font-bold");
@@ -232,10 +232,10 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
         gc.strokeOval(2, 2, w - 4, h - 4);
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.telescope.name", "Telescope"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.telescope.desc", "Telescope control viewer."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.telescope.longdesc", "Telescope control and monitoring."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.telescope.name", "Telescope"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.telescope.desc", "Telescope control viewer."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.telescope.longdesc", "Telescope control and monitoring."); }
     
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

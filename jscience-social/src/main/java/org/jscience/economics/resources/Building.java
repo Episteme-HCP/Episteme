@@ -35,10 +35,9 @@ import org.jscience.util.identity.Identification;
 
 /**
  * Represents a human-made physical structure such as a house, factory, or skyscraper.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Building extends Artifact implements Store {

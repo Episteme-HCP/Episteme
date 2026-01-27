@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.history;
 
 import java.io.Serializable;
@@ -35,8 +36,9 @@ import org.jscience.sociology.SocietySimulation;
  * Orchestrates multi-domain counterfactual simulations by combining 
  * historical contingencies with agent-based social simulations.
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public class CounterfactualHistoryRunner implements Serializable {
 

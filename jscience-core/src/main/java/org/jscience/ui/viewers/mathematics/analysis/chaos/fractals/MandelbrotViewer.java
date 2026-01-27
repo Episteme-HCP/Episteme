@@ -53,40 +53,40 @@ public class MandelbrotViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.name", "Mandelbrot Set");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.name", "Mandelbrot Set");
     }
 
     @Override
     public List<Parameter<?>> getViewerParameters() {
         List<Parameter<?>> params = new ArrayList<>();
         params.add(new NumericParameter("viewer.mandelbrotviewer.param.minre",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.param.minre.desc", "Min Real"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.param.minre.desc", "Min Real"),
                 -3, 1, 0.1, minRe.doubleValue(), v -> { minRe = Real.of(v); render(); }));
         params.add(new NumericParameter("viewer.mandelbrotviewer.param.maxre",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.param.maxre.desc", "Max Real"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.param.maxre.desc", "Max Real"),
                 -1, 3, 0.1, maxRe.doubleValue(), v -> { maxRe = Real.of(v); render(); }));
         params.add(new NumericParameter("viewer.mandelbrotviewer.param.minim",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.param.minim.desc", "Min Imaginary"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.param.minim.desc", "Min Imaginary"),
                 -2, 2, 0.1, minIm.doubleValue(), v -> { minIm = Real.of(v); render(); }));
         params.add(new NumericParameter("viewer.mandelbrotviewer.param.maxim",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.param.maxim.desc", "Max Imaginary"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.param.maxim.desc", "Max Imaginary"),
                 -2, 2, 0.1, maxIm.doubleValue(), v -> { maxIm = Real.of(v); render(); }));
         params.add(new NumericParameter("viewer.mandelbrotviewer.param.maxiter",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.param.maxiter.desc", "Max Iterations"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.param.maxiter.desc", "Max Iterations"),
                 50, 2000, 50, maxIter, v -> { maxIter = v.intValue(); render(); }));
         params.add(new NumericParameter("viewer.mandelbrotviewer.param.juliareal",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.param.juliareal.desc", "Julia Real (c_re)"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.param.juliareal.desc", "Julia Real (c_re)"),
                 -2, 2, 0.01, juliaReal.doubleValue(), v -> { juliaReal = Real.of(v); if(juliaMode) render(); }));
         params.add(new NumericParameter("viewer.mandelbrotviewer.param.juliaimag",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.param.juliaimag.desc", "Julia Imaginary (c_im)"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.param.juliaimag.desc", "Julia Imaginary (c_im)"),
                 -2, 2, 0.01, juliaImag.doubleValue(), v -> { juliaImag = Real.of(v); if(juliaMode) render(); }));
         params.add(new BooleanParameter("viewer.mandelbrotviewer.mode.julia",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.mode.julia", "Julia Set Mode"),
+                org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.mode.julia", "Julia Set Mode"),
                 juliaMode,
                 v -> {
                     juliaMode = v;
@@ -251,12 +251,12 @@ public class MandelbrotViewer extends AbstractViewer {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.desc", "Interactive exploration of the Mandelbrot set and Julia sets.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.desc", "Interactive exploration of the Mandelbrot set and Julia sets.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.longdesc", "Explore the infinite complexity of the Mandelbrot set with zoom and pan controls. Switch to Julia mode to explore related Julia sets with customizable parameters.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.mandelbrotviewer.longdesc", "Explore the infinite complexity of the Mandelbrot set with zoom and pan controls. Switch to Julia mode to explore related Julia sets with customizable parameters.");
     }
 }
 

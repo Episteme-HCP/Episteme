@@ -33,6 +33,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Initializes the Admin user on startup.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @Component
 public class AdminUserInitializer implements CommandLineRunner {

@@ -27,7 +27,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -44,6 +44,9 @@ import java.util.regex.Pattern;
  * Automated UI Crawler to verify localization.
  * Launches the Master Control and spider-crawls through tabs and nodes
  * to identify hardcoded strings or missing keys.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class LocalizationCrawlerTest extends ApplicationTest {
 
@@ -71,7 +74,7 @@ public class LocalizationCrawlerTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         // Force Chinese locale for testing
-        I18n.getInstance().setLocale(TARGET_LOCALE);
+        I18N.getInstance().setLocale(TARGET_LOCALE);
 
         JScienceMasterControl app = new JScienceMasterControl();
         app.start(stage);

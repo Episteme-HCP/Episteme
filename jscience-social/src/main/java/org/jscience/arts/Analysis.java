@@ -31,10 +31,9 @@ import java.util.Objects;
  * Represents a scientific analysis or examination of an artwork.
  * Common methodologies include Carbon-14 dating, X-Ray fluorescence (XRF), 
  * infrared reflectography, and pigment spectroscopy.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class Analysis implements Serializable {

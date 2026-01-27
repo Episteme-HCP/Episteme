@@ -40,6 +40,9 @@ import java.util.concurrent.*;
  * - Authorization decisions
  * - Task submissions
  * - Administrative actions
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class AuditLogger {
 
@@ -80,7 +83,7 @@ public class AuditLogger {
             String action,
             boolean success,
             String details) {
-        public String toJson() {
+        public String toJSON() {
             return String.format(
                     "{\"timestamp\":\"%s\",\"type\":\"%s\",\"userId\":\"%s\"," +
                             "\"remoteAddress\":\"%s\",\"resource\":\"%s\",\"action\":\"%s\"," +
@@ -164,7 +167,7 @@ public class AuditLogger {
 
     private void writeEvent(AuditEvent event) {
         if (writer != null) {
-            writer.println(event.toJson());
+            writer.println(event.toJSON());
             writer.flush();
         }
     }

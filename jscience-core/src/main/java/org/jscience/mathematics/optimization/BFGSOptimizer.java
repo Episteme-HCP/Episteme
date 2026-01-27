@@ -31,13 +31,12 @@ import org.jscience.mathematics.numbers.real.Real;
  * Efficient unconstrained optimization without computing Hessian directly.
  * Uses rank-2 updates to approximate inverse Hessian.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Broyden, C. G., Fletcher, R., Goldfarb, D., & Shanno, D. F. (1970). The BFGS Algorithm. <i>Journal of the Institute of Mathematics and Its Applications</i>.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

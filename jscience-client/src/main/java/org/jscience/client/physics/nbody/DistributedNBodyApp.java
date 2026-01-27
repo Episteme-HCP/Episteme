@@ -68,6 +68,9 @@ import java.util.concurrent.TimeUnit;
  * Aarseth, S. J. (2003). <i>Gravitational N-Body Simulations</i>. Cambridge University Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedNBodyApp extends Application implements org.jscience.ui.App {
 
@@ -129,7 +132,7 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
                     int fps = frameCount;
                     frameCount = 0;
                     lastFpsTime = now;
-                    Platform.runLater(() -> fpsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.fps", "FPS: --").replace("--", String.valueOf(fps))));
+                    Platform.runLater(() -> fpsLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.fps", "FPS: --").replace("--", String.valueOf(fps))));
                 }
 
                 if (distributed && serverAvailable) {
@@ -148,7 +151,7 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
 
         Scene scene = new Scene(root, WIDTH + 40, HEIGHT + 140);
         ThemeManager.getInstance().applyTheme(scene);
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.title", "JScience Distributed N-Body Simulation"));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.title", "JScience Distributed N-Body Simulation"));
         primaryStage.setScene(scene);
         primaryStage.show();
         render();
@@ -210,7 +213,7 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
             // Server unavailable, fall back to local
             if (serverAvailable) {
                 serverAvailable = false;
-                Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.status.local_fallback", "⚠️ Server unavailable, using local mode")));
+                Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.status.local_fallback", "⚠️ Server unavailable, using local mode")));
             }
             simulation.step(Real.of(DT));
         }
@@ -262,10 +265,10 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
 
     private void updateStatus() {
         if (stepCount % 60 == 0) { // Update every ~1 second
-            String modeLabel = distributed ? (serverAvailable ? org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.mode.dist", "🌐 Distributed") : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.mode.fallback", "⚠️ Fallback Local")) : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.mode.local", "💻 Local");
+            String modeLabel = distributed ? (serverAvailable ? org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.mode.dist", "🌐 Distributed") : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.mode.fallback", "⚠️ Fallback Local")) : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.mode.local", "💻 Local");
             double energy = simulation.totalEnergy().doubleValue();
             Platform.runLater(
-                    () -> statusLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.status.format", "%s | Step: %d | E: %.2e J"), modeLabel, stepCount, energy)));
+                    () -> statusLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.status.format", "%s | Step: %d | E: %.2e J"), modeLabel, stepCount, energy)));
         }
     }
 
@@ -343,28 +346,28 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
         header.getStyleClass().add("header-box");
         header.setAlignment(Pos.CENTER_LEFT);
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.header", "🌌 Distributed N-Body Simulation"));
+        Label title = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.header", "🌌 Distributed N-Body Simulation"));
         title.getStyleClass().add("header-label-white");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        startBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.btn.start", "▶ Start"));
+        startBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.btn.start", "▶ Start"));
         startBtn.getStyleClass().add("accent-button-green");
         startBtn.setOnAction(e -> toggleSimulation());
 
-        ToggleButton distributedToggle = new ToggleButton(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.btn.dist", "🌐 Distributed"));
+        ToggleButton distributedToggle = new ToggleButton(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.btn.dist", "🌐 Distributed"));
         distributedToggle.getStyleClass().add("accent-button-red");
         distributedToggle.setOnAction(e -> {
             distributed = distributedToggle.isSelected();
             if (distributed && !serverAvailable) {
                 checkServerAvailability(); // Retry connection
             }
-            statusLabel.setText(distributed ? (serverAvailable ? org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.status.dist_mode", "🌐 Distributed Mode") : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.status.server_unavail", "⚠️ Server unavailable"))
-                    : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.status.local_mode", "💻 Local Mode"));
+            statusLabel.setText(distributed ? (serverAvailable ? org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.status.dist_mode", "🌐 Distributed Mode") : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.status.server_unavail", "⚠️ Server unavailable"))
+                    : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.status.local_mode", "💻 Local Mode"));
         });
 
-        Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.btn.reset", "🔄 Reset"));
+        Button resetBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.btn.reset", "🔄 Reset"));
         resetBtn.getStyleClass().add("accent-button-gray");
         resetBtn.setOnAction(e -> {
             resetSimulation();
@@ -379,10 +382,10 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
         running = !running;
         if (running) {
             timer.start();
-            startBtn.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.btn.pause", "⏸ Pause"));
+            startBtn.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.btn.pause", "⏸ Pause"));
         } else {
             timer.stop();
-            startBtn.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.btn.start", "▶ Start"));
+            startBtn.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.btn.start", "▶ Start"));
         }
     }
 
@@ -391,13 +394,13 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
         footer.setPadding(new Insets(10, 20, 10, 20));
         footer.getStyleClass().add("status-bar");
 
-        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.status.ready", "💻 Local Mode - Ready"));
+        statusLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.status.ready", "💻 Local Mode - Ready"));
         statusLabel.getStyleClass().add("label-green");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        fpsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.fps", "FPS: --"));
+        fpsLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.fps", "FPS: --"));
         fpsLabel.getStyleClass().add("label-muted");
 
         footer.getChildren().addAll(statusLabel, spacer, fpsLabel);
@@ -433,16 +436,16 @@ public class DistributedNBodyApp extends Application implements org.jscience.ui.
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.physics", "Physics"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.name", "Distributed N Body App"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.name", "Distributed N Body App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.desc", "Complex gravitational N-body simulation utilizing the JScience computing cluster."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.desc", "Complex gravitational N-body simulation utilizing the JScience computing cluster."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributednbodyapp.longdesc", "Model the motions of celestial bodies or particles interacting through gravitational forces. This simulation offloads heavy force-calculation metrics to the JScience grid, allowing for significantly higher particle counts and more complex orbital dynamics than local execution alone."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributednbodyapp.longdesc", "Model the motions of celestial bodies or particles interacting through gravitational forces. This simulation offloads heavy force-calculation metrics to the JScience grid, allowing for significantly higher particle counts and more complex orbital dynamics than local execution alone."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics;
 
 import org.jscience.biology.HomoSapiens;
@@ -47,9 +48,9 @@ import java.util.UUID;
  * manage financial {@link Account}s, and interact with other organizations 
  * as providers or clients.</p>
  *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.1
+ * @since 1.0
  */
 @Persistent
 public class Organization extends Community implements Property {

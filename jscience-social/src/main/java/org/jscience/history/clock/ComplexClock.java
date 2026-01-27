@@ -28,10 +28,9 @@ import java.util.Objects;
 /**
  * A composite clock container that aggregates multiple specialized clock functionalities.
  * Groups a standard clock, chronometer, alarm, and countdown into a single management unit.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class ComplexClock {

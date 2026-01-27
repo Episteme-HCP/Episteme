@@ -28,6 +28,9 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Predefined spintronic device configurations.
  * Provides ready-to-use structures for common applications.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DevicePresets {
 

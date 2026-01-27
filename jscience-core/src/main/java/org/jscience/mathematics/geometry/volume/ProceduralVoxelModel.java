@@ -27,6 +27,9 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * A VoxelModel that generates data procedurally using 'Real' math.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ProceduralVoxelModel implements VoxelModel {
     private final int w, h, d;

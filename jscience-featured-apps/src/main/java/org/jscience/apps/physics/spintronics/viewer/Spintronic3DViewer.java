@@ -28,9 +28,10 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Abstract interface for 3D spintronic structure visualization.
  * Supports multiple backends (JavaFX 3D, Jzy3d).
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface Spintronic3DViewer {
 

@@ -32,10 +32,9 @@ import java.util.stream.Collectors;
 /**
  * A persistent record container for sporting events, competitions, and match results.
  * Acts as a historical archive for sports data analysis.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Almanac implements Serializable {

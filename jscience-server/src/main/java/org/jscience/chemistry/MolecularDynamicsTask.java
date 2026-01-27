@@ -33,6 +33,9 @@ import java.util.List;
 
 /**
  * Molecular Dynamics Simulation Task.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MolecularDynamicsTask
         implements DistributedTask<MolecularDynamicsTask, MolecularDynamicsTask> {

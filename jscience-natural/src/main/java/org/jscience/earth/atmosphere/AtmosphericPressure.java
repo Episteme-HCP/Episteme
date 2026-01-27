@@ -30,7 +30,7 @@ import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Pressure;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

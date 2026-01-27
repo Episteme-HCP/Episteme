@@ -37,11 +37,6 @@ import org.jscience.measure.quantity.Length;
  * standards such as ADA, EN 17210, and ISO 21542.
  * It provides automated audits for door widths, corridor clearance, ramp slopes, 
  * and maneuvering spaces.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class AccessibilityChecker {
 
@@ -49,7 +44,10 @@ public final class AccessibilityChecker {
 
     /**
      * Recognized international and regional accessibility standards.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Standard {
         /** Americans with Disabilities Act 2010. */
         ADA_2010("Americans with Disabilities Act 2010"),

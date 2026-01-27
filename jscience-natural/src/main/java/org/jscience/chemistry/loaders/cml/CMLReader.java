@@ -54,11 +54,10 @@ import java.io.*;
  * Element root = doc.getDocumentElement();
  * }</pre>
  * </p>
- *
+ * * @see <a href="http://www.xml-cml.org/">XML-CML</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="http://www.xml-cml.org/">XML-CML</a>
  */
 public class CMLReader extends AbstractResourceReader<AbstractCMLDocument> {
 

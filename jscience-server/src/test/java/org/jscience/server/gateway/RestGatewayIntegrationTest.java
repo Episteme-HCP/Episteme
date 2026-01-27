@@ -38,9 +38,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for REST Gateway endpoints.
  * These tests verify the REST API contract.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 class RestGatewayIntegrationTest {
 

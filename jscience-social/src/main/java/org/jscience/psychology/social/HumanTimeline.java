@@ -31,10 +31,9 @@ import java.util.Objects;
 /**
  * A specialized timeline for tracking events in a specific category of human life.
  * Used for social, personal, and psychological history tracking.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent

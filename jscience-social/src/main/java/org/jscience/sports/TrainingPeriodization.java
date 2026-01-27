@@ -30,17 +30,16 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Handles training periodization logic, including cycle generation and load monitoring.
  * Provides implementations for Chronic Training Load (CTL) and Acute Training Load (ATL).
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class TrainingPeriodization {
 
     private TrainingPeriodization() {}
 
-    /** Phases of a training period (Macro/Meso cycles). */
+    /** Phases of a training period (Macro/Meso cycles).
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum MesoPhase {
         ANATOMICAL_ADAPTATION, HYPERTROPHY, STRENGTH, POWER, 
         ENDURANCE_BASE, THRESHOLD, VO2MAX, COMPETITION, RECOVERY

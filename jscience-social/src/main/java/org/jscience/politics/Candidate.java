@@ -34,11 +34,10 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents the role of a candidate within a political situation (e.g., an election).
  * A candidate is an individual seeking a specific office or representation.
- *
+ * * @version 1.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.0
- * @since 2.0
+ * @since 1.0
  */
 @Persistent
 public class Candidate extends Role {

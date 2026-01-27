@@ -28,7 +28,7 @@ package org.jscience.io;
  * Replaces the old ResourceLoader.
  * 
  * Implementations MUST override: getCategory(), getName(), getDescription()
- * with proper I18n support.
+ * with proper I18N support.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -62,28 +62,28 @@ public interface ResourceIO<T> {
 
     /**
      * Returns the display name of this resource handler.
-     * MUST be implemented with I18n support.
+     * MUST be implemented with I18N support.
      * @return the display name
      */
     String getName();
 
     /**
      * Returns a short description of this resource handler.
-     * MUST be implemented with I18n support.
+     * MUST be implemented with I18N support.
      * @return the description
      */
     String getDescription();
 
     /**
      * Returns a long description of this resource handler.
-     * MUST be implemented with I18n support.
+     * MUST be implemented with I18N support.
      * @return the long description
      */
     String getLongDescription();
 
     /**
      * Returns the category for grouping.
-     * MUST be implemented with I18n support.
+     * MUST be implemented with I18N support.
      * @return the category name
      */
     String getCategory();

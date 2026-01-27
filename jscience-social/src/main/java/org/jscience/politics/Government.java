@@ -32,10 +32,9 @@ import java.util.Objects;
 /**
  * Represents the structure and executive configuration of a national government.
  * Groups administrative types, leadership roles, and ministerial departments.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Government implements Serializable {

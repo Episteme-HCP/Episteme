@@ -57,12 +57,12 @@ public class UnitConverterViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.measure", "Measurement");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.name", "Unit Converter");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.name", "Unit Converter");
     }
 
     @Override
@@ -83,7 +83,7 @@ public class UnitConverterViewer extends AbstractViewer {
             setupUnits();
 
             Label title = new Label(
-                    org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.name", "Universal Measure Converter"));
+                    org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.name", "Universal Measure Converter"));
             title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 20px; -fx-font-weight: bold;
 
             // Category
@@ -94,7 +94,7 @@ public class UnitConverterViewer extends AbstractViewer {
             categoryBox.setConverter(new javafx.util.StringConverter<String>() {
                 @Override
                 public String toString(String object) {
-                    return org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.category." + object, object);
+                    return org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.category." + object, object);
                 }
 
                 @Override
@@ -104,7 +104,7 @@ public class UnitConverterViewer extends AbstractViewer {
             });
             categoryBox.setOnAction(e -> updateUnitLists());
             catRow.getChildren().addAll(
-                    new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.label.category", "Category:")),
+                    new Label(org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.label.category", "Category:")),
                     categoryBox);
 
             // Conversion grid
@@ -120,17 +120,17 @@ public class UnitConverterViewer extends AbstractViewer {
             fromUnitBox = new ComboBox<>();
             toUnitBox = new ComboBox<>();
 
-            grid.add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.label.from", "From:")), 0, 0);
+            grid.add(new Label(org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.label.from", "From:")), 0, 0);
             grid.add(inputField, 1, 0);
             grid.add(fromUnitBox, 2, 0);
 
-            grid.add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.label.to", "To:")), 0, 1);
+            grid.add(new Label(org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.label.to", "To:")), 0, 1);
             grid.add(outputField, 1, 1);
             grid.add(toUnitBox, 2, 1);
 
             updateUnitLists();
 
-            Button convertBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.button.convert", "Convert"));
+            Button convertBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.button.convert", "Convert"));
             convertBtn.setMaxWidth(Double.MAX_VALUE);
             convertBtn.setOnAction(e -> doConvert());
 
@@ -140,7 +140,7 @@ public class UnitConverterViewer extends AbstractViewer {
 
             getChildren().addAll(new VBox(20, title, catRow, grid, convertBtn));
         } catch (Exception e) {
-            getChildren().add(new Label(String.format(org.jscience.ui.i18n.I18n.getInstance()
+            getChildren().add(new Label(String.format(org.jscience.ui.i18n.I18N.getInstance()
                     .get("viewer.unitconverterviewer.error.launch", "Error launching Unit Converter:\n%s"), e.getMessage())));
         }
     }
@@ -177,19 +177,19 @@ public class UnitConverterViewer extends AbstractViewer {
 
             outputField.setText(String.format("%.6g", result.getValue().doubleValue()));
         } catch (Exception e) {
-            outputField.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.error.generic", "Error"));
+            outputField.setText(org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.error.generic", "Error"));
         }
     }
 
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.desc", "Convert between physical units.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.desc", "Convert between physical units.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.longdesc", "Universal unit converter supporting SI, CGS, Imperial, and custom unit systems. Includes length, mass, time, energy, and more.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.unitconverterviewer.longdesc", "Universal unit converter supporting SI, CGS, Imperial, and custom unit systems. Includes length, mass, time, energy, and more.");
     }
 }
 

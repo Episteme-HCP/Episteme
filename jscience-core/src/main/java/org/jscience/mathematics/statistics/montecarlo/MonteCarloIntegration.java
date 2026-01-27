@@ -33,13 +33,12 @@ import org.jscience.technical.backend.algorithms.MonteCarloProvider;
  * Uses random sampling to estimate integrals. Particularly effective
  * for high-dimensional integrals where grid methods fail.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Metropolis, N., et al. (1953). Equation of State Calculations by Fast Computing Machines. <i>The Journal of Chemical Physics</i>, 21(6), 1087.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

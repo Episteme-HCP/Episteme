@@ -27,11 +27,6 @@ package org.jscience.law;
  * Constants and enumerations for legal sciences and jurisprudence.
  * <p>
  * Provides classifications for legal fields and world legal systems.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class LawConstants {
 
@@ -39,7 +34,10 @@ public final class LawConstants {
 
     /**
      * Major fields of law.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum LawField {
         CIVIL, MILITARY, BUSINESS, LABOR, FAMILY, PENAL, 
         GOVERNMENT, ADMINISTRATIVE, ELECTION, HEALTH, 

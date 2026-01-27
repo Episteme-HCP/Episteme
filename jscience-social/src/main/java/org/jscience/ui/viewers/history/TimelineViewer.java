@@ -37,7 +37,7 @@ import org.jscience.history.time.Era;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.RealParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.Parameter;
 
@@ -47,7 +47,7 @@ import java.util.Optional;
 /**
  * Generic Viewer for Timeline data.
  * Refactored to use Real precision for dates (Years).
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -206,7 +206,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
             gc.translate(x, cy - 12);
             gc.rotate(-45);
             String label = e.getName();
-            label = I18n.getInstance().get(label, label);
+            label = I18N.getInstance().get(label, label);
             gc.fillText(label, 0, 0);
             gc.restore();
         }
@@ -214,17 +214,17 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.history", "History");
+        return I18N.getInstance().get("category.history", "History");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("viewer.timeline.name", "Timeline Viewer");
+        return I18N.getInstance().get("viewer.timeline.name", "Timeline Viewer");
     }
     
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("viewer.timeline.desc", "Visualizes events on a timeline.");
+        return I18N.getInstance().get("viewer.timeline.desc", "Visualizes events on a timeline.");
     }
 
     @Override
@@ -247,7 +247,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         if (maxYear.equals(Real.of(2050))) maxYear = defMax;
 
         parameters.add(new RealParameter("viewer.timelineviewer.param.start",
-                I18n.getInstance().get("viewer.timelineviewer.param.start.desc", "Start Year"),
+                I18N.getInstance().get("viewer.timelineviewer.param.start.desc", "Start Year"),
                 minYear.subtract(Real.of(10000)), 
                 maxYear, 
                 Real.of(100), 
@@ -258,7 +258,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
                 }));
 
         parameters.add(new RealParameter("viewer.timelineviewer.param.end",
-                I18n.getInstance().get("viewer.timelineviewer.param.end.desc", "End Year"),
+                I18N.getInstance().get("viewer.timelineviewer.param.end.desc", "End Year"),
                 minYear, 
                 maxYear.add(Real.of(10000)), 
                 Real.of(100), 
@@ -269,7 +269,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
                 }));
                 
         parameters.add(new BooleanParameter("viewer.timelineviewer.param.log",
-                I18n.getInstance().get("viewer.timelineviewer.param.log.desc", "Logarithmic Scale"),
+                I18N.getInstance().get("viewer.timelineviewer.param.log.desc", "Logarithmic Scale"),
                 logScale,
                 v -> {
                     this.logScale = v;
@@ -282,7 +282,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("viewer.timeline.longdesc", "Interactive historical chronological visualization tool. features support for BCE/CE dates, event clustering, fuzzy date handling, and dynamic scaling to explore deep history and modern events.");
+        return I18N.getInstance().get("viewer.timeline.longdesc", "Interactive historical chronological visualization tool. features support for BCE/CE dates, event clustering, fuzzy date handling, and dynamic scaling to explore deep history and modern events.");
     }
 }
 

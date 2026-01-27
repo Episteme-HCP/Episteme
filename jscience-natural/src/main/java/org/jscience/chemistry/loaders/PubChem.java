@@ -94,9 +94,9 @@ public class PubChem {
      */
     public static CompoundInfo searchCompound(String name) {
         try {
-            String propsJson = getProperties(name,
+            String propsJSON = getProperties(name,
                     "MolecularFormula,MolecularWeight,IUPACName,InChIKey,CanonicalSMILES");
-            return parsePropertiesJson(name, propsJson);
+            return parsePropertiesJSON(name, propsJSON);
         } catch (Exception e) {
             System.err.println("WARNING: Failed to fetch compound info for '" + name + "': " + e.getMessage());
             return null;
@@ -110,7 +110,7 @@ public class PubChem {
      * @param json raw JSON response from PubChem properties API
      * @return parsed CompoundInfo
      */
-    private static CompoundInfo parsePropertiesJson(String name, String json) {
+    private static CompoundInfo parsePropertiesJSON(String name, String json) {
         // Simple JSON parsing without external dependencies
         // PubChem returns: {"PropertyTable":{"Properties":[{...}]}}
         CompoundInfo.Builder builder = new CompoundInfo.Builder().name(name);
@@ -191,7 +191,7 @@ public class PubChem {
     @SuppressWarnings("unchecked")
     public static <T> T map(String json, Class<T> target) {
         if (target == CompoundInfo.class) {
-            return (T) parsePropertiesJson("unknown", json);
+            return (T) parsePropertiesJSON("unknown", json);
         }
         System.err.println("WARNING: Domain mapping for " + target.getSimpleName() +
                 " is not yet implemented. Use searchCompound() for CompoundInfo.");

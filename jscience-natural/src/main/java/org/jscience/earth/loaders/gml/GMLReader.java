@@ -45,11 +45,10 @@ import java.io.*;
  *   <li>Feature properties and attributes</li>
  * </ul>
  * </p>
- *
+ * * @see <a href="https://www.ogc.org/standards/gml">OGC GML Standard</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://www.ogc.org/standards/gml">OGC GML Standard</a>
  */
 public class GMLReader extends AbstractResourceReader<GMLDocument> {
 

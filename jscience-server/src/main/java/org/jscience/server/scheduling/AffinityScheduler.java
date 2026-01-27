@@ -38,6 +38,9 @@ import java.util.function.Predicate;
  * - Memory requirements
  * - Data locality
  * - Worker labels/constraints
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class AffinityScheduler<T> {
 

@@ -29,7 +29,7 @@ import javafx.scene.control.*;
 
 import javafx.stage.Stage;
 import org.jscience.ui.JScienceMasterControl;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -51,6 +51,9 @@ import java.util.*;
  * Translation crawler test that navigates the UI to detect missing i18n keys.
  * Currently disabled due to pre-existing ClassCastException in
  * JScienceDashboard.refreshUI().
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @Disabled("Pre-existing bug: ClassCastException in JScienceDashboard.refreshUI() - requires UI refactoring")
 @ExtendWith(ApplicationExtension.class)
@@ -61,7 +64,7 @@ public class TranslationCrawlerTest {
     @Start
     public void start(Stage stage) {
         // Enable test mode to easily detect missing keys
-        I18n.setTestMode(true);
+        I18N.setTestMode(true);
         // Force Locale to English for consistent headless traversal
         java.util.Locale.setDefault(java.util.Locale.ENGLISH);
         new JScienceMasterControl().start(stage);
@@ -74,7 +77,7 @@ public class TranslationCrawlerTest {
 
     @AfterEach
     void tearDown() {
-        I18n.setTestMode(false);
+        I18N.setTestMode(false);
         if (!suspiciousTexts.isEmpty()) {
             System.err.println("---------------------------------------------------");
             System.err.println("SUSPICIOUS OR MISSING TRANSLATIONS FOUND:");

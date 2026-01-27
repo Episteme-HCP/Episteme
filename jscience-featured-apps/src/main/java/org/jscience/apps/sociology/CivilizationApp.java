@@ -37,7 +37,7 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.*;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 /**
  * Civilization Evolution Simulator.
@@ -101,7 +101,7 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return I18n.getInstance().get("viewer.civilizationapp.name", "Civilization Simulator");
+        return I18N.getInstance().get("viewer.civilizationapp.name", "Civilization Simulator");
     }
 
     @Override
@@ -111,12 +111,12 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("viewer.civilizationapp.desc", "Simulate civilization growth, resources, and pollution dynamics.");
+        return I18N.getInstance().get("viewer.civilizationapp.desc", "Simulate civilization growth, resources, and pollution dynamics.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("viewer.civilizationapp.longdesc", "A simplified System Dynamics model (Limits to Growth style) simulating the interaction between Population, Resources, and Pollution. Features interactive parameters like birth rate, consumption per capita, and innovation rate.");
+        return I18N.getInstance().get("viewer.civilizationapp.longdesc", "A simplified System Dynamics model (Limits to Growth style) simulating the interaction between Population, Resources, and Pollution. Features interactive parameters like birth rate, consumption per capita, and innovation rate.");
     }
 
     @Override
@@ -539,7 +539,7 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.sociology", "Sociology");
+        return I18N.getInstance().get("category.sociology", "Sociology");
     }
 
 

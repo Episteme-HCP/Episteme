@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

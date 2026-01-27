@@ -57,10 +57,10 @@ import java.util.List;
  * </ul>
  * </p>
  *
- * @javadoc Complexity: O(N) per step due to Cell-Linked Lists.
+ * @javadoc Complexity: O(N) per step due to Cell-Linked Lists. * @see org.jscience.mathematics.analysis.ode.VerletIntegrator
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @see org.jscience.mathematics.analysis.ode.VerletIntegrator
+ * @since 1.0
  */
 public class MolecularDynamicsVerlet implements Serializable {
 

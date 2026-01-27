@@ -134,21 +134,21 @@ public class FASTABioSequenceReader extends AbstractResourceReader<List<BioSeque
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastabiosequencereader.name", "FASTA BioSequence Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fastabiosequencereader.name", "FASTA BioSequence Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastabiosequencereader.desc", "Parser for FASTA format files into BioSequences.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fastabiosequencereader.desc", "Parser for FASTA format files into BioSequences.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastabiosequencereader.longdesc", "Reads FASTA format files and converts them into BioSequence objects for specific biological analysis.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fastabiosequencereader.longdesc", "Reads FASTA format files and converts them into BioSequence objects for specific biological analysis.");
     }
 }

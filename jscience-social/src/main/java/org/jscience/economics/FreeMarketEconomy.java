@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
 package org.jscience.economics;
  
 import java.util.HashSet;
@@ -30,10 +30,9 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * An economic model where resource allocation is determined by supply and demand 
  * with minimal central intervention.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class FreeMarketEconomy extends Economy {

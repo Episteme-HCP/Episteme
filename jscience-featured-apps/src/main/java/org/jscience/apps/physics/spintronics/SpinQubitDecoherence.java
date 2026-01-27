@@ -54,7 +54,7 @@ import java.util.Random;
  *       <i>Reviews of Modern Physics</i>, 79(4), 1217.
  *       <a href="https://doi.org/10.1103/RevModPhys.79.1217">DOI: 10.1103/RevModPhys.79.1217</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

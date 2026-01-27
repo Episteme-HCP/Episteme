@@ -47,7 +47,7 @@ public interface Oscilloscope extends Sensor<Real> {
 
         @Override
         public String toString() {
-            return org.jscience.ui.i18n.I18n.getInstance().get(i18nKey);
+            return org.jscience.ui.i18n.I18N.getInstance().get(i18nKey);
         }
     }
 

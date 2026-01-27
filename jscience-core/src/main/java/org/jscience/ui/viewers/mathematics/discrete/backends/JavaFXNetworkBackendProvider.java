@@ -28,7 +28,7 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for JavaFX network/graph renderer.
  * Always available as JavaFX is a core dependency.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

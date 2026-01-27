@@ -30,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for Map Backend Providers.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MapBackendProviderTest {
 

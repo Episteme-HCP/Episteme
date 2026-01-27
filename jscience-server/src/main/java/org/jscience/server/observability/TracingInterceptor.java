@@ -35,6 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * Implements distributed tracing for gRPC calls without external dependencies.
  * Can export to Jaeger, Zipkin, or other OpenTelemetry collectors.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class TracingInterceptor implements ServerInterceptor {
 
@@ -85,7 +88,7 @@ public class TracingInterceptor implements ServerInterceptor {
             return (endTimeNanos - startTimeNanos) / 1_000_000;
         }
 
-        public String toJson() {
+        public String toJSON() {
             return String.format(
                     "{\"traceId\":\"%s\",\"spanId\":\"%s\",\"parentSpanId\":\"%s\"," +
                             "\"operationName\":\"%s\",\"durationMs\":%d,\"status\":\"%s\"%s}",
@@ -119,7 +122,7 @@ public class TracingInterceptor implements ServerInterceptor {
      * Create tracing interceptor with console exporter.
      */
     public TracingInterceptor() {
-        this(span -> LOG.info("SPAN: {}", span.toJson()));
+        this(span -> LOG.info("SPAN: {}", span.toJSON()));
     }
 
     /**
@@ -218,7 +221,7 @@ public class TracingInterceptor implements ServerInterceptor {
     public static SpanExporter fileExporter(java.nio.file.Path path) {
         return span -> {
             try (java.io.FileWriter writer = new java.io.FileWriter(path.toFile(), true)) {
-                writer.write(span.toJson() + "\n");
+                writer.write(span.toJSON() + "\n");
             } catch (java.io.IOException e) {
                 LOG.error("Failed to export span to file", e);
             }

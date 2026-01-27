@@ -31,10 +31,9 @@ import org.jscience.util.Named;
 /**
  * Represents an electoral district or voting precinct.
  * Constituencies define the geographic area and population size for representative allocation.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Constituency implements Named, Serializable {

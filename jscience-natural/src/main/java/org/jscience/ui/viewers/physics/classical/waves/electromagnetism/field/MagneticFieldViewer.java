@@ -30,7 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
@@ -39,11 +39,14 @@ import org.jscience.technical.backend.algorithms.MulticoreMaxwellProvider;
 /**
  * 3D Viewer for Magnetic Fields.
  * Refactored to be 100% parameter-based.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.magneticfieldviewer.name", "Magnetic Field Viewer"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.magneticfieldviewer.name", "Magnetic Field Viewer"); }
 
     private final Group root = new Group();
     private final Group fieldGroup = new Group();
@@ -73,7 +76,7 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("mag.grid", I18n.getInstance().get("viewer.magneticfieldviewer.param.gridspacing", "Grid Spacing"), 10.0, 100.0, 5.0, gridSpacing, v -> gridSpacing = v));
+        parameters.add(new NumericParameter("mag.grid", I18N.getInstance().get("viewer.magneticfieldviewer.param.gridspacing", "Grid Spacing"), 10.0, 100.0, 5.0, gridSpacing, v -> gridSpacing = v));
         parameters.add(new BooleanParameter("mag.vectors", "Show Vectors", showVectors, v -> showVectors = v));
         parameters.add(new BooleanParameter("mag.lines", "Show Streamlines", showStreamlines, v -> showStreamlines = v));
     }
@@ -183,6 +186,6 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
     }
 
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.magneticfieldviewer.desc", "3D magnetic field visualization."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.magneticfieldviewer.longdesc", "Interactive 3D field lines."); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.magneticfieldviewer.desc", "3D magnetic field visualization."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.magneticfieldviewer.longdesc", "Interactive 3D field lines."); }
 }

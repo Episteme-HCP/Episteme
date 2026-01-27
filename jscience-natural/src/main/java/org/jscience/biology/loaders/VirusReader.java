@@ -70,17 +70,17 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.virusreader.desc", "Virus Species Reader (JSON).");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.virusreader.desc", "Virus Species Reader (JSON).");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.virusreader.longdesc", "Loads virus taxonomy and genomic data from internal JSON resources.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.virusreader.longdesc", "Loads virus taxonomy and genomic data from internal JSON resources.");
     }
 
     @Override
@@ -166,6 +166,6 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
         public List<String> hostRange;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.virusreader.name", "Virus Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.virusreader.name", "Virus Reader"); }
 }
 

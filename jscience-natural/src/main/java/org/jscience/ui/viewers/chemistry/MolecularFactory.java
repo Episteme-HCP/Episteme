@@ -35,6 +35,9 @@ import java.util.Optional;
 /**
  * Factory for creating molecular renderers using SPI-based backend discovery.
  * Similar to {@link org.jscience.ui.plotting.PlotFactory}.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MolecularFactory {
 

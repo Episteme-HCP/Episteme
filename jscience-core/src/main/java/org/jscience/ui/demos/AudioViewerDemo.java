@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractSimulationDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.media.AudioViewer;
 
 /**
  * Audio Analysis Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -41,7 +41,7 @@ public class AudioViewerDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.physics");
+        return I18N.getInstance().get("category.physics");
     }
 
     @Override

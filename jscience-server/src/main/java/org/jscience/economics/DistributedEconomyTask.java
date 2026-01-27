@@ -34,6 +34,9 @@ import org.jscience.distributed.TaskRegistry;
  * Simulates macro-economic indicators (GDP, Inflation) based on stochastic
  * shocks
  * and policy interventions.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedEconomyTask implements Serializable {
 
@@ -87,7 +90,7 @@ public class DistributedEconomyTask implements Serializable {
         }
     }
 
-    public Real getGdp() {
+    public Real getGDP() {
         return mode == TaskRegistry.PrecisionMode.REAL ? gdp : Real.of(gdpD);
     }
 

@@ -33,11 +33,6 @@ import java.util.Map;
  * Analytical tool for identifying and interpreting iconographic symbols 
  * in artworks. It supports art historical research by mapping visual elements 
  * to their symbolic meanings, historical periods, and thematic categories.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class IconographyAnalyzer {
 
@@ -45,7 +40,10 @@ public final class IconographyAnalyzer {
 
     /**
      * Thematic categories for iconographic symbols.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum SymbolCategory {
         RELIGIOUS, MYTHOLOGICAL, HERALDIC, ALLEGORICAL, NATURAL, POLITICAL
     }

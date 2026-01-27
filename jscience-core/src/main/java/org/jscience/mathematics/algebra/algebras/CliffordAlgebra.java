@@ -36,13 +36,12 @@ import org.jscience.mathematics.structures.rings.Field;
  * equipped with a quadratic form Q.
  * It unifies scalars, vectors, bivectors, and higher-grade multivectors.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Clifford, W. K. (1878). Applications of Grassmann's Extensive Algebra. <i>American Journal of Mathematics</i>, 1(4), 350-358.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

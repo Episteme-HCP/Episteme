@@ -37,21 +37,24 @@ import org.jscience.mathematics.geometry.volume.VoxelModel;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.RealParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.List;
 
 /**
  * A high-fidelity 3D Voxel Viewer supporting orthogonal slicing and volumetric rendering.
  * Inspired by professional Geoscience and Medical imaging software.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class VoxelViewer extends org.jscience.ui.AbstractViewer {
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.medicine", "Medicine"); }
+    public String getCategory() { return I18N.getInstance().get("category.medicine", "Medicine"); }
 
     @Override
-    public String getName() { return I18n.getInstance().get("viewer.voxelviewer.name", "Voxel Viewer"); }
+    public String getName() { return I18N.getInstance().get("viewer.voxelviewer.name", "Voxel Viewer"); }
 
     private final VoxelModel model;
     private final Group root3D = new Group();
@@ -221,11 +224,11 @@ public class VoxelViewer extends org.jscience.ui.AbstractViewer {
     }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("viewer.voxelviewer.desc", "Scientific 3D volumetric data visualizer."); }
+    public String getDescription() { return I18N.getInstance().get("viewer.voxelviewer.desc", "Scientific 3D volumetric data visualizer."); }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("viewer.voxelviewer.longdesc", 
+        return I18N.getInstance().get("viewer.voxelviewer.longdesc", 
             "A high-fidelity 3D Voxel Viewer designed for professional scientific visualization.\n" +
             "It supports:\n" +
             "- Volumetric point-cloud rendering with density thresholding.\n" +

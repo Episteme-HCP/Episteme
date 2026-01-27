@@ -24,7 +24,7 @@
 package org.jscience.medicine.loaders;
 
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -37,10 +37,10 @@ import javax.imageio.ImageIO;
 /**
  * Reader for DICOM (Digital Imaging and Communications in Medicine) files.
  * Provides capabilities to read metadata and display images.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class DICOMReader implements org.jscience.io.ResourceReader<BufferedImage> {
 
@@ -48,22 +48,22 @@ public class DICOMReader implements org.jscience.io.ResourceReader<BufferedImage
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.medicine", "Medicine");
+        return I18N.getInstance().get("category.medicine", "Medicine");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.dicom.name", "DICOM Reader");
+        return I18N.getInstance().get("reader.dicom.name", "DICOM Reader");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.dicom.desc", "Reads and displays DICOM medical images.");
+        return I18N.getInstance().get("reader.dicom.desc", "Reads and displays DICOM medical images.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.dicom.longdesc", 
+        return I18N.getInstance().get("reader.dicom.longdesc", 
             "Professional-grade DICOM reader capable of parsing standard tags (Patient ID, Modality, Study Date) " +
             "and extracting pixel data for visualization. Supports multiple modalities including CT, MRI, and X-Ray.");
     }

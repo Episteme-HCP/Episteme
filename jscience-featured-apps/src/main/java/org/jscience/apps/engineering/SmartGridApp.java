@@ -97,7 +97,7 @@ public class SmartGridApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.smartgridapp.name", "Smart Grid Simulator");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.name", "Smart Grid Simulator");
     }
 
     @Override
@@ -107,12 +107,12 @@ public class SmartGridApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.smartgridapp.desc", "Real-time power grid frequency balance simulation.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.desc", "Real-time power grid frequency balance simulation.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.smartgridapp.longdesc", "Advanced engineering simulator for smart power grids. Features real-time frequency balancing, intermittent renewable energy sources (Wind/Solar), and battery storage management to prevent blackouts and ensure grid stability.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.longdesc", "Advanced engineering simulator for smart power grids. Features real-time frequency balancing, intermittent renewable energy sources (Wind/Solar), and battery storage management to prevent blackouts and ensure grid stability.");
     }
 
     @Override
@@ -582,6 +582,6 @@ public class SmartGridApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.engineering", "Engineering");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.engineering", "Engineering");
     }
 }

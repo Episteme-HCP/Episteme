@@ -38,13 +38,12 @@ import java.util.List;
  * Maps a vector of N complex numbers (time domain) to N complex numbers
  * (frequency domain).
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Bracewell, R. N. (1999). <i>The Fourier Transform and Its Applications</i>. McGraw-Hill.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

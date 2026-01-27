@@ -31,7 +31,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.JScience;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 import org.jscience.technical.backend.BackendDiscovery;
 import org.jscience.technical.backend.BackendProvider;
@@ -81,7 +81,7 @@ public class JScienceMasterControl extends Application {
         try {
             // Load persistent settings
             String lang = PREFS.getLanguage();
-            org.jscience.ui.i18n.I18n.getInstance().setLocale(Locale.of(lang));
+            org.jscience.ui.i18n.I18N.getInstance().setLocale(Locale.of(lang));
 
             // Theme is handled by ThemeManager
             ThemeManager.getInstance().applyTheme(stage.getScene());
@@ -109,11 +109,11 @@ public class JScienceMasterControl extends Application {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.getTabs().clear();
 
-        I18n i18n = I18n.getInstance();
+        I18N i18n = I18N.getInstance();
 
         tabPane.getTabs().addAll(
                 createGeneralTab(i18n),
-                createI18nTab(i18n),
+                createI18NTab(i18n),
                 createThemesTab(i18n),
                 createComputingTab(i18n),
                 createLibrariesTab(i18n),
@@ -168,7 +168,7 @@ public class JScienceMasterControl extends Application {
         ThemeManager.getInstance().applyTheme(scene);
     }
 
-    private Tab createGeneralTab(I18n i18n) {
+    private Tab createGeneralTab(I18N i18n) {
         VBox content = new VBox(25);
         content.setPadding(new Insets(40));
         content.setAlignment(Pos.CENTER);
@@ -245,7 +245,7 @@ public class JScienceMasterControl extends Application {
         }
     }
 
-    private Tab createI18nTab(I18n i18n) {
+    private Tab createI18NTab(I18N i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
         content.setAlignment(Pos.TOP_LEFT);
@@ -305,7 +305,7 @@ public class JScienceMasterControl extends Application {
         return new Tab(i18n.get("mastercontrol.tab.i18n", "Languages"), content);
     }
 
-    private Tab createComputingTab(I18n i18n) {
+    private Tab createComputingTab(I18N i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
 
@@ -427,7 +427,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
 
-    private Tab createLibrariesTab(I18n i18n) {
+    private Tab createLibrariesTab(I18N i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
 
@@ -497,7 +497,7 @@ public class JScienceMasterControl extends Application {
         return new Tab(i18n.get("mastercontrol.tab.libraries", "Libraries"), scroll);
     }
 
-    private VBox createChemistryCategory(I18n i18n) {
+    private VBox createChemistryCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.chemistry.title", "Chemistry & Biology"));
         header.getStyleClass().add("header-title");
@@ -562,7 +562,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
     
-    private VBox createQuantumCategory(I18n i18n) {
+    private VBox createQuantumCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.quantum.title", "Quantum Computing"));
         header.getStyleClass().add("header-title");
@@ -626,7 +626,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
 
-    private VBox createGeographyCategory(I18n i18n) {
+    private VBox createGeographyCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.geography.title", "Geography & GIS"));
         header.getStyleClass().add("header-title");
@@ -691,7 +691,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
 
-    private VBox createNetworkCategory(I18n i18n) {
+    private VBox createNetworkCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.network.title", "Network & Graph Analysis"));
         header.getStyleClass().add("header-title");
@@ -755,7 +755,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
 
-    private VBox createAudioCategory(I18n i18n) {
+    private VBox createAudioCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.audio.title", "Audio Processing"));
         header.getStyleClass().add("header-title");
@@ -829,7 +829,7 @@ public class JScienceMasterControl extends Application {
         }
     }
 
-    private VBox createLibCategory(I18n i18n, String catKey, List<LibInfo> libs, I18n i18nRef) {
+    private VBox createLibCategory(I18N i18n, String catKey, List<LibInfo> libs, I18N i18nRef) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.libraries.cat." + catKey, catKey));
         header.getStyleClass().add("header-title");
@@ -849,7 +849,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
 
-    private void addLibRow(GridPane grid, int row, String nameKey, boolean available, String descKey, I18n i18n) {
+    private void addLibRow(GridPane grid, int row, String nameKey, boolean available, String descKey, I18N i18n) {
         String name = i18n.get("lib." + nameKey + ".name", nameKey);
         String desc = i18n.get("lib." + nameKey + ".desc", descKey); // Could fallback to hardcoded if needed
 
@@ -868,7 +868,7 @@ public class JScienceMasterControl extends Application {
         grid.addRow(row, nameLabel, statusLabel, descLabel);
     }
 
-    private VBox createMathCategory(I18n i18n) {
+    private VBox createMathCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.libraries.cat.math", "Mathematics & Algorithms"));
         header.getStyleClass().add("header-title");
@@ -930,7 +930,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
 
-    private VBox createHardwareCategory(I18n i18n) {
+    private VBox createHardwareCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.libraries.cat.hardware", "Hardware Acceleration"));
         header.getStyleClass().add("header-title");
@@ -988,7 +988,7 @@ public class JScienceMasterControl extends Application {
         return box;
     }
 
-    private VBox createTensorsCategory(I18n i18n) {
+    private VBox createTensorsCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.libraries.cat.tensors", "Tensors"));
         header.getStyleClass().add("header-title");
@@ -1068,7 +1068,7 @@ public class JScienceMasterControl extends Application {
     /**
      * Creates the Visualization & Plotting category using SPI discovery.
      */
-    private VBox createPlottingCategory(I18n i18n) {
+    private VBox createPlottingCategory(I18N i18n) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.libraries.cat.vis", "Visualization & Plotting"));
         header.getStyleClass().add("header-title");
@@ -1191,7 +1191,7 @@ public class JScienceMasterControl extends Application {
      * Creates the Molecular Viewing category using SPI discovery.
      */
     @SuppressWarnings("unused") // Reserved for future layout options
-    private VBox createMolecularCategory(I18n i18n) {
+    private VBox createMolecularCategory(I18N i18n) {
         return createBackendCategory(i18n, BackendDiscovery.TYPE_MOLECULAR,
                 i18n.get("mastercontrol.libraries.cat.molecular", "Molecular Viewing"),
                 i18n.get("mastercontrol.libraries.cat.molecular.desc",
@@ -1201,7 +1201,7 @@ public class JScienceMasterControl extends Application {
     /**
      * Reusable method to create a category from discovered SPI backends.
      */
-    private VBox createBackendCategory(I18n i18n, String type, String title, String description) {
+    private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
 
         VBox box = new VBox(12);
         
@@ -1264,7 +1264,7 @@ public class JScienceMasterControl extends Application {
      */
 
     @SuppressWarnings("rawtypes")
-    private Tab createLoadersTab(I18n i18n) {
+    private Tab createLoadersTab(I18N i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
         
@@ -1356,7 +1356,7 @@ public class JScienceMasterControl extends Application {
         return new Tab(i18n.get("mastercontrol.tab.loaders", "Loaders"), scroll);
     }
 
-    private Accordion createLoaderAccordion(Map<String, List<ResourceIO<?>>> categories, I18n i18n) {
+    private Accordion createLoaderAccordion(Map<String, List<ResourceIO<?>>> categories, I18N i18n) {
         Accordion accordion = new Accordion();
         
         // Sort categories by localized name
@@ -1434,7 +1434,7 @@ public class JScienceMasterControl extends Application {
         }
     }
 
-    private Tab createThemesTab(I18n i18n) {
+    private Tab createThemesTab(I18N i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
         content.setAlignment(Pos.TOP_LEFT);
@@ -1464,9 +1464,9 @@ public class JScienceMasterControl extends Application {
         previewBox.setPadding(new Insets(20));
         previewBox.setStyle("-fx-border-color: #ddd; -fx-border-radius: 5; -fx-background-color: #fdfdfd;");
         previewBox.getChildren().addAll(
-                new Label(org.jscience.ui.i18n.I18n.getInstance().get("auto.jsciencemastercontrol.theme_preview_components", "Theme Preview Components:")),
-                new Button(org.jscience.ui.i18n.I18n.getInstance().get("auto.jsciencemastercontrol.sample_button", "Sample Button")),
-                new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("auto.jsciencemastercontrol.sample_checkbox", "Sample CheckBox")),
+                new Label(org.jscience.ui.i18n.I18N.getInstance().get("auto.jsciencemastercontrol.theme_preview_components", "Theme Preview Components:")),
+                new Button(org.jscience.ui.i18n.I18N.getInstance().get("auto.jsciencemastercontrol.sample_button", "Sample Button")),
+                new CheckBox(org.jscience.ui.i18n.I18N.getInstance().get("auto.jsciencemastercontrol.sample_checkbox", "Sample CheckBox")),
                 new ProgressBar(0.6));
 
         content.getChildren().addAll(header, themeSelector, previewBox);
@@ -1478,7 +1478,7 @@ public class JScienceMasterControl extends Application {
         refreshUI();
     }
 
-    private Tab createAppsTab(I18n i18n) {
+    private Tab createAppsTab(I18N i18n) {
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
 
@@ -1610,12 +1610,12 @@ public class JScienceMasterControl extends Application {
                 demo.show(stage);
             }
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, java.text.MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("master.error.launch_failed", "Failed to launch app: {0}"), e.getMessage())).show();
+            new Alert(Alert.AlertType.ERROR, java.text.MessageFormat.format(org.jscience.ui.i18n.I18N.getInstance().get("master.error.launch_failed", "Failed to launch app: {0}"), e.getMessage())).show();
             e.printStackTrace();
         }
     }
 
-    private Tab createDevicesTab(I18n i18n) {
+    private Tab createDevicesTab(I18N i18n) {
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
 
@@ -1678,7 +1678,7 @@ public class JScienceMasterControl extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    private void addBackendRow(GridPane grid, int row, org.jscience.technical.backend.BackendProvider provider, I18n i18n) {
+    private void addBackendRow(GridPane grid, int row, org.jscience.technical.backend.BackendProvider provider, I18N i18n) {
         String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
         String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
         boolean available = provider.isAvailable();

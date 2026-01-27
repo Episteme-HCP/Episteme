@@ -31,7 +31,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18NManager;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -40,6 +40,9 @@ import java.util.Map;
 /**
  * Standardized Help Dialog for Featured Apps.
  * Supports displaying text and images for Documentation and Tutorials.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class HelpDialog extends Dialog<Void> {
 
@@ -52,7 +55,7 @@ public class HelpDialog extends Dialog<Void> {
         setTitle(title);
         setHeaderText(null);
 
-        ButtonType closeButtonType = new ButtonType(I18nManager.getInstance().get("dialog.close"),
+        ButtonType closeButtonType = new ButtonType(I18NManager.getInstance().get("dialog.close"),
                 ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().add(closeButtonType);
 
@@ -104,7 +107,7 @@ public class HelpDialog extends Dialog<Void> {
     private void showTopic(String title) {
         HelpTopic topic = topics.get(title);
         if (topic == null) {
-            detailPane.setContent(new Label(org.jscience.ui.i18n.I18n.getInstance().get("auto.helpdialog.select_a_topic_to_view_details", "Select a topic to view details.")));
+            detailPane.setContent(new Label(org.jscience.ui.i18n.I18N.getInstance().get("auto.helpdialog.select_a_topic_to_view_details", "Select a topic to view details.")));
             return;
         }
 

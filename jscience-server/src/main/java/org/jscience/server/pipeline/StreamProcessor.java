@@ -39,6 +39,9 @@ import java.util.function.Function;
  * - Windowed aggregation
  * - Backpressure handling
  * - Parallel processing
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class StreamProcessor<T> {
 

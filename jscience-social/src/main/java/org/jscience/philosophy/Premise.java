@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.philosophy;
 
 import java.io.Serializable;
@@ -31,10 +32,10 @@ import java.util.Objects;
  * 
  * <p> Premises are used as the fundamental building blocks for arguments and 
  *     syllogisms within a logical framework.</p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
+ * @since 1.0
  */
 public class Premise implements Serializable {
 

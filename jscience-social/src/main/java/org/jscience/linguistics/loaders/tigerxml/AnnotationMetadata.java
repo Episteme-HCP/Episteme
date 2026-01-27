@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @since 1.0
  */
 public class AnnotationMetadata implements Serializable {
     private static final long serialVersionUID = 1L;

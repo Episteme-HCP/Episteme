@@ -56,7 +56,7 @@ import java.io.Serializable;
  *
  * @param <I> Input type (must be Serializable for network transfer)
  * @param <O> Output type (must be Serializable for network transfer)
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

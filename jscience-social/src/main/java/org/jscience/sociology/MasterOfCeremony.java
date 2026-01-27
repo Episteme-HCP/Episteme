@@ -29,10 +29,9 @@ import org.jscience.economics.Organization;
 
 /**
  * A specialized role for the person leading, organizing, or officiating a celebration or event.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class MasterOfCeremony extends Role {

@@ -31,13 +31,12 @@ import org.jscience.mathematics.numbers.real.Real;
  * Hamiltonian: H = ÃŽÂ£pÃ¡ÂµÂ¢qÃŒâ€¡Ã¡ÂµÂ¢ - L
  * Hamilton's equations: qÃŒâ€¡ = Ã¢Ë†â€šH/Ã¢Ë†â€šp, Ã¡Â¹â€” = -Ã¢Ë†â€šH/Ã¢Ë†â€šq
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Hamilton, W. R. (1834). On a General Method in Dynamics. <i>Philosophical Transactions of the Royal Society</i>.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -24,12 +24,12 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.geography.MapViewer;
 
 /**
  * Geography GIS Demo using JScience geometry types.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -46,17 +46,17 @@ public class GeographyGISDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.geographygisdemo.name");
+        return I18N.getInstance().get("demo.geographygisdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.geographygisdemo.desc");
+        return I18N.getInstance().get("demo.geographygisdemo.desc");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.geographygisdemo.longdesc");
+        return I18N.getInstance().get("demo.geographygisdemo.longdesc");
     }
 
     @Override

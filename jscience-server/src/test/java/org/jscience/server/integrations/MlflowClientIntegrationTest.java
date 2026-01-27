@@ -32,9 +32,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration tests for MlflowClient using WireMock.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 class MlflowClientIntegrationTest {
 

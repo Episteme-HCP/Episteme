@@ -45,6 +45,9 @@ import java.time.Duration;
  * S3 Storage Service for Large Datasets.
  * 
  * Uses MinIO or AWS S3 to store large scientific data files.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @Service
 public class S3StorageService {

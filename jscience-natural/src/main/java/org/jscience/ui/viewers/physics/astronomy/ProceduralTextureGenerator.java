@@ -27,7 +27,7 @@ import java.util.Random;
 import java.awt.image.BufferedImage;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

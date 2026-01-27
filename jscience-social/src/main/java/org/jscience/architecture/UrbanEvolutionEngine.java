@@ -34,11 +34,6 @@ import java.util.Random;
  * Historical simulation engine that models the architectural and demographic 
  * evolution of a city over centuries. It tracks transitions between 
  * architectural styles, building construction cycles, and urban prosperity.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class UrbanEvolutionEngine {
 
@@ -46,7 +41,10 @@ public final class UrbanEvolutionEngine {
 
     /**
      * Defined historical periods for urban categorization.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum HistoricalPeriod {
         EARLY_MEDIEVAL(500, 1000, "Haut Moyen-Âge"),
         HIGH_MEDIEVAL(1000, 1250, "Moyen-Âge Central"),

@@ -33,10 +33,10 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Loader for book catalogs, supporting interfaces with major library databases
  * like OpenLibrary, Library of Congress, or local records.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class BookCatalogReader extends AbstractResourceReader<List<BibliographicalNotice>> implements CatalogReader {
 

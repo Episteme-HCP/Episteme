@@ -183,7 +183,7 @@ public abstract class SimulatedDevice implements Device {
      * Generates a formatted info string for dashboard display.
      */
     public String getFormattedInfo() {
-        org.jscience.ui.i18n.I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
+        org.jscience.ui.i18n.I18N i18n = org.jscience.ui.i18n.I18N.getInstance();
         StringBuilder sb = new StringBuilder();
         sb.append(i18n.get("dashboard.tab.devices", "Device")).append(": ").append(name).append("\n");
 

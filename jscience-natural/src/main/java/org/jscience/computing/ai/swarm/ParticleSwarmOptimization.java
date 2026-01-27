@@ -34,13 +34,12 @@ import java.util.Random;
  * Each particle: position, velocity, personal best, global best.
  * Update: v = Ãâ€°v + cÃ¢â€šÂrand()(pbest - x) + cÃ¢â€šâ€šrand()(gbest - x)
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Kennedy, J., & Eberhart, R. (1995). Particle swarm optimization. <i>Proceedings of ICNN'95 - International Conference on Neural Networks</i>.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

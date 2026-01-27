@@ -24,7 +24,7 @@
 package org.jscience.linguistics.loaders.tigerxml;
 
 import org.jscience.linguistics.loaders.tigerxml.core.CorpusBuilder;
-import org.jscience.linguistics.loaders.tigerxml.core.TigerXmlDocument;
+import org.jscience.linguistics.loaders.tigerxml.core.TigerXMLDocument;
 import org.jscience.linguistics.loaders.tigerxml.tools.GeneralTools;
 import org.jscience.linguistics.loaders.tigerxml.tools.SyncMMAX;
 import org.w3c.dom.Element;
@@ -44,13 +44,11 @@ import java.util.stream.Collectors;
  * syntactic tree structure (composed of terminals and non-terminals).
  * It also stores metadata and annotation specifications from the {@code <head>} section.
  * </p>
- *
+ * * @see Sentence
+ * @see AnnotationMetadata
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
- * @see Sentence
- * @see AnnotationMetadata
  */
 public class Corpus implements Serializable {
 
@@ -119,7 +117,7 @@ public class Corpus implements Serializable {
     }
 
     private void load(String fileName) {
-        TigerXmlDocument doc = new TigerXmlDocument(fileName, verbosity);
+        TigerXMLDocument doc = new TigerXMLDocument(fileName, verbosity);
         CorpusBuilder.buildCorpus(this, doc.getDocumentRoot());
     }
 

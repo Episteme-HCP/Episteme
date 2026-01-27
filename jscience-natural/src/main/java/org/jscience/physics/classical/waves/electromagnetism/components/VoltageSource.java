@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.classical.waves.electromagnetism.circuit.CircuitElement;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

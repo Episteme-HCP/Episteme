@@ -29,11 +29,6 @@ import java.util.*;
 /**
  * Models archaeological stratigraphy and topological relationships between strata.
  * Supports the analysis of Harris Matrices and verifies logical consistency of stratigraphic sequences.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class StratigraphyModel {
 
@@ -43,7 +38,10 @@ public final class StratigraphyModel {
 
     /**
      * Topographic relationship between stratigraphic units.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Relationship {
         ABOVE, BELOW, EQUAL, CUT_BY, COVERS
     }

@@ -35,6 +35,9 @@ import java.util.stream.LongStream;
  * Metropolis, N., et al. (1953). Equation of State Calculations by Fast Computing Machines. <i>The Journal of Chemical Physics</i>, 21(6), 1087.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MonteCarloPiPrimitiveSupport {
 

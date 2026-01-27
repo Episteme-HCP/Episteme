@@ -47,7 +47,7 @@ import java.util.Random;
  * $$ WER = \exp\left(-\frac{E_b}{k_B T}\right) \cdot f(I, t_p) $$
  * where $E_b$ is the energy barrier and $f(I, t_p)$ captures write dynamics.
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

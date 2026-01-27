@@ -23,7 +23,7 @@
 
 package org.jscience.ui.demos;
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.Viewer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,14 +37,14 @@ import java.util.regex.Pattern;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Comprehensive tests to verify I18n support across all demos.
+ * Comprehensive tests to verify I18N support across all demos.
  * Checks for missing translations, hardcoded strings, and key consistency.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ViewerProviderI18nTest {
+public class ViewerProviderI18NTest {
 
     private static List<Viewer> allProviders;
     private static final Pattern UNRESOLVED_KEY_PATTERN = Pattern.compile("^[a-z]+\\.[a-z]+.*$");
@@ -99,10 +99,10 @@ public class ViewerProviderI18nTest {
     }
 
     @Nested
-    class I18nKeyResolutionTests {
+    class I18NKeyResolutionTests {
 
         @Test
-        void namesDoNotContainUnresolvedI18nKeys() {
+        void namesDoNotContainUnresolvedI18NKeys() {
             List<String> failures = new ArrayList<>();
             for (Viewer provider : allProviders) {
                 String name = provider.getName();
@@ -112,11 +112,11 @@ public class ViewerProviderI18nTest {
                 }
             }
             assertTrue(failures.isEmpty(),
-                    "Demos with unresolved I18n keys in getName():\n" + String.join("\n", failures));
+                    "Demos with unresolved I18N keys in getName():\n" + String.join("\n", failures));
         }
 
         @Test
-        void descriptionsDoNotContainUnresolvedI18nKeys() {
+        void descriptionsDoNotContainUnresolvedI18NKeys() {
             List<String> failures = new ArrayList<>();
             for (Viewer provider : allProviders) {
                 String desc = provider.getDescription();
@@ -125,11 +125,11 @@ public class ViewerProviderI18nTest {
                 }
             }
             assertTrue(failures.isEmpty(),
-                    "Demos with unresolved I18n keys in getDescription():\n" + String.join("\n", failures));
+                    "Demos with unresolved I18N keys in getDescription():\n" + String.join("\n", failures));
         }
 
         @Test
-        void categoriesDoNotContainUnresolvedI18nKeys() {
+        void categoriesDoNotContainUnresolvedI18NKeys() {
             List<String> failures = new ArrayList<>();
             for (Viewer provider : allProviders) {
                 String category = provider.getCategory();
@@ -138,7 +138,7 @@ public class ViewerProviderI18nTest {
                 }
             }
             assertTrue(failures.isEmpty(),
-                    "Demos with unresolved I18n keys in getCategory():\n" + String.join("\n", failures));
+                    "Demos with unresolved I18N keys in getCategory():\n" + String.join("\n", failures));
         }
 
         private boolean looksLikeUnresolvedKey(String value) {
@@ -153,7 +153,7 @@ public class ViewerProviderI18nTest {
     }
 
     @Nested
-    class I18nPropertyFileParity {
+    class I18NPropertyFileParity {
 
         private static final String[] LANGUAGES = { "en", "fr", "es", "de", "zh" };
         private static final String RESOURCE_PATH = "/org/jscience/ui/i18n/messages_natural_%s.properties";
@@ -207,17 +207,17 @@ public class ViewerProviderI18nTest {
     }
 
     @Nested
-    class I18nManagerTests {
+    class I18NManagerTests {
 
         @Test
         void i18nManagerCanBeInstantiated() {
-            I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
-            assertNotNull(i18n, "I18n manager should not be null");
+            I18N i18n = org.jscience.ui.i18n.I18N.getInstance();
+            assertNotNull(i18n, "I18N manager should not be null");
         }
 
         @Test
         void knownKeysResolveCorrectly() {
-            I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
+            I18N i18n = org.jscience.ui.i18n.I18N.getInstance();
 
             // Test some known keys
             String[] knownKeys = {
@@ -237,7 +237,7 @@ public class ViewerProviderI18nTest {
 
         @Test
         void missingKeyReturnsKeyOrFallback() {
-            I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
+            I18N i18n = org.jscience.ui.i18n.I18N.getInstance();
             String result = i18n.get("totally.nonexistent.key.xyz");
             // Typically returns the key itself or a placeholder
             assertNotNull(result);

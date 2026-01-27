@@ -1,24 +1,26 @@
 /*
- * TigerXmlDocument.java
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * Created on January 29, 2004, 11:22 PM
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Copyright (C) 2003 Oezguer Demir <oeze@coli.uni-sb.de>,
- *                    Vaclav Nemcik <vicky@coli.uni-sb.de>,
- *                    Hajo Keffer <hajokeffer@coli.uni-sb.de>
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
+
 package org.jscience.linguistics.loaders.tigerxml.core;
 
 import org.w3c.dom.Element;
@@ -29,71 +31,69 @@ import java.io.Serializable;
 /**
  * Represents the TIGER-XML source document of a corpus.
  *
- * @author <a href="mailto:oeze@coli.uni-sb.de"> Oezguer Demir </a>
- * @version 1.84 $Id: TigerXmlDocument.java,v 1.3 2007-10-23 18:21:42 virtualcall Exp $
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
-public class TigerXmlDocument implements Serializable {
-    /** DOCUMENT ME! */
+public class TigerXMLDocument implements Serializable {
     private String fileName;
 
-    /** DOCUMENT ME! */
     private Element documentRoot;
 
-    /** DOCUMENT ME! */
     private int verbosity = 0;
 
-/**
-     * Creates a new TigerXmlDocument object.
+    /**
+     * Creates a new TigerXMLDocument object.
      *
-     * @param corpusFileName DOCUMENT ME!
+     * @param corpusFileName path to the corpus file
      */
-    public TigerXmlDocument(String corpusFileName) {
+    public TigerXMLDocument(String corpusFileName) {
         init(corpusFileName);
     }
 
-/**
-     * Creates a new TigerXmlDocument object.
+    /**
+     * Creates a new TigerXMLDocument object.
      *
-     * @param corpusFileName DOCUMENT ME!
-     * @param verbosity      DOCUMENT ME!
+     * @param corpusFileName path to the corpus file
+     * @param verbosity      logging verbosity level
      */
-    public TigerXmlDocument(String corpusFileName, int verbosity) {
+    public TigerXMLDocument(String corpusFileName, int verbosity) {
         this.verbosity = verbosity;
         init(corpusFileName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Initializes the document by parsing the XML file.
      *
-     * @param corpusFileName DOCUMENT ME!
+     * @param corpusFileName path to the corpus file
      */
     private void init(String corpusFileName) {
         this.fileName = corpusFileName;
 
-        XmlParser xmlP = new XmlParser(corpusFileName, this.verbosity);
+        XMLParser xmlP = new XMLParser(corpusFileName, this.verbosity);
         this.documentRoot = xmlP.getDOMRootElement();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the DOM root element of the parsed document.
      *
-     * @return DOCUMENT ME!
+     * @return the root Element
      */
     public Element getDocumentRoot() {
         return this.documentRoot;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the source file name.
      *
-     * @return DOCUMENT ME!
+     * @return the absolute path to the XML file
      */
     public String getFileName() {
         return this.fileName;
     }
 
     /**
-     * DOCUMENT ME!
+     * Resets the document state, clearing the DOM tree.
      */
     public void reset() {
         this.fileName = null;

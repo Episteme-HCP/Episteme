@@ -28,11 +28,6 @@ package org.jscience.psychology;
  * <p>
  * Provides classifications for emotions, Maslow's hierarchy of needs, 
  * personality models (Big Five, Myers-Briggs/Keirsey), and sleep stages.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class PsychologyConstants {
 
@@ -40,7 +35,10 @@ public final class PsychologyConstants {
 
     /**
      * Primary and secondary emotions.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Emotion {
         ANGER, RAGE, SORROW, SADNESS, JOY, HAPPINESS, DISGUST, 
         ACCEPTANCE, ANTICIPATION, SURPRISE, FEAR, TERROR, 

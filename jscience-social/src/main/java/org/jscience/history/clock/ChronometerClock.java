@@ -28,10 +28,9 @@ import java.util.Objects;
 /**
  * A chronometer (stopwatch) implementation that measures elapsed time.
  * Calculates duration relative to a start time captured from a {@link TimeServer}.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class ChronometerClock extends Clock {

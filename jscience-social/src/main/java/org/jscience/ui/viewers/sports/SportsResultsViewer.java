@@ -34,7 +34,7 @@ import org.jscience.ui.ChoiceParameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.StringParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.io.Configuration;
 
 import java.util.ArrayList;
@@ -44,6 +44,9 @@ import java.util.stream.Collectors;
 /**
  * Sports Results Management Viewer.
  * Refactored to be 100% parameter-based.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SportsResultsViewer extends AbstractViewer {
 
@@ -63,15 +66,15 @@ public class SportsResultsViewer extends AbstractViewer {
     }
 
     private void setupParameters() {
-        parameters.add(new StringParameter("sports.teams", I18n.getInstance().get("sports.param.teams", "Teams List"), Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool"), v -> reinitializeTeams(v)));
+        parameters.add(new StringParameter("sports.teams", I18N.getInstance().get("sports.param.teams", "Teams List"), Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool"), v -> reinitializeTeams(v)));
         
         List<String> teamNames = teams.stream().map(Team::getName).collect(Collectors.toList());
-        parameters.add(new ChoiceParameter("sports.match.home", I18n.getInstance().get("sports.form.home", "Home Team"), teamNames, "", v -> homeTeamName = v));
-        parameters.add(new ChoiceParameter("sports.match.away", I18n.getInstance().get("sports.form.away", "Away Team"), teamNames, "", v -> awayTeamName = v));
+        parameters.add(new ChoiceParameter("sports.match.home", I18N.getInstance().get("sports.form.home", "Home Team"), teamNames, "", v -> homeTeamName = v));
+        parameters.add(new ChoiceParameter("sports.match.away", I18N.getInstance().get("sports.form.away", "Away Team"), teamNames, "", v -> awayTeamName = v));
         parameters.add(new NumericParameter("sports.match.hscore", "Home Score", 0, 20, 1, (double)homeScore, v -> homeScore = v.intValue()));
         parameters.add(new NumericParameter("sports.match.ascore", "Away Score", 0, 20, 1, (double)awayScore, v -> awayScore = v.intValue()));
         
-        parameters.add(new BooleanParameter("sports.match.add", I18n.getInstance().get("sports.button.add", "Add Match"), false, v -> {
+        parameters.add(new BooleanParameter("sports.match.add", I18N.getInstance().get("sports.button.add", "Add Match"), false, v -> {
             if (v) {
                 Team h = teams.stream().filter(t -> t.name.equals(homeTeamName)).findFirst().orElse(null);
                 Team a = teams.stream().filter(t -> t.name.equals(awayTeamName)).findFirst().orElse(null);
@@ -79,7 +82,7 @@ public class SportsResultsViewer extends AbstractViewer {
             }
         }));
         
-        parameters.add(new BooleanParameter("sports.simulate", I18n.getInstance().get("sports.button.simulate", "Simulate Season"), false, v -> {
+        parameters.add(new BooleanParameter("sports.simulate", I18N.getInstance().get("sports.button.simulate", "Simulate Season"), false, v -> {
             if (v) simulateSeason();
         }));
     }
@@ -88,13 +91,13 @@ public class SportsResultsViewer extends AbstractViewer {
         TableView<Team> table = new TableView<>(teams);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         
-        TableColumn<Team, String> nameCol = new TableColumn<>(I18n.getInstance().get("sports.col.team", "Team"));
+        TableColumn<Team, String> nameCol = new TableColumn<>(I18N.getInstance().get("sports.col.team", "Team"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         
-        TableColumn<Team, Integer> playedCol = new TableColumn<>(I18n.getInstance().get("sports.col.played", "Played"));
+        TableColumn<Team, Integer> playedCol = new TableColumn<>(I18N.getInstance().get("sports.col.played", "Played"));
         playedCol.setCellValueFactory(new PropertyValueFactory<>("played"));
         
-        TableColumn<Team, Number> pointsCol = new TableColumn<>(I18n.getInstance().get("sports.col.pts", "Points"));
+        TableColumn<Team, Number> pointsCol = new TableColumn<>(I18N.getInstance().get("sports.col.pts", "Points"));
         pointsCol.setCellValueFactory(cell -> cell.getValue().points);
         
         @SuppressWarnings({"unchecked", "unused"})
@@ -147,9 +150,9 @@ public class SportsResultsViewer extends AbstractViewer {
         @Override public String toString() { return name; }
     }
 
-    @Override public String getName() { return I18n.getInstance().get("viewer.sportsresults.name", "Sports Results"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.sports", "Sports"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.sportsresults.desc", "Sports Results Management"); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.sportsresults.longdesc", "A comprehensive sports league management and visualization tool. Create lists of teams, record match results with home and away scores, and maintain a real-time league table. The viewer includes a season simulation feature to quickly populate results and analyze statistical trends in team performance."); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.sportsresults.name", "Sports Results"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.sports", "Sports"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.sportsresults.desc", "Sports Results Management"); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.sportsresults.longdesc", "A comprehensive sports league management and visualization tool. Create lists of teams, record match results with home and away scores, and maintain a real-time league table. The viewer includes a season simulation feature to quickly populate results and analyze statistical trends in team performance."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

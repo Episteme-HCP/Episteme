@@ -32,10 +32,9 @@ import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a political party, characterized by its ideology, leadership, and organization.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent

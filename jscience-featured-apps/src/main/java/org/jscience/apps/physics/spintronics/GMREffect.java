@@ -55,9 +55,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * <a href="https://doi.org/10.1016/0375-9601(75)90174-7">DOI:
  * 10.1016/0375-9601(75)90174-7</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class GMREffect {
 

@@ -28,10 +28,10 @@ import java.nio.file.Path;
 
 /**
  * Interface for loading grammars from formal definition files (PEG, BNF, etc.).
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public interface FormalGrammarLoader {
     /**

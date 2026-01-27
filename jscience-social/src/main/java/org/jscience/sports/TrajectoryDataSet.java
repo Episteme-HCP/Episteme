@@ -35,11 +35,6 @@ import org.jscience.util.UniversalDataModel;
 /**
  * Universal data model for performance tracking and human evolution trajectories.
  * Used for storing time-series data related to athletic performance or biological evolution.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class TrajectoryDataSet implements UniversalDataModel, Serializable {
 
@@ -54,7 +49,11 @@ public final class TrajectoryDataSet implements UniversalDataModel, Serializable
     /** A labeled series of related data points. */
     public record Series(String id, String label, ColorType color, List<DataPoint> points) implements Serializable {}
     
-    /** Color categories for visualization. */
+    /** Color categories for visualization.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum ColorType { VITAL, STRESS, RECOVERY }
 
     private final Map<String, Series> seriesMap = new LinkedHashMap<>();

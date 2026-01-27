@@ -31,10 +31,10 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Universal analyzer for Natural Languages.
  * Provides a framework for POS tagging, lemmatization and morphological analysis.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class NaturalLanguageAnalyzer {
 

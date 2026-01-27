@@ -28,7 +28,7 @@ import org.jscience.economics.loaders.FinancialMarketReader.Candle;
 import org.jscience.economics.money.Money;
 import org.jscience.history.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18NManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -61,11 +61,11 @@ public class MarketCrashPredictor {
 
         @Override
         public String toString() {
-            return I18nManager.getInstance().get(key);
+            return I18NManager.getInstance().get(key);
         }
     }
 
-    private static final I18nManager i18n = I18nManager.getInstance();
+    private static final I18NManager i18n = I18NManager.getInstance();
 
     public static void main(String[] args) {
         System.out.println(

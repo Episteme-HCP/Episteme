@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.chemistry.PeriodicTableViewer;
 
 /**
  * Periodic Table Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -44,10 +44,10 @@ public class PeriodicTableDemo extends AbstractDemo {
     public String getCategory() { return "Chemistry"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("PeriodicTable.title", "Periodic Table"); }
+    public String getName() { return I18N.getInstance().get("PeriodicTable.title", "Periodic Table"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("PeriodicTable.desc", "Interactive Periodic Table of Elements"); }
+    public String getDescription() { return I18N.getInstance().get("PeriodicTable.desc", "Interactive Periodic Table of Elements"); }
     
     @Override
     public String getLongDescription() { 

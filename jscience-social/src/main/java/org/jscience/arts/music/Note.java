@@ -31,6 +31,9 @@ import org.jscience.measure.Units;
 
 /**
  * Represents a musical note with microtonal and dynamic properties.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Note {
 

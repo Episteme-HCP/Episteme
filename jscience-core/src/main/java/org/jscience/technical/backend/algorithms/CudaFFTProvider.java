@@ -35,11 +35,12 @@ import java.util.logging.Logger;
  * Uses NVIDIA's cuFFT library for optimized FFT on NVIDIA GPUs.
  * For AMD/Intel GPUs, use {@link OpenCLFFTProvider} instead.
  * </p>
- *
+ * * @see OpenCLFFTProvider
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see OpenCLFFTProvider
+ * @see <a href="https://docs.nvidia.com/cuda/cufft/index.html">NVIDIA cuFFT Library</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">Cooley–Tukey FFT Algorithm</a>
  */
 public class CUDAFFTProvider implements FFTProvider {
 

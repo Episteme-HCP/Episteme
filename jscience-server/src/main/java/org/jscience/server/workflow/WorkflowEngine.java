@@ -39,6 +39,9 @@ import java.util.function.Function;
  * - Parallel step execution
  * - State management
  * - Retry and error handling
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class WorkflowEngine {
 

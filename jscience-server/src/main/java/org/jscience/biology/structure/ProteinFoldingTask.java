@@ -48,6 +48,9 @@ import org.jscience.distributed.TaskRegistry;
  * 22(10), 3986-3997.</li>
  * </ul>
  * </p>
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ProteinFoldingTask implements Serializable {
 

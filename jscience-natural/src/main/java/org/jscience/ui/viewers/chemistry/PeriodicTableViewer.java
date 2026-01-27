@@ -37,7 +37,7 @@ import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.StringParameter;
 import org.jscience.ui.BooleanParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,9 @@ import java.util.List;
 /**
  * Interactive periodic table viewer.
  * Refactored to be 100% parameter-based.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PeriodicTableViewer extends AbstractViewer {
 
@@ -84,18 +87,18 @@ public class PeriodicTableViewer extends AbstractViewer {
         detailPanel = new VBox(10); detailPanel.setPadding(new Insets(10)); detailPanel.setPrefWidth(300);
         detailPanel.getStyleClass().add("viewer-sidebar");
         
-        detailPanel.getChildren().add(new Label(I18n.getInstance().get("viewer.periodictable.details.hint", "Select an element to view details")));
+        detailPanel.getChildren().add(new Label(I18N.getInstance().get("viewer.periodictable.details.hint", "Select an element to view details")));
 
         setCenter(scrollPane); setRight(detailPanel);
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("periodic.zoom", I18n.getInstance().get("viewer.periodictable.zoom", "Zoom"), 0.5, 2.0, 0.1, zoom, v -> {
+        parameters.add(new NumericParameter("periodic.zoom", I18N.getInstance().get("viewer.periodictable.zoom", "Zoom"), 0.5, 2.0, 0.1, zoom, v -> {
             zoom = v; if (contentGroup != null) { contentGroup.setScaleX(zoom); contentGroup.setScaleY(zoom); }
         }));
         
-        parameters.add(new StringParameter("periodic.search", I18n.getInstance().get("viewer.periodictable.search.prompt", "Compound Search"), searchString, v -> searchString = v));
-        parameters.add(new BooleanParameter("periodic.dosearch", I18n.getInstance().get("viewer.periodictable.search.button", "Search"), false, v -> {
+        parameters.add(new StringParameter("periodic.search", I18N.getInstance().get("viewer.periodictable.search.prompt", "Compound Search"), searchString, v -> searchString = v));
+        parameters.add(new BooleanParameter("periodic.dosearch", I18N.getInstance().get("viewer.periodictable.search.button", "Search"), false, v -> {
             if (v) performSearch();
         }));
     }
@@ -150,9 +153,9 @@ public class PeriodicTableViewer extends AbstractViewer {
         return "-fx-background-color: #8395a7;" + base;
     }
 
-    @Override public String getName() { return I18n.getInstance().get("viewer.periodictableviewer.name", "Periodic Table"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.chemistry", "Chemistry"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.periodictableviewer.desc", "Interactive periodic table."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.periodictableviewer.longdesc", "Detailed interactive periodic table of elements. Explore properties like atomic number, symbol, name, and atomic mass. This viewer provides a comprehensive overview of chemical elements organized by their properties and trends."); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.periodictableviewer.name", "Periodic Table"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.chemistry", "Chemistry"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.periodictableviewer.desc", "Interactive periodic table."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.periodictableviewer.longdesc", "Detailed interactive periodic table of elements. Explore properties like atomic number, symbol, name, and atomic mass. This viewer provides a comprehensive overview of chemical elements organized by their properties and trends."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

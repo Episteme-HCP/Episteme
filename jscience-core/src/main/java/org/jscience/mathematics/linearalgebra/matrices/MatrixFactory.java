@@ -31,11 +31,7 @@ import java.util.ArrayList;
 
 /**
  * Factory for creating matrices with specific storage layouts.
- * * @author Silvere Martin-Michiellot
- * 
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+ * * */
 public final class MatrixFactory {
 
     private MatrixFactory() {

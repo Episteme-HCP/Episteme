@@ -39,7 +39,7 @@ import org.jscience.physics.astronomy.SolarSystemReader;
 import org.jscience.physics.astronomy.StarSystem;
 import org.jscience.physics.loaders.HorizonsEphemerisReader;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -50,6 +50,9 @@ import java.util.stream.Collectors;
 /**
  * Interplanetary Trajectory Planner Demo.
  * Ported from Killer App.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class InterplanetaryTrajectoryDemo extends AbstractDemo {
 
@@ -70,12 +73,12 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("trajectory.title", "Interplanetary Trajectory");
+        return I18N.getInstance().get("trajectory.title", "Interplanetary Trajectory");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("trajectory.desc", "Planning of optimal Hohmann transfers between planets.");
+        return I18N.getInstance().get("trajectory.desc", "Planning of optimal Hohmann transfers between planets.");
     }
 
     @Override
@@ -127,7 +130,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
     private VBox createControls() {
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(20));
-        I18n i18n = I18n.getInstance();
+        I18N i18n = I18N.getInstance();
 
         Label title = new Label("🚀 " + i18n.get("trajectory.panel.config", "Configuration"));
         title.getStyleClass().add("header-label");
@@ -173,7 +176,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
         grid.add(calcBtn, 0, 4, 2, 1);
 
         grid.add(new Label(i18n.get("trajectory.label.deltav", "Delta-V")), 0, 5);
-        deltaVLabel = new Label(I18n.getInstance().get("generated.interplanetarytrajectory.", "--"));
+        deltaVLabel = new Label(I18N.getInstance().get("generated.interplanetarytrajectory.", "--"));
         deltaVLabel.getStyleClass().add("header-label");
         deltaVLabel.setStyle("-fx-font-size: 14px;");
         grid.add(deltaVLabel, 1, 5);
@@ -307,7 +310,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
             return;
         if (!(originBody instanceof Planet) || !(targetBody instanceof Planet))
             return;
-        I18n i18n = I18n.getInstance();
+        I18N i18n = I18N.getInstance();
 
         LocalDate d1 = launchDatePicker.getValue();
         LocalDate d2 = d1.plusDays((long) durationDays);
@@ -360,7 +363,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("InterplanetaryTrajectoryDemo.desc", "InterplanetaryTrajectoryDemo description");
+        return I18N.getInstance().get("InterplanetaryTrajectoryDemo.desc", "InterplanetaryTrajectoryDemo description");
     }
 
     

@@ -31,13 +31,12 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * CPU-optimized implementations. For large-scale problems, use GPU backend.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Nocedal, J., & Wright, S. J. (2006). <i>Numerical Optimization</i>. Springer.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

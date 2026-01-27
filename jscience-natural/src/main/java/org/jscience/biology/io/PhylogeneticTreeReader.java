@@ -27,7 +27,7 @@ import org.jscience.biology.Taxon;
 import org.jscience.io.AbstractResourceReader;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -44,6 +44,9 @@ import java.util.Map;
  * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PhylogeneticTreeReader extends AbstractResourceReader<Taxon> {
 
@@ -97,22 +100,22 @@ public class PhylogeneticTreeReader extends AbstractResourceReader<Taxon> {
     
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.phylogenetictreereader.name", "Phylogenetic Tree Reader");
+        return I18N.getInstance().get("reader.phylogenetictreereader.name", "Phylogenetic Tree Reader");
     }
 
     @Override
     public String getCategory() { 
-        return I18n.getInstance().get("category.biology", "Biology"); 
+        return I18N.getInstance().get("category.biology", "Biology"); 
     }
 
     @Override
     public String getDescription() { 
-        return I18n.getInstance().get("reader.phylogenetictreereader.desc", "Reads phylogenetic trees from CSV format."); 
+        return I18N.getInstance().get("reader.phylogenetictreereader.desc", "Reads phylogenetic trees from CSV format."); 
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.phylogenetictreereader.longdesc", "Parses phylogenetic tree data from CSV, reconstructing hierarchical taxon relationships.");
+        return I18N.getInstance().get("reader.phylogenetictreereader.longdesc", "Parses phylogenetic tree data from CSV, reconstructing hierarchical taxon relationships.");
     }
 
     @Override public String getResourcePath() { return "/data/phylogeny/"; }

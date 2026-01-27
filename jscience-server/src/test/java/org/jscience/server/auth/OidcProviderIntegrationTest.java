@@ -32,9 +32,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration tests for OIDCProvider using WireMock to mock JWKS endpoint.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 class OIDCProviderIntegrationTest {
 

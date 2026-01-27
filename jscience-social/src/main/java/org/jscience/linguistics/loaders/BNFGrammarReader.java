@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
 
 /**
  * Resource reader for Backus-Naur Form (BNF) files.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class BNFGrammarReader extends AbstractResourceReader<Grammar> {
 

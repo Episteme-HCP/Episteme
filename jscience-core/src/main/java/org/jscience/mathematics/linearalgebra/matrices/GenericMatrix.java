@@ -193,7 +193,28 @@ public class GenericMatrix<E> implements Matrix<E> {
         if (other instanceof GenericMatrix) {
             return provider.multiply(this, (GenericMatrix<E>) other);
         }
-        throw new UnsupportedOperationException("Multiplication with non-GenericMatrix not supported");
+        
+        // Fallback manual multiplication
+        int rows = this.rows();
+        int cols = other.cols();
+        int inner = this.cols();
+        
+        if (inner != other.rows()) {
+            throw new IllegalArgumentException("Matrix dimensions do not match for multiplication.");
+        }
+        
+        DenseMatrixStorage<E> resStorage = new DenseMatrixStorage<>(rows, cols, ring.zero());
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                E sum = ring.zero();
+                for (int k = 0; k < inner; k++) {
+                    E prod = ring.multiply(this.get(i, k), other.get(k, j));
+                    sum = ring.add(sum, prod);
+                }
+                resStorage.set(i, j, sum);
+            }
+        }
+        return new GenericMatrix<E>(resStorage, provider, ring);
     }
 
     @Override

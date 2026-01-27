@@ -30,7 +30,7 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Interface for Finite Element Method providers.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

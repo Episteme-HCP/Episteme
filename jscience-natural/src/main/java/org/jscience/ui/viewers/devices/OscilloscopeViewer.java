@@ -32,7 +32,7 @@ import org.jscience.device.sensors.Oscilloscope;
 import org.jscience.ui.AbstractDeviceViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -40,6 +40,9 @@ import java.util.ArrayList;
 /**
  * Viewer for Oscilloscope.
  * Refactored to be parameter-based.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class OscilloscopeViewer extends AbstractDeviceViewer<Oscilloscope> {
 
@@ -63,8 +66,8 @@ public class OscilloscopeViewer extends AbstractDeviceViewer<Oscilloscope> {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("osc.gain", I18n.getInstance().get("osc.gain", "Gain"), 0.1, 10, 0.1, gain, v -> gain = v));
-        parameters.add(new NumericParameter("osc.timebase", I18n.getInstance().get("osc.timebase", "Time Base"), 0.1, 5, 0.1, timeBase, v -> timeBase = v));
+        parameters.add(new NumericParameter("osc.gain", I18N.getInstance().get("osc.gain", "Gain"), 0.1, 10, 0.1, gain, v -> gain = v));
+        parameters.add(new NumericParameter("osc.timebase", I18N.getInstance().get("osc.timebase", "Time Base"), 0.1, 5, 0.1, timeBase, v -> timeBase = v));
     }
 
     @Override
@@ -92,8 +95,8 @@ public class OscilloscopeViewer extends AbstractDeviceViewer<Oscilloscope> {
         } catch (Exception e) {}
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.measure", "Measurement"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.oscilloscope.name", "Oscilloscope"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.oscilloscope.desc", "Oscilloscope viewer."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.measure", "Measurement"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.oscilloscope.name", "Oscilloscope"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.oscilloscope.desc", "Oscilloscope viewer."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

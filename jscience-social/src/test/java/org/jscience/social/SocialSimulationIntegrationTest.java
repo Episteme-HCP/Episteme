@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.social;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,6 +39,9 @@ import java.util.List;
 
 /**
  * Integration test for the complete Counterfactual History and Social Simulation pipeline.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SocialSimulationIntegrationTest {
 

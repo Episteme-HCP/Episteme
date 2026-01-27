@@ -96,7 +96,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pandemicforecasterapp.name", "Pandemic Forecaster");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.name", "Pandemic Forecaster");
     }
 
     @Override
@@ -106,12 +106,12 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pandemicforecasterapp.desc", "Simulate disease spread using SEIR models.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.desc", "Simulate disease spread using SEIR models.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pandemicforecasterapp.longdesc", "Advanced biological simulator for modeling the propagation of infectious diseases. Implements the SEIR (Susceptible-Exposed-Infectious-Recovered-Deceased) compartmental model with support for real-world demographic data from the World Bank and adjustable parameters for transmission, incubation, recovery, and mortality rates.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.longdesc", "Advanced biological simulator for modeling the propagation of infectious diseases. Implements the SEIR (Susceptible-Exposed-Infectious-Recovered-Deceased) compartmental model with support for real-world demographic data from the World Bank and adjustable parameters for transmission, incubation, recovery, and mortality rates.");
     }
 
     @Override
@@ -669,6 +669,6 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
     }
 }

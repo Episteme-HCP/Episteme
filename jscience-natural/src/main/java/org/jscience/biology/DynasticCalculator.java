@@ -33,11 +33,6 @@ import org.jscience.util.persistence.Relation;
 /**
  * Calculates consanguinity coefficients, inbreeding, and models dynastic succession.
  * Provides tools for genealogical analysis of historical dynasties.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class DynasticCalculator {
 
@@ -47,7 +42,10 @@ public final class DynasticCalculator {
 
     /**
      * Gender for dynastic succession priority logic.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Gender {
         MALE, FEMALE, OTHER
     }

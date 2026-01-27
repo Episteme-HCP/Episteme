@@ -23,7 +23,7 @@
 
 package org.jscience.ui;
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
@@ -45,9 +45,9 @@ public abstract class AbstractSimulationDemo extends AbstractDemo implements Sim
         VBox panel = super.createControlPanel();
         
         ToolBar toolbar = new ToolBar();
-        Button btnPlay = new Button(I18n.getInstance().get("demo.control.play", "Play"));
-        Button btnPause = new Button(I18n.getInstance().get("demo.control.pause", "Pause"));
-        Button btnStop = new Button(I18n.getInstance().get("demo.control.stop", "Reset"));
+        Button btnPlay = new Button(I18N.getInstance().get("demo.control.play", "Play"));
+        Button btnPause = new Button(I18N.getInstance().get("demo.control.pause", "Pause"));
+        Button btnStop = new Button(I18N.getInstance().get("demo.control.stop", "Reset"));
         
         btnPlay.setOnAction(e -> play());
         btnPause.setOnAction(e -> pause());

@@ -40,7 +40,7 @@ import javafx.scene.paint.Color;
  *   <li>Skyrmion tracking (center of mass)</li>
  * </ul>
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

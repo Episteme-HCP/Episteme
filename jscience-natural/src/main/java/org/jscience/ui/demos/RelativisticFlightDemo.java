@@ -33,7 +33,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -43,6 +43,9 @@ import java.util.Random;
 /**
  * Special Relativity Spaceflight Simulator Demo.
  * Ported from Killer App.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RelativisticFlightDemo extends AbstractDemo {
 
@@ -76,12 +79,12 @@ public class RelativisticFlightDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("relativity.title", "Vol Relativiste");
+        return I18N.getInstance().get("relativity.title", "Vol Relativiste");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("relativity.desc",
+        return I18N.getInstance().get("relativity.desc",
                 "Simulation de vol ÃƒÂ  vitesse relativiste montrant la dilatation temporelle et l'effet Doppler.");
     }
 
@@ -134,7 +137,7 @@ public class RelativisticFlightDemo extends AbstractDemo {
         box.getStyleClass().add("info-panel");
         box.setStyle("-fx-background-color: rgba(253, 251, 247, 0.85); -fx-padding: 15; -fx-background-radius: 10;");
 
-        I18n i18n = I18n.getInstance();
+        I18N i18n = I18N.getInstance();
 
         Label title = new Label("Ã°Å¸Å¡â‚¬ " + i18n.get("relativity.panel.warp", "Warp Drive"));
         title.getStyleClass().add("header-label");
@@ -198,7 +201,7 @@ public class RelativisticFlightDemo extends AbstractDemo {
     }
 
     private void updateLabels() {
-        I18n i18n = I18n.getInstance();
+        I18N i18n = I18N.getInstance();
         speedLabel.setText(i18n.get("relativity.label.speed_fmt", "Speed: {0}c", String.format("%.3f", beta)));
         if (beta >= 1.0)
             beta = 0.9999;
@@ -280,7 +283,7 @@ public class RelativisticFlightDemo extends AbstractDemo {
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("RelativisticFlightDemo.desc", "RelativisticFlightDemo description");
+        return I18N.getInstance().get("RelativisticFlightDemo.desc", "RelativisticFlightDemo description");
     }
 
     

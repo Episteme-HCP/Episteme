@@ -41,7 +41,7 @@ public class MultimeterViewer extends AbstractDeviceViewer<Multimeter> {
     public MultimeterViewer(Multimeter device) {
         super(device);
 
-        valueLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.multimeter.000.v", "0.00 V"));
+        valueLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("generated.multimeter.000.v", "0.00 V"));
         valueLabel.getStyleClass().add("font-xlarge"); // Replaced inline style: -fx-font-family: 'Courier New'; -fx-font-size: 24px; -fx-text-fill: #222;
         this.getChildren().add(valueLabel);
 
@@ -51,28 +51,28 @@ public class MultimeterViewer extends AbstractDeviceViewer<Multimeter> {
     @Override
     public void update() {
         // Mock update
-        valueLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.multimeter.000.v.1", "0.00 V")); // device.readValue() needs Exception handling
+        valueLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("generated.multimeter.000.v.1", "0.00 V")); // device.readValue() needs Exception handling
     }
 
-    // --- Mandatory Abstract Methods (I18n) ---
+    // --- Mandatory Abstract Methods (I18N) ---
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.measure", "Measurement");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.name", "Multimeter");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.multimeter.name", "Multimeter");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.desc", "A multimeter viewer for measuring electrical properties.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.multimeter.desc", "A multimeter viewer for measuring electrical properties.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.longdesc", "Digital multimeter simulation that measures voltage, current, and resistance. features a clear LCD-style display, automatic range selection, and precise measurements for electronic circuit testing.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.multimeter.longdesc", "Digital multimeter simulation that measures voltage, current, and resistance. features a clear LCD-style display, automatic range selection, and precise measurements for electronic circuit testing.");
     }
 }

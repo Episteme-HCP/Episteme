@@ -46,10 +46,10 @@ import java.util.Map;
 public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.physics", "Physics"); }
     
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistorcolorcodeviewer.name", "Resistor Color Code"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("viewer.resistorcolorcodeviewer.name", "Resistor Color Code"); }
 
 
     private final org.jscience.ui.Parameter<String> band1Param;
@@ -67,7 +67,7 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
     private final Rectangle r3 = new Rectangle(20, 50);
     private final Rectangle r4 = new Rectangle(20, 50);
 
-    private final Label resultLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("resistor.result", "Resistance: "));
+    private final Label resultLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("resistor.result", "Resistance: "));
 
     private static final Map<String, Color> colorMap = new HashMap<>();
     private static final Map<String, Integer> valMap = new HashMap<>();
@@ -168,19 +168,19 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
 
         double ohms = (v1 * 10 + v2) * m;
         String tol = c4.equals("Gold") ? "5%" : "10%";
-        resultLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("resistor.result.fmt", "Resistance: {0} Ohms +/- {1}", ohms, tol));
+        resultLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("resistor.result.fmt", "Resistance: {0} Ohms +/- {1}", ohms, tol));
     }
 
 
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistorcolorcodeviewer.desc", "Resistor color code calculator.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.resistorcolorcodeviewer.desc", "Resistor color code calculator.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistorcolorcodeviewer.longdesc", "Calculate resistor values based on their color bands. Supports 4-band resistor codes, including multipliers and tolerance bands. features a visual representation of the resistor that updates in real-time.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.resistorcolorcodeviewer.longdesc", "Calculate resistor values based on their color bands. Supports 4-band resistor codes, including multipliers and tolerance bands. features a visual representation of the resistor that updates in real-time.");
     }
 }
 

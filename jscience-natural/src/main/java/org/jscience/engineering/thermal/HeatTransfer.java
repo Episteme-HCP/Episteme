@@ -36,7 +36,7 @@ import org.jscience.physics.PhysicalConstants;
 /**
  * Fundamental heat transfer calculations.
  * Modernized to use high-precision Real and typed Quantities.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

@@ -41,35 +41,35 @@ public class PHMeterViewer extends AbstractDeviceViewer<PHMeter> {
     public PHMeterViewer(PHMeter device) {
         super(device);
 
-        phLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.phmeter.ph.70", "pH 7.0"));
+        phLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("generated.phmeter.ph.70", "pH 7.0"));
         phLabel.getStyleClass().add("text-success"); // Replaced inline style: -fx-font-size: 20px; -fx-text-fill: green;
         this.getChildren().add(phLabel);
     }
 
     @Override
     public void update() {
-        phLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.phmeter.ph.70.1", "pH 7.0"));
+        phLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("generated.phmeter.ph.70.1", "pH 7.0"));
     }
 
-    // --- Mandatory Abstract Methods (I18n) ---
+    // --- Mandatory Abstract Methods (I18N) ---
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.name", "pH Meter");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.phmeter.name", "pH Meter");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.desc", "A pH meter viewer for measuring acidity/alkalinity.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.phmeter.desc", "A pH meter viewer for measuring acidity/alkalinity.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.longdesc", "Precise laboratory instrument for measuring the pH (hydrogen-ion activity) in water-based solutions. features a digital display with color-coded pH levels (Acidic to Basic) and automatic temperature compensation.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.phmeter.longdesc", "Precise laboratory instrument for measuring the pH (hydrogen-ion activity) in water-based solutions. features a digital display with color-coded pH levels (Acidic to Basic) and automatic temperature compensation.");
     }
 }

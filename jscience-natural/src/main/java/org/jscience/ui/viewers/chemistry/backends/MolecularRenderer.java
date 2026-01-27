@@ -31,6 +31,9 @@ import javafx.scene.paint.Color;
 /**
  * Abstraction for molecular rendering engines.
  * implementations can use JavaFX (Native), Jmol, PyMOL, etc.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface MolecularRenderer {
 

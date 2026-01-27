@@ -32,7 +32,7 @@ import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.ChoiceParameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.computing.logic.*;
 
 import java.util.ArrayList;
@@ -41,6 +41,9 @@ import java.util.List;
 /**
  * Digital Logic Circuit Simulator Viewer.
  * Refactored to be 100% parameter-based.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
@@ -59,7 +62,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
     }
 
     private void setupParameters() {
-        parameters.add(new BooleanParameter("logic.mode", I18n.getInstance().get("viewer.digitallogicviewer.mode.simulation", "Simulation Mode"), simulationMode, v -> {
+        parameters.add(new BooleanParameter("logic.mode", I18N.getInstance().get("viewer.digitallogicviewer.mode.simulation", "Simulation Mode"), simulationMode, v -> {
             simulationMode = v; selectedComponent = null; if (simulationMode) circuit.simulate(); draw();
         }));
         
@@ -144,9 +147,9 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
     @Override public void step() { circuit.simulate(); draw(); }
     @Override public void setSpeed(double s) {}
     @Override public boolean isPlaying() { return playing; }
-    @Override public String getName() { return I18n.getInstance().get("viewer.digitallogicviewer.name", "Digital Logic Viewer"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.computing", "Computing"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.digitallogicviewer.desc", "Digital logic simulator."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.digitallogicviewer.longdesc", "A comprehensive digital logic circuit simulator. Design complex circuits using basic logic gates (AND, OR, NOT, NAND), inputs, and outputs. Switch between Design Mode to place and connect components, and Simulation Mode to interact with the circuit in real-time."); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.digitallogicviewer.name", "Digital Logic Viewer"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.computing", "Computing"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.digitallogicviewer.desc", "Digital logic simulator."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.digitallogicviewer.longdesc", "A comprehensive digital logic circuit simulator. Design complex circuits using basic logic gates (AND, OR, NOT, NAND), inputs, and outputs. Switch between Design Mode to place and connect components, and Simulation Mode to interact with the circuit in real-time."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

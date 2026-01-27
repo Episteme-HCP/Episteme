@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -49,7 +50,7 @@ import java.util.UUID;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.4
+ * @since 1.0
  */
 @Persistent
 public class PotentialResource implements ComprehensiveIdentification {

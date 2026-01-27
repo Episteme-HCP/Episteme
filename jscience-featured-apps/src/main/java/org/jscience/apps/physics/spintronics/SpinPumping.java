@@ -44,9 +44,10 @@ import org.jscience.mathematics.numbers.real.Real;
  *     <i>Phys. Rev. Lett.</i>, 88, 117601. 
  *     <a href="https://doi.org/10.1103/PhysRevLett.88.117601">DOI: 10.1103/PhysRevLett.88.117601</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SpinPumping {
 

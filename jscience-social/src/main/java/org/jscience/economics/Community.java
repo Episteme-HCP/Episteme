@@ -38,10 +38,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a primitive or cooperative social group where resources are shared.
  * Suitable for modeling anything from animal social structures to human cooperatives.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent

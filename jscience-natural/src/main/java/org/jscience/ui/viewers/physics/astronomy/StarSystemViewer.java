@@ -47,7 +47,7 @@ import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.ChoiceParameter;
 import org.jscience.ui.Parameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
  * 3D Star System Viewer.
  * Features: Solar System, Black Hole etc.
  * Refactored to be fully parameter-based.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -143,16 +143,16 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
 
     private void setupParameters() {
         List<String> presets = Arrays.stream(Preset.values()).map(Preset::getLabel).collect(Collectors.toList());
-        parameters.add(new ChoiceParameter("starsystem.preset", I18n.getInstance().get("starsystem.preset", "System Preset"), presets, Preset.SOLAR_SYSTEM.getLabel(), v -> {
+        parameters.add(new ChoiceParameter("starsystem.preset", I18N.getInstance().get("starsystem.preset", "System Preset"), presets, Preset.SOLAR_SYSTEM.getLabel(), v -> {
             loadSystem(Preset.fromLabel(v));
         }));
         
-        parameters.add(new NumericParameter("starsystem.timescale", I18n.getInstance().get("starsystem.timescale", "Time Scale"), 0.0, 100.0, 0.1, timeScale, v -> timeScale = v));
-        parameters.add(new NumericParameter("starsystem.planetscale", I18n.getInstance().get("starsystem.planetscale", "Planet Scale"), 1.0, 10000.0, 10.0, planetScale, v -> {
+        parameters.add(new NumericParameter("starsystem.timescale", I18N.getInstance().get("starsystem.timescale", "Time Scale"), 0.0, 100.0, 0.1, timeScale, v -> timeScale = v));
+        parameters.add(new NumericParameter("starsystem.planetscale", I18N.getInstance().get("starsystem.planetscale", "Planet Scale"), 1.0, 10000.0, 10.0, planetScale, v -> {
             planetScale = v;
             build3DWorld();
         }));
-        parameters.add(new BooleanParameter("starsystem.paused", I18n.getInstance().get("starsystem.paused", "Paused"), paused, v -> paused = v));
+        parameters.add(new BooleanParameter("starsystem.paused", I18N.getInstance().get("starsystem.paused", "Paused"), paused, v -> paused = v));
     }
 
     private void setupInput(SubScene info) {
@@ -266,7 +266,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         }
     }
     
-    private void updateLabels() { if(dateLabel!=null) dateLabel.setText(I18n.getInstance().get("starsystem.date", "Date") + ": " + String.format("%.2f", currentDate.getValue())); }
+    private void updateLabels() { if(dateLabel!=null) dateLabel.setText(I18N.getInstance().get("starsystem.date", "Date") + ": " + String.format("%.2f", currentDate.getValue())); }
     private void updateVisuals() { }
 
     @Override public void play() { paused = false; }
@@ -312,9 +312,9 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         return s;
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.starsystemviewer.name", "Star System Viewer"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.starsystemviewer.desc", "3D Star System Viewer."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.starsystemviewer.longdesc", "Explore stellar systems and exotic objects."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.starsystemviewer.name", "Star System Viewer"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.starsystemviewer.desc", "3D Star System Viewer."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.starsystemviewer.longdesc", "Explore stellar systems and exotic objects."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

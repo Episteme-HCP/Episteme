@@ -31,13 +31,12 @@ import java.util.*;
  * Computes shortest paths between all pairs of vertices in O(VÃ‚Â³) time.
  * Can handle negative weights but will detect negative cycles.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Floyd, R. W. (1962). Algorithm 97: Shortest Path. <i>Communications of the ACM</i>, 5(6), 345.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

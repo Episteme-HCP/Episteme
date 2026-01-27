@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.politics;
 
 import org.jscience.biology.Individual;
@@ -34,10 +35,9 @@ import java.util.Objects;
 /**
  * Represents a person participating in a voting process.
  * A voter manages their ballots across multiple rounds of voting.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class Voter extends Role {

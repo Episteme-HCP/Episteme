@@ -65,6 +65,9 @@ import javafx.geometry.Pos;
 
 /**
  * 3D Visualization of Molecular Dynamics with Distributed Grid support.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedMolecularDynamicsApp extends Application implements org.jscience.ui.App {
 
@@ -89,7 +92,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.title", "🧪 Molecular Dynamics - Distributed JScience"));
+        stage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.title", "🧪 Molecular Dynamics - Distributed JScience"));
 
         Group root = new Group(atomGroup);
         Box box = new Box(BOX_SIZE, BOX_SIZE, BOX_SIZE);
@@ -136,17 +139,17 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
             atomGroup.getChildren().add(s);
         }
 
-        stats = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.stats.init", "Initializing Grid..."));
+        stats = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.stats.init", "Initializing Grid..."));
         stats.getStyleClass().add("header-label-white");
 
-        localSimCheckBox = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.chk.local", "Local Simulation"));
+        localSimCheckBox = new CheckBox(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.chk.local", "Local Simulation"));
         localSimCheckBox.setSelected(true);
         localSimCheckBox.setTextFill(Color.WHITE);
 
-        Button exportBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.btn.export", "💾 Export PDB"));
+        Button exportBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.btn.export", "💾 Export PDB"));
         exportBtn.setOnAction(e -> exportToPdb());
 
-        loadPdbBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.btn.load", "📂 Load PDB"));
+        loadPdbBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.btn.load", "📂 Load PDB"));
         loadPdbBtn.setOnAction(e -> loadPdb(stage));
         HBox overlay = new HBox(20, stats, localSimCheckBox, loadPdbBtn, exportBtn);
         overlay.setAlignment(Pos.CENTER_LEFT);
@@ -173,8 +176,8 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
 
     private void exportToPdb() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.save.title", "Save PDB Export"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb"));
+        fileChooser.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.save.title", "Save PDB Export"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb"));
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -193,10 +196,10 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
                 p.addChain(chain);
 
                 new PDBWriter().save(p, file.getAbsolutePath());
-                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.alert.export.success", "Exported {0} atoms to {1}", task.getNumAtoms(), file.getName()))
+                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.alert.export.success", "Exported {0} atoms to {1}", task.getNumAtoms(), file.getName()))
                         .show();
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
             }
         }
     }
@@ -311,7 +314,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
                     p.getMass().to(org.jscience.measure.Units.KILOGRAM).getValue().doubleValue()));
         }
         task.updateState(states, 0.0);
-        updateUI(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.local_provider", "Local Provider"));
+        updateUI(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.local_provider", "Local Provider"));
     }
 
     private void runDistributedStep() {
@@ -342,7 +345,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
                     applyAtoms(result.getSerializedData().toByteArray());
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> stats.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.grid_error", "Grid Error: {0}", e.getMessage())));
+                Platform.runLater(() -> stats.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.grid_error", "Grid Error: {0}", e.getMessage())));
             }
         }).start();
     }
@@ -395,7 +398,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
             Color color = speed > 1.5 ? Color.RED : (speed > 0.8 ? Color.ORANGE : Color.CYAN);
             ((PhongMaterial) mesh.getMaterial()).setDiffuseColor(color);
         }
-        stats.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.format", "Mode: %s | Energy: %.2f"), mode, task.getTotalEnergy()));
+        stats.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.format", "Mode: %s | Energy: %.2f"), mode, task.getTotalEnergy()));
     }
 
     @Override
@@ -409,7 +412,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
     }
 
     private void loadPdb(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.open.title", "Load Protein PDB"), org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb",
+        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.open.title", "Load Protein PDB"), org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb",
                 "*.ent");
         if (file != null) {
             try {
@@ -449,10 +452,10 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
                     }
                     // Re-init task with new particles
                     task = new MolecularDynamicsTask(particles, BOX_SIZE);
-                    stats.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.loaded", "Loaded: {0} ({1} atoms)", protein.getName(), particles.size()));
+                    stats.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.status.loaded", "Loaded: {0} ({1} atoms)", protein.getName(), particles.size()));
                 }
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.alert.load.error", "Failed to load PDB: {0}", e.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.alert.load.error", "Failed to load PDB: {0}", e.getMessage())).show();
             }
         }
     }
@@ -483,16 +486,16 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.name", "Distributed Molecular Dynamics App"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.name", "Distributed Molecular Dynamics App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.desc", "3D molecular dynamics simulation for gas and protein interactions on the JScience cluster."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.desc", "3D molecular dynamics simulation for gas and protein interactions on the JScience cluster."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmoleculardynamicsapp.longdesc", "Real-time 3D simulation of atomic systems using Lennard-Jones potentials. It supports distributed force computation on the JScience grid, enabling simulation of complex protein structures and large-scale gas dynamics with PDB format import/export capabilities."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.longdesc", "Real-time 3D simulation of atomic systems using Lennard-Jones potentials. It supports distributed force computation on the JScience grid, enabling simulation of complex protein structures and large-scale gas dynamics with PDB format import/export capabilities."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

@@ -34,6 +34,9 @@ import java.util.stream.IntStream;
  * Prim, R. C. (1957). Shortest connection networks and some generalizations. <i>Bell System Technical Journal</i>, 36(6), 1389-1401.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MandelbrotPrimitiveSupport {
 

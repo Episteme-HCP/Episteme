@@ -46,12 +46,10 @@ import java.util.Objects;
  * Currencies are special units where conversions depend on exchange rates
  * that can change dynamically. Quantities stated in Currency are typically
  * instances of {@link Money}.
- *
- * @author Jean-Marie Dautelle
+ * * @see <a href="https://www.iso.org/iso-4217-currency-codes.html">ISO 4217</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://www.iso.org/iso-4217-currency-codes.html">ISO 4217</a>
  */
 @Persistent
 public class Currency extends StandardUnit<Money> implements ComprehensiveIdentification {

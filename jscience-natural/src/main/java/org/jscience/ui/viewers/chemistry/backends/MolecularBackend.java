@@ -26,6 +26,9 @@ package org.jscience.ui.viewers.chemistry.backends;
 /**
  * Enumeration of available molecular rendering backends.
  * Similar to {@link org.jscience.ui.plotting.PlottingBackend}
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public enum MolecularBackend {
     /**

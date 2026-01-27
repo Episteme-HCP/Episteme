@@ -25,6 +25,9 @@ package org.jscience.mathematics.analysis.pde;
 
 /**
  * Boundary condition types for PDE solvers.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public enum BoundaryType {
     DIRICHLET, // Fixed value

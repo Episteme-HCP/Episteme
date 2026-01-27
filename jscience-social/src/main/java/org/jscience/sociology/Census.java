@@ -33,10 +33,9 @@ import java.util.Objects;
 /**
  * Represents a systematic collection of demographic data for a population of individuals.
  * Provides analytical methods for population statistics like average age and gender distribution.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Census implements Serializable {

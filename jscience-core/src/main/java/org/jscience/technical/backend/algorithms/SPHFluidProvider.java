@@ -26,6 +26,9 @@ package org.jscience.technical.backend.algorithms;
 /**
  * Interface for SPH (Smoothed Particle Hydrodynamics) fluid providers.
  * Allows switching between CPU (Multicore) and GPU implementations.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface SPHFluidProvider {
 

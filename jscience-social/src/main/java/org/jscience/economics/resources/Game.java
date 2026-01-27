@@ -29,10 +29,9 @@ import org.jscience.biology.Individual;
 
 /**
  * Interface for interactive games requiring players and rules.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public interface Game {

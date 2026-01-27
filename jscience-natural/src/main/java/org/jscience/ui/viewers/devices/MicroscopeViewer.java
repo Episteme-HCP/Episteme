@@ -41,7 +41,7 @@ public class MicroscopeViewer extends AbstractDeviceViewer<Microscope> {
     public MicroscopeViewer(Microscope device) {
         super(device);
 
-        magLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.microscope.magnification", "Magnification: -"));
+        magLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("generated.microscope.magnification", "Magnification: -"));
         this.getChildren().add(magLabel);
 
         update();
@@ -54,25 +54,25 @@ public class MicroscopeViewer extends AbstractDeviceViewer<Microscope> {
         }
     }
 
-    // --- Mandatory Abstract Methods (I18n) ---
+    // --- Mandatory Abstract Methods (I18N) ---
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.name", "Microscope");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.microscope.name", "Microscope");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.desc", "A microscope viewer for micro-scale observation.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.microscope.desc", "A microscope viewer for micro-scale observation.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.longdesc", "Simulates an optical microscope with multiple magnification levels. allows users to observe biological and material samples at cellular levels, with integrated image processing and measurement tools.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.microscope.longdesc", "Simulates an optical microscope with multiple magnification levels. allows users to observe biological and material samples at cellular levels, with integrated image processing and measurement tools.");
     }
 }

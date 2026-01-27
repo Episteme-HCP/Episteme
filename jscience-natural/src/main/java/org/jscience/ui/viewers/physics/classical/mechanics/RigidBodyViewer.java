@@ -39,7 +39,7 @@ import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,14 +93,14 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("rigid.gravity", I18n.getInstance().get("rigid.gravity", "Gravity"), 0, 2, 0.1, gravityVal, v -> gravityVal = v));
-        parameters.add(new NumericParameter("rigid.bounciness", I18n.getInstance().get("rigid.bounciness", "Bounciness"), 0.1, 1.0, 0.05, bouncinessVal, v -> bouncinessVal = v));
+        parameters.add(new NumericParameter("rigid.gravity", I18N.getInstance().get("rigid.gravity", "Gravity"), 0, 2, 0.1, gravityVal, v -> gravityVal = v));
+        parameters.add(new NumericParameter("rigid.bounciness", I18N.getInstance().get("rigid.bounciness", "Bounciness"), 0.1, 1.0, 0.05, bouncinessVal, v -> bouncinessVal = v));
         
-        parameters.add(new BooleanParameter("rigid.add", I18n.getInstance().get("rigid.add", "Add Body"), false, v -> {
+        parameters.add(new BooleanParameter("rigid.add", I18N.getInstance().get("rigid.add", "Add Body"), false, v -> {
             if (v) addBody();
         }));
         
-        parameters.add(new BooleanParameter("rigid.clear", I18n.getInstance().get("rigid.clear", "Clear World"), false, v -> {
+        parameters.add(new BooleanParameter("rigid.clear", I18N.getInstance().get("rigid.clear", "Clear World"), false, v -> {
             if (v) { engine.clear(); visualData.clear(); }
         }));
     }
@@ -167,9 +167,9 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     @Override public void setSpeed(double s) { speed = s; }
     @Override public void step() { update(); render(); }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.rigidbodyviewer.name", "Rigid Body Physics"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.rigidbodyviewer.desc", "Rigid body physics."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.rigidbodyviewer.longdesc", "Interactive 2D rigid body physics simulation. Watch as geometric bodies interact with gravity, bounce off boundaries, and collide with each other. Adjust gravity and bounciness in real-time to see how the physical environment changes behavior."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.rigidbodyviewer.name", "Rigid Body Physics"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.rigidbodyviewer.desc", "Rigid body physics."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.rigidbodyviewer.longdesc", "Interactive 2D rigid body physics simulation. Watch as geometric bodies interact with gravity, bounce off boundaries, and collide with each other. Adjust gravity and bounciness in real-time to see how the physical environment changes behavior."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

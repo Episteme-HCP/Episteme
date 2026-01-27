@@ -34,7 +34,8 @@ import org.jscience.measure.Unit;
  * </p>
  * 
  * @param <Q> the quantity type
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

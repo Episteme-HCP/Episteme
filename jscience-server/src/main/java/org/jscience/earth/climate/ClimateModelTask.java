@@ -46,6 +46,9 @@ import org.jscience.distributed.TaskRegistry;
  * climate of the Earth. Tellus, 21(5), 611-619.</li>
  * </ul>
  * </p>
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ClimateModelTask implements Serializable {
 

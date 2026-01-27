@@ -58,6 +58,26 @@ public final class CulturalDiffusionModel {
     }
 
     /**
+     * Calculates the number of new adopters at time t using the Bass Diffusion Model.
+     * Formula: n(t) = [p + (q/M) * N(t)] * [M - N(t)]
+     *
+     * @param p                coefficient of innovation
+     * @param q                coefficient of imitation
+     * @param marketPotential  total potential number of adopters (M)
+     * @param previousAdopters cumulative number of adopters before time t (N(t))
+     * @return number of new adopters at time t
+     */
+    public static Real bassDiffusionModel(Real p, Real q, Real marketPotential, Real previousAdopters) {
+        if (marketPotential.isZero()) return Real.ZERO;
+        
+        Real imitationEffect = q.divide(marketPotential).multiply(previousAdopters);
+        Real probabilityOfAdoption = p.add(imitationEffect);
+        Real remainingPotential = marketPotential.subtract(previousAdopters);
+        
+        return probabilityOfAdoption.multiply(remainingPotential);
+    }
+
+    /**
      * Estimates the "Cultural Distance" between two societies or groups.
      * Calculates the Euclidean distance between value maps.
      *

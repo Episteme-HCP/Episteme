@@ -41,11 +41,10 @@ import java.util.Set;
  * <p>
  * A lexicon maps lexemes (abstract word units) to their definitions for
  * a specific language.
- *
+ * * @see <a href="https://en.wikipedia.org/wiki/Lexicon">Lexicon (Wikipedia)</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://en.wikipedia.org/wiki/Lexicon">Lexicon (Wikipedia)</a>
  */
 @Persistent
 public class Lexicon implements Named, Serializable {

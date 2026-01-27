@@ -35,6 +35,9 @@ import org.jscience.mathematics.structures.rings.Semiring;
 /**
  * Test demonstrating Exact (Natural) vs Approximate (Real) number operations.
  * Adapted from ExactVsApproximateDemo.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ExactVsApproximateTest {
 

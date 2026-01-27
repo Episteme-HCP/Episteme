@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer;
 
 public class EconomicsGDPDemo extends AbstractDemo {
@@ -36,17 +36,17 @@ public class EconomicsGDPDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return I18n.getInstance().get("category.economics", "Economics"); 
+        return I18N.getInstance().get("category.economics", "Economics"); 
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.economicsgdpdemo.name", "GDP Growth");
+        return I18N.getInstance().get("demo.economicsgdpdemo.name", "GDP Growth");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.economicsgdpdemo.desc", "Economic projection model with adjustable growth rate.");
+        return I18N.getInstance().get("demo.economicsgdpdemo.desc", "Economic projection model with adjustable growth rate.");
     }
 
     @Override
@@ -60,6 +60,6 @@ public class EconomicsGDPDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.economicsgdpdemo.longdesc", "Simulation of GDP growth over time using exponential growth models and adjustable parameters.");
+        return I18N.getInstance().get("demo.economicsgdpdemo.longdesc", "Simulation of GDP growth over time using exponential growth models and adjustable parameters.");
     }
 }

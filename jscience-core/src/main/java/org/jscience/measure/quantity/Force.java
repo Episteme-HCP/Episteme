@@ -26,7 +26,7 @@ package org.jscience.measure.quantity;
 import org.jscience.measure.Quantity;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

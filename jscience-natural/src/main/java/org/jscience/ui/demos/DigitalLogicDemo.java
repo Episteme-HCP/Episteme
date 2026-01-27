@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractSimulationDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.computing.logic.DigitalLogicViewer;
 
 /**
  * Digital Logic Circuit Simulator Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -43,17 +43,17 @@ public class DigitalLogicDemo extends AbstractSimulationDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.computing", "Computing"); }
+    public String getCategory() { return I18N.getInstance().get("category.computing", "Computing"); }
 
     @Override
-    public String getName() { return I18n.getInstance().get("digital.title", "Digital Logic Simulator"); }
+    public String getName() { return I18N.getInstance().get("digital.title", "Digital Logic Simulator"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("digital.desc", "Interactive Logic Circuit Simulator"); }
+    public String getDescription() { return I18N.getInstance().get("digital.desc", "Interactive Logic Circuit Simulator"); }
     
     @Override
     public String getLongDescription() { 
-        return I18n.getInstance().get("digital.long_desc", "Design and simulate digital logic circuits using AND, OR, NOT, NAND gates."); 
+        return I18N.getInstance().get("digital.long_desc", "Design and simulate digital logic circuits using AND, OR, NOT, NAND gates."); 
     }
 
     @Override

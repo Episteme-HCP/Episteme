@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Interface for volumetric data models using scientific 'Real' values.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

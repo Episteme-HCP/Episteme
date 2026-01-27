@@ -40,6 +40,9 @@ import org.slf4j.LoggerFactory;
  * Fréchet, M. (1906). Sur quelques points du calcul fonctionnel. <i>Rendiconti del Circolo Matematico di Palermo</i>.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MetricsInterceptor implements ServerInterceptor {
 

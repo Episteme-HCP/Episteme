@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendDiscovery;
 
 /**
  * BackendProvider for EJML (Efficient Java Matrix Library).
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class EJMLBackendProvider implements BackendProvider {
     @Override

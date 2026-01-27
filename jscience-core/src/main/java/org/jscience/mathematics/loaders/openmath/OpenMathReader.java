@@ -65,12 +65,11 @@ import java.util.*;
  * }
  * }</pre>
  * </p>
- *
+ * * @see <a href="https://openmath.org/">OpenMath.org</a>
+ * @see OpenMathWriter
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://openmath.org/">OpenMath.org</a>
- * @see OpenMathWriter
  */
 public class OpenMathReader extends AbstractResourceReader<Object> {
 

@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for JavaFX 2D plotting.
  * Always available as JavaFX is a core dependency.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JavaFXPlot2DBackendProvider implements BackendProvider {
 

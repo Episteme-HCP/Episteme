@@ -23,28 +23,28 @@
 
 package org.jscience.apps;
 
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18NManager;
 import org.junit.jupiter.api.Test;
 import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class I18nTest {
+public class I18NTest {
     
     @Test
     public void testLocalizationKeys() {
-        System.out.println("Running I18n Verification...");
+        System.out.println("Running I18N Verification...");
         
         // Simulate what Launcher does
-        I18nManager.getInstance().setLocale(Locale.FRENCH);
-        I18nManager.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
+        I18NManager.getInstance().setLocale(Locale.FRENCH);
+        I18NManager.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
         
-        String title = I18nManager.getInstance().get("launcher.title");
+        String title = I18NManager.getInstance().get("launcher.title");
         System.out.println("launcher.title (FR): " + title);
         
-        String spintronics = I18nManager.getInstance().get("spintronics.title");
+        String spintronics = I18NManager.getInstance().get("spintronics.title");
         System.out.println("spintronics.title (FR): " + spintronics);
         
-        String category = I18nManager.getInstance().get("category.featured_apps");
+        String category = I18NManager.getInstance().get("category.featured_apps");
         System.out.println("category.featured_apps (FR): " + category);
         
         assertFalse(title.startsWith("!"), "launcher.title should be resolved");

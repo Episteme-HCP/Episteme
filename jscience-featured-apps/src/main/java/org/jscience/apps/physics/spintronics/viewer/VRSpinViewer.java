@@ -39,7 +39,7 @@ package org.jscience.apps.physics.spintronics.viewer;
  *   <li>6DOF controller interaction for rotating/slicing model</li>
  *   <li>Room-scale visualization of vector fields</li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

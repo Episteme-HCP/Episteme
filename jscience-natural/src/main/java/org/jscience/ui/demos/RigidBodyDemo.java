@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractSimulationDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.physics.classical.mechanics.RigidBodyViewer;
 
 /**
@@ -46,10 +46,10 @@ public class RigidBodyDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("RigidBody.title", "Rigid Body Physics"); }
+    public String getName() { return I18N.getInstance().get("RigidBody.title", "Rigid Body Physics"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("RigidBody.desc", "2D rigid body simulation with collisions."); }
+    public String getDescription() { return I18N.getInstance().get("RigidBody.desc", "2D rigid body simulation with collisions."); }
 
     @Override
     public String getLongDescription() {

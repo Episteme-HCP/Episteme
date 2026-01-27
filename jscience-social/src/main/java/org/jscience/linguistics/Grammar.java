@@ -38,11 +38,10 @@ import java.util.Set;
  * <p>
  * A grammar defines the syntactic structure of a language through
  * a set of production rules.
- *
+ * * @see <a href="https://en.wikipedia.org/wiki/Grammar">Grammar (Wikipedia)</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://en.wikipedia.org/wiki/Grammar">Grammar (Wikipedia)</a>
  */
 @Persistent
 public class Grammar implements Serializable {

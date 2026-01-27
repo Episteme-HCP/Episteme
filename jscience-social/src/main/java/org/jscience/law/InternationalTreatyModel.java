@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.law;
 
 import java.util.HashMap;
@@ -28,11 +29,7 @@ import java.util.Map;
 /**
  * Models international treaties and their ratification status across different countries.
  * Provides metrics for global adoption and binding status.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.0
- */
+ * */
 public final class InternationalTreatyModel {
 
     private InternationalTreatyModel() {
@@ -41,7 +38,10 @@ public final class InternationalTreatyModel {
 
     /**
      * Represents the formal status of a country regarding an international treaty.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum RatificationStatus {
         SIGNED, RATIFIED, ACCEDED, NOT_A_PARTY
     }

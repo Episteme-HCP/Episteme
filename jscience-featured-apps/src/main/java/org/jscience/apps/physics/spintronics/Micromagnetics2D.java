@@ -44,9 +44,10 @@ import org.jscience.mathematics.numbers.real.Real;
  *     <i>Nature Reviews Materials</i>, 2, 17031. 
  *     <a href="https://doi.org/10.1038/natrevmats.2017.31">DOI: 10.1038/natrevmats.2017.31</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Micromagnetics2D {
 

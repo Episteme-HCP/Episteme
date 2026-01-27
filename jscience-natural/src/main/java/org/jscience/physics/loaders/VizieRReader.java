@@ -42,11 +42,10 @@ import java.util.Optional;
  * This reader retrieves data from the VizieR Service (CDS, Strasbourg) 
  * in VOTable format and parses it into structured records.
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Enhanced with VOTable support)
  */
 public class VizieRReader extends AbstractResourceReader<List<Map<String, String>>> {
 
@@ -57,17 +56,17 @@ public class VizieRReader extends AbstractResourceReader<List<Map<String, String
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.astronomy", "Astronomy");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.astronomy", "Astronomy");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.desc", "Access to VizieR astronomical catalogs.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.vizierreader.desc", "Access to VizieR astronomical catalogs.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.longdesc", "Queries VizieR astronomical catalogs by object name or coordinates (conesearch). Parsed using VOTable standard.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.vizierreader.longdesc", "Queries VizieR astronomical catalogs by object name or coordinates (conesearch). Parsed using VOTable standard.");
     }
 
     @Override
@@ -119,10 +118,10 @@ public class VizieRReader extends AbstractResourceReader<List<Map<String, String
                     + "&-c=" + java.net.URLEncoder.encode(objectName, "UTF-8")
                     + "&-out.max=10";
             
-            String rawXml = fetchRaw(urlStr);
-            if (rawXml == null) return new ArrayList<>();
+            String rawXML = fetchRaw(urlStr);
+            if (rawXML == null) return new ArrayList<>();
             
-            return VOTableBridge.parse(rawXml);
+            return VOTableBridge.parse(rawXML);
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -154,10 +153,10 @@ public class VizieRReader extends AbstractResourceReader<List<Map<String, String
                     + "&-c.rm=" + radiusArcmin
                     + "&-out.max=50";
             
-            String rawXml = fetchRaw(urlStr);
-            if (rawXml == null) return new ArrayList<>();
+            String rawXML = fetchRaw(urlStr);
+            if (rawXML == null) return new ArrayList<>();
             
-            return VOTableBridge.parse(rawXml);
+            return VOTableBridge.parse(rawXML);
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -203,5 +202,5 @@ public class VizieRReader extends AbstractResourceReader<List<Map<String, String
         return new String[] {"VOTable 1.4", "VOTable 1.3", "VOTable 1.2"};
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.name", "VizieR Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.vizierreader.name", "VizieR Reader"); }
 }

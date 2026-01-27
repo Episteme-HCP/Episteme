@@ -30,6 +30,9 @@ import javafx.scene.chart.XYChart;
 
 /**
  * Automates hysteresis loop measurements.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class HysteresisExperiment {
 

@@ -39,6 +39,9 @@ import java.util.Set;
  * 2. Validates the token
  * 3. Checks if user role matches required roles
  * 4. Allows or denies the call
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RbacInterceptor implements ServerInterceptor {
 

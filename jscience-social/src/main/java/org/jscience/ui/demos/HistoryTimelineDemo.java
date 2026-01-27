@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.history.TimelineViewer;
 import org.jscience.history.HistoricalTimeline;
 
@@ -37,22 +37,22 @@ public class HistoryTimelineDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return I18n.getInstance().get("category.history", "History"); 
+        return I18N.getInstance().get("category.history", "History"); 
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.historytimelinedemo.name", "Interactive Timeline");
+        return I18N.getInstance().get("demo.historytimelinedemo.name", "Interactive Timeline");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.historytimelinedemo.desc", "Horizontal scrollable timeline.");
+        return I18N.getInstance().get("demo.historytimelinedemo.desc", "Horizontal scrollable timeline.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.historytimelinedemo.longdesc", "Horizontal scrollable timeline visualizing historical eras and events.");
+        return I18N.getInstance().get("demo.historytimelinedemo.longdesc", "Horizontal scrollable timeline visualizing historical eras and events.");
     }
 
     @Override

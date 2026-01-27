@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
 
 /**
  * Resource reader for Parsing Expression Grammar (PEG) files.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class PEGGrammarReader extends AbstractResourceReader<Grammar> {
 

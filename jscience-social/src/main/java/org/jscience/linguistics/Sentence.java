@@ -35,10 +35,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a sentence, a sequence of phrases or words that expresses 
  * a complete thought or proposition. It contains grammatical metadata 
  * about its purpose and structure.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

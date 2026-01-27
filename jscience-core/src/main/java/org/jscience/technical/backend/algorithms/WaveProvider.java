@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Interface for Wave Equation providers using High-Precision Real numbers.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

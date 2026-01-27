@@ -34,17 +34,16 @@ import org.jscience.mathematics.numbers.real.Real;
  * An implementation of Thomas Schelling's model of spatial segregation.
  * demonstrating how individual preferences for similar neighbors (homophily) can lead
  * to macro-level segregation, even with mild preferences.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class SegregationModel {
 
     private SegregationModel() {}
 
-    /** Types of agents or occupancy status in the grid. */
+    /** Types of agents or occupancy status in the grid.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum AgentType { TYPE_A, TYPE_B, EMPTY }
 
     /** Represents a snapshot of the grid at a specific simulation step. */

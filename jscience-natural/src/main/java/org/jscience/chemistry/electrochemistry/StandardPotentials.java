@@ -23,7 +23,7 @@
 
 package org.jscience.chemistry.electrochemistry;
 
-import org.jscience.util.SimpleJson;
+import org.jscience.util.SimpleJSON;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class StandardPotentials {
             }
 
             String jsonText = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Object result = SimpleJson.parse(jsonText);
+            Object result = SimpleJSON.parse(jsonText);
 
             if (result instanceof Map) {
                 Map<String, Object> root = (Map<String, Object>) result;

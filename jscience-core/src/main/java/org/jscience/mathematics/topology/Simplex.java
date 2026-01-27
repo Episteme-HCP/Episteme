@@ -34,13 +34,12 @@ import java.util.Set;
  * Simplex where vertices are identified by natural numbers (non-negative
  * integers).
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Dantzig, G. B. (1947). Minimization of a linear function of variables subject to linear inequalities. <i>Activity Analysis of Production and Allocation</i>, 13, 317-329.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

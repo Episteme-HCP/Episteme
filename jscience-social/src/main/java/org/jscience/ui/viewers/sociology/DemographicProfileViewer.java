@@ -1,3 +1,26 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.ui.viewers.sociology;
 
 import javafx.scene.chart.BarChart;
@@ -5,7 +28,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import org.jscience.ui.AbstractViewer;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.sociology.DemographicData;
 
 import java.util.List;
@@ -24,14 +47,14 @@ public final class DemographicProfileViewer extends AbstractViewer {
         NumberAxis xAxis = new NumberAxis();
         CategoryAxis yAxis = new CategoryAxis();
         
-        xAxis.setLabel(I18n.getInstance().get("viewer.demography.axis.population", "Population Count"));
-        yAxis.setLabel(I18n.getInstance().get("viewer.demography.axis.age", "Age Group"));
+        xAxis.setLabel(I18N.getInstance().get("viewer.demography.axis.population", "Population Count"));
+        yAxis.setLabel(I18N.getInstance().get("viewer.demography.axis.age", "Age Group"));
 
         chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle(I18n.getInstance().get("viewer.demography.title", "Population Pyramid"));
+        chart.setTitle(I18N.getInstance().get("viewer.demography.title", "Population Pyramid"));
         
-        maleSeries.setName(I18n.getInstance().get("viewer.demography.male", "Male"));
-        femaleSeries.setName(I18n.getInstance().get("viewer.demography.female", "Female"));
+        maleSeries.setName(I18N.getInstance().get("viewer.demography.male", "Male"));
+        femaleSeries.setName(I18N.getInstance().get("viewer.demography.female", "Female"));
         
         chart.getData().add(maleSeries);
         chart.getData().add(femaleSeries);
@@ -53,10 +76,10 @@ public final class DemographicProfileViewer extends AbstractViewer {
         }
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.social", "Social Sciences"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.demography.name", "Demographic Profile Viewer"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.demography.desc", "Visualizes population pyramids and demographic structures."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.social", "Social Sciences"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.demography.name", "Demographic Profile Viewer"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.demography.desc", "Visualizes population pyramids and demographic structures."); }
     @Override public String getLongDescription() { 
-        return I18n.getInstance().get("viewer.demography.longdesc", "Advanced demographic analysis tool. Comparative visualization of age and gender distribution across populations."); 
+        return I18N.getInstance().get("viewer.demography.longdesc", "Advanced demographic analysis tool. Comparative visualization of age and gender distribution across populations."); 
     }
 }

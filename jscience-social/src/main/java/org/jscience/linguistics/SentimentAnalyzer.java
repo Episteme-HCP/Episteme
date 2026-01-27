@@ -35,11 +35,6 @@ import org.jscience.mathematics.numbers.real.Real;
  * Analytical tool for sentiment analysis and emotional polarity detection in text. 
  * It identifies positive, negative, and neutral tones using a lexicon-based 
  * approach with support for negations and intensifiers.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class SentimentAnalyzer {
 
@@ -47,7 +42,10 @@ public final class SentimentAnalyzer {
 
     /**
      * Qualitative classification of text sentiment.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Sentiment {
         VERY_POSITIVE, POSITIVE, NEUTRAL, NEGATIVE, VERY_NEGATIVE
     }

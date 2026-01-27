@@ -37,6 +37,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * @see <a href="https://doi.org/10.1103/RevModPhys.77.1375">Žutić, I., et al.
  *      Spintronics: Fundamentals and applications. Rev. Mod. Phys. 77, 1375
  *      (2005)</a>
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class FerromagneticLayer {
     private SpintronicMaterial material;

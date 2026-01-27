@@ -45,6 +45,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.jscience.util.Logger;
 
 /**
  * FBX loader for JavaFX 3D using the jfbx library.
@@ -58,6 +59,8 @@ import java.util.Optional;
  * @since 1.0
  */
 public class FbxMeshReader extends AbstractResourceReader<Group> {
+    
+    private static final Logger LOGGER = Logger.getLogger(FbxMeshReader.class);
     
     @Override
     public String[] getSupportedVersions() {
@@ -154,7 +157,7 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
         FBXNode objectsNode = root.getChildByName("Objects");
         if (objectsNode == null) return fbxRoot;
         
-        System.out.println("DEBUG: Starting parseJfbx (Hierarchy + Raw Transforms)");
+        LOGGER.debug("Starting parseJfbx (Hierarchy + Raw Transforms)");
 
         // Inner classes for parsing
         class TransformData { 
@@ -295,7 +298,7 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             models.put(id, md);
         }
         
-        System.out.println("DEBUG: Parsed " + models.size() + " Models");
+        LOGGER.debug(() -> "Parsed " + models.size() + " Models");
         
         // 2. Parse Connections to build Hierarchy and Link Geometries
         // Map: ChildID -> ParentID
@@ -330,8 +333,8 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             }
         }
         
-        System.out.println("DEBUG: Found " + childToParent.size() + " Model hierarchy links");
-        System.out.println("DEBUG: Found " + geomModelLinks.size() + " Geometry-Model links");
+        LOGGER.debug(() -> "Found " + childToParent.size() + " Model hierarchy links");
+        LOGGER.debug(() -> "Found " + geomModelLinks.size() + " Geometry-Model links");
         
         // 3. Assemble Scene Graph
         for (ModelData md : models.values()) {
@@ -414,8 +417,8 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             }
         }
         
-        System.out.println("DEBUG: Attached " + attachedCount + " meshes to models");
-        System.out.println("DEBUG: fbxRoot has " + fbxRoot.getChildren().size() + " root children");
+        LOGGER.debug("Attached " + attachedCount + " meshes to models");
+        LOGGER.debug("fbxRoot has " + fbxRoot.getChildren().size() + " root children");
         
         // 5. Global Coordinate System Fix
         Group worldGroup = new Group(fbxRoot);
@@ -443,7 +446,7 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
         fbxRoot.setTranslateZ(-cz);
         */
         
-        System.out.println("DEBUG: Applied global scale: " + globalScale + " with Y-Flip. Auto-Center DISABLED for alignment.");
+        LOGGER.info(() -> "Applied global scale: " + globalScale + " with Y-Flip. Auto-Center DISABLED for alignment.");
 
         return worldGroup;
     }
@@ -531,21 +534,21 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmeshreader.name", "FBX Mesh Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fbxmeshreader.name", "FBX Mesh Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmeshreader.desc", "FBX loader for JavaFX 3D using the jfbx library.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fbxmeshreader.desc", "FBX loader for JavaFX 3D using the jfbx library.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmeshreader.longdesc", "Parses binary FBX files and creates JavaFX TriangleMesh objects, supporting transformations and scene hierarchy.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fbxmeshreader.longdesc", "Parses binary FBX files and creates JavaFX TriangleMesh objects, supporting transformations and scene hierarchy.");
     }
 }

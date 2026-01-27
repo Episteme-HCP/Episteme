@@ -44,9 +44,10 @@ import org.jscience.mathematics.numbers.real.Real;
  *     <i>Nature</i>, 455, 778-781. 
  *     <a href="https://doi.org/10.1038/nature07321">DOI: 10.1038/nature07321</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SpinSeebeckEffect {
 

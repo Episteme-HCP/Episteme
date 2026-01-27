@@ -28,6 +28,9 @@ import org.jscience.mathematics.analysis.transform.SignalFFT;
 
 /**
  * Real-based implementation of spectrum analysis using JScience Real types.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RealSpectrumAnalysisProvider implements SpectrumAnalysisProvider {
 

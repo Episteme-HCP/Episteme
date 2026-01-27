@@ -32,10 +32,9 @@ import org.jscience.util.Commented;
  * Represents a specific behavior that an individual can exhibit.
  * Behaviors are categorized into reflexes, self-oriented behaviors, or social behaviors.
  * This class provides a comprehensive ethogram of common biological and social behaviors.
- *
+ * * @version 1.5
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.5
  * @since 1.0
  */
 public class Behavior implements Commented, org.jscience.biology.Behavior, Serializable {

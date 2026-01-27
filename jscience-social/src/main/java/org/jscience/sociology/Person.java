@@ -44,10 +44,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a human being with demographic and social attributes.
  * Extends the biological {@link Human} to incorporate societal concepts.
  * Modernized to use extensible Gender and standardized Individual types.
- *
+ * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
  */
 @Persistent

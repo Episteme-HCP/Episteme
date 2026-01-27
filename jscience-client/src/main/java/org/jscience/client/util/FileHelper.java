@@ -29,6 +29,9 @@ import java.io.File;
 
 /**
  * Utility class for file operations in JavaFX applications.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class FileHelper {
 

@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for JavaFX molecular renderer.
  * Always available as JavaFX is a core dependency.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JavaFXMolecularBackendProvider implements BackendProvider {
 

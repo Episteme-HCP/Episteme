@@ -1,10 +1,14 @@
 # Credits
 
 ## Project Lead & Architecture
-*   **Silvere Martin-Michiellot** (silvere.martin@gmail.com) - Original Author & Lead Architect
+
+* **Silvere Martin-Michiellot** ([silvere.martin@gmail.com](mailto:silvere.martin@gmail.com)) - Original Author & Lead Architect
 
 ## Implementation & Design
-*   **Gemini AI** (Google DeepMind) - Implementation & Architecture Design
+
+* **Gemini AI** (Google DeepMind) - Core Implementation & Scientific Modeling
+* **Advanced Agentic Coding Team** (Google DeepMind) - Specialized in complex refactoring and agentic software engineering.
 
 ## Legacy Codebase
-*   Original JScience Team (Inspiration and Reference)
+
+* Original JScience Team (Inspiration and Reference)

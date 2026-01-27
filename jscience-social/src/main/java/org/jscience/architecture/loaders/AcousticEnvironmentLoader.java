@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * Loader for acoustic material absorption coefficients.
  * Modernized to extend {@link AbstractResourceReader}.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

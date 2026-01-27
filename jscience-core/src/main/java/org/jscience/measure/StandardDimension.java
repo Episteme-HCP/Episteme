@@ -30,8 +30,8 @@ import java.util.Objects;
  * <p>
  * This class is immutable and thread-safe.
  * </p>
- * * @author Silvere Martin-Michiellot
- * 
+ * *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

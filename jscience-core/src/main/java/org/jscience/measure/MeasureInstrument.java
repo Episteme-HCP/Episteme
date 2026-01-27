@@ -44,16 +44,15 @@ import java.time.temporal.ChronoUnit;
  * </ul>
  * </p>
  *
- * @param <Q> The type of quantity measured by this instrument.
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+ * @param <Q> The type of quantity measured by this instrument. */
 public abstract class MeasureInstrument<Q extends Quantity<Q>> implements Device {
 
     /**
      * Instrument status
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Status {
         OPERATIONAL, CALIBRATING, NEEDS_CALIBRATION, ERROR, OFFLINE, DISCONNECTED
     }

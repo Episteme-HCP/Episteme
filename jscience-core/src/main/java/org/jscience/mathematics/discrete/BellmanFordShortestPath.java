@@ -31,13 +31,12 @@ import java.util.*;
  * Unlike Dijkstra's algorithm, Bellman-Ford can handle negative edge weights
  * and detects negative cycles. Time complexity is O(VE).
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Bellman, R. (1958). On a routing problem. <i>Quarterly of Applied Mathematics</i>, 16, 87-90.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

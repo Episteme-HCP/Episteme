@@ -41,6 +41,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for ComputeService gRPC endpoints.
  * Tests the full request/response cycle with an embedded gRPC server.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ComputeServiceIT {

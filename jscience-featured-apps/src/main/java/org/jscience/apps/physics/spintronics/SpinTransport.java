@@ -58,9 +58,10 @@ import org.jscience.physics.PhysicalConstants;
  * <a href="https://doi.org/10.1103/PhysRev.130.1677">DOI:
  * 10.1103/PhysRev.130.1677</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SpinTransport {
 

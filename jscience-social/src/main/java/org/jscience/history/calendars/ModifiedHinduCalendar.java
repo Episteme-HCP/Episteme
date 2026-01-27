@@ -2,9 +2,6 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * Originally based on code from Mark E. Shoulson <mark@kli.org>
- * http://web.meson.org/calendars/
- *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -30,11 +27,9 @@ package org.jscience.history.calendars;
  * Abstract base class for modified Hindu calendars using floating-point arithmetic.
  * Provides astronomical calculations for solar and lunar positions based
  * on the Surya Siddhanta with modern refinements.
- *
- * @author Mark E. Shoulson (original implementation)
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 abstract class ModifiedHinduCalendar {

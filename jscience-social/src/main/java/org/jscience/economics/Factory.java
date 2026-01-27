@@ -37,10 +37,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * An organization specialized in mass production and transformation of resources.
  * Models Taylorist and modern manufacturing structures.
- *
+ * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
  */
 @Persistent

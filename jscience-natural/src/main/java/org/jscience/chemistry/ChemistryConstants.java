@@ -35,11 +35,6 @@ import org.jscience.physics.PhysicalConstants;
  * <p>
  * Provides chemical constants (Avogadro, Gas constant, etc.) and
  * classifications for states of matter and phase transitions.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class ChemistryConstants {
 
@@ -47,7 +42,10 @@ public final class ChemistryConstants {
 
     /**
      * States of matter.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum MatterState {
         SOLID, LIQUID, GAS, PLASMA, 
         BOSE_EINSTEIN_CONDENSATE, FERMIONIC_CONDENSATE, 

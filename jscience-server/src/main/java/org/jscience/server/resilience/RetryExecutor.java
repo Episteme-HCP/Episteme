@@ -38,6 +38,9 @@ import java.util.function.Supplier;
  * - Exponential backoff with jitter
  * - Retry only specific exceptions
  * - Integration with Circuit Breaker
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RetryExecutor {
 

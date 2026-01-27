@@ -34,7 +34,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.RealParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.mathematics.analysis.ode.DormandPrinceIntegrator;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
@@ -71,10 +71,10 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
     private double speed = 1.0;
     
     @Override
-    public String getName() { return I18n.getInstance().get("viewer.lotkavolterra.name", "Lotka-Volterra Model"); }
+    public String getName() { return I18N.getInstance().get("viewer.lotkavolterra.name", "Lotka-Volterra Model"); }
     
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
+    public String getCategory() { return I18N.getInstance().get("category.biology", "Biology"); }
 
     public LotkaVolterraViewer() {
         initParameters();
@@ -82,10 +82,10 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
     }
 
     private void initParameters() {
-        alphaParam = new RealParameter(I18n.getInstance().get("lotka.param.alpha", "Alpha"), "Prey Growth Rate", 0.0, 5.0, 0.1, 1.1, null);
-        betaParam = new RealParameter(I18n.getInstance().get("lotka.param.beta", "Beta"), "Predation Rate", 0.0, 5.0, 0.1, 0.4, null);
-        deltaParam = new RealParameter(I18n.getInstance().get("lotka.param.delta", "Delta"), "Predator Growth Rate", 0.0, 5.0, 0.1, 0.1, null);
-        gammaParam = new RealParameter(I18n.getInstance().get("lotka.param.gamma", "Gamma"), "Predator Death Rate", 0.0, 5.0, 0.1, 0.4, null);
+        alphaParam = new RealParameter(I18N.getInstance().get("lotka.param.alpha", "Alpha"), "Prey Growth Rate", 0.0, 5.0, 0.1, 1.1, null);
+        betaParam = new RealParameter(I18N.getInstance().get("lotka.param.beta", "Beta"), "Predation Rate", 0.0, 5.0, 0.1, 0.4, null);
+        deltaParam = new RealParameter(I18N.getInstance().get("lotka.param.delta", "Delta"), "Predator Growth Rate", 0.0, 5.0, 0.1, 0.1, null);
+        gammaParam = new RealParameter(I18N.getInstance().get("lotka.param.gamma", "Gamma"), "Predator Death Rate", 0.0, 5.0, 0.1, 0.4, null);
     }
 
     private void initUI() {
@@ -95,25 +95,25 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         VBox chartsBox = new VBox(10);
 
         NumberAxis xAxisTime = new NumberAxis();
-        xAxisTime.setLabel(I18n.getInstance().get("lotka.axis.time", "Time"));
+        xAxisTime.setLabel(I18N.getInstance().get("lotka.axis.time", "Time"));
         NumberAxis yAxisPop = new NumberAxis();
-        yAxisPop.setLabel(I18n.getInstance().get("lotka.axis.pop", "Population"));
+        yAxisPop.setLabel(I18N.getInstance().get("lotka.axis.pop", "Population"));
 
         LineChart<Number, Number> timeChart = new LineChart<>(xAxisTime, yAxisPop);
-        timeChart.setTitle(I18n.getInstance().get("lotka.chart.time", "Population Dynamics"));
+        timeChart.setTitle(I18N.getInstance().get("lotka.chart.time", "Population Dynamics"));
         timeChart.setCreateSymbols(false);
-        preySeries.setName(I18n.getInstance().get("lotka.series.prey", "Prey"));
-        predSeries.setName(I18n.getInstance().get("lotka.series.pred", "Predator"));
+        preySeries.setName(I18N.getInstance().get("lotka.series.prey", "Prey"));
+        predSeries.setName(I18N.getInstance().get("lotka.series.pred", "Predator"));
         timeChart.getData().addAll(List.of(preySeries, predSeries));
 
         NumberAxis xAxisPhase = new NumberAxis();
-        xAxisPhase.setLabel(I18n.getInstance().get("lotka.axis.prey", "Prey"));
+        xAxisPhase.setLabel(I18N.getInstance().get("lotka.axis.prey", "Prey"));
         NumberAxis yAxisPhase = new NumberAxis();
-        yAxisPhase.setLabel(I18n.getInstance().get("lotka.axis.pred", "Predator"));
+        yAxisPhase.setLabel(I18N.getInstance().get("lotka.axis.pred", "Predator"));
 
         ScatterChart<Number, Number> phaseChart = new ScatterChart<>(xAxisPhase, yAxisPhase);
-        phaseChart.setTitle(I18n.getInstance().get("lotka.chart.phase", "Phase Portrait"));
-        phaseSeries.setName(I18n.getInstance().get("lotka.series.traj", "Trajectory"));
+        phaseChart.setTitle(I18N.getInstance().get("lotka.chart.phase", "Phase Portrait"));
+        phaseSeries.setName(I18N.getInstance().get("lotka.series.traj", "Trajectory"));
         phaseChart.getData().add(phaseSeries);
         phaseChart.setLegendVisible(false);
 
@@ -181,8 +181,8 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         phaseSeries.getData().clear();
     }
 
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.lotkavolterra.desc", "Dynamic predator-prey ecosystem."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.lotkavolterra.longdesc", "Predicts the population dynamics of two interacting species."); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.lotkavolterra.desc", "Dynamic predator-prey ecosystem."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.lotkavolterra.longdesc", "Predicts the population dynamics of two interacting species."); }
     
     @Override public List<Parameter<?>> getViewerParameters() { 
         return List.of(alphaParam, betaParam, deltaParam, gammaParam);

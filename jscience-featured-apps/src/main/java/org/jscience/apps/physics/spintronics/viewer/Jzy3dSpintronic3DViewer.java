@@ -39,6 +39,9 @@ import org.jscience.mathematics.linearalgebra.Vector;
 /**
  * Jzy3d (OpenGL) implementation of Spintronic3DViewer.
  * Provides high-performance 3D rendering for large spin arrays.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
 

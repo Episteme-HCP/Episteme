@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.earth.seismology.EarthquakeMapViewer;
 
 /**
  * Earthquake Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -41,17 +41,17 @@ public class EarthquakeDemo extends AbstractDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.earth_sciences", "Earth Sciences"); }
+    public String getCategory() { return I18N.getInstance().get("category.earth_sciences", "Earth Sciences"); }
 
     @Override
-    public String getName() { return I18n.getInstance().get("earthquake.label.title", "Earthquake Map"); }
+    public String getName() { return I18N.getInstance().get("earthquake.label.title", "Earthquake Map"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("earthquake.desc", "Interactive Seismic Map"); }
+    public String getDescription() { return I18N.getInstance().get("earthquake.desc", "Interactive Seismic Map"); }
     
     @Override
     public String getLongDescription() { 
-        return I18n.getInstance().get("earthquake.long_desc", "Visualizes seismic data on an interactive world map with explanations and controls."); 
+        return I18N.getInstance().get("earthquake.long_desc", "Visualizes seismic data on an interactive world map with explanations and controls."); 
     }
 
     @Override

@@ -41,7 +41,7 @@ import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.ChoiceParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.mathematics.linearalgebra.vectors.VectorFactory;
 import org.jscience.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.mathematics.linearalgebra.matrices.GenericMatrix;
@@ -118,8 +118,8 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         loadPreset("preset.fractal_plant");
     }
     
-    @Override public String getName() { return I18n.getInstance().get("viewer.lsystemviewer.name", "L-System Visualizer"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.lsystemviewer.name", "L-System Visualizer"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.biology", "Biology"); }
 
     private void initPresets() {
         LSystem plant = new LSystem("preset.fractal_plant", "X", 25, false);
@@ -157,17 +157,17 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
 
     private void setupParameters() {
         List<String> presetNames = new ArrayList<>(presets.keySet());
-        parameters.add(new ChoiceParameter(I18n.getInstance().get("viewer.lsystemviewer.preset", "Preset"), 
+        parameters.add(new ChoiceParameter(I18N.getInstance().get("viewer.lsystemviewer.preset", "Preset"), 
             "L-System Preset", presetNames, "preset.fractal_plant", v -> loadPreset(v)));
         
-        parameters.add(new NumericParameter(I18n.getInstance().get("viewer.lsystemviewer.iterations", "Iterations"), 
+        parameters.add(new NumericParameter(I18N.getInstance().get("viewer.lsystemviewer.iterations", "Iterations"), 
             "Recursion Depth", 1, 10, 1, 4, v -> {
                 iterations = v.intValue();
                 generateAndRender();
             }));
             
         parameters.add(new BooleanParameter("viewer.lsystemviewer.animate", 
-            I18n.getInstance().get("viewer.lsystemviewer.animate", "Animate Growth"), animateGrowth, v -> {
+            I18N.getInstance().get("viewer.lsystemviewer.animate", "Animate Growth"), animateGrowth, v -> {
                 animateGrowth = v;
                 generateAndRender();
             }));
@@ -206,11 +206,11 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         rulesArea.setWrapText(true);
         rulesArea.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px;");
 
-        statusLabel = new Label(I18n.getInstance().get("viewer.lsystemviewer.ready", "Ready"));
+        statusLabel = new Label(I18N.getInstance().get("viewer.lsystemviewer.ready", "Ready"));
         statusLabel.getStyleClass().add("description-label");
         statusLabel.setStyle("-fx-font-size: 10px;");
 
-        sidebar.getChildren().addAll(new Label(I18n.getInstance().get("viewer.lsystemviewer.rules", "Rules:")), rulesArea, new Separator(), statusLabel);
+        sidebar.getChildren().addAll(new Label(I18N.getInstance().get("viewer.lsystemviewer.rules", "Rules:")), rulesArea, new Separator(), statusLabel);
         this.setRight(sidebar);
     }
 
@@ -244,7 +244,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         long start = System.currentTimeMillis();
         String commands = currentSystem.generate(iterations);
         long dur = System.currentTimeMillis() - start;
-        if (statusLabel != null) statusLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.lsystemviewer.generated", "Generated {0} chars in {1}ms"), commands.length(), dur));
+        if (statusLabel != null) statusLabel.setText(MessageFormat.format(I18N.getInstance().get("viewer.lsystemviewer.generated", "Generated {0} chars in {1}ms"), commands.length(), dur));
         if (is3DView) render3D(commands);
         else render2D(commands);
     }
@@ -430,7 +430,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         });
     }
 
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.lsystemviewer.desc", "Visualizes Lindenmayer systems."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.lsystemviewer.longdesc", "Explore recursive L-System rules."); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.lsystemviewer.desc", "Visualizes Lindenmayer systems."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.lsystemviewer.longdesc", "Explore recursive L-System rules."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

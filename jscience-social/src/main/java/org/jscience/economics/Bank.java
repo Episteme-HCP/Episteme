@@ -40,10 +40,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a banking institution capable of managing accounts and providing 
  * currency conversion services.
  * Extends {@link Organization} and implements {@link ChangeSource}.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent

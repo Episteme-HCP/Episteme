@@ -29,11 +29,11 @@ import org.jscience.ui.viewers.mathematics.symbolic.FormulaNotationViewer;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.Parameter;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -46,17 +46,17 @@ public class FormulaNotationDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.mathematics");
+        return I18N.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.formulanotationdemo.name");
+        return I18N.getInstance().get("demo.formulanotationdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.formulanotationdemo.desc");
+        return I18N.getInstance().get("demo.formulanotationdemo.desc");
     }
 
     @Override
@@ -66,7 +66,7 @@ public class FormulaNotationDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-         return I18n.getInstance().get("demo.formulanotationdemo.longdesc");
+         return I18N.getInstance().get("demo.formulanotationdemo.longdesc");
     }
 
     @Override

@@ -20,16 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.politics.flags;
 
 /**
  * Constants and enums for vexillology (the study of flags).
  * Defines common patterns and symbols found in flags globally.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+ * */
 public final class Vexillology {
 
     private Vexillology() {}
@@ -44,7 +41,10 @@ public final class Vexillology {
 
     /**
      * Standard flag patterns.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Pattern {
         SOLID,
         HORIZONTAL_BICOLOR,

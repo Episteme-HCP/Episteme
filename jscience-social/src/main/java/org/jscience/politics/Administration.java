@@ -39,10 +39,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a state-managed administrative organization (agency, ministry, police, etc.).
  * Administrations are structured hierarchies of individuals serving a Country.
- *
+ * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
  */
 @Persistent

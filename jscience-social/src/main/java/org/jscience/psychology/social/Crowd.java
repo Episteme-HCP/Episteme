@@ -31,10 +31,9 @@ import org.jscience.biology.taxonomy.Species;
 /**
  * Represents a transient gathering of individuals (a crowd) sharing a common physical proximity 
  * and motive, but lacking the structured relations found in a {@link Group}.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Crowd extends Population {

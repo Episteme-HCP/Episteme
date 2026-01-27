@@ -52,10 +52,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * Represents a social network graph where persons are nodes and relationships are edges.
  * Provides basic graph algorithms for social network analysis, such as degrees of separation.
  * Modernized to implement ComprehensiveIdentification and support edge weights.
- *
+ * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
  */
 @Persistent

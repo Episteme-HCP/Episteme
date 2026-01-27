@@ -34,7 +34,7 @@ import java.util.List;
  * Viewers are JavaFX Nodes that can be embedded in Demos or launched independently.
  * 
  * Subclasses MUST override: getCategory(), getName(), getDescription(), getLongDescription()
- * with proper I18n support.
+ * with proper I18N support.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -43,28 +43,28 @@ import java.util.List;
 public abstract class AbstractViewer extends BorderPane implements Viewer {
 
     /**
-     * Returns the category for grouping. MUST be overridden with I18n.
+     * Returns the category for grouping. MUST be overridden with I18N.
      * @return the category name
      */
     @Override
     public abstract String getCategory();
 
     /**
-     * Returns the display name. MUST be overridden with I18n.
+     * Returns the display name. MUST be overridden with I18N.
      * @return the display name
      */
     @Override
     public abstract String getName();
 
     /**
-     * Returns a short description (1-2 lines). MUST be overridden with I18n.
+     * Returns a short description (1-2 lines). MUST be overridden with I18N.
      * @return the short description
      */
     @Override
     public abstract String getDescription();
 
     /**
-     * Returns a long description. MUST be overridden with I18n.
+     * Returns a long description. MUST be overridden with I18N.
      * @return the long description
      */
     @Override

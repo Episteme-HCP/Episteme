@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

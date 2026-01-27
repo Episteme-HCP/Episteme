@@ -35,6 +35,9 @@ import org.jscience.technical.backend.algorithms.MaxwellSource;
 
 /**
  * Demo Provider for Magnetic Field Visualization with physical source bodies.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MagneticFieldDemo extends AbstractDemo {
 

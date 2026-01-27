@@ -45,10 +45,9 @@ import org.jscience.measure.quantity.Velocity;
  *   <li>Treiber, M., Hennecke, A., & Helbing, D. (2000). Congested traffic states in empirical data and microscopic simulation.</li>
  *   <li>Kesting, A., Treiber, M., & Helbing, D. (2007). General Lane-Changing Model MOBIL for Heterogeneous Traffic Flow.</li>
  * </ul>
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class TrafficSimulator implements Serializable {

@@ -39,13 +39,12 @@ import org.jscience.mathematics.linearalgebra.Vector;
  * - p = 2: Euclidean metric
  * - p = Ã¢Ë†Å¾: Chebyshev metric
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Minkowski, H. (1908). Raum und Zeit. <i>Physikalische Zeitschrift</i>, 10, 104-111.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

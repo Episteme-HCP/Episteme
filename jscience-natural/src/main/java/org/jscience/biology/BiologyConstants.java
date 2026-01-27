@@ -28,11 +28,6 @@ package org.jscience.biology;
  * <p>
  * Provides classifications for sensory perception, taxonomy, diet, 
  * ecological interactions, and thermal regulation.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class BiologyConstants {
 
@@ -40,7 +35,10 @@ public final class BiologyConstants {
 
     /**
      * Sensory perception types.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Sense {
         VISION, AUDITION, GUSTATION, OLFACTION, TACTITION, 
         THERMOCEPTION, NOCICEPTION, EQUILIBRIOCEPTION, PROPRIOCEPTION, 

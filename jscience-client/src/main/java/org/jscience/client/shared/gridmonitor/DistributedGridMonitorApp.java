@@ -45,6 +45,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Real-time Grid Monitor Dashboard showing actual JScience Cluster status.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedGridMonitorApp extends Application implements org.jscience.ui.App {
 
@@ -72,7 +75,7 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         root.setCenter(splitPane);
         root.setBottom(createFooter());
 
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.title", "JScience Cluster Monitor"));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.title", "JScience Cluster Monitor"));
         Scene scene = new Scene(root, 1200, 700);
         ThemeManager.getInstance().applyTheme(scene);
         primaryStage.setScene(scene);
@@ -85,13 +88,13 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         HBox header = new HBox(20);
         header.setPadding(new Insets(15, 20, 15, 20));
         header.getStyleClass().add("header-box");
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.header", "⚡ JScience Grid Monitor"));
+        Label title = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.header", "⚡ JScience Grid Monitor"));
         title.getStyleClass().add("header-label-white");
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS); // Stats cards
-        workerCountLabel = createStatCard(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.workers", "Workers"), "0");
-        jobCountLabel = createStatCard(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.jobs", "Jobs"), "0");
-        completedCountLabel = createStatCard(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.completed", "Completed"), "0");
+        workerCountLabel = createStatCard(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.workers", "Workers"), "0");
+        jobCountLabel = createStatCard(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.jobs", "Jobs"), "0");
+        completedCountLabel = createStatCard(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.completed", "Completed"), "0");
 
         header.getChildren().addAll(title, spacer, workerCountLabel, jobCountLabel, completedCountLabel);
         return header;
@@ -108,10 +111,10 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         pane.setPadding(new Insets(10));
         pane.getStyleClass().add("section-box");
         TableView<WorkerInfo> table = new TableView<>(workers);
-        table.getColumns().add(new TableColumn<WorkerInfo, String>(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.col.worker_id", "Worker ID")));
+        table.getColumns().add(new TableColumn<WorkerInfo, String>(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.col.worker_id", "Worker ID")));
         table.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("workerId"));
         VBox.setVgrow(table, javafx.scene.layout.Priority.ALWAYS);
-        pane.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.active_workers", "Active Workers")), table);
+        pane.getChildren().addAll(new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.active_workers", "Active Workers")), table);
         return pane;
     }
 
@@ -120,10 +123,10 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         pane.setPadding(new Insets(10));
         pane.getStyleClass().add("section-box");
         TableView<JobInfo> table = new TableView<>(jobs);
-        table.getColumns().add(new TableColumn<JobInfo, String>(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.col.job_id", "Job ID")));
+        table.getColumns().add(new TableColumn<JobInfo, String>(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.col.job_id", "Job ID")));
         table.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("jobId"));
         VBox.setVgrow(table, javafx.scene.layout.Priority.ALWAYS);
-        pane.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.queue", "Task Queue")), table);
+        pane.getChildren().addAll(new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.queue", "Task Queue")), table);
         return pane;
     }
 
@@ -131,7 +134,7 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         HBox footer = new HBox(10);
         footer.setPadding(new Insets(10));
         footer.getStyleClass().add("status-bar");
-        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.status.connecting", "Connecting..."));
+        statusLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.status.connecting", "Connecting..."));
         statusLabel.setTextFill(
                 org.jscience.server.proto.Status.UNKNOWN.name().equals("UNKNOWN") ? Color.valueOf("#4ecca3")
                         : Color.valueOf("#e94560"));
@@ -148,15 +151,15 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         try {
             ServerStatus status = blockingStub.getStatus(Empty.newBuilder().build());
             Platform.runLater(() -> {
-                workerCountLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.workers", "Workers") + ": " + status.getActiveWorkers());
-                jobCountLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.jobs", "Jobs") + ": " + status.getQueuedTasks());
-                completedCountLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.stat.completed", "Completed") + ": " + status.getTotalTasksCompleted());
-                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.status.connected", "✅ Connected | Grid Load: {0}%", (int) (status.getSystemLoad() * 100)));
+                workerCountLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.workers", "Workers") + ": " + status.getActiveWorkers());
+                jobCountLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.jobs", "Jobs") + ": " + status.getQueuedTasks());
+                completedCountLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.completed", "Completed") + ": " + status.getTotalTasksCompleted());
+                statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.status.connected", "✅ Connected | Grid Load: {0}%", (int) (status.getSystemLoad() * 100)));
                 statusLabel.getStyleClass().setAll("label", "accent-button-green"); // Using green accent for connected
             });
         } catch (Exception e) {
             Platform.runLater(() -> {
-                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.status.disconnected", "❌ Server Disconnected"));
+                statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.status.disconnected", "❌ Server Disconnected"));
                 statusLabel.getStyleClass().setAll("label", "accent-button-red");
             });
         }
@@ -205,16 +208,16 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.general", "General"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.general", "General"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.name", "Distributed Grid Monitor App"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.name", "Distributed Grid Monitor App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.desc", "Real-time monitoring of the JScience grid computing cluster."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.desc", "Real-time monitoring of the JScience grid computing cluster."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedgridmonitorapp.longdesc", "The Grid Monitor provides a comprehensive view of the JScience distributed computing network. It tracks active worker nodes, queued tasks, and overall system load to ensure optimal cluster performance."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.longdesc", "The Grid Monitor provides a comprehensive view of the JScience distributed computing network. It tracks active worker nodes, queued tasks, and overall system load to ensure optimal cluster performance."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

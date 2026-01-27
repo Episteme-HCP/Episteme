@@ -38,6 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * - Save intermediate task state
  * - Resume from last checkpoint on failure
  * - Automatic checkpoint cleanup
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class CheckpointManager {
 

@@ -40,13 +40,12 @@ import org.jscience.measure.quantity.Mass;
  * Keplerian orbital elements and transformations between perifocal
  * and inertial reference frames.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007). <i>Numerical Recipes: The Art of Scientific Computing</i> (3rd ed.). Cambridge University Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

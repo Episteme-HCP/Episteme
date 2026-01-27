@@ -52,16 +52,16 @@ public class FormulaNotationViewer extends AbstractViewer {
         content.getStyleClass().add("bg-light"); // Replaced inline style: -fx-background-color: white;
 
         Label title = new Label(
-                org.jscience.ui.i18n.I18n.getInstance().get("formula.title", "Mathematical Formula Renderer"));
+                org.jscience.ui.i18n.I18N.getInstance().get("formula.title", "Mathematical Formula Renderer"));
         title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;
 
         VBox formulaList = new VBox(40);
         formulaList.getChildren().addAll(
-                createFormulaBox(org.jscience.ui.i18n.I18n.getInstance().get("formula.euler", "Euler's Identity"), createEulerIdentity()),
-                createFormulaBox(org.jscience.ui.i18n.I18n.getInstance().get("formula.quadratic", "Quadratic Formula"), createQuadraticFormula()),
-                createFormulaBox(org.jscience.ui.i18n.I18n.getInstance().get("formula.schrodinger", "Schr\u00F6dinger Equation"),
+                createFormulaBox(org.jscience.ui.i18n.I18N.getInstance().get("formula.euler", "Euler's Identity"), createEulerIdentity()),
+                createFormulaBox(org.jscience.ui.i18n.I18N.getInstance().get("formula.quadratic", "Quadratic Formula"), createQuadraticFormula()),
+                createFormulaBox(org.jscience.ui.i18n.I18N.getInstance().get("formula.schrodinger", "Schr\u00F6dinger Equation"),
                         createSchrodingerEquation()),
-                createFormulaBox(org.jscience.ui.i18n.I18n.getInstance().get("formula.gravitation", "Newton's Law of Gravitation"),
+                createFormulaBox(org.jscience.ui.i18n.I18N.getInstance().get("formula.gravitation", "Newton's Law of Gravitation"),
                         createGravitationLaw()));
 
         content.getChildren().addAll(title, new Separator(), new ScrollPane(formulaList) {
@@ -75,12 +75,12 @@ public class FormulaNotationViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.formulanotationviewer.name", "Formula Notation");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.formulanotationviewer.name", "Formula Notation");
     }
 
     private VBox createFormulaBox(String name, Region formula) {
@@ -235,12 +235,12 @@ public class FormulaNotationViewer extends AbstractViewer {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.formulanotationviewer.desc", "Visualizes mathematical formulas using JavaFX text nodes.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.formulanotationviewer.desc", "Visualizes mathematical formulas using JavaFX text nodes.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.formulanotationviewer.longdesc", "Demonstrates rendering of complex mathematical formulas like Schrödinger equation and Euler's identity using custom JavaFX text layouts.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.formulanotationviewer.longdesc", "Demonstrates rendering of complex mathematical formulas like Schrödinger equation and Euler's identity using custom JavaFX text layouts.");
     }
 }
 

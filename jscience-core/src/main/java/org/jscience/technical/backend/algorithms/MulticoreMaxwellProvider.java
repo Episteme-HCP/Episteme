@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Multicore (Analytical) implementation of MaxwellProvider.
  * Computes the electromagnetic field as a superposition of oscillating dipoles.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

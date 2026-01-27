@@ -32,11 +32,6 @@ import org.jscience.util.persistence.Persistent;
 /**
  * Analyzes historical military campaigns from a logistical and strategic perspective.
  * Estimates supply requirements, movement speeds, and attrition rates across different terrains.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class MilitaryCampaignAnalyzer {
 
@@ -46,7 +41,10 @@ public final class MilitaryCampaignAnalyzer {
 
     /**
      * Categories of military supplies required for operations.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum SupplyType {
         FOOD, WATER, AMMUNITION, FODDER, FUEL, MEDICAL
     }

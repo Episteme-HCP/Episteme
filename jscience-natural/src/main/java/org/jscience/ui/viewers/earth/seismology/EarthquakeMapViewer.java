@@ -31,7 +31,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.jscience.earth.seismology.Earthquake;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.earth.MapViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
@@ -44,7 +44,7 @@ import java.util.Random;
  * Earthquake Viewer.
  * Visualizes earthquakes on a map.
  * Refactored to be 100% parameter-based.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -94,7 +94,7 @@ public class EarthquakeMapViewer extends MapViewer {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("earthquake.minmag", I18n.getInstance().get("viewer.earthquakemapviewer.param.minmag", "Min Magnitude"), 0.0, 9.0, 0.1, minMagnitude, v -> {
+        parameters.add(new NumericParameter("earthquake.minmag", I18N.getInstance().get("viewer.earthquakemapviewer.param.minmag", "Min Magnitude"), 0.0, 9.0, 0.1, minMagnitude, v -> {
             minMagnitude = v;
             draw();
         }));
@@ -140,9 +140,9 @@ public class EarthquakeMapViewer extends MapViewer {
         }
     }
 
-    @Override public String getName() { return I18n.getInstance().get("viewer.earthquakemapviewer.name", "Earthquake Map"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.earth", "Earth Sciences"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.earthquakemapviewer.desc", "Visualizes seismic activity."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.earthquakemapviewer.longdesc", "Seismic map."); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.earthquakemapviewer.name", "Earthquake Map"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.earth", "Earth Sciences"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.earthquakemapviewer.desc", "Visualizes seismic activity."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.earthquakemapviewer.longdesc", "Seismic map."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

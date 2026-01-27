@@ -39,6 +39,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * - Configurable pool size
  * - Automatic channel health checking
  * - Round-robin channel selection
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ConnectionPool {
 

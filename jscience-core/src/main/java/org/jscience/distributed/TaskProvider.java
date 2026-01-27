@@ -63,7 +63,7 @@ import java.io.Serializable;
  *
  * @param <I> Input type
  * @param <O> Output type
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

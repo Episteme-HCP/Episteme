@@ -31,6 +31,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * Main entry point for the JScience Server (Spring Boot).
  *
  * Replaces the legacy manual bootstrapping in JscienceServer.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @SpringBootApplication
 @EnableScheduling

@@ -41,7 +41,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.io.Configuration;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Stellar Sky Viewer.
  * Refactored to be 100% parameter-based.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -120,7 +120,7 @@ public class StellarSkyViewer extends AbstractViewer {
         centerStack.getStyleClass().add("content-dark");
         setCenter(centerStack);
         
-        infoLabel = new Label(I18n.getInstance().get("sky.info.select", "Select an object..."));
+        infoLabel = new Label(I18N.getInstance().get("sky.info.select", "Select an object..."));
         infoLabel.setWrapText(true);
         infoLabel.getStyleClass().addAll("description-label", "info-panel");
         infoLabel.setPrefHeight(100);
@@ -139,25 +139,25 @@ public class StellarSkyViewer extends AbstractViewer {
 
     private void setupParameters() {
         parameters.add(new NumericParameter("viewer.stellarsky.param.lat",
-                I18n.getInstance().get("sky.lat", "Latitude"),
+                I18N.getInstance().get("sky.lat", "Latitude"),
                 -90, 90, 0.1, observerLat.doubleValue(), v -> { observerLat = Real.of(v); drawSky(); }));
         parameters.add(new NumericParameter("viewer.stellarsky.param.lon",
-                I18n.getInstance().get("sky.lon", "Longitude"),
+                I18N.getInstance().get("sky.lon", "Longitude"),
                 -180, 180, 0.1, observerLon.doubleValue(), v -> { observerLon = Real.of(v); drawSky(); }));
         parameters.add(new NumericParameter("viewer.stellarsky.param.fov",
-                I18n.getInstance().get("sky.fov", "FOV Scale"),
+                I18N.getInstance().get("sky.fov", "FOV Scale"),
                 0.1, 5.0, 0.1, fovScale.doubleValue(), v -> { fovScale = Real.of(v); drawSky(); }));
         
         parameters.add(new NumericParameter("viewer.stellarsky.param.hour", 
-                I18n.getInstance().get("sky.hour", "Hour"), 0, 23, 1, simulationTime.getHour(), v -> {
+                I18N.getInstance().get("sky.hour", "Hour"), 0, 23, 1, simulationTime.getHour(), v -> {
                     simulationTime = simulationTime.withHour(v.intValue());
                     drawSky();
                 }));
 
-        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_constellations", I18n.getInstance().get("sky.stars", "Show Constellations"), bShowConstellations, v -> { bShowConstellations = v; drawSky(); }));
-        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_planets", I18n.getInstance().get("sky.planets", "Show Planets"), bShowPlanets, v -> { bShowPlanets = v; drawSky(); }));
-        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_dso", I18n.getInstance().get("sky.dso", "Show DSO"), bShowDSO, v -> { bShowDSO = v; drawSky(); }));
-        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_trails", I18n.getInstance().get("sky.trails", "Show Trails"), bShowTrails, v -> { bShowTrails = v; drawSky(); }));
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_constellations", I18N.getInstance().get("sky.stars", "Show Constellations"), bShowConstellations, v -> { bShowConstellations = v; drawSky(); }));
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_planets", I18N.getInstance().get("sky.planets", "Show Planets"), bShowPlanets, v -> { bShowPlanets = v; drawSky(); }));
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_dso", I18N.getInstance().get("sky.dso", "Show DSO"), bShowDSO, v -> { bShowDSO = v; drawSky(); }));
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_trails", I18N.getInstance().get("sky.trails", "Show Trails"), bShowTrails, v -> { bShowTrails = v; drawSky(); }));
     }
 
     private void setupInteraction() {
@@ -283,10 +283,10 @@ public class StellarSkyViewer extends AbstractViewer {
     }
 
     private void updateInfoPanel() {
-        if (selectedPlanet != null) infoLabel.setText(I18n.getInstance().get("sky.info.planet", "Planet: {0}", selectedPlanet.name));
-        else if (selectedStar != null) infoLabel.setText(I18n.getInstance().get("sky.info.star", "Star: {0} ({1})", selectedStar.name, selectedStar.mag));
-        else if (selectedConstellation != null) infoLabel.setText(I18n.getInstance().get("sky.info.constellation", "Constellation: {0}", selectedConstellation.name));
-        else infoLabel.setText(I18n.getInstance().get("sky.info.select", "Select an object"));
+        if (selectedPlanet != null) infoLabel.setText(I18N.getInstance().get("sky.info.planet", "Planet: {0}", selectedPlanet.name));
+        else if (selectedStar != null) infoLabel.setText(I18N.getInstance().get("sky.info.star", "Star: {0} ({1})", selectedStar.name, selectedStar.mag));
+        else if (selectedConstellation != null) infoLabel.setText(I18N.getInstance().get("sky.info.constellation", "Constellation: {0}", selectedConstellation.name));
+        else infoLabel.setText(I18N.getInstance().get("sky.info.select", "Select an object"));
     }
 
     private double getDaysSinceJ2000() {
@@ -427,9 +427,9 @@ public class StellarSkyViewer extends AbstractViewer {
         }
     }
     
-    @Override public String getName() { return I18n.getInstance().get("viewer.stellarskyviewer.name", "Stellar Sky Viewer"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.desc", "Real-time sky map."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.longdesc", "Advanced sky map simulation."); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.stellarskyviewer.name", "Stellar Sky Viewer"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.stellarskyviewer.desc", "Real-time sky map."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.stellarskyviewer.longdesc", "Advanced sky map simulation."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

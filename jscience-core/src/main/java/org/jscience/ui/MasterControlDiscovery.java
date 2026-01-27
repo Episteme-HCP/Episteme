@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class MasterControlDiscovery {
 
@@ -93,7 +93,7 @@ public class MasterControlDiscovery {
         return groupedProviders;
     }
 
-    // --- Legacy Scanning Methods (Required for Loaders, Devices, and I18n) ---
+    // --- Legacy Scanning Methods (Required for Loaders, Devices, and I18N) ---
 
     public List<ClassInfo> findClasses(String suffix) {
         Set<String> processed = new HashSet<>();

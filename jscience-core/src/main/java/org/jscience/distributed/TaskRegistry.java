@@ -51,11 +51,7 @@ import java.util.logging.Logger;
  *         .orElseThrow(() -&gt; new IllegalArgumentException("Unknown task"));
  * </pre>
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+ * */
 public final class TaskRegistry {
 
     private static final Logger LOGGER = Logger.getLogger(TaskRegistry.class.getName());
@@ -193,7 +189,10 @@ public final class TaskRegistry {
 
     /**
      * Precision mode for task execution.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum PrecisionMode {
         /** Use primitive double - fastest, no GPU */
         PRIMITIVE,

@@ -32,10 +32,9 @@ import java.util.Set;
 /**
  * Represents a direct exchange of property between two agents without using money.
  * Atomic transaction that validates ownership before execution.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Barter implements Serializable {

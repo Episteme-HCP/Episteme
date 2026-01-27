@@ -35,13 +35,12 @@ import org.jscience.technical.backend.algorithms.MulticoreFEMProvider;
  * Currently supports solving the Poisson equation: -div(grad u) = f.
  * Delegates to {@link FEMProvider}.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007). <i>Numerical Recipes: The Art of Scientific Computing</i> (3rd ed.). Cambridge University Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

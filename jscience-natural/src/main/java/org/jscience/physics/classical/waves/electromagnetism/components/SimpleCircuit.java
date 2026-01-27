@@ -28,7 +28,7 @@ import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

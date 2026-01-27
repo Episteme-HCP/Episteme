@@ -28,6 +28,9 @@ import java.io.IOException;
 
 /**
  * Mock device class for testing DashboardDiscovery.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class TestDevice implements Device {
     @Override

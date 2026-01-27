@@ -44,7 +44,7 @@ import java.util.*;
  * equations (DAE) of the circuit.
  * $$ \mathbf{C} \dot{\mathbf{x}} + \mathbf{G} \mathbf{x} + \mathbf{F}(\mathbf{x}) = \mathbf{b}(t) $$
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

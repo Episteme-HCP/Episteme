@@ -30,6 +30,9 @@ import java.math.RoundingMode;
 /**
  * High-precision implementation of Mandelbrot set calculation using Real
  * numbers.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RealMandelbrotTask extends MandelbrotTask {
 

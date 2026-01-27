@@ -38,28 +38,28 @@ public interface Viewer {
     
     /**
      * Returns the category for grouping (e.g., "Chemistry", "Physics").
-     * Must be internationalized via I18n.
+     * Must be internationalized via I18N.
      * @return the category name
      */
     String getCategory();
 
     /**
      * Returns the display name of the viewer/demo.
-     * Must be internationalized via I18n.
+     * Must be internationalized via I18N.
      * @return the display name
      */
     String getName();
 
     /**
      * Returns a short description (1-2 lines).
-     * Must be internationalized via I18n.
+     * Must be internationalized via I18N.
      * @return the short description
      */
     String getDescription();
 
     /**
      * Returns a long description (multi-line, detailed explanation).
-     * Must be internationalized via I18n.
+     * Must be internationalized via I18N.
      * @return the long description
      */
     String getLongDescription();

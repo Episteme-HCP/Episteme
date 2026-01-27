@@ -47,11 +47,10 @@ import java.io.*;
  *   <li>Naive Bayes classifiers</li>
  * </ul>
  * </p>
- *
+ * * @see <a href="https://dmg.org/pmml/">DMG PMML Standard</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://dmg.org/pmml/">DMG PMML Standard</a>
  */
 public class PMMLReader extends AbstractResourceReader<PMMLModel> {
 

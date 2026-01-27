@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -44,11 +44,11 @@ public class ChEBIReader {
     }
 
     public static String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 
     public static String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.chebi.desc", "ChEBI Database Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.chebi.desc", "ChEBI Database Reader.");
     }
 
     /**

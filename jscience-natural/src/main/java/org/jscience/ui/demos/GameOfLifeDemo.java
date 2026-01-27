@@ -30,14 +30,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import org.jscience.computing.ai.automata.ConwayLife;
 import org.jscience.ui.*;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Game of Life Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -45,21 +45,21 @@ import java.util.List;
 public class GameOfLifeDemo extends AbstractSimulationDemo {
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.computing", "Computing"); }
+    public String getCategory() { return I18N.getInstance().get("category.computing", "Computing"); }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("life.title", "Conway's Game of Life");
+        return I18N.getInstance().get("life.title", "Conway's Game of Life");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("life.desc", "Conway's Game of Life");
+        return I18N.getInstance().get("life.desc", "Conway's Game of Life");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("life.long_desc",
+        return I18N.getInstance().get("life.long_desc",
                 "Conway's Game of Life is a cellular automaton that demonstrates how complex patterns " +
                 "can emerge from simple rules. Each cell follows three rules based on its neighbors: " +
                 "survival, birth, or death by isolation or overpopulation. This interactive visualization " +
@@ -97,13 +97,13 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
 
         private void setupParameters() {
             parameters.add(new NumericParameter(
-                    I18n.getInstance().get("life.param.density", "Initial Density"),
+                    I18N.getInstance().get("life.param.density", "Initial Density"),
                     "Density of alive cells when randomizing",
                     0.01, 1.0, 0.05, 0.2,
                     val -> this.initialDensity = val));
 
             parameters.add(new Parameter<Color>(
-                    I18n.getInstance().get("life.param.color", "Cell Color"),
+                    I18N.getInstance().get("life.param.color", "Cell Color"),
                     "Color of the alive cells",
                     Color.LIME,
                     val -> {
@@ -213,15 +213,15 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
             return parameters;
         }
 
-        @Override public String getName() { return I18n.getInstance().get("viewer.gameoflife.name", "Game of Life Viewer"); }
+        @Override public String getName() { return I18N.getInstance().get("viewer.gameoflife.name", "Game of Life Viewer"); }
         @Override
-        public String getCategory() { return I18n.getInstance().get("category.computing", "Computing"); }
+        public String getCategory() { return I18N.getInstance().get("category.computing", "Computing"); }
         @Override
-        public String getDescription() { return I18n.getInstance().get("viewer.gameoflife.desc", "Game of Life Viewer Console"); }
+        public String getDescription() { return I18N.getInstance().get("viewer.gameoflife.desc", "Game of Life Viewer Console"); }
 
         @Override
         public String getLongDescription() {
-            return I18n.getInstance().get("life.long_desc", "Conway's Game of Life detailed simulation viewer.");
+            return I18N.getInstance().get("life.long_desc", "Conway's Game of Life detailed simulation viewer.");
         }
 
         

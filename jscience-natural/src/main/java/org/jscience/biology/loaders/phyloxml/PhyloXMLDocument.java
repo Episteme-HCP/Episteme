@@ -27,6 +27,9 @@ import java.util.*;
 
 /**
  * Represents a PhyloXML document containing one or more phylogenies.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PhyloXMLDocument {
     

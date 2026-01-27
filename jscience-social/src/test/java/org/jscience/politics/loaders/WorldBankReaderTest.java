@@ -43,6 +43,9 @@ import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for WorldBankReader.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")

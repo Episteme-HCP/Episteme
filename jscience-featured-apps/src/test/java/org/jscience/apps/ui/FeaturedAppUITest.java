@@ -36,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * TestFX UI tests for JScience Killer Apps.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @ExtendWith(ApplicationExtension.class)
 class FeaturedAppUITest {

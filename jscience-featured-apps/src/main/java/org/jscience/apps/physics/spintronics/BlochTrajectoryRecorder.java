@@ -33,9 +33,10 @@ import java.util.List;
  * Records magnetization dynamics and provides data for visualization
  * on a unit sphere (classical analog of quantum Bloch sphere).
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class BlochTrajectoryRecorder {
 

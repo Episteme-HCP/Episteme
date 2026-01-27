@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer;
 
 /**
  * Thermodynamics Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -44,10 +44,10 @@ public class ThermodynamicsDemo extends AbstractDemo {
     public String getCategory() { return "Mathematics"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("Thermodynamics.title", "Thermodynamics Explorer"); }
+    public String getName() { return I18N.getInstance().get("Thermodynamics.title", "Thermodynamics Explorer"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("thermo.desc", "Explore thermodynamic functions (Isotherms etc.)"); }
+    public String getDescription() { return I18N.getInstance().get("thermo.desc", "Explore thermodynamic functions (Isotherms etc.)"); }
     
     @Override
     public String getLongDescription() { 

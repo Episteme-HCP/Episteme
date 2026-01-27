@@ -30,7 +30,7 @@ import org.jscience.ui.Simulatable;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -50,8 +50,8 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
 
     private static final String CFG_PREFIX = "viewer.lorenz.default.";
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.mathematics", "Mathematics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.lorenzviewer.name", "Lorenz Attractor"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.mathematics", "Mathematics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.lorenzviewer.name", "Lorenz Attractor"); }
 
     private Real x = Real.of(Configuration.getDouble(CFG_PREFIX + "x0", 0.1));
     private Real y = Real.of(Configuration.getDouble(CFG_PREFIX + "y0", 0.0));
@@ -91,10 +91,10 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("viewer.lorenzviewer.param.sigma", I18n.getInstance().get("viewer.lorenzviewer.param.sigma", "Sigma"), 0, 50, 0.5, sigma.doubleValue(), v -> { sigma = Real.of(v); points.clear(); }));
-        parameters.add(new NumericParameter("viewer.lorenzviewer.param.rho", I18n.getInstance().get("viewer.lorenzviewer.param.rho", "Rho"), 0, 100, 1, rho.doubleValue(), v -> { rho = Real.of(v); points.clear(); }));
-        parameters.add(new NumericParameter("viewer.lorenzviewer.param.beta", I18n.getInstance().get("viewer.lorenzviewer.param.beta", "Beta"), 0, 10, 0.1, beta.doubleValue(), v -> { beta = Real.of(v); points.clear(); }));
-        parameters.add(new NumericParameter("viewer.lorenzviewer.param.dt", I18n.getInstance().get("viewer.lorenzviewer.param.dt", "Time Step"), 0.001, 0.05, 0.001, dt.doubleValue(), v -> dt = Real.of(v)));
+        parameters.add(new NumericParameter("viewer.lorenzviewer.param.sigma", I18N.getInstance().get("viewer.lorenzviewer.param.sigma", "Sigma"), 0, 50, 0.5, sigma.doubleValue(), v -> { sigma = Real.of(v); points.clear(); }));
+        parameters.add(new NumericParameter("viewer.lorenzviewer.param.rho", I18N.getInstance().get("viewer.lorenzviewer.param.rho", "Rho"), 0, 100, 1, rho.doubleValue(), v -> { rho = Real.of(v); points.clear(); }));
+        parameters.add(new NumericParameter("viewer.lorenzviewer.param.beta", I18N.getInstance().get("viewer.lorenzviewer.param.beta", "Beta"), 0, 10, 0.1, beta.doubleValue(), v -> { beta = Real.of(v); points.clear(); }));
+        parameters.add(new NumericParameter("viewer.lorenzviewer.param.dt", I18N.getInstance().get("viewer.lorenzviewer.param.dt", "Time Step"), 0.001, 0.05, 0.001, dt.doubleValue(), v -> dt = Real.of(v)));
     }
 
     private void initUI() {
@@ -134,7 +134,7 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
     @Override public void setSpeed(double multiplier) {}
     @Override public boolean isPlaying() { return isRunning; }
 
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.lorenzviewer.desc", "Lorenz attractor visualization."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.lorenzviewer.longdesc", "System of differential equations for atmospheric convection."); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.lorenzviewer.desc", "Lorenz attractor visualization."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.lorenzviewer.longdesc", "System of differential equations for atmospheric convection."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

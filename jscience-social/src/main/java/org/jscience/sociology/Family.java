@@ -32,10 +32,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a family unit within the social structure.
  * Extends the basic {@link Group} to model specific familial relationships like parents and children.
- *
+ * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
  */
 @Persistent

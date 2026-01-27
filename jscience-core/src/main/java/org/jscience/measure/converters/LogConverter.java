@@ -34,10 +34,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * Instances of this class are immutable.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * @since 1.0
- */
+ * */
 public final class LogConverter implements UnitConverter {
 
     /**
@@ -116,7 +113,10 @@ public final class LogConverter implements UnitConverter {
     /**
      * This inner class represents the inverse of the logarithmic converter
      * (exponentiation converter).
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     private class Inverse implements UnitConverter {
 
         @Override

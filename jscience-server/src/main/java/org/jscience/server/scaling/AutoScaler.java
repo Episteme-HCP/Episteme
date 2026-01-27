@@ -40,6 +40,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * - Scale UP: Queue depth > threshold AND all workers busy
  * - Scale DOWN: Queue empty AND workers idle > timeout
  * - Cooldown: Prevent rapid scaling oscillations
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class AutoScaler {
 

@@ -28,7 +28,7 @@ import javafx.scene.control.Label;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.RealParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.mathematics.discrete.backends.JavaFXNetworkRenderer;
 
 import java.util.*;
@@ -36,7 +36,7 @@ import java.util.*;
 /**
  * Universal Network/Graph Viewer.
  * Visualizes complex graphs using native force-directed layout or external backends (GraphStream, JGraphT).
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -71,7 +71,7 @@ public class NetworkViewer extends AbstractViewer {
                 javafx.scene.layout.VBox info = new javafx.scene.layout.VBox(10);
                 info.setAlignment(javafx.geometry.Pos.CENTER);
                 info.getChildren().addAll(
-                    new Label(I18n.getInstance().get("viewer.network.active", "Active Backend: ") + provider.get().getName()),
+                    new Label(I18N.getInstance().get("viewer.network.active", "Active Backend: ") + provider.get().getName()),
                     new Label(provider.get().getDescription())
                 );
                 setCenter(info);
@@ -79,7 +79,7 @@ public class NetworkViewer extends AbstractViewer {
         } else {
             Pane container = new Pane();
             container.getStyleClass().add("viewer-root");
-            container.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.error.nobackend", "No Network Backend Available (Install GraphStream, JUNG, etc.)")));
+            container.getChildren().add(new Label(org.jscience.ui.i18n.I18N.getInstance().get("viewer.networkviewer.error.nobackend", "No Network Backend Available (Install GraphStream, JUNG, etc.)")));
             setCenter(container);
         }
     }
@@ -102,22 +102,22 @@ public class NetworkViewer extends AbstractViewer {
     public List<Parameter<?>> getViewerParameters() {
         List<Parameter<?>> params = new ArrayList<>();
         params.add(new RealParameter(
-            I18n.getInstance().get("viewer.network.repulsion", "Repulsion Strength"), 
+            I18N.getInstance().get("viewer.network.repulsion", "Repulsion Strength"), 
             "Strength of node repulsion (force physics)", 0.0, 5000.0, 100.0, 1000.0, val -> {
                 if (nativeRenderer != null) nativeRenderer.setRepulsion(val);
             }));
         params.add(new RealParameter(
-            I18n.getInstance().get("viewer.network.spring", "Spring Strength"), 
+            I18N.getInstance().get("viewer.network.spring", "Spring Strength"), 
             "Strength of edge attraction", 0.0, 1.0, 0.01, 0.05, val -> {
                 if (nativeRenderer != null) nativeRenderer.setSpringStrength(val);
             }));
         return params;
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.mathematics", "Mathematics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.network.name", "Universal Network Viewer"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.network.desc", "Visualizes networks and graphs with multiple backends."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.mathematics", "Mathematics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.network.name", "Universal Network Viewer"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.network.desc", "Visualizes networks and graphs with multiple backends."); }
     @Override public String getLongDescription() { 
-        return I18n.getInstance().get("viewer.network.longdesc", "Advanced graph theory and network visualization tool. Supports high-performance native force-directed layout and external providers like GraphStream or JUNG."); 
+        return I18N.getInstance().get("viewer.network.longdesc", "Advanced graph theory and network visualization tool. Supports high-performance native force-directed layout and external providers like GraphStream or JUNG."); 
     }
 }

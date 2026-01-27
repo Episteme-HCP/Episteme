@@ -25,18 +25,17 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractSimulationDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.biology.ecology.LotkaVolterraViewer;
 
 /**
  * Lotka-Volterra Demo.
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Lotka, A. J. (1925). <i>Elements of Physical Biology</i>. Williams & Wilkins.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -51,10 +50,10 @@ public class LotkaVolterraDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("LotkaVolterra.title", "Lotka-Volterra"); }
+    public String getName() { return I18N.getInstance().get("LotkaVolterra.title", "Lotka-Volterra"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("LotkaVolterra.desc", "Predator-prey population dynamics simulation."); }
+    public String getDescription() { return I18N.getInstance().get("LotkaVolterra.desc", "Predator-prey population dynamics simulation."); }
     
     @Override
     public String getLongDescription() {

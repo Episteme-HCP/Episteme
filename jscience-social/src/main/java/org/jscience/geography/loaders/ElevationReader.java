@@ -25,7 +25,7 @@ package org.jscience.geography.loaders;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.Configuration;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 
 
@@ -40,7 +40,7 @@ import java.time.Duration;
 /**
  * Reader for Altimetry and Bathymetry data (Elevation).
  * Supports ETOPO1, SRTM, and Google Elevation API.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -68,22 +68,22 @@ public class ElevationReader extends AbstractResourceReader<Double> {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("reader.elevation.category", "Geography");
+        return I18N.getInstance().get("reader.elevation.category", "Geography");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.elevation.name", "Elevation Reader");
+        return I18N.getInstance().get("reader.elevation.name", "Elevation Reader");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.elevation.description", "Elevation Data Reader (Altimetry/Bathymetry).");
+        return I18N.getInstance().get("reader.elevation.description", "Elevation Data Reader (Altimetry/Bathymetry).");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.elevation.longdesc", "Reads elevation data from various sources including Google Maps API, SRTM, and ETOPO1.");
+        return I18N.getInstance().get("reader.elevation.longdesc", "Reads elevation data from various sources including Google Maps API, SRTM, and ETOPO1.");
     }
 
     @Override

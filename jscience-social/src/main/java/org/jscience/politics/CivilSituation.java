@@ -32,10 +32,9 @@ import org.jscience.sociology.Situation;
 /**
  * Represents a social interaction context where individuals interact as citizens 
  * within urban or civil environments.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class CivilSituation extends Situation {

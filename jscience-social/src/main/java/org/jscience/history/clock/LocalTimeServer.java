@@ -29,10 +29,9 @@ import java.util.TimerTask;
 /**
  * A local time server that broadcasts modern wall-clock time updates at regular intervals.
  * Uses a daemon {@link Timer} to periodically sample system time and notify listeners.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class LocalTimeServer extends TimeServer {

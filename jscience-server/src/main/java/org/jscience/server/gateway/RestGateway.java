@@ -45,6 +45,9 @@ import java.util.UUID;
 /**
  * Spring Boot REST Gateway for JScience.
  * Translates REST calls to gRPC calls.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/api")

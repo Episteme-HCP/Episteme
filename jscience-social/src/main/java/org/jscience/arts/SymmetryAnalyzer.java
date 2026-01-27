@@ -31,11 +31,6 @@ import org.jscience.mathematics.numbers.real.Real;
  * Analytical engine for detecting and measuring symmetry and repetitive patterns 
  * in visual compositions. It supports several types of symmetry including 
  * bilateral, rotational, translational, and point symmetry.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class SymmetryAnalyzer {
 
@@ -43,7 +38,10 @@ public final class SymmetryAnalyzer {
 
     /**
      * Geometric symmetry types.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum SymmetryType {
         /** Mirror symmetry. */
         BILATERAL,

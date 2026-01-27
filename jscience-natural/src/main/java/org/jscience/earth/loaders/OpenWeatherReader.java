@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import org.jscience.earth.atmosphere.WeatherInfo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 /**
  * OpenWeather API loader for meteorological data.
@@ -65,22 +65,22 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("reader.openweather.category", "Earth");
+        return I18N.getInstance().get("reader.openweather.category", "Earth");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.openweatherreader.name", "OpenWeather Reader");
+        return I18N.getInstance().get("reader.openweatherreader.name", "OpenWeather Reader");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.openweatherreader.desc", "Meteorological Data Reader.");
+        return I18N.getInstance().get("reader.openweatherreader.desc", "Meteorological Data Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.openweatherreader.longdesc", "Fetches current weather data from OpenWeatherMap API.");
+        return I18N.getInstance().get("reader.openweatherreader.longdesc", "Fetches current weather data from OpenWeatherMap API.");
     }
 
     @Override
@@ -169,7 +169,7 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
             String urlStr = API_URL + "?q=" + java.net.URLEncoder.encode(city, "UTF-8")
                     + "&appid=" + apiKey + "&units=metric";
             String json = fetchUrl(urlStr);
-            return parseWeatherJson(json);
+            return parseWeatherJSON(json);
         } catch (Exception e) {
             System.err.println("WARNING: Failed to fetch weather for '" + city + "': " + e.getMessage());
             return null;
@@ -184,7 +184,7 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
             String urlStr = API_URL + "?lat=" + lat + "&lon=" + lon
                     + "&appid=" + apiKey + "&units=metric";
             String json = fetchUrl(urlStr);
-            return parseWeatherJson(json);
+            return parseWeatherJSON(json);
         } catch (Exception e) {
             System.err.println("WARNING: Failed to fetch weather: " + e.getMessage());
             return null;
@@ -212,7 +212,7 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
         }
     }
 
-    private WeatherInfo parseWeatherJson(String json) {
+    private WeatherInfo parseWeatherJSON(String json) {
         try {
             JsonNode root = mapper.readTree(json);
             WeatherInfo.Builder builder = new WeatherInfo.Builder();

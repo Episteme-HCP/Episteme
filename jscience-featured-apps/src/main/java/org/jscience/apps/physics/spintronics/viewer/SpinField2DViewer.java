@@ -44,7 +44,7 @@ import java.util.List;
  *   <li>Color-coded topological density for Skyrmion identification</li>
  * </ul>
  * </p>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

@@ -31,10 +31,9 @@ import org.jscience.geography.GeoPath;
  * Represents a physical roadway segment within a traffic network. It extends 
  * {@link GeoPath} to provide geographical geometry and adds operational 
  * parameters like speed limits and lane counts for micro-simulation.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class Road extends GeoPath {

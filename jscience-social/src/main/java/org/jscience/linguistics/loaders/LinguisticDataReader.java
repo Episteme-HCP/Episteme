@@ -42,7 +42,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class LinguisticDataReader extends AbstractResourceReader<Map<String, String>> {
 

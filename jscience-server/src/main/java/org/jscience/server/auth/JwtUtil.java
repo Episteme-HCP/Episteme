@@ -30,6 +30,9 @@ import javax.crypto.SecretKey;
 
 /**
  * JWT Token Utility for generating and validating tokens.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JWTUtil {
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(

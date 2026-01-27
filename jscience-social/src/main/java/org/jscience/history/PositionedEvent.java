@@ -35,7 +35,7 @@ import org.jscience.util.persistence.Relation;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 @Persistent
 public class PositionedEvent extends Event implements Positioned<Place> {

@@ -47,11 +47,10 @@ import java.awt.*;
  * <p>
  * Requires Jmol library (jmol-*.jar) on the classpath.
  * </p>
- *
+ * * @see <a href="https://jmol.sourceforge.net/">Jmol Project</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
- * @see <a href="https://jmol.sourceforge.net/">Jmol Project</a>
+ * @since 1.0
  */
 public class JmolMolecularRenderer implements MolecularRenderer {
 

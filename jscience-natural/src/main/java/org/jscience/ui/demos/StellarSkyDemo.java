@@ -25,12 +25,12 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.physics.astronomy.StellarSkyViewer;
 
 /**
  * Stellar Sky Demo.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -44,10 +44,10 @@ public class StellarSkyDemo extends AbstractDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("sky.window.title", "Night Sky Visualizer"); }
+    public String getName() { return I18N.getInstance().get("sky.window.title", "Night Sky Visualizer"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("sky.title", "Stellar Sky"); }
+    public String getDescription() { return I18N.getInstance().get("sky.title", "Stellar Sky"); }
     
     @Override
     public String getLongDescription() { 

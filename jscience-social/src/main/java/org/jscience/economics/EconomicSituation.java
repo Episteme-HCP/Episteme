@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics;
 
 import org.jscience.biology.Individual;
@@ -33,13 +34,12 @@ import org.jscience.sociology.Situation;
  * <p>This class extends {@link Situation} to provide a base for modeling
  * economic contexts where individuals participate as {@link EconomicAgent}s.
  * Subclasses like {@link WorkSituation} provide more specialized behavior.</p>
- *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
- * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
- * @see Situation
+ * * @see Situation
  * @see EconomicAgent
  * @see WorkSituation
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class EconomicSituation extends Situation {
 

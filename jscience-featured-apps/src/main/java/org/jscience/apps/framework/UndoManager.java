@@ -29,6 +29,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  * Manages Undo/Redo stack for Featured Apps.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class UndoManager {
 

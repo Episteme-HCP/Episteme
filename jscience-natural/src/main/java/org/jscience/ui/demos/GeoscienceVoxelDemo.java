@@ -30,6 +30,9 @@ import org.jscience.ui.viewers.shared.volume.VoxelViewer;
 
 /**
  * Geoscience demo for mineral deposit visualization.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class GeoscienceVoxelDemo extends AbstractDemo {
 

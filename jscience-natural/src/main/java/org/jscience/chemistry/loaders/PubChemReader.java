@@ -1,3 +1,26 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.chemistry.loaders;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -5,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jscience.chemistry.Compound;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.Configuration;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +51,6 @@ import java.util.concurrent.CompletableFuture;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Integrated into ResourceReader)
  */
 public class PubChemReader extends AbstractResourceReader<Compound> {
 
@@ -54,22 +76,22 @@ public class PubChemReader extends AbstractResourceReader<Compound> {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.chemistry", "Chemistry");
+        return I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.pubchem.name", "PubChem Reader");
+        return I18N.getInstance().get("reader.pubchem.name", "PubChem Reader");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.pubchem.desc", "Electronic database of chemical molecules.");
+        return I18N.getInstance().get("reader.pubchem.desc", "Electronic database of chemical molecules.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.pubchem.longdesc", 
+        return I18N.getInstance().get("reader.pubchem.longdesc", 
             "Official reader for NCBI PubChem, providing access to millions of compound properties, structures, and bioactivities.");
     }
 

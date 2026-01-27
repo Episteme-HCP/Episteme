@@ -39,6 +39,9 @@ import java.util.function.Function;
  * - Configurable batch size and timeout
  * - Async batch processing
  * - Batch result distribution
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class BatchProcessor<T, R> {
 

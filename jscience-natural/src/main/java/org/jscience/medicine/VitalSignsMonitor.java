@@ -30,11 +30,10 @@ import org.jscience.device.Sensor;
  * <p>
  * Provides streamable access to real-time vital signs data and associated waveforms.
  * </p>
- *
+ * * @see VitalSigns
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see VitalSigns
  */
 public interface VitalSignsMonitor extends Sensor<VitalSigns> {
 

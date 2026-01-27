@@ -20,13 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics.loaders;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jscience.io.AbstractResourceReader;
 
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +51,10 @@ import java.util.Map;
  * </ul>
  * 
  * <p>This replaces the deprecated {@code OandaRateLoader}.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 5.0
+ * @since 1.0
  */
 public class ExchangeRateReader extends AbstractResourceReader<org.jscience.mathematics.numbers.real.Real> {
 
@@ -90,22 +91,22 @@ public class ExchangeRateReader extends AbstractResourceReader<org.jscience.math
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.exchangerate.name", "Exchange Rate Reader");
+        return I18N.getInstance().get("reader.exchangerate.name", "Exchange Rate Reader");
     }
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.economics", "Economics");
+        return I18N.getInstance().get("category.economics", "Economics");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.exchangerate.desc", "Currency exchange rate reader.");
+        return I18N.getInstance().get("reader.exchangerate.desc", "Currency exchange rate reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.exchangerate.longdesc", 
+        return I18N.getInstance().get("reader.exchangerate.longdesc", 
             "Fetches real-time currency exchange rates from free APIs including " +
             "the European Central Bank and Frankfurter. No API key required for basic usage.");
     }

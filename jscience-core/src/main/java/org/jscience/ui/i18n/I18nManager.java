@@ -28,25 +28,25 @@ import java.util.function.Consumer;
 
 /**
  * Internationalization Manager for JScience Killer Apps.
- * Delegates to the core {@link I18n} class to ensure shared state.
+ * Delegates to the core {@link I18N} class to ensure shared state.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class I18nManager {
+public final class I18NManager {
 
-    private static I18nManager instance;
-    // We strictly wrap I18n singleton
-    private final I18n delegate;
+    private static I18NManager instance;
+    // We strictly wrap I18N singleton
+    private final I18N delegate;
 
-    private I18nManager() {
-        this.delegate = org.jscience.ui.i18n.I18n.getInstance();
+    private I18NManager() {
+        this.delegate = org.jscience.ui.i18n.I18N.getInstance();
     }
 
-    public static synchronized I18nManager getInstance() {
+    public static synchronized I18NManager getInstance() {
         if (instance == null) {
-            instance = new I18nManager();
+            instance = new I18NManager();
         }
         return instance;
     }
@@ -76,6 +76,6 @@ public final class I18nManager {
     }
 
     public static Locale[] getSupportedLocales() {
-        return org.jscience.ui.i18n.I18n.getInstance().getSupportedLocales();
+        return org.jscience.ui.i18n.I18N.getInstance().getSupportedLocales();
     }
 }

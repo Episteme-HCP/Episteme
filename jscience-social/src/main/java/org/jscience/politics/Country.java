@@ -43,7 +43,6 @@ import org.jscience.util.persistence.Relation;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.1 (Modernized with ISO support)
  */
 @Persistent
 public class Country extends Region {

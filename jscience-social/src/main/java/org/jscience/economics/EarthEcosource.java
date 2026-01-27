@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics;
 
 import org.jscience.biology.taxonomy.Species;
@@ -34,7 +35,7 @@ import org.jscience.measure.Quantity;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @since 1.0
  */
 public class EarthEcosource extends Community {
 

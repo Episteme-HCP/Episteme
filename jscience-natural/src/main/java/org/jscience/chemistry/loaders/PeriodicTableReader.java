@@ -51,17 +51,17 @@ public class PeriodicTableReader extends AbstractResourceReader<List<Element>> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.desc", "Periodic Table of Elements Loader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.periodictable.desc", "Periodic Table of Elements Loader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.longdesc", "Loads chemical elements data including atomic properties, thermodynamics, and classification from JSON resources.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.periodictable.longdesc", "Loads chemical elements data including atomic properties, thermodynamics, and classification from JSON resources.");
     }
 
     @Override
@@ -176,5 +176,5 @@ public class PeriodicTableReader extends AbstractResourceReader<List<Element>> {
         return new String[] {"JSON 1.0"};
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.name", "Periodic Table Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.periodictable.name", "Periodic Table Reader"); }
 }

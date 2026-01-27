@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for PyMOL molecular renderer.
  * PyMOL is an external application that requires a bridge.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PyMOLMolecularBackendProvider implements BackendProvider {
 

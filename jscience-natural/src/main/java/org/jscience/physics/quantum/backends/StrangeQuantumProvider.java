@@ -44,13 +44,12 @@ import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 
 /**
  * Quantum Backend implementation using the Strange pure Java library.
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

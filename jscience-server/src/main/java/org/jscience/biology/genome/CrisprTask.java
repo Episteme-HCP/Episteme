@@ -44,6 +44,9 @@ import org.jscience.mathematics.discrete.TextAlgorithms;
  * 
  * @javadoc Complexity: O(N * M / W) where N=Genome Length, M=Pattern Length,
  *          W=Word Size. Uses Shift-Or (Bit-Parallel).
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class CrisprTask implements Serializable {
 

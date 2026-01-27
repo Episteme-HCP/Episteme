@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendProvider;
 /**
  * BackendProvider for Jzy3D 3D plotting.
  * Available when Jzy3D library is on classpath.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Jzy3dPlot3DBackendProvider implements BackendProvider {
 

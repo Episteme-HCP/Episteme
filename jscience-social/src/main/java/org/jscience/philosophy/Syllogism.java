@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.philosophy;
 
 import java.io.Serializable;
@@ -34,7 +35,7 @@ import java.util.Objects;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
+ * @since 1.0
  */
 public class Syllogism implements Serializable {
 

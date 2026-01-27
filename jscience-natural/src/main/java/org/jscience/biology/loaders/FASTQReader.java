@@ -131,21 +131,21 @@ public class FASTQReader extends AbstractResourceReader<List<BioSequence>> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastqreader.name", "FASTQ Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fastqreader.name", "FASTQ Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastqreader.desc", "Parsed FASTQ format files (includes quality scores).");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fastqreader.desc", "Parsed FASTQ format files (includes quality scores).");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastqreader.longdesc", "Reads biological sequences from FASTQ format, including quality scores.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.fastqreader.longdesc", "Reads biological sequences from FASTQ format, including quality scores.");
     }
 }

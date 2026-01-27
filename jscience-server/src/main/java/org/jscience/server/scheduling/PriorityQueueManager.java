@@ -38,6 +38,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * - Fair scheduling within priority levels
  * - Starvation prevention with aging
  * - Queue metrics and monitoring
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PriorityQueueManager<T> {
 

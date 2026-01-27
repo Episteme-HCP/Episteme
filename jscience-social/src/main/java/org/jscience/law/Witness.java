@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.law;
 
 import org.jscience.biology.Individual;
@@ -34,7 +35,7 @@ import java.util.Set;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @since 1.0
  */
 public class Witness extends Role {
 

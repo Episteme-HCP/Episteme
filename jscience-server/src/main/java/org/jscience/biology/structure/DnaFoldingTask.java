@@ -46,6 +46,9 @@ import org.jscience.distributed.TaskRegistry;
  * secondary structure in ribonucleic acids. Nature, 230(5293), 362-367.</li>
  * </ul>
  * </p>
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DnaFoldingTask implements Serializable {
 

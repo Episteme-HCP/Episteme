@@ -35,10 +35,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a linguistic word, defined as a sequence of one or more morphemes 
  * that form a minimal meaningful unit of language.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

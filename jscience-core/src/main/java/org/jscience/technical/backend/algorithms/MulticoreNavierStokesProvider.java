@@ -31,13 +31,12 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * Uses Stam's Stable Fluids approach (simplified).
  * </p>
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Navier, C. L. M. H. (1822). Mémoire sur les lois du mouvement des fluides. <i>Mémoires de l'Académie Royale des Sciences de l'Institut de France</i>, 6, 389-440.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

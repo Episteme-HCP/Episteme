@@ -42,10 +42,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a group of individuals from a psychological and social perspective.
  * Unlike a simple {@link Population}, a Group includes structures such as 
  * leadership and a sociogram tracking interpersonal relations over time.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent

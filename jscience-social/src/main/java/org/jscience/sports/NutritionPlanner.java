@@ -31,17 +31,16 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Provides mathematical methods for athlete nutrition planning and metabolic analysis.
  * Includes BMR and TDEE calculations using the Mifflin-St Jeor equation.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
 public final class NutritionPlanner {
 
     private NutritionPlanner() {}
 
-    /** Standard categorical activity levels for metabolic calculations. */
+    /** Standard categorical activity levels for metabolic calculations.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum ActivityLevel {
         SEDENTARY(1.2),
         LIGHT(1.375),

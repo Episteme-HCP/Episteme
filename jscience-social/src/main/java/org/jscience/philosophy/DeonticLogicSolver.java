@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.philosophy;
 
 import java.util.Map;
@@ -31,11 +32,7 @@ import java.util.Map;
  *     obligation, permission, and related concepts. This solver supports the 
  *     analysis of moral codes and normative consistency through the standard 
  *     Deontic Square.</p>
- *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
- * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
- */
+ * */
 public final class DeonticLogicSolver {
 
 
@@ -43,7 +40,10 @@ public final class DeonticLogicSolver {
 
     /**
      * Categories of normative status.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum DeonticMode {
         /** Required by norm (O). */
         OBLIGATORY,

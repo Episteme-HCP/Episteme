@@ -30,6 +30,9 @@ import java.util.Optional;
 
 /**
  * Spring Data JPA Repository for Users.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {

@@ -33,10 +33,10 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Loader for scientific article catalogs, supporting interfaces with major
  * research databases like PubMed, CrossRef, or arXiv.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class ArticleCatalogReader extends AbstractResourceReader<List<BibliographicalNotice>> implements CatalogReader {
 

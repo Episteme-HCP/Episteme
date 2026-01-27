@@ -28,7 +28,8 @@ import java.math.BigInteger;
 /**
  * Integer backed by arbitrary-precision {@link BigInteger}.
  * Package-private implementation detail.
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

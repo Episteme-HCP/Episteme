@@ -33,7 +33,7 @@ import org.jscience.measure.Units;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.ChoiceParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,13 +43,16 @@ import java.util.stream.Collectors;
 /**
  * Interactive Electrical Circuit Schematic Designer.
  * Refactored to be 100% parameter-based.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer implements org.jscience.ui.Simulatable {
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.circuitsimulatorviewer.name", "Circuit Simulator"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.circuitsimulatorviewer.desc", "Interactive analog circuit simulator."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.circuitsimulatorviewer.longdesc", "A comprehensive interactive analog circuit simulator. Design electronic schematics using a variety of components including resistors, capacitors, inductors, batteries, and ground points. Use the integrated solver to calculate nodal voltages and analyze circuit behavior in real-time."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.circuitsimulatorviewer.name", "Circuit Simulator"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.circuitsimulatorviewer.desc", "Interactive analog circuit simulator."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.circuitsimulatorviewer.longdesc", "A comprehensive interactive analog circuit simulator. Design electronic schematics using a variety of components including resistors, capacitors, inductors, batteries, and ground points. Use the integrated solver to calculate nodal voltages and analyze circuit behavior in real-time."); }
 
     private enum ComponentType {
         WIRE("circuit.component.wire"),
@@ -63,7 +66,7 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
 
         private final String i18nKey;
         ComponentType(String i18nKey) { this.i18nKey = i18nKey; }
-        @Override public String toString() { return I18n.getInstance().get(i18nKey); }
+        @Override public String toString() { return I18N.getInstance().get(i18nKey); }
         public static ComponentType fromString(String s) {
             for (ComponentType t : values()) if (t.toString().equals(s)) return t;
             return WIRE;
@@ -103,17 +106,17 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
 
     private void setupParameters() {
         List<String> types = Arrays.stream(ComponentType.values()).map(Object::toString).collect(Collectors.toList());
-        parameters.add(new ChoiceParameter("circuit.tool", I18n.getInstance().get("circuit.tool", "Tool"), types, ComponentType.WIRE.toString(), v -> {
+        parameters.add(new ChoiceParameter("circuit.tool", I18N.getInstance().get("circuit.tool", "Tool"), types, ComponentType.WIRE.toString(), v -> {
             selectedType = ComponentType.fromString(v);
             selectedComponent = null;
             draw();
         }));
 
-        parameters.add(new BooleanParameter("circuit.action.solve", I18n.getInstance().get("circuit.btn.solve", "Solve"), false, v -> { if(v) solveCircuit(); }));
-        parameters.add(new BooleanParameter("circuit.action.delete", I18n.getInstance().get("circuit.btn.delete", "Delete Selected"), false, v -> {
+        parameters.add(new BooleanParameter("circuit.action.solve", I18N.getInstance().get("circuit.btn.solve", "Solve"), false, v -> { if(v) solveCircuit(); }));
+        parameters.add(new BooleanParameter("circuit.action.delete", I18N.getInstance().get("circuit.btn.delete", "Delete Selected"), false, v -> {
             if(v && selectedComponent != null) { components.remove(selectedComponent); selectedComponent = null; draw(); }
         }));
-        parameters.add(new BooleanParameter("circuit.action.clear", I18n.getInstance().get("circuit.btn.clear", "Clear All"), false, v -> {
+        parameters.add(new BooleanParameter("circuit.action.clear", I18N.getInstance().get("circuit.btn.clear", "Clear All"), false, v -> {
             if(v) { components.clear(); selectedComponent = null; nodeVoltages = null; draw(); }
         }));
     }

@@ -1,3 +1,26 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.ui;
 
 import javafx.application.Application;
@@ -7,7 +30,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +70,10 @@ public class JScienceDemosApp extends Application {
         TabPane mainTabs = new TabPane();
         mainTabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         
-        Tab demoTab = new Tab(I18n.getInstance().get("demosapp.tab.demos", "Applications & Demos"));
+        Tab demoTab = new Tab(I18N.getInstance().get("demosapp.tab.demos", "Applications & Demos"));
         demoTab.setContent(createDiscoveryView());
         
-        Tab libTab = new Tab(I18n.getInstance().get("demosapp.tab.libraries", "Libraries"));
+        Tab libTab = new Tab(I18N.getInstance().get("demosapp.tab.libraries", "Libraries"));
         libTab.setContent(createLibraryView());
         
         mainTabs.getTabs().addAll(demoTab, libTab);
@@ -61,7 +84,7 @@ public class JScienceDemosApp extends Application {
             scene.getStylesheets().add(cssResource.toExternalForm());
         }
 
-        primaryStage.setTitle(I18n.getInstance().get("demosapp.header.title", "JScience Demos"));
+        primaryStage.setTitle(I18N.getInstance().get("demosapp.header.title", "JScience Demos"));
         primaryStage.setScene(scene);
 
         ThemeManager.getInstance().applyTheme(scene);
@@ -75,7 +98,7 @@ public class JScienceDemosApp extends Application {
         allContent.getStyleClass().add("content-box");
 
         if (demosByCategory.isEmpty()) {
-            allContent.getChildren().add(new Label(I18n.getInstance().get("demosapp.nodemos")));
+            allContent.getChildren().add(new Label(I18N.getInstance().get("demosapp.nodemos")));
         } else {
             for (Map.Entry<String, List<Viewer>> entry : demosByCategory.entrySet()) {
                 if ("Social Sciences".equalsIgnoreCase(entry.getKey())
@@ -107,10 +130,10 @@ public class JScienceDemosApp extends Application {
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
 
-        Menu languageMenu = new Menu(I18n.getInstance().get("menu.preferences.language", "Language"));
+        Menu languageMenu = new Menu(I18N.getInstance().get("menu.preferences.language", "Language"));
         ToggleGroup langGroup = new ToggleGroup();
 
-        for (Locale locale : I18n.getInstance().getSupportedLocales()) {
+        for (Locale locale : I18N.getInstance().getSupportedLocales()) {
             String label = locale.getDisplayLanguage(locale);
             if (label.length() > 0) {
                 label = label.substring(0, 1).toUpperCase() + label.substring(1);
@@ -118,19 +141,19 @@ public class JScienceDemosApp extends Application {
 
             RadioMenuItem item = new RadioMenuItem(label);
             item.setToggleGroup(langGroup);
-            item.setSelected(locale.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
+            item.setSelected(locale.getLanguage().equals(I18N.getInstance().getLocale().getLanguage()));
             item.setOnAction(e -> {
-                I18n.getInstance().setLocale(locale);
+                I18N.getInstance().setLocale(locale);
                 buildUI();
             });
             languageMenu.getItems().add(item);
         }
 
-        Menu themeMenu = new Menu(I18n.getInstance().get("demosapp.menu.theme", "Theme"));
+        Menu themeMenu = new Menu(I18N.getInstance().get("demosapp.menu.theme", "Theme"));
         ToggleGroup themeGroup = new ToggleGroup();
         String currentTheme = ThemeManager.getInstance().getCurrentTheme();
 
-        RadioMenuItem modenaItem = new RadioMenuItem(I18n.getInstance().get("demosapp.menu.theme.modena", "Modena (Light)"));
+        RadioMenuItem modenaItem = new RadioMenuItem(I18N.getInstance().get("demosapp.menu.theme.modena", "Modena (Light)"));
         modenaItem.setToggleGroup(themeGroup);
         modenaItem.setSelected("Modena".equalsIgnoreCase(currentTheme));
         modenaItem.setOnAction(e -> {
@@ -138,7 +161,7 @@ public class JScienceDemosApp extends Application {
             ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         });
 
-        RadioMenuItem caspianItem = new RadioMenuItem(I18n.getInstance().get("demosapp.menu.theme.caspian", "Caspian"));
+        RadioMenuItem caspianItem = new RadioMenuItem(I18N.getInstance().get("demosapp.menu.theme.caspian", "Caspian"));
         caspianItem.setToggleGroup(themeGroup);
         caspianItem.setSelected("Caspian".equalsIgnoreCase(currentTheme));
         caspianItem.setOnAction(e -> {
@@ -147,7 +170,7 @@ public class JScienceDemosApp extends Application {
         });
 
         RadioMenuItem highContrastItem = new RadioMenuItem(
-                I18n.getInstance().get("demosapp.menu.theme.highcontrast", "High Contrast"));
+                I18N.getInstance().get("demosapp.menu.theme.highcontrast", "High Contrast"));
         highContrastItem.setToggleGroup(themeGroup);
         highContrastItem.setSelected("HighContrast".equalsIgnoreCase(currentTheme));
         highContrastItem.setOnAction(e -> {
@@ -155,7 +178,7 @@ public class JScienceDemosApp extends Application {
             ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         });
 
-        RadioMenuItem darkItem = new RadioMenuItem(I18n.getInstance().get("menu.view.theme.dark", "Dark"));
+        RadioMenuItem darkItem = new RadioMenuItem(I18N.getInstance().get("menu.view.theme.dark", "Dark"));
         darkItem.setToggleGroup(themeGroup);
         darkItem.setSelected("Dark".equalsIgnoreCase(currentTheme));
         darkItem.setOnAction(e -> {
@@ -175,10 +198,10 @@ public class JScienceDemosApp extends Application {
         header.setAlignment(Pos.CENTER);
         header.getStyleClass().add("header-box");
 
-        Label title = new Label(I18n.getInstance().get("demosapp.header.title", "JScience Demos"));
+        Label title = new Label(I18N.getInstance().get("demosapp.header.title", "JScience Demos"));
         title.getStyleClass().add("header-label");
 
-        Label subtitle = new Label(I18n.getInstance().get("demosapp.header.subtitle", "Scientific Applications & Tools"));
+        Label subtitle = new Label(I18N.getInstance().get("demosapp.header.subtitle", "Scientific Applications & Tools"));
         subtitle.getStyleClass().add("header-subtitle");
 
         header.getChildren().addAll(title, subtitle);
@@ -206,7 +229,7 @@ public class JScienceDemosApp extends Application {
         row.setPadding(new Insets(15));
         row.getStyleClass().add("demo-card");
 
-        Button btn = new Button(I18n.getInstance().get("demosapp.button.launch", "Launch"));
+        Button btn = new Button(I18N.getInstance().get("demosapp.button.launch", "Launch"));
         btn.getStyleClass().add("launch-button");
         btn.getStyleClass().add("font-bold");
 
@@ -256,7 +279,7 @@ public class JScienceDemosApp extends Application {
 
     private void showError(String title, String message, Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(I18n.getInstance().get("status.error", "Error"));
+        alert.setTitle(I18N.getInstance().get("status.error", "Error"));
         alert.setHeaderText(title);
         alert.setContentText(message + "\n" + ex.getMessage());
         alert.show(); 
@@ -285,7 +308,7 @@ public class JScienceDemosApp extends Application {
             return;
         for (Map.Entry<String, List<Viewer>> entry : source.entrySet()) {
             String key = entry.getKey();
-            String catName = I18n.getInstance().get("category." + key.toLowerCase().replace(" ", "_"), key);
+            String catName = I18N.getInstance().get("category." + key.toLowerCase().replace(" ", "_"), key);
 
             target.computeIfAbsent(catName, k -> new ArrayList<>()).addAll(entry.getValue());
         }

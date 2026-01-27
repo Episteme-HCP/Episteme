@@ -36,12 +36,11 @@ import java.util.Objects;
  * <p>
  * A phoneme is to spoken language what a grapheme is to written language.
  * This class uses IPA (International Phonetic Alphabet) for representation.
- *
+ * * @see <a href="https://en.wikipedia.org/wiki/Phoneme">Phoneme (Wikipedia)</a>
+ * @see <a href="https://en.wikipedia.org/wiki/International_Phonetic_Alphabet">IPA</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://en.wikipedia.org/wiki/Phoneme">Phoneme (Wikipedia)</a>
- * @see <a href="https://en.wikipedia.org/wiki/International_Phonetic_Alphabet">IPA</a>
  */
 @Persistent
 public class Phoneme implements Serializable {

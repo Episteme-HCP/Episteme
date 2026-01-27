@@ -36,11 +36,10 @@ import java.util.Objects;
  * A grapheme is the fundamental unit of a writing system, such as a letter
  * in alphabetic scripts. For example, in English, the letters a-z are graphemes.
  * Note that space (as a delimiter) is typically not considered a grapheme.
- *
+ * * @see <a href="https://en.wikipedia.org/wiki/Grapheme">Grapheme (Wikipedia)</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://en.wikipedia.org/wiki/Grapheme">Grapheme (Wikipedia)</a>
  */
 @Persistent
 public class Grapheme implements Serializable {

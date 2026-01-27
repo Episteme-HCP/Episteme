@@ -28,7 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Multicore implementation of WaveProvider.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

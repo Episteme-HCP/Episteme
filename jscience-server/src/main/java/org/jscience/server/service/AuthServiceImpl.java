@@ -38,6 +38,9 @@ import java.util.Optional;
 
 /**
  * gRPC Service implementation for user authentication.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @GrpcService
 public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {

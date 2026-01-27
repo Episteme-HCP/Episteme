@@ -32,7 +32,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 
 /**
@@ -50,17 +50,17 @@ public class BenchmarkRunner {
     public void discover() {
         ServiceLoader<RunnableBenchmark> loader = ServiceLoader.load(RunnableBenchmark.class);
         loader.forEach(benchmarks::add);
-        System.out.println(I18n.getInstance().get("benchmark.discovered", benchmarks.size()));
+        System.out.println(I18N.getInstance().get("benchmark.discovered", benchmarks.size()));
     }
 
     public void runAll() {
-        System.out.println(I18n.getInstance().get("benchmark.suite.starting"));
+        System.out.println(I18N.getInstance().get("benchmark.suite.starting"));
         System.out.printf("%-30s | %-15s | %-13s | %-13s | %-9s%n",
-                I18n.getInstance().get("benchmark.header.name"),
-                I18n.getInstance().get("benchmark.header.domain"),
-                I18n.getInstance().get("benchmark.header.time"),
-                I18n.getInstance().get("benchmark.header.ops"),
-                I18n.getInstance().get("benchmark.header.mem"));
+                I18N.getInstance().get("benchmark.header.name"),
+                I18N.getInstance().get("benchmark.header.domain"),
+                I18N.getInstance().get("benchmark.header.time"),
+                I18N.getInstance().get("benchmark.header.ops"),
+                I18N.getInstance().get("benchmark.header.mem"));
         System.out.println("-".repeat(90));
 
         for (RunnableBenchmark b : benchmarks) {
@@ -98,7 +98,7 @@ public class BenchmarkRunner {
                 b.teardown();
 
             } catch (Exception e) {
-                System.err.println(I18n.getInstance().get("benchmark.failed", b.getName(), e.getMessage()));
+                System.err.println(I18N.getInstance().get("benchmark.failed", b.getName(), e.getMessage()));
             }
         }
     }
@@ -110,17 +110,17 @@ public class BenchmarkRunner {
         }
 
         JFreeChart barChart = ChartFactory.createBarChart(
-                I18n.getInstance().get("benchmark.chart.title"),
-                I18n.getInstance().get("benchmark.header.name"),
-                I18n.getInstance().get("benchmark.chart.yaxis"),
+                I18N.getInstance().get("benchmark.chart.title"),
+                I18N.getInstance().get("benchmark.header.name"),
+                I18N.getInstance().get("benchmark.chart.yaxis"),
                 dataset);
 
         try {
             File chartFile = new File("benchmark_results.png");
             ChartUtils.saveChartAsPNG(chartFile, barChart, 800, 600);
-            System.out.println("\n" + I18n.getInstance().get("benchmark.chart.saved", chartFile.getAbsolutePath()));
+            System.out.println("\n" + I18N.getInstance().get("benchmark.chart.saved", chartFile.getAbsolutePath()));
         } catch (Exception e) {
-            System.err.println(I18n.getInstance().get("benchmark.chart.error", e.getMessage()));
+            System.err.println(I18N.getInstance().get("benchmark.chart.error", e.getMessage()));
         }
     }
 

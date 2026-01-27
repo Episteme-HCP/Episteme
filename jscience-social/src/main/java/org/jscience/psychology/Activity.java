@@ -35,10 +35,9 @@ import java.util.Set;
 /**
  * Represents a structured activity composed of nested sub-activities or atomic behaviors.
  * Activities help organize behaviors into goal-oriented sequences for individuals or roles.
- *
+ * * @version 1.7
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.7
  * @since 1.0
  */
 public class Activity implements Named, Commented, Serializable {

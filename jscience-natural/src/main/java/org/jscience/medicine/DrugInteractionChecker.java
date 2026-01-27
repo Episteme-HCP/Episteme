@@ -27,16 +27,16 @@ import java.util.*;
 
 /**
  * Utility for checking potential drug-drug interactions.
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+ * */
 public final class DrugInteractionChecker {
 
     private DrugInteractionChecker() {}
 
-    /** Severity levels for drug interactions. */
+    /** Severity levels for drug interactions.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum Severity {
         CONTRAINDICATED, MAJOR, MODERATE, MINOR, UNKNOWN
     }

@@ -25,18 +25,17 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.viewers.biology.genetics.GeneticsViewer;
 
 /**
  * Genetics Demo.
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -51,10 +50,10 @@ public class GeneticsDemo extends AbstractDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("Genetics.title", "Genetics"); }
+    public String getName() { return I18N.getInstance().get("Genetics.title", "Genetics"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("Genetics.desc", "Genetic drift and Mendelian inheritance simulations."); }
+    public String getDescription() { return I18N.getInstance().get("Genetics.desc", "Genetic drift and Mendelian inheritance simulations."); }
 
     @Override
     public String getLongDescription() {

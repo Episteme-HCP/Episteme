@@ -40,10 +40,9 @@ import java.util.List;
  * This reader parses GML files and converts them into {@link Place} objects.
  * It uses the core GML parser from the natural module.
  * </p>
- *
+ * * @version 3.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 3.0
  * @since 1.0
  */
 public class GMLReader extends AbstractResourceReader<List<Place>> {
@@ -56,22 +55,22 @@ public class GMLReader extends AbstractResourceReader<List<Place>> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gml.name", "GML Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.gml.name", "GML Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gml.desc", "Geography Markup Language (GML) reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.gml.desc", "Geography Markup Language (GML) reader");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gml.longdesc",
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.gml.longdesc",
             "Reads geographic features from GML (Geography Markup Language) files. " +
             "Supports Points, LineStrings, and Polygons with associated properties.");
     }

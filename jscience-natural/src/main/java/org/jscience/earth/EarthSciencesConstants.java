@@ -28,11 +28,6 @@ package org.jscience.earth;
  * <p>
  * Provides classifications for planetary layers, rock types, grain sizes, 
  * volcanic structures, climates, biomes, and cloud types.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class EarthSciencesConstants {
 
@@ -56,7 +51,10 @@ public final class EarthSciencesConstants {
 
     /**
      * Internal layers of terrestrial planets.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum PlanetaryLayer {
         INNER_CORE, OUTER_CORE, LOWER_MANTLE, UPPER_MANTLE, 
         ASTHENOSPHERE, LITHOSPHERE, CRUST, HYDROSPHERE, ATMOSPHERE, UNKNOWN

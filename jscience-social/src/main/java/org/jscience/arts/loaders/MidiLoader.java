@@ -34,7 +34,7 @@ import java.util.Objects;
 
 /**
  * Loader for musical compositions from binary MIDI files (.mid).
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

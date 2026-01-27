@@ -37,10 +37,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a formal organization such as a company, NGO, or government agency.
  * Extends {@link Group} to include organizational metadata like sector, industry, and headquarters.
  * Supports hierarchical structure through departments (sub-organizations).
- *
+ * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
  * @since 1.0
  */
 @Persistent

@@ -33,10 +33,9 @@ import org.jscience.economics.money.Money;
 /**
  * Represents a sports competition, such as a tournament, league, or championship.
  * Aggregates matches and manages prize distribution.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class Competition implements Serializable {

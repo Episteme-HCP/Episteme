@@ -27,13 +27,12 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.DiscreteDistribution;
 
 /**
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Poisson, S. D. (1837). <i>Recherches sur la probabilité des jugements en matière criminelle et en matière civile</i>. Bachelier.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -31,13 +31,12 @@ package org.jscience.physics.classical.matter.fluids;
  * DÃŽÂµ/Dt = C_ÃŽÂµ1 * ÃŽÂµ/k * P_k - C_ÃŽÂµ2 * ÃŽÂµÃ‚Â²/k + Ã¢Ë†â€¡Ã‚Â·((ÃŽÂ½ + ÃŽÂ½_t/ÃÆ’_ÃŽÂµ)Ã¢Ë†â€¡ÃŽÂµ)
  *
  * where ÃŽÂ½_t = C_ÃŽÂ¼ * kÃ‚Â²/ÃŽÂµ (turbulent viscosity)
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Zeigler, B. P., Praehofer, H., & Kim, T. G. (2000). <i>Theory of Modeling and Simulation</i>. Academic Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

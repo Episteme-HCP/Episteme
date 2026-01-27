@@ -44,10 +44,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a social interaction context where individuals assume specific roles.
  * Situations often occur at dedicated physical locations and involve common activities or conflicts.
  * Modernized to implement ComprehensiveIdentification and use RoleKind.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

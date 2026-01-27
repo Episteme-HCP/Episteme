@@ -142,7 +142,7 @@ public class MlflowClient {
             }
 
             // If not found, create new experiment
-            String createBody = "{\"name\": \"" + escapeJson(name) + "\"}";
+            String createBody = "{\"name\": \"" + escapeJSON(name) + "\"}";
             HttpRequest createRequest = HttpRequest.newBuilder()
                     .uri(URI.create(trackingUri + "/api/2.0/mlflow/experiments/create"))
                     .header("Content-Type", "application/json")
@@ -204,7 +204,7 @@ public class MlflowClient {
     public void logParam(String runId, String key, String value) {
         String json = String.format(
                 "{\"run_id\":\"%s\",\"key\":\"%s\",\"value\":\"%s\"}",
-                runId, key, escapeJson(value));
+                runId, key, escapeJSON(value));
         postAsync("/api/2.0/mlflow/runs/log-parameter", json);
         LOG.debug("MLflow: Logged param {}={} for run {}", key, value, runId);
     }
@@ -268,7 +268,7 @@ public class MlflowClient {
     /**
      * Escapes a string for JSON.
      */
-    private String escapeJson(String value) {
+    private String escapeJSON(String value) {
         return value.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")

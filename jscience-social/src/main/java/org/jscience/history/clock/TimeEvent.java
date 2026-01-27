@@ -33,10 +33,9 @@ import org.jscience.util.persistence.Relation;
 /**
  * An event indicating a change or occurrence in a time simulation or tracking system.
  * This is primarily used by the {@link TimeServer} to notify listeners of tick updates.
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent

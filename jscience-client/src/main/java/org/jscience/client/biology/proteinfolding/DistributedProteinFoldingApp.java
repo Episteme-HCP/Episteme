@@ -57,6 +57,9 @@ import java.util.concurrent.TimeUnit;
  * Distributed Protein Folding Simulation using the HP Model.
  * Visualizes 3D lattice protein folding with Monte Carlo methods.
  * Offloads computation to the JScience grid.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DistributedProteinFoldingApp extends Application implements org.jscience.ui.App {
 
@@ -75,7 +78,7 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.title", "🧬 JScience - Distributed Protein Folding (HP Model)"));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.title", "🧬 JScience - Distributed Protein Folding (HP Model)"));
 
         StackPane root = new StackPane();
         root.getStyleClass().add("viewer-root");
@@ -113,10 +116,10 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
         panel.getStyleClass().add("section-box");
         panel.setMaxWidth(300);
 
-        Label titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.header", "Protein Folding Simulation"));
+        Label titleLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.header", "Protein Folding Simulation"));
         titleLabel.getStyleClass().add("header-label-white");
 
-        Label seqLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.seq_label", "HP Sequence (H=Hydrophobic, P=Polar):"));
+        Label seqLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.seq_label", "HP Sequence (H=Hydrophobic, P=Polar):"));
         seqLabel.getStyleClass().add("label-white");
 
         sequenceInput = new TextArea("HPPHHHPHHPPHHHPPHPHPHHPH");
@@ -124,20 +127,20 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
         sequenceInput.setWrapText(true);
         sequenceInput.getStyleClass().add("info-text-area");
 
-        Button startBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.btn.start", "▶ Start Folding"));
+        Button startBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.btn.start", "▶ Start Folding"));
         startBtn.getStyleClass().add("accent-button-green");
         startBtn.setOnAction(e -> startFolding());
 
-        Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.btn.reset", "↻ Reset"));
+        Button resetBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.btn.reset", "↻ Reset"));
         resetBtn.getStyleClass().add("accent-button-red");
         resetBtn.setOnAction(e -> resetVisualization());
 
         HBox buttons = new HBox(10, startBtn, resetBtn);
 
-        energyLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.energy", "Energy: {0}", "--"));
+        energyLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.energy", "Energy: {0}", "--"));
         energyLabel.getStyleClass().add("label-green");
 
-        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.ready", "Ready"));
+        statusLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.ready", "Ready"));
         statusLabel.getStyleClass().add("label-muted");
 
         panel.getChildren().addAll(titleLabel, seqLabel, sequenceInput, buttons, energyLabel, statusLabel);
@@ -151,22 +154,22 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
                     .build();
             blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
             serverAvailable = true;
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.grid_connected", "✅ Grid Connected"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.grid_connected", "✅ Grid Connected"));
         } catch (Exception e) {
             serverAvailable = false;
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.local_mode", "⚠️ Local Mode"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.local_mode", "⚠️ Local Mode"));
         }
     }
 
     private void startFolding() {
         String sequence = sequenceInput.getText().trim().toUpperCase().replaceAll("[^HP]", "");
         if (sequence.isEmpty()) {
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.invalid_seq", "Invalid sequence"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.invalid_seq", "Invalid sequence"));
             return;
         }
 
         task = new ProteinFoldingTask(sequence, 5000, 1.0);
-        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.folding", "Folding..."));
+        statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.folding", "Folding..."));
 
         new Thread(() -> {
             if (serverAvailable) {
@@ -201,11 +204,11 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
                 task = (ProteinFoldingTask) deserialize(result.getSerializedData().toByteArray());
                 Platform.runLater(this::updateVisualization);
             } else {
-                Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.task_failed", "Task failed")));
+                Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.task_failed", "Task failed")));
             }
         } catch (Exception e) {
             Platform.runLater(() -> {
-                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.grid_error", "Grid error: {0}", e.getMessage()));
+                statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.grid_error", "Grid error: {0}", e.getMessage()));
                 runLocal();
             });
         }
@@ -216,7 +219,7 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
 
         List<Monomer> monomers = task.getResult();
         if (monomers == null || monomers.isEmpty()) {
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.no_result", "No result"));
+            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.no_result", "No result"));
             return;
         }
 
@@ -251,9 +254,9 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
             }
         }
 
-        energyLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.energy_format", "Energy: %.1f | Monomers: %d"),
+        energyLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.energy_format", "Energy: %.1f | Monomers: %d"),
                 calculateEnergy(monomers), monomers.size()));
-        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.complete", "✅ Folding Complete"));
+        statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.complete", "✅ Folding Complete"));
     }
 
     private Cylinder createBond(double x1, double y1, double z1, double x2, double y2, double z2) {
@@ -295,8 +298,8 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
     private void resetVisualization() {
         moleculeGroup.getChildren().clear();
         task = null;
-        energyLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.energy", "Energy: {0}", "--"));
-        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.status.ready", "Ready"));
+        energyLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.energy", "Energy: {0}", "--"));
+        statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.status.ready", "Ready"));
     }
 
     private void startAnimation() {
@@ -338,16 +341,16 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
+    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.name", "Distributed Protein Folding App"); }
+    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.name", "Distributed Protein Folding App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.desc", "Distributed protein folding simulation using the HP lattice model."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.desc", "Distributed protein folding simulation using the HP lattice model."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedproteinfoldingapp.longdesc", "Predict the 3D conformation of proteins based on hydrophobic-polar (HP) interactions. This application offloads Monte Carlo optimization tasks to the JScience cluster, enabling rapid folding analysis of long amino acid sequences in a 3D lattice."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.longdesc", "Predict the 3D conformation of proteins based on hydrophobic-polar (HP) interactions. This application offloads Monte Carlo optimization tasks to the JScience cluster, enabling rapid folding analysis of long amino acid sequences in a 3D lattice."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

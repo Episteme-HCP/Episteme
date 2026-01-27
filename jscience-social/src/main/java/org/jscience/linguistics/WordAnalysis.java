@@ -29,10 +29,10 @@ import java.util.Map;
 
 /**
  * Stores morphological and semantic analysis of a word.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public class WordAnalysis implements Serializable {
 

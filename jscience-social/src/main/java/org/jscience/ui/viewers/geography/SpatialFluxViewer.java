@@ -1,3 +1,26 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.ui.viewers.geography;
 
 import javafx.scene.canvas.Canvas;
@@ -10,7 +33,7 @@ import javafx.scene.paint.Stop;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.RealParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.geography.SpatialDataSet;
 import org.jscience.mathematics.numbers.real.Real;
 
@@ -116,22 +139,22 @@ public final class SpatialFluxViewer extends AbstractViewer {
     public List<Parameter<?>> getViewerParameters() {
         List<Parameter<?>> params = new ArrayList<>();
         params.add(new RealParameter(
-            I18n.getInstance().get("viewer.spatial.heat", "Heat Intensity"), 
+            I18N.getInstance().get("viewer.spatial.heat", "Heat Intensity"), 
             "Gamma correction for heatmap visualization", 0.1, 5.0, 0.1, 1.0, val -> {
                 this.heatIntensity = val; draw();
             }));
         params.add(new RealParameter(
-            I18n.getInstance().get("viewer.spatial.flow", "Flow Thickness"), 
+            I18N.getInstance().get("viewer.spatial.flow", "Flow Thickness"), 
             "Width of flow vector lines", 0.1, 10.0, 0.5, 1.0, val -> {
                 this.flowThickness = val; draw();
             }));
         return params;
     }
 
-    @Override public String getCategory() { return I18n.getInstance().get("category.shared", "General Purpose"); }
-    @Override public String getName() { return I18n.getInstance().get("viewer.spatial.name", "Spatial Flux Viewer"); }
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.spatial.desc", "Visualizes geographic data, hazards, and flows."); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.shared", "General Purpose"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.spatial.name", "Spatial Flux Viewer"); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.spatial.desc", "Visualizes geographic data, hazards, and flows."); }
     @Override public String getLongDescription() { 
-        return I18n.getInstance().get("viewer.spatial.longdesc", "Advanced multi-layer mapping tool for scientific datasets. Supports heatmaps for intensity and vector lines for directional fluxes."); 
+        return I18N.getInstance().get("viewer.spatial.longdesc", "Advanced multi-layer mapping tool for scientific datasets. Supports heatmaps for intensity and vector lines for directional fluxes."); 
     }
 }

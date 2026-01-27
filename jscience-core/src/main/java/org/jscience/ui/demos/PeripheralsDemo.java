@@ -28,7 +28,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Label;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.ui.MasterControlDiscovery;
 import java.util.List;
 
@@ -43,22 +43,22 @@ public class PeripheralsDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.engineering", "Engineering");
+        return I18N.getInstance().get("category.engineering", "Engineering");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.peripherals.name", "Peripherals Demo");
+        return I18N.getInstance().get("demo.peripherals.name", "Peripherals Demo");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.peripherals.desc", "Explore all scientific instruments in one place");
+        return I18N.getInstance().get("demo.peripherals.desc", "Explore all scientific instruments in one place");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.peripherals.longdesc", "Interact with various simulated peripherals and sensors including Oscilloscopes, Vital Monitors, and Spectrographs.");
+        return I18N.getInstance().get("demo.peripherals.longdesc", "Interact with various simulated peripherals and sensors including Oscilloscopes, Vital Monitors, and Spectrographs.");
     }
 
     @Override

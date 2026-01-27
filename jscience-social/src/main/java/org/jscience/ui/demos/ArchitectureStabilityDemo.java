@@ -39,7 +39,7 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Mass;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,17 +53,17 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() { 
-        return I18n.getInstance().get("category.architecture", "Architecture"); 
+        return I18N.getInstance().get("category.architecture", "Architecture"); 
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.architecturestabilitydemo.name", "Structural Stability");
+        return I18N.getInstance().get("demo.architecturestabilitydemo.name", "Structural Stability");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.architecturestabilitydemo.desc", "Structural stability analysis with center of gravity.");
+        return I18N.getInstance().get("demo.architecturestabilitydemo.desc", "Structural stability analysis with center of gravity.");
     }
 
     private Canvas canvas;
@@ -94,7 +94,7 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     protected VBox createControlPanel() {
-        I18n i18n = I18n.getInstance();
+        I18N i18n = I18N.getInstance();
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(20));
         panel.setPrefWidth(280);
@@ -134,7 +134,7 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     private void draw() {
         if (gc == null) return;
-        I18n i18n = I18n.getInstance();
+        I18N i18n = I18N.getInstance();
         gc.clearRect(0, 0, 600, 600);
         gc.setFill(Color.LIGHTGREEN);
         gc.fillRect(0, 550, 600, 50);
@@ -189,6 +189,6 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.architecturestabilitydemo.longdesc", "Interactive simulation of block stacking and structural stability analysis using center of mass calculations.");
+        return I18N.getInstance().get("demo.architecturestabilitydemo.longdesc", "Interactive simulation of block stacking and structural stability analysis using center of mass calculations.");
     }
 }

@@ -36,6 +36,9 @@ import java.util.function.Consumer;
  * 
  * Workers must send heartbeats periodically. If no heartbeat is received
  * within the timeout period, the worker is marked as dead and removed.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class HeartbeatMonitor {
 

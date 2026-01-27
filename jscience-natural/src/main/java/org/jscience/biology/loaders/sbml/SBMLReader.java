@@ -68,11 +68,10 @@ import java.util.logging.Logger;
  * RealDoubleMatrix stoichiometry = model.getStoichiometryMatrix();
  * }</pre>
  * </p>
- *
+ * * @see <a href="http://sbml.org/">SBML.org</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="http://sbml.org/">SBML.org</a>
  */
 public class SBMLReader extends AbstractResourceReader<SBMLModel> {
 

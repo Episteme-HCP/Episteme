@@ -26,7 +26,7 @@ package org.jscience.ui.viewers.mathematics.discrete.backends;
 /**
  * Enumeration of available network/graph rendering backends.
  * Similar to {@link org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend}
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

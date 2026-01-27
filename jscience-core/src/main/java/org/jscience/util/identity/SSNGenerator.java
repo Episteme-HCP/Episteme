@@ -36,7 +36,7 @@ import java.security.SecureRandom;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SSNGenerator implements IDGenerator {
+public class SSNGenerator implements IdGenerator {
 
     private final SecureRandom random = new SecureRandom();
 

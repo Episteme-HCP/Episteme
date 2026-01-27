@@ -47,9 +47,10 @@ import java.util.Random;
  *     <i>Phys. Rev. X</i>, 7, 031014. 
  *     <a href="https://doi.org/10.1103/PhysRevX.7.031014">DOI: 10.1103/PhysRevX.7.031014</a></li>
  * </ul>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class StochasticMTJ {
 

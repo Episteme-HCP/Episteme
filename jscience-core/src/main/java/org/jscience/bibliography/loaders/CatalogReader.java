@@ -30,10 +30,10 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface for loading bibliographical catalogs of books or articles.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.0
  */
 public interface CatalogReader extends ResourceReader<List<BibliographicalNotice>> {
 

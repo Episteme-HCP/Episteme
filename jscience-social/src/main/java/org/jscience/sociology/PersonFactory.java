@@ -24,7 +24,7 @@
 package org.jscience.sociology;
 
 import java.time.LocalDate;
-import org.jscience.util.identity.IDGenerator;
+import org.jscience.util.identity.IdGenerator;
 import org.jscience.util.identity.SSNGenerator;
 import org.jscience.util.identity.UUIDGenerator;
 import org.jscience.util.identity.Identification;
@@ -33,17 +33,16 @@ import org.jscience.biology.BiologicalSex;
 /**
  * Factory for creating {@link Person} instances with auto-generated unique identifiers.
  * <p>
- * Provides support for different ID generation strategies (UUID, SSN) via pluggable {@link IDGenerator}.
+ * Provides support for different ID generation strategies (UUID, SSN) via pluggable {@link IdGenerator}.
  * </p>
- *
+ * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 public class PersonFactory {
 
-    private final IDGenerator idGenerator;
+    private final IdGenerator idGenerator;
 
     /**
      * Creates a factory with the default UUID generator.
@@ -57,7 +56,7 @@ public class PersonFactory {
      *
      * @param idGenerator the generator to use for person IDs
      */
-    public PersonFactory(IDGenerator idGenerator) {
+    public PersonFactory(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
     }
 

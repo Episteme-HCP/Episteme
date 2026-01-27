@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics;
 
 import org.jscience.util.Named;
@@ -28,10 +29,10 @@ import org.jscience.util.Named;
  * Defines various manufacturing and industrial processes.
  * Used to categorize activities in the production of goods.
  * Based on the taxonomy of manufacturing processes.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @since 1.0
  */
 public class Process implements Named {
 

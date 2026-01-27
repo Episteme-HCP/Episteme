@@ -65,12 +65,12 @@ public class DrugBankReader implements org.jscience.io.ResourceReader<Medication
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.medicine", "Medicine");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.medicine", "Medicine");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.drugbankreader.desc", "DrugBank Medication Data Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.drugbankreader.desc", "DrugBank Medication Data Reader.");
     }
 
     @Override
@@ -178,12 +178,12 @@ public class DrugBankReader implements org.jscience.io.ResourceReader<Medication
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.drugbankreader.name", "DrugBank Reader");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.drugbankreader.name", "DrugBank Reader");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.drugbankreader.longdesc", "Fetches medication data including details, dosage, and active ingredients from DrugBank.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.drugbankreader.longdesc", "Fetches medication data including details, dosage, and active ingredients from DrugBank.");
     }
 
     @Override

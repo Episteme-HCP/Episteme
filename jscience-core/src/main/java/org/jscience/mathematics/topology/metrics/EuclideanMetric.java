@@ -33,13 +33,12 @@ import org.jscience.mathematics.linearalgebra.Vector;
  * <p>
  * d(x,y) = Ã¢Ë†Å¡(ÃŽÂ£(xi - yi)Ã‚Â²)
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Euclid. (c. 300 BC). <i>Elements</i>.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

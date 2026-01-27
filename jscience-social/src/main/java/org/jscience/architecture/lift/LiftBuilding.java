@@ -37,10 +37,9 @@ import java.util.List;
  * to minimize average waiting time.</p>
  *
  * <p>Reference: Barney, G. C. (2003). Elevator Traffic Handbook: Theory and Practice.</p>
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class LiftBuilding implements Serializable {

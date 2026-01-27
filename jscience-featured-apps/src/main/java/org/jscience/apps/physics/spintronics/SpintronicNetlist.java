@@ -53,7 +53,7 @@ import java.util.*;
  * .TRAN 0 10n 1p
  * .END
  * </pre>
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

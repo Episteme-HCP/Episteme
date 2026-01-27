@@ -34,10 +34,9 @@ import org.jscience.util.Named;
  * Extraversion, Agreeableness, and Neuroticism). 
  * 
  * <p>Trait values are normalized on a continuous scale from 0.0 to 1.0.</p>
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 public class Trait implements Named, Serializable {

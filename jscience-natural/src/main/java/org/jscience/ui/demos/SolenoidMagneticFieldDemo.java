@@ -35,6 +35,9 @@ import org.jscience.technical.backend.algorithms.MaxwellSource;
 
 /**
  * Demo for a Magnetic solenoid or rod using the generic viewer.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SolenoidMagneticFieldDemo extends AbstractDemo {
 

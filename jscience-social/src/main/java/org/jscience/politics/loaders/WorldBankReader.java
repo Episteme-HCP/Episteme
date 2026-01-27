@@ -49,6 +49,11 @@ import java.util.concurrent.CompletableFuture;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
+/**
+ * Reader for World Bank Data.
+ *
+ * @see <a href="https://data.worldbank.org/">World Bank Open Data</a>
+ */
 public class WorldBankReader extends AbstractResourceReader<Country> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorldBankReader.class);
@@ -102,17 +107,17 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.politics", "Politics");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.politics", "Politics");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.desc", "World Bank Data (Indicators & Countries).");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.worldbank.desc", "World Bank Data (Indicators & Countries).");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.longdesc", "Fetcher for World Bank Open Data, providing access to global development data indicators and country information.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.worldbank.longdesc", "Fetcher for World Bank Open Data, providing access to global development data indicators and country information.");
     }
 
     @Override
@@ -355,7 +360,7 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
         /*
          * double gdpValue = node.path("gdp").asDouble(0.0);
          * if (gdpValue > 0) {
-         * // country.setGdp(new Money(Real.of(gdpValue), "USD"));
+         * // country.setGDP(new Money(Real.of(gdpValue), "USD"));
          * }
          */
 
@@ -488,5 +493,5 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
         LOG.debug("WorldBankReader: manual cache clear requested (delegated to system cache)");
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.name", "World Bank Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.worldbank.name", "World Bank Reader"); }
 }

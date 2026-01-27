@@ -28,6 +28,9 @@ import java.util.stream.IntStream;
 
 /**
  * Multicore implementation of Lattice Boltzmann Provider using Java Streams.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MulticoreLatticeBoltzmannProvider implements LatticeBoltzmannProvider {
 

@@ -25,6 +25,9 @@ package org.jscience.physics.classical.waves;
 
 /**
  * Interface for spectrum analysis providers.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface SpectrumAnalysisProvider {
     /**

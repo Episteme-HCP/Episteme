@@ -33,7 +33,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * Viewer for Arts & Color Theory.
  * Encapsulates color harmony logic.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -104,19 +104,19 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
         harmonies.setAlignment(Pos.CENTER);
 
         harmonies.getChildren()
-                .add(new Label(I18n.getInstance().get("viewer.artscolortheoryviewer.label.comp", "Complementary (Contrast)")));
+                .add(new Label(I18N.getInstance().get("viewer.artscolortheoryviewer.label.comp", "Complementary (Contrast)")));
         harmonies.getChildren().addAll(compBox, compCode);
 
         HBox ana = new HBox(10, new VBox(5, ana1Box, ana1Code), new VBox(5, ana2Box, ana2Code));
         ana.setAlignment(Pos.CENTER);
         harmonies.getChildren()
-                .add(new Label(I18n.getInstance().get("viewer.artscolortheoryviewer.label.analog", "Analogous (Harmony)")));
+                .add(new Label(I18N.getInstance().get("viewer.artscolortheoryviewer.label.analog", "Analogous (Harmony)")));
         harmonies.getChildren().add(ana);
 
         HBox tri = new HBox(10, new VBox(5, tri1Box, tri1Code), new VBox(5, tri2Box, tri2Code));
         tri.setAlignment(Pos.CENTER);
         harmonies.getChildren()
-                .add(new Label(I18n.getInstance().get("viewer.artscolortheoryviewer.label.triad", "Triadic (Vibrant)")));
+                .add(new Label(I18N.getInstance().get("viewer.artscolortheoryviewer.label.triad", "Triadic (Vibrant)")));
         harmonies.getChildren().add(tri);
 
         VBox main = new VBox(20, colorBox, mainCode);
@@ -137,17 +137,17 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.arts", "Arts");
+        return I18N.getInstance().get("category.arts", "Arts");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("viewer.artscolortheory.name", "Color Theory");
+        return I18N.getInstance().get("viewer.artscolortheory.name", "Color Theory");
     }
     
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("viewer.artscolortheory.desc", "Explore color harmonies and palettes.");
+        return I18N.getInstance().get("viewer.artscolortheory.desc", "Explore color harmonies and palettes.");
     }
 
     @Override
@@ -162,7 +162,7 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
     @Override
     public List<Parameter<?>> getViewerParameters() {
         List<Parameter<?>> params = new ArrayList<>();
-        params.add(new NumericParameter("artscolortheory.hue", I18n.getInstance().get("artscolortheory.hue", "Hue"), 0, 360, 1, hue, v -> {
+        params.add(new NumericParameter("artscolortheory.hue", I18N.getInstance().get("artscolortheory.hue", "Hue"), 0, 360, 1, hue, v -> {
             hue = v;
             if (update != null) update.run();
         }));
@@ -172,7 +172,7 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("viewer.artscolortheory.longdesc", "Interactive color palette explorer based on formal color theory. Calculate and visualize complementary, analogous, and triadic color harmonies in real-time. includes HEX code generation and saturation/brightness adjustments.");
+        return I18N.getInstance().get("viewer.artscolortheory.longdesc", "Interactive color palette explorer based on formal color theory. Calculate and visualize complementary, analogous, and triadic color harmonies in real-time. includes HEX code generation and saturation/brightness adjustments.");
     }
 }
 

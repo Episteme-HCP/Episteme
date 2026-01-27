@@ -44,11 +44,10 @@ import java.io.*;
  *   <li>Inputs and stimuli</li>
  * </ul>
  * </p>
- *
+ * * @see <a href="https://neuroml.org/">NeuroML.org</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://neuroml.org/">NeuroML.org</a>
  */
 public class NeuroMLReader extends AbstractResourceReader<NeuroMLDocument> {
 

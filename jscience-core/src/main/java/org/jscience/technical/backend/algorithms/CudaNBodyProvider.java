@@ -35,19 +35,17 @@ import java.util.logging.Logger;
  * Provides CUDA-based N-body computation for NVIDIA GPUs. For AMD/Intel GPUs,
  * use {@link OpenCLNBodyProvider} instead.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Aarseth, S. J. (2003). <i>Gravitational N-Body Simulations</i>. Cambridge University Press.
  * </p>
- *
+ * * @see OpenCLNBodyProvider
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see OpenCLNBodyProvider
  */
-public class CUDANBodyProvider implements NBodyProvider {
-    private static final Logger LOGGER = Logger.getLogger(CUDANBodyProvider.class.getName());
+public class CudaNBodyProvider implements NBodyProvider {
+    private static final Logger LOGGER = Logger.getLogger(CudaNBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
     private final boolean gpuAvailable;
@@ -55,7 +53,7 @@ public class CUDANBodyProvider implements NBodyProvider {
     /**
      * Creates a new CUDA N-Body provider.
      */
-    public CUDANBodyProvider() {
+    public CudaNBodyProvider() {
         CUDABackend backend = null;
         boolean available = false;
         try {

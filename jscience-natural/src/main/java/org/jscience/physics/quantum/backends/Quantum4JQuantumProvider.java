@@ -36,14 +36,14 @@ import java.util.Map;
 
 /**
  * Quantum4J backend implementation for JScience using io.quantum4j libraries.
- * 
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Quantum4JQuantumProvider implements QuantumBackend {
 

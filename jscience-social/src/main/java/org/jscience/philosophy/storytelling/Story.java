@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.philosophy.storytelling;
 
 import org.jscience.history.Event;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.1
+ * @since 1.0
  */
 public class Story implements Graph<Event>, ComprehensiveIdentification {
 

@@ -28,6 +28,9 @@ import org.jscience.technical.backend.BackendDiscovery;
 
 /**
  * BackendProvider for JScience Core Math engine.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JScienceMathBackendProvider implements BackendProvider {
     @Override

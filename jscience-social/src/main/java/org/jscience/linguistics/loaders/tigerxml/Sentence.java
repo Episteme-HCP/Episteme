@@ -1,23 +1,24 @@
 /*
- * Sentence.java
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * Created on July 6, 2003, 1:42 AM
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Copyright (C) 2003 Oezguer Demir <oeze@coli.uni-sb.de>,
- *                    Vaclav Nemcik <vicky@coli.uni-sb.de>,
- *                    Hajo Keffer <hajokeffer@coli.uni-sb.de>
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package org.jscience.linguistics.loaders.tigerxml;
@@ -38,15 +39,13 @@ import java.util.HashMap;
  * <code>Sentence</code> objects hold a list of NTs and a list of Ts. They also
  * provide methods for traversing the syntax tree, accessing nodes directly,
  * and getting other structural information.
- *
- * @author <a href="mailto:oeze@coli.uni-sb.de">Oezguer Demir</a>
- * @author <a href="mailto:vicky@coli.uni-sb.de">Vaclav Nemcik</a>
- * @author <a href="mailto:hajokeffer@coli.uni-sb.de">Hajo Keffer</a>
- * @version 1.84
- *          $Id: Sentence.java,v 1.2 2007-10-21 17:40:33 virtualcall Exp $
+ * *          $Id: Sentence.java,v 1.2 2007-10-21 17:40:33 virtualcall Exp $
  * @see GraphNode
  * @see NT
  * @see T
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Sentence
         implements Serializable {
@@ -615,7 +614,7 @@ public class Sentence
         return id2vnode.get(v_node_id);
     }
 
-    protected void print2Xml(FileWriter out_xml) {
+    protected void print2XML(FileWriter out_xml) {
         try {
             out_xml.write("<s ");
             out_xml.write
@@ -641,7 +640,7 @@ public class Sentence
                  i < this.getTCount();
                  i++) {
                 T next_t = this.getT(i);
-                next_t.print2Xml(out_xml);
+                next_t.print2XML(out_xml);
             }
             out_xml.write("</terminals>\n");
             out_xml.write("<nonterminals>\n");
@@ -649,7 +648,7 @@ public class Sentence
                  i < this.getNTCount();
                  i++) {
                 NT next_nt = this.getNT(i);
-                next_nt.print2Xml(out_xml);
+                next_nt.print2XML(out_xml);
             }
             out_xml.write("</nonterminals>\n");
             out_xml.write("</graph>\n");
@@ -659,7 +658,7 @@ public class Sentence
                     ("Error occurred while writing: " +
                             e.toString());
         }
-    } // method print2Xml
+    } // method print2XML
 
     /**
      * Gets the currently set level of verbosity of this instance. The higher

@@ -32,7 +32,7 @@ import org.jscience.ui.Parameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.StringParameter;
 import org.jscience.ui.AbstractViewer;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 import org.jscience.biology.Taxon;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.biology.io.PhylogeneticTreeReader;
@@ -68,22 +68,22 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         loadData();
     }
     
-    @Override public String getName() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.name", "Phylogenetic Tree Viewer"); }
-    @Override public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
+    @Override public String getName() { return I18N.getInstance().get("viewer.phylogenetictreeviewer.name", "Phylogenetic Tree Viewer"); }
+    @Override public String getCategory() { return I18N.getInstance().get("category.biology", "Biology"); }
 
     private void setupParameters() {
-        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.radial", I18n.getInstance().get("viewer.phylogenetictreeviewer.radial", "Radial Mode"), radialMode, v -> {
+        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.radial", I18N.getInstance().get("viewer.phylogenetictreeviewer.radial", "Radial Mode"), radialMode, v -> {
             radialMode = v;
             updateLayoutAndDraw(canvas);
         }));
 
-        parameters.add(new StringParameter("viewer.phylogenetictreeviewer.ncbi.query", I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.query", "NCBI Query"), ncbiQuery, v -> ncbiQuery = v));
+        parameters.add(new StringParameter("viewer.phylogenetictreeviewer.ncbi.query", I18N.getInstance().get("viewer.phylogenetictreeviewer.ncbi.query", "NCBI Query"), ncbiQuery, v -> ncbiQuery = v));
         
-        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.ncbi.search", I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.search", "Search NCBI"), false, v -> {
+        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.ncbi.search", I18N.getInstance().get("viewer.phylogenetictreeviewer.ncbi.search", "Search NCBI"), false, v -> {
             if (v) performNCBISearch();
         }));
         
-        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.reset", I18n.getInstance().get("viewer.phylogenetictreeviewer.reset", "Reset Tree"), false, v -> {
+        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.reset", I18N.getInstance().get("viewer.phylogenetictreeviewer.reset", "Reset Tree"), false, v -> {
             if (v) {
                 loadData();
                 updateLayoutAndDraw(canvas);
@@ -99,7 +99,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         widthProperty().addListener(e -> { canvas.setWidth(getWidth() - 250); updateLayoutAndDraw(canvas); });
         heightProperty().addListener(e -> { canvas.setHeight(getHeight()); updateLayoutAndDraw(canvas); });
 
-        infoPanel = new Label(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node."));
+        infoPanel = new Label(I18N.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node."));
         infoPanel.setWrapText(true);
         infoPanel.setPrefWidth(220);
         
@@ -233,7 +233,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         }
     }
 
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.desc", "Phylogenetic tree browser."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.longdesc", "Tree of Life viewer."); }
+    @Override public String getDescription() { return I18N.getInstance().get("viewer.phylogenetictreeviewer.desc", "Phylogenetic tree browser."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.phylogenetictreeviewer.longdesc", "Tree of Life viewer."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

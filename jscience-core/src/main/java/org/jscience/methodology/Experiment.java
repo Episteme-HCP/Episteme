@@ -35,6 +35,9 @@ import java.util.concurrent.CompletableFuture;
  * 
  * @param <I> The input configuration type
  * @param <R> The result type
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public interface Experiment<I, R> extends ComprehensiveIdentification {
     

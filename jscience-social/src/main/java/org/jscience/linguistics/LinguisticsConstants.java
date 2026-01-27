@@ -28,11 +28,6 @@ package org.jscience.linguistics;
  * <p>
  * Provides classifications for phonetics, language families, 
  * writing systems, pragmatics, and speech acts.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
  */
 public final class LinguisticsConstants {
 
@@ -40,7 +35,10 @@ public final class LinguisticsConstants {
 
     /**
      * Place of articulation.
-     */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
     public enum ArticulationPlace {
         BILABIAL, LABIODENTAL, LINGUOLABIAL, DENTAL, ALVEOLAR, 
         POSTALVEOLAR, PALATAL, RETROFLEX, VELAR, UVULAR, 

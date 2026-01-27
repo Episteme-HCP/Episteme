@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jscience.earth.seismology.Earthquake;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.Configuration;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.I18N;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Integrated into ResourceReader system)
+ * @see <a href="https://earthquake.usgs.gov/earthquakes/feed/">USGS Earthquake Hazards Program</a>
  */
 public class USGSEarthquakesReader extends AbstractResourceReader<List<Earthquake>> {
 
@@ -64,22 +64,22 @@ public class USGSEarthquakesReader extends AbstractResourceReader<List<Earthquak
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("reader.usgsearthquakes.category", "Earth");
+        return I18N.getInstance().get("reader.usgsearthquakes.category", "Earth");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.usgsearthquakes.name", "USGS Earthquakes Reader");
+        return I18N.getInstance().get("reader.usgsearthquakes.name", "USGS Earthquakes Reader");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.usgsearthquakes.desc", "Reads seismic events from the US Geological Survey API.");
+        return I18N.getInstance().get("reader.usgsearthquakes.desc", "Reads seismic events from the US Geological Survey API.");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("reader.usgsearthquakes.longdesc", 
+        return I18N.getInstance().get("reader.usgsearthquakes.longdesc", 
                 "Provides access to USGS Global Earthquake feeds, including significant monthly summaries and near real-time data.");
     }
 
@@ -108,11 +108,11 @@ public class USGSEarthquakesReader extends AbstractResourceReader<List<Earthquak
     @Override
     protected List<Earthquake> loadFromSource(String feedName) throws Exception {
         String urlStr = API_BASE + "/" + feedName + ".geojson";
-        String rawJson = fetchUrl(urlStr);
-        return parseGeoJson(rawJson);
+        String rawJSON = fetchUrl(urlStr);
+        return parseGeoJSON(rawJSON);
     }
 
-    private List<Earthquake> parseGeoJson(String json) throws Exception {
+    private List<Earthquake> parseGeoJSON(String json) throws Exception {
         List<Earthquake> earthquakes = new ArrayList<>();
         JsonNode root = mapper.readTree(json);
         JsonNode features = root.path("features");

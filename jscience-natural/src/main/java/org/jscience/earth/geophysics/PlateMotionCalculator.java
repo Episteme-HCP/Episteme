@@ -27,7 +27,7 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 
 /**
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0

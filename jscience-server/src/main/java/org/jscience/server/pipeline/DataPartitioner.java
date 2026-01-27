@@ -39,6 +39,9 @@ import java.util.stream.IntStream;
  * - Hash-based
  * - Range-based
  * - Custom partitioning
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DataPartitioner<T> {
 

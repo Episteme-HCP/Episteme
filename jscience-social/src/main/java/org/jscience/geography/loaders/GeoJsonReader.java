@@ -45,27 +45,27 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
+public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
 
     private final ObjectMapper mapper;
 
-    public GeoJsonReader() {
+    public GeoJSONReader() {
         this.mapper = new ObjectMapper();
     }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.desc", "GeoJSON Geographic Data Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.geojson.desc", "GeoJSON Geographic Data Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.longdesc", "Reads geographic features and regions from GeoJSON format files.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.geojson.longdesc", "Reads geographic features and regions from GeoJSON format files.");
     }
 
     @Override
@@ -282,5 +282,5 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
         }
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.name", "GeoJSON Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.geojson.name", "GeoJSON Reader"); }
 }

@@ -29,6 +29,9 @@ import java.util.Objects;
 
 /**
  * JPA Entity for User Management.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 @Entity
 @Table(name = "users")

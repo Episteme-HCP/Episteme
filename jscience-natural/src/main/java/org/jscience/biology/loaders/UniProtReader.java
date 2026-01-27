@@ -60,17 +60,17 @@ public class UniProtReader extends AbstractResourceReader<Map<String, String>> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.uniprotreader.desc", "UniProt Protein Database Reader.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.uniprotreader.desc", "UniProt Protein Database Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.uniprotreader.longdesc", "Retrieves protein data from UniProt Knowledgebase (UniProtKB) via REST API.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.uniprotreader.longdesc", "Retrieves protein data from UniProt Knowledgebase (UniProtKB) via REST API.");
     }
 
     @Override
@@ -180,7 +180,7 @@ public class UniProtReader extends AbstractResourceReader<Map<String, String>> {
         return "https://www.uniprot.org/uniprotkb/" + accession;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.uniprotreader.name", "UniProt Reader"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("reader.uniprotreader.name", "UniProt Reader"); }
 }
 
 

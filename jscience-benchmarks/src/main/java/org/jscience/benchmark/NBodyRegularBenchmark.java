@@ -33,13 +33,12 @@ package org.jscience.benchmark;
  * Tests performance of direct N-body gravitational simulation
  * with O(NÃ‚Â²) force calculations.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * <p>
+ * * <p>
  * <b>Reference:</b><br>
  * Aarseth, S. J. (2003). <i>Gravitational N-Body Simulations</i>. Cambridge University Press.
  * </p>
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -231,7 +230,7 @@ public class NBodyRegularBenchmark {
      * Main benchmark runner.
      */
     public static void main(String[] args) {
-        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.regular.title"));
+        System.out.println(org.jscience.ui.i18n.I18N.getInstance().get("benchmark.nbody.regular.title"));
         System.out.println("==========================================");
 
         int[] bodyCounts = { 100, 500, 1000, 2000 };
@@ -246,7 +245,7 @@ public class NBodyRegularBenchmark {
             double stepsPerSec = steps * 1000.0 / time;
             double pairwiseOps = (long) n * (n - 1) / 2 * steps;
 
-            System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.regular.result", n, time,
+            System.out.println(org.jscience.ui.i18n.I18N.getInstance().get("benchmark.nbody.regular.result", n, time,
                     steps, stepsPerSec, pairwiseOps));
         }
     }

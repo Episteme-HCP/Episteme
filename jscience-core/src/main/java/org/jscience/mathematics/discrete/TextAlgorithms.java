@@ -39,6 +39,9 @@ import java.util.List;
  * Communications of the ACM, 35(10), 83-91. (Shift-And algorithm)</li>
  * </ul>
  * </p>
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class TextAlgorithms {
 

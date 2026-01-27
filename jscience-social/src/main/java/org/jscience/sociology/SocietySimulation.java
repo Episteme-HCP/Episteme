@@ -47,8 +47,9 @@ import org.jscience.politics.VotingMethod;
  * where persons interact, exchange opinions, and evolve socially.
  * Modernized to use Real for internal continuous values and provide double for output.
  *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public class SocietySimulation implements Serializable {
 

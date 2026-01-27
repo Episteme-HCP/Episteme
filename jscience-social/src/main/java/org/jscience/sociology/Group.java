@@ -41,10 +41,9 @@ import org.jscience.util.persistence.Relation;
  * Represents a formal or informal social group of individuals.
  * Provides mechanisms for managing membership, roles, and leadership hierarchies.
  * Modernized to implement ComprehensiveIdentification and use GroupKind.
- *
+ * * @version 2.0
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
  * @since 1.0
  */
 @Persistent

@@ -37,6 +37,9 @@ import java.util.Map;
 
 /**
  * JavaFX 3D implementation of Spintronic3DViewer.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JavaFXSpintronic3DViewer implements Spintronic3DViewer {
 

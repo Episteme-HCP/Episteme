@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.law.loaders;
 
 import org.jscience.io.ResourceWriter;
@@ -27,10 +28,10 @@ import org.jscience.law.Statute;
 
 /**
  * Common interface for components that save or export legal documents.
- * 
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @since 1.0
  */
 public interface LegalDocumentWriter extends ResourceWriter<Statute> {
     /**

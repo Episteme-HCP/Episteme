@@ -31,6 +31,9 @@ import java.util.List;
 
 /**
  * Writer for FASTA files.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class FASTAWriter extends AbstractResourceWriter<List<FASTAReader.Sequence>> {
 
@@ -64,25 +67,25 @@ public class FASTAWriter extends AbstractResourceWriter<List<FASTAReader.Sequenc
         }
     }
 
-    // --- Mandatory Abstract Methods (I18n) ---
+    // --- Mandatory Abstract Methods (I18N) ---
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fastawriter.name", "FASTA Writer");
+        return org.jscience.ui.i18n.I18N.getInstance().get("writer.fastawriter.name", "FASTA Writer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fastawriter.desc", "Writes FASTA format files.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("writer.fastawriter.desc", "Writes FASTA format files.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fastawriter.longdesc", "Writes biological sequences to FASTA format files.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("writer.fastawriter.longdesc", "Writes biological sequences to FASTA format files.");
     }
 }

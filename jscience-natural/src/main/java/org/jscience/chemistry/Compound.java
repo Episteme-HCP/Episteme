@@ -116,7 +116,7 @@ public class Compound implements ComprehensiveIdentification {
         return iupacName;
     }
 
-    public String getIupacName() {
+    public String getIUPACName() {
         return iupacName;
     }
 
