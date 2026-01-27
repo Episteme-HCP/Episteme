@@ -48,6 +48,29 @@ package org.jscience;
 
 import org.jscience.mathematics.context.ComputeMode;
 import org.jscience.mathematics.context.MathContext;
+import org.jscience.io.UserPreferences;
+import org.jscience.io.ResourceIO;
+import org.jscience.io.ResourceReader;
+import org.jscience.io.ResourceWriter;
+import org.jscience.technical.backend.BackendDiscovery;
+import org.jscience.technical.backend.BackendManager;
+import org.jscience.technical.backend.BackendProvider;
+import org.jscience.technical.backend.cuda.CUDABackend;
+import org.jscience.technical.backend.opencl.OpenCLBackend;
+import org.jscience.ui.MasterControlDiscovery;
+import org.jscience.ui.JScienceMasterControl;
+import org.jscience.ui.i18n.I18N;
+import org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
+
+import java.io.InputStream;
+import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
  * The central entry point and configuration dashboard for the JScience library.
