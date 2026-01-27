@@ -23,6 +23,7 @@
 
 package org.jscience.chemistry;
 
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,13 +44,6 @@ public class ReactionBalancer {
     }
 
     /**
-     * Balances a chemical reaction.
-     * 
-     * @param reaction The unbalanced reaction.
-     * @return A new Balanced ChemicalReaction, or throws exception if
-     *         unbalanceable.
-     */
-    /**
      * Balances a chemical equation string.
      * Example: "H2 + O2 = H2O" -> "2H2 + O2 -> 2H2O"
      * 
@@ -57,7 +51,7 @@ public class ReactionBalancer {
      * @return A balanced ChemicalReaction object.
      */
     public static ChemicalReaction balance(String equation) {
-        String[] sides = equation.split("->|=|Ã¢â€ â€™");
+        String[] sides = equation.split("->|=|→");
         if (sides.length != 2) {
             throw new IllegalArgumentException("Invalid equation format: " + equation);
         }
@@ -94,28 +88,27 @@ public class ReactionBalancer {
             }
         }
 
-        StringBuilder balancedEq = new StringBuilder();
-        boolean first = true;
-        for (Map.Entry<String, Integer> e : reactants.entrySet()) {
-            if (!first)
-                balancedEq.append(" + ");
-            if (e.getValue() > 1)
-                balancedEq.append(e.getValue());
-            balancedEq.append(e.getKey());
-            first = false;
-        }
-        balancedEq.append(" -> ");
-        first = true;
-        for (Map.Entry<String, Integer> e : products.entrySet()) {
-            if (!first)
-                balancedEq.append(" + ");
-            if (e.getValue() > 1)
-                balancedEq.append(e.getValue());
-            balancedEq.append(e.getKey());
-            first = false;
-        }
+        return new ChemicalReaction(reactants, products, formatBalanced(reactants, products));
+    }
 
-        return new ChemicalReaction(reactants, products, balancedEq.toString());
+    private static String formatBalanced(Map<String, Integer> reactants, Map<String, Integer> products) {
+        StringBuilder sb = new StringBuilder();
+        appendCompoundMap(sb, reactants);
+        sb.append(" -> ");
+        appendCompoundMap(sb, products);
+        return sb.toString();
+    }
+
+    private static void appendCompoundMap(StringBuilder sb, Map<String, Integer> map) {
+        boolean first = true;
+        for (Map.Entry<String, Integer> e : map.entrySet()) {
+            if (!first)
+                sb.append(" + ");
+            if (e.getValue() > 1)
+                sb.append(e.getValue());
+            sb.append(e.getKey());
+            first = false;
+        }
     }
 
     private static String parseSpecies(String term) {
@@ -155,24 +148,23 @@ public class ReactionBalancer {
         // Entry M[i][j] = count of element i in compound j
         // If compound j is product, count is negative (to sum to 0)
 
-        double[][] matrix = new double[rows][cols];
+        Real[][] matrix = new Real[rows][cols];
 
         for (int r = 0; r < rows; r++) {
             String el = elementList.get(r);
             for (int c = 0; c < cols; c++) {
                 int count = compositions.get(c).getOrDefault(el, 0);
                 if (isProduct.get(c)) {
-                    matrix[r][c] = -count;
+                    matrix[r][c] = Real.of(-count);
                 } else {
-                    matrix[r][c] = count;
+                    matrix[r][c] = Real.of(count);
                 }
             }
         }
 
         // solve M * x = 0
         // We use Gaussian elimination
-
-        double[] solution = solveHomogeneous(matrix);
+        Real[] solution = solveHomogeneous(matrix);
 
         // Convert to integers
         int[] integerSolution = convertToIntegers(solution);
@@ -254,7 +246,7 @@ public class ReactionBalancer {
         }
     }
 
-    private static double[] solveHomogeneous(double[][] matrix) {
+    private static Real[] solveHomogeneous(Real[][] matrix) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
@@ -263,36 +255,36 @@ public class ReactionBalancer {
         for (int pivotCol = 0; pivotCol < cols - 1 && pivotRow < rows; pivotCol++) {
             // Find pivot
             int maxRow = pivotRow;
-            double maxVal = Math.abs(matrix[maxRow][pivotCol]);
+            double maxVal = Math.abs(matrix[maxRow][pivotCol].doubleValue());
 
             for (int r = pivotRow + 1; r < rows; r++) {
-                if (Math.abs(matrix[r][pivotCol]) > maxVal) {
+                if (Math.abs(matrix[r][pivotCol].doubleValue()) > maxVal) {
                     maxRow = r;
-                    maxVal = Math.abs(matrix[r][pivotCol]);
+                    maxVal = Math.abs(matrix[r][pivotCol].doubleValue());
                 }
             }
 
-            if (maxVal < 1e-10) {
+            if (maxVal < 1e-12) {
                 continue; // No pivot in this column
             }
 
             // Swap
-            double[] temp = matrix[pivotRow];
+            Real[] temp = matrix[pivotRow];
             matrix[pivotRow] = matrix[maxRow];
             matrix[maxRow] = temp;
 
             // Normalize pivot row
-            double pivot = matrix[pivotRow][pivotCol];
+            Real pivot = matrix[pivotRow][pivotCol];
             for (int c = pivotCol; c < cols; c++) {
-                matrix[pivotRow][c] /= pivot;
+                matrix[pivotRow][c] = matrix[pivotRow][c].divide(pivot);
             }
 
             // Eliminate other rows
             for (int r = 0; r < rows; r++) {
                 if (r != pivotRow) {
-                    double factor = matrix[r][pivotCol];
+                    Real factor = matrix[r][pivotCol];
                     for (int c = pivotCol; c < cols; c++) {
-                        matrix[r][c] -= factor * matrix[pivotRow][c];
+                        matrix[r][c] = matrix[r][c].subtract(factor.multiply(matrix[pivotRow][c]));
                     }
                 }
             }
@@ -302,46 +294,41 @@ public class ReactionBalancer {
 
         // Now extract solution
         // We assume 1 degree of freedom (last variable = 1)
-        double[] x = new double[cols];
-        x[cols - 1] = 1.0;
-
-        // Back substitution?
-        // In RREF, pivot variables are expressed in terms of free variables.
-        // Assuming rank = cols - 1.
+        Real[] x = new Real[cols];
+        java.util.Arrays.fill(x, Real.ZERO);
+        x[cols - 1] = Real.ONE;
 
         for (int i = pivotRow - 1; i >= 0; i--) {
             // Find pivot col for this row
             int pCol = -1;
             for (int c = 0; c < cols; c++) {
-                if (Math.abs(matrix[i][c]) > 1e-10) {
+                if (Math.abs(matrix[i][c].doubleValue()) > 1e-12) {
                     pCol = c;
                     break;
                 }
             }
 
             if (pCol != -1 && pCol < cols - 1) {
-                double sum = 0;
+                Real sum = Real.ZERO;
                 for (int j = pCol + 1; j < cols; j++) {
-                    sum += matrix[i][j] * x[j];
+                    sum = sum.add(matrix[i][j].multiply(x[j]));
                 }
-                x[pCol] = -sum; // since coeff of x[pCol] is 1
+                x[pCol] = sum.negate(); // since coeff of x[pCol] is 1
             }
         }
 
-        // If simpler cases failed, return default 1s
         return x;
     }
 
-    private static int[] convertToIntegers(double[] x) {
-        // Find LCM equivalent
-        double maxError = 1e-5;
-        for (int multiplier = 1; multiplier <= 1000; multiplier++) {
+    private static int[] convertToIntegers(Real[] x) {
+        double maxError = 1e-6;
+        for (int multiplier = 1; multiplier <= 5000; multiplier++) {
             boolean allInt = true;
             int[] result = new int[x.length];
             for (int i = 0; i < x.length; i++) {
-                double val = x[i] * multiplier;
+                double val = Math.abs(x[i].doubleValue() * multiplier);
                 long round = Math.round(val);
-                if (Math.abs(val - round) > maxError) {
+                if (Math.abs(val - round) > maxError || round == 0) {
                     allInt = false;
                     break;
                 }
@@ -353,10 +340,8 @@ public class ReactionBalancer {
         // Fallback
         int[] res = new int[x.length];
         for (int i = 0; i < x.length; i++)
-            res[i] = (int) Math.round(x[i]);
+            res[i] = (int) Math.round(Math.abs(x[i].doubleValue()));
         return res;
     }
 
 }
-
-

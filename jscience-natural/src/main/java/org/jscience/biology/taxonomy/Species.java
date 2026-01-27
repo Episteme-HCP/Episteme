@@ -44,6 +44,7 @@ import org.jscience.util.persistence.Relation;
  * Represents a biological species with full taxonomic classification.
  * Uses the trait system for flexible attribute management.
  * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
+ * Modernized to use extensible ConservationStatus.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -52,38 +53,13 @@ import org.jscience.util.persistence.Relation;
 @Persistent
 public class Species implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     protected final Identification id;
 
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
-
-    /**
-     * IUCN Red List conservation status.
-     */
-    public enum ConservationStatus {
-        NOT_EVALUATED("NE"),
-        DATA_DEFICIENT("DD"),
-        LEAST_CONCERN("LC"),
-        NEAR_THREATENED("NT"),
-        VULNERABLE("VU"),
-        ENDANGERED("EN"),
-        CRITICALLY_ENDANGERED("CR"),
-        EXTINCT_IN_WILD("EW"),
-        EXTINCT("EX");
-
-        private final String code;
-
-        ConservationStatus(String code) {
-            this.code = code;
-        }
-
-        public String getCode() {
-            return code;
-        }
-    }
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Species ancestor;
@@ -150,64 +126,29 @@ public class Species implements ComprehensiveIdentification {
     }
 
     public void setConservationStatus(ConservationStatus status) {
-        this.conservationStatus = status;
+        this.conservationStatus = Objects.requireNonNull(status);
     }
 
-    public String getKingdom() {
-        return kingdom;
-    }
+    public String getKingdom() { return kingdom; }
+    public void setKingdom(String kingdom) { this.kingdom = kingdom; }
 
-    public void setKingdom(String kingdom) {
-        this.kingdom = kingdom;
-    }
+    public String getPhylum() { return phylum; }
+    public void setPhylum(String phylum) { this.phylum = phylum; }
 
-    public String getPhylum() {
-        return phylum;
-    }
+    public String getTaxonomicClass() { return taxonomicClass; }
+    public void setTaxonomicClass(String taxonomicClass) { this.taxonomicClass = taxonomicClass; }
 
-    public void setPhylum(String phylum) {
-        this.phylum = phylum;
-    }
+    public String getOrder() { return order; }
+    public void setOrder(String order) { this.order = order; }
 
-    public String getTaxonomicClass() {
-        return taxonomicClass;
-    }
+    public String getFamily() { return family; }
+    public void setFamily(String family) { this.family = family; }
 
-    public void setTaxonomicClass(String taxonomicClass) {
-        this.taxonomicClass = taxonomicClass;
-    }
+    public String getGenus() { return genus; }
+    public void setGenus(String genus) { this.genus = genus; }
 
-    public String getOrder() {
-        return order;
-    }
-
-    public void setOrder(String order) {
-        this.order = order;
-    }
-
-    public String getFamily() {
-        return family;
-    }
-
-    public void setFamily(String family) {
-        this.family = family;
-    }
-
-    public String getGenus() {
-        return genus;
-    }
-
-    public void setGenus(String genus) {
-        this.genus = genus;
-    }
-
-    public String getSpecificEpithet() {
-        return specificEpithet;
-    }
-
-    public void setSpecificEpithet(String specificEpithet) {
-        this.specificEpithet = specificEpithet;
-    }
+    public String getSpecificEpithet() { return specificEpithet; }
+    public void setSpecificEpithet(String specificEpithet) { this.specificEpithet = specificEpithet; }
 
     public void addAttribute(String name, String value) {
         setTrait(name, value);
@@ -234,38 +175,23 @@ public class Species implements ComprehensiveIdentification {
         return Collections.unmodifiableSet(tissues);
     }
 
-    /**
-     * Returns full taxonomic lineage string.
-     */
     public String getLineage() {
         StringBuilder sb = new StringBuilder();
-        if (kingdom != null)
-            sb.append(kingdom);
-        if (phylum != null)
-            sb.append(" > ").append(phylum);
-        if (taxonomicClass != null)
-            sb.append(" > ").append(taxonomicClass);
-        if (order != null)
-            sb.append(" > ").append(order);
-        if (family != null)
-            sb.append(" > ").append(family);
-        if (genus != null)
-            sb.append(" > ").append(genus);
+        if (kingdom != null) sb.append(kingdom);
+        if (phylum != null) sb.append(" > ").append(phylum);
+        if (taxonomicClass != null) sb.append(" > ").append(taxonomicClass);
+        if (order != null) sb.append(" > ").append(order);
+        if (family != null) sb.append(" > ").append(family);
+        if (genus != null) sb.append(" > ").append(genus);
         return sb.toString();
     }
 
-    /**
-     * Checks if this species is endangered (VU, EN, or CR).
-     */
     public boolean isEndangered() {
         return conservationStatus == ConservationStatus.VULNERABLE ||
                 conservationStatus == ConservationStatus.ENDANGERED ||
                 conservationStatus == ConservationStatus.CRITICALLY_ENDANGERED;
     }
 
-    /**
-     * Checks if this species is extinct.
-     */
     public boolean isExtinct() {
         return conservationStatus == ConservationStatus.EXTINCT ||
                 conservationStatus == ConservationStatus.EXTINCT_IN_WILD;
@@ -288,6 +214,5 @@ public class Species implements ComprehensiveIdentification {
         return getScientificName() + " (" + getCommonName() + ") [" + conservationStatus.getCode() + "]";
     }
 
-    /** Predefined species for humans. */
     public static final Species HUMAN = new Species("Human", "Homo sapiens");
 }

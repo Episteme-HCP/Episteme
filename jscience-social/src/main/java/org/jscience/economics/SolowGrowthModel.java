@@ -49,13 +49,13 @@ public final class SolowGrowthModel {
      */
     public record GrowthState(
         int year,
-        double capital,
-        double labor,
-        double output,
-        double consumption,
-        double investment,
-        double capitalPerWorker,
-        double outputPerWorker
+        Real capital,
+        Real labor,
+        Real output,
+        Real consumption,
+        Real investment,
+        Real capitalPerWorker,
+        Real outputPerWorker
     ) implements Serializable {
         private static final long serialVersionUID = 2L;
     }
@@ -75,25 +75,33 @@ public final class SolowGrowthModel {
      * @return a history of GrowthState snapshots
      */
     public static List<GrowthState> simulate(
-            double initialK, double initialL, double a, double alpha,
-            double s, double d, double n, double g, int periods) {
+            Real initialK, Real initialL, Real a, Real alpha,
+            Real s, Real d, Real n, Real g, int periods) {
         
         List<GrowthState> history = new ArrayList<>();
-        double k = initialK;
-        double l = initialL;
-        double tfp = a;
+        Real k = initialK;
+        Real l = initialL;
+        Real tfp = a;
+        Real oneMinusAlpha = Real.ONE.subtract(alpha);
 
         for (int t = 0; t < periods; t++) {
-            double y = tfp * Math.pow(k, alpha) * Math.pow(l, 1 - alpha);
-            double i = s * y;
-            double c = y - i;
+            // Y = tfp * K^alpha * L^(1-alpha)
+            Real y = tfp.multiply(k.pow(alpha)).multiply(l.pow(oneMinusAlpha));
+            Real i = s.multiply(y);
+            Real c = y.subtract(i);
             
-            history.add(new GrowthState(t, k, l, y, c, i, l != 0 ? k/l : 0, l != 0 ? y/l : 0));
+            Real kPerW = l.isZero() ? Real.ZERO : k.divide(l);
+            Real yPerW = l.isZero() ? Real.ZERO : y.divide(l);
+            
+            history.add(new GrowthState(t, k, l, y, c, i, kPerW, yPerW));
 
             // Accumulation equations
-            k = k + i - d * k;
-            l = l * (1 + n);
-            tfp = tfp * (1 + g);
+            // k = k + i - d * k
+            k = k.add(i).subtract(d.multiply(k));
+            // l = l * (1 + n)
+            l = l.multiply(Real.ONE.add(n));
+            // tfp = tfp * (1 + g)
+            tfp = tfp.multiply(Real.ONE.add(g));
         }
         return history;
     }
@@ -110,12 +118,14 @@ public final class SolowGrowthModel {
      * @param g TFP growth rate
      * @return steady state capital per worker as a Real
      */
-    public static Real calculateSteadyStateCapital(double a, double alpha, double s, 
-            double d, double n, double g) {
-        double power = 1.0 / (1.0 - alpha);
-        if (n + d + g == 0) return Real.ZERO;
-        double kStar = Math.pow((s * a) / (n + d + g), power);
-        return Real.of(kStar);
+    public static Real calculateSteadyStateCapital(Real a, Real alpha, Real s, 
+            Real d, Real n, Real g) {
+        Real power = Real.ONE.divide(Real.ONE.subtract(alpha));
+        Real denominator = n.add(d).add(g);
+        if (denominator.isZero()) return Real.ZERO;
+        
+        // k* = (sA / (n + d + g))^(1 / (1 - alpha))
+        return s.multiply(a).divide(denominator).pow(power);
     }
 
     /**
@@ -128,7 +138,7 @@ public final class SolowGrowthModel {
      * @param g technology growth
      * @return the convergence rate value
      */
-    public static Real convergenceSpeed(double alpha, double n, double d, double g) {
-        return Real.of((1 - alpha) * (n + d + g));
+    public static Real convergenceSpeed(Real alpha, Real n, Real d, Real g) {
+        return Real.ONE.subtract(alpha).multiply(n.add(d).add(g));
     }
 }

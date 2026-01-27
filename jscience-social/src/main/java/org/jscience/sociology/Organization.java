@@ -26,35 +26,61 @@ package org.jscience.sociology;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a formal organization such as a company, NGO, or government agency.
  * Extends {@link Group} to include organizational metadata like sector, industry, and headquarters.
+ * Supports hierarchical structure through departments (sub-organizations).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
 public class Organization extends Group {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
-     * Categories of organizational sectors.
+     * @deprecated Use {@link OrganizationSector} instead.
      */
+    @Deprecated
     public enum Sector {
-        PUBLIC, PRIVATE, NON_PROFIT, GOVERNMENT, ACADEMIC, MILITARY
+        /** @deprecated Use {@link OrganizationSector#PUBLIC} */
+        @Deprecated PUBLIC, 
+        /** @deprecated Use {@link OrganizationSector#PRIVATE} */
+        @Deprecated PRIVATE, 
+        /** @deprecated Use {@link OrganizationSector#NON_PROFIT} */
+        @Deprecated NON_PROFIT, 
+        /** @deprecated Use {@link OrganizationSector#GOVERNMENT} */
+        @Deprecated GOVERNMENT, 
+        /** @deprecated Use {@link OrganizationSector#ACADEMIC} */
+        @Deprecated ACADEMIC, 
+        /** @deprecated Use {@link OrganizationSector#MILITARY} */
+        @Deprecated MILITARY;
+        
+        @Deprecated
+        public OrganizationSector toOrganizationSector() {
+            try {
+                return OrganizationSector.valueOf(this.name());
+            } catch (IllegalArgumentException e) {
+                return OrganizationSector.OTHER;
+            }
+        }
     }
 
     @Attribute
     private final LocalDate foundedDate;
     
     @Attribute
-    private final Sector sector;
+    private OrganizationSector sector;
     
     @Attribute
     private String headquarters;
@@ -65,6 +91,12 @@ public class Organization extends Group {
     @Attribute
     private String industry;
 
+    @Attribute
+    private String missionStatement = "";
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<Organization> departments = new ArrayList<>();
+
     /**
      * Creates a new organization.
      *
@@ -73,10 +105,15 @@ public class Organization extends Group {
      * @param sector      the economic or social sector
      * @throws NullPointerException if any argument is null
      */
-    public Organization(String name, LocalDate foundedDate, Sector sector) {
-        super(name, Group.Type.ORGANIZATION);
+    public Organization(String name, LocalDate foundedDate, OrganizationSector sector) {
+        super(name, GroupKind.ORGANIZATION);
         this.foundedDate = Objects.requireNonNull(foundedDate, "Founding date cannot be null");
         this.sector = Objects.requireNonNull(sector, "Sector cannot be null");
+    }
+
+    @Deprecated
+    public Organization(String name, LocalDate foundedDate, Sector sector) {
+        this(name, foundedDate, sector != null ? sector.toOrganizationSector() : OrganizationSector.OTHER);
     }
 
     /**
@@ -91,8 +128,21 @@ public class Organization extends Group {
      * Returns the organization's sector.
      * @return the sector
      */
-    public Sector getSector() {
+    public OrganizationSector getSector() {
         return sector;
+    }
+
+    public void setSector(OrganizationSector sector) {
+        this.sector = Objects.requireNonNull(sector);
+    }
+
+    @Deprecated
+    public Sector getLegacySector() {
+        try {
+            return Sector.valueOf(sector.name());
+        } catch (Exception e) {
+            return Sector.PRIVATE;
+        }
     }
 
     /**
@@ -141,6 +191,24 @@ public class Organization extends Group {
      */
     public void setIndustry(String industry) {
         this.industry = industry;
+    }
+
+    public String getMissionStatement() {
+        return missionStatement;
+    }
+
+    public void setMissionStatement(String missionStatement) {
+        this.missionStatement = Objects.requireNonNull(missionStatement);
+    }
+
+    public void addDepartment(Organization department) {
+        if (department != null && !departments.contains(department)) {
+            departments.add(department);
+        }
+    }
+
+    public List<Organization> getDepartments() {
+        return Collections.unmodifiableList(departments);
     }
 
     /**

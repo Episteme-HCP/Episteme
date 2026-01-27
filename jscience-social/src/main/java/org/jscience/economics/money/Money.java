@@ -40,13 +40,18 @@ import java.util.Objects;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Money implements Quantity<Money> {
+@org.jscience.util.persistence.Persistent
+public class Money implements Quantity<Money>, java.io.Serializable {
+    
+    private static final long serialVersionUID = 2L;
     
     public static final Dimension DIMENSION = Dimension.NONE;
     public static final Unit<Money> BASE_UNIT = new org.jscience.measure.StandardUnit<Money>("Money", "Money", DIMENSION);
 
 
+    @org.jscience.util.persistence.Attribute
     private final Real amount;
+    @org.jscience.util.persistence.Attribute
     private final Currency currency;
 
     public Money(Real amount, Currency currency) {
@@ -170,12 +175,12 @@ public class Money implements Quantity<Money> {
 
     @Override
     public Quantity<?> pow(int exponent) {
-        return Quantities.create(amount.pow(exponent).doubleValue(), currency.pow(exponent));
+        return Quantities.create(amount.pow(exponent), currency.pow(exponent));
     }
 
     @Override
     public Quantity<?> sqrt() {
-        return Quantities.create(amount.sqrt().doubleValue(), currency.sqrt());
+        return Quantities.create(amount.sqrt(), currency.sqrt());
     }
 
     // --- Legacy / Convenience Methods ---

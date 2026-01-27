@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
@@ -50,7 +49,7 @@ import org.jscience.util.persistence.Relation;
 @Persistent
 public class Survey implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+
 
     @Id
     protected final Identification id;
@@ -62,7 +61,7 @@ public class Survey implements ComprehensiveIdentification {
     private final List<Question> questions = new ArrayList<>();
 
     public Survey(String title) {
-        this.id = new UUIDIdentification(UUID.randomUUID().toString());
+        this.id = new UUIDIdentification();
         setName(title);
     }
 

@@ -55,22 +55,23 @@ public final class SocialMobilityMatrix {
      * @return Array representing the future class distribution
      * @throws IllegalArgumentException if matrix dimensions do not match distribution
      */
-    public static double[] projectClassDistribution(double[] initialDistribution, 
-            double[][] transitionMatrix, int generations) {
+    public static Real[] projectClassDistribution(Real[] initialDistribution, 
+            Real[][] transitionMatrix, int generations) {
         
         int n = initialDistribution.length;
         if (transitionMatrix.length != n || transitionMatrix[0].length != n) {
             throw new IllegalArgumentException("Transition matrix dimensions must match distribution length.");
         }
 
-        double[] current = initialDistribution.clone();
+        Real[] current = initialDistribution.clone();
         
         for (int g = 0; g < generations; g++) {
-            double[] next = new double[n];
+            Real[] next = new Real[n];
             for (int j = 0; j < n; j++) {
+                next[j] = Real.ZERO;
                 // For each destination class j, sum contributions from all source classes i
                 for (int i = 0; i < n; i++) {
-                    next[j] += current[i] * transitionMatrix[i][j];
+                    next[j] = next[j].add(current[i].multiply(transitionMatrix[i][j]));
                 }
             }
             current = next;
@@ -91,17 +92,17 @@ public final class SocialMobilityMatrix {
      * @param matrix the transition matrix
      * @return the mobility index
      */
-    public static Real mobilityIndex(double[][] matrix) {
+    public static Real mobilityIndex(Real[][] matrix) {
         int n = matrix.length;
         if (n <= 1) return Real.ZERO;
 
-        double trace = 0;
+        Real trace = Real.ZERO;
         for (int i = 0; i < n; i++) {
-            trace += matrix[i][i];
+            trace = trace.add(matrix[i][i]);
         }
         
         // (n - sum of stayers) / (n - 1)
-        return Real.of((n - trace) / (n - 1));
+        return Real.of(n).subtract(trace).divide(Real.of(n - 1));
     }
 
     /**
@@ -111,14 +112,14 @@ public final class SocialMobilityMatrix {
      * @param matrix the transition matrix
      * @return the equilibrium distribution array
      */
-    public static double[] findEquilibrium(double[][] matrix) {
+    public static Real[] findEquilibrium(Real[][] matrix) {
         int n = matrix.length;
         // Start with an arbitrary distribution, e.g., 100% in first class
-        double[] initial = new double[n];
-        initial[0] = 1.0;
+        Real[] initial = new Real[n];
+        initial[0] = Real.ONE;
+        for (int i = 1; i < n; i++) initial[i] = Real.ZERO;
         
         // Use a sufficient number of iterations to approximate steady state
-        // 50-100 is usually enough for well-behaved stochastic matrices
         return projectClassDistribution(initial, matrix, 100);
     }
 }

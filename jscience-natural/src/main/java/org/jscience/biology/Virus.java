@@ -24,12 +24,18 @@
 package org.jscience.biology;
 
 import org.jscience.biology.genetics.BioSequence;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
 import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.util.ExtensibleEnum;
+import org.jscience.util.EnumRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +52,7 @@ import java.util.Objects;
 @Persistent
 public class Virus implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     protected final Identification id;
@@ -57,34 +63,64 @@ public class Virus implements ComprehensiveIdentification {
     /**
      * Virus lifecycle stages.
      */
-    public enum Stage {
-        DORMANT, ATTACHMENT, PENETRATION, REPLICATION, ASSEMBLY, RELEASE
-    }
-
     /**
-     * Type of genetic material.
+     * Virus lifecycle stages.
+     * Extensible enum since 2.0.
      */
-    public enum GenomeType {
-        DNA_DOUBLE_STRANDED, DNA_SINGLE_STRANDED, RNA_DOUBLE_STRANDED,
-        RNA_SINGLE_STRANDED_POSITIVE, RNA_SINGLE_STRANDED_NEGATIVE,
-        RNA_REVERSE_TRANSCRIBING, DNA_REVERSE_TRANSCRIBING
-    }
+    public static final class Stage extends ExtensibleEnum {
+        private static final long serialVersionUID = 1L;
+        
+        public static final Stage DORMANT = new Stage("DORMANT", true);
+        public static final Stage ATTACHMENT = new Stage("ATTACHMENT", true);
+        public static final Stage PENETRATION = new Stage("PENETRATION", true);
+        public static final Stage REPLICATION = new Stage("REPLICATION", true);
+        public static final Stage ASSEMBLY = new Stage("ASSEMBLY", true);
+        public static final Stage RELEASE = new Stage("RELEASE", true);
+        
+        static {
+            EnumRegistry.register(Stage.class, DORMANT);
+            EnumRegistry.register(Stage.class, ATTACHMENT);
+            EnumRegistry.register(Stage.class, PENETRATION);
+            EnumRegistry.register(Stage.class, REPLICATION);
+            EnumRegistry.register(Stage.class, ASSEMBLY);
+            EnumRegistry.register(Stage.class, RELEASE);
+        }
 
-    /**
-     * Virus morphology.
-     */
-    public enum Morphology {
-        ICOSAHEDRAL, HELICAL, COMPLEX, ENVELOPED
+        private final boolean builtIn;
+
+        private Stage(String name, boolean builtIn) {
+            super(name);
+            this.builtIn = builtIn;
+        }
+        
+        public Stage(String name) {
+            super(name);
+            this.builtIn = false;
+            EnumRegistry.register(Stage.class, this);
+        }
+
+        @Override
+        public boolean isBuiltIn() {
+            return builtIn;
+        }
+
+        public static Stage valueOf(String name) {
+            return (Stage) EnumRegistry.valueOf(Stage.class, name);
+        }
+        
+        public static Stage[] values() {
+             return EnumRegistry.values(Stage.class).toArray(new Stage[0]);
+        }
     }
 
     @Attribute
     private final String family;
     
     @Attribute
-    private final GenomeType genomeType;
+    private final VirusGenomeType genomeType;
     
     @Attribute
-    private final Morphology morphology;
+    private final VirusMorphology morphology;
     
     @Attribute
     private final BioSequence genome;
@@ -93,18 +129,23 @@ public class Virus implements ComprehensiveIdentification {
     private Stage currentStage;
     
     @Attribute
-    private final double capsidDiameterNm;
+    private final Quantity<Length> capsidDiameter;
 
-    public Virus(String name, String family, GenomeType genomeType,
-            Morphology morphology, BioSequence genome, double capsidDiameterNm) {
+    public Virus(String name, String family, VirusGenomeType genomeType,
+            VirusMorphology morphology, BioSequence genome, Quantity<Length> capsidDiameter) {
         this.id = new SimpleIdentification(name.toLowerCase().replace(' ', '-'));
         setName(name);
         this.family = family;
         this.genomeType = genomeType;
         this.morphology = morphology;
         this.genome = genome;
-        this.capsidDiameterNm = capsidDiameterNm;
+        this.capsidDiameter = capsidDiameter;
         this.currentStage = Stage.DORMANT;
+    }
+
+    public Virus(String name, String family, VirusGenomeType genomeType,
+            VirusMorphology morphology, BioSequence genome, double capsidDiameterNm) {
+        this(name, family, genomeType, morphology, genome, Quantities.create(capsidDiameterNm, Units.NANOMETER));
     }
 
     @Override
@@ -121,11 +162,11 @@ public class Virus implements ComprehensiveIdentification {
         return family;
     }
 
-    public GenomeType getGenomeType() {
+    public VirusGenomeType getGenomeType() {
         return genomeType;
     }
 
-    public Morphology getMorphology() {
+    public VirusMorphology getMorphology() {
         return morphology;
     }
 
@@ -133,8 +174,8 @@ public class Virus implements ComprehensiveIdentification {
         return genome;
     }
 
-    public double getCapsidDiameterNm() {
-        return capsidDiameterNm;
+    public Quantity<Length> getCapsidDiameter() {
+        return capsidDiameter;
     }
 
     public Stage getCurrentStage() {
@@ -160,7 +201,7 @@ public class Virus implements ComprehensiveIdentification {
     }
 
     public boolean isRetrovirus() {
-        return genomeType == GenomeType.RNA_REVERSE_TRANSCRIBING;
+        return genomeType.equals(VirusGenomeType.RNA_REVERSE_TRANSCRIBING);
     }
 
     @Override
@@ -177,32 +218,32 @@ public class Virus implements ComprehensiveIdentification {
 
     @Override
     public String toString() {
-        return String.format("%s (%s) - %s, %s, %d bp, %.0f nm",
-                getName(), family, genomeType, morphology, getGenomeSize(), capsidDiameterNm);
+        return String.format("%s (%s) - %s, %s, %d bp, %s",
+                getName(), family, genomeType, morphology, getGenomeSize(), capsidDiameter);
     }
 
     // Factory methods
     public static Virus sarsCov2() {
         return new Virus("SARS-CoV-2", "Coronaviridae",
-                GenomeType.RNA_SINGLE_STRANDED_POSITIVE, Morphology.ENVELOPED,
+                VirusGenomeType.RNA_SINGLE_STRANDED_POSITIVE, VirusMorphology.ENVELOPED,
                 null, 120);
     }
 
     public static Virus influenzaA() {
         return new Virus("Influenza A", "Orthomyxoviridae",
-                GenomeType.RNA_SINGLE_STRANDED_NEGATIVE, Morphology.ENVELOPED,
+                VirusGenomeType.RNA_SINGLE_STRANDED_NEGATIVE, VirusMorphology.ENVELOPED,
                 null, 100);
     }
 
     public static Virus hiv1() {
         return new Virus("HIV-1", "Retroviridae",
-                GenomeType.RNA_REVERSE_TRANSCRIBING, Morphology.ENVELOPED,
+                VirusGenomeType.RNA_REVERSE_TRANSCRIBING, VirusMorphology.ENVELOPED,
                 null, 120);
     }
 
     public static Virus bacteriophageT4() {
         return new Virus("Bacteriophage T4", "Myoviridae",
-                GenomeType.DNA_DOUBLE_STRANDED, Morphology.COMPLEX,
+                VirusGenomeType.DNA_DOUBLE_STRANDED, VirusMorphology.COMPLEX,
                 null, 200);
     }
 }

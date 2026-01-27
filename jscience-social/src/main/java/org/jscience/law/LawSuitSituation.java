@@ -26,7 +26,6 @@ import org.jscience.biology.Individual;
 import org.jscience.economics.MaterialResource;
 import org.jscience.economics.WorkSituation;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
 import org.jscience.politics.Administration;
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ import java.util.Set;
  * @author Gemini AI (Google DeepMind)
  * @version 1.2
  */
-public class LawSuitSituation extends WorkSituation implements Identified<Identification> {
+public class LawSuitSituation extends WorkSituation {
     
     private Identification identification;
     private Set<MaterialResource> evidences;

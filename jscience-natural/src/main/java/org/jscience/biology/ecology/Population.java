@@ -27,6 +27,8 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import org.jscience.biology.Individual;
+import org.jscience.biology.BiologicalSex;
+import org.jscience.biology.LifeStage;
 import org.jscience.biology.taxonomy.Species;
 import org.jscience.earth.Place;
 import org.jscience.util.Positioned;
@@ -40,11 +42,8 @@ import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a population of individuals of the same species.
- * <p>
- * Provides population-level analysis: demographics, statistics, growth
- * modeling.
- * </p>
- * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
+ * Provides population-level analysis: demographics, statistics, growth modeling.
+ * Modernized to use extensible biometric traits and standardized persistence.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -53,7 +52,7 @@ import org.jscience.util.persistence.Relation;
 @Persistent
 public class Population implements ComprehensiveIdentification, Positioned<Place> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     protected final Identification id;
@@ -146,31 +145,27 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
         return members.size();
     }
 
-    // ========== Demographics ==========
-
     public long countAlive() {
         return members.stream().filter(Individual::isAlive).count();
     }
 
-    public long countByStage(Individual.LifeStage stage) {
+    public long countByStage(LifeStage stage) {
         return members.stream()
-                .filter(i -> i.getLifeStage() == stage)
+                .filter(i -> i.getLifeStage() != null && i.getLifeStage().equals(stage))
                 .count();
     }
 
-    public long countBySex(Individual.Sex sex) {
+    public long countBySex(BiologicalSex sex) {
         return members.stream()
-                .filter(i -> i.getSex() == sex)
+                .filter(i -> i.getSex() != null && i.getSex().equals(sex))
                 .count();
     }
 
     public double getSexRatio() {
-        long males = countBySex(Individual.Sex.MALE);
-        long females = countBySex(Individual.Sex.FEMALE);
+        long males = countBySex(BiologicalSex.MALE);
+        long females = countBySex(BiologicalSex.FEMALE);
         return females > 0 ? (double) males / females : 0;
     }
-
-    // ========== Statistics ==========
 
     public double getAverageAge() {
         return members.stream()
@@ -195,37 +190,27 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
                 .orElse(0);
     }
 
-    public Map<Individual.LifeStage, Long> getAgeDistribution() {
-        Map<Individual.LifeStage, Long> dist = new EnumMap<>(Individual.LifeStage.class);
-        for (Individual.LifeStage stage : Individual.LifeStage.values()) {
+    public Map<LifeStage, Long> getAgeDistribution() {
+        Map<LifeStage, Long> dist = new HashMap<>();
+        for (LifeStage stage : LifeStage.values()) {
             dist.put(stage, countByStage(stage));
         }
         return dist;
     }
 
-    // ========== Genealogy ==========
-
-    /**
-     * Returns all individuals with no parents in this population.
-     */
     public List<Individual> getFounders() {
         return members.stream()
                 .filter(i -> i.getParents().isEmpty())
                 .toList();
     }
 
-    /**
-     * Returns average number of offspring per adult.
-     */
     public double getAverageFecundity() {
         return members.stream()
-                .filter(i -> i.getLifeStage() == Individual.LifeStage.ADULT)
+                .filter(i -> i.getLifeStage() != null && i.getLifeStage().equals(LifeStage.ADULT))
                 .mapToInt(i -> i.getChildren().size())
                 .average()
                 .orElse(0);
     }
-
-    // ========== Filtering ==========
 
     public List<Individual> filter(Predicate<Individual> predicate) {
         return members.stream().filter(predicate).toList();

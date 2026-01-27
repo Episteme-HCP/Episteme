@@ -63,10 +63,10 @@ public final class FinancialPortfolioViewer extends AbstractViewer {
 
     private void setupHoldingsTable() {
         TableColumn<PortfolioData.Holding, String> symbolCol = new TableColumn<>("Symbol");
-        symbolCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().asset().symbol()));
+        symbolCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getAsset().getSymbol()));
         
         TableColumn<PortfolioData.Holding, String> priceCol = new TableColumn<>("Price");
-        priceCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().asset().currentPrice().toString()));
+        priceCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getAsset().getCurrentPrice().toString()));
 
         TableColumn<PortfolioData.Holding, String> valueCol = new TableColumn<>("Total Value");
         valueCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().totalValue().toString()));
@@ -86,7 +86,7 @@ public final class FinancialPortfolioViewer extends AbstractViewer {
         // Update Allocation
         allocationChart.getData().clear();
         for (var holding : portfolio.getHoldings()) {
-            allocationChart.getData().add(new PieChart.Data(holding.asset().symbol(), 
+            allocationChart.getData().add(new PieChart.Data(holding.getAsset().getSymbol(), 
                 holding.totalValue().getValue().doubleValue()));
         }
 
@@ -94,8 +94,8 @@ public final class FinancialPortfolioViewer extends AbstractViewer {
         performanceChart.getData().clear();
         for (var holding : portfolio.getHoldings()) {
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName(holding.asset().symbol());
-            List<Money> history = holding.asset().priceHistory();
+            series.setName(holding.getAsset().getSymbol());
+            List<Money> history = holding.getAsset().getPriceHistory();
             for (int i = 0; i < history.size(); i++) {
                 series.getData().add(new XYChart.Data<>(i, history.get(i).getValue().doubleValue()));
             }

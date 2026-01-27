@@ -22,32 +22,45 @@
  */
 package org.jscience.philosophy;
 
-
-import java.io.Serializable;
-import java.util.Objects;
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a fundamental conviction or tenet within a philosophical system.
  * 
  * <p> Beliefs are the core units of conviction that form the basis of larger 
  *     philosophical frameworks and argumentations.</p>
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
+ * @version 7.0
+ * @since 1.0
  */
-public class Belief implements Named, Commented, Serializable {
+@Persistent
+public class Belief implements ComprehensiveIdentification {
 
+    private static final long serialVersionUID = 2L;
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    private final Identification id;
 
-    private final String name;
-    private final String comments;
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Concept> relatedConcepts = new HashSet<>();
 
     /**
@@ -58,21 +71,22 @@ public class Belief implements Named, Commented, Serializable {
      * @throws IllegalArgumentException if null or empty arguments are provided
      */
     public Belief(String name, String comments) {
-        if (name == null || name.isEmpty() || comments == null || comments.isEmpty()) {
-            throw new IllegalArgumentException("Name and comments cannot be null or empty.");
+        this.id = new SimpleIdentification("Belief:" + UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
         }
-        this.name = name;
-        this.comments = comments;
+        setComments(Objects.requireNonNull(comments, "Comments cannot be null"));
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
     }
 
     @Override
-    public String getComments() {
-        return comments;
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public void addRelatedConcept(Concept concept) {
@@ -86,25 +100,17 @@ public class Belief implements Named, Commented, Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Belief belief = (Belief) o;
-        return Objects.equals(name, belief.name);
+        if (!(o instanceof Belief that)) return false;
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    private java.util.Map<String, Object> traits = new java.util.HashMap<>();
-
-    @Override
-    public java.util.Map<String, Object> getTraits() {
-        return traits;
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return name + ": " + comments;
+        return getName() + ": " + getComments();
     }
 }

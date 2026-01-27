@@ -163,7 +163,7 @@ public class Polymer {
             mol.addAtom(atom);
 
             if (prev != null) {
-                mol.addBond(new org.jscience.chemistry.Bond(prev, atom, org.jscience.chemistry.Bond.BondOrder.SINGLE));
+                mol.addBond(new org.jscience.chemistry.Bond(prev, atom, org.jscience.chemistry.BondType.SINGLE));
             }
             prev = atom;
         }

@@ -46,6 +46,7 @@ import java.util.UUID;
  * Base class for all geographical features and named locations.
  * Uses geodetic coordinates for absolute positioning on Earth.
  * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
+ * Modernized to use extensible PlaceType and PlacePrecision.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -54,7 +55,7 @@ import java.util.UUID;
 @Persistent
 public class Place implements ComprehensiveIdentification, Positioned<EarthCoordinate> {
 
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 5L;
 
     @Id
     protected final Identification id;
@@ -62,27 +63,17 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    public enum Type {
-        COUNTRY, REGION, PROVINCE, STATE, COUNTY, CITY, TOWN, VILLAGE, 
-        BUILDING, ADDRESS, NATURAL_FEATURE, CELESTIAL_BODY, GLOBAL, 
-        CONTINENT, OCEAN, SEA, RIVER, LAKE, MOUNTAIN, PARK, UNKNOWN, OTHER
-    }
-
-    public enum Precision {
-        EXACT, APPROXIMATE, CITY_LEVEL, REGION_LEVEL, COUNTRY_LEVEL, CONTINENT_LEVEL, GLOBAL_LEVEL, UNKNOWN
-    }
-
     @Attribute
     private GeodeticCoordinate center;
 
     @Attribute
-    private Type type;
+    private PlaceType type;
 
     @Attribute
     private String historicalName;
 
     @Attribute
-    private Precision precision = Precision.UNKNOWN;
+    private PlacePrecision precision = PlacePrecision.UNKNOWN;
 
     @Attribute
     private Quantity<Length> uncertaintyRadius;
@@ -93,17 +84,17 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
     private final java.util.Set<org.jscience.biology.Individual> inhabitants = new java.util.HashSet<>();
 
     public Place(String name) {
-        this(name, Type.UNKNOWN);
+        this(name, PlaceType.UNKNOWN);
     }
 
-    public Place(String name, Type type) {
+    public Place(String name, PlaceType type) {
         this.id = new UUIDIdentification(UUID.randomUUID().toString());
         setName(Objects.requireNonNull(name));
-        this.type = type != null ? type : Type.UNKNOWN;
+        this.type = type != null ? type : PlaceType.UNKNOWN;
         this.uncertaintyRadius = Quantities.create(0.0, Units.METER);
     }
 
-    public Place(String name, GeodeticCoordinate center, Type type) {
+    public Place(String name, GeodeticCoordinate center, PlaceType type) {
         this(name, type);
         this.center = center;
     }
@@ -118,17 +109,14 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
         return traits;
     }
 
-    public Type getType() {
+    public PlaceType getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(PlaceType type) {
         this.type = type;
     }
 
-    /**
-     * Returns the center coordinate of this place.
-     */
     public GeodeticCoordinate getCenter() {
         return center;
     }
@@ -150,11 +138,11 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
         this.historicalName = historicalName;
     }
 
-    public Precision getPrecision() {
+    public PlacePrecision getPrecision() {
         return precision;
     }
 
-    public void setPrecision(Precision precision) {
+    public void setPrecision(PlacePrecision precision) {
         this.precision = precision;
     }
 
@@ -186,9 +174,6 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
         return java.util.Collections.unmodifiableSet(inhabitants);
     }
 
-    /**
-     * Calculates spherical distance to another place.
-     */
     public Quantity<Length> distanceTo(Place other) {
         if (center == null || other.center == null) return null;
         return center.distanceTo(other.center);
@@ -212,11 +197,11 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
     }
 
     // Factory methods
-    public static Place of(String name, double lat, double lon, Type type) {
+    public static Place of(String name, double lat, double lon, PlaceType type) {
         return new Place(name, new GeodeticCoordinate(lat, lon), type);
     }
 
     public static Place greenwich() {
-        return of("Greenwich Observatory", 51.4772, 0.0, Type.BUILDING);
+        return of("Greenwich Observatory", 51.4772, 0.0, PlaceType.BUILDING);
     }
 }

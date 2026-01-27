@@ -24,7 +24,7 @@
 package org.jscience.engineering;
 
 /**
- * Constants and enumerations for engineering and system transformation.
+ * Constants for engineering.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,25 +35,7 @@ public final class EngineeringConstants {
 
     private EngineeringConstants() {}
 
-    /**
-     * Types of system or entity transformations.
-     */
-    public enum TransformationType {
-        /** Shifting from one state to another (addition and suppression). */
-        DISPLACEMENT,
-        
-        /** Reducing complexity while maintaining core function. */
-        SIMPLIFICATION,
-        
-        /** Increasing complexity, generalization, or inclusion. */
-        COMPLEXIFICATION,
-        
-        /** Modification of form or structure without changing essence. */
-        MODIFICATION,
-        
-        /** Complete change in character or condition. */
-        TRANSFORMATION,
-        
-        UNKNOWN
-    }
+    // Constants can be added here in the future.
+    // TransformationType has been moved to its own top-level class.
+
 }

@@ -23,12 +23,16 @@
 
 package org.jscience.methodology;
 
-import org.jscience.util.Named;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a scientific term with its definition and source reference.
@@ -39,12 +43,15 @@ import java.io.Serializable;
  * @since 1.0
  */
 @Persistent
-public class ScientificTerm implements Named, Serializable {
+public class ScientificTerm implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    private final String code;
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
     
     @Attribute
     private final String term;
@@ -56,19 +63,25 @@ public class ScientificTerm implements Named, Serializable {
     private final String sourceUrl;
 
     public ScientificTerm(String code, String term, String definition, String sourceUrl) {
-        this.code = code;
+        this.id = new SimpleIdentification(code);
+        setName(Objects.requireNonNull(term, "Term cannot be null"));
         this.term = term;
         this.definition = definition;
         this.sourceUrl = sourceUrl;
     }
 
-    public String getCode() {
-        return code;
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     @Override
-    public String getName() {
-        return term;
+    public Identification getId() {
+        return id;
+    }
+
+    public String getCode() {
+        return id.toString();
     }
 
     public String getTerm() {
@@ -85,7 +98,7 @@ public class ScientificTerm implements Named, Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s [%s]: %s", term, code, definition != null && definition.length() > 50 ? 
+        return String.format("%s [%s]: %s", term, getCode(), definition != null && definition.length() > 50 ? 
                              definition.substring(0, 47) + "..." : definition);
     }
 }

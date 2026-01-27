@@ -24,32 +24,76 @@
 package org.jscience.biology;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import org.jscience.util.Named;
+import java.util.UUID;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a biological organ.
+ * Modernized to use extensible OrganType and core identification patterns.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Organ implements Named {
-    private final String name;
+@Persistent
+public class Organ implements ComprehensiveIdentification {
+    private static final long serialVersionUID = 2L;
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
+    private OrganType type;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Tissue> tissues = new HashSet<>();
     
     public Organ(String name) {
-        this.name = name;
+        this(name, OrganType.UNKNOWN);
+    }
+
+    public Organ(String name, OrganType type) {
+        this.id = new SimpleIdentification("Organ:" + UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Organ name cannot be null"));
+        this.type = type != null ? type : OrganType.UNKNOWN;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    public OrganType getType() {
+        return type;
+    }
+
+    public void setType(OrganType type) {
+        this.type = type;
     }
     
     public void addTissue(Tissue tissue) {
-        tissues.add(tissue);
+        if (tissue != null) {
+            tissues.add(tissue);
+        }
     }
     
     public Set<Tissue> getTissues() {

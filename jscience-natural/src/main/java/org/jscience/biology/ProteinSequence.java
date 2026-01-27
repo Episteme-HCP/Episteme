@@ -24,6 +24,7 @@
 package org.jscience.biology;
 
 import org.jscience.chemistry.biochemistry.AminoAcid;
+import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,11 +58,23 @@ public class ProteinSequence {
         return Collections.unmodifiableList(sequence);
     }
 
-    public double getMolecularWeight() {
+    /**
+     * Returns the molecular weight in g/mol.
+     * Subtracts water for peptide bond formation.
+     */
+    public Real getMolecularWeight() {
         if (sequence.isEmpty())
-            return 0.0;
-        return sequence.stream()
-                .mapToDouble(AminoAcid::getMolarMass)
-                .sum() - (sequence.size() - 1) * 18.01528; // Subtract water weight for peptide bonds
+            return Real.ZERO;
+        
+        Real total = Real.ZERO;
+        for (AminoAcid aa : sequence) {
+            total = total.add(aa.getMolarMass());
+        }
+        
+        // Subtract (n-1) * 18.01528 for water loss in peptide bonds
+        int bonds = Math.max(0, sequence.size() - 1);
+        total = total.subtract(Real.of(18.01528).multiply(Real.of(bonds)));
+        
+        return total;
     }
 }

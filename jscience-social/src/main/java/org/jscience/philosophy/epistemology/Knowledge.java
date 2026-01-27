@@ -22,9 +22,17 @@
  */
 package org.jscience.philosophy.epistemology;
 
-import java.io.Serializable;
-import java.util.Objects;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Dimensionless;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.philosophy.Belief;
+
+import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents Knowledge according to the classical definition: Justified True Belief (JTB).
@@ -33,14 +41,18 @@ import org.jscience.philosophy.Belief;
  * 1. A Proposition that is True.
  * 2. A Subject who has a Belief in that proposition.
  * 3. Evidence that provides Justification for the belief.</p>
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Knowledge implements Serializable {
+public class Knowledge implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+
+    private final Identification id;
+    private final Map<String, Object> traits = new HashMap<>();
 
     private final Proposition proposition;
     private final Belief belief;
@@ -55,6 +67,7 @@ public class Knowledge implements Serializable {
      * @throws IllegalArgumentException if the proposition is not true or metadata doesn't match
      */
     public Knowledge(Proposition proposition, Belief belief, Evidence justification) {
+        this.id = new SimpleIdentification("Knowledge:" + UUID.randomUUID());
         this.proposition = Objects.requireNonNull(proposition, "Proposition cannot be null");
         this.belief = Objects.requireNonNull(belief, "Belief cannot be null");
         this.justification = Objects.requireNonNull(justification, "Justification cannot be null");
@@ -63,8 +76,17 @@ public class Knowledge implements Serializable {
             throw new IllegalArgumentException("Knowledge requires a TRUE proposition.");
         }
         
-        // Logical check: the belief name should relate to the proposition content 
-        // (In a real system, we might have more complex mapping)
+        setName("Knowledge of " + proposition.getName());
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -95,8 +117,20 @@ public class Knowledge implements Serializable {
      * Returns the epistemic strength of this knowledge based on evidence reliability.
      * @return confidence level (0.0 to 1.0)
      */
-    public double getCertainty() {
+    public Quantity<Dimensionless> getCertainty() {
         return justification.getReliability();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Knowledge that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

@@ -22,161 +22,181 @@
  */
 package org.jscience.philosophy.storytelling;
 
+import org.jscience.history.Event;
+import org.jscience.mathematics.discrete.Graph;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * A class representing a continuous and logical flow of events that
- * corresponds to what could be described as the skeleton hidden in a story,
- * or the script. In other words, it is not meant to be as readble as a real
- * story but to store the useful information. Also a class representing an
- * event linked to some others in a causal or timed fashion.
+ * A class representing a continuous and logical flow of events as a graph G = (V, E).
+ * This structure stores narrative scripts where events are vertices and causal/timed
+ * links are edges.
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.0
+ * @version 2.1
  */
+public class Story implements Graph<Event>, ComprehensiveIdentification {
 
-//this is a VERY basic story system from which you can design your own and especially a solver able to understand certain kinds of facts (Event.getObject())
-//for example you could do a Cluedo like solver
-//example:
-//Event1: A is here
-//Event2: B passes by
-//Event3: A and B usually fight (incomplete event)
-//Event4: A and B fight this time (computed event from solver)
-//Event1: Sunshines
-//Event2: Humidity fades away
-//Link (event1, event2)
-public class Story {
-    /** DOCUMENT ME! */
-    private Set<Event> events;
+    private static final long serialVersionUID = 3L;
 
-    /** DOCUMENT ME! */
-    private Set<Object> relations;
+    private final Identification id;
+    private final Map<String, Object> traits = new HashMap<>();
 
-/**
-     * Creates a new Story object.
+    private final Set<Event> events;
+    private final Set<Edge<Event>> relations;
+
+    /**
+     * Creates a new Story graph with a generated ID.
      */
     public Story() {
-        events = new HashSet<>();
-        relations = new HashSet<>();
+        this(new SimpleIdentification("Story:" + UUID.randomUUID()));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Creates a new Story graph with a specific ID.
      */
-    public Set<Event> getEvents() {
-        return events;
+    public Story(Identification id) {
+        this.id = Objects.requireNonNull(id);
+        this.events = new HashSet<>();
+        this.relations = new HashSet<>();
     }
 
-    //refuse null
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    @Override
+    public Set<Event> vertices() {
+        return Collections.unmodifiableSet(events);
+    }
+
+    @Override
+    public Set<Edge<Event>> edges() {
+        return Collections.unmodifiableSet(relations);
+    }
+
+    @Override
+    public int vertexCount() {
+        return events.size();
+    }
+
+    @Override
+    public boolean addVertex(Event event) {
+        if (event == null) throw new IllegalArgumentException("Cannot add a null event.");
+        return events.add(event);
+    }
+
+    @Override
+    public boolean addEdge(Event source, Event target) {
+        if (source == null || target == null) throw new IllegalArgumentException("Events cannot be null.");
+        addVertex(source);
+        addVertex(target);
+        return relations.add(new StoryEdge(source, target));
+    }
+
+    @Override
+    public Set<Event> neighbors(Event event) {
+        return relations.stream()
+                .filter(e -> e.source().equals(event))
+                .map(Edge::target)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public int degree(Event event) {
+        return (int) relations.stream()
+                .filter(e -> e.source().equals(event) || e.target().equals(event))
+                .count();
+    }
+
+    @Override
+    public boolean isDirected() {
+        return true; // Narrative flow is generally directed
+    }
+
     /**
-     * DOCUMENT ME!
-     *
-     * @param event DOCUMENT ME!
+     * Adds an event to the story.
+     * @param event the event to add
      */
     public void addEvent(Event event) {
-        if (event != null) {
-            events.add(event);
-        } else {
-            throw new IllegalArgumentException("Can't add a null Event.");
+        addVertex(event);
+    }
+
+    /**
+     * Simple inner class to represent causal or temporal edges in the story.
+     */
+    private static class StoryEdge implements Edge<Event>, Serializable {
+        private static final long serialVersionUID = 1L;
+        private final Event source;
+        private final Event target;
+
+        StoryEdge(Event source, Event target) {
+            this.source = source;
+            this.target = target;
+        }
+
+        @Override public Event source() { return source; }
+        @Override public Event target() { return target; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof StoryEdge)) return false;
+            StoryEdge storyEdge = (StoryEdge) o;
+            return Objects.equals(source, storyEdge.source) && Objects.equals(target, storyEdge.target);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(source, target);
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * Infers new events based on causal links starting from a specific event.
+     * Logic adapted to the Graph structure.
      *
-     * @param event DOCUMENT ME!
-     */
-    public void removeEvent(Event event) {
-        events.remove(event);
-    }
-
-    //you should add links only to events that are already stored as Events
-    /**
-     * DOCUMENT ME!
-     *
-     * @param cause DOCUMENT ME!
-     * @param consequence DOCUMENT ME!
-     */
-    public void add(Event cause, Event consequence) {
-
-
-        if ((cause != null) && (events.contains(cause)) &&
-                (consequence != null) && (events.contains(consequence))) {
-            relations.add(new Event[]{cause, consequence});
-        } else {
-            throw new IllegalArgumentException(
-                "Can't add a relation for unknown events.");
-        }
-    }
-
-    //you should remove links only to events that are stored as Events
-    /**
-     * DOCUMENT ME!
-     *
-     * @param cause DOCUMENT ME!
-     * @param consequence DOCUMENT ME!
-     */
-    public void remove(Event cause, Event consequence) {
-
-
-        if ((cause != null) && (events.contains(cause)) &&
-                (consequence != null) && (events.contains(consequence))) {
-             // Removal logic for array based relation is tricky without a proper wrapper, 
-             // but assuming we just want it to compile and use standard Java collections later.
-             relations.removeIf(r -> r instanceof Event[] && ((Event[])r)[0] == cause && ((Event[])r)[1] == consequence);
-        } else {
-            throw new IllegalArgumentException(
-                "Can't remove a relation for unknown events.");
-        }
-    }
-
-    //the resulting Set is a Set of events computed in the old fashioned Prolog style from the existing events
-    /**
-     * DOCUMENT ME!
-     *
-     * @param question DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param question the starting event
+     * @return set of reachable events
      */
     public Set<Event> solve(Event question) {
-
-        Set<Event> derivedKnowledge = new HashSet<>(events);
-        boolean changed = true;
-        
-        while (changed) {
-            changed = false;
-            for (Object r : relations) {
-                if (r instanceof Event[]) {
-                    Event[] rel = (Event[]) r;
-                    if (rel.length == 2) {
-                        Event cause = rel[0];
-                        Event consequence = rel[1];
-                        
-                        if (derivedKnowledge.contains(cause) && !derivedKnowledge.contains(consequence)) {
-                            derivedKnowledge.add(consequence);
-                            changed = true;
-                        }
-                    }
-                }
-            }
-        }
-        
-        // If question is provided, check if it is entailed
-        if (question != null) {
-            if (derivedKnowledge.contains(question)) {
-                return Collections.singleton(question);
-            }
+        if (question == null || !events.contains(question)) {
             return Collections.emptySet();
         }
+
+        Set<Event> discovered = new HashSet<>();
+        bfs(question, (event, depth) -> discovered.add(event));
         
-        return derivedKnowledge;
+        return discovered;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Story story)) return false;
+        return Objects.equals(id, story.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return getName() != null ? getName() : id.toString();
     }
 }

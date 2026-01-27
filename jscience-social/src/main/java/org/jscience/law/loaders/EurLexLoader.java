@@ -24,6 +24,8 @@ package org.jscience.law.loaders;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.law.Statute;
+import org.jscience.law.StatuteStatus;
+import org.jscience.law.StatuteType;
 
 /**
  * Loader for European Union legal documents via EUR-Lex (CELLAR API).
@@ -42,8 +44,16 @@ public final class EurLexLoader extends AbstractResourceReader<Statute> implemen
         // resourceId would be a CELEX number (e.g., "32016R0679" for GDPR)
         
         if (resourceId != null && !resourceId.isEmpty()) {
-            return new Statute(resourceId, "EU Regulation/Directive (EUR-Lex)", 
-                Statute.Type.DIRECTIVE, "European Union", 2025, Statute.Status.ENACTED);
+            Statute statute = new Statute(resourceId, "EU Regulation/Directive (EUR-Lex)", 
+                StatuteType.DIRECTIVE, "European Union", 2025, StatuteStatus.ENACTED);
+                
+            // Populate traits
+            statute.getTraits().put("source", "EUR-Lex CELLAR (Mock)");
+            statute.getTraits().put("celex", resourceId);
+            statute.getTraits().put("language", "en,fr,de"); // EU multilingual
+            statute.getTraits().put("uri", "http://publications.europa.eu/resource/celex/" + resourceId);
+            
+            return statute;
         }
         
         throw new Exception("Invalid CELEX identifier: " + resourceId);
@@ -52,7 +62,7 @@ public final class EurLexLoader extends AbstractResourceReader<Statute> implemen
     @Override
     public Statute loadContent(String content) {
         return new Statute("EUMOCK", "Content-loaded EU Statute", 
-            Statute.Type.DIRECTIVE, "European Union", 2025, Statute.Status.ENACTED);
+            StatuteType.DIRECTIVE, "European Union", 2025, StatuteStatus.ENACTED);
     }
 
     @Override

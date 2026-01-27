@@ -23,47 +23,94 @@
 
 package org.jscience.util;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
- * Interface for extensible enumeration pattern.
+ * Abstract base class for extensible enumeration pattern.
  * <p>
  * Unlike Java enums which are closed sets, ExtensibleEnum allows
- * user-defined values to be added at runtime. Useful for:
- * <ul>
- * <li>Particle types (new particles can be discovered)</li>
- * <li>Taxonomic ranks (custom classifications)</li>
- * <li>Unit systems (domain-specific units)</li>
- * </ul>
+ * user-defined values to be added at runtime.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface ExtensibleEnum<T extends ExtensibleEnum<T>> {
+public abstract class ExtensibleEnum implements Serializable, Comparable<ExtensibleEnum> {
+
+    private static final long serialVersionUID = 1L;
+
+    private final String name;
+    private transient int ordinal; // Assigned by registry
+
+    protected ExtensibleEnum(String name) {
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.ordinal = -1; // Will be set by registry
+    }
 
     /**
      * Returns the name of this enum constant.
      */
-    String name();
+    public final String name() {
+        return name;
+    }
 
     /**
      * Returns the ordinal of this enum constant.
      */
-    int ordinal();
+    public final int ordinal() {
+        return ordinal;
+    }
+    
+    /**
+     * Internal method for registry to set ordinal.
+     */
+    void setOrdinal(int ordinal) {
+        this.ordinal = ordinal;
+    }
 
     /**
      * Returns a description of this enum constant.
      */
-    default String description() {
+    public String description() {
         return name();
     }
 
     /**
-     * Checks if this is a built-in (predefined) value or user-added.
+     * Checks if this is a built-in (predefined) value.
+     * Default implementation returns true to mimic standard Enum behavior 
+     * unless explicitly overridden.
      */
-    default boolean isBuiltIn() {
+    public boolean isBuiltIn() {
         return true;
     }
+
+    @Override
+    public final String toString() {
+        return name;
+    }
+
+    @Override
+    public final boolean equals(Object other) {
+        return this == other;
+    }
+
+    @Override
+    public final int hashCode() {
+        return System.identityHashCode(this);
+    }
+
+    @Override
+    public final int compareTo(ExtensibleEnum o) {
+        if (this.getClass() != o.getClass() && // optimization
+            this.getDeclaringClass() != o.getDeclaringClass())
+            throw new ClassCastException();
+        return this.ordinal - o.ordinal;
+    }
+    
+
+    public final Class<? extends ExtensibleEnum> getDeclaringClass() {
+        return this.getClass();
+    }
 }
-
-

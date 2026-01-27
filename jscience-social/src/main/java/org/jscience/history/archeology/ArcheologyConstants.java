@@ -24,6 +24,7 @@
 package org.jscience.history.archeology;
 
 import org.jscience.history.HistoryConstants;
+import org.jscience.history.HistoricalPeriod;
 import org.jscience.mathematics.algebra.Interval;
 import org.jscience.mathematics.algebra.intervals.RealInterval;
 import org.jscience.mathematics.numbers.real.Real;
@@ -41,10 +42,15 @@ import org.jscience.mathematics.numbers.real.Real;
 public final class ArcheologyConstants {
 
     /** Historical period category identifiers. */
-    public static final int ANTIQUE = 1;
-    public static final int MEDIEVAL = 2;
-    public static final int MODERN = 3;
-    public static final int CONTEMPORARY = 4;
+    public static final HistoricalPeriod ANTIQUE_PERIOD = HistoricalPeriod.ANCIENT_HISTORY;
+    public static final HistoricalPeriod MEDIEVAL_PERIOD = HistoricalPeriod.POST_CLASSICAL;
+    public static final HistoricalPeriod MODERN_PERIOD = HistoricalPeriod.LATE_MODERN;
+    public static final HistoricalPeriod CONTEMPORARY_PERIOD = HistoricalPeriod.CONTEMPORARY;
+
+    @Deprecated public static final int ANTIQUE = 1;
+    @Deprecated public static final int MEDIEVAL = 2;
+    @Deprecated public static final int MODERN = 3;
+    @Deprecated public static final int CONTEMPORARY = 4;
 
     private static final double YEAR = HistoryConstants.JULIAN_YEAR_SECONDS;
 

@@ -23,11 +23,20 @@
 
 package org.jscience.law;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a legal statute, law, or regulation.
@@ -35,58 +44,124 @@ import java.util.Objects;
  * A statute is a formal written enactment of a legislative authority.
  * This class provides a structured representation including hierarchical elements like articles.
  * </p>
+ * Modernized to implement ComprehensiveIdentification and use extensible StatuteType and StatuteStatus.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
  */
-public class Statute implements Serializable {
+@Persistent
+public class Statute implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3L;
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
 
     /**
-     * Types of legal acts.
+     * @deprecated Use {@link StatuteType} instead.
      */
+    @Deprecated
     public enum Type {
-        CONSTITUTION, FEDERAL_LAW, STATE_LAW, REGULATION, ORDINANCE,
-        TREATY, DIRECTIVE, DECREE, ACT
+        @Deprecated CONSTITUTION, @Deprecated FEDERAL_LAW, @Deprecated STATE_LAW, @Deprecated REGULATION, @Deprecated ORDINANCE,
+        @Deprecated TREATY, @Deprecated DIRECTIVE, @Deprecated DECREE, @Deprecated ACT;
+        
+        @Deprecated
+        public StatuteType toStatuteType() {
+             try {
+                return StatuteType.valueOf(this.name());
+            } catch (IllegalArgumentException e) {
+                return StatuteType.OTHER;
+            }
+        }
     }
 
     /**
-     * Life cycle status of a legal act.
+     * @deprecated Use {@link StatuteStatus} instead.
      */
+    @Deprecated
     public enum Status {
-        PROPOSED, ENACTED, AMENDED, REPEALED
+        @Deprecated PROPOSED, @Deprecated ENACTED, @Deprecated AMENDED, @Deprecated REPEALED;
+        
+        @Deprecated
+        public StatuteStatus toStatuteStatus() {
+             try {
+                return StatuteStatus.valueOf(this.name());
+            } catch (IllegalArgumentException e) {
+                return StatuteStatus.PROPOSED;
+            }
+        }
     }
 
+    @Attribute
     private final String code;
-    private final String title;
-    private final Type type;
-    private final String jurisdiction;
-    private final int yearEnacted;
-    private Status status;
+    
+    @Attribute
+    private StatuteType type;
+    
+    @Attribute
+    private String jurisdiction;
+    
+    @Attribute
+    private int yearEnacted;
+    
+    @Attribute
+    private StatuteStatus status;
     
     /** The hierarchical components (articles/clauses) of the statute. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Article> articles = new ArrayList<>();
 
-    public Statute(String code, String title, Type type, String jurisdiction,
-            int yearEnacted, Status status) {
+    public Statute(String code, String title, StatuteType type, String jurisdiction,
+            int yearEnacted, StatuteStatus status) {
+        this.id = new SimpleIdentification("Statute:" + UUID.randomUUID());
         this.code = Objects.requireNonNull(code);
-        this.title = Objects.requireNonNull(title);
-        this.type = type;
+        setName(Objects.requireNonNull(title));
+        this.type = Objects.requireNonNull(type);
         this.jurisdiction = jurisdiction;
         this.yearEnacted = yearEnacted;
-        this.status = status;
+        this.status = Objects.requireNonNull(status);
+    }
+
+    @Deprecated
+    public Statute(String code, String title, Type type, String jurisdiction,
+            int yearEnacted, Status status) {
+        this(code, title, type != null ? type.toStatuteType() : StatuteType.OTHER, 
+             jurisdiction, yearEnacted, status != null ? status.toStatuteStatus() : StatuteStatus.PROPOSED);
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getCode() { return code; }
-    public String getTitle() { return title; }
-    public Type getType() { return type; }
+    
+    public String getTitle() { return getName(); }
+    
+    public StatuteType getType() { return type; }
+    
+    public void setType(StatuteType type) { this.type = Objects.requireNonNull(type); }
+
     public String getJurisdiction() { return jurisdiction; }
+    
+    public void setJurisdiction(String jurisdiction) { this.jurisdiction = jurisdiction; }
+
     public int getYearEnacted() { return yearEnacted; }
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
+    
+    public void setYearEnacted(int yearEnacted) { this.yearEnacted = yearEnacted; }
+
+    public StatuteStatus getStatus() { return status; }
+    
+    public void setStatus(StatuteStatus status) { this.status = Objects.requireNonNull(status); }
 
     public List<Article> getArticles() {
         return Collections.unmodifiableList(articles);
@@ -97,11 +172,23 @@ public class Statute implements Serializable {
     }
 
     public boolean isActive() {
-        return status == Status.ENACTED || status == Status.AMENDED;
+        return status == StatuteStatus.ENACTED || status == StatuteStatus.AMENDED;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Statute that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return String.format("[%s] %s (%s, %d) - %s", code, title, type, yearEnacted, status);
+        return String.format("[%s] %s (%s, %d) - %s", code, getName(), type, yearEnacted, status);
     }
 }

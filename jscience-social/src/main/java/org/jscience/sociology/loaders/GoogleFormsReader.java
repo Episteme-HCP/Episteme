@@ -21,10 +21,11 @@
 package org.jscience.sociology.loaders;
 
 import org.jscience.io.AbstractResourceReader;
-import org.jscience.sociology.survey.Question;
+
 import org.jscience.sociology.survey.Survey;
 import org.jscience.sociology.survey.ChoiceQuestion;
 import org.jscience.sociology.survey.TextQuestion;
+import org.jscience.sociology.survey.QuestionType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,12 +80,12 @@ public class GoogleFormsReader extends AbstractResourceReader<Survey> {
         Survey survey = new Survey("Imported Google Form");
         survey.setDescription("This is a simulated import from Google Forms ID: " + formId);
         
-        ChoiceQuestion q1 = new ChoiceQuestion("What is your age?", Question.Type.MULTIPLE_CHOICE);
+        ChoiceQuestion q1 = new ChoiceQuestion("What is your age?", QuestionType.MULTIPLE_CHOICE);
         q1.addOption("18-24");
         q1.addOption("25-34");
         survey.addQuestion(q1);
         
-        TextQuestion q2 = new TextQuestion("Comments", Question.Type.TEXT);
+        TextQuestion q2 = new TextQuestion("Comments", QuestionType.TEXT);
         survey.addQuestion(q2);
 
         return survey;

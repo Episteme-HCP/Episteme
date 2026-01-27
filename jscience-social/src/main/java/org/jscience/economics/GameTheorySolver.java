@@ -41,7 +41,7 @@ public final class GameTheorySolver {
     private GameTheorySolver() {}
 
     /** Data structure for 2-player payoff entries. */
-    public record Payoff(double playerA, double playerB) implements Serializable {}
+    public record Payoff(Real playerA, Real playerB) implements Serializable {}
 
     /**
      * Finds index pairs (row, col) representing pure Nash Equilibria.
@@ -63,17 +63,17 @@ public final class GameTheorySolver {
     }
 
     private static boolean isBestResponseA(Payoff[][] matrix, int row, int col) {
-        double current = matrix[row][col].playerA();
+        Real current = matrix[row][col].playerA();
         for (int i = 0; i < matrix.length; i++) {
-            if (matrix[i][col].playerA() > current) return false;
+            if (matrix[i][col].playerA().compareTo(current) > 0) return false;
         }
         return true;
     }
 
     private static boolean isBestResponseB(Payoff[][] matrix, int row, int col) {
-        double current = matrix[row][col].playerB();
+        Real current = matrix[row][col].playerB();
         for (int j = 0; j < matrix[0].length; j++) {
-            if (matrix[row][j].playerB() > current) return false;
+            if (matrix[row][j].playerB().compareTo(current) > 0) return false;
         }
         return true;
     }
@@ -81,7 +81,7 @@ public final class GameTheorySolver {
     /** 
      * Calculates the Tragedy of the Commons payoff for a given number of users.
      */
-    public static Real calculateCommonsPayoff(int users, double resourceValue, double baseCost) {
-        return Real.of(resourceValue - (baseCost * users));
+    public static org.jscience.economics.money.Money calculateCommonsPayoff(int users, org.jscience.economics.money.Money resourceValue, org.jscience.economics.money.Money baseCost) {
+        return resourceValue.subtract(baseCost.multiply(Real.of(users)));
     }
 }

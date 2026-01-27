@@ -1,3 +1,32 @@
 {
-    "countries": []
+    "countries": [
+        {"code": "AF", "englishName": "Afghanistan", "builtIn": true},
+        {"code": "AL", "englishName": "Albania", "builtIn": true},
+        {"code": "DZ", "englishName": "Algeria", "builtIn": true},
+        {"code": "AR", "englishName": "Argentina", "builtIn": true},
+        {"code": "AM", "englishName": "Armenia", "builtIn": true},
+        {"code": "AU", "englishName": "Australia", "builtIn": true},
+        {"code": "AT", "englishName": "Austria", "builtIn": true},
+        {"code": "AZ", "englishName": "Azerbaijan", "builtIn": true},
+        {"code": "BE", "englishName": "Belgium", "builtIn": true},
+        {"code": "BR", "englishName": "Brazil", "builtIn": true},
+        {"code": "BG", "englishName": "Bulgaria", "builtIn": true},
+        {"code": "CA", "englishName": "Canada", "builtIn": true},
+        {"code": "CN", "englishName": "China", "builtIn": true},
+        {"code": "FR", "englishName": "France", "builtIn": true},
+        {"code": "DE", "englishName": "Germany", "builtIn": true},
+        {"code": "IN", "englishName": "India", "builtIn": true},
+        {"code": "ID", "englishName": "Indonesia", "builtIn": true},
+        {"code": "IT", "englishName": "Italy", "builtIn": true},
+        {"code": "JP", "englishName": "Japan", "builtIn": true},
+        {"code": "MX", "englishName": "Mexico", "builtIn": true},
+        {"code": "RU", "englishName": "Russia", "builtIn": true},
+        {"code": "SA", "englishName": "Saudi Arabia", "builtIn": true},
+        {"code": "ZA", "englishName": "South Africa", "builtIn": true},
+        {"code": "KR", "englishName": "South Korea", "builtIn": true},
+        {"code": "ES", "englishName": "Spain", "builtIn": true},
+        {"code": "TR", "englishName": "Turkey", "builtIn": true},
+        {"code": "GB", "englishName": "United Kingdom", "builtIn": true},
+        {"code": "US", "englishName": "United States", "builtIn": true}
+    ]
 }

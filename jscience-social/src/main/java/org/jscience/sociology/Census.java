@@ -25,7 +25,7 @@ package org.jscience.sociology;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.EnumMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -82,10 +82,10 @@ public class Census implements Serializable {
      * Returns the distribution of genders within the population.
      * @return a map from gender to the count of individuals
      */
-    public Map<Person.Gender, Long> getGenderDistribution() {
-        Map<Person.Gender, Long> dist = new EnumMap<>(Person.Gender.class);
+    public Map<Gender, Long> getGenderDistribution() {
+        Map<Gender, Long> dist = new java.util.HashMap<>();
         for (Person p : population) {
-            Person.Gender gender = p.getGender();
+            Gender gender = p.getGender();
             dist.put(gender, dist.getOrDefault(gender, 0L) + 1);
         }
         return dist;

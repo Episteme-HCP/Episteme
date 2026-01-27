@@ -75,7 +75,7 @@ public class City extends Place {
      * @throws NullPointerException if any argument is null
      */
     public City(String name, Country country) {
-        super(Objects.requireNonNull(name, "City name cannot be null"), Place.Type.CITY);
+        super(Objects.requireNonNull(name, "City name cannot be null"), org.jscience.earth.PlaceType.CITY);
         this.country = Objects.requireNonNull(country, "Country cannot be null");
         this.country.addCity(this);
     }

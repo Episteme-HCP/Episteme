@@ -23,15 +23,14 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.jscience.biology.Individual;
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
 import org.jscience.util.Temporal;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
@@ -44,48 +43,37 @@ import org.jscience.util.persistence.Relation;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @version 2.1
  * @since 1.0
  */
 @Persistent
-public class Role implements Named, Identified<Identification>, Commented, Temporal<Instant>, Serializable {
+public class Role implements ComprehensiveIdentification, Temporal<Instant> {
 
-    private static final long serialVersionUID = 1L;
+
 
     @Id
-    private Identification identification;
+    private final Identification id;
 
-    /** Primary role of receiving a service (e.g., student, customer, patient). */
-    public final static int CLIENT = 1;
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
 
-    /** Primary role of providing a service (e.g., teacher, waiter, doctor). */
-    public final static int SERVER = 2;
-
-    /** Role of monitoring or managing others (e.g., administrator, manager). */
-    public final static int SUPERVISOR = 4;
-
-    /** Role of passive observation (e.g., narrator, audience). */
-    public final static int OBSERVER = 8;
+    /** Primary role categories. */
+    public static final RoleKind CLIENT = RoleKind.CLIENT;
+    public static final RoleKind SERVER = RoleKind.SERVER;
+    public static final RoleKind SUPERVISOR = RoleKind.SUPERVISOR;
+    public static final RoleKind OBSERVER = RoleKind.OBSERVER;
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Individual individual;
-
-    @Attribute
-    private String name;
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Situation situation;
 
     @Attribute
-    private String comments;
-
-    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
-
-    @Attribute
     private Instant timestamp;
 
     @Attribute
-    private int kind;
+    private RoleKind kind;
 
     /**
      * Creates a new Role for an individual within a specific situation.
@@ -96,17 +84,29 @@ public class Role implements Named, Identified<Identification>, Commented, Tempo
      * @param kind       the categorical classification of the role
      * @throws NullPointerException if any argument is null
      */
-    public Role(Individual individual, String name, Situation situation, int kind) {
+    public Role(Individual individual, String name, Situation situation, RoleKind kind) {
+        this.id = new SimpleIdentification(individual.getId() + ":" + name);
+        setName(name);
         this.individual = Objects.requireNonNull(individual, "Individual cannot be null");
-        this.name = Objects.requireNonNull(name, "Role name cannot be null");
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Role name cannot be empty");
-        }
         this.situation = Objects.requireNonNull(situation, "Situation cannot be null");
-        this.kind = kind;
-        this.identification = new SimpleIdentification(individual.getId() + ":" + name);
+        this.kind = Objects.requireNonNull(kind, "RoleKind cannot be null");
         this.timestamp = Instant.now();
         this.individual.addRole(this);
+    }
+
+    @Deprecated
+    public Role(Individual individual, String name, Situation situation, int kind) {
+        this(individual, name, situation, mapLegacyKind(kind));
+    }
+
+    private static RoleKind mapLegacyKind(int legacyKind) {
+        return switch (legacyKind) {
+            case 1 -> RoleKind.CLIENT;
+            case 2 -> RoleKind.SERVER;
+            case 4 -> RoleKind.SUPERVISOR;
+            case 8 -> RoleKind.OBSERVER;
+            default -> RoleKind.OTHER;
+        };
     }
 
     /**
@@ -116,19 +116,26 @@ public class Role implements Named, Identified<Identification>, Commented, Tempo
      * @param kind the categorical classification
      * @throws NullPointerException if name is null
      */
-    public Role(String name, int kind) {
-        this.name = Objects.requireNonNull(name, "Role name cannot be null");
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Role name cannot be empty");
-        }
-        this.kind = kind;
-        this.identification = new SimpleIdentification("Template:" + name);
+    public Role(String name, RoleKind kind) {
+        this.id = new SimpleIdentification("Template:" + name);
+        setName(name);
+        this.kind = Objects.requireNonNull(kind, "RoleKind cannot be null");
         this.timestamp = Instant.now();
     }
 
+    @Deprecated
+    public Role(String name, int kind) {
+        this(name, mapLegacyKind(kind));
+    }
+
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -151,32 +158,12 @@ public class Role implements Named, Identified<Identification>, Commented, Tempo
      * Returns the archetypal kind of this role.
      * @return the kind constant
      */
-    public int getKind() {
+    public RoleKind getKind() {
         return kind;
     }
 
-    @Override
-    public Identification getId() {
-        return identification;
-    }
-
-    @Override
-    public String getComments() {
-        return comments;
-    }
-
-    /**
-     * Sets the comments for this role.
-     * @param comments the comments to set
-     */
-    @Override
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
-
-    @Override
-    public java.util.Map<String, Object> getTraits() {
-        return traits;
+    public void setKind(RoleKind kind) {
+        this.kind = Objects.requireNonNull(kind);
     }
 
     @Override
@@ -198,7 +185,19 @@ public class Role implements Named, Identified<Identification>, Commented, Tempo
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Role role)) return false;
+        return Objects.equals(id, role.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
     public String toString() {
-        return name + " (" + (individual != null ? individual.getName() : "None") + ")";
+        return getName() + " (" + (individual != null ? individual.getName() : "None") + ")";
     }
 }

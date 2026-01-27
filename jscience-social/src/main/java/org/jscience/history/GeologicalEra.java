@@ -17,7 +17,7 @@ public class GeologicalEra extends Event {
     private static final long serialVersionUID = 2L;
 
     public GeologicalEra(String name, String description, TimeCoordinate when) {
-        super(name, description, when, Category.NATURAL);
+        super(name, description, when, EventCategory.NATURAL);
     }
 
     public GeologicalEra(String name, TimeCoordinate when) {

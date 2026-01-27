@@ -55,7 +55,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 5.0
  */
-public class ExchangeRateReader extends AbstractResourceReader<Double> {
+public class ExchangeRateReader extends AbstractResourceReader<org.jscience.mathematics.numbers.real.Real> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExchangeRateReader.class);
     
@@ -116,8 +116,8 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
     }
 
     @Override
-    public Class<Double> getResourceType() {
-        return Double.class;
+    public Class<org.jscience.mathematics.numbers.real.Real> getResourceType() {
+        return org.jscience.mathematics.numbers.real.Real.class;
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
      * @return The exchange rate (how many target units per 1 source unit)
      */
     @Override
-    protected Double loadFromSource(String currencyPairId) throws Exception {
+    protected org.jscience.mathematics.numbers.real.Real loadFromSource(String currencyPairId) throws Exception {
         String[] parts = currencyPairId.split("/");
         if (parts.length != 2) {
             throw new IllegalArgumentException(
@@ -152,7 +152,7 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
      * Fetches exchange rate from Frankfurter API (based on ECB data).
      * Free, reliable, no API key required.
      */
-    private double fetchFromFrankfurter(String from, String to) throws Exception {
+    private org.jscience.mathematics.numbers.real.Real fetchFromFrankfurter(String from, String to) throws Exception {
         String url = String.format("%s?from=%s&to=%s", FRANKFURTER_API, from, to);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -177,13 +177,13 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
 
         double rate = rates.get(to).asDouble();
         LOG.debug("Fetched rate {}/{}: {}", from, to, rate);
-        return rate;
+        return org.jscience.mathematics.numbers.real.Real.of(rate);
     }
 
     /**
      * Fetches exchange rate from ExchangeRate-API (free tier).
      */
-    private double fetchFromExchangeRateApi(String from, String to) throws Exception {
+    private org.jscience.mathematics.numbers.real.Real fetchFromExchangeRateApi(String from, String to) throws Exception {
         String url = EXCHANGE_RATE_API + "/" + from;
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -206,14 +206,14 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
             throw new Exception("Rate not found for " + from + "/" + to);
         }
 
-        return rates.get(to).asDouble();
+        return org.jscience.mathematics.numbers.real.Real.of(rates.get(to).asDouble());
     }
 
     /**
      * Fetches exchange rate from ECB (simplified, returns EUR-based rates).
      * Note: ECB only provides EUR-based rates, so non-EUR pairs require calculation.
      */
-    private double fetchFromECB(String from, String to) throws Exception {
+    private org.jscience.mathematics.numbers.real.Real fetchFromECB(String from, String to) throws Exception {
         // For simplicity, use Frankfurter which wraps ECB data in a simpler format
         return fetchFromFrankfurter(from, to);
     }
@@ -224,7 +224,7 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
      * @param baseCurrency The base currency code (e.g., "USD", "EUR")
      * @return Map of currency codes to exchange rates
      */
-    public Map<String, Double> getAllRates(String baseCurrency) throws Exception {
+    public Map<String, org.jscience.mathematics.numbers.real.Real> getAllRates(String baseCurrency) throws Exception {
         String url = String.format("%s?from=%s", FRANKFURTER_API, baseCurrency.toUpperCase());
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -243,12 +243,12 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
         JsonNode root = mapper.readTree(response.body());
         JsonNode rates = root.get("rates");
         
-        Map<String, Double> result = new HashMap<>();
+        Map<String, org.jscience.mathematics.numbers.real.Real> result = new HashMap<>();
         if (rates != null) {
             Iterator<String> fields = rates.fieldNames();
             while (fields.hasNext()) {
                 String currency = fields.next();
-                result.put(currency, rates.get(currency).asDouble());
+                result.put(currency, org.jscience.mathematics.numbers.real.Real.of(rates.get(currency).asDouble()));
             }
         }
 
@@ -264,8 +264,8 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
      * @param to Target currency code
      * @return The converted amount
      */
-    public double convert(double amount, String from, String to) throws Exception {
-        double rate = loadFromSource(from + "/" + to);
-        return amount * rate;
+    public org.jscience.mathematics.numbers.real.Real convert(org.jscience.mathematics.numbers.real.Real amount, String from, String to) throws Exception {
+        org.jscience.mathematics.numbers.real.Real rate = loadFromSource(from + "/" + to);
+        return amount.multiply(rate);
     }
 }

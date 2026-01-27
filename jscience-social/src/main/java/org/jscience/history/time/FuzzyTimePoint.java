@@ -30,7 +30,7 @@ public final class FuzzyTimePoint implements TimeCoordinate, Serializable {
     private final Natural day; // 1-31
 
     @Attribute
-    private final Precision precision;
+    private final TimePrecision precision;
 
     @Attribute
     private final Era era;
@@ -39,7 +39,7 @@ public final class FuzzyTimePoint implements TimeCoordinate, Serializable {
     private final String qualifier;
 
     private FuzzyTimePoint(Natural year, Natural month, Natural day,
-            Precision precision, Era era, String qualifier) {
+            TimePrecision precision, Era era, String qualifier) {
         this.year = year;
         this.month = month;
         this.day = day;
@@ -49,35 +49,35 @@ public final class FuzzyTimePoint implements TimeCoordinate, Serializable {
     }
 
     public static FuzzyTimePoint of(long year, int month, int day) {
-        return new FuzzyTimePoint(Natural.of(year), Natural.of(month), Natural.of(day), Precision.DAY, Era.CE, null);
+        return new FuzzyTimePoint(Natural.of(year), Natural.of(month), Natural.of(day), TimePrecision.DAY, Era.CE, null);
     }
 
     public static FuzzyTimePoint of(long year, int month) {
-        return new FuzzyTimePoint(Natural.of(year), Natural.of(month), null, Precision.MONTH, Era.CE, null);
+        return new FuzzyTimePoint(Natural.of(year), Natural.of(month), null, TimePrecision.MONTH, Era.CE, null);
     }
 
     public static FuzzyTimePoint of(long year) {
-        return new FuzzyTimePoint(Natural.of(year), null, null, Precision.YEAR, Era.CE, null);
+        return new FuzzyTimePoint(Natural.of(year), null, null, TimePrecision.YEAR, Era.CE, null);
     }
 
     public static FuzzyTimePoint circa(long year) {
-        return new FuzzyTimePoint(Natural.of(year), null, null, Precision.APPROXIMATE, Era.CE, null);
+        return new FuzzyTimePoint(Natural.of(year), null, null, TimePrecision.APPROXIMATE, Era.CE, null);
     }
 
     public static FuzzyTimePoint bce(long year) {
-        return new FuzzyTimePoint(Natural.of(year), null, null, Precision.YEAR, Era.BCE, null);
+        return new FuzzyTimePoint(Natural.of(year), null, null, TimePrecision.YEAR, Era.BCE, null);
     }
 
     public static FuzzyTimePoint circaBce(long year) {
-        return new FuzzyTimePoint(Natural.of(year), null, null, Precision.APPROXIMATE, Era.BCE, null);
+        return new FuzzyTimePoint(Natural.of(year), null, null, TimePrecision.APPROXIMATE, Era.BCE, null);
     }
 
     public static FuzzyTimePoint unknown() {
-        return new FuzzyTimePoint(null, null, null, Precision.UNKNOWN, null, null);
+        return new FuzzyTimePoint(null, null, null, TimePrecision.UNKNOWN, null, null);
     }
 
     @Override
-    public Precision getPrecision() {
+    public TimePrecision getPrecision() {
         return precision;
     }
 
@@ -91,12 +91,12 @@ public final class FuzzyTimePoint implements TimeCoordinate, Serializable {
 
     @Override
     public boolean isFuzzy() {
-        return precision != Precision.EXACT && precision != Precision.DAY;
+        return !Objects.equals(precision, TimePrecision.EXACT) && !Objects.equals(precision, TimePrecision.DAY);
     }
 
     @Override
     public java.time.Instant toInstant() {
-        if (precision == Precision.UNKNOWN || year == null) {
+        if (precision == TimePrecision.UNKNOWN || year == null) {
             return java.time.Instant.MIN;
         }
         try {
@@ -116,14 +116,14 @@ public final class FuzzyTimePoint implements TimeCoordinate, Serializable {
 
     @Override
     public String toString() {
-        if (precision == Precision.UNKNOWN) return "Unknown date";
+        if (precision == TimePrecision.UNKNOWN) return "Unknown date";
         StringBuilder sb = new StringBuilder();
         if (qualifier != null) sb.append(qualifier).append(" ");
-        if (precision == Precision.APPROXIMATE) sb.append("c. ");
-        if (precision == Precision.CENTURY && year != null) {
+        if (precision == TimePrecision.APPROXIMATE) sb.append("c. ");
+        if (precision == TimePrecision.CENTURY && year != null) {
             long centuryNum = (Math.abs(year.longValue()) / 100) + 1;
             sb.append(centuryNum).append(" century");
-        } else if (precision == Precision.DECADE && year != null) {
+        } else if (precision == TimePrecision.DECADE && year != null) {
             sb.append((year.longValue() / 10) * 10).append("s");
         } else {
             if (day != null) sb.append(day).append(" ");
@@ -141,8 +141,8 @@ public final class FuzzyTimePoint implements TimeCoordinate, Serializable {
         return Objects.equals(year, other.year) &&
                 Objects.equals(month, other.month) &&
                 Objects.equals(day, other.day) &&
-                precision == other.precision &&
-                era == other.era;
+                Objects.equals(precision, other.precision) &&
+                Objects.equals(era, other.era);
     }
 
     @Override

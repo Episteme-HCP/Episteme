@@ -26,6 +26,7 @@ package org.jscience.economics;
 
 import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.economics.money.Money;
 
 /**
  * Standard macroeconomic formulas for GDP, inflation, trade, and debt analysis.
@@ -40,13 +41,13 @@ public final class MacroIndicators {
     private MacroIndicators() {}
 
     /** GDP (Expenditure Approach): C + I + G + (NX). */
-    public static Real calculateGDP(Real consumption, Real investment, 
-            Real governmentSpending, Real netExports) {
+    public static Money calculateGDP(Money consumption, Money investment, 
+            Money governmentSpending, Money netExports) {
         return consumption.add(investment).add(governmentSpending).add(netExports);
     }
 
     /** Real GDP adjusted by deflator. */
-    public static Real realGDP(Real nominalGDP, Real deflator) {
+    public static Money realGDP(Money nominalGDP, Real deflator) {
         return nominalGDP.divide(deflator).multiply(Real.of(100));
     }
 
@@ -57,9 +58,9 @@ public final class MacroIndicators {
     }
 
     /** Debt-to-GDP ratio as a percentage. */
-    public static Real debtToGDP(Real totalDebt, Real gdp) {
-        if (gdp.isZero()) return Real.ZERO;
-        return totalDebt.divide(gdp).multiply(Real.of(100));
+    public static Real debtToGDP(Money totalDebt, Money gdp) {
+        if (gdp.getAmount().isZero()) return Real.ZERO;
+        return totalDebt.getAmount().divide(gdp.getAmount()).multiply(Real.of(100));
     }
 
     /** Taylor Rule for central bank interest rate settings. */
@@ -72,6 +73,6 @@ public final class MacroIndicators {
 
     /** Gini coefficient for reaching income distribution analysis. */
     public static Real giniCoefficient(List<Real> incomes) {
-        return EconomicMetrics.giniCoefficient(incomes);
+        return org.jscience.economics.EconomicMetrics.giniCoefficientReal(incomes);
     }
 }

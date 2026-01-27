@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.jscience.chemistry.Element;
+import org.jscience.chemistry.ElementCategory;
 import org.jscience.chemistry.PeriodicTable;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
@@ -141,32 +142,32 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
             List<ElementData> elements = wrapper.elements;
 
             for (ElementData data : elements) {
-                Element.ElementCategory cat = Element.ElementCategory.UNKNOWN;
+                ElementCategory cat = ElementCategory.UNKNOWN;
                 String catStr = data.category.toUpperCase().replace(" ", "_").replace("-", "_");
                 if (catStr.contains("DIATOMIC") || catStr.contains("POLYATOMIC")) {
                     catStr = "NONMETAL";
                 }
                 try {
-                    cat = Element.ElementCategory.valueOf(catStr);
+                    cat = ElementCategory.valueOf(catStr);
                 } catch (Exception e) {
                     if (catStr.contains("NOBLE"))
-                        cat = Element.ElementCategory.NOBLE_GAS;
+                        cat = ElementCategory.NOBLE_GAS;
                     else if (catStr.contains("ALKALI") && !catStr.contains("EARTH"))
-                        cat = Element.ElementCategory.ALKALI_METAL;
+                        cat = ElementCategory.ALKALI_METAL;
                     else if (catStr.contains("ALKALINE"))
-                        cat = Element.ElementCategory.ALKALINE_EARTH_METAL;
+                        cat = ElementCategory.ALKALINE_EARTH_METAL;
                     else if (catStr.contains("TRANSITION"))
-                        cat = Element.ElementCategory.TRANSITION_METAL;
+                        cat = ElementCategory.TRANSITION_METAL;
                     else if (catStr.contains("LANTHANIDE"))
-                        cat = Element.ElementCategory.LANTHANIDE;
+                        cat = ElementCategory.LANTHANIDE;
                     else if (catStr.contains("ACTINIDE"))
-                        cat = Element.ElementCategory.ACTINIDE;
+                        cat = ElementCategory.ACTINIDE;
                     else if (catStr.contains("METALLOID"))
-                        cat = Element.ElementCategory.METALLOID;
+                        cat = ElementCategory.METALLOID;
                     else if (catStr.contains("HALOGEN"))
-                        cat = Element.ElementCategory.HALOGEN;
+                        cat = ElementCategory.HALOGEN;
                     else if (catStr.contains("NONMETAL"))
-                        cat = Element.ElementCategory.NONMETAL;
+                        cat = ElementCategory.NONMETAL;
                 }
 
                 Element element = new Element(data.name, data.symbol);
@@ -278,9 +279,9 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
             if (bd.from >= 0 && bd.from < createdAtoms.size() &&
                     bd.to >= 0 && bd.to < createdAtoms.size()) {
 
-                org.jscience.chemistry.Bond.BondOrder order = org.jscience.chemistry.Bond.BondOrder.SINGLE;
+                org.jscience.chemistry.BondType order = org.jscience.chemistry.BondType.SINGLE;
                 try {
-                    order = org.jscience.chemistry.Bond.BondOrder.valueOf(bd.order.toUpperCase());
+                    order = org.jscience.chemistry.BondType.valueOf(bd.order.toUpperCase());
                 } catch (Exception ignore) {
                 }
 

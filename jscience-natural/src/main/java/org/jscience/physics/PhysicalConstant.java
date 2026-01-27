@@ -23,64 +23,61 @@
 
 package org.jscience.physics;
 
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Unit;
-import org.jscience.measure.Quantities;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Unit;
 
-import org.jscience.util.Named;
 
 /**
- * Represents a physical constant with uncertainty.
+ * Fundamental physical constants.
+ * Ported to use Real for high-precision scientific computing.
+ * Values based on CODATA 2018.
  *
  * @author Silvere Martin-Michiellot
- * <p>
- * <b>Reference:</b><br>
- * Mohr, P. J., et al. (2016). CODATA Recommended Values of the Fundamental Physical Constants. <i>Reviews of Modern Physics</i>.
- * </p>
- *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PhysicalConstant<Q extends Quantity<Q>> implements Named {
+public class PhysicalConstant<Q extends Quantity<Q>> {
 
     private final String name;
-    private final double value;
-    private final Unit<Q> unit;
-    private final Object source; // Changed to Object to accept CODATA enum or String
-    private final double uncertainty;
+    private final Real value;
+    @SuppressWarnings("rawtypes")
+    private final Unit unit;
+    private final String source;
+    private final Real uncertainty;
 
-    public PhysicalConstant(String name, double value, Unit<Q> unit, Object source, double uncertainty) {
+    public PhysicalConstant(String name, double value, @SuppressWarnings("rawtypes") Unit unit, Object source, double uncertainty) {
         this.name = name;
-        this.value = value;
+        this.value = Real.of(value);
         this.unit = unit;
-        this.source = source;
-        this.uncertainty = uncertainty;
-    }
-
-    public Quantity<Q> toQuantity() {
-        return Quantities.create(value, unit);
-    }
-
-    public Real getValue() {
-        return Real.of(value);
+        this.source = String.valueOf(source);
+        this.uncertainty = Real.of(uncertainty);
     }
 
     public String getName() {
         return name;
     }
 
-    public Unit<Q> getUnit() {
+    public Real getValue() {
+        return value;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public Unit getUnit() {
         return unit;
     }
 
-    public Object getSource() {
+    public String getSource() {
         return source;
     }
 
-    public double getUncertainty() {
+    public Real getUncertainty() {
         return uncertainty;
     }
+
+    @SuppressWarnings("unchecked")
+    public Quantity<Q> toQuantity() {
+        return (Quantity<Q>) Quantities.create(value, unit);
+    }
 }
-
-

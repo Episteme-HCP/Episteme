@@ -41,7 +41,7 @@ public final class InflationForecaster {
      * Estimates inflation rate based on growth in money supply, velocity, and real GDP.
      * Equation: π ≈ ΔM/M + ΔV/V - ΔY/Y
      */
-    public static Real estimateInflation(double moneyGrowth, double velocityGrowth, double gdpGrowth) {
-        return Real.of(moneyGrowth + velocityGrowth - gdpGrowth);
+    public static Real estimateInflation(Real moneyGrowth, Real velocityGrowth, Real gdpGrowth) {
+        return moneyGrowth.add(velocityGrowth).subtract(gdpGrowth);
     }
 }

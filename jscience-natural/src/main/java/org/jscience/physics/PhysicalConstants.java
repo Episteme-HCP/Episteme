@@ -51,7 +51,7 @@ public final class PhysicalConstants {
         // Fundamental Constants
         // =========================================================================
 
-        public static final PhysicalConstant<Velocity> C_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Velocity> C_REF = new PhysicalConstant<Velocity>(
                         "Speed of light in vacuum",
                         299792458.0,
                         Units.METER_PER_SECOND,
@@ -61,7 +61,7 @@ public final class PhysicalConstants {
         public static final Quantity<Velocity> SPEED_OF_LIGHT = C_REF.toQuantity();
         public static final Real c = C_REF.getValue();
 
-        public static final PhysicalConstant<Action> PLANCK_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Action> PLANCK_REF = new PhysicalConstant<Action>(
                         "Planck constant",
                         6.62607015e-34,
                         Units.JOULE.multiply(Units.SECOND).asType(Action.class),
@@ -74,7 +74,7 @@ public final class PhysicalConstants {
         public static final Quantity<Action> HBAR = PLANCK_CONSTANT.divide(2.0 * Math.PI);
         public static final Real h_bar = h.divide(Real.of(2.0 * Math.PI));
 
-        public static final PhysicalConstant<ElectricCharge> ELEMENTARY_CHARGE_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<ElectricCharge> ELEMENTARY_CHARGE_REF = new PhysicalConstant<ElectricCharge>(
                         "Elementary charge",
                         1.602176634e-19,
                         Units.COULOMB,
@@ -84,7 +84,7 @@ public final class PhysicalConstants {
         public static final Quantity<ElectricCharge> ELEMENTARY_CHARGE = ELEMENTARY_CHARGE_REF.toQuantity();
         public static final Real e = ELEMENTARY_CHARGE_REF.getValue();
 
-        public static final PhysicalConstant<Entropy> BOLTZMANN_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Entropy> BOLTZMANN_REF = new PhysicalConstant<Entropy>(
                         "Boltzmann constant",
                         1.380649e-23,
                         Units.JOULE.divide(Units.KELVIN).asType(Entropy.class),
@@ -94,7 +94,7 @@ public final class PhysicalConstants {
         public static final Quantity<Entropy> BOLTZMANN_CONSTANT = BOLTZMANN_REF.toQuantity();
         public static final Real k_B = BOLTZMANN_REF.getValue();
 
-        public static final PhysicalConstant<?> AVOGADRO_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<?> AVOGADRO_REF = new PhysicalConstant<Quantity<?>>(
                         "Avogadro constant",
                         6.02214076e23,
                         Units.MOLE.inverse(),
@@ -110,7 +110,7 @@ public final class PhysicalConstants {
 
         // Gravitational constant
         // 6.674 30(15) x 10^-11
-        public static final PhysicalConstant<?> GRAVITATIONAL_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<?> GRAVITATIONAL_REF = new PhysicalConstant<Quantity<?>>(
                         "Newtonian constant of gravitation",
                         6.67430e-11,
                         (Unit<?>) Units.CUBIC_METER.divide(Units.KILOGRAM).divide(Units.SECOND.pow(2)),
@@ -121,7 +121,7 @@ public final class PhysicalConstants {
         public static final Real G = GRAVITATIONAL_REF.getValue();
 
         // Standard acceleration of gravity (Standard)
-        public static final PhysicalConstant<Acceleration> STANDARD_GRAVITY_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Acceleration> STANDARD_GRAVITY_REF = new PhysicalConstant<Acceleration>(
                         "Standard acceleration of gravity",
                         9.80665,
                         Units.METERS_PER_SECOND_SQUARED,
@@ -131,7 +131,7 @@ public final class PhysicalConstants {
         public static final Real g_n = STANDARD_GRAVITY_REF.getValue();
 
         // Vacuum permittivity
-        public static final PhysicalConstant<ElectricPermittivity> EPSILON_0_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<ElectricPermittivity> EPSILON_0_REF = new PhysicalConstant<ElectricPermittivity>(
                         "Vacuum electric permittivity",
                         8.8541878128e-12,
                         Units.FARAD.divide(Units.METER).asType(ElectricPermittivity.class),
@@ -142,7 +142,7 @@ public final class PhysicalConstants {
         public static final Real epsilon_0 = EPSILON_0_REF.getValue();
 
         // Electron mass
-        public static final PhysicalConstant<Mass> ELECTRON_MASS_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Mass> ELECTRON_MASS_REF = new PhysicalConstant<Mass>(
                         "Electron mass",
                         9.1093837015e-31,
                         Units.KILOGRAM,
@@ -152,7 +152,7 @@ public final class PhysicalConstants {
         public static final Real m_e = ELECTRON_MASS_REF.getValue();
 
         // Proton mass
-        public static final PhysicalConstant<Mass> PROTON_MASS_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Mass> PROTON_MASS_REF = new PhysicalConstant<Mass>(
                         "Proton mass",
                         1.67262192369e-27,
                         Units.KILOGRAM,
@@ -162,7 +162,7 @@ public final class PhysicalConstants {
         public static final Real m_p = PROTON_MASS_REF.getValue();
 
         // Neutron mass
-        public static final PhysicalConstant<Mass> NEUTRON_MASS_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Mass> NEUTRON_MASS_REF = new PhysicalConstant<Mass>(
                         "Neutron mass",
                         1.67492749804e-27,
                         Units.KILOGRAM,
@@ -187,10 +187,10 @@ public final class PhysicalConstants {
         public static final Real ly = Real.of(9.4607304725808e15);
         public static final Real pc = Real.of(3.0856775814913673e16);
         public static final Real M_sun = Real.of(1.98892e30);
-        public static final Real M_earth = Real.of(5.9722e24);
+
         // Quantum Constants
         public static final Quantity<Action> REDUCED_PLANCK = HBAR;
-        public static final PhysicalConstant<WaveNumber> RYDBERG_CONSTANT_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<WaveNumber> RYDBERG_CONSTANT_REF = new PhysicalConstant<WaveNumber>(
                         "Rydberg constant",
                         10973731.568160,
                         Units.METER.inverse().asType(WaveNumber.class),
@@ -198,7 +198,7 @@ public final class PhysicalConstants {
                         2.1e-4 // uncertainty
         );
         public static final Quantity<WaveNumber> RYDBERG_CONSTANT = RYDBERG_CONSTANT_REF.toQuantity();
-        public static final PhysicalConstant<Dimensionless> FINE_STRUCTURE_REF = new PhysicalConstant<>(
+        public static final PhysicalConstant<Dimensionless> FINE_STRUCTURE_REF = new PhysicalConstant<Dimensionless>(
                         "Fine-structure constant",
                         7.2973525693e-3,
                         Units.ONE,
@@ -218,7 +218,18 @@ public final class PhysicalConstants {
         // If ParticleType expects eV to be Energy in Joules (L21: "Electron volt in
         // Joules"), then it is numerically equal to 'e' value in derived units.
 
-        public static final Real PI = Real.PI;
+        public static final PhysicalConstant<Power> STEFAN_BOLTZMANN_REF = new PhysicalConstant<Power>(
+                        "Stefan-Boltzmann constant",
+                        5.670374419e-8,
+                        Units.WATT.divide(Units.SQUARE_METER).divide(Units.KELVIN.pow(4)).asType(Power.class),
+                        CODATA.V2022,
+                        0.0 // exact per SI redefinition? No, derived from k, h, c.
+        );
+        public static final Quantity<Power> STEFAN_BOLTZMANN_CONSTANT = STEFAN_BOLTZMANN_REF.toQuantity();
+        public static final Real stefan_boltzmann = STEFAN_BOLTZMANN_REF.getValue();
+        public static final Real sigma = stefan_boltzmann;
+
 }
+
 
 

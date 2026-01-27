@@ -1,6 +1,6 @@
 package org.jscience.economics;
 
-import java.io.Serializable;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -9,6 +9,17 @@ import java.util.Set;
 import org.jscience.economics.money.Money;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
+import org.jscience.util.identity.Identification;
+
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
+import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Functional abstraction for an economic system, encompassing organizations, 
@@ -21,14 +32,28 @@ import org.jscience.measure.Quantity;
  * @version 2.0
  * @since 1.0
  */
-public abstract class Economy implements Serializable {
+@Persistent
+public abstract class Economy implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Organization> organizations;
+    
+    @Relation(type = Relation.Type.ONE_TO_ONE)
     private final Bank centralBank;
+    
+    @Attribute
     private Money cachedGdp;
+    @Attribute
     private Real inflationRate = Real.ZERO;
+    @Attribute
     private Real unemploymentRate = Real.ZERO;
 
     /**
@@ -53,6 +78,11 @@ public abstract class Economy implements Serializable {
      * @throws NullPointerException if centralBank or orgs is null
      */
     public Economy(Set<Organization> orgs, Bank centralBank) {
+        this(new org.jscience.util.identity.UUIDIdentification(UUID.randomUUID()), orgs, centralBank);
+    }
+
+    public Economy(Identification id, Set<Organization> orgs, Bank centralBank) {
+        this.id = Objects.requireNonNull(id);
         this.centralBank = Objects.requireNonNull(centralBank, "Central bank cannot be null");
         this.organizations = new HashSet<>(Objects.requireNonNull(orgs, "Organization set cannot be null"));
         this.organizations.remove(centralBank);
@@ -111,13 +141,21 @@ public abstract class Economy implements Serializable {
         return total;
     }
 
-    /**
-     * Advances the economic simulation by an incremental time step.
-     * To be implemented by specific economic models (e.g., FreeMarket, Planned).
-     * 
-     * @param dt the time delta in simulation units
-     */
-    public abstract void step(double dt);
+    public abstract void step(Real dt);
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    public String getModelType() {
+        return "ECONOMY";
+    }
 
     // --- Macro Indicators ---
 

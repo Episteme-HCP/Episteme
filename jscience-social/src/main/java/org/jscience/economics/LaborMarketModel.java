@@ -41,7 +41,7 @@ public final class LaborMarketModel {
      * Calculates change in unemployment rate based on Okun's Law.
      * ΔU = -0.5 * (ΔGDP_growth - 3.0)
      */
-    public static Real okunDeltaUnemployment(double gdpGrowth) {
-        return Real.of(-0.5 * (gdpGrowth - 3.0));
+    public static Real okunDeltaUnemployment(Real gdpGrowth) {
+        return Real.of(-0.5).multiply(gdpGrowth.subtract(Real.of(3.0)));
     }
 }

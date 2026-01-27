@@ -46,12 +46,12 @@ public final class EconomicScenarioReader extends AbstractResourceReader<Portfol
             Money price = new Money(Real.of(100 + rand.nextDouble() * 500), cur);
             for (int i = 0; i < 50; i++) {
                 history.add(price);
-                price = price.multiply(0.98 + rand.nextDouble() * 0.04);
+                price = price.multiply(Real.of(0.98).add(Real.of(rand.nextDouble()).multiply(Real.of(0.04))));
             }
             PortfolioData.Asset asset = new PortfolioData.Asset(s, s + " Corp", price, 
                                     new Money(Real.of(rand.nextDouble()), cur), 
-                                    Real.of(rand.nextDouble() * 2), (long)(rand.nextDouble() * 1000000), history);
-            pd.addHolding(asset, Real.of(rand.nextInt(100) + 1), price.multiply(0.9));
+                                    Real.of(rand.nextDouble()).multiply(Real.of(2)), (long)(rand.nextDouble() * 1000000), history);
+            pd.addHolding(asset, Real.of(rand.nextInt(100) + 1), price.multiply(Real.of(0.9)));
             pd.addToWatchlist(asset);
         }
         return pd;

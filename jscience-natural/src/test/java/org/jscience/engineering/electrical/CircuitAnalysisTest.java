@@ -32,7 +32,7 @@ import org.jscience.measure.quantity.ElectricPotential;
 import org.jscience.measure.quantity.ElectricCurrent;
 import org.jscience.measure.quantity.ElectricResistance;
 import org.jscience.measure.quantity.Power;
-import org.jscience.mathematics.numbers.real.Real;
+
 
 /**
  * Tests for CircuitAnalysis.
@@ -48,7 +48,7 @@ public class CircuitAnalysisTest {
         Quantity<ElectricCurrent> i = Quantities.create(2, Units.AMPERE);
         Quantity<ElectricResistance> r = Quantities.create(10, Units.OHM);
 
-        Quantity<ElectricPotential> v = CircuitAnalysis.voltageQ(i, r);
+        Quantity<ElectricPotential> v = CircuitAnalysis.voltage(i, r);
         assertEquals(20.0, v.to(Units.VOLT).getValue().doubleValue(), 1e-9);
     }
 
@@ -57,15 +57,17 @@ public class CircuitAnalysisTest {
         Quantity<ElectricPotential> v = Quantities.create(12, Units.VOLT);
         Quantity<ElectricCurrent> i = Quantities.create(0.5, Units.AMPERE);
 
-        Quantity<Power> p = CircuitAnalysis.powerQ(v, i);
+        Quantity<Power> p = CircuitAnalysis.power(v, i);
         assertEquals(6.0, p.to(Units.WATT).getValue().doubleValue(), 1e-9);
     }
 
     @Test
     public void testParallelResistance() {
         // 10 || 10 = 5
-        Real rTotal = CircuitAnalysis.resistanceParallel2(Real.of(10), Real.of(10));
-        assertEquals(5.0, rTotal.doubleValue(), 1e-9);
+        Quantity<ElectricResistance> r1 = Quantities.create(10, Units.OHM);
+        Quantity<ElectricResistance> r2 = Quantities.create(10, Units.OHM);
+        Quantity<ElectricResistance> rTotal = CircuitAnalysis.resistanceParallel2(r1, r2);
+        assertEquals(5.0, rTotal.to(Units.OHM).getValue().doubleValue(), 1e-9);
     }
 }
 

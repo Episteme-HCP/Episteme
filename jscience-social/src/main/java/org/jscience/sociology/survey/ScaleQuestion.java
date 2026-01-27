@@ -14,7 +14,7 @@ public class ScaleQuestion extends Question {
     private String maxLabel;
 
     public ScaleQuestion(String text, int min, int max) {
-        super(text, Type.LINEAR_SCALE);
+        super(text, QuestionType.LINEAR_SCALE);
         this.min = min;
         this.max = max;
     }

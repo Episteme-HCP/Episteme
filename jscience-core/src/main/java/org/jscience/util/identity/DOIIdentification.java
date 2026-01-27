@@ -13,4 +13,9 @@ public class DOIIdentification extends Identification {
     public DOIIdentification(String value) {
         super(value);
     }
+
+    @Override
+    public String getScheme() {
+        return "DOI";
+    }
 }

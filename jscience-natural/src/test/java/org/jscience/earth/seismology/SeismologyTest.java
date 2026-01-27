@@ -25,6 +25,7 @@ package org.jscience.earth.seismology;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
 import org.jscience.measure.quantity.Energy;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,7 +63,7 @@ public class SeismologyTest {
     public void testIntensity() {
         // Mag 7.0 at 10km distance
         // MMI = 1.5*7 - 3.5*log10(10) + 3 = 10.5 - 3.5 + 3 = 10
-        int mmi = Seismology.estimateIntensity(Real.of(7.0), Real.of(10.0));
+        int mmi = Seismology.estimateIntensity(Real.of(7.0), Quantities.create(10.0, org.jscience.measure.Units.KILOMETER));
         assertEquals(10, mmi);
     }
 }

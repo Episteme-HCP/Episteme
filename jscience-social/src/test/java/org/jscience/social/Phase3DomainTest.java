@@ -32,6 +32,7 @@ import org.jscience.arts.*;
 import org.jscience.sports.*;
 import org.jscience.bibliography.*;
 import org.jscience.sociology.Person;
+import org.jscience.biology.BiologicalSex;
 
 public class Phase3DomainTest {
 
@@ -65,7 +66,7 @@ public class Phase3DomainTest {
         assertEquals("Soccer", soccer.getId());
 
         Team team = new Team("Real Madrid", soccer);
-        Person player = new Person("Ronaldo", Person.Gender.MALE);
+        Person player = new Person("Ronaldo", BiologicalSex.MALE);
         team.addMember(player);
 
         assertEquals(1, team.getMembers().size());

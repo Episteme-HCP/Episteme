@@ -29,6 +29,7 @@ import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.economics.money.Money;
 import org.jscience.economics.resources.Machine;
 import org.jscience.earth.Place;
+import org.jscience.earth.PlaceType;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
@@ -81,7 +82,7 @@ public class Vehicle extends Machine {
         this.geodeticPosition = position;
         Place p = getPosition();
         if (p == null) {
-            p = new Place(getName(), position, Place.Type.OTHER);
+            p = new Place(getName(), position, PlaceType.OTHER);
             super.setPosition(p);
         } else {
             p.setCenter(position);

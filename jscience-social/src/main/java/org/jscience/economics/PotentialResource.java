@@ -22,7 +22,11 @@
  */
 package org.jscience.economics;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Time;
 import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
@@ -40,18 +44,17 @@ import java.util.UUID;
  * that is expected to be found, or ingredients required in a recipe or task.
  * 
  * <p>Resources can be people, equipment, facilities, funding, or anything else 
- * capable of definition (usually other than labour) required for the completion 
- * of a project activity.</p>
- * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
+ * capable of definition required for the completion of a project activity.</p>
+ * Implements ComprehensiveIdentification and modernized to use Real for continuous factors.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.3
+ * @version 1.4
  */
 @Persistent
 public class PotentialResource implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     protected final Identification id;
@@ -64,12 +67,12 @@ public class PotentialResource implements ComprehensiveIdentification {
 
     @Attribute
     private Quantity<?> amount;
+ 
+    @Attribute
+    private Quantity<Time> decayTime;
 
     @Attribute
-    private double decayTime;
-
-    @Attribute
-    private int kind;
+    private ResourceKind kind;
 
     /**
      * Creates a new PotentialResource object.
@@ -93,8 +96,17 @@ public class PotentialResource implements ComprehensiveIdentification {
         this.description = Objects.requireNonNull(description, "Description cannot be null");
         this.amount = Objects.requireNonNull(amount, "Quantity cannot be null");
         
-        this.decayTime = -1;
-        this.kind = EconomicsConstants.UNKNOWN;
+        // Default to no decay (marker value)
+        this.decayTime = Quantities.create(Real.of(-1), Units.SECOND);
+        this.kind = ResourceKind.UNKNOWN;
+    }
+
+    /**
+     * Creates a new PotentialResource with a specific kind.
+     */
+    public PotentialResource(String name, String description, Quantity<?> amount, ResourceKind kind) {
+        this(new UUIDIdentification(UUID.randomUUID().toString()), name, description, amount);
+        this.kind = Objects.requireNonNull(kind, "Kind cannot be null");
     }
 
     @Override
@@ -123,20 +135,35 @@ public class PotentialResource implements ComprehensiveIdentification {
         this.amount = Objects.requireNonNull(amount, "Quantity cannot be null");
     }
 
-    public double getDecayTime() {
+    public Quantity<Time> getDecayTime() {
         return decayTime;
     }
-
-    public void setDecayTime(double decayTime) {
+ 
+    public void setDecayTime(Quantity<Time> decayTime) {
         this.decayTime = decayTime;
     }
+    
+    // Convenience for double input (default to seconds)
+    public void setDecaySeconds(double decayTime) {
+        this.decayTime = org.jscience.measure.Quantities.create(decayTime, Units.SECOND);
+    }
 
-    public int getKind() {
+    public ResourceKind getKind() {
         return kind;
     }
 
-    public void setKind(int kind) {
-        this.kind = kind;
+    public void setKind(ResourceKind kind) {
+        this.kind = Objects.requireNonNull(kind);
+    }
+
+    @Deprecated
+    public int getLegacyKind() {
+        return kind != null ? kind.ordinal() : -1;
+    }
+
+    @Deprecated
+    public void setLegacyKind(int legacyKind) {
+        this.kind = ResourceKind.valueOf(legacyKind);
     }
 
     @Override

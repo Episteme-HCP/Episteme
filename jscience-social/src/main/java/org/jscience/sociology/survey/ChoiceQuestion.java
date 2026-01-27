@@ -15,9 +15,9 @@ public class ChoiceQuestion extends Question {
     private final List<String> options = new ArrayList<>();
     private boolean allowOther;
 
-    public ChoiceQuestion(String text, Type type) {
+    public ChoiceQuestion(String text, QuestionType type) {
         super(text, type);
-        if (type != Type.MULTIPLE_CHOICE && type != Type.CHECKBOXES && type != Type.DROPDOWN) {
+        if (type != QuestionType.MULTIPLE_CHOICE && type != QuestionType.CHECKBOXES && type != QuestionType.DROPDOWN) {
             throw new IllegalArgumentException("Invalid type for ChoiceQuestion: " + type);
         }
     }

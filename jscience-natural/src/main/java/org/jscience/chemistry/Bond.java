@@ -26,6 +26,18 @@ package org.jscience.chemistry;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Length;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
 /**
  * A chemical bond between two atoms.
  *
@@ -33,39 +45,47 @@ import org.jscience.measure.quantity.Length;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Bond {
+@Persistent
+public class Bond implements ComprehensiveIdentification {
 
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Relation(type = Relation.Type.ONE_TO_ONE)
     private final Atom atom1;
+    @Relation(type = Relation.Type.ONE_TO_ONE)
     private final Atom atom2;
-    private final BondOrder order;
-
-    public enum BondOrder {
-        SINGLE(1),
-        DOUBLE(2),
-        TRIPLE(3),
-        AROMATIC(1.5),
-        COORDINATION(1); // Dative bond
-
-        private final double electrons;
-
-        BondOrder(double electrons) {
-            this.electrons = electrons;
-        }
-
-        public double getElectronPairs() {
-            return electrons;
-        }
-    }
+    @Attribute
+    private final BondType type;
 
     public Bond(Atom atom1, Atom atom2) {
-        this(atom1, atom2, BondOrder.SINGLE);
+        this(atom1, atom2, BondType.SINGLE);
     }
 
-    public Bond(Atom atom1, Atom atom2, BondOrder order) {
-        this.atom1 = atom1;
-        this.atom2 = atom2;
-        this.order = order;
+    public Bond(Atom atom1, Atom atom2, BondType type) {
+        this.id = new SimpleIdentification("BOND:" + UUID.randomUUID());
+        setName("Bond " + atom1.getElement().getSymbol() + "-" + atom2.getElement().getSymbol());
+        this.atom1 = Objects.requireNonNull(atom1);
+        this.atom2 = Objects.requireNonNull(atom2);
+        this.type = Objects.requireNonNull(type);
     }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+
 
     public Atom getAtom1() {
         return atom1;
@@ -75,8 +95,8 @@ public class Bond {
         return atom2;
     }
 
-    public BondOrder getOrder() {
-        return order;
+    public BondType getType() {
+        return type;
     }
 
     /**
@@ -106,13 +126,13 @@ public class Bond {
 
     @Override
     public String toString() {
-        String bondSymbol = switch (order) {
-            case SINGLE -> "-";
-            case DOUBLE -> "=";
-            case TRIPLE -> "Ã¢â€°Â¡";
-            case AROMATIC -> "~";
-            case COORDINATION -> "Ã¢â€ â€™";
-        };
+        String bondSymbol;
+        if (type == BondType.SINGLE) bondSymbol = "-";
+        else if (type == BondType.DOUBLE) bondSymbol = "=";
+        else if (type == BondType.TRIPLE) bondSymbol = "#";
+        else if (type == BondType.AROMATIC) bondSymbol = "~";
+        else if (type == BondType.COORDINATION) bondSymbol = "->";
+        else bondSymbol = "-";
         return atom1.getElement().getSymbol() + bondSymbol + atom2.getElement().getSymbol();
     }
 }

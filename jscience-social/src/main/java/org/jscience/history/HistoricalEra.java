@@ -29,7 +29,7 @@ public class HistoricalEra extends Event {
     private final List<HistoricalEvent> keyEvents = new ArrayList<>();
 
     public HistoricalEra(String name, String description, TimeCoordinate when) {
-        super(name, description, when, Category.CULTURAL);
+        super(name, description, when, EventCategory.CULTURAL);
     }
 
     public HistoricalEra(String name, TimeCoordinate when) {

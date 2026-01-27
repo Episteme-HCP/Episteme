@@ -27,6 +27,9 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a vitamin with nutritional data.
@@ -35,20 +38,29 @@ import java.util.Objects;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class Vitamin implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
+    @Attribute
     public final String id;
+    @Attribute
     public final String name;
+    @Attribute
     public final List<String> aliases;
+    @Attribute
     public final String solubility;
-    public final double rdaAdult;
+    @Attribute
+    public final Real rdaAdult;
+    @Attribute
     public final String rdaUnit;
+    @Attribute
     public final List<String> sources;
+    @Attribute
     public final List<String> functions;
 
     public Vitamin(String id, String name, List<String> aliases, String solubility,
-            double rdaAdult, String rdaUnit, List<String> sources, List<String> functions) {
+            Real rdaAdult, String rdaUnit, List<String> sources, List<String> functions) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
         this.aliases = aliases != null ? aliases : Collections.emptyList();
@@ -57,6 +69,11 @@ public class Vitamin implements Serializable {
         this.rdaUnit = rdaUnit;
         this.sources = sources != null ? sources : Collections.emptyList();
         this.functions = functions != null ? functions : Collections.emptyList();
+    }
+
+    public Vitamin(String id, String name, List<String> aliases, String solubility,
+            double rdaAdult, String rdaUnit, List<String> sources, List<String> functions) {
+        this(id, name, aliases, solubility, Real.of(rdaAdult), rdaUnit, sources, functions);
     }
 
     public boolean isFatSoluble() {
@@ -69,7 +86,7 @@ public class Vitamin implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s (%s) - RDA: %.1f %s, %s-soluble",
+        return String.format("%s (%s) - RDA: %s %s, %s-soluble",
                 name, id, rdaAdult, rdaUnit, solubility);
     }
 

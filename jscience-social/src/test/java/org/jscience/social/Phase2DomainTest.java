@@ -31,6 +31,7 @@ import org.jscience.philosophy.*;
 import org.jscience.sociology.*;
 import org.jscience.sociology.Religion;
 import org.jscience.psychology.*;
+import org.jscience.biology.BiologicalSex;
 import java.time.LocalDate;
 
 public class Phase2DomainTest {
@@ -45,8 +46,8 @@ public class Phase2DomainTest {
         assertEquals(art1, civilCode.getArticle("Art. 1"));
 
         Contract contract = new Contract("Employment Contract", LocalDate.now());
-        Person employer = new Person("ACME Corp", Person.Gender.MALE); // Simplified Person usage
-        Person employee = new Person("John Doe", Person.Gender.MALE);
+        Person employer = new Person("ACME Corp", BiologicalSex.MALE); // Simplified Person usage
+        Person employee = new Person("John Doe", BiologicalSex.MALE);
 
         contract.addParty(employer);
         contract.addParty(employee);

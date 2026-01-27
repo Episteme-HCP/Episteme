@@ -45,13 +45,13 @@ public class PositionedEvent extends Event implements Positioned<Place> {
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Place position;
 
-    public PositionedEvent(String name, String description, TimeCoordinate when, Place position, Category category) {
+    public PositionedEvent(String name, String description, TimeCoordinate when, Place position, EventCategory category) {
         super(name, description, when, category);
         this.position = position;
     }
 
     public PositionedEvent(String name, TimeCoordinate when, Place position) {
-        this(name, null, when, position, Category.OTHER);
+        this(name, null, when, position, EventCategory.OTHER);
     }
 
     /**

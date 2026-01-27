@@ -23,6 +23,8 @@
 
 package org.jscience.sociology;
 
+import org.jscience.biology.BiologicalSex;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,8 +35,8 @@ public class SociologyRestorationTest {
     @Test
     public void testSocialRolesAndSituations() {
         // Setup
-        Person alice = new Person("P001", "Alice", Person.Gender.FEMALE, LocalDate.of(1990, 1, 1), "USA");
-        Person bob = new Person("P002", "Bob", Person.Gender.MALE, LocalDate.of(1985, 1, 1), "UK");
+        Person alice = new Person("P001", "Alice", BiologicalSex.FEMALE, LocalDate.of(1990, 1, 1), "USA");
+        Person bob = new Person("P002", "Bob", BiologicalSex.MALE, LocalDate.of(1985, 1, 1), "UK");
 
         Situation dinnerParty = new Situation("Dinner Party", "A social gathering");
 

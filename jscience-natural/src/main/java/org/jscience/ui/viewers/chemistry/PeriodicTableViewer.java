@@ -29,6 +29,7 @@ import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.jscience.chemistry.Element;
+import org.jscience.chemistry.ElementCategory;
 import org.jscience.chemistry.PeriodicTable;
 import org.jscience.chemistry.loaders.PeriodicTableReader;
 import org.jscience.ui.AbstractViewer;
@@ -140,11 +141,13 @@ public class PeriodicTableViewer extends AbstractViewer {
     private String getCategoryStyle(Element e) {
         String base = "-fx-background-radius: 5; -fx-cursor: hand;";
         if (e.getCategory() == null) return "-fx-background-color: #576574;" + base;
-        return switch (e.getCategory()) {
-            case ALKALI_METAL -> "-fx-background-color: #ff6b6b;" + base;
-            case NOBLE_GAS -> "-fx-background-color: #c8d6e5;" + base;
-            default -> "-fx-background-color: #8395a7;" + base;
-        };
+        
+        if (ElementCategory.ALKALI_METAL.equals(e.getCategory())) {
+             return "-fx-background-color: #ff6b6b;" + base;
+        } else if (ElementCategory.NOBLE_GAS.equals(e.getCategory())) {
+             return "-fx-background-color: #c8d6e5;" + base;
+        }
+        return "-fx-background-color: #8395a7;" + base;
     }
 
     @Override public String getName() { return I18n.getInstance().get("viewer.periodictableviewer.name", "Periodic Table"); }

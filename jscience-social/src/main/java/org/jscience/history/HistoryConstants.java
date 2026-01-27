@@ -143,28 +143,28 @@ public final class HistoryConstants {
     // ========== Major Historical Events ==========
 
     public static final HistoricalEvent GREAT_PYRAMID = new HistoricalEvent("Great Pyramid of Giza", 
-            FuzzyTimePoint.circaBce(2560), Event.Category.CULTURAL);
+            FuzzyTimePoint.circaBce(2560), EventCategory.CULTURAL);
 
     public static final HistoricalEvent FOUNDING_OF_ROME = new HistoricalEvent("Founding of Rome", 
-            FuzzyTimePoint.bce(753), Event.Category.POLITICAL);
+            FuzzyTimePoint.bce(753), EventCategory.POLITICAL);
 
     public static final HistoricalEvent BATTLE_OF_MARATHON = new HistoricalEvent("Battle of Marathon", 
-            FuzzyTimePoint.bce(490), Event.Category.MILITARY);
+            FuzzyTimePoint.bce(490), EventCategory.MILITARY);
 
     public static final HistoricalEvent FALL_OF_ROME = new HistoricalEvent("Fall of Western Roman Empire", 
-            FuzzyTimePoint.of(476), Event.Category.POLITICAL);
+            FuzzyTimePoint.of(476), EventCategory.POLITICAL);
 
     public static final HistoricalEvent FRENCH_REVOLUTION = new HistoricalEvent("French Revolution", 
-            FuzzyTimePoint.of(1789), Event.Category.POLITICAL);
+            FuzzyTimePoint.of(1789), EventCategory.POLITICAL);
 
     public static final HistoricalEvent WORLD_WAR_I = new HistoricalEvent("World War I", 
-            FuzzyTimePoint.of(1914), Event.Category.MILITARY);
+            FuzzyTimePoint.of(1914), EventCategory.MILITARY);
 
     public static final HistoricalEvent WORLD_WAR_II = new HistoricalEvent("World War II", 
-            FuzzyTimePoint.of(1939), Event.Category.MILITARY);
+            FuzzyTimePoint.of(1939), EventCategory.MILITARY);
 
     public static final HistoricalEvent MOON_LANDING = new HistoricalEvent("Apollo 11 Moon Landing", 
-            FuzzyTimePoint.of(1969, 7, 20), Event.Category.SCIENTIFIC);
+            FuzzyTimePoint.of(1969, 7, 20), EventCategory.SCIENTIFIC);
 
     // ========== Timelines ==========
 
@@ -186,8 +186,4 @@ public final class HistoryConstants {
             .addEvent(BATTLE_OF_MARATHON)
             .addEvent(FALL_OF_ROME);
 
-    /** Historical periods. */
-    public enum HistoricalPeriod {
-        PREHISTORY, ANCIENT_HISTORY, POST_CLASSICAL, EARLY_MODERN, LATE_MODERN, CONTEMPORARY
-    }
 }

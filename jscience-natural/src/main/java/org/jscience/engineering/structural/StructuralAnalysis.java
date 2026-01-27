@@ -33,6 +33,7 @@ import org.jscience.measure.quantity.Pressure;
 
 /**
  * Structural analysis calculations.
+ * Modernized to use high-precision Real and typed Quantities.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -40,9 +41,11 @@ import org.jscience.measure.quantity.Pressure;
  */
 public class StructuralAnalysis {
 
+    private StructuralAnalysis() {}
+
     /**
      * Simply supported beam: maximum deflection at center.
-     * ÃŽÂ´_max = (5 * w * LÃ¢ÂÂ´) / (384 * E * I)
+     * δ_max = (5 * w * L⁴) / (384 * E * I)
      */
     public static Real simpleBeamDeflectionUniform(Real w, Real L, Real E, Real I) {
         return Real.of(5).multiply(w).multiply(L.pow(4)).divide(Real.of(384).multiply(E).multiply(I));
@@ -50,7 +53,7 @@ public class StructuralAnalysis {
 
     /**
      * Simply supported beam: deflection under point load at center.
-     * ÃŽÂ´_max = (P * LÃ‚Â³) / (48 * E * I)
+     * δ_max = (P * L³) / (48 * E * I)
      */
     public static Real simpleBeamDeflectionPoint(Real P, Real L, Real E, Real I) {
         return P.multiply(L.pow(3)).divide(Real.of(48).multiply(E).multiply(I));
@@ -58,7 +61,7 @@ public class StructuralAnalysis {
 
     /**
      * Cantilever beam: deflection at free end under uniform load.
-     * ÃŽÂ´_max = (w * LÃ¢ÂÂ´) / (8 * E * I)
+     * δ_max = (w * L⁴) / (8 * E * I)
      */
     public static Real cantileverDeflectionUniform(Real w, Real L, Real E, Real I) {
         return w.multiply(L.pow(4)).divide(Real.of(8).multiply(E).multiply(I));
@@ -66,7 +69,7 @@ public class StructuralAnalysis {
 
     /**
      * Cantilever beam: deflection at free end under point load.
-     * ÃŽÂ´_max = (P * LÃ‚Â³) / (3 * E * I)
+     * δ_max = (P * L³) / (3 * E * I)
      */
     public static Real cantileverDeflectionPoint(Real P, Real L, Real E, Real I) {
         return P.multiply(L.pow(3)).divide(Real.of(3).multiply(E).multiply(I));
@@ -74,7 +77,7 @@ public class StructuralAnalysis {
 
     /**
      * Maximum bending moment for simply supported beam with uniform load.
-     * M_max = w * LÃ‚Â² / 8
+     * M_max = w * L² / 8
      */
     public static Real simpleBeamMomentUniform(Real w, Real L) {
         return w.multiply(L.pow(2)).divide(Real.of(8));
@@ -82,7 +85,7 @@ public class StructuralAnalysis {
 
     /**
      * Maximum bending moment for cantilever with uniform load.
-     * M_max = w * LÃ‚Â² / 2
+     * M_max = w * L² / 2
      */
     public static Real cantileverMomentUniform(Real w, Real L) {
         return w.multiply(L.pow(2)).divide(Real.TWO);
@@ -90,7 +93,7 @@ public class StructuralAnalysis {
 
     /**
      * Bending stress.
-     * ÃÆ’ = M * y / I
+     * σ = M * y / I
      */
     public static Real bendingStress(Real moment, Real distanceFromNA, Real momentOfInertia) {
         return moment.multiply(distanceFromNA).divide(momentOfInertia);
@@ -98,7 +101,7 @@ public class StructuralAnalysis {
 
     /**
      * Shear stress in beam.
-     * Ãâ€ž = V * Q / (I * b)
+     * τ = V * Q / (I * b)
      */
     public static Real shearStress(Real shearForce, Real firstMoment, Real momentOfInertia, Real width) {
         return shearForce.multiply(firstMoment).divide(momentOfInertia.multiply(width));
@@ -106,7 +109,7 @@ public class StructuralAnalysis {
 
     /**
      * Second moment of area for rectangle.
-     * I = b * hÃ‚Â³ / 12
+     * I = b * h³ / 12
      */
     public static Real rectangleMomentOfInertia(Real width, Real height) {
         return width.multiply(height.pow(3)).divide(Real.of(12));
@@ -114,7 +117,7 @@ public class StructuralAnalysis {
 
     /**
      * Second moment of area for circle.
-     * I = Ãâ‚¬ * rÃ¢ÂÂ´ / 4
+     * I = π * r⁴ / 4
      */
     public static Real circleMomentOfInertia(Real radius) {
         return Real.PI.multiply(radius.pow(4)).divide(Real.of(4));
@@ -130,7 +133,7 @@ public class StructuralAnalysis {
 
     /**
      * Column buckling (Euler formula).
-     * P_cr = Ãâ‚¬Ã‚Â² * E * I / (K * L)Ã‚Â²
+     * P_cr = π² * E * I / (K * L)²
      */
     public static Real eulerBucklingLoad(Real E, Real I, Real L, Real K) {
         return Real.PI.pow(2).multiply(E).multiply(I).divide(K.multiply(L).pow(2));
@@ -138,7 +141,7 @@ public class StructuralAnalysis {
 
     /**
      * Slenderness ratio.
-     * ÃŽÂ» = K * L / r
+     * λ = K * L / r
      */
     public static Real slendernessRatio(Real K, Real L, Real radiusOfGyration) {
         return K.multiply(L).divide(radiusOfGyration);
@@ -146,7 +149,7 @@ public class StructuralAnalysis {
 
     /**
      * Radius of gyration.
-     * r = Ã¢Ë†Å¡(I / A)
+     * r = √(I / A)
      */
     public static Real radiusOfGyration(Real momentOfInertia, Real area) {
         return momentOfInertia.divide(area).sqrt();
@@ -161,7 +164,7 @@ public class StructuralAnalysis {
 
     /**
      * Torsional shear stress in circular shaft.
-     * Ãâ€ž = T * r / J where J = Ãâ‚¬rÃ¢ÂÂ´/2
+     * τ = T * r / J where J = πr⁴/2
      */
     public static Real torsionalShearStress(Real torque, Real radius) {
         Real J = Real.PI.multiply(radius.pow(4)).divide(Real.TWO);
@@ -170,7 +173,7 @@ public class StructuralAnalysis {
 
     /**
      * Angle of twist.
-     * ÃŽÂ¸ = T * L / (G * J)
+     * θ = T * L / (G * J)
      */
     public static Real angleOfTwist(Real torque, Real length, Real shearModulus, Real radius) {
         Real J = Real.PI.multiply(radius.pow(4)).divide(Real.TWO);
@@ -181,12 +184,13 @@ public class StructuralAnalysis {
 
     /**
      * Bending stress using Quantity types.
+     * Note: moment is represented as Quantity<?> (typically Energy/Torque units N*m).
      */
     public static Quantity<Pressure> bendingStressQ(Quantity<?> moment, Quantity<Length> distanceFromNA,
             Real momentOfInertia) {
-        double m = moment.getValue().doubleValue();
-        double y = distanceFromNA.to(Units.METER).getValue().doubleValue();
-        double stress = m * y / momentOfInertia.doubleValue();
+        Real m = moment.getValue();
+        Real y = distanceFromNA.to(Units.METER).getValue();
+        Real stress = m.multiply(y).divide(momentOfInertia);
         return Quantities.create(stress, Units.PASCAL);
     }
 
@@ -194,11 +198,9 @@ public class StructuralAnalysis {
      * Euler buckling load using Quantity types.
      */
     public static Quantity<Force> eulerBucklingLoadQ(Quantity<Pressure> E, Real I, Quantity<Length> L, Real K) {
-        double ePa = E.to(Units.PASCAL).getValue().doubleValue();
-        double lM = L.to(Units.METER).getValue().doubleValue();
-        Real pCr = eulerBucklingLoad(Real.of(ePa), I, Real.of(lM), K);
-        return Quantities.create(pCr.doubleValue(), Units.NEWTON);
+        Real ePa = E.to(Units.PASCAL).getValue();
+        Real lM = L.to(Units.METER).getValue();
+        Real pCr = eulerBucklingLoad(ePa, I, lM, K);
+        return Quantities.create(pCr, Units.NEWTON);
     }
 }
-
-

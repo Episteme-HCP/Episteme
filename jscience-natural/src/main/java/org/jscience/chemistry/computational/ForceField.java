@@ -101,7 +101,7 @@ public class ForceField {
             Real rAngstrom = rMeter.multiply(Real.of(1e10));
 
             Real r0 = CC_BOND_LENGTH;
-            if (bond.getOrder() == org.jscience.chemistry.Bond.BondOrder.DOUBLE)
+            if (bond.getType() == org.jscience.chemistry.BondType.DOUBLE)
                 r0 = CC_DOUBLE_LENGTH;
 
             totalEnergy = totalEnergy.add(bondStretch(rAngstrom, r0, Real.of(300.0)));

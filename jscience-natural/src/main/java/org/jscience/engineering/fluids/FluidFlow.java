@@ -28,11 +28,14 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
 import org.jscience.physics.PhysicalConstants;
+import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Pressure;
 import org.jscience.measure.quantity.Velocity;
 
+
 /**
  * Fluid flow calculations.
+ * Modernized to use high-precision Real and typed Quantities.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -43,43 +46,62 @@ public class FluidFlow {
     private FluidFlow() {
     }
 
-    /** Reynolds number: Re = v * L / ÃŽÂ½ */
+    /** 
+     * Reynolds number: Re = v * L / ν 
+     * Dimensionless quantity.
+     */
     public static Real reynoldsNumber(Real velocity, Real characteristicLength, Real kinematicViscosity) {
         return velocity.multiply(characteristicLength).divide(kinematicViscosity);
     }
 
-    /** Flow regime from Reynolds number */
-    public static String flowRegime(Real reynoldsNumber) {
+    /** 
+     * Flow regime based on Reynolds number.
+     * Returns LAMINAR, TRANSITIONAL, or TURBULENT.
+     */
+    public static FlowRegime flowRegime(Real reynoldsNumber) {
         double re = reynoldsNumber.doubleValue();
         if (re < 2300)
-            return "Laminar";
+            return FlowRegime.LAMINAR;
         if (re < 4000)
-            return "Transitional";
-        return "Turbulent";
+            return FlowRegime.TRANSITIONAL;
+        return FlowRegime.TURBULENT;
     }
 
-    /** Bernoulli's equation */
+    /** 
+     * Bernoulli's equation for incompressible flow.
+     * Calculates pressure at point 2 given conditions at point 1 and flow parameters.
+     * P2 = P1 + 0.5*ρ*(v1² - v2²) + ρ*g*(h1 - h2)
+     */
     public static Quantity<Pressure> bernoulliPressure(
-            Quantity<Pressure> p1, Quantity<Velocity> v1, Real h1,
-            Quantity<Velocity> v2, Real h2, Real density) {
+            Quantity<Pressure> p1, Quantity<Velocity> v1, Quantity<Length> h1,
+            Quantity<Velocity> v2, Quantity<Length> h2, Real density) {
 
         Real P1 = p1.to(Units.PASCAL).getValue();
         Real V1 = v1.to(Units.METERS_PER_SECOND).getValue();
         Real V2 = v2.to(Units.METERS_PER_SECOND).getValue();
+        Real H1 = h1.to(Units.METER).getValue();
+        Real H2 = h2.to(Units.METER).getValue();
         Real g = PhysicalConstants.g_n;
 
         Real P2 = P1.add(Real.of(0.5).multiply(density).multiply(V1.pow(2).subtract(V2.pow(2))))
-                .add(density.multiply(g).multiply(h1.subtract(h2)));
+                .add(density.multiply(g).multiply(H1.subtract(H2)));
         return Quantities.create(P2, Units.PASCAL);
     }
 
-    /** Hagen-Poiseuille: Q = Ãâ‚¬ * ÃŽâ€P * rÃ¢ÂÂ´ / (8 * ÃŽÂ¼ * L) */
+    /** 
+     * Hagen-Poiseuille equation for laminar flow in a pipe.
+     * Q = π * ΔP * r⁴ / (8 * μ * L)
+     * All inputs as Reals in consistent base units (e.g. SI).
+     */
     public static Real laminarPipeFlow(Real pressureDrop, Real radius, Real dynamicViscosity, Real length) {
         return Real.PI.multiply(pressureDrop).multiply(radius.pow(4))
                 .divide(Real.of(8).multiply(dynamicViscosity).multiply(length));
     }
 
-    /** Laminar friction factor: f = 64 / Re */
+    /** 
+     * Darcy friction factor for laminar flow.
+     * f = 64 / Re
+     */
     public static Real laminarFrictionFactor(Real reynoldsNumber) {
         return Real.of(64).divide(reynoldsNumber);
     }

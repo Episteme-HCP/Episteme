@@ -142,6 +142,25 @@ public class Country extends Region {
         setAreaSqKm(area);
     }
 
+    @SuppressWarnings("unchecked")
+    public void setAreaSqKm(double areaSqKm) {
+        org.jscience.measure.Unit<org.jscience.measure.quantity.Area> sqMeter = 
+            (org.jscience.measure.Unit<org.jscience.measure.quantity.Area>) (Object) org.jscience.measure.Units.METER.pow(2);
+        setArea(org.jscience.measure.Quantities.create(areaSqKm * 1_000_000.0, sqMeter));
+    }
+
+    @SuppressWarnings("unchecked")
+    public double getAreaSqKm() {
+        if (getArea() == null) return 0.0;
+        org.jscience.measure.Unit<org.jscience.measure.quantity.Area> sqMeter = 
+            (org.jscience.measure.Unit<org.jscience.measure.quantity.Area>) (Object) org.jscience.measure.Units.METER.pow(2);
+        return getArea().to(sqMeter).getValue().doubleValue() / 1_000_000.0;
+    }
+
+    public long getPopulationLong() {
+        return getPopulation();
+    }
+
     public Nation getNation() { return nation; }
     public void setNation(Nation nation) { this.nation = nation; }
 

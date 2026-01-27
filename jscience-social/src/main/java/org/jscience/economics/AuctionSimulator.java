@@ -45,7 +45,7 @@ public final class AuctionSimulator {
     private AuctionSimulator() {}
 
     /** Model for an individual auction participant. */
-    public record Bidder(String id, Real maxWillingness, double bidIncrement) implements Serializable {}
+    public record Bidder(String id, Real maxWillingness, Real bidIncrement) implements Serializable {}
 
     /** Result summary for a completed auction simulation. */
     public record AuctionResult(
@@ -109,8 +109,8 @@ public final class AuctionSimulator {
         List<Bid> bids = new ArrayList<>();
         for (Bidder bidder : bidders) {
             // Strategic shading: bid 70-95% of true value
-            double fraction = 0.7 + Math.random() * 0.25;
-            Real amount = bidder.maxWillingness().multiply(Real.of(fraction));
+            Real fraction = Real.of(0.7 + Math.random() * 0.25);
+            Real amount = bidder.maxWillingness().multiply(fraction);
             bids.add(new Bid(bidder.id(), amount, 1));
         }
         bids.sort((a, b) -> b.amount().compareTo(a.amount()));
@@ -144,20 +144,21 @@ public final class AuctionSimulator {
      * Statistical comparison of revenue across multiple simulations of different formats.
      */
     public static Map<String, Real> compareAuctionFormats(List<Bidder> bidders, int simulations) {
-        Map<String, Double> totals = new HashMap<>();
+        Map<String, Real> totals = new HashMap<>();
         String[] types = {"English", "FirstPrice", "Vickrey"};
-        for (String t : types) totals.put(t, 0.0);
+        for (String t : types) totals.put(t, Real.ZERO);
         
         Real start = bidders.stream().map(Bidder::maxWillingness).max(Real::compareTo).orElse(Real.ZERO).multiply(Real.of(0.1));
         
         for (int i = 0; i < simulations; i++) {
-            totals.merge("English", englishAuction(bidders, start, Real.of(1)).sellerRevenue().doubleValue(), (a, b) -> Double.sum(a, b));
-            totals.merge("FirstPrice", firstPriceSealedBid(bidders).sellerRevenue().doubleValue(), (a, b) -> Double.sum(a, b));
-            totals.merge("Vickrey", vickreyAuction(bidders).sellerRevenue().doubleValue(), (a, b) -> Double.sum(a, b));
+            totals.merge("English", englishAuction(bidders, start, Real.of(1.0)).sellerRevenue(), Real::add);
+            totals.merge("FirstPrice", firstPriceSealedBid(bidders).sellerRevenue(), Real::add);
+            totals.merge("Vickrey", vickreyAuction(bidders).sellerRevenue(), Real::add);
         }
         
         Map<String, Real> averages = new HashMap<>();
-        totals.forEach((k, v) -> averages.put(k, Real.of(v / simulations)));
+        Real count = Real.of(simulations);
+        totals.forEach((k, v) -> averages.put(k, v.divide(count)));
         return averages;
     }
 }

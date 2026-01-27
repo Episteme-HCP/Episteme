@@ -23,9 +23,8 @@
 
 package org.jscience.sociology;
 
-import java.util.ArrayList;
+
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jscience.mathematics.numbers.real.Real;
@@ -44,77 +43,17 @@ public final class CulturalDiffusionModel {
     private CulturalDiffusionModel() {}
 
     /**
-     * Categorizes adopters based on when they adopt an innovation.
-     */
-    public enum AdoptionStatus { INNOVATOR, EARLY_ADOPTER, EARLY_MAJORITY, LATE_MAJORITY, LAGGARD }
-
-    /**
-     * Represents a cultural identifier or innovation with specific properties.
-     * @param name       the name of the trait
-     * @param complexity difficulty of adoption (0-1, higher is harder)
-     * @param utility    attractiveness of the trait (0-1, higher is better)
-     */
-    public record CultureTrait(
-        String name,
-        double complexity,
-        double utility
-    ) {}
-
-    /**
-     * Simulates the Bass Diffusion Model for innovation adoption.
-     * <p>
-     * Equation: dN(t)/dt = (p + q * N(t)/M) * (M - N(t))
-     * </p>
-     * 
-     * @param p       Coefficient of innovation (external influence)
-     * @param q       Coefficient of imitation (internal influence)
-     * @param m       Potential market/population size
-     * @param periods Number of time periods to simulate
-     * @return a list of cumulative adopter counts for each period
-     */
-    public static List<Double> simulateBassDiffusion(double p, double q, double m, int periods) {
-        List<Double> adopters = new ArrayList<>();
-        double n = 0; // Cumulative adopters
-
-        for (int t = 0; t < periods; t++) {
-            double dn = (p + q * (n / m)) * (m - n);
-            n += dn;
-            adopters.add(n);
-        }
-        return adopters;
-    }
-
-    /**
-     * Calculates the probability of cultural transmission between two agents.
-     * Based on Axelrod's Model, where probability is proportional to cultural similarity.
-     *
-     * @param traits1 feature vector of first agent
-     * @param traits2 feature vector of second agent
-     * @return probability of interaction/transmission (0.0 to 1.0)
-     */
-    public static Real transmissionProbability(int[] traits1, int[] traits2) {
-        if (traits1.length != traits2.length || traits1.length == 0) {
-            return Real.ZERO;
-        }
-        int shared = 0;
-        for (int i = 0; i < traits1.length; i++) {
-            if (traits1[i] == traits2[i]) shared++;
-        }
-        return Real.of((double) shared / traits1.length);
-    }
-
-    /**
      * Categorizes an adopter based on their position in the adoption timeline.
      * Uses standard diffusion of innovations percentages (e.g., Rogers).
      *
      * @param cumulativePercent the percentile of adoption (0-100)
      * @return the corresponding AdoptionStatus
      */
-    public static AdoptionStatus getAdopterType(double cumulativePercent) {
-        if (cumulativePercent <= 2.5) return AdoptionStatus.INNOVATOR;
-        if (cumulativePercent <= 16.0) return AdoptionStatus.EARLY_ADOPTER;
-        if (cumulativePercent <= 50.0) return AdoptionStatus.EARLY_MAJORITY;
-        if (cumulativePercent <= 84.0) return AdoptionStatus.LATE_MAJORITY;
+    public static AdoptionStatus getAdopterType(Real cumulativePercent) {
+        if (cumulativePercent.compareTo(Real.of(2.5)) <= 0) return AdoptionStatus.INNOVATOR;
+        if (cumulativePercent.compareTo(Real.of(16.0)) <= 0) return AdoptionStatus.EARLY_ADOPTER;
+        if (cumulativePercent.compareTo(Real.of(50.0)) <= 0) return AdoptionStatus.EARLY_MAJORITY;
+        if (cumulativePercent.compareTo(Real.of(84.0)) <= 0) return AdoptionStatus.LATE_MAJORITY;
         return AdoptionStatus.LAGGARD;
     }
 
@@ -126,16 +65,18 @@ public final class CulturalDiffusionModel {
      * @param values2 map of cultural dimensions/values for group 2
      * @return the calculated distance
      */
-    public static Real culturalDistance(Map<String, Double> values1, Map<String, Double> values2) {
-        double sumSq = 0;
+    public static Real culturalDistance(Map<String, Real> values1, Map<String, Real> values2) {
+        Real sumSq = Real.ZERO;
         Set<String> allKeys = new HashSet<>(values1.keySet());
         allKeys.addAll(values2.keySet());
 
+        Real defaultVal = Real.of(0.5);
         for (String key : allKeys) {
-            double v1 = values1.getOrDefault(key, 0.5);
-            double v2 = values2.getOrDefault(key, 0.5);
-            sumSq += Math.pow(v1 - v2, 2);
+            Real v1 = values1.getOrDefault(key, defaultVal);
+            Real v2 = values2.getOrDefault(key, defaultVal);
+            Real diff = v1.subtract(v2);
+            sumSq = sumSq.add(diff.multiply(diff));
         }
-        return Real.of(Math.sqrt(sumSq));
+        return sumSq.sqrt();
     }
 }

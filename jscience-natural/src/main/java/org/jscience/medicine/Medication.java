@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.jscience.measure.Quantity;
 import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
@@ -41,7 +42,7 @@ import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a medication or drug with clinical and pharmaceutical details.
- * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
+ * Modernized to use extensible enums and typed quantities for dosages.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -50,23 +51,13 @@ import org.jscience.util.persistence.Relation;
 @Persistent
 public class Medication implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     protected final Identification id;
 
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
-
-    public enum Form {
-        TABLET, CAPSULE, LIQUID, INJECTION, TOPICAL, INHALANT,
-        SUPPOSITORY, PATCH, DROPS, SPRAY
-    }
-
-    public enum Route {
-        ORAL, INTRAVENOUS, INTRAMUSCULAR, SUBCUTANEOUS, TOPICAL,
-        INHALATION, RECTAL, SUBLINGUAL, TRANSDERMAL, OPHTHALMIC
-    }
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Pathology pathology;
@@ -84,7 +75,10 @@ public class Medication implements ComprehensiveIdentification {
     private Route route;
 
     @Attribute
-    private String dosage;
+    private Quantity<?> dosageAmount;
+
+    @Attribute
+    private String dosageText;
 
     @Attribute
     private String frequency;
@@ -103,6 +97,14 @@ public class Medication implements ComprehensiveIdentification {
 
     @Attribute
     private String atcCode;
+
+    public enum Form {
+        TABLET, CAPSULE, LIQUID, INJECTION, CREAM, OINTMENT, PATCH, INHALER, SUPPOSITORY, DROPS, OTHER
+    }
+
+    public enum Route {
+        ORAL, INTRAVENOUS, INTRAMUSCULAR, SUBCUTANEOUS, TOPICAL, INHALATION, RECTAL, OPHTHALMIC, OTIC, NASAL, OTHER
+    }
 
     public Medication(String name) {
         this.id = new UUIDIdentification(UUID.randomUUID().toString());
@@ -159,12 +161,20 @@ public class Medication implements ComprehensiveIdentification {
         this.route = route;
     }
 
-    public String getDosage() {
-        return dosage;
+    public void setDosage(String dosage) {
+        this.dosageText = dosage;
     }
 
-    public void setDosage(String dosage) {
-        this.dosage = dosage;
+    public String getDosage() {
+        return dosageText;
+    }
+
+    public Quantity<?> getDosageAmount() {
+        return dosageAmount;
+    }
+
+    public void setDosageAmount(Quantity<?> dosageAmount) {
+        this.dosageAmount = dosageAmount;
     }
 
     public String getFrequency() {
@@ -229,7 +239,7 @@ public class Medication implements ComprehensiveIdentification {
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %s)", getName(), form, route);
+        return String.format("%s (%s, %s, %s)", getName(), form, route, dosageAmount);
     }
 
     // Factory methods
@@ -238,7 +248,6 @@ public class Medication implements ComprehensiveIdentification {
         m.setForm(Form.TABLET);
         m.setRoute(Route.ORAL);
         m.setGenericName("Acetylsalicylic acid");
-        m.setDosage("325mg");
         return m;
     }
 }

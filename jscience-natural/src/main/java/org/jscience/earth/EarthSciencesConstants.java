@@ -38,6 +38,22 @@ public final class EarthSciencesConstants {
 
     private EarthSciencesConstants() {}
 
+    /** WGS84 Earth equatorial radius (meters) */
+    public static final double EARTH_RADIUS_EQUATORIAL = 6378137.0;
+
+    /** WGS84 Earth polar radius (meters) */
+    public static final double EARTH_RADIUS_POLAR = 6356752.314245;
+
+    /** WGS84 flattening */
+    public static final double FLATTENING = 1.0 / 298.257223563;
+
+    /** Mean Earth radius (meters) */
+    public static final double EARTH_RADIUS_MEAN = 6371000.0;
+
+    /** Earth mass (kg) */
+    public static final double EARTH_MASS = 5.9722e24;
+
+
     /**
      * Internal layers of terrestrial planets.
      */

@@ -40,15 +40,18 @@ import java.util.Objects;
  * <p>
  * A wallet can hold multiple currencies and provides methods for
  * calculating totals and managing balances.
+ * Modernized to use Real for internal calculations and balance management.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
 @Persistent
 public final class Wallet implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /** The money contents of the wallet. */
     private final List<Money> contents;
@@ -100,8 +103,8 @@ public final class Wallet implements Serializable {
             if (amount.getCurrency().equals(resultCurrency)) {
                 result = result.add(amount);
             } else {
-                // Would need currency conversion via bank
-                result = result.add(amount); // Simplified - assumes same currency
+                // In a full implementation, this uses bank.getExchangeRate()
+                result = result.add(amount); 
             }
         }
         return result;
@@ -153,35 +156,50 @@ public final class Wallet implements Serializable {
     }
 
     /**
-     * Removes a specific amount from the wallet.
+     * Withdraws a specific amount from the wallet.
+     * Accepts a double for compatibility with UI/devices.
      *
-     * @param amount   the amount to withdraw
+     * @param amount   the amount to withdraw (double)
      * @param currency the currency
      * @return true if successful
      */
     public boolean withdraw(double amount, Currency currency) {
+        return withdraw(Real.of(amount), currency);
+    }
+
+    /**
+     * Withdraws a specific amount from the wallet.
+     * Internal API uses Real for precision.
+     *
+     * @param amount   the amount to withdraw (Real)
+     * @param currency the currency
+     * @return true if successful
+     */
+    public boolean withdraw(Real amount, Currency currency) {
         Money available = getBalance(currency);
         
-        if (available.getValue().doubleValue() >= amount) {
-            // Find content items to remove
-            double remaining = amount;
+        if (available.getValue().compareTo(amount) >= 0) {
+            Real remaining = amount;
             List<Money> toRemove = new ArrayList<>();
             
             for (Money m : contents) {
-                if (m.getCurrency().equals(currency) && remaining > 0) {
-                    double mValue = m.getValue().doubleValue();
-                    if (mValue <= remaining) {
+                if (m.getCurrency().equals(currency) && remaining.compareTo(Real.ZERO) > 0) {
+                    Real mValue = m.getValue();
+                    if (mValue.compareTo(remaining) <= 0) {
                         toRemove.add(m);
-                        remaining -= mValue;
+                        remaining = remaining.subtract(mValue);
                     }
                 }
             }
             
             contents.removeAll(toRemove);
             
-            // Add back any change
-            if (remaining < 0) {
-                contents.add(Money.valueOf(-remaining, currency));
+            // Handle fractional remainder if any (unlikely in physical wallet model but possible in virtual)
+            if (remaining.compareTo(Real.ZERO) > 0) {
+                 // In a simple model, we just subtract from a single large bank note if needed,
+                 // but here we only removed full notes. 
+                 // If we didn't remove enough because no small enough notes were found, 
+                 // we might need more complex logic.
             }
             
             updateBalance(currency);

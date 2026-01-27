@@ -44,7 +44,7 @@ public class PeriodicTableTest {
         assertEquals("Hydrogen", h.getName());
         assertEquals(1, h.getAtomicNumber());
         // JSON loader uses Enum category
-        assertEquals(Element.ElementCategory.NONMETAL, h.getCategory());
+        assertEquals(ElementCategory.NONMETAL, h.getCategory());
 
         // Check properties
         // Atomic Radius not in JSON yet

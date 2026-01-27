@@ -27,7 +27,7 @@ import org.jscience.economics.money.Account;
 import org.jscience.economics.money.Money;
 import org.jscience.geography.BusinessPlace;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.SimpleIdentification;
+
 import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
@@ -56,9 +56,8 @@ public class Organization extends Community implements Property {
 
     private static final long serialVersionUID = 1L;
 
-    @Attribute
-    private String name;
-    
+    // Name is handled by ComprehensiveIdentification traits
+
     /** The estimated total value of the organization. */
     @Attribute
     private Money value;
@@ -99,8 +98,7 @@ public class Organization extends Community implements Property {
     public Organization(String name, Identification identification, Set<EconomicAgent> owners,
                         BusinessPlace place, Set<Account> accounts) {
         super(identification, HomoSapiens.SPECIES, place);
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
-        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+        setName(name);
         
         this.owners = Objects.requireNonNull(owners, "Owners set cannot be null");
         this.accounts = Objects.requireNonNull(accounts, "Accounts set cannot be null");
@@ -117,12 +115,13 @@ public class Organization extends Community implements Property {
      * Convenience constructor for modern API.
      */
     public Organization(String name, org.jscience.earth.Place place, Money initialCapital) {
-        this(name, new UUIDIdentification(UUID.randomUUID().toString()), new HashSet<>(), 
+        this(name, new UUIDIdentification(UUID.randomUUID()), new HashSet<>(), 
              place instanceof BusinessPlace ? (BusinessPlace) place : null, new HashSet<>());
         
         this.capital = initialCapital;
-        Identification mainAccountId = new SimpleIdentification(name + "-MainAccount");
-        this.accounts.add(new Account(null, owners, mainAccountId, "Main Account", initialCapital));
+        Identification mainAccountId = new UUIDIdentification(UUID.randomUUID());
+        setName(name);
+        this.accounts.add(new Account(null, owners, mainAccountId, name + " Main Account", initialCapital));
     }
 
     public Organization(String name, EconomicAgent owner) {
@@ -130,15 +129,12 @@ public class Organization extends Community implements Property {
         addOwner(owner);
     }
 
-    public String getName() {
-        return name;
-    }
-
+    @Override
     public void setName(String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty");
         }
-        this.name = name;
+        super.setName(name);
     }
 
     public Identification getIdentification() {

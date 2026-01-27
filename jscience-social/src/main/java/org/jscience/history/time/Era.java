@@ -23,33 +23,61 @@
 
 package org.jscience.history.time;
 
+
+import org.jscience.util.EnumRegistry;
+import org.jscience.util.ExtensibleEnum;
+
 /**
- * Historical eras.
+ * An extensible enumeration for chronological eras.
+ * Supports standard BC/AD (BCE/CE) but allows for cultural extensions.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 2.1
  */
-public enum Era {
+public class Era extends ExtensibleEnum {
+
+    private static final long serialVersionUID = 1L;
+
+    public static final EnumRegistry<Era> REGISTRY = new EnumRegistry<>();
+
     /** Before Common Era (equivalent to BC). */
-    BCE("Before Common Era", "BCE"),
+    public static final Era BCE = new Era("BCE", "Before Common Era", true);
     
     /** Common Era (equivalent to AD). */
-    CE("Common Era", "CE");
+    public static final Era CE = new Era("CE", "Common Era", true);
+
+    /** Islamic (Hijri) Era. */
+    public static final Era AH = new Era("AH", "Anno Hegirae", true);
+
+    /** Hebrew (Anno Mundi) Era. */
+    public static final Era AM = new Era("AM", "Anno Mundi", true);
 
     private final String description;
-    private final String abbreviation;
 
-    Era(String description, String abbreviation) {
+    private Era(String name, String description, boolean builtIn) {
+        super(name);
         this.description = description;
-        this.abbreviation = abbreviation;
+        /* builtIn ignored as it is handled by ExtensibleEnum or ignored */
+        REGISTRY.register(this);
     }
 
-    public String getDescription() {
-        return description;
+    public static Era valueOf(String name) {
+        return REGISTRY.valueOf(name);
     }
+
+    public static Era valueOf(int ordinal) {
+        return REGISTRY.valueOf(ordinal);
+    }
+
+    @Override
+    public String description() {
+        return description != null ? description : name();
+    }
+
+    /* isBuiltIn removed as it is final in ExtensibleEnum */
 
     public String getAbbreviation() {
-        return abbreviation;
+        return name();
     }
 }

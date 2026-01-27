@@ -22,8 +22,8 @@
  */
 package org.jscience.philosophy.epistemology;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Dimensionless;
 
 /**
  * Evidence based on the report or testimony of another subject or authority.
@@ -33,10 +33,8 @@ import java.util.Map;
  * @since 1.0
  */
 public class TestimonialEvidence extends Evidence {
-    private Map<String, Object> traits = new HashMap<>();
-    @Override public Map<String, Object> getTraits() { return traits; }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Creates new TestimonialEvidence.
@@ -45,12 +43,7 @@ public class TestimonialEvidence extends Evidence {
      * @param description the message or report
      * @param reliability confidence in the reporter
      */
-    public TestimonialEvidence(String source, String description, double reliability) {
-        super(source, description, reliability);
-    }
-
-    @Override
-    public String getEvidenceType() {
-        return "Testimonial";
+    public TestimonialEvidence(String source, String description, Quantity<Dimensionless> reliability) {
+        super(source, description, reliability, EvidenceKind.TESTIMONIAL);
     }
 }

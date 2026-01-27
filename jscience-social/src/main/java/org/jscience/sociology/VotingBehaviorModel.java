@@ -24,14 +24,16 @@
 package org.jscience.sociology;
 
 import org.jscience.mathematics.numbers.real.Real;
+import java.util.Map;
 
 /**
  * Models individual and collective voting behavior based on political science theories.
  * Incorporates factors such as economic performance (retrospective voting) and partisanship.
+ * Modernized to use Real for internal continuous values while accepting double inputs.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.3
  * @since 1.0
  */
 public final class VotingBehaviorModel {
@@ -44,18 +46,44 @@ public final class VotingBehaviorModel {
      * Model based on: P(Vote) = 0.5 + a * (GDP Growth) + b * (Partisanship)
      * </p>
      *
-     * @param gdpGrowth annual GDP growth rate (e.g., 0.03 for 3%)
-     * @param partyId   partisan identification score (-1.0 to 1.0, where 1.0 is full support for incumbent)
-     * @return the probability of voting for the incumbent (0.0 to 1.0)
+     * @param gdpGrowth annual GDP growth rate (Real)
+     * @param partyId   partisan identification score (Real)
+     * @return the probability of voting for the incumbent as Real
      */
-    public static Real incumbentVoteProb(double gdpGrowth, double partyId) {
-        // Coefficients derived from standard economic voting literature approximations
-        // 0.05 coefficient for growth (economic checking)
-        // 0.3 coefficient for party ID (partisan bias)
-        double prob = 0.5 + 5.0 * gdpGrowth + 0.3 * partyId; 
-        // Note: Adjusted 0.05 to 5.0 assuming gdpGrowth is decimal (0.02) not percent (2.0) for meaningful impact
-        // Or if inputs are percents, 0.05 is fine. Assuming decimal input here implies 1% growth (0.01) -> +0.05 probability.
+    public static Real incumbentVoteProb(Real gdpGrowth, Real partyId) {
+        // Internal calculation using Real for precision
+        Real prob = Real.of(0.5)
+            .add(Real.of(5.0).multiply(gdpGrowth))
+            .add(Real.of(0.3).multiply(partyId));
+            
+        // Clamp 0.0 to 1.0
+        if (prob.compareTo(Real.ZERO) < 0) return Real.ZERO;
+        if (prob.compareTo(Real.ONE) > 0) return Real.ONE;
+        return prob;
+    }
+
+    /**
+     * Calculates polarization in a society based on opinion distribution.
+     * Higher values indicate a more divided society with extreme clusters.
+     * 
+     * @param opinions map of person ID to opinion score (Real values)
+     * @return polarization index as Real
+     */
+    public static Real calculatePolarization(Map<String, Real> opinions) {
+        if (opinions == null || opinions.isEmpty()) return Real.ZERO;
         
-        return Real.of(Math.max(0.0, Math.min(1.0, prob)));
+        Real sum = Real.ZERO;
+        for (Real v : opinions.values()) sum = sum.add(v);
+        Real mean = sum.divide(Real.of(opinions.size()));
+        
+        Real sumSqDiff = Real.ZERO;
+        for (Real v : opinions.values()) {
+            Real diff = v.subtract(mean);
+            sumSqDiff = sumSqDiff.add(diff.multiply(diff));
+        }
+        Real variance = sumSqDiff.divide(Real.of(opinions.size()));
+                
+        // Polarization factor: higher variance usually means more polarization in a bounded space.
+        return variance.sqrt();
     }
 }

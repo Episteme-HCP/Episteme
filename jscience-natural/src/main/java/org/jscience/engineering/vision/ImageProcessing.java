@@ -25,12 +25,19 @@ package org.jscience.engineering.vision;
 
 /**
  * Computer vision image processing utilities.
+ * <p>
+ * This class uses standard {@code double[][]} arrays for image representation (normalized 0.0-1.0)
+ * to maintain high performance for pixel-level operations, as opposed to high-precision Real
+ * objects which would incur significant memory and CPU overhead for large images.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class ImageProcessing {
+
+    private ImageProcessing() {}
 
     /**
      * Sobel edge detection kernel (3x3).
@@ -72,7 +79,7 @@ public class ImageProcessing {
     };
 
     /**
-     * Gaussian blur kernel (3x3, ÃÆ’ Ã¢â€°Ë† 0.85).
+     * Gaussian blur kernel (3x3, σ ≈ 0.85).
      */
     public static final double[][] GAUSSIAN_3x3 = {
             { 1.0 / 16, 2.0 / 16, 1.0 / 16 },
@@ -92,7 +99,7 @@ public class ImageProcessing {
     /**
      * Apply convolution kernel to grayscale image.
      * 
-     * @param image  2D grayscale image [height][width]
+     * @param image  2D grayscale image [height][width] (values usually 0.0 to 1.0)
      * @param kernel Convolution kernel
      * @return Filtered image
      */

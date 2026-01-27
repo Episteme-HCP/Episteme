@@ -20,66 +20,99 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+ 
 package org.jscience.economics;
-
+ 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
-
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+ 
 /**
  * Advanced metrics for analyzing economic inequality, including Gini coefficients 
  * and Lorenz curve generation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class InequalityMetrics {
-
+ 
     private InequalityMetrics() {}
-
+ 
     /**
-     * Calculates the Gini coefficient for a population income set.
+     * Calculates the Gini coefficient for a population income set (Quantities).
      * Higher values indicate greater inequality.
      */
-    public static Real calculateGini(double[] incomes) {
+    public static Real calculateGini(Quantity<?>[] incomes) {
         if (incomes == null || incomes.length < 2) return Real.ZERO;
         int n = incomes.length;
-        double sumDiff = 0;
-        double sumIncomes = 0;
+        Real sumDiff = Real.ZERO;
+        Real sumIncomes = Real.ZERO;
         
         for (int i = 0; i < n; i++) {
-            sumIncomes += incomes[i];
+            Real valI = incomes[i].getValue();
+            sumIncomes = sumIncomes.add(valI);
             for (int j = 0; j < n; j++) {
-                sumDiff += Math.abs(incomes[i] - incomes[j]);
+                sumDiff = sumDiff.add(valI.subtract(incomes[j].getValue()).abs());
             }
         }
         
-        double mean = sumIncomes / n;
-        if (mean == 0) return Real.ZERO;
-        return Real.of(sumDiff / (2.0 * n * n * mean));
+        if (sumIncomes.isZero()) return Real.ZERO;
+        
+        // G = sumDiff / (2 * n * sumIncomes)
+        Real denominator = Real.of(2L * n).multiply(sumIncomes);
+        return sumDiff.divide(denominator);
     }
-
+ 
+    /**
+     * Overload for Real arrays.
+     */
+    public static Real calculateGini(Real[] incomes) {
+        if (incomes == null) return Real.ZERO;
+        Quantity<?>[] qArray = new Quantity<?>[incomes.length];
+        for (int i = 0; i < incomes.length; i++) qArray[i] = Quantities.create(incomes[i], Units.ONE);
+        return calculateGini(qArray);
+    }
+ 
     /**
      * Generates a list of coordinates (x, y) representing the Lorenz curve.
      */
-    public static List<double[]> getLorenzCurve(double[] incomes) {
-        if (incomes == null || incomes.length == 0) return List.of(new double[]{0,0}, new double[]{1,1});
-        double[] sorted = incomes.clone();
-        Arrays.sort(sorted);
-        double total = Arrays.stream(sorted).sum();
+    public static List<Real[]> getLorenzCurve(Quantity<?>[] incomes) {
+        if (incomes == null || incomes.length == 0) return List.of(new Real[]{Real.ZERO, Real.ZERO}, new Real[]{Real.ONE, Real.ONE});
+        Quantity<?>[] sorted = incomes.clone();
+        Arrays.sort(sorted, Comparator.comparing(Quantity::getValue));
+        Real total = Real.ZERO;
+        for (Quantity<?> q : sorted) total = total.add(q.getValue());
         
-        List<double[]> curve = new ArrayList<>();
-        curve.add(new double[]{0, 0});
+        List<Real[]> curve = new ArrayList<>();
+        curve.add(new Real[]{Real.ZERO, Real.ZERO});
         
-        double cumulativeIncome = 0;
+        if (total.isZero()) return curve;
+ 
+        Real cumulativeIncome = Real.ZERO;
         for (int i = 0; i < sorted.length; i++) {
-            cumulativeIncome += sorted[i];
-            curve.add(new double[]{(double)(i+1)/sorted.length, cumulativeIncome/total});
+            cumulativeIncome = cumulativeIncome.add(sorted[i].getValue());
+            curve.add(new Real[]{
+                Real.of(i + 1).divide(Real.of(sorted.length)),
+                cumulativeIncome.divide(total)
+            });
         }
         return curve;
+    }
+ 
+    /**
+     * Overload for Real arrays.
+     */
+    public static List<Real[]> getLorenzCurve(Real[] incomes) {
+        if (incomes == null) return List.of(new Real[]{Real.ZERO, Real.ZERO}, new Real[]{Real.ONE, Real.ONE});
+        Quantity<?>[] qArray = new Quantity<?>[incomes.length];
+        for (int i = 0; i < incomes.length; i++) qArray[i] = Quantities.create(incomes[i], Units.ONE);
+        return getLorenzCurve(qArray);
     }
 }

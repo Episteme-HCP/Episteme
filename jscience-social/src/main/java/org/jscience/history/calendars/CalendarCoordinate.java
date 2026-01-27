@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Objects;
-import org.jscience.history.time.Precision;
+import org.jscience.history.time.TimePrecision;
 import org.jscience.history.time.TimeCoordinate;
 
 /**
@@ -21,15 +21,15 @@ public final class CalendarCoordinate implements TimeCoordinate, Serializable {
     private static final long serialVersionUID = 2L;
 
     private final AlternateCalendar calendar;
-    private final Precision precision;
+    private final TimePrecision precision;
 
-    public CalendarCoordinate(AlternateCalendar calendar, Precision precision) {
+    public CalendarCoordinate(AlternateCalendar calendar, TimePrecision precision) {
         this.calendar = Objects.requireNonNull(calendar, "Calendar cannot be null");
-        this.precision = precision != null ? precision : Precision.DAY;
+        this.precision = precision != null ? precision : TimePrecision.DAY;
     }
 
     public CalendarCoordinate(AlternateCalendar calendar) {
-        this(calendar, Precision.DAY);
+        this(calendar, TimePrecision.DAY);
     }
 
     public AlternateCalendar getCalendar() {
@@ -45,13 +45,13 @@ public final class CalendarCoordinate implements TimeCoordinate, Serializable {
     }
 
     @Override
-    public Precision getPrecision() {
+    public TimePrecision getPrecision() {
         return precision;
     }
 
     @Override
     public boolean isFuzzy() {
-        return precision.ordinal() > Precision.DAY.ordinal();
+        return precision.ordinal() > TimePrecision.DAY.ordinal();
     }
 
     /**

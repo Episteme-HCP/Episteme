@@ -22,28 +22,46 @@
  */
 package org.jscience.philosophy.epistemology;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.jscience.philosophy.Belief;
-import org.jscience.util.Named;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents an epistemic agent (human, organization, or AI) capable of 
  * holding beliefs and acquiring knowledge.
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Subject implements Named, Serializable {
+@Persistent
+public class Subject implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    private final String name;
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Belief> beliefs;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Knowledge> knowledgeBase;
 
     /**
@@ -52,14 +70,20 @@ public class Subject implements Named, Serializable {
      * @param name the name of the subject
      */
     public Subject(String name) {
-        this.name = Objects.requireNonNull(name, "Subject name cannot be null");
+        this.id = new SimpleIdentification("Subject:" + UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Subject name cannot be null"));
         this.beliefs = new ArrayList<>();
         this.knowledgeBase = new ArrayList<>();
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -111,7 +135,19 @@ public class Subject implements Named, Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Subject that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
     public String toString() {
-        return "Subject: " + name + " (" + knowledgeBase.size() + " items known, " + beliefs.size() + " beliefs)";
+        return "Subject: " + getName() + " (" + knowledgeBase.size() + " items known, " + beliefs.size() + " beliefs)";
     }
 }

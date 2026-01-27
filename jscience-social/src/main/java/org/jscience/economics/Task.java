@@ -8,10 +8,15 @@
  */
 package org.jscience.economics;
 
-import org.jscience.util.Named;
+
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,7 +39,11 @@ import java.util.Set;
  * @version 6.0, July 21, 2014
  */
 @Persistent
-public class Task implements Named {
+public class Task implements ComprehensiveIdentification {
+    @Id
+    private final Identification id;
+    @Attribute
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
     @Attribute
     private String name;
     @Attribute
@@ -46,7 +55,7 @@ public class Task implements Named {
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private Set<Resource> products;
     @Attribute
-    private double duration;
+    private Real duration;
 
     /**
      * Creates a new Task object.
@@ -56,7 +65,12 @@ public class Task implements Named {
      * @param products  the produced resources
      */
     public Task(String name, Set<Resource> resources, Set<Resource> products) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this(new SimpleIdentification(name), name, resources, products);
+    }
+
+    public Task(Identification id, String name, Set<Resource> resources, Set<Resource> products) {
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         
         this.resources = new HashSet<>(Objects.requireNonNull(resources, "Resources set cannot be null"));
@@ -64,7 +78,17 @@ public class Task implements Named {
         
         this.process = "";
         this.subTasks = new HashSet<>();
-        this.duration = 0;
+        this.duration = Real.ZERO;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getName() {
@@ -99,11 +123,11 @@ public class Task implements Named {
         return Collections.unmodifiableSet(resources);
     }
 
-    public double getDuration() {
+    public Real getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
+    public void setDuration(Real duration) {
         this.duration = duration;
     }
 

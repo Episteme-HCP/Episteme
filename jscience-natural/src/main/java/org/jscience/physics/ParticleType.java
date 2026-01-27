@@ -202,7 +202,7 @@ public class ParticleType implements Identified<Identification>, Named {
             Real partialWidthIn, Real partialWidthOut,
             Real spin) {
         Real hbarc = Real.of(197.327); // MeV·fm
-        Real prefactor = spin.multiply(Real.of(2)).add(Real.ONE).multiply(PhysicalConstants.PI)
+        Real prefactor = spin.multiply(Real.of(2)).add(Real.ONE).multiply(Real.of(Math.PI))
                 .multiply(hbarc.multiply(hbarc));
         Real numerator = partialWidthIn.multiply(partialWidthOut);
         Real denominator = E.subtract(M).pow(2).add(totalWidth.multiply(totalWidth).divide(Real.of(4)));
@@ -213,6 +213,6 @@ public class ParticleType implements Identified<Identification>, Named {
         Real me = Real.of(0.511); // MeV
         Real lnQ = (Q_MeV.multiply(Q_MeV).divide(me.multiply(me))).log();
         return ALPHA
-                .divide(Real.ONE.subtract(ALPHA.divide(Real.of(3).multiply(PhysicalConstants.PI)).multiply(lnQ)));
+                .divide(Real.ONE.subtract(ALPHA.divide(Real.of(3).multiply(Real.of(Math.PI))).multiply(lnQ)));
     }
 }

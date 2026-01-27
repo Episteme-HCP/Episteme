@@ -24,13 +24,18 @@
 package org.jscience.sociology;
 
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Velocity;
 
 /**
  * Utility class for simulating crowd dynamics and estimating flow rates in evacuation scenarios.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class CrowdDensitySimulator {
@@ -42,15 +47,29 @@ public final class CrowdDensitySimulator {
      * Uses a simplified relationship: Flow = density * velocity * width.
      * Velocity is modeled as decreasing linearly with density.
      *
-     * @param density crowd density in persons/m^2
-     * @param width   width of the exit in meters
-     * @return the flow rate in persons per second
+     * @param density crowd density in persons/m^2 as Quantity
+     * @param width   width of the exit in meters as Quantity
+     * @return the flow rate in persons per second as Quantity
      */
-    public static Real exitFlow(double density, double width) {
+    public static Quantity<?> exitFlow(Quantity<?> density, Quantity<Length> width) {
         // Simplified speed deduction model: v = 1.2 * (1 - 0.25 * density)
-        // Adjusts walking speed based on congestion.
-        double velocity = 1.2 * (1 - 0.25 * density); 
+        Real dVal = density.getValue();
+        Real baseVelocity = Real.of(1.2);
+        Real densityFactor = Real.of(0.25);
+        
+        Real factor = Real.ONE.subtract(densityFactor.multiply(dVal));
+        Real vVal = baseVelocity.multiply(factor);
+
         // Ensure non-negative and non-zero minimum velocity for flow calculation purposes (capping lower bound)
-        return Real.of(density * Math.max(0.1, velocity) * width);
+        Real minVelocity = Real.of(0.1);
+        if (vVal.compareTo(minVelocity) < 0) {
+            vVal = minVelocity;
+        }
+
+        Quantity<Velocity> velocity = org.jscience.measure.Quantities.create(vVal, Units.METER_PER_SECOND);
+        
+        // Flow = density * velocity * width
+        // [pers/m^2] * [m/s] * [m] = [pers/s]
+        return density.multiply(velocity).multiply(width);
     }
 }

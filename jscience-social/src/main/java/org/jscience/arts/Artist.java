@@ -26,11 +26,18 @@ package org.jscience.arts;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.jscience.biology.BiologicalSex;
 import org.jscience.biology.Individual;
+
+// ... (existing imports, but I will just replace the top import block or use replace_file_content carefully)
+
+// Actually, I should insert the import first, then replace usage.
+// Let's do imports first.
+
 import org.jscience.biology.taxonomy.Species;
 import org.jscience.economics.Organization;
 import org.jscience.economics.Worker;
@@ -49,7 +56,7 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 @Persistent
@@ -57,16 +64,8 @@ public class Artist extends Worker {
 
     private static final long serialVersionUID = 2L;
 
-    /**
-     * Categories of artistic media.
-     */
-    public enum Medium {
-        PAINTING, SCULPTURE, MUSIC, DANCE, THEATER, FILM,
-        PHOTOGRAPHY, ARCHITECTURE, LITERATURE, DIGITAL
-    }
-
     @Attribute
-    private final Set<Medium> media = EnumSet.noneOf(Medium.class);
+    private final Set<ArtMedium> media = new HashSet<>();
     @Attribute
     private String nationality;
     @Attribute
@@ -101,7 +100,7 @@ public class Artist extends Worker {
         this(individual, organization, "Artist");
     }
 
-    public Set<Medium> getMedia() {
+    public Set<ArtMedium> getMedia() {
         return Collections.unmodifiableSet(media);
     }
 
@@ -149,12 +148,14 @@ public class Artist extends Worker {
         return Collections.unmodifiableList(notableWorks);
     }
 
-    public void addMedium(Medium medium) {
-        media.add(medium);
-    }
-
     public void addNotableWork(String work) {
         notableWorks.add(work);
+    }
+
+    public void addMedium(ArtMedium medium) {
+        if (medium != null) {
+            media.add(medium);
+        }
     }
 
     /**
@@ -176,14 +177,14 @@ public class Artist extends Worker {
      */
     public static Artist leonardoDaVinci() {
         Species human = new Species("Human", "Homo sapiens");
-        Individual leo = new Individual(UUID.randomUUID().toString(), human, Individual.Sex.MALE, LocalDate.of(1452, 4, 15));
+        Individual leo = new Individual(UUID.randomUUID().toString(), human, BiologicalSex.MALE, LocalDate.of(1452, 4, 15));
         leo.setTrait("name", "Leonardo da Vinci");
         
         Organization selfEmployed = new Organization("Independent", new Place("Florence"), Money.usd(Real.ZERO));
         Artist a = new Artist(leo, selfEmployed, "Polymath");
         
-        a.addMedium(Medium.PAINTING);
-        a.addMedium(Medium.SCULPTURE);
+        a.addMedium(ArtMedium.PAINTING);
+        a.addMedium(ArtMedium.SCULPTURE);
         a.setNationality("Italian");
         a.setBirthDate(FuzzyTimePoint.of(1452, 4, 15));
         a.setDeathDate(FuzzyTimePoint.of(1519, 5, 2));
@@ -199,13 +200,13 @@ public class Artist extends Worker {
      */
     public static Artist beethoven() {
         Species human = new Species("Human", "Homo sapiens");
-        Individual ludwig = new Individual(UUID.randomUUID().toString(), human, Individual.Sex.MALE, LocalDate.of(1770, 12, 17));
+        Individual ludwig = new Individual(UUID.randomUUID().toString(), human, BiologicalSex.MALE, LocalDate.of(1770, 12, 17));
         ludwig.setTrait("name", "Ludwig van Beethoven");
         
         Organization selfEmployed = new Organization("Independent", new Place("Vienna"), Money.usd(Real.ZERO));
         Artist a = new Artist(ludwig, selfEmployed, "Composer");
         
-        a.addMedium(Medium.MUSIC);
+        a.addMedium(ArtMedium.MUSIC);
         a.setNationality("German");
         a.setBirthDate(FuzzyTimePoint.of(1770, 12, 17));
         a.setDeathDate(FuzzyTimePoint.of(1827, 3, 26));

@@ -23,96 +23,80 @@
 
 package org.jscience.arts;
 
+
+import org.jscience.util.EnumRegistry;
+import org.jscience.util.ExtensibleEnum;
+
 /**
- * Enumeration of the different forms of art, categorized by traditional 
- * and modern classifications. Includes the "Seven Arts" as well as modern 
- * digital and interactive media.
+ * Extensible enumeration of the different forms of art.
+ * Includes the "Seven Arts" as well as modern digital and interactive media.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
+ * @version 2.2
  * @since 1.0
  */
-public enum ArtForm {
+public final class ArtForm extends ExtensibleEnum {
 
-    /** Architecture (1st Art). */
-    ARCHITECTURE(1),
-    
-    /** Sculpture (2nd Art). */
-    SCULPTURE(2),
-    
-    /** Painting (3rd Art). */
-    PAINTING(3),
-    
-    /** Music (4th Art). */
-    MUSIC(4),
-    
-    /** Poetry and Literature (5th Art). */
-    POETRY(5),
-    LITERATURE(5),
-    
-    /** Performing Arts and Dance (6th Art). */
-    DANCE(6),
-    
-    /** Cinema (7th Art). */
-    CINEMA(7),
+    private static final long serialVersionUID = 2L;
 
-    /** Photography (8th Art). */
-    PHOTOGRAPHY(8),
+    public static final EnumRegistry<ArtForm> REGISTRY = EnumRegistry.getRegistry(ArtForm.class);
+
+    public static final ArtForm ARCHITECTURE = new ArtForm("ARCHITECTURE", 1, true);
+    public static final ArtForm SCULPTURE = new ArtForm("SCULPTURE", 2, true);
+    public static final ArtForm PAINTING = new ArtForm("PAINTING", 3, true);
+    public static final ArtForm MUSIC = new ArtForm("MUSIC", 4, true);
+    public static final ArtForm POETRY = new ArtForm("POETRY", 5, true);
+    public static final ArtForm LITERATURE = new ArtForm("LITERATURE", 5, true);
+    public static final ArtForm DANCE = new ArtForm("DANCE", 6, true);
+    public static final ArtForm CINEMA = new ArtForm("CINEMA", 7, true);
+    public static final ArtForm PHOTOGRAPHY = new ArtForm("PHOTOGRAPHY", 8, true);
+    public static final ArtForm COMICS = new ArtForm("COMICS", 9, true);
+    public static final ArtForm TELEVISION = new ArtForm("TELEVISION", 10, true);
+    public static final ArtForm RADIO = new ArtForm("RADIO", 11, true);
+    public static final ArtForm GAMING = new ArtForm("GAMING", 12, true);
+    public static final ArtForm CRAFTING = new ArtForm("CRAFTING", 13, true);
+    public static final ArtForm GASTRONOMY = new ArtForm("GASTRONOMY", 14, true);
+    public static final ArtForm THEATER = new ArtForm("THEATER", 15, true);
+    public static final ArtForm DIGITAL_ART = new ArtForm("DIGITAL_ART", 16, true);
+    public static final ArtForm PERFORMANCE_ART = new ArtForm("PERFORMANCE_ART", 17, true);
     
-    /** Comics and Sequential Art (9th Art). */
-    COMICS(9),
-    
-    /** Television and Broadcast Media. */
-    TELEVISION(10),
-    
-    /** Radio and Acoustic Arts. */
-    RADIO(11),
-    
-    /** Interactive Media and Video games. */
-    GAMING(12),
-    
-    /** Handicrafts and Applied Arts. */
-    CRAFTING(13),
-    
-    /** Culinary Arts and Gastronomy. */
-    GASTRONOMY(14),
-    
-    /** Theater and Dramatic Arts. */
-    THEATER(15),
-    
-    /** Digital and Generative Art. */
-    DIGITAL_ART(16),
-    
-    /** Performance and Conceptual Art. */
-    PERFORMANCE_ART(17);
+    public static final ArtForm OTHER = new ArtForm("OTHER", 0, true);
+    public static final ArtForm UNKNOWN = new ArtForm("UNKNOWN", -1, true);
 
     private final int value;
+    private final boolean builtIn;
 
-    ArtForm(int value) {
+    private ArtForm(String name, int value, boolean builtIn) {
+        super(name);
         this.value = value;
+        this.builtIn = builtIn;
+        REGISTRY.register(this);
     }
 
-    /**
-     * Returns the numeric value associated with this art form.
-     * @return the value
-     */
+    public ArtForm(String name, int value) {
+        this(name, value, false);
+    }
+
     public int getValue() {
         return value;
     }
 
-    /**
-     * Returns the ArtForm corresponding to the given integer value.
-     * 
-     * @param value the numeric value to find
-     * @return the corresponding ArtForm, or null if not found
-     */
+    @Override
+    public boolean isBuiltIn() {
+        return builtIn;
+    }
+
+    public static ArtForm valueOf(String name) {
+        return REGISTRY.valueOf(name);
+    }
+    
     public static ArtForm fromValue(int value) {
-        for (ArtForm form : ArtForm.values()) {
+        for (ArtForm form : REGISTRY.values()) {
             if (form.value == value) {
                 return form;
             }
         }
-        return null;
+        return UNKNOWN;
     }
 }

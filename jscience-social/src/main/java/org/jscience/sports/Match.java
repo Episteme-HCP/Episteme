@@ -59,11 +59,6 @@ public class Match implements ComprehensiveIdentification, Temporal<TimeCoordina
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    /** Current lifecycle state of the match. */
-    public enum Status {
-        SCHEDULED, IN_PROGRESS, COMPLETED, POSTPONED, CANCELLED
-    }
-
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Sport sport;
 
@@ -80,7 +75,7 @@ public class Match implements ComprehensiveIdentification, Temporal<TimeCoordina
     private Place venue;
 
     @Attribute
-    private Status status;
+    private MatchStatus status;
 
     @Attribute
     private int homeScore;
@@ -106,7 +101,7 @@ public class Match implements ComprehensiveIdentification, Temporal<TimeCoordina
         this.date = Objects.requireNonNull(date, "Date cannot be null");
         this.homeTeam = Objects.requireNonNull(homeTeam, "Home team cannot be null");
         this.awayTeam = Objects.requireNonNull(awayTeam, "Away team cannot be null");
-        this.status = Status.SCHEDULED;
+        this.status = MatchStatus.SCHEDULED;
         setName(homeTeam.getName() + " vs " + awayTeam.getName());
     }
 
@@ -149,7 +144,7 @@ public class Match implements ComprehensiveIdentification, Temporal<TimeCoordina
         return venue;
     }
 
-    public Status getStatus() {
+    public MatchStatus getStatus() {
         return status;
     }
 
@@ -169,7 +164,7 @@ public class Match implements ComprehensiveIdentification, Temporal<TimeCoordina
         this.venue = venue;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(MatchStatus status) {
         this.status = status;
     }
 
@@ -183,23 +178,23 @@ public class Match implements ComprehensiveIdentification, Temporal<TimeCoordina
     public void setScore(int homeScore, int awayScore) {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
-        this.status = Status.COMPLETED;
+        this.status = MatchStatus.COMPLETED;
     }
 
     public Team getWinner() {
-        if (status != Status.COMPLETED) return null;
+        if (!MatchStatus.COMPLETED.equals(status)) return null;
         if (homeScore > awayScore) return homeTeam;
         if (awayScore > homeScore) return awayTeam;
         return null; // Tie
     }
 
     public boolean isTie() {
-        return status == Status.COMPLETED && homeScore == awayScore;
+        return MatchStatus.COMPLETED.equals(status) && homeScore == awayScore;
     }
 
     @Override
     public String toString() {
-        if (status == Status.COMPLETED) {
+        if (status == MatchStatus.COMPLETED) {
             return String.format("%s %d-%d %s (%s)",
                     homeTeam.getName(), homeScore, awayScore, awayTeam.getName(), sport.getName());
         }

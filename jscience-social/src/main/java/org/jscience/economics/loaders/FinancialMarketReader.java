@@ -137,20 +137,14 @@ public class FinancialMarketReader extends AbstractResourceReader<List<Financial
                 if (parts.length >= 6) {
                     // Date, Open, High, Low, Close, Volume
                     try {
-                        double openVal = Double.parseDouble(parts[1]);
-                        double highVal = Double.parseDouble(parts[2]);
-                        double lowVal = Double.parseDouble(parts[3]);
-                        double closeVal = Double.parseDouble(parts[4]);
-                        double volVal = Double.parseDouble(parts[5]);
-
                         candles.add(new Candle(
                                 TimePoint.now(), // Placeholder time as parsing wasn't in original
-                                new Money(Real.of(openVal), currencyCode),
-                                new Money(Real.of(highVal), currencyCode),
-                                new Money(Real.of(lowVal), currencyCode),
-                                new Money(Real.of(closeVal), currencyCode),
-                                Real.of(volVal)));
-                    } catch (NumberFormatException e) {
+                                new Money(Real.of(parts[1]), currencyCode),
+                                new Money(Real.of(parts[2]), currencyCode),
+                                new Money(Real.of(parts[3]), currencyCode),
+                                new Money(Real.of(parts[4]), currencyCode),
+                                Real.of(parts[5])));
+                    } catch (Exception e) {
                         // Skip malformed
                     }
                 }

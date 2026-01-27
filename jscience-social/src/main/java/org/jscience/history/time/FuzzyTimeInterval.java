@@ -35,7 +35,7 @@ public final class FuzzyTimeInterval implements TimeCoordinate, Serializable {
     }
 
     @Override
-    public Precision getPrecision() {
+    public TimePrecision getPrecision() {
         return start.getPrecision();
     }
 

@@ -2,6 +2,9 @@ package org.jscience.economics;
 
 import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 import java.util.Set;
 
@@ -17,16 +20,20 @@ import java.util.Set;
  * @author Silvere Martin-Michiellot
  * @version 1.0
  */
+@Persistent
 public class OrganizationTask extends Task {
     //usually lower than sum of energy and human costs thanks to the fact that big groups work usually faster
     //you may also count in that cost the price of using the machines, renting the building, etc....
     /** DOCUMENT ME! */
-    private double humanCost; //the number of hours of man work
+    @Attribute
+    private Real humanCost; //the number of hours of man work
 
     /** DOCUMENT ME! */
+    @Attribute
     private Money adjustedCost; //the adjusted cost depending on the price of the energy and the human work
 
     /** DOCUMENT ME! */
+    @Attribute
     private int kind;
 
     //this is the work to produce one unit of the products (there is usually only a single resulting product)
@@ -39,8 +46,8 @@ public class OrganizationTask extends Task {
      */
     public OrganizationTask(String name, Set<Resource> resources, Set<Resource> products) {
         super(name, resources, products);
-        this.humanCost = 0;
-        this.adjustedCost = Money.valueOf(0, Currency.USD);
+        this.humanCost = Real.ZERO;
+        this.adjustedCost = Money.valueOf(Real.ZERO, Currency.USD);
         this.kind = EconomicsConstants.UNKNOWN;
     }
 
@@ -49,7 +56,7 @@ public class OrganizationTask extends Task {
      *
      * @return DOCUMENT ME!
      */
-    public double getHumanCost() {
+    public Real getHumanCost() {
         return humanCost;
     }
 
@@ -59,7 +66,7 @@ public class OrganizationTask extends Task {
      *
      * @param cost DOCUMENT ME!
      */
-    public void setHumanCost(double cost) {
+    public void setHumanCost(Real cost) {
         humanCost = cost;
     }
 

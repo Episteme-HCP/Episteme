@@ -23,12 +23,13 @@
 
 package org.jscience.sociology;
 
-
 import java.util.Date;
 import java.util.Objects;
 import org.jscience.economics.WorkSituation;
 import org.jscience.earth.Place;
-
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a cultural or religious celebration (feast, rite of passage, festival).
@@ -36,63 +37,22 @@ import org.jscience.earth.Place;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 2.0
  * @since 1.0
  */
+@Persistent
 public class Celebration extends WorkSituation {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    /** Rite of passage for physical birth. */
-    public final static int BIRTH = 1;
-    /** Ceremonial entry into a society or group. */
-    public final static int INITIATION = 2;
-    /** Ceremonial recognition of physical maturity. */
-    public final static int PUBERTY = 4;
-    /** Recognition of legal or social maturity. */
-    public final static int SOCIAL_ADULTHOOD = 8;
-    /** Ceremonial recognition of educational achievement. */
-    public final static int GRADUATION = 16;
-    /** Religious rite of immersion or naming. */
-    public final static int BAPTISM = 32;
-    /** Formal union of individuals. */
-    public final static int MARRIAGE = 64;
-    /** Recognition of biological termination. */
-    public final static int DEATH = 128;
-    /** Ceremonious disposal of a body. */
-    public final static int BURIAL = 256;
-    /** Celebration of conflict cessation. */
-    public final static int PEACE = 512;
-    /** Celebration of a specific success or conquest. */
-    public final static int VICTORY = 1024;
-    /** Formal declaration of hostilities. */
-    public final static int WAR = 2048;
-    /** Ceremony of sovereign investiture. */
-    public final static int CORONATION = 4096;
-    /** Solar-oriented festival (solstice, equinox). */
-    public final static int SUN = 8192;
-    /** Lunar-oriented festival. */
-    public final static int MOON = 16384;
-    /** Earth or agricultural festival (harvest). */
-    public final static int EARTH = 32768;
-    /** General seasonal celebration. */
-    public final static int SEASON = 65536;
-    /** Celebration of specific personal or group achievement. */
-    public final static int SUCCESS = 131072;
-    /** Purely recreational or festive celebration. */
-    public final static int PLEASURE = 262144;
-    /** Commercial or trade-related fair. */
-    public final static int BUSINESS = 524288;
-    /** Liturgical or holy day defined by a calendar. */
-    public final static int CALENDAR_SPECIFIC = 1048576;
-    /** Celebration of a specific modern event (grand opening). */
-    public final static int EVENT_SPECIFIC = 2097152;
-    /** Unclassified cultural event. */
-    public final static int OTHER = 4194304;
-
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Place place;
-    private final int kind;
-    private final Date date;
+
+    @Attribute
+    private CelebrationKind kind;
+
+    @Attribute
+    private Date date;
 
     /**
      * Creates a new Celebration.
@@ -103,15 +63,15 @@ public class Celebration extends WorkSituation {
      * @param date     the scheduled occurrence date
      * @throws NullPointerException if mandatory arguments are null
      */
-    public Celebration(String name, String comments, int kind, Date date) {
+    public Celebration(String name, String comments, CelebrationKind kind, Date date) {
         super(name, comments);
-        this.kind = kind;
+        this.kind = Objects.requireNonNull(kind, "Celebration kind cannot be null");
         this.date = Objects.requireNonNull(date, "Celebration date cannot be null");
     }
 
     /** Legacy constructor. */
     public Celebration(String name) {
-        this(name, "", OTHER, new Date());
+        this(name, "", CelebrationKind.OTHER, new Date());
     }
 
     @Override
@@ -126,10 +86,14 @@ public class Celebration extends WorkSituation {
 
     /**
      * Returns the categorical kind of this celebration.
-     * @return the kind constant
+     * @return the celebration kind
      */
-    public int getKind() {
+    public CelebrationKind getKind() {
         return kind;
+    }
+
+    public void setKind(CelebrationKind kind) {
+        this.kind = Objects.requireNonNull(kind);
     }
 
     /**
@@ -140,8 +104,12 @@ public class Celebration extends WorkSituation {
         return date;
     }
 
+    public void setDate(Date date) {
+        this.date = Objects.requireNonNull(date);
+    }
+
     @Override
     public String toString() {
-        return getName() + " [" + date + "]";
+        return getName() + " [" + date + "] (" + kind + ")";
     }
 }

@@ -51,8 +51,8 @@ public final class SegregationModel {
     public record GridState(
         int step,
         AgentType[][] grid,
-        double segregationIndex,
-        double happinessRate,
+        Real segregationIndex,
+        Real happinessRate,
         int moves
     ) implements Serializable {}
 
@@ -65,15 +65,16 @@ public final class SegregationModel {
      * @param steps     Maximum number of simulation steps
      * @return List of GridState objects representing the simulation history
      */
-    public static List<GridState> simulate(int size, double density, double threshold, int steps) {
+    public static List<GridState> simulate(int size, Real density, Real threshold, int steps) {
         List<GridState> history = new ArrayList<>();
         Random random = new Random(42);
         
         // Initialize grid
         AgentType[][] grid = new AgentType[size][size];
+        double d = density.doubleValue();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (random.nextDouble() < density) {
+                if (random.nextDouble() < d) {
                     grid[i][j] = random.nextBoolean() ? AgentType.TYPE_A : AgentType.TYPE_B;
                 } else {
                     grid[i][j] = AgentType.EMPTY;
@@ -81,7 +82,7 @@ public final class SegregationModel {
             }
         }
         
-        history.add(createState(0, grid, 0));
+        history.add(createState(0, grid, 0, threshold));
         
         for (int step = 1; step <= steps; step++) {
             int moves = 0;
@@ -114,7 +115,7 @@ public final class SegregationModel {
                 moves++;
             }
             
-            history.add(createState(step, grid, moves));
+            history.add(createState(step, grid, moves, threshold));
             
             // Stop if no agents moved (equilibrium reached)
             if (moves == 0) break;
@@ -126,7 +127,7 @@ public final class SegregationModel {
     /**
      * Checks if an agent at (row, col) is satisfied with their neighborhood.
      */
-    private static boolean isHappy(AgentType[][] grid, int row, int col, double threshold) {
+    private static boolean isHappy(AgentType[][] grid, int row, int col, Real threshold) {
         AgentType type = grid[row][col];
         if (type == AgentType.EMPTY) return true;
         
@@ -153,7 +154,7 @@ public final class SegregationModel {
         int total = same + different;
         if (total == 0) return true; // Happy if no neighbors
         
-        return (double) same / total >= threshold;
+        return Real.of(same).divide(Real.of(total)).compareTo(threshold) >= 0;
     }
 
     /**
@@ -178,7 +179,7 @@ public final class SegregationModel {
         if (totalA == 0 || totalB == 0) return Real.ZERO;
         
         // Calculate neighborhood-level dissimilarity
-        double sum = 0;
+        Real sum = Real.ZERO;
         int blockSize = Math.max(1, size / 5); // Use 5x5 blocks or smaller
         
         for (int bi = 0; bi < size; bi += blockSize) {
@@ -192,11 +193,12 @@ public final class SegregationModel {
                     }
                 }
                 
-                sum += Math.abs((double) blockA / totalA - (double) blockB / totalB);
+                Real diff = Real.of(blockA).divide(Real.of(totalA)).subtract(Real.of(blockB).divide(Real.of(totalB))).abs();
+                sum = sum.add(diff);
             }
         }
         
-        return Real.of(sum / 2);
+        return sum.divide(Real.of(2));
     }
 
     /**
@@ -206,7 +208,7 @@ public final class SegregationModel {
      * @param threshold the happiness threshold used
      * @return happiness rate (0.0 to 1.0)
      */
-    public static Real calculateHappiness(AgentType[][] grid, double threshold) {
+    public static Real calculateHappiness(AgentType[][] grid, Real threshold) {
         int happy = 0, total = 0;
         int size = grid.length;
         
@@ -242,14 +244,14 @@ public final class SegregationModel {
         return sb.toString();
     }
 
-    private static GridState createState(int step, AgentType[][] grid, int moves) {
+    private static GridState createState(int step, AgentType[][] grid, int moves, Real threshold) {
         AgentType[][] copy = new AgentType[grid.length][grid.length];
         for (int i = 0; i < grid.length; i++) {
             copy[i] = grid[i].clone();
         }
         
-        double segIndex = calculateSegregationIndex(grid).doubleValue();
-        double happiness = calculateHappiness(grid, 0.3).doubleValue();
+        Real segIndex = calculateSegregationIndex(grid);
+        Real happiness = calculateHappiness(grid, threshold);
         
         return new GridState(step, copy, segIndex, happiness, moves);
     }

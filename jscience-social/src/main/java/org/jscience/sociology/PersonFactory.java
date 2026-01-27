@@ -28,7 +28,7 @@ import org.jscience.util.identity.IDGenerator;
 import org.jscience.util.identity.SSNGenerator;
 import org.jscience.util.identity.UUIDGenerator;
 import org.jscience.util.identity.Identification;
-import org.jscience.biology.Individual;
+import org.jscience.biology.BiologicalSex;
 
 /**
  * Factory for creating {@link Person} instances with auto-generated unique identifiers.
@@ -70,9 +70,18 @@ public class PersonFactory {
      * @param nationality the person's nationality
      * @return a new Person instance
      */
-    public Person create(String name, Person.Gender gender, LocalDate birthDate, String nationality) {
+    /**
+     * Creates a person with specific attributes and an auto-generated ID.
+     *
+     * @param name        the person's name
+     * @param gender      the person's gender
+     * @param birthDate   the person's birth date
+     * @param nationality the person's nationality
+     * @return a new Person instance
+     */
+    public Person create(String name, Gender gender, LocalDate birthDate, String nationality) {
         Identification id = idGenerator.generate();
-        Individual.Sex sex = (gender != null) ? gender.toSex() : Individual.Sex.UNKNOWN;
+        BiologicalSex sex = (gender != null) ? gender.toSex() : BiologicalSex.UNKNOWN;
         return new Person(id, name, sex, birthDate, nationality);
     }
 
@@ -84,7 +93,7 @@ public class PersonFactory {
      * @return a new Person instance
      */
     public Person create(String name) {
-        return create(name, Person.Gender.UNSPECIFIED, null, null);
+        return create(name, Gender.UNKNOWN, null, null);
     }
 
     /**

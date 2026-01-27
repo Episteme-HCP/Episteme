@@ -20,12 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+ 
 package org.jscience.economics;
-
+ 
 import java.util.HashSet;
 import java.util.Set;
-
+import org.jscience.mathematics.numbers.real.Real;
+ 
 /**
  * An economic model where resource allocation is determined by supply and demand 
  * with minimal central intervention.
@@ -36,25 +37,23 @@ import java.util.Set;
  * @since 1.0
  */
 public class FreeMarketEconomy extends Economy {
-
+ 
     public FreeMarketEconomy(Set<Organization> orgs, Bank centralBank) {
         super(orgs, centralBank);
     }
-
+ 
     /**
      * Executes one time step of the free market simulation.
      * Includes handling bankruptcies and transactional cycles.
      */
     @Override
-    public void step(double dt) {
+    public void step(Real dt) {
         Set<Organization> dead = new HashSet<>();
-        for (Organization org : getOrganizations()) {
-            if (org.getCapital().getValue().doubleValue() < -1000.0) {
-                dead.add(org);
+        for (Organization organization : getOrganizations()) {
+            if (organization.getCapital().getValue().compareTo(Real.of(-1000.0)) < 0) {
+                dead.add(organization);
             }
         }
         dead.forEach(this::removeOrganization);
-
-        // Standard simulation logic happens here via subclasses or engine hooks
     }
 }

@@ -28,6 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.astronomy.StarSystem;
 import org.jscience.biology.ecology.Population;
 import org.jscience.biology.taxonomy.Species;
+import org.jscience.biology.BiologicalSex;
 import org.jscience.biology.Individual;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,7 +54,7 @@ public class IntegrationTest {
     public void testPopulationDynamics() {
         Species human = new Species("Homo sapiens", "Human");
         Population pop = new Population("City", human, null);
-        Individual adam = new Individual("1", human, Individual.Sex.MALE);
+        Individual adam = new Individual("1", human, BiologicalSex.MALE);
         pop.addMember(adam);
 
         assertEquals(1, pop.size());

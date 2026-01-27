@@ -23,11 +23,14 @@
 
 package org.jscience.sociology;
 
+import org.jscience.methodology.ScientificField;
+
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,15 +46,8 @@ public class Scientist implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /** Primary scientific disciplines. */
-    public enum Field {
-        PHYSICS, CHEMISTRY, BIOLOGY, MATHEMATICS, ASTRONOMY,
-        MEDICINE, COMPUTER_SCIENCE, ENGINEERING, GEOLOGY,
-        PSYCHOLOGY, SOCIOLOGY, ECONOMICS, LINGUISTICS
-    }
-
     private final String name;
-    private final Set<Field> fields = EnumSet.noneOf(Field.class);
+    private final Set<ScientificField> fields = new HashSet<>();
     private String nationality;
     private LocalDate birthDate;
     private LocalDate deathDate;
@@ -73,7 +69,7 @@ public class Scientist implements Serializable {
      * @param name name
      * @param primaryField main area of research
      */
-    public Scientist(String name, Field primaryField) {
+    public Scientist(String name, ScientificField primaryField) {
         this(name);
         if (primaryField != null) {
             this.fields.add(primaryField);
@@ -85,7 +81,7 @@ public class Scientist implements Serializable {
         return name;
     }
 
-    public Set<Field> getFields() {
+    public Set<ScientificField> getFields() {
         return Collections.unmodifiableSet(fields);
     }
 
@@ -138,7 +134,7 @@ public class Scientist implements Serializable {
         this.nobelLaureate = laureate;
     }
 
-    public void addField(Field field) {
+    public void addField(ScientificField field) {
         if (field != null) {
             fields.add(field);
         }
@@ -171,7 +167,7 @@ public class Scientist implements Serializable {
 
     // Famous scientists
     public static Scientist einstein() {
-        Scientist s = new Scientist("Albert Einstein", Field.PHYSICS);
+        Scientist s = new Scientist("Albert Einstein", ScientificField.PHYSICS);
         s.setNationality("German-American");
         s.setBirthDate(LocalDate.of(1879, 3, 14));
         s.setDeathDate(LocalDate.of(1955, 4, 18));
@@ -182,8 +178,8 @@ public class Scientist implements Serializable {
     }
 
     public static Scientist curie() {
-        Scientist s = new Scientist("Marie Curie", Field.PHYSICS);
-        s.addField(Field.CHEMISTRY);
+        Scientist s = new Scientist("Marie Curie", ScientificField.PHYSICS);
+        s.addField(ScientificField.CHEMISTRY);
         s.setNationality("Polish-French");
         s.setBirthDate(LocalDate.of(1867, 11, 7));
         s.setDeathDate(LocalDate.of(1934, 7, 4));
@@ -194,8 +190,8 @@ public class Scientist implements Serializable {
     }
 
     public static Scientist turing() {
-        Scientist s = new Scientist("Alan Turing", Field.MATHEMATICS);
-        s.addField(Field.COMPUTER_SCIENCE);
+        Scientist s = new Scientist("Alan Turing", ScientificField.MATHEMATICS);
+        s.addField(ScientificField.COMPUTER_SCIENCE);
         s.setNationality("British");
         s.setBirthDate(LocalDate.of(1912, 6, 23));
         s.setDeathDate(LocalDate.of(1954, 6, 7));

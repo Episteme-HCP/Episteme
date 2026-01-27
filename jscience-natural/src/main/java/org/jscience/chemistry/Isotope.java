@@ -23,81 +23,99 @@
 
 package org.jscience.chemistry;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Time;
-import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 
-import org.jscience.util.identity.Identified;
-import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.SimpleIdentification;
-import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
- * Represents a specific isotope of an element.
+ * Represents an isotope of a chemical element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Isotope implements Identified<Identification>, Named {
+@Persistent
+public class Isotope implements Serializable {
+    private static final long serialVersionUID = 2L;
 
+    @Attribute
     private final Element element;
-    private final int neutronCount;
-    private final double massAMU; // Atomic Mass Units
-    private final boolean radioactive;
-    private final Quantity<Time> halfLife; // null if stable
+    @Attribute
+    private final String symbol;
+    @Attribute
+    private final int massNumber;
+    @Attribute
+    private final Real atomicMass; // in u
+    @Attribute
+    private final Real abundance; // relative abundance (0 to 1)
 
-    public Isotope(Element element, int neutronCount, double massAMU, boolean radioactive, Quantity<Time> halfLife) {
-        this.element = element;
-        this.neutronCount = neutronCount;
-        this.massAMU = massAMU;
-        this.radioactive = radioactive;
-        this.halfLife = halfLife;
+    public Isotope(Element element, int massNumber, Real atomicMass, Real abundance) {
+        this.element = Objects.requireNonNull(element);
+        this.symbol = element.getSymbol() + "-" + massNumber;
+        this.massNumber = massNumber;
+        this.atomicMass = atomicMass;
+        this.abundance = abundance;
+    }
+
+    public Isotope(Element element, int massNumber, double atomicMassValue, double abundanceValue) {
+        this(element, massNumber, Real.of(atomicMassValue), Real.of(abundanceValue));
+    }
+
+    public Isotope(String symbol, int massNumber, Real atomicMass, Real abundance) {
+        // Deprecated or legacy constructor - infer element? 
+        // For now, minimal support or throw error if element strictness required.
+        // We'll require Element.
+        throw new UnsupportedOperationException("Isotope requires Element reference");
     }
 
     public Element getElement() {
         return element;
     }
 
-    public int getProtonCount() {
-        return element.getAtomicNumber();
-    }
-
-    public int getNeutronCount() {
-        return neutronCount;
+    public String getSymbol() {
+        return symbol;
     }
 
     public int getMassNumber() {
-        return getProtonCount() + neutronCount;
+        return massNumber;
+    }
+
+    public Real getAtomicMass() {
+        return atomicMass;
     }
 
     public Quantity<Mass> getMass() {
-        // 1 u = 1.66053906660e-27 kg
-        return Quantities.create(massAMU * 1.66053906660e-27, Units.KILOGRAM);
+        return org.jscience.measure.Quantities.create(atomicMass, Units.UNIFIED_ATOMIC_MASS);
     }
 
-    public boolean isStable() {
-        return !radioactive;
-    }
-
-    @Override
-    public String getName() {
-        return element.getName() + "-" + getMassNumber();
+    public Real getAbundance() {
+        return abundance;
     }
 
     @Override
-    public Identification getId() {
-        return new SimpleIdentification(element.getSymbol() + "-" + getMassNumber());
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Isotope isotope))
+            return false;
+        return massNumber == isotope.massNumber && Objects.equals(symbol, isotope.symbol);
     }
 
-    public Quantity<Time> getHalfLife() {
-        return halfLife;
+    @Override
+    public int hashCode() {
+        return Objects.hash(symbol, massNumber);
     }
 
     @Override
     public String toString() {
-        return element.getSymbol() + "-" + getMassNumber();
+        return String.format("%d%s (Mass: %s u, Abundance: %.2f%%)",
+                massNumber, symbol, atomicMass, abundance.multiply(Real.of(100)).doubleValue());
     }
 }

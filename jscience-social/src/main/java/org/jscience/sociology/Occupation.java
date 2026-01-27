@@ -23,14 +23,12 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 import org.jscience.util.EnumRegistry;
 import org.jscience.util.ExtensibleEnum;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.util.Named;
 
 /**
  * Represents an extensible set of occupation types for individuals.
@@ -38,133 +36,67 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
-public final class Occupation implements ExtensibleEnum<Occupation>, org.jscience.util.Named, Serializable {
+public final class Occupation extends ExtensibleEnum implements Named {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    private static final EnumRegistry<Occupation> REGISTRY = new EnumRegistry<>();
+    public static final EnumRegistry<Occupation> REGISTRY = EnumRegistry.getRegistry(Occupation.class);
 
     // Built-in occupations
-    public static final Occupation UNEMPLOYED = register("UNEMPLOYED", "Not employed", true);
-    public static final Occupation STUDENT = register("STUDENT", "Enrolled in education", true);
-    public static final Occupation TEACHER = register("TEACHER", "Education profession", true);
-    public static final Occupation ENGINEER = register("ENGINEER", "Engineering profession", true);
-    public static final Occupation DOCTOR = register("DOCTOR", "Medical profession", true);
-    public static final Occupation SCIENTIST = register("SCIENTIST", "Research profession", true);
-    public static final Occupation LAWYER = register("LAWYER", "Legal profession", true);
-    public static final Occupation ARTIST = register("ARTIST", "Creative profession", true);
-    public static final Occupation FARMER = register("FARMER", "Agriculture profession", true);
-    public static final Occupation MERCHANT = register("MERCHANT", "Commerce profession", true);
-    public static final Occupation RETIRED = register("RETIRED", "No longer working", true);
+    public static final Occupation UNEMPLOYED = new Occupation("UNEMPLOYED", "Not employed", true);
+    public static final Occupation STUDENT = new Occupation("STUDENT", "Enrolled in education", true);
+    public static final Occupation TEACHER = new Occupation("TEACHER", "Education profession", true);
+    public static final Occupation ENGINEER = new Occupation("ENGINEER", "Engineering profession", true);
+    public static final Occupation DOCTOR = new Occupation("DOCTOR", "Medical profession", true);
+    public static final Occupation SCIENTIST = new Occupation("SCIENTIST", "Research profession", true);
+    public static final Occupation LAWYER = new Occupation("LAWYER", "Legal profession", true);
+    public static final Occupation ARTIST = new Occupation("ARTIST", "Creative profession", true);
+    public static final Occupation FARMER = new Occupation("FARMER", "Agriculture profession", true);
+    public static final Occupation MERCHANT = new Occupation("MERCHANT", "Commerce profession", true);
+    public static final Occupation RETIRED = new Occupation("RETIRED", "No longer working", true);
 
-    @Id
     @Attribute
-    private final String name;
+    private String description;
     
-    @Attribute
-    private final String description;
-    
-    @Attribute
-    private final int ordinal;
-    
-    @Attribute
     private final boolean builtIn;
 
-    private Occupation(String name, String description, int ordinal, boolean builtIn) {
-        this.name = name;
+    private Occupation(String name, String description, boolean builtIn) {
+        super(name);
         this.description = description;
-        this.ordinal = ordinal;
         this.builtIn = builtIn;
-    }
-
-    private static Occupation register(String name, String description, boolean builtIn) {
-        Occupation occ = new Occupation(name, description, REGISTRY.size(), builtIn);
-        REGISTRY.register(occ);
-        return occ;
+        REGISTRY.register(this);
     }
 
     /**
      * Registers a custom occupation type.
-     *
-     * @param name        unique name for the occupation
-     * @param description descriptive text for the profession
-     * @return the registered Occupation instance
      */
     public static Occupation registerCustom(String name, String description) {
-        Occupation existing = REGISTRY.valueOf(name);
-        if (existing != null) {
-            return existing;
-        }
-        return register(name, description, false);
+        return new Occupation(name, description, false);
     }
 
-    /**
-     * Retrieves an occupation by its name.
-     * @param name the name to look up
-     * @return the matching Occupation, or null if not found
-     */
     public static Occupation valueOf(String name) {
         return REGISTRY.valueOf(name);
     }
 
-    /**
-     * Returns all registered occupations.
-     * @return a list of all occupations
-     */
     public static List<Occupation> values() {
         return REGISTRY.values();
     }
 
     @Override
-    public String name() {
-        return name;
-    }
-
-    @Override
     public String getName() {
-        return name;
+        return name();
     }
 
-    /**
-     * Returns the description of the occupation.
-     * @return the description
-     */
     public String getDescription() {
         return description;
     }
 
     @Override
-    public int ordinal() {
-        return ordinal;
-    }
-
-    /**
-     * Returns whether this occupation is a built-in standard.
-     * @return true if built-in
-     */
     public boolean isBuiltIn() {
         return builtIn;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Occupation)) return false;
-        Occupation that = (Occupation) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 }

@@ -41,7 +41,26 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class EnumRegistry<T extends ExtensibleEnum<T>> {
+public class EnumRegistry<T extends ExtensibleEnum> {
+
+    private static final Map<Class<? extends ExtensibleEnum>, EnumRegistry<?>> REGISTRIES = new ConcurrentHashMap<>();
+
+    @SuppressWarnings("unchecked")
+    public static <T extends ExtensibleEnum> EnumRegistry<T> getRegistry(Class<T> type) {
+        return (EnumRegistry<T>) REGISTRIES.computeIfAbsent(type, k -> new EnumRegistry<>());
+    }
+
+    public static <T extends ExtensibleEnum> void register(Class<T> type, T value) {
+        getRegistry(type).register(value);
+    }
+
+    public static <T extends ExtensibleEnum> T valueOf(Class<T> type, String name) {
+        return getRegistry(type).valueOf(name);
+    }
+
+    public static <T extends ExtensibleEnum> List<T> values(Class<T> type) {
+        return getRegistry(type).values();
+    }
 
     private final Map<String, T> byName = new ConcurrentHashMap<>();
     private final Map<Integer, T> byOrdinal = new ConcurrentHashMap<>();
@@ -56,12 +75,14 @@ public class EnumRegistry<T extends ExtensibleEnum<T>> {
      */
     public void register(T value) {
         if (byName.containsKey(value.name())) {
-            throw new IllegalArgumentException("Value already registered: " + value.name());
+            // Idempotent registration for static initializers
+            return;
         }
+        int ordinal = nextOrdinal.getAndIncrement();
+        value.setOrdinal(ordinal);
         byName.put(value.name(), value);
-        byOrdinal.put(value.ordinal(), value);
+        byOrdinal.put(ordinal, value);
         valuesList.add(value);
-        nextOrdinal.updateAndGet(current -> Math.max(current, value.ordinal() + 1));
     }
 
     /**

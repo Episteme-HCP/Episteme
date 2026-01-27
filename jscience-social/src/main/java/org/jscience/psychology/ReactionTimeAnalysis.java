@@ -23,16 +23,23 @@
 
 package org.jscience.psychology;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Time;
 
 /**
  * Provides mathematical models for analyzing human reaction times and motor control.
  * Includes implementations of Hick's Law, Fitts's Law, and basic decision probability models.
+ * Modernized to use Quantity and Real for high-precision physical and cognitive modeling.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class ReactionTimeAnalysis {
@@ -43,79 +50,93 @@ public final class ReactionTimeAnalysis {
      * Models decision time based on the number of choices using Hick's Law.
      * RT = a + b * log2(n + 1)
      * 
-     * @param a Base reaction time (simple RT intercept)
-     * @param b Processing speed coefficient (slope, time per bit)
+     * @param a Base reaction time
+     * @param b Processing speed coefficient
      * @param n Number of equally probable choices
      * @return Estimated reaction time
      */
-    public static Real hicksLaw(double a, double b, int n) {
-        if (n < 0) return Real.of(a);
-        return Real.of(a + b * (Math.log(n + 1) / Math.log(2)));
+    public static Quantity<Time> hicksLaw(Quantity<Time> a, Quantity<Time> b, int n) {
+        if (n < 0) return a;
+        // log2(x) = log(x) / log(2)
+        Real logPart = Real.of(Math.log(n + 1.0) / Math.log(2.0));
+        Real rtValue = a.getValue().add(b.getValue().multiply(logPart));
+        return Quantities.create(rtValue, Units.SECOND);
     }
 
     /**
      * Models movement time to a target using Fitts's Law.
      * MT = a + b * log2(2D / W)
      * 
-     * @param a Intercept (start/stop time)
-     * @param b Slope (1/bandwidth)
+     * @param a Intercept (Time)
+     * @param b Slope (Time per bit)
      * @param d Distance to target center
      * @param w Width of target (tolerance)
      * @return Estimated movement time
      */
-    public static Real fittsLaw(double a, double b, double d, double w) {
-        if (w <= 0 || d < 0) return Real.ZERO;
-        return Real.of(a + b * (Math.log(2 * d / w) / Math.log(2)));
+    public static Quantity<Time> fittsLaw(
+            Quantity<Time> a, 
+            Quantity<Time> b, 
+            Quantity<Length> d, 
+            Quantity<Length> w) {
+        
+        Real dVal = d.getValue();
+        Real wVal = w.getValue();
+        if (wVal.isZero() || dVal.isNegative()) return Quantities.create(Real.ZERO, Units.SECOND);
+        
+        Real logPart = Real.of(Math.log(2.0 * dVal.doubleValue() / wVal.doubleValue()) / Math.log(2.0));
+        Real mtValue = a.getValue().add(b.getValue().multiply(logPart));
+        return Quantities.create(mtValue, Units.SECOND);
     }
 
     /**
      * Provides a rough estimate of Simple Reaction Time (SRT) based on age.
-     * Base approximation: ~200ms at age 20, increasing by ~2ms per year thereafter due to cognitive slowing.
      * 
-     * @param age Age in years
-     * @return Estimated SRT in seconds
+     * @param age Age in years (Quantity<Time> or Real) - using int as it's a discrete demographic count here
+     * @return Estimated SRT
      */
-    public static Real typicalSimpleRT(int age) {
-        double base = 0.200;
+    public static Quantity<Time> typicalSimpleRT(int age) {
+        Real base = Real.of(0.200);
         if (age > 20) {
-            base += (age - 20) * 0.002;
+            base = base.add(Real.of(age - 20).multiply(Real.of(0.002)));
         }
-        return Real.of(base);
+        return Quantities.create(base, Units.SECOND);
     }
 
     /**
      * Calculates the Index of Difficulty (ID) for a pointing task.
      * ID = log2(2D / W)
-     * Measured in bits.
      * 
      * @param d Distance to target
      * @param w Width of target
-     * @return Index of Difficulty
+     * @return Index of Difficulty (dimensionless Real)
      */
-    public static double indexOfDifficulty(double d, double w) {
-        if (w <= 0 || d < 0) return 0.0;
-        return Math.log(2 * d / w) / Math.log(2);
+    public static Real indexOfDifficulty(Quantity<Length> d, Quantity<Length> w) {
+        Real dVal = d.getValue();
+        Real wVal = w.getValue();
+        if (wVal.isZero() || dVal.isNegative()) return Real.ZERO;
+        return Real.of(Math.log(2.0 * dVal.doubleValue() / wVal.doubleValue()) / Math.log(2.0));
     }
 
     /**
      * Calculates choice probabilities using Luce's Choice Axiom.
-     * Probability of choosing item i = v_i / sum(v_j)
-     * Where v represents the utility or value of an option.
      * 
-     * @param utilities Array of positive utility values for each option
-     * @return Array of probabilities summing to 1.0
-     * @throws IllegalArgumentException if utilities contains non-positive values
+     * @param utilities List of utility values
+     * @return List of probabilities
      */
-    public static double[] lucisChoiceProbability(double[] utilities) {
-        double sum = Arrays.stream(utilities).sum();
-        if (sum <= 0) {
+    public static List<Real> lucisChoiceProbability(List<Real> utilities) {
+        Real sum = Real.ZERO;
+        for (Real u : utilities) {
+            if (u.isNegative()) throw new IllegalArgumentException("Utilities must be non-negative.");
+            sum = sum.add(u);
+        }
+        
+        if (sum.isZero()) {
             throw new IllegalArgumentException("Sum of utilities must be positive.");
         }
         
-        double[] probs = new double[utilities.length];
-        for (int i = 0; i < utilities.length; i++) {
-            if (utilities[i] < 0) throw new IllegalArgumentException("Utilities must be non-negative.");
-            probs[i] = utilities[i] / sum;
+        List<Real> probs = new ArrayList<>();
+        for (Real u : utilities) {
+            probs.add(u.divide(sum));
         }
         return probs;
     }

@@ -28,20 +28,25 @@ import java.time.LocalDate;
 import java.util.*;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.history.time.TimeCoordinate;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Area;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Mass;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
-import org.jscience.util.identity.IDGenerator;
-import org.jscience.util.identity.UUIDGenerator;
-import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.psychology.social.Biography;
+import org.jscience.psychology.BigFiveProfile;
 import org.jscience.biology.Individual;
+import org.jscience.biology.BiologicalSex;
+import org.jscience.biology.BloodType;
 import org.jscience.biology.HomoSapiens;
 
 /**
  * Represents a human individual.
  * Combines biological biometric data with historical and biographical records.
+ * Modernized to use Real for measurements and ExtensibleEnums for biometric traits.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -50,23 +55,17 @@ import org.jscience.biology.HomoSapiens;
 @Persistent
 public class Human extends Individual {
 
-    private static final long serialVersionUID = 4L;
-
-    /** Roles identifying the nature of a person's historical significance. */
-    public enum Role {
-        RULER, MILITARY, RELIGIOUS, PHILOSOPHER, SCIENTIST,
-        ARTIST, EXPLORER, REVOLUTIONARY, REFORMER, INVENTOR
-    }
+    private static final long serialVersionUID = 5L;
 
     // Biometric Data
     @Attribute
-    private HomoSapiens.BloodType bloodType;
+    private BloodType bloodType;
     @Attribute
     private String ethnicity;
     @Attribute
-    private Real heightMeters;
+    private Quantity<Length> height;
     @Attribute
-    private Real weightKg;
+    private Quantity<Mass> weight;
     @Attribute
     private String eyeColor;
     @Attribute
@@ -82,7 +81,7 @@ public class Human extends Individual {
 
     // Historical & Biographical Data
     @Attribute
-    private final Set<Role> roles = EnumSet.noneOf(Role.class);
+    private final Set<HumanRole> humanRoles = new HashSet<>();
     @Attribute
     private String title;
     @Attribute
@@ -95,68 +94,57 @@ public class Human extends Individual {
     
     @Attribute
     private Biography biography;
-    
+
     @Attribute
-    private final Map<String, Object> traits = new HashMap<>();
+    private BigFiveProfile personality;
 
     /**
      * Creates a new human with a specific ID.
      */
-    public Human(Identification id, Individual.Sex sex, LocalDate birthDate) {
+    public Human(org.jscience.util.identity.Identification id, BiologicalSex sex, LocalDate birthDate) {
         super(id, HomoSapiens.SPECIES, sex, birthDate);
-        this.heightMeters = Real.ZERO;
-        this.weightKg = Real.ZERO;
+        this.height = org.jscience.measure.Quantities.create(Real.ZERO, Units.METER);
+        this.weight = org.jscience.measure.Quantities.create(Real.ZERO, Units.KILOGRAM);
     }
 
     /**
      * Helper constructor for String IDs.
      */
-    public Human(String id, Individual.Sex sex, LocalDate birthDate) {
-        this(new SimpleIdentification(id), sex, birthDate);
+    public Human(String id, BiologicalSex sex, LocalDate birthDate) {
+        this(new org.jscience.util.identity.UUIDIdentification(UUID.fromString(id)), sex, birthDate);
     }
 
     /**
      * Creates a new human with a generated UUID.
      */
-    public Human(Individual.Sex sex, LocalDate birthDate) {
-        this(new UUIDGenerator().generate().getId(), sex, birthDate);
+    public Human(BiologicalSex sex, LocalDate birthDate) {
+        this(new org.jscience.util.identity.UUIDIdentification(UUID.randomUUID()), sex, birthDate);
     }
 
-    /**
-     * Creates a new human with a custom ID generator.
-     */
-    public Human(IDGenerator generator, Individual.Sex sex, LocalDate birthDate) {
-        this(generator.generate().getId(), sex, birthDate);
-    }
-
-    /**
-     * Internal constructor for specific ID and sex.
-     */
-    public Human(Identification id, Individual.Sex sex) {
+    public Human(org.jscience.util.identity.Identification id, BiologicalSex sex) {
         this(id, sex, null);
     }
 
-    /**
-     * Helper constructor for specific String ID and sex.
-     */
-    public Human(String id, Individual.Sex sex) {
-        this(new SimpleIdentification(id), sex, null);
+    public Human(String id, BiologicalSex sex) {
+        this(new org.jscience.util.identity.UUIDIdentification(UUID.fromString(id)), sex, null);
     }
 
     // Biometric Getters & Setters
-    public HomoSapiens.BloodType getBloodType() { return bloodType; }
-    public void setBloodType(HomoSapiens.BloodType bloodType) { this.bloodType = bloodType; }
-
+    public BloodType getBloodType() { return bloodType; }
+    public void setBloodType(BloodType bloodType) { this.bloodType = bloodType; }
+ 
     public String getEthnicity() { return ethnicity; }
     public void setEthnicity(String ethnicity) { this.ethnicity = ethnicity; }
-
-    public Real getHeightMeters() { return heightMeters; }
-    public void setHeightMeters(Real heightMeters) { this.heightMeters = heightMeters; }
-    public void setHeightMeters(double heightMeters) { this.heightMeters = Real.of(heightMeters); }
-
-    public Real getWeightKg() { return weightKg; }
-    public void setWeightKg(Real weightKg) { this.weightKg = weightKg; }
-    public void setWeightKg(double weightKg) { this.weightKg = Real.of(weightKg); }
+ 
+    public Quantity<Length> getHeight() { return height; }
+    public void setHeight(Quantity<Length> height) { this.height = height; }
+    public void setHeightMeters(Real meters) { this.height = org.jscience.measure.Quantities.create(meters, Units.METER); }
+    public void setHeightMeters(double meters) { setHeightMeters(Real.of(meters)); }
+ 
+    public Quantity<Mass> getWeight() { return weight; }
+    public void setWeight(Quantity<Mass> weight) { this.weight = weight; }
+    public void setWeightKg(Real kg) { this.weight = org.jscience.measure.Quantities.create(kg, Units.KILOGRAM); }
+    public void setWeightKg(double kg) { setWeightKg(Real.of(kg)); }
 
     public String getEyeColor() { return eyeColor; }
     public void setEyeColor(String eyeColor) { this.eyeColor = eyeColor; }
@@ -164,7 +152,6 @@ public class Human extends Individual {
     public String getHairColor() { return hairColor; }
     public void setHairColor(String hairColor) { this.hairColor = hairColor; }
 
-    // Name Getters & Setters
     public String getGivenName() { return givenName; }
     public void setGivenName(String givenName) { this.givenName = givenName; }
 
@@ -179,9 +166,11 @@ public class Human extends Individual {
         return (givenName != null ? givenName + " " : "") + (lastName != null ? lastName : "");
     }
 
-    // Historical Getters & Setters
-    public Set<Role> getRoles() { return Collections.unmodifiableSet(roles); }
-    public void addRole(Role role) { roles.add(Objects.requireNonNull(role, "Role cannot be null")); }
+    public BigFiveProfile getPersonality() { return personality; }
+    public void setPersonality(BigFiveProfile personality) { this.personality = personality; }
+
+    public Set<HumanRole> getHumanRoles() { return Collections.unmodifiableSet(humanRoles); }
+    public void addHumanRole(HumanRole role) { humanRoles.add(Objects.requireNonNull(role, "Role cannot be null")); }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -196,57 +185,59 @@ public class Human extends Individual {
     public void setDeathWhen(TimeCoordinate deathWhen) { this.deathWhen = deathWhen; }
 
     public String getBiographicalSummary() { 
-        return biography != null ? (String)biography.getTrait("summary") : (String)traits.get("biographicalSummary"); 
+        return biography != null ? (String)biography.getTrait("summary") : (String)getTrait("biographicalSummary"); 
     }
     public void setBiographicalSummary(String summary) { 
         if (biography != null) biography.setTrait("summary", summary);
-        else traits.put("biographicalSummary", summary);
+        else setTrait("biographicalSummary", summary);
     }
 
     @SuppressWarnings("unchecked")
     public List<String> getAchievements() { 
-        return (List<String>) traits.getOrDefault("achievements", new ArrayList<String>()); 
+        Object val = getTrait("achievements");
+        return val != null ? (List<String>) val : new ArrayList<>();
     }
     
     @SuppressWarnings("unchecked")
     public void addAchievement(String achievement) { 
-        List<String> list = (List<String>) traits.get("achievements");
+        List<String> list = (List<String>) getTrait("achievements");
         if (list == null) {
             list = new ArrayList<>();
-            traits.put("achievements", list);
+            setTrait("achievements", list);
         }
         list.add(Objects.requireNonNull(achievement)); 
     }
 
-    /** BMI calculation */
-    public Real getBMI() {
-        if (heightMeters == null || heightMeters.isZero()) return Real.ZERO;
-        return weightKg.divide(heightMeters.pow(2));
+    public Quantity<?> getBMI() {
+        if (height == null || height.getValue().isZero()) return org.jscience.measure.Quantities.create(Real.ZERO, Units.ONE);
+        // BMI = mass / height^2 [kg/m^2]
+        return weight.divide(height.pow(2));
     }
-
-    /** BMI category */
+ 
     public String getBMICategory() {
-        double bmi = getBMI().doubleValue();
+        double bmi = getBMI().getValue().doubleValue();
         if (bmi < 18.5) return "Underweight";
         if (bmi < 25) return "Normal weight";
         if (bmi < 30) return "Overweight";
         return "Obese";
     }
-
-    /** Body Surface Area (Du Bois formula) */
-    public Real getBSA() {
-        if (heightMeters == null || weightKg == null) return Real.ZERO;
-        Real heightCm = heightMeters.multiply(Real.of(100));
-        return Real.of(0.007184)
-                .multiply(Real.of(Math.pow(heightCm.doubleValue(), 0.725)))
-                .multiply(Real.of(Math.pow(weightKg.doubleValue(), 0.425)));
+ 
+    public Quantity<Area> getBSA() {
+        if (height == null || weight == null) return org.jscience.measure.Quantities.create(Real.ZERO, Units.SQUARE_METER);
+        
+        // Du Bois formula: BSA = 0.007184 * height^0.725 * weight^0.425
+        // height in cm, weight in kg. Result in m^2.
+        double hCm = height.to(Units.CENTIMETER).getValue().doubleValue();
+        double wKg = weight.to(Units.KILOGRAM).getValue().doubleValue();
+        double bsa = 0.007184 * Math.pow(hCm, 0.725) * Math.pow(wKg, 0.425);
+        
+        return org.jscience.measure.Quantities.create(bsa, Units.SQUARE_METER);
     }
 
-    /** Blood type compatibility check */
-    public boolean canReceiveBloodFrom(HomoSapiens.BloodType donor) {
+    public boolean canReceiveBloodFrom(BloodType donor) {
         if (bloodType == null || donor == null) return false;
-        if (donor == HomoSapiens.BloodType.O_NEGATIVE) return true;
-        if (bloodType == HomoSapiens.BloodType.AB_POSITIVE) return true;
+        if (donor == BloodType.O_NEGATIVE) return true;
+        if (bloodType == BloodType.AB_POSITIVE) return true;
         if (bloodType == donor) return true;
 
         String recipientABO = bloodType.name().substring(0, bloodType.name().indexOf('_'));
@@ -262,10 +253,10 @@ public class Human extends Individual {
 
     @Override
     public String toString() {
-        String base = String.format("Human[%s (%s): %s, %d years, %.2fm, %.1fkg]",
+        String base = String.format("Human[%s (%s): %s, %d years, %s, %s]",
                 getFullName(), getId(), getSex(), getAge(), 
-                heightMeters != null ? heightMeters.doubleValue() : 0.0, 
-                weightKg != null ? weightKg.doubleValue() : 0.0);
+                height != null ? height.toString() : "0m", 
+                weight != null ? weight.toString() : "0kg");
         if (title != null) base = title + " " + base;
         return base;
     }

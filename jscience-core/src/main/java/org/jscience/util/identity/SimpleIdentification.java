@@ -16,4 +16,9 @@ public class SimpleIdentification extends Identification {
     public SimpleIdentification(String value) {
         super(value);
     }
+
+    @Override
+    public String getScheme() {
+        return "Simple";
+    }
 }

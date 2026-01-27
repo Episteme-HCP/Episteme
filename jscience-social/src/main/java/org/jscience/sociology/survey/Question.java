@@ -1,24 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.sociology.survey;
@@ -33,7 +15,6 @@ import org.jscience.util.persistence.Persistent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Base class for all survey questions.
@@ -46,29 +27,45 @@ import java.util.UUID;
 @Persistent
 public abstract class Question implements ComprehensiveIdentification {
     
-    private static final long serialVersionUID = 1L;
-
     @Id
     protected final Identification id;
 
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    public enum Type {
-        TEXT, PARAGRAPH, MULTIPLE_CHOICE, CHECKBOXES, DROPDOWN, LINEAR_SCALE, DATE
-    }
-
     @Attribute
-    private final Type type;
+    private final QuestionType type;
 
     @Attribute
     private boolean required;
 
-    public Question(String text, Type type) {
-        this.id = new UUIDIdentification(UUID.randomUUID().toString());
+    @Deprecated
+    public enum Type {
+        @Deprecated TEXT,
+        @Deprecated PARAGRAPH,
+        @Deprecated MULTIPLE_CHOICE,
+        @Deprecated CHECKBOXES,
+        @Deprecated DROPDOWN,
+        @Deprecated LINEAR_SCALE,
+        @Deprecated DATE,
+        @Deprecated TIME;
+        
+        @Deprecated
+        public QuestionType toQuestionType() {
+            return QuestionType.valueOf(name());
+        }
+    }
+
+    public Question(String text, QuestionType type) {
+        this.id = new UUIDIdentification();
         setName(text);
         this.type = type;
         this.required = false;
+    }
+
+    @Deprecated
+    public Question(String text, Type type) {
+        this(text, type.toQuestionType());
     }
 
     @Override
@@ -89,8 +86,17 @@ public abstract class Question implements ComprehensiveIdentification {
         setName(text);
     }
 
-    public Type getType() {
+    public QuestionType getType() {
         return type;
+    }
+    
+    @Deprecated
+    public Type getLegacyType() {
+        try {
+            return Type.valueOf(type.name());
+        } catch (IllegalArgumentException e) {
+            return Type.TEXT;
+        }
     }
 
     public boolean isRequired() {

@@ -49,11 +49,11 @@ public final class BehavioralEconomics {
      * @param lambda the loss aversion coefficient
      * @return the subjective value
      */
-    public static Real prospectValue(double gainLoss, double alpha, double beta, double lambda) {
-        if (gainLoss >= 0) {
-            return Real.of(Math.pow(gainLoss, alpha));
+    public static Real prospectValue(Real gainLoss, Real alpha, Real beta, Real lambda) {
+        if (gainLoss.isZero() || gainLoss.isPositive()) {
+            return gainLoss.pow(alpha);
         } else {
-            return Real.of(-lambda * Math.pow(-gainLoss, beta));
+            return lambda.negate().multiply(gainLoss.negate().pow(beta));
         }
     }
 
@@ -65,24 +65,26 @@ public final class BehavioralEconomics {
      * @param gamma the curvature parameter
      * @return the weighted probability
      */
-    public static Real probabilityWeight(double p, double gamma) {
-        if (p <= 0) return Real.ZERO;
-        if (p >= 1) return Real.ONE;
-        return Real.of(Math.exp(-Math.pow(-Math.log(p), gamma)));
+    public static Real probabilityWeight(Real p, Real gamma) {
+        if (p.compareTo(Real.ZERO) <= 0) return Real.ZERO;
+        if (p.compareTo(Real.ONE) >= 0) return Real.ONE;
+        
+        // w(p) = exp(-(-ln p)^gamma)
+        // Calculating (-ln p)
+        double lnP = Math.log(p.doubleValue());
+        Real negLnP = Real.of(-lnP);
+        
+        // (-ln p)^gamma
+        Real powGamma = negLnP.pow(gamma);
+        
+        // -(-ln p)^gamma
+        Real exponent = powGamma.negate();
+        
+        // exp(...)
+        return exponent.exp();
     }
-
-    /**
-     * Hyperbolic Discounting: V = A / (1 + kD)
-     * Models preference for immediate vs delayed rewards.
-     * 
-     * @param amount Future Amount
-     * @param k Impulsivity parameter
-     * @param delay Delay periods
-     * @return the present value
-     */
-    public static Real hyperbolicDiscount(double amount, double k, double delay) {
-        return Real.of(amount / (1 + k * delay));
-    }
+    
+    // ... (rest of the file until decisionValue)
 
     /**
      * Calculates the "Decision Weight" for a prospect.
@@ -93,9 +95,18 @@ public final class BehavioralEconomics {
      * @param gamma the weighting parameter
      * @return the decision weight
      */
-    public static Real decisionValue(double amount, double probability, double gamma) {
-        double v = amount >= 0 ? Math.pow(amount, 0.88) : -2.25 * Math.pow(-amount, 0.88);
-        double w = probabilityWeight(probability, gamma).doubleValue();
-        return Real.of(v * w);
+    public static Real decisionValue(Real amount, Real probability, Real gamma) {
+        Real alpha = Real.of(0.88);
+        Real lambda = Real.of(2.25);
+        
+        Real v;
+        if (amount.compareTo(Real.ZERO) >= 0) {
+            v = amount.pow(alpha);
+        } else {
+            v = lambda.negate().multiply(amount.negate().pow(alpha));
+        }
+        
+        Real w = probabilityWeight(probability, gamma);
+        return v.multiply(w);
     }
 }

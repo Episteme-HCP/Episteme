@@ -10,127 +10,31 @@
  * furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.medicine;
 
-import org.jscience.mathematics.numbers.real.Real;
-
 /**
  * Constants and enumerations for medical sciences and anatomy.
  * <p>
- * Provides classifications for organ systems, anatomical terminology,
- * therapeutic categories (ATC), and pain scales.
+ * <b>Modernization Note:</b> Enums have been promoted to top-level {@link org.jscience.util.ExtensibleEnum} classes:
+ * <ul>
+ *   <li>{@link OrganSystem}</li>
+ *   <li>{@link AnatomicalDirection}</li>
+ *   <li>{@link AnatomicalPlane}</li>
+ *   <li>{@link AnatomicalMovement}</li>
+ *   <li>{@link SchmidtPainIndex}</li>
+ *   <li>{@link AtcMainGroup}</li>
+ * </ul>
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 public final class MedicineConstants {
 
     private MedicineConstants() {}
 
-    /**
-     * Major biological organ systems.
-     */
-    public enum OrganSystem {
-        CIRCULATORY, DIGESTIVE, ENDOCRINE, INTEGUMENTARY, IMMUNE, 
-        LYMPHATIC, MUSCULAR, NERVOUS, REPRODUCTIVE, RESPIRATORY, 
-        SKELETAL, URINARY, UNKNOWN
-    }
-
-    /**
-     * Anatomical directional terms.
-     */
-    public enum Direction {
-        CRANIAL, CAUDAL, ROSTRAL, DORSAL, VENTRAL, 
-        PROXIMAL, DISTAL, DEXTER, SINISTER, 
-        SUPERIOR, INFERIOR, ANTERIOR, POSTERIOR, 
-        MEDIAL, LATERAL, SUPERFICIAL, PROFOUND, 
-        VISCERAL, PARIETAL, RADIAL, ULNAR, TIBIAL, FIBULAR
-    }
-
-    /**
-     * Anatomical planes.
-     */
-    public enum AnatomicalPlane {
-        TRANSVERSE, // Axial (X-Y)
-        CORONAL,    // Frontal (X-Z)
-        SAGITTAL     // (Y-Z)
-    }
-
-    /**
-     * Anatomical movements.
-     */
-    public enum Movement {
-        FLEXION, EXTENSION, ABDUCTION, ADDUCTION, 
-        ROTATION, SUPINATION, PRONATION, 
-        ANTEROGRADE, RETROGRADE
-    }
-
-    /**
-     * Schmidt Sting Pain Index (Schmidt, 1990).
-     * Represented as high-precision {@link Real} values.
-     */
-    public enum SchmidtPainIndex {
-        SWEAT_BEE(Real.of("1.0"), "Light, ephemeral, almost fruity."),
-        FIRE_ANT(Real.of("1.2"), "Sharp, sudden, mildly alarming."),
-        BULLHORN_ACACIA_ANT(Real.of("1.8"), "Piercing, elevated. Like a staple in the cheek."),
-        BALD_FACED_HORNET(Real.of("2.0"), "Rich, hearty, slightly crunchy."),
-        YELLOW_JACKET(Real.of("2.0"), "Hot and smoky, almost irreverent."),
-        RED_HARVESTER_ANT(Real.of("3.0"), "Bold and unrelenting."),
-        PAPER_WASP(Real.of("3.0"), "Caustic and burning."),
-        PEPSIS_WASP(Real.of("4.0"), "Blinding, fierce, shockingly electric."),
-        BULLET_ANT(Real.of("4.0"), "Pure, intense, brilliant pain.");
-
-        private final Real value;
-        private final String description;
-
-        SchmidtPainIndex(Real value, String description) {
-            this.value = value;
-            this.description = description;
-        }
-
-        public Real getValue() { return value; }
-        public String getDescription() { return description; }
-    }
-
-    /**
-     * Anatomical Therapeutic Chemical (ATC) Classification System main groups.
-     */
-    public enum AtcMainGroup {
-        A("Alimentary tract and metabolism"),
-        B("Blood and blood forming organs"),
-        C("Cardiovascular system"),
-        D("Dermatologicals"),
-        G("Genito-urinary system and sex hormones"),
-        H("Systemic hormonal preparations, excluding sex hormones and insulins"),
-        J("Anti-infectives for systemic use"),
-        L("Antineoplastic and immunomodulating agents"),
-        M("Musculo-skeletal system"),
-        N("Nervous system"),
-        P("Antiparasitic products, insecticides and repellents"),
-        Q("Veterinary drugs"),
-        R("Respiratory system"),
-        S("Sensory organs"),
-        V("Various");
-
-        private final String description;
-
-        AtcMainGroup(String description) {
-            this.description = description;
-        }
-
-        public String getDescription() { return description; }
-    }
 }

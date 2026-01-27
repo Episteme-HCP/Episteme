@@ -1,26 +1,3 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.history;
 
 import org.jscience.history.time.TimeCoordinate;
@@ -35,10 +12,11 @@ import org.jscience.util.persistence.Relation;
 /**
  * Simulates counterfactual historical scenarios ("What if?").
  * Analyzes historical contingency and potential alternative timelines based on causal chains.
+ * Modernized to use Real for internal weights and divergence factors.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class CounterfactualSimulator {
@@ -49,13 +27,6 @@ public final class CounterfactualSimulator {
 
     /**
      * Internal representation of a historical event with its causal dependencies.
-     * 
-     * @param id           unique ID
-     * @param name         event name
-     * @param date         fuzzy date
-     * @param category     event category
-     * @param importance   importance weight (0.0 to 1.0)
-     * @param consequences list of dependent event IDs
      */
     @Persistent
     public record ContingencyEvent(
@@ -63,28 +34,27 @@ public final class CounterfactualSimulator {
         @Attribute String name,
         @Relation(type = Relation.Type.ONE_TO_ONE) TimeCoordinate date,
         @Attribute String category,
-        @Attribute double importance,
+        @Attribute Real importance,
         @Attribute List<String> consequences
     ) implements Serializable {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         public ContingencyEvent {
             Objects.requireNonNull(id, "ID cannot be null");
             Objects.requireNonNull(name, "Name cannot be null");
             Objects.requireNonNull(date, "Date cannot be null");
             consequences = consequences != null ? List.copyOf(consequences) : List.of();
+            if (importance == null) importance = Real.of(0.5);
+        }
+
+        // Convenience constructor for double input
+        public ContingencyEvent(String id, String name, TimeCoordinate date, String category, double importance, List<String> consequences) {
+            this(id, name, date, category, Real.of(importance), consequences);
         }
     }
 
     /**
      * Defines a specific counterfactual scenario starting from a divergence point.
-     * 
-     * @param name                scenario name
-     * @param description         scenario summary
-     * @param divergencePoint     the original event being changed
-     * @param alternativeOutcome  the new outcome for the divergence point
-     * @param affectedEvents       explicitly list of known affected events (optional)
-     * @param changedConsequences mapping of event IDs to their new alternative outcomes
      */
     @Persistent
     public record CounterfactualScenario(
@@ -95,7 +65,7 @@ public final class CounterfactualSimulator {
         @Attribute List<String> affectedEvents,
         @Attribute Map<String, String> changedConsequences
     ) implements Serializable {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         public CounterfactualScenario {
             Objects.requireNonNull(name, "Scenario name cannot be null");
@@ -107,37 +77,32 @@ public final class CounterfactualSimulator {
 
     /**
      * The analytical results of a counterfactual simulation.
-     * 
-     * @param scenario            the scenario tested
-     * @param butterfliedEvents   list of events that changed
-     * @param unchangedEvents     list of events that remained the same
-     * @param historicalDivergence measure of divergence (0.0 to 1.0)
-     * @param narrativeSummary    generated text analysis
      */
     @Persistent
     public record SimulationResult(
         @Relation(type = Relation.Type.MANY_TO_ONE) CounterfactualScenario scenario,
         @Attribute List<String> butterfliedEvents,
         @Attribute List<String> unchangedEvents,
-        @Attribute double historicalDivergence,
+        @Attribute Real historicalDivergence,
         @Attribute String narrativeSummary
     ) implements Serializable {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         public SimulationResult {
             Objects.requireNonNull(scenario, "Scenario cannot be null");
             butterfliedEvents = butterfliedEvents != null ? List.copyOf(butterfliedEvents) : List.of();
             unchangedEvents = unchangedEvents != null ? List.copyOf(unchangedEvents) : List.of();
+            if (historicalDivergence == null) historicalDivergence = Real.ZERO;
         }
+
+        // Double output for display
+        public double historicalDivergenceValue() { return historicalDivergence.doubleValue(); }
     }
 
     private static final List<ContingencyEvent> EVENT_DATABASE = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Registers a contingency event in the simulation database.
-     * 
-     * @param event the event to add
-     * @throws NullPointerException if event is null
      */
     public static void addEvent(ContingencyEvent event) {
         EVENT_DATABASE.add(Objects.requireNonNull(event, "Event cannot be null"));
@@ -145,10 +110,6 @@ public final class CounterfactualSimulator {
 
     /**
      * Simulates the cascade effects of a counterfactual scenario.
-     * 
-     * @param scenario the scenario to simulate
-     * @return simulation results
-     * @throws NullPointerException if scenario is null
      */
     public static SimulationResult simulate(CounterfactualScenario scenario) {
         Objects.requireNonNull(scenario, "Scenario cannot be null");
@@ -162,7 +123,6 @@ public final class CounterfactualSimulator {
         synchronized (EVENT_DATABASE) {
             for (ContingencyEvent e : EVENT_DATABASE) {
                 if (!butterflied.contains(e.id()) && !e.id().equals(scenario.divergencePoint().id())) {
-                    // Check if before divergence
                     if (e.date().compareTo(scenario.divergencePoint().date()) < 0) {
                         unchanged.add(e.id());
                     } else if (!isConnected(e.id(), scenario.divergencePoint().id())) {
@@ -172,9 +132,8 @@ public final class CounterfactualSimulator {
             }
         }
         
-        // Calculate divergence factor
-        double divergence = (double) butterflied.size() / 
-            Math.max(1, butterflied.size() + unchanged.size());
+        // Calculate divergence factor using Real
+        Real divergence = Real.of(butterflied.size()).divide(Real.of(Math.max(1, butterflied.size() + unchanged.size())));
         
         // Generate narrative
         String narrative = generateNarrative(scenario, butterflied);
@@ -190,10 +149,6 @@ public final class CounterfactualSimulator {
 
     /**
      * Calculates the historical contingency score of a specific event.
-     * 
-     * @param eventId unique ID of the event
-     * @return contingency score as a {@link Real} number
-     * @throws NullPointerException if eventId is null
      */
     public static Real calculateContingency(String eventId) {
         Objects.requireNonNull(eventId, "Event ID cannot be null");
@@ -203,18 +158,12 @@ public final class CounterfactualSimulator {
         Set<String> dependents = new HashSet<>();
         cascadeEffects(eventId, dependents);
         
-        double contingency = event.importance() * dependents.size() / 
-            Math.max(1, EVENT_DATABASE.size());
-        
-        return Real.of(contingency);
+        // score = importance * (dependents / total_events)
+        return event.importance().multiply(Real.of(dependents.size())).divide(Real.of(Math.max(1, EVENT_DATABASE.size())));
     }
 
     /**
-     * Suggests plausible counterfactual outcomes for a given event category.
-     * 
-     * @param eventId unique ID of the event
-     * @return unmodifiable list of counterfactual suggestions
-     * @throws NullPointerException if eventId is null
+     * Suggests plausible counterfactual outcomes.
      */
     public static List<String> suggestCounterfactuals(String eventId) {
         Objects.requireNonNull(eventId, "Event ID cannot be null");

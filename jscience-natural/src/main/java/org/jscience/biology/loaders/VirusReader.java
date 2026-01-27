@@ -24,7 +24,9 @@
 package org.jscience.biology.loaders;
 
 import org.jscience.biology.VirusSpecies;
-import org.jscience.biology.Virus;
+
+import org.jscience.biology.VirusGenomeType;
+import org.jscience.biology.VirusMorphology;
 import org.jscience.io.AbstractResourceReader;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -121,7 +123,7 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
         });
         for (VirusDTO dto : dtos) {
             // Map genome type string to enum
-            Virus.GenomeType genomeType = parseGenomeType(dto.genomeType);
+            VirusGenomeType genomeType = parseGenomeType(dto.genomeType);
 
             VirusSpecies species = new VirusSpecies(
                     dto.scientificName != null ? dto.scientificName : dto.name,
@@ -129,7 +131,7 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
                     dto.family,
                     null, // genus not in JSON
                     genomeType,
-                    Virus.Morphology.COMPLEX);
+                    VirusMorphology.COMPLEX);
 
             if (dto.hostRange != null) {
                 for (String host : dto.hostRange) {
@@ -145,14 +147,14 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
         loaded = true;
     }
 
-    private Virus.GenomeType parseGenomeType(String type) {
+    private VirusGenomeType parseGenomeType(String type) {
         if (type == null)
-            return Virus.GenomeType.DNA_DOUBLE_STRANDED;
+            return VirusGenomeType.DNA_DOUBLE_STRANDED;
         if (type.equalsIgnoreCase("RNA"))
-            return Virus.GenomeType.RNA_SINGLE_STRANDED_POSITIVE;
+            return VirusGenomeType.RNA_SINGLE_STRANDED_POSITIVE;
         if (type.equalsIgnoreCase("DNA"))
-            return Virus.GenomeType.DNA_DOUBLE_STRANDED;
-        return Virus.GenomeType.DNA_DOUBLE_STRANDED;
+            return VirusGenomeType.DNA_DOUBLE_STRANDED;
+        return VirusGenomeType.DNA_DOUBLE_STRANDED;
     }
 
     // DTO for JSON parsing

@@ -23,6 +23,8 @@
 
 package org.jscience.chemistry.spectroscopy;
 
+import org.jscience.mathematics.numbers.real.Real;
+
 /**
  * Mass Spectrometry models.
  *
@@ -32,6 +34,9 @@ package org.jscience.chemistry.spectroscopy;
  */
 public class MassSpectrum {
 
+    private MassSpectrum() {
+    }
+
     /**
      * Calculates Mass-to-Charge ratio (m/z).
      * 
@@ -39,24 +44,17 @@ public class MassSpectrum {
      * @param charge Charge (integer, e.g. +1, +2)
      * @return m/z ratio
      */
-    public static double calculateMZ(double mass, int charge) {
+    public static Real calculateMZ(Real mass, int charge) {
         if (charge == 0)
             throw new IllegalArgumentException("Charge cannot be zero");
-        // Usually mass of electron is subtracted for positive ions formed by electron
-        // loss
-        // M+ = (M_neutral - m_e) / 1
-        return mass / (double) Math.abs(charge);
+        return mass.divide(Real.of(Math.abs(charge)));
     }
 
     /**
      * Radius of curvature in magnetic field.
-     * r = (1/B) * sqrt(2Vm/q)
-     * or for velocity selector:
-     * qvB = mv^2/r -> r = mv/qB
+     * r = (m * v) / (q * B)
      */
-    public static double cycloidalRadius(double massKg, double velocity, double chargeC, double magneticFieldTesla) {
-        return (massKg * velocity) / (chargeC * magneticFieldTesla);
+    public static Real cycloidalRadius(Real massKg, Real velocity, Real chargeC, Real magneticFieldTesla) {
+        return massKg.multiply(velocity).divide(chargeC.multiply(magneticFieldTesla));
     }
 }
-
-

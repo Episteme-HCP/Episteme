@@ -23,7 +23,7 @@
 package org.jscience.law;
 
 import org.jscience.biology.Individual;
-import org.jscience.measure.Report;
+import org.jscience.methodology.ScientificReport;
 import org.jscience.sociology.Role;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import java.util.List;
 public class ResponsibleIndividual extends Role {
 
     private final List<License> schoolRecords;
-    private final List<Report> policeRecords;
+    private final List<ScientificReport> policeRecords;
     private Biometrics biometrics;
 
     /**
@@ -119,7 +119,7 @@ public class ResponsibleIndividual extends Role {
      * Returns the list of legal and police reports.
      * @return the list of police records
      */
-    public List<Report> getPoliceRecords() {
+    public List<ScientificReport> getPoliceRecords() {
         return new ArrayList<>(policeRecords);
     }
 
@@ -129,7 +129,7 @@ public class ResponsibleIndividual extends Role {
      * @param policeRecord the report to add
      * @throws IllegalArgumentException if the record is null
      */
-    public void addPoliceRecord(Report policeRecord) {
+    public void addPoliceRecord(ScientificReport policeRecord) {
         if (policeRecord == null) {
             throw new IllegalArgumentException("Police record cannot be null.");
         }
@@ -140,7 +140,7 @@ public class ResponsibleIndividual extends Role {
      * Removes a specific police report or record.
      * @param policeRecord the report to remove
      */
-    public void removePoliceRecord(Report policeRecord) {
+    public void removePoliceRecord(ScientificReport policeRecord) {
         policeRecords.remove(policeRecord);
     }
 
@@ -159,14 +159,14 @@ public class ResponsibleIndividual extends Role {
      * @param policeRecords the list of Report objects
      * @throws IllegalArgumentException if the list is null or contains non-Report elements
      */
-    public void setPoliceRecords(List<Report> policeRecords) {
+    public void setPoliceRecords(List<ScientificReport> policeRecords) {
         if (policeRecords == null) {
             throw new IllegalArgumentException("Police records list cannot be null.");
         }
         
         for (Object record : policeRecords) {
-            if (!(record instanceof Report)) {
-                throw new IllegalArgumentException("The list of police records must contain only Report objects.");
+            if (!(record instanceof ScientificReport)) {
+                throw new IllegalArgumentException("The list of police records must contain only ScientificReport objects.");
             }
         }
         

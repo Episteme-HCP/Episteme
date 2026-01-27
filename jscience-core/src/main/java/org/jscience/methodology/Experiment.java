@@ -23,10 +23,10 @@
 
 package org.jscience.methodology;
 
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
+
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.UUIDIdentification;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -36,7 +36,7 @@ import java.util.concurrent.CompletableFuture;
  * @param <I> The input configuration type
  * @param <R> The result type
  */
-public interface Experiment<I, R> extends Named, Identified<Identification> {
+public interface Experiment<I, R> extends ComprehensiveIdentification {
     
     /**
      * Executes the experiment with the given input.
@@ -60,6 +60,6 @@ public interface Experiment<I, R> extends Named, Identified<Identification> {
 
     @Override
     default Identification getId() {
-        return new SimpleIdentification("EXP-" + System.currentTimeMillis());
+        return new UUIDIdentification();
     }
 }

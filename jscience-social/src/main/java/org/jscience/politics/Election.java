@@ -24,15 +24,18 @@
 package org.jscience.politics;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.jscience.biology.Individual;
 
 import org.jscience.sociology.Situation;
 import org.jscience.util.Temporal;
+import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a political election event, aggregating votes for candidates.
@@ -40,7 +43,7 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @version 2.0
  * @since 1.0
  */
 @Persistent
@@ -48,9 +51,17 @@ public class Election extends Situation implements Temporal<org.jscience.history
 
     private static final long serialVersionUID = 1L;
 
+    @Attribute
     private final LocalDate date;
+    
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Country country;
-    private final Map<String, Integer> results = new HashMap<>(); // Candidate Name -> Votes
+    
+    @Attribute
+    private final Map<String, Integer> results = new HashMap<>(); // Candidate Name -> Votes (aggregated)
+    
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<Ballot> ballots = new ArrayList<>(); // Individual cast ballots
 
     /**
      * Creates a new Election.
@@ -66,16 +77,26 @@ public class Election extends Situation implements Temporal<org.jscience.history
     }
 
     /**
-     * Returns the timestamp of the election.
-     * @return the instant
+     * Registers a cast ballot in this election.
+     * @param ballot the ballot to add
      */
-    public java.time.Instant getTimestamp() {
-        return java.time.Instant.from(date.atStartOfDay(java.time.ZoneId.of("UTC")));
+    public void addBallot(Ballot ballot) {
+        if (ballot != null) {
+            ballots.add(ballot);
+            // Auto-aggregate for simple systems if this electionId matches
+            String top = ballot.getTopChoice(getName());
+            if (top != null) {
+                addVote(top, 1);
+            }
+        }
     }
 
-    @Override
-    public org.jscience.history.time.TimeCoordinate getWhen() {
-        return org.jscience.history.time.TimePoint.of(getTimestamp());
+    /**
+     * Returns the list of all individual cast ballots.
+     * @return unmodifiable list of ballots
+     */
+    public List<Ballot> getBallots() {
+        return Collections.unmodifiableList(ballots);
     }
 
     /**
@@ -85,22 +106,34 @@ public class Election extends Situation implements Temporal<org.jscience.history
      * @param office     the office sought
      * @return the created Candidate role
      */
-    public Candidate addCandidate(Individual individual, String office) {
-        Candidate candidate = new Candidate(individual, this, office);
-        // Candidate role automatically adds itself to the situation's roles
-        return candidate;
+    public Candidate addCandidate(org.jscience.biology.Individual individual, String office) {
+        return new Candidate(individual, this, office);
     }
 
-    public String getTitle() {
-        return getName();
+    /**
+     * Registers an individual as a voter in this election.
+     * @param individual the person who will vote
+     * @return the created Voter role
+     */
+    public Voter addVoter(org.jscience.biology.Individual individual) {
+        return new Voter(individual, this);
     }
 
-    public Country getCountry() {
-        return country;
-    }
-
-    public LocalDate getDate() {
-        return date;
+    /**
+     * Determines the winner(s) using a specific method and all cast ballots.
+     * @param method the voting system algorithm to use
+     * @param seats  number of seats to fill
+     * @return list of winners
+     */
+    public List<String> calculateWinners(VotingMethod method, int seats) {
+        // Use full ballots if possible
+        if (!ballots.isEmpty()) {
+            return VotingEngine.resolve(ballots, getName(), method, seats);
+        }
+        // Fallback to aggregated results
+        Map<String, Long> longResults = new HashMap<>();
+        results.forEach((k, v) -> longResults.put(k, (long) v));
+        return VotingSystem.determineWinners(longResults, method, seats);
     }
 
     /**
@@ -115,18 +148,7 @@ public class Election extends Situation implements Temporal<org.jscience.history
     }
 
     /**
-     * Adds votes for a specific Candidate role.
-     * @param candidate the candidate receiving votes
-     * @param count     number of votes
-     */
-    public void addVote(Candidate candidate, int count) {
-        if (candidate != null) {
-            addVote(candidate.getIndividual().getName(), count);
-        }
-    }
-
-    /**
-     * Returns the current tally of results.
+     * Returns the current tally of aggregated results.
      * @return unmodifiable map of results
      */
     public Map<String, Integer> getResults() {
@@ -135,12 +157,25 @@ public class Election extends Situation implements Temporal<org.jscience.history
 
     /**
      * Determines the winner based on the highest vote count (First Past The Post).
-     * @return the name of the winner, or null if no votes
+     * @return the name of the winner (top aggregated), or null if no votes
      */
     public String getWinner() {
         return results.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
+    }
+
+    @Override
+    public org.jscience.history.time.TimeCoordinate getWhen() {
+        return org.jscience.history.time.FuzzyTimePoint.of(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public Country getCountry() {
+        return country;
     }
 }

@@ -24,139 +24,130 @@ package org.jscience.law;
 
 import org.jscience.sociology.Human;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.Commented;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+import org.jscience.history.time.TimeCoordinate;
 
-import java.util.Date;
+
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A class representing a legal act or certificate (contract, deed, etc.) 
  * which defines social and legal relations such as ownership, citizenship, 
  * marriage, or nationality.
+ * 
+ * <p>Modernized to implement ComprehensiveIdentification and use ActKind extensible enum.</p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @since 1.0
  */
-// no relation with an act in a play, see Jsci.arts.theater.Act.
-public class Act implements Identified<Identification>, Commented {
+@Persistent
+public class Act implements ComprehensiveIdentification {
     
-    /** Indicates a birth certificate. */
-    public final static String BIRTH = "Birth";
+    private static final long serialVersionUID = 3L;
 
-    /** Indicates a residence permit or certificate. */
-    public final static String RESIDENCE = "Residence";
+    @Id
+    private final Identification id;
 
-    /** Indicates a certificate of nationality. */
-    public final static String NATIONALITY = "Nationality";
-
-    /** Indicates a marriage certificate. */
-    public final static String MARRIAGE = "Marriage";
-
-    /** Indicates a divorce decree. */
-    public final static String DIVORCE = "Divorce";
-
-    /** Indicates a title of property. */
-    public final static String PROPERTY = "Property";
-
-    /** Indicates a certificate of professional aptitude. */
-    public final static String APTITUDE = "Aptitude";
-
-    /** Indicates a death certificate. */
-    public final static String DEATH = "Death";
-
-    private Identification identification;
-    private String matter;
-    private Date date;
-    private String object; // "you ... have the right to ... under these circumstances..."
-    private Set<Human> subjects; // the people in the act
-    
+    @Attribute
     private final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
+    private ActKind kind;
+
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private TimeCoordinate date;
+
+    @Attribute
+    private String object; // "you ... have the right to ... under these circumstances..."
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Human> subjects;
 
     /**
      * Creates a new Act object.
      *
-     * @param identification the unique identification of this act
-     * @param matter the type or category of the act (e.g., BIRTH, MARRIAGE)
+     * @param id the unique identification of this act
+     * @param kind the categorical classification of the act
      * @param date the date when the act was established or signed
      * @param object the primary content or legal consequences of the act
      * @param subjects the set of individuals concerned by this act
-     * @param comments additional notes or observations
-     * @throws IllegalArgumentException if any argument is null or if subjects contains non-human entities
+     * @throws NullPointerException if any required argument is null
      */
-    public Act(Identification identification, String matter, Date date,
-        String object, Set<Human> subjects, String comments) {
-
-        if (identification == null || matter == null || matter.isEmpty() ||
-            date == null || object == null || object.isEmpty() ||
-            subjects == null || comments == null) {
-            throw new IllegalArgumentException("Arguments cannot be null or empty.");
-        }
-
-        for (Object subject : subjects) {
-            if (!(subject instanceof Human)) {
-                throw new IllegalArgumentException("The subjects Set must contain only Humans.");
-            }
-        }
-
-        this.identification = identification;
-        this.matter = matter;
-        this.date = date;
-        this.object = object;
-        this.subjects = subjects;
-        setComments(comments);
-    }
-
-    /**
-     * Returns the identification of this act.
-     * @return the identification
-     */
-    public Identification getIdentification() {
-        return identification;
+    public Act(Identification id, ActKind kind, TimeCoordinate date,
+        String object, Set<Human> subjects) {
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
+        this.kind = Objects.requireNonNull(kind, "ActKind cannot be null");
+        this.date = Objects.requireNonNull(date, "Date cannot be null");
+        this.object = Objects.requireNonNull(object, "Object cannot be null");
+        this.subjects = Objects.requireNonNull(subjects, "Subjects cannot be null");
+        
+        setName(kind.name() + " (" + id + ")");
     }
 
     @Override
     public Identification getId() {
-        return identification;
-    }
-
-    /**
-     * Returns the matter or category of this act.
-     * @return the matter
-     */
-    public String getMatter() {
-        return matter;
-    }
-
-    /**
-     * Returns the date of the act.
-     * @return the date
-     */
-    public Date getDate() {
-        return date;
-    }
-
-    /**
-     * Returns the primary object or clause of the act.
-     * @return the object
-     */
-    public String getObject() {
-        return object;
-    }
-
-    /**
-     * Returns the set of human subjects involved in the act.
-     * @return the set of subjects
-     */
-    public Set<Human> getSubjects() {
-        return subjects;
+        return id;
     }
 
     @Override
     public Map<String, Object> getTraits() {
         return traits;
+    }
+
+    public ActKind getKind() {
+        return kind;
+    }
+
+    public void setKind(ActKind kind) {
+        this.kind = Objects.requireNonNull(kind);
+    }
+
+    public TimeCoordinate getDate() {
+        return date;
+    }
+
+    public void setDate(TimeCoordinate date) {
+        this.date = Objects.requireNonNull(date);
+    }
+
+    public String getObject() {
+        return object;
+    }
+
+    public void setObject(String object) {
+        this.object = Objects.requireNonNull(object);
+    }
+
+    public Set<Human> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(Set<Human> subjects) {
+        this.subjects = Objects.requireNonNull(subjects);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Act that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

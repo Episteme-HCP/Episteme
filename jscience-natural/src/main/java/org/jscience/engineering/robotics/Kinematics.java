@@ -23,8 +23,23 @@
 
 package org.jscience.engineering.robotics;
 
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.sets.Reals;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Angle;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.measure.quantity.Length;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Robotics kinematics calculations.
+ * Modernized to use high-precision Real matrices and typed Quantities.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,158 +47,80 @@ package org.jscience.engineering.robotics;
  */
 public class Kinematics {
 
+    private Kinematics() {}
+
     /**
      * 2D forward kinematics for 2-link planar arm.
-     * 
-     * @param L1     Length of link 1
-     * @param L2     Length of link 2
-     * @param theta1 Angle of joint 1 (radians)
-     * @param theta2 Angle of joint 2 (radians, relative to link 1)
-     * @return [x, y] position of end effector
+     * Returns the end-effector position (x, y).
      */
-    public static double[] forwardKinematics2Link(double L1, double L2,
-            double theta1, double theta2) {
-        double x = L1 * Math.cos(theta1) + L2 * Math.cos(theta1 + theta2);
-        double y = L1 * Math.sin(theta1) + L2 * Math.sin(theta1 + theta2);
-        return new double[] { x, y };
-    }
+    public static Vector<Real> forwardKinematics2Link(
+            Quantity<Length> L1, Quantity<Length> L2,
+            Quantity<Angle> theta1, Quantity<Angle> theta2) {
 
-    /**
-     * 2D inverse kinematics for 2-link planar arm.
-     * 
-     * @param L1 Length of link 1
-     * @param L2 Length of link 2
-     * @param x  Target x position
-     * @param y  Target y position
-     * @return [theta1, theta2] joint angles (radians), or null if unreachable
-     */
-    public static double[] inverseKinematics2Link(double L1, double L2, double x, double y) {
-        double d = Math.sqrt(x * x + y * y);
+        Real l1 = L1.to(Units.METER).getValue();
+        Real l2 = L2.to(Units.METER).getValue();
+        Real t1 = theta1.to(Units.RADIAN).getValue();
+        Real t2 = theta2.to(Units.RADIAN).getValue();
 
-        // Check reachability
-        if (d > L1 + L2 || d < Math.abs(L1 - L2)) {
-            return null;
-        }
+        // Using Real trig functions
+        Real x = l1.multiply(t1.cos()).add(l2.multiply(t1.add(t2).cos()));
+        Real y = l1.multiply(t1.sin()).add(l2.multiply(t1.add(t2).sin()));
 
-        // Law of cosines for theta2
-        double cosTheta2 = (x * x + y * y - L1 * L1 - L2 * L2) / (2 * L1 * L2);
-        double theta2 = Math.acos(cosTheta2); // Elbow up solution
-
-        // Theta1 from geometry
-        double k1 = L1 + L2 * Math.cos(theta2);
-        double k2 = L2 * Math.sin(theta2);
-        double theta1 = Math.atan2(y, x) - Math.atan2(k2, k1);
-
-        return new double[] { theta1, theta2 };
+        return DenseVector.of(List.of(x, y), Reals.getInstance());
     }
 
     /**
      * Denavit-Hartenberg transformation matrix.
-     * T = Rz(ÃŽÂ¸) * Tz(d) * Tx(a) * Rx(ÃŽÂ±)
-     * 
-     * @param theta Joint angle (radians)
-     * @param d     Link offset
-     * @param a     Link length
-     * @param alpha Link twist (radians)
-     * @return 4x4 transformation matrix (row-major)
+     * T = Rz(θ) * Tz(d) * Tx(a) * Rx(α)
      */
-    public static double[][] dhMatrix(double theta, double d, double a, double alpha) {
-        double ct = Math.cos(theta);
-        double st = Math.sin(theta);
-        double ca = Math.cos(alpha);
-        double sa = Math.sin(alpha);
+    public static Matrix<Real> dhMatrix(Quantity<Angle> theta, Quantity<Length> d, 
+                                       Quantity<Length> a, Quantity<Angle> alpha) {
+        Real t = theta.to(Units.RADIAN).getValue();
+        Real l_d = d.to(Units.METER).getValue();
+        Real l_a = a.to(Units.METER).getValue();
+        Real al = alpha.to(Units.RADIAN).getValue();
 
-        return new double[][] {
-                { ct, -st * ca, st * sa, a * ct },
-                { st, ct * ca, -ct * sa, a * st },
-                { 0, sa, ca, d },
-                { 0, 0, 0, 1 }
-        };
+        Real ct = t.cos();
+        Real st = t.sin();
+        Real ca = al.cos();
+        Real sa = al.sin();
+
+        List<List<Real>> rows = new ArrayList<>();
+        rows.add(List.of(ct, st.negate().multiply(ca), st.multiply(sa), l_a.multiply(ct)));
+        rows.add(List.of(st, ct.multiply(ca), ct.negate().multiply(sa), l_a.multiply(st)));
+        rows.add(List.of(Real.ZERO, sa, ca, l_d));
+        rows.add(List.of(Real.ZERO, Real.ZERO, Real.ZERO, Real.ONE));
+
+        return DenseMatrix.of(rows, Reals.getInstance());
     }
 
     /**
-     * Multiplies two 4x4 matrices.
+     * Extracts position vector from a 4x4 transformation matrix.
      */
-    public static double[][] multiplyMatrices(double[][] A, double[][] B) {
-        double[][] C = new double[4][4];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    C[i][j] += A[i][k] * B[k][j];
-                }
-            }
-        }
-        return C;
-    }
-
-    /**
-     * Extracts position from transformation matrix.
-     */
-    public static double[] getPosition(double[][] T) {
-        return new double[] { T[0][3], T[1][3], T[2][3] };
+    public static Vector<Real> getPosition(Matrix<Real> T) {
+        return DenseVector.of(List.of(T.get(0, 3), T.get(1, 3), T.get(2, 3)), Reals.getInstance());
     }
 
     /**
      * Jacobian for 2-link planar arm (velocity kinematics).
-     * J = [dx/dÃŽÂ¸1, dx/dÃŽÂ¸2; dy/dÃŽÂ¸1, dy/dÃŽÂ¸2]
      */
-    public static double[][] jacobian2Link(double L1, double L2, double theta1, double theta2) {
-        double s1 = Math.sin(theta1);
-        double c1 = Math.cos(theta1);
-        double s12 = Math.sin(theta1 + theta2);
-        double c12 = Math.cos(theta1 + theta2);
+    public static Matrix<Real> jacobian2Link(Quantity<Length> L1, Quantity<Length> L2, 
+                                            Quantity<Angle> theta1, Quantity<Angle> theta2) {
+        Real l1 = L1.to(Units.METER).getValue();
+        Real l2 = L2.to(Units.METER).getValue();
+        Real t1 = theta1.to(Units.RADIAN).getValue();
+        Real t2 = theta2.to(Units.RADIAN).getValue();
+        Real t12 = t1.add(t2);
 
-        return new double[][] {
-                { -L1 * s1 - L2 * s12, -L2 * s12 },
-                { L1 * c1 + L2 * c12, L2 * c12 }
-        };
-    }
+        Real s1 = t1.sin();
+        Real c1 = t1.cos();
+        Real s12 = t12.sin();
+        Real c12 = t12.cos();
 
-    /**
-     * Trapezoidal velocity profile for trajectory planning.
-     * Returns position at time t.
-     */
-    public static double trapezoidalProfile(double t, double totalTime,
-            double accelTime, double startPos, double endPos) {
-        double distance = endPos - startPos;
-        double vMax = distance / (totalTime - accelTime);
+        List<List<Real>> rows = new ArrayList<>();
+        rows.add(List.of(l1.multiply(s1).negate().subtract(l2.multiply(s12)), l2.multiply(s12).negate()));
+        rows.add(List.of(l1.multiply(c1).add(l2.multiply(c12)), l2.multiply(c12)));
 
-        if (t <= accelTime) {
-            // Acceleration phase
-            double a = vMax / accelTime;
-            return startPos + 0.5 * a * t * t;
-        } else if (t <= totalTime - accelTime) {
-            // Constant velocity phase
-            return startPos + 0.5 * vMax * accelTime + vMax * (t - accelTime);
-        } else if (t <= totalTime) {
-            // Deceleration phase
-            double tDecel = t - (totalTime - accelTime);
-            double posAtDecelStart = startPos + distance - 0.5 * vMax * accelTime;
-            double a = vMax / accelTime;
-            return posAtDecelStart + vMax * tDecel - 0.5 * a * tDecel * tDecel;
-        }
-        return endPos;
-    }
-
-    /**
-     * Cubic polynomial trajectory.
-     * ÃŽÂ¸(t) = a0 + a1*t + a2*tÃ‚Â² + a3*tÃ‚Â³
-     * With zero velocity at start and end.
-     */
-    public static double cubicTrajectory(double t, double totalTime,
-            double startPos, double endPos) {
-        double T = totalTime;
-        double s = t / T; // Normalized time [0, 1]
-        double h = endPos - startPos;
-
-        // Coefficients for zero velocity at endpoints
-        double a0 = startPos;
-        double a1 = 0;
-        double a2 = 3 * h;
-        double a3 = -2 * h;
-
-        return a0 + a1 * s + a2 * s * s + a3 * s * s * s;
+        return DenseMatrix.of(rows, Reals.getInstance());
     }
 }
-
-

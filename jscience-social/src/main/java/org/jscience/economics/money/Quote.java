@@ -176,11 +176,11 @@ public final class Quote implements Serializable {
      * Returns the price change as a percentage.
      * @return the change percentage
      */
-    public double getChangePercent() {
+    public org.jscience.mathematics.numbers.real.Real getChangePercent() {
         if (previousClose == null || previousClose.getValue().isZero()) {
-            return 0.0;
+            return org.jscience.mathematics.numbers.real.Real.ZERO;
         }
-        return change.getValue().doubleValue() / previousClose.getValue().doubleValue() * 100;
+        return change.getValue().divide(previousClose.getValue()).multiply(org.jscience.mathematics.numbers.real.Real.of(100));
     }
 
     // Setters

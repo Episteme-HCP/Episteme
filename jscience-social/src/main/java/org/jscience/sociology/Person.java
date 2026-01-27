@@ -33,7 +33,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import org.jscience.biology.Individual;
+import org.jscience.biology.BiologicalSex;
 import org.jscience.economics.money.Money;
 import org.jscience.earth.Place;
 import org.jscience.util.persistence.Attribute;
@@ -42,54 +42,21 @@ import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a human being with demographic and social attributes.
- * Extends the biological {@link Individual} to incorporate societal concepts
- * like nationality, roles, wealth, and marriage.
+ * Extends the biological {@link Human} to incorporate societal concepts.
+ * Modernized to use extensible Gender and standardized Individual types.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
 public class Person extends Human {
 
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Gender categories for social modeling.
-     */
-    public enum Gender {
-        MALE, FEMALE, OTHER, UNSPECIFIED;
-
-        /**
-         * Maps social gender to biological sex.
-         * @return corresponding Individual.Sex
-         */
-        public Individual.Sex toSex() {
-            switch (this) {
-                case MALE: return Individual.Sex.MALE;
-                case FEMALE: return Individual.Sex.FEMALE;
-                default: return Individual.Sex.UNKNOWN;
-            }
-        }
-
-        /**
-         * Maps biological sex to social gender.
-         * @param sex original biological sex
-         * @return corresponding Gender
-         */
-        public static Gender fromSex(Individual.Sex sex) {
-            if (sex == null) return UNSPECIFIED;
-            switch (sex) {
-                case MALE: return MALE;
-                case FEMALE: return FEMALE;
-                default: return UNSPECIFIED;
-            }
-        }
-    }
+    private static final long serialVersionUID = 2L;
 
     @Attribute
-    private final String nationality;
+    private String nationality;
     
     @Attribute
     private final List<String> socialRoles = new ArrayList<>();
@@ -106,137 +73,82 @@ public class Person extends Human {
     @Attribute
     private String address;
 
-    /**
-     * Creates a new person with full attributes.
-     *
-     * @param id          unique identifier
-     * @param name        full name
-     * @param sex         biological sex
-     * @param birthDate   date of birth
-     * @param nationality country of citizenship
-     */
-    public Person(org.jscience.util.identity.Identification id, String name, Individual.Sex sex, LocalDate birthDate, String nationality) {
+    @Attribute
+    private Gender gender;
+
+    public Person(org.jscience.util.identity.Identification id, String name, BiologicalSex sex, LocalDate birthDate, String nationality) {
         super(id, sex, birthDate);
-        setTrait("name", name);
+        setName(name);
         this.nationality = (nationality != null) ? nationality : "Unknown";
         this.wealth = Money.usd(0);
+        this.gender = Gender.fromSex(sex);
     }
 
-    public Person(String id, String name, Individual.Sex sex, LocalDate birthDate, String nationality) {
-        super(new org.jscience.util.identity.SimpleIdentification(id), sex, birthDate);
-        setTrait("name", name);
-        this.nationality = (nationality != null) ? nationality : "Unknown";
-        this.wealth = Money.usd(0);
+    public Person(String id, String name, BiologicalSex sex, LocalDate birthDate, String nationality) {
+        this(new org.jscience.util.identity.UUIDIdentification(UUID.fromString(id)), name, sex, birthDate, nationality);
     }
     
-    /**
-     * Creates a new person using social Gender instead of biological Sex.
-     */
-    public Person(String id, String name, Gender gender, LocalDate birthDate, String nationality) {
-        this(id, name, gender != null ? gender.toSex() : Individual.Sex.UNKNOWN, birthDate, nationality);
+    public Person(String name, BiologicalSex sex) {
+        this(new org.jscience.util.identity.UUIDIdentification(UUID.randomUUID()), name, sex, LocalDate.now().minusYears(20), "Unknown");
     }
 
-    /**
-     * Convenient constructor for a person with minimal info.
-     * Generates a random ID and sets default age to 20.
-     */
-    public Person(String name, Individual.Sex sex) {
-        this(UUID.randomUUID().toString(), name, sex, LocalDate.now().minusYears(20), "Unknown");
-    }
-
-    /**
-     * Convenient constructor using social Gender.
-     */
-    public Person(String name, Gender gender) {
-        this(name, gender != null ? gender.toSex() : Individual.Sex.UNKNOWN);
-    }
-
-    /**
-     * Returns the person's gender based on their biological sex.
-     * @return the gender
-     */
     public Gender getGender() {
-        return Gender.fromSex(getSex());
+        return gender;
     }
 
-    /**
-     * Returns the person's nationality.
-     * @return nationality string
-     */
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
     public String getNationality() {
         return nationality;
     }
 
-    /**
-     * Returns an unmodifiable list of roles assigned to this person.
-     * @return roles list
-     */
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
+    }
+
     public List<String> getSocialRoles() {
         return Collections.unmodifiableList(socialRoles);
     }
 
-    /**
-     * Returns the current wealth of the person.
-     * @return wealth as Money
-     */
     public Money getWealth() {
         return wealth;
     }
 
-    /**
-     * Increases the person's wealth.
-     * @param amount amount to add
-     * @throws NullPointerException if amount is null
-     */
+    public void setWealth(Money wealth) {
+        this.wealth = wealth;
+    }
+
     public void earn(Money amount) {
         Objects.requireNonNull(amount, "Amount cannot be null");
-        if (this.wealth.getCurrency().equals(amount.getCurrency())) {
+        if (this.wealth == null) this.wealth = amount;
+        else if (this.wealth.getCurrency().equals(amount.getCurrency())) {
             this.wealth = this.wealth.add(amount);
         }
     }
 
-    /**
-     * Decreases the person's wealth.
-     * @param amount amount to subtract
-     * @throws NullPointerException if amount is null
-     */
     public void spend(Money amount) {
         Objects.requireNonNull(amount, "Amount cannot be null");
-        if (this.wealth.getCurrency().equals(amount.getCurrency())) {
+        if (this.wealth != null && this.wealth.getCurrency().equals(amount.getCurrency())) {
             this.wealth = this.wealth.subtract(amount);
         }
     }
 
-    /**
-     * Returns the set of current and former spouses.
-     * @return unmodifiable set of spouses
-     */
     public Set<Person> getSpouses() {
         return Collections.unmodifiableSet(spouses);
     }
 
-    /**
-     * Registers a marriage or relationship partner.
-     * @param spouse the spouse to add
-     */
     public void addSpouse(Person spouse) {
         if (spouse != null) {
             spouses.add(spouse);
         }
     }
 
-    /**
-     * Removes a partner from the spouse list.
-     * @param spouse the spouse to remove
-     */
     public void removeSpouse(Person spouse) {
         spouses.remove(spouse);
     }
 
-    /**
-     * Relocates the person to a new place and updates inhabitant records.
-     * @param newLocation the destination place
-     */
     public void move(Place newLocation) {
         Place oldLocation = getPosition();
         if (oldLocation != null) {
@@ -248,11 +160,6 @@ public class Person extends Human {
         }
     }
 
-    /**
-     * Assigns a new role title to the person.
-     * @param role the role to add
-     * @return this person instance for chaining
-     */
     public Person addSocialRole(String role) {
         if (role != null) {
             socialRoles.add(role);
@@ -260,50 +167,30 @@ public class Person extends Human {
         return this;
     }
 
-    /**
-     * Registers a structural sociological role.
-     * @param role the structural role
-     */
     public void addStructuralRole(org.jscience.sociology.Role role) {
         if (role != null && !structuralRoles.contains(role)) {
             structuralRoles.add(role);
         }
     }
 
-    /**
-     * Removes a structural sociological role.
-     * @param role the role to remove
-     */
     public void removeStructuralRole(org.jscience.sociology.Role role) {
         structuralRoles.remove(role);
     }
 
-    /**
-     * Returns an unmodifiable list of structural roles.
-     * @return structural roles list
-     */
     public List<org.jscience.sociology.Role> getStructuralRoles() {
         return Collections.unmodifiableList(structuralRoles);
     }
 
-    /**
-     * Returns the physical address.
-     * @return address string
-     */
     public String getAddress() {
         return address;
     }
 
-    /**
-     * Sets the physical address.
-     * @param address the address to set
-     */
     public void setAddress(String address) {
         this.address = address;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %d years, %s)", getName(), getSex(), getAge(), nationality);
+        return String.format("%s (%s/%s, %d years, %s)", getName(), getSex(), gender, getAge(), nationality);
     }
 }

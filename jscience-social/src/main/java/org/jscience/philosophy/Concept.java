@@ -22,30 +22,45 @@
  */
 package org.jscience.philosophy;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.util.Named;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a key idea or element within a philosophical framework.
  * 
  * <p> Concepts can be interlinked to form a semantic network, allowing for
  *     complex conceptual mapping and analysis of philosophical systems.</p>
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
+ * @version 7.0
+ * @since 1.0
  */
-public class Concept implements Named, Serializable {
+@Persistent
+public class Concept implements ComprehensiveIdentification {
 
+    private static final long serialVersionUID = 2L;
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    private final Identification id;
 
-    private final String name;
-    private String description;
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Concept> relatedConcepts = new HashSet<>();
 
     /**
@@ -62,29 +77,30 @@ public class Concept implements Named, Serializable {
      * Rich constructor with description.
      */
     public Concept(String name, String description) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Concept name cannot be null or empty.");
+        this.id = new SimpleIdentification("Concept:" + UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Concept name cannot be null"));
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Concept name cannot be empty");
         }
-        this.name = name;
-        this.description = description;
+        setComments(description);
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getDescription() {
-        return description;
+        return getComments();
     }
 
     public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /** Legacy getter for ID. */
-    public String getId() {
-        return name;
+        setComments(description);
     }
 
     /**
@@ -149,18 +165,17 @@ public class Concept implements Named, Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Concept concept = (Concept) o;
-        return Objects.equals(name, concept.name);
+        if (!(o instanceof Concept that)) return false;
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return name;
+        return getName();
     }
 }

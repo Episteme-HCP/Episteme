@@ -165,12 +165,12 @@ public class AlphaVantageQuoteReader extends AbstractResourceReader<Quote> {
         }
 
         String sym = globalQuote.path("01. symbol").asText(symbol);
-        double price = globalQuote.path("05. price").asDouble(0.0);
-        double open = globalQuote.path("02. open").asDouble(0.0);
-        double high = globalQuote.path("03. high").asDouble(0.0);
-        double low = globalQuote.path("04. low").asDouble(0.0);
+        org.jscience.mathematics.numbers.real.Real price = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("05. price").asText("0.0"));
+        org.jscience.mathematics.numbers.real.Real open = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("02. open").asText("0.0"));
+        org.jscience.mathematics.numbers.real.Real high = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("03. high").asText("0.0"));
+        org.jscience.mathematics.numbers.real.Real low = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("04. low").asText("0.0"));
         long volume = globalQuote.path("06. volume").asLong(0);
-        double change = globalQuote.path("09. change").asDouble(0.0);
+        org.jscience.mathematics.numbers.real.Real change = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("09. change").asText("0.0"));
         String changePercent = globalQuote.path("10. change percent").asText("0%");
 
         Quote quote = new Quote(sym, sym, "Alpha Vantage");

@@ -24,48 +24,45 @@
 package org.jscience.economics;
 
 import org.jscience.mathematics.discrete.RootedTree;
-import org.jscience.util.Named;
-import org.jscience.util.Commented;
 import org.jscience.util.Temporal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 
 /**
  * Represents a formal organizational structure (organigram).
  * This defines the intended hierarchy and grouping of workers within an organization.
  * Uses the graph-based RootedTree for hierarchical representation.
+ * Modernized to implement ComprehensiveIdentification and follow new standards.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Organigram implements Named, Identified<Identification>, Commented, Temporal<Instant> {
+public class Organigram implements ComprehensiveIdentification, Temporal<Instant> {
+
+    private static final long serialVersionUID = 2L;
 
     @Id
-    private Identification identification;
+    private final Identification id;
 
     @Attribute
-    private String name;
-
-    @Attribute
-    private String comments;
+    private final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private Instant timestamp;
-
-    /** The internal map for traits. */
-    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
 
     /** The actual hierarchical structure of organizational unit names. */
     private RootedTree<String> structure;
@@ -82,47 +79,24 @@ public class Organigram implements Named, Identified<Identification>, Commented,
      * @throws IllegalArgumentException if name is empty
      */
     public Organigram(String name) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.id = new SimpleIdentification("Organigram:" + name);
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
-        this.identification = new SimpleIdentification("Organigram:" + name);
         this.timestamp = Instant.now();
         this.structure = new RootedTree<>(name);
         this.workers = new HashSet<>();
     }
 
-    /**
-     * Returns the name of this organigram.
-     *
-     * @return the name
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of this organigram.
-     *
-     * @param name the new name
-     */
-    public void setName(String name) {
-        this.name = Objects.requireNonNull(name);
-    }
-
     @Override
     public Identification getId() {
-        return identification;
+        return id;
     }
 
     @Override
-    public String getComments() {
-        return comments;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     @Override
@@ -130,17 +104,17 @@ public class Organigram implements Named, Identified<Identification>, Commented,
         return timestamp;
     }
 
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = Objects.requireNonNull(timestamp);
+    }
+
     /**
      * Legacy getter.
      * @return the timestamp
      */
+    @Deprecated
     public Instant getTimestamp() {
         return timestamp;
-    }
-
-    @Override
-    public java.util.Map<String, Object> getTraits() {
-        return traits;
     }
 
     /**
@@ -177,5 +151,22 @@ public class Organigram implements Named, Identified<Identification>, Commented,
      */
     public Set<Worker> getAllWorkers() {
         return workers; // Currently all workers are in this set
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Organigram that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

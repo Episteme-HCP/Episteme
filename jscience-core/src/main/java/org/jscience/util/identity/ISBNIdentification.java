@@ -13,4 +13,9 @@ public class ISBNIdentification extends Identification {
     public ISBNIdentification(String value) {
         super(value);
     }
+
+    @Override
+    public String getScheme() {
+        return "ISBN";
+    }
 }

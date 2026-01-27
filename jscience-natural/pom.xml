@@ -160,7 +160,7 @@
                         <source>src/main/resources/xsd/animl-technique.xsd</source>
                         <source>src/main/resources/xsd/ThermoML.xsd</source>
                     </sources>
-                    <packageName>org.astm.animl.schema.core.draft._0</packageName>
+                    <!-- <packageName>org.astm.animl.schema.core.draft._0</packageName> -->
                 </configuration>
             </plugin>
         </plugins>

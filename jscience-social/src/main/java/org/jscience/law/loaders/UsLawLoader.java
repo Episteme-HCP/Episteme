@@ -24,6 +24,8 @@ package org.jscience.law.loaders;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.law.Statute;
+import org.jscience.law.StatuteStatus;
+import org.jscience.law.StatuteType;
 
 /**
  * Loader for United States federal law (US Code).
@@ -40,8 +42,15 @@ public final class UsLawLoader extends AbstractResourceReader<Statute> implement
     protected Statute loadFromSource(String resourceId) throws Exception {
         // resourceId would be a Title/Section reference (e.g., "17 U.S.C. 101")
         if (resourceId != null && !resourceId.isEmpty()) {
-            return new Statute(resourceId, "US Code Section", 
-                Statute.Type.FEDERAL_LAW, "United States", 2025, Statute.Status.ENACTED);
+            Statute statute = new Statute(resourceId, "US Code Section", 
+                StatuteType.FEDERAL_LAW, "United States", 2025, StatuteStatus.ENACTED);
+            
+            // Populate traits
+            statute.getTraits().put("citation", resourceId); // e.g. "17 U.S.C. 101"
+            statute.getTraits().put("source", "US Government Publishing Office (GovInfo) - Mock");
+            statute.getTraits().put("url", "https://www.govinfo.gov/app/details/" + resourceId.replace(" ", ""));
+            
+            return statute;
         }
         
         throw new Exception("Invalid US Code identifier: " + resourceId);
@@ -50,7 +59,7 @@ public final class UsLawLoader extends AbstractResourceReader<Statute> implement
     @Override
     public Statute loadContent(String content) {
         return new Statute("USCMOCK", "Content-loaded US Statute", 
-            Statute.Type.FEDERAL_LAW, "United States", 2025, Statute.Status.ENACTED);
+            StatuteType.FEDERAL_LAW, "United States", 2025, StatuteStatus.ENACTED);
     }
 
     @Override

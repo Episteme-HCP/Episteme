@@ -23,13 +23,11 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
+
 import java.util.List;
-import java.util.Objects;
 import org.jscience.util.EnumRegistry;
 import org.jscience.util.ExtensibleEnum;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
@@ -38,51 +36,37 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
-public final class EducationLevel implements ExtensibleEnum<EducationLevel>, org.jscience.util.Named, Serializable {
+public final class EducationLevel extends ExtensibleEnum implements org.jscience.util.Named {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    private static final EnumRegistry<EducationLevel> REGISTRY = new EnumRegistry<>();
+    public static final EnumRegistry<EducationLevel> REGISTRY = EnumRegistry.getRegistry(EducationLevel.class);
 
     // Built-in levels (ISCED based)
-    public static final EducationLevel NONE = register("NONE", "No formal education", 0, true);
-    public static final EducationLevel PRIMARY = register("PRIMARY", "Primary education", 1, true);
-    public static final EducationLevel LOWER_SECONDARY = register("LOWER_SECONDARY", "Lower secondary", 2, true);
-    public static final EducationLevel UPPER_SECONDARY = register("UPPER_SECONDARY", "Upper secondary", 3, true);
-    public static final EducationLevel POST_SECONDARY = register("POST_SECONDARY", "Post-secondary non-tertiary", 4, true);
-    public static final EducationLevel SHORT_CYCLE = register("SHORT_CYCLE", "Short-cycle tertiary", 5, true);
-    public static final EducationLevel BACHELOR = register("BACHELOR", "Bachelor's or equivalent", 6, true);
-    public static final EducationLevel MASTER = register("MASTER", "Master's or equivalent", 7, true);
-    public static final EducationLevel DOCTORATE = register("DOCTORATE", "Doctoral or equivalent", 8, true);
+    public static final EducationLevel NONE = new EducationLevel("NONE", "No formal education", true);
+    public static final EducationLevel PRIMARY = new EducationLevel("PRIMARY", "Primary education", true);
+    public static final EducationLevel LOWER_SECONDARY = new EducationLevel("LOWER_SECONDARY", "Lower secondary", true);
+    public static final EducationLevel UPPER_SECONDARY = new EducationLevel("UPPER_SECONDARY", "Upper secondary", true);
+    public static final EducationLevel POST_SECONDARY = new EducationLevel("POST_SECONDARY", "Post-secondary non-tertiary", true);
+    public static final EducationLevel SHORT_CYCLE = new EducationLevel("SHORT_CYCLE", "Short-cycle tertiary", true);
+    public static final EducationLevel BACHELOR = new EducationLevel("BACHELOR", "Bachelor's or equivalent", true);
+    public static final EducationLevel MASTER = new EducationLevel("MASTER", "Master's or equivalent", true);
+    public static final EducationLevel DOCTORATE = new EducationLevel("DOCTORATE", "Doctoral or equivalent", true);
 
-    @Id
     @Attribute
-    private final String name;
+    private final String customDescription;
     
-    @Attribute
-    private final String description;
-    
-    @Attribute
-    private final int ordinal;
-    
-    @Attribute
     private final boolean builtIn;
 
-    private EducationLevel(String name, String description, int ordinal, boolean builtIn) {
-        this.name = name;
-        this.description = description;
-        this.ordinal = ordinal;
+    private EducationLevel(String name, String description, boolean builtIn) {
+        super(name);
+        this.customDescription = description;
         this.builtIn = builtIn;
-    }
-
-    private static EducationLevel register(String name, String description, int ordinal, boolean builtIn) {
-        EducationLevel level = new EducationLevel(name, description, ordinal, builtIn);
-        REGISTRY.register(level);
-        return level;
+        REGISTRY.register(this);
     }
 
     /**
@@ -97,72 +81,29 @@ public final class EducationLevel implements ExtensibleEnum<EducationLevel>, org
         if (existing != null) {
             return existing;
         }
-        return register(name, description, REGISTRY.size(), false);
-    }
-
-    /**
-     * Retrieves an education level by its name.
-     * @param name the name to look up
-     * @return the matching EducationLevel, or null if not found
-     */
-    public static EducationLevel valueOf(String name) {
-        return REGISTRY.valueOf(name);
-    }
-
-    /**
-     * Returns all registered education levels.
-     * @return a list of all levels
-     */
-    public static List<EducationLevel> values() {
-        return REGISTRY.values();
-    }
-
-    @Override
-    public String name() {
-        return name;
+        return new EducationLevel(name, description, false);
     }
 
     @Override
     public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the description of the education level.
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
+        return name();
     }
 
     @Override
-    public int ordinal() {
-        return ordinal;
+    public String description() {
+        return customDescription;
     }
 
-    /**
-     * Returns whether this level is a built-in ISCED standard level.
-     * @return true if built-in
-     */
+    @Override
     public boolean isBuiltIn() {
         return builtIn;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof EducationLevel)) return false;
-        EducationLevel that = (EducationLevel) o;
-        return Objects.equals(name, that.name);
+    public static EducationLevel valueOf(String name) {
+        return REGISTRY.valueOf(name);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    public static List<EducationLevel> values() {
+        return REGISTRY.values();
     }
 }

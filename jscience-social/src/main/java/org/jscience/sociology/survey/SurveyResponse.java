@@ -33,7 +33,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Represents a filled-out survey response by a participant.
@@ -46,7 +45,7 @@ import java.util.UUID;
 @Persistent
 public class SurveyResponse implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+
 
     @Id
     protected final Identification id;
@@ -67,7 +66,7 @@ public class SurveyResponse implements ComprehensiveIdentification {
     private final Map<String, Object> answers = new HashMap<>(); // Question ID -> Answer value
 
     public SurveyResponse(Survey survey, Person respondent) {
-        this.id = new UUIDIdentification(UUID.randomUUID().toString());
+        this.id = new UUIDIdentification();
         this.survey = Objects.requireNonNull(survey, "Survey cannot be null");
         this.respondent = respondent;
         this.timestamp = Instant.now();

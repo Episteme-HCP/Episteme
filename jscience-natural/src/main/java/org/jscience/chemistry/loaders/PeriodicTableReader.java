@@ -33,6 +33,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Temperature;
 import org.jscience.chemistry.Element;
+import org.jscience.chemistry.ElementCategory;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -138,11 +139,11 @@ public class PeriodicTableReader extends AbstractResourceReader<List<Element>> {
 
         String catStr = node.has("category") ? node.get("category").asText().toUpperCase().replace(" ", "_")
                 : "UNKNOWN";
-        Element.ElementCategory category;
+        ElementCategory category;
         try {
-            category = Element.ElementCategory.valueOf(catStr);
+            category = ElementCategory.valueOf(catStr);
         } catch (IllegalArgumentException e) {
-            category = Element.ElementCategory.UNKNOWN;
+            category = ElementCategory.UNKNOWN;
         }
 
         double electro = node.has("electronegativity") ? node.get("electronegativity").asDouble() : 0.0;

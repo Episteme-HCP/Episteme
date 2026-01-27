@@ -23,16 +23,20 @@
 
 package org.jscience.biology;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jscience.util.identity.Identified;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
-import org.jscience.util.Named;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a Deoxyribonucleic acid (DNA) strand.
@@ -41,11 +45,23 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DNA implements Serializable, Cloneable, Identified<Identification>, Named {
+@Persistent
+public class DNA implements Cloneable, ComprehensiveIdentification {
 
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
     private final List<Base> bases;
 
     public DNA(List<Base> bases) {
+        this.id = new SimpleIdentification("DNA:" + UUID.randomUUID());
+        setName("DNA Strand (" + bases.size() + " bases)");
         if (bases.contains(Base.URACIL)) {
             throw new IllegalArgumentException("DNA cannot contain Uracil.");
         }
@@ -62,6 +78,8 @@ public class DNA implements Serializable, Cloneable, Identified<Identification>,
      * @param sequence the string representation
      */
     public DNA(String sequence) {
+        this.id = new SimpleIdentification("DNA:" + UUID.randomUUID());
+        setName("DNA Strand (" + sequence.length() + " bases)");
         this.bases = new ArrayList<>();
         for (char c : sequence.toUpperCase().toCharArray()) {
             switch (c) {
@@ -125,11 +143,11 @@ public class DNA implements Serializable, Cloneable, Identified<Identification>,
 
     @Override
     public Identification getId() {
-        return new SimpleIdentification(toString());
+        return id;
     }
 
     @Override
-    public String getName() {
-        return "DNA Strand (" + getLength() + " bases)";
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 }

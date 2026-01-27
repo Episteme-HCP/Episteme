@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.biology.Individual;
 import org.jscience.util.identity.Identification;
 import org.jscience.biology.ecology.Population;
@@ -62,7 +63,7 @@ public class Group extends Population {
      * The double value typically represents attraction/repulsion or dominance.
      */
     @Relation(type = Relation.Type.MANY_TO_MANY)
-    private Map<Individual, Map<Individual, Double>> relations;
+    private Map<Individual, Map<Individual, Real>> relations;
 
     /**
      * Creates a new Group for a specific species.
@@ -130,7 +131,7 @@ public class Group extends Population {
      * Returns the complete sociogram of relations.
      * @return the relations map
      */
-    public Map<Individual, Map<Individual, Double>> getRelations() {
+    public Map<Individual, Map<Individual, Real>> getRelations() {
         return relations;
     }
 
@@ -142,16 +143,20 @@ public class Group extends Population {
      * @param status numeric value representing the relation (e.g., attraction score)
      * @throws NullPointerException if from or to is null
      */
-    public void setRelation(Individual from, Individual to, double status) {
+    public void setRelation(Individual from, Individual to, Real status) {
         Objects.requireNonNull(from, "Source individual cannot be null");
         Objects.requireNonNull(to, "Target individual cannot be null");
         
-        Map<Individual, Double> individualRelations = relations.get(from);
+        Map<Individual, Real> individualRelations = relations.get(from);
         if (individualRelations == null) {
             individualRelations = new HashMap<>();
             relations.put(from, individualRelations);
         }
         individualRelations.put(to, status);
+    }
+
+    public void setRelation(Individual from, Individual to, double status) {
+        setRelation(from, to, Real.of(status));
     }
 
     /**
@@ -161,14 +166,14 @@ public class Group extends Population {
      * @param to   the target individual
      * @return the relation score, or 0.0 if no relation is defined
      */
-    public double getRelation(Individual from, Individual to) {
-        Map<Individual, Double> individualRelations = relations.get(from);
+    public Real getRelation(Individual from, Individual to) {
+        Map<Individual, Real> individualRelations = relations.get(from);
         if (individualRelations != null) {
-            Double status = individualRelations.get(to);
+            Real status = individualRelations.get(to);
             if (status != null) {
                 return status;
             }
         }
-        return 0.0;
+        return Real.ZERO;
     }
 }

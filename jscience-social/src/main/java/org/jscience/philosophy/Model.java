@@ -22,29 +22,45 @@
  */
 package org.jscience.philosophy;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.util.Named;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a logical organization or cluster of interrelated concepts.
  * 
  * <p> Models are used to structure philosophical systems or scientific 
  *     theories, providing a framework for organizing conceptual networks.</p>
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
+ * @version 7.0
+ * @since 1.0
  */
-public class Model implements Named, Serializable {
+@Persistent
+public class Model implements ComprehensiveIdentification {
 
+    private static final long serialVersionUID = 2L;
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    private final Identification id;
 
-    private final String name;
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Concept> concepts = new HashSet<>();
 
     /**
@@ -54,15 +70,21 @@ public class Model implements Named, Serializable {
      * @throws IllegalArgumentException if name is null or empty
      */
     public Model(String name) {
-        this.name = Objects.requireNonNull(name, "Model name cannot be null");
+        this.id = new SimpleIdentification("Model:" + UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Model name cannot be null"));
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Model name cannot be empty");
         }
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -105,7 +127,19 @@ public class Model implements Named, Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Model that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
     public String toString() {
-        return name + " (" + concepts.size() + " concepts)";
+        return getName() + " (" + concepts.size() + " concepts)";
     }
 }

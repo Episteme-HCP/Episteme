@@ -23,23 +23,24 @@
 
 package org.jscience.engineering.electrical;
 
-import org.jscience.mathematics.linearalgebra.Vector;
+import java.util.List;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
+import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.ElectricPotential;
-import org.jscience.measure.quantity.ElectricCurrent;
-import org.jscience.measure.quantity.ElectricResistance;
-import org.jscience.measure.quantity.Power;
 import org.jscience.measure.quantity.ElectricCapacitance;
-import org.jscience.measure.quantity.Inductance;
-import org.jscience.measure.quantity.Time;
+import org.jscience.measure.quantity.ElectricCurrent;
+import org.jscience.measure.quantity.ElectricPotential;
+import org.jscience.measure.quantity.ElectricResistance;
 import org.jscience.measure.quantity.Frequency;
+import org.jscience.measure.quantity.Inductance;
+import org.jscience.measure.quantity.Power;
+import org.jscience.measure.quantity.Time;
 
 /**
- * Basic DC circuit calculations using Ohm's law and Kirchhoff's rules.
+ * Basic DC/AC circuit calculations using Ohm's law and Kirchhoff's rules.
+ * Modernized to use typed Quantities.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -50,65 +51,33 @@ public class CircuitAnalysis {
     private CircuitAnalysis() {
     }
 
-    // === Quantity Overloads ===
-
-    public static Quantity<ElectricPotential> voltageQ(Quantity<ElectricCurrent> i, Quantity<ElectricResistance> r) {
-        Real result = voltage(Real.of(i.to(Units.AMPERE).getValue().doubleValue()),
-                Real.of(r.to(Units.OHM).getValue().doubleValue()));
-        return Quantities.create(result.doubleValue(), Units.VOLT);
-    }
-
-    public static Quantity<ElectricCurrent> currentQ(Quantity<ElectricPotential> v, Quantity<ElectricResistance> r) {
-        Real result = current(Real.of(v.to(Units.VOLT).getValue().doubleValue()),
-                Real.of(r.to(Units.OHM).getValue().doubleValue()));
-        return Quantities.create(result.doubleValue(), Units.AMPERE);
-    }
-
-    public static Quantity<ElectricResistance> resistanceQ(Quantity<ElectricPotential> v, Quantity<ElectricCurrent> i) {
-        Real result = resistance(Real.of(v.to(Units.VOLT).getValue().doubleValue()),
-                Real.of(i.to(Units.AMPERE).getValue().doubleValue()));
-        return Quantities.create(result.doubleValue(), Units.OHM);
-    }
-
-    public static Quantity<Power> powerQ(Quantity<ElectricPotential> v, Quantity<ElectricCurrent> i) {
-        Real result = power(Real.of(v.to(Units.VOLT).getValue().doubleValue()),
-                Real.of(i.to(Units.AMPERE).getValue().doubleValue()));
-        return Quantities.create(result.doubleValue(), Units.WATT);
-    }
-
-    public static Quantity<Time> rcTimeConstantQ(Quantity<ElectricResistance> r, Quantity<ElectricCapacitance> c) {
-        Real result = rcTimeConstant(Real.of(r.to(Units.OHM).getValue().doubleValue()),
-                Real.of(c.to(Units.FARAD).getValue().doubleValue()));
-        return Quantities.create(result.doubleValue(), Units.SECOND);
-    }
-
-    public static Quantity<Frequency> resonantFrequencyQ(Quantity<Inductance> l, Quantity<ElectricCapacitance> c) {
-        Real result = resonantFrequency(Real.of(l.to(Units.HENRY).getValue().doubleValue()),
-                Real.of(c.to(Units.FARAD).getValue().doubleValue()));
-        return Quantities.create(result.doubleValue(), Units.HERTZ);
-    }
-
     // === Ohm's Law ===
 
     /**
      * Voltage from current and resistance. V = IR
      */
-    public static Real voltage(Real currentAmps, Real resistanceOhms) {
-        return currentAmps.multiply(resistanceOhms);
+    public static Quantity<ElectricPotential> voltage(Quantity<ElectricCurrent> current, Quantity<ElectricResistance> resistance) {
+        Real i = current.to(Units.AMPERE).getValue();
+        Real r = resistance.to(Units.OHM).getValue();
+        return Quantities.create(i.multiply(r), Units.VOLT);
     }
 
     /**
      * Current from voltage and resistance. I = V/R
      */
-    public static Real current(Real voltageVolts, Real resistanceOhms) {
-        return voltageVolts.divide(resistanceOhms);
+    public static Quantity<ElectricCurrent> current(Quantity<ElectricPotential> voltage, Quantity<ElectricResistance> resistance) {
+        Real v = voltage.to(Units.VOLT).getValue();
+        Real r = resistance.to(Units.OHM).getValue();
+        return Quantities.create(v.divide(r), Units.AMPERE);
     }
 
     /**
      * Resistance from voltage and current. R = V/I
      */
-    public static Real resistance(Real voltageVolts, Real currentAmps) {
-        return voltageVolts.divide(currentAmps);
+    public static Quantity<ElectricResistance> resistance(Quantity<ElectricPotential> voltage, Quantity<ElectricCurrent> current) {
+        Real v = voltage.to(Units.VOLT).getValue();
+        Real i = current.to(Units.AMPERE).getValue();
+        return Quantities.create(v.divide(i), Units.OHM);
     }
 
     // === Power ===
@@ -116,22 +85,28 @@ public class CircuitAnalysis {
     /**
      * Electrical power. P = VI
      */
-    public static Real power(Real voltageVolts, Real currentAmps) {
-        return voltageVolts.multiply(currentAmps);
+    public static Quantity<Power> power(Quantity<ElectricPotential> voltage, Quantity<ElectricCurrent> current) {
+        Real v = voltage.to(Units.VOLT).getValue();
+        Real i = current.to(Units.AMPERE).getValue();
+        return Quantities.create(v.multiply(i), Units.WATT);
     }
 
     /**
-     * Power from current and resistance. P = IÃ‚Â²R
+     * Power from current and resistance. P = I²R
      */
-    public static Real powerFromCurrent(Real currentAmps, Real resistanceOhms) {
-        return currentAmps.pow(2).multiply(resistanceOhms);
+    public static Quantity<Power> powerFromCurrent(Quantity<ElectricCurrent> current, Quantity<ElectricResistance> resistance) {
+        Real i = current.to(Units.AMPERE).getValue();
+        Real r = resistance.to(Units.OHM).getValue();
+        return Quantities.create(i.pow(2).multiply(r), Units.WATT);
     }
 
     /**
-     * Power from voltage and resistance. P = VÃ‚Â²/R
+     * Power from voltage and resistance. P = V²/R
      */
-    public static Real powerFromVoltage(Real voltageVolts, Real resistanceOhms) {
-        return voltageVolts.pow(2).divide(resistanceOhms);
+    public static Quantity<Power> powerFromVoltage(Quantity<ElectricPotential> voltage, Quantity<ElectricResistance> resistance) {
+        Real v = voltage.to(Units.VOLT).getValue();
+        Real r = resistance.to(Units.OHM).getValue();
+        return Quantities.create(v.pow(2).divide(r), Units.WATT);
     }
 
     // === Series/Parallel ===
@@ -139,137 +114,175 @@ public class CircuitAnalysis {
     /**
      * Total resistance in series.
      */
-    public static Real resistanceSeries(Vector<Real> resistances) {
+    public static Quantity<ElectricResistance> resistanceSeries(List<Quantity<ElectricResistance>> resistances) {
         Real total = Real.ZERO;
-        for (int i = 0; i < resistances.dimension(); i++) {
-            total = total.add(resistances.get(i));
+        for (Quantity<ElectricResistance> r : resistances) {
+            total = total.add(r.to(Units.OHM).getValue());
         }
-        return total;
+        return Quantities.create(total, Units.OHM);
     }
 
     /**
      * Total resistance in parallel.
      */
-    public static Real resistanceParallel(Vector<Real> resistances) {
-        Real sum = Real.ZERO;
-        for (int i = 0; i < resistances.dimension(); i++) {
-            sum = sum.add(Real.ONE.divide(resistances.get(i)));
+    public static Quantity<ElectricResistance> resistanceParallel(List<Quantity<ElectricResistance>> resistances) {
+        Real sumReciprocal = Real.ZERO;
+        for (Quantity<ElectricResistance> r : resistances) {
+            sumReciprocal = sumReciprocal.add(Real.ONE.divide(r.to(Units.OHM).getValue()));
         }
-        return Real.ONE.divide(sum);
+        return Quantities.create(Real.ONE.divide(sumReciprocal), Units.OHM);
     }
 
     /**
-     * Two resistors in parallel (simplified).
+     * Two resistors in parallel.
      */
-    public static Real resistanceParallel2(Real r1, Real r2) {
-        return r1.multiply(r2).divide(r1.add(r2));
+    public static Quantity<ElectricResistance> resistanceParallel2(Quantity<ElectricResistance> r1, Quantity<ElectricResistance> r2) {
+        Real v1 = r1.to(Units.OHM).getValue();
+        Real v2 = r2.to(Units.OHM).getValue();
+        return Quantities.create(v1.multiply(v2).divide(v1.add(v2)), Units.OHM);
     }
 
     /**
      * Total capacitance in parallel.
      */
-    public static Real capacitanceParallel(Vector<Real> capacitances) {
+    public static Quantity<ElectricCapacitance> capacitanceParallel(List<Quantity<ElectricCapacitance>> capacitances) {
         Real total = Real.ZERO;
-        for (int i = 0; i < capacitances.dimension(); i++) {
-            total = total.add(capacitances.get(i));
+        for (Quantity<ElectricCapacitance> c : capacitances) {
+            total = total.add(c.to(Units.FARAD).getValue());
         }
-        return total;
+        return Quantities.create(total, Units.FARAD);
     }
 
     /**
      * Total capacitance in series.
      */
-    public static Real capacitanceSeries(Vector<Real> capacitances) {
-        Real sum = Real.ZERO;
-        for (int i = 0; i < capacitances.dimension(); i++) {
-            sum = sum.add(Real.ONE.divide(capacitances.get(i)));
+    public static Quantity<ElectricCapacitance> capacitanceSeries(List<Quantity<ElectricCapacitance>> capacitances) {
+        Real sumReciprocal = Real.ZERO;
+        for (Quantity<ElectricCapacitance> c : capacitances) {
+            sumReciprocal = sumReciprocal.add(Real.ONE.divide(c.to(Units.FARAD).getValue()));
         }
-        return Real.ONE.divide(sum);
+        return Quantities.create(Real.ONE.divide(sumReciprocal), Units.FARAD);
     }
 
     // === Voltage Divider ===
 
     /**
      * Output voltage of a voltage divider.
+     * Vout = Vin * R2 / (R1 + R2)
      */
-    public static Real voltageDivider(Real vin, Real r1, Real r2) {
-        return vin.multiply(r2).divide(r1.add(r2));
+    public static Quantity<ElectricPotential> voltageDivider(Quantity<ElectricPotential> vin, Quantity<ElectricResistance> r1, Quantity<ElectricResistance> r2) {
+        Real v = vin.to(Units.VOLT).getValue();
+        Real val1 = r1.to(Units.OHM).getValue();
+        Real val2 = r2.to(Units.OHM).getValue();
+        return Quantities.create(v.multiply(val2).divide(val1.add(val2)), Units.VOLT);
     }
 
     /**
-     * Current divider for parallel resistors.
+     * Current divider for 2 parallel resistors.
+     * I1 = Itotal * R2 / (R1 + R2)
      */
-    public static Real currentDivider(Real iTotalAmps, Real r1, Real r2) {
-        return iTotalAmps.multiply(r1).divide(r1.add(r2));
+    public static Quantity<ElectricCurrent> currentDivider(Quantity<ElectricCurrent> iTotal, Quantity<ElectricResistance> r1, Quantity<ElectricResistance> r2) {
+        Real i = iTotal.to(Units.AMPERE).getValue();
+        Real val1 = r1.to(Units.OHM).getValue();
+        Real val2 = r2.to(Units.OHM).getValue();
+        // Current through R1
+        return Quantities.create(i.multiply(val2).divide(val1.add(val2)), Units.AMPERE);
     }
 
     // === Time Constants ===
 
     /**
-     * RC time constant. Ãâ€ž = RC
+     * RC time constant. τ = RC
      */
-    public static Real rcTimeConstant(Real resistanceOhms, Real capacitanceFarads) {
-        return resistanceOhms.multiply(capacitanceFarads);
+    public static Quantity<Time> rcTimeConstant(Quantity<ElectricResistance> r, Quantity<ElectricCapacitance> c) {
+        Real res = r.to(Units.OHM).getValue();
+        Real cap = c.to(Units.FARAD).getValue();
+        return Quantities.create(res.multiply(cap), Units.SECOND);
     }
 
     /**
-     * RL time constant. Ãâ€ž = L/R
+     * RL time constant. τ = L/R
      */
-    public static Real rlTimeConstant(Real inductanceHenries, Real resistanceOhms) {
-        return inductanceHenries.divide(resistanceOhms);
+    public static Quantity<Time> rlTimeConstant(Quantity<Inductance> l, Quantity<ElectricResistance> r) {
+        Real ind = l.to(Units.HENRY).getValue();
+        Real res = r.to(Units.OHM).getValue();
+        return Quantities.create(ind.divide(res), Units.SECOND);
     }
 
     /**
-     * Capacitor voltage during charging.
+     * Capacitor voltage during charging: V(t) = Vmax * (1 - e^(-t/τ))
      */
-    public static Real capacitorChargingVoltage(Real vmax, Real timeS, Real tau) {
-        return vmax.multiply(Real.ONE.subtract(timeS.negate().divide(tau).exp()));
+    public static Quantity<ElectricPotential> capacitorChargingVoltage(Quantity<ElectricPotential> vmax, Quantity<Time> time, Quantity<Time> tau) {
+        Real v = vmax.to(Units.VOLT).getValue();
+        Real t = time.to(Units.SECOND).getValue();
+        Real tc = tau.to(Units.SECOND).getValue();
+        return Quantities.create(v.multiply(Real.ONE.subtract(t.negate().divide(tc).exp())), Units.VOLT);
     }
 
     /**
-     * Capacitor voltage during discharging.
+     * Capacitor voltage during discharging: V(t) = V0 * e^(-t/τ)
      */
-    public static Real capacitorDischargingVoltage(Real v0, Real timeS, Real tau) {
-        return v0.multiply(timeS.negate().divide(tau).exp());
+    public static Quantity<ElectricPotential> capacitorDischargingVoltage(Quantity<ElectricPotential> v0, Quantity<Time> time, Quantity<Time> tau) {
+        Real v = v0.to(Units.VOLT).getValue();
+        Real t = time.to(Units.SECOND).getValue();
+        Real tc = tau.to(Units.SECOND).getValue();
+        return Quantities.create(v.multiply(t.negate().divide(tc).exp()), Units.VOLT);
     }
 
     // === AC Impedance ===
 
     /**
-     * Capacitive reactance. Xc = 1 / (2Ãâ‚¬fC)
+     * Capacitive reactance. Xc = 1 / (2πfC)
      */
-    public static Real capacitiveReactance(Real frequencyHz, Real capacitanceFarads) {
-        return Real.ONE.divide(Real.TWO_PI.multiply(frequencyHz).multiply(capacitanceFarads));
+    public static Quantity<ElectricResistance> capacitiveReactance(Quantity<Frequency> frequency, Quantity<ElectricCapacitance> capacitance) {
+        Real f = frequency.to(Units.HERTZ).getValue();
+        Real c = capacitance.to(Units.FARAD).getValue();
+        Real xc = Real.ONE.divide(Real.TWO_PI.multiply(f).multiply(c));
+        return Quantities.create(xc, Units.OHM);
     }
 
     /**
-     * Inductive reactance. Xl = 2Ãâ‚¬fL
+     * Inductive reactance. Xl = 2πfL
      */
-    public static Real inductiveReactance(Real frequencyHz, Real inductanceHenries) {
-        return Real.TWO_PI.multiply(frequencyHz).multiply(inductanceHenries);
+    public static Quantity<ElectricResistance> inductiveReactance(Quantity<Frequency> frequency, Quantity<Inductance> inductance) {
+        Real f = frequency.to(Units.HERTZ).getValue();
+        Real l = inductance.to(Units.HENRY).getValue();
+        Real xl = Real.TWO_PI.multiply(f).multiply(l);
+        return Quantities.create(xl, Units.OHM);
     }
 
     /**
      * Impedance magnitude for RLC series circuit.
+     * Z = sqrt(R² + (Xl - Xc)²)
      */
-    public static Real impedanceMagnitude(Real resistance, Real inductiveReactance, Real capacitiveReactance) {
-        Real x = inductiveReactance.subtract(capacitiveReactance);
-        return resistance.pow(2).add(x.pow(2)).sqrt();
+    public static Quantity<ElectricResistance> impedanceMagnitude(Quantity<ElectricResistance> r, Quantity<ElectricResistance> xl, Quantity<ElectricResistance> xc) {
+        Real res = r.to(Units.OHM).getValue();
+        Real xL = xl.to(Units.OHM).getValue();
+        Real xC = xc.to(Units.OHM).getValue();
+        Real x = xL.subtract(xC);
+        return Quantities.create(res.pow(2).add(x.pow(2)).sqrt(), Units.OHM);
     }
 
     /**
      * Resonant frequency for LC circuit.
+     * f = 1 / (2π * sqrt(LC))
      */
-    public static Real resonantFrequency(Real inductanceHenries, Real capacitanceFarads) {
-        return Real.ONE.divide(Real.TWO_PI.multiply(
-                inductanceHenries.multiply(capacitanceFarads).sqrt()));
+    public static Quantity<Frequency> resonantFrequency(Quantity<Inductance> inductance, Quantity<ElectricCapacitance> capacitance) {
+        Real l = inductance.to(Units.HENRY).getValue();
+        Real c = capacitance.to(Units.FARAD).getValue();
+        Real f = Real.ONE.divide(Real.TWO_PI.multiply(l.multiply(c).sqrt()));
+        return Quantities.create(f, Units.HERTZ);
     }
 
     /**
      * Quality factor for RLC circuit.
+     * Q = (1/R) * sqrt(L/C)
      */
-    public static Real qualityFactor(Real resistance, Real inductance, Real capacitance) {
-        return Real.ONE.divide(resistance).multiply(inductance.divide(capacitance).sqrt());
+    public static Real qualityFactor(Quantity<ElectricResistance> resistance, Quantity<Inductance> inductance, Quantity<ElectricCapacitance> capacitance) {
+        Real r = resistance.to(Units.OHM).getValue();
+        Real l = inductance.to(Units.HENRY).getValue();
+        Real c = capacitance.to(Units.FARAD).getValue();
+        return Real.ONE.divide(r).multiply(l.divide(c).sqrt());
     }
 }
 

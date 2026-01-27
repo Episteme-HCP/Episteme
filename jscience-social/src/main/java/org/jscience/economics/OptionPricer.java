@@ -42,25 +42,25 @@ public final class OptionPricer {
     public enum OptionStyle { EUROPEAN, AMERICAN }
 
     public record OptionParameters(
-        double spotPrice,        // Current stock price
-        double strikePrice,      // Exercise price
-        double timeToExpiry,     // In years
-        double riskFreeRate,     // Annualized
-        double volatility,       // Annualized std dev
+        Real spotPrice,        // Current stock price
+        Real strikePrice,      // Exercise price
+        Real timeToExpiry,     // In years
+        Real riskFreeRate,     // Annualized
+        Real volatility,       // Annualized std dev
         OptionType type,
         OptionStyle style
     ) {}
 
     public record OptionGreeks(
-        double delta,    // Price sensitivity to underlying
-        double gamma,    // Rate of change of delta
-        double theta,    // Time decay (per day)
-        double vega,     // Volatility sensitivity
-        double rho       // Interest rate sensitivity
+        Real delta,    // Price sensitivity to underlying
+        Real gamma,    // Rate of change of delta
+        Real theta,    // Time decay (per day)
+        Real vega,     // Volatility sensitivity
+        Real rho       // Interest rate sensitivity
     ) {}
 
     public record PricingResult(
-        double price,
+        Real price,
         OptionGreeks greeks,
         String model
     ) {}
@@ -69,81 +69,96 @@ public final class OptionPricer {
      * Black-Scholes pricing for European options.
      */
     public static PricingResult blackScholes(OptionParameters params) {
-        double S = params.spotPrice();
-        double K = params.strikePrice();
-        double T = params.timeToExpiry();
-        double r = params.riskFreeRate();
-        double sigma = params.volatility();
+        Real S = params.spotPrice();
+        Real K = params.strikePrice();
+        Real T = params.timeToExpiry();
+        Real r = params.riskFreeRate();
+        Real sigma = params.volatility();
         
-        double d1 = (Math.log(S / K) + (r + sigma * sigma / 2) * T) / (sigma * Math.sqrt(T));
-        double d2 = d1 - sigma * Math.sqrt(T);
+        // d1 = (ln(S/K) + (r + sigma^2 / 2) * T) / (sigma * sqrt(T))
+        Real sqrtT = T.sqrt();
+        Real d1 = S.divide(K).log().add(r.add(sigma.multiply(sigma).divide(Real.TWO)).multiply(T))
+                    .divide(sigma.multiply(sqrtT));
+        Real d2 = d1.subtract(sigma.multiply(sqrtT));
         
-        double price;
+        Real price;
+        Real ert = r.multiply(T).negate().exp();
         if (params.type() == OptionType.CALL) {
-            price = S * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
+            price = S.multiply(normalCDF(d1)).subtract(K.multiply(ert).multiply(normalCDF(d2)));
         } else {
-            price = K * Math.exp(-r * T) * normalCDF(-d2) - S * normalCDF(-d1);
+            price = K.multiply(ert).multiply(normalCDF(d2.negate())).subtract(S.multiply(normalCDF(d1.negate())));
         }
         
         // Greeks
-        double delta = params.type() == OptionType.CALL ? normalCDF(d1) : normalCDF(d1) - 1;
-        double gamma = normalPDF(d1) / (S * sigma * Math.sqrt(T));
-        double theta = -(S * normalPDF(d1) * sigma) / (2 * Math.sqrt(T))
-                      - r * K * Math.exp(-r * T) * normalCDF(params.type() == OptionType.CALL ? d2 : -d2);
-        theta /= 365; // Per day
-        double vega = S * normalPDF(d1) * Math.sqrt(T) / 100; // Per 1% vol change
-        double rho = params.type() == OptionType.CALL 
-            ? K * T * Math.exp(-r * T) * normalCDF(d2) / 100
-            : -K * T * Math.exp(-r * T) * normalCDF(-d2) / 100;
+        Real delta = params.type() == OptionType.CALL ? normalCDF(d1) : normalCDF(d1).subtract(Real.ONE);
+        Real gamma = normalPDF(d1).divide(S.multiply(sigma).multiply(sqrtT));
+        
+        Real ncdfD2 = normalCDF(params.type() == OptionType.CALL ? d2 : d2.negate());
+        Real theta = S.multiply(normalPDF(d1)).multiply(sigma).divide(Real.TWO.multiply(sqrtT)).negate()
+                       .subtract(r.multiply(K).multiply(ert).multiply(ncdfD2));
+        theta = theta.divide(Real.of(365)); // Per day
+        
+        Real vega = S.multiply(normalPDF(d1)).multiply(sqrtT).divide(Real.of(100)); // Per 1% vol change
+        Real rho = params.type() == OptionType.CALL 
+            ? K.multiply(T).multiply(ert).multiply(normalCDF(d2)).divide(Real.of(100))
+            : K.multiply(T).multiply(ert).multiply(normalOf(d2.negate())).divide(Real.of(100)).negate();
         
         return new PricingResult(price, new OptionGreeks(delta, gamma, theta, vega, rho), "Black-Scholes");
+    }
+
+    private static Real normalOf(Real x) {
+        return normalCDF(x);
     }
 
     /**
      * Binomial tree pricing (can handle American options).
      */
     public static PricingResult binomialTree(OptionParameters params, int steps) {
-        double S = params.spotPrice();
-        double K = params.strikePrice();
-        double T = params.timeToExpiry();
-        double r = params.riskFreeRate();
-        double sigma = params.volatility();
+        Real S = params.spotPrice();
+        Real K = params.strikePrice();
+        Real T = params.timeToExpiry();
+        Real r = params.riskFreeRate();
+        Real sigma = params.volatility();
         
-        double dt = T / steps;
-        double u = Math.exp(sigma * Math.sqrt(dt));      // Up factor
-        double d = 1 / u;                                 // Down factor
-        double p = (Math.exp(r * dt) - d) / (u - d);     // Risk-neutral probability
-        double disc = Math.exp(-r * dt);                  // Discount factor
+        Real dt = T.divide(Real.of(steps));
+        Real u = sigma.multiply(dt.sqrt()).exp();      // Up factor
+        Real d = u.inverse();                          // Down factor
+        
+        Real rdtExp = r.multiply(dt).exp();
+        Real p = rdtExp.subtract(d).divide(u.subtract(d));     // Risk-neutral probability
+        Real pInv = Real.ONE.subtract(p);
+        Real disc = rdtExp.inverse();                         // Discount factor
         
         // Build price tree at expiration
-        double[] prices = new double[steps + 1];
+        Real[] prices = new Real[steps + 1];
         for (int i = 0; i <= steps; i++) {
-            double ST = S * Math.pow(u, steps - i) * Math.pow(d, i);
-            prices[i] = params.type() == OptionType.CALL 
-                ? Math.max(0, ST - K) 
-                : Math.max(0, K - ST);
+            Real ST = S.multiply(u.pow(steps - i)).multiply(d.pow(i));
+            Real exercise = params.type() == OptionType.CALL 
+                ? ST.subtract(K).max(Real.ZERO) 
+                : K.subtract(ST).max(Real.ZERO);
+            prices[i] = exercise;
         }
         
         // Work backwards through tree
         for (int step = steps - 1; step >= 0; step--) {
             for (int i = 0; i <= step; i++) {
-                double continuation = disc * (p * prices[i] + (1 - p) * prices[i + 1]);
+                Real continuation = disc.multiply(p.multiply(prices[i]).add(pInv.multiply(prices[i + 1])));
                 
                 if (params.style() == OptionStyle.AMERICAN) {
-                    double ST = S * Math.pow(u, step - i) * Math.pow(d, i);
-                    double exercise = params.type() == OptionType.CALL 
-                        ? Math.max(0, ST - K) 
-                        : Math.max(0, K - ST);
-                    prices[i] = Math.max(continuation, exercise);
+                    Real ST = S.multiply(u.pow(step - i)).multiply(d.pow(i));
+                    Real exercise = params.type() == OptionType.CALL 
+                        ? ST.subtract(K).max(Real.ZERO) 
+                        : K.subtract(ST).max(Real.ZERO);
+                    prices[i] = continuation.max(exercise);
                 } else {
                     prices[i] = continuation;
                 }
             }
         }
         
-        double price = prices[0];
+        Real price = prices[0];
         
-        // Approximate Greeks using finite differences
+        // Approximate Greeks using finite differences or just return Black-Scholes greeks for simplicity
         PricingResult base = blackScholes(params);
         
         return new PricingResult(price, base.greeks(), "Binomial (" + steps + " steps)");
@@ -152,58 +167,61 @@ public final class OptionPricer {
     /**
      * Calculates implied volatility from market price.
      */
-    public static Real impliedVolatility(OptionParameters params, double marketPrice) {
-        double low = 0.01;
-        double high = 2.0;
-        double tolerance = 0.0001;
+    public static Real impliedVolatility(OptionParameters params, Real marketPrice) {
+        Real low = Real.of(0.01);
+        Real high = Real.of(2.0);
+        Real tolerance = Real.of(0.0001);
         
-        while (high - low > tolerance) {
-            double mid = (low + high) / 2;
+        while (high.subtract(low).compareTo(tolerance) > 0) {
+            Real mid = low.add(high).divide(Real.TWO);
             OptionParameters testParams = new OptionParameters(
                 params.spotPrice(), params.strikePrice(), params.timeToExpiry(),
                 params.riskFreeRate(), mid, params.type(), params.style()
             );
             
-            double testPrice = blackScholes(testParams).price();
+            Real testPrice = blackScholes(testParams).price();
             
-            if (testPrice < marketPrice) {
+            if (testPrice.compareTo(marketPrice) < 0) {
                 low = mid;
             } else {
                 high = mid;
             }
         }
         
-        return Real.of((low + high) / 2);
+        return low.add(high).divide(Real.TWO);
     }
 
     /**
      * Put-Call Parity check.
      */
-    public static boolean checkPutCallParity(double callPrice, double putPrice,
-            double spotPrice, double strikePrice, double riskFreeRate, double timeToExpiry) {
+    public static boolean checkPutCallParity(Real callPrice, Real putPrice,
+            Real spotPrice, Real strikePrice, Real riskFreeRate, Real timeToExpiry) {
         
-        double lhs = callPrice - putPrice;
-        double rhs = spotPrice - strikePrice * Math.exp(-riskFreeRate * timeToExpiry);
+        Real lhs = callPrice.subtract(putPrice);
+        Real rhs = spotPrice.subtract(strikePrice.multiply(riskFreeRate.multiply(timeToExpiry).negate().exp()));
         
-        return Math.abs(lhs - rhs) < 0.01;
+        return lhs.subtract(rhs).abs().compareTo(Real.of(0.01)) < 0;
     }
 
-    private static double normalCDF(double x) {
-        return 0.5 * (1 + erf(x / Math.sqrt(2)));
+    private static Real normalCDF(Real x) {
+        return Real.of(0.5).multiply(Real.ONE.add(erf(x.divide(Real.TWO.sqrt()))));
     }
 
-    private static double normalPDF(double x) {
-        return Math.exp(-x * x / 2) / Math.sqrt(2 * Math.PI);
+    private static Real normalPDF(Real x) {
+        return x.multiply(x).divide(Real.TWO).negate().exp()
+                    .divide(Real.TWO.multiply(Real.PI).sqrt());
     }
 
-    private static double erf(double x) {
+    private static Real erf(Real x) {
         // Approximation
-        double t = 1.0 / (1.0 + 0.5 * Math.abs(x));
-        double tau = t * Math.exp(-x * x - 1.26551223 +
-            t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
-            t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 +
-            t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+        Real t = Real.ONE.divide(Real.ONE.add(Real.of(0.5).multiply(x.abs())));
         
-        return x >= 0 ? 1 - tau : tau - 1;
+        Real poly = Real.of(1.00002368).add(t.multiply(Real.of(0.37409196).add(t.multiply(Real.of(0.09678418).add(
+            t.multiply(Real.of(-0.18628806).add(t.multiply(Real.of(0.27886807).add(t.multiply(Real.of(-1.13520398).add(
+            t.multiply(Real.of(1.48851587).add(t.multiply(Real.of(-0.82215223).add(t.multiply(Real.of(0.17087277)))))))))))))))));
+        
+        Real tau = t.multiply(x.multiply(x).negate().subtract(Real.of(1.26551223)).add(t.multiply(poly)).exp());
+        
+        return x.compareTo(Real.ZERO) >= 0 ? Real.ONE.subtract(tau) : tau.subtract(Real.ONE);
     }
 }

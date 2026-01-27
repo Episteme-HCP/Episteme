@@ -42,8 +42,8 @@ public class TimeInterval implements TimeCoordinate, Serializable {
     }
 
     @Override
-    public Precision getPrecision() {
-        return Precision.EXACT;
+    public TimePrecision getPrecision() {
+        return TimePrecision.EXACT;
     }
 
     @Override

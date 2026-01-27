@@ -22,30 +22,53 @@
  */
 package org.jscience.philosophy.epistemology;
 
+
+import org.jscience.util.EnumRegistry;
+import org.jscience.util.ExtensibleEnum;
+
 /**
  * Enumeration of possible epistemic statuses of a proposition for a given subject.
+ * Extensible to allow for nuanced philosophical states.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public enum EpistemicStatus {
+public class EpistemicStatus extends ExtensibleEnum {
+
+    private static final long serialVersionUID = 1L;
+
+    public static final EnumRegistry<EpistemicStatus> REGISTRY = new EnumRegistry<>();
 
     /** The subject is unaware of the proposition. */
-    UNKNOWN,
+    public static final EpistemicStatus UNKNOWN = new EpistemicStatus("UNKNOWN", true);
 
     /** The subject knows the proposition for a fact (justified true belief). */
-    KNOWN,
+    public static final EpistemicStatus KNOWN = new EpistemicStatus("KNOWN", true);
 
     /** The subject believes the proposition but lacks sufficient justification. */
-    BELIEVED,
+    public static final EpistemicStatus BELIEVED = new EpistemicStatus("BELIEVED", true);
 
-    /** The subject is uncertain or suspended in judgment (EpochÃƒÂ©). */
-    DOUBTED,
+    /** The subject is uncertain or suspended in judgment (Epoché). */
+    public static final EpistemicStatus DOUBTED = new EpistemicStatus("DOUBTED", true);
 
     /** The subject actively rejects the proposition as false. */
-    REJECTED,
+    public static final EpistemicStatus REJECTED = new EpistemicStatus("REJECTED", true);
 
     /** The subject considers the proposition possible but not necessarily true. */
-    HYPOTHETICAL
+    public static final EpistemicStatus HYPOTHETICAL = new EpistemicStatus("HYPOTHETICAL", true);
+
+    public EpistemicStatus(String name) {
+        this(name, false);
+    }
+
+    private EpistemicStatus(String name, boolean builtIn) {
+        super(name);
+        /* builtIn ignored */
+        REGISTRY.register(this);
+    }
+
+    public static EpistemicStatus valueOf(String name) {
+        return REGISTRY.valueOf(name);
+    }
 }

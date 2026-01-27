@@ -35,13 +35,13 @@ import org.jscience.util.persistence.Relation;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
 public class Family extends Group {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Person parent1;
@@ -57,7 +57,7 @@ public class Family extends Group {
      * @param familyName the surname or name identifying the family unit
      */
     public Family(String familyName) {
-        super(familyName, Type.FAMILY);
+        super(familyName, GroupKind.FAMILY);
     }
 
     /**

@@ -28,6 +28,7 @@ import java.awt.*;
 import org.jscience.sociology.survey.Question;
 import org.jscience.sociology.survey.Survey;
 import org.jscience.sociology.survey.ChoiceQuestion;
+import org.jscience.sociology.survey.QuestionType;
 
 /**
  * A Swing-based viewer for rendering a Survey.
@@ -80,37 +81,32 @@ public class SurveyViewer extends JPanel {
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBorder(BorderFactory.createTitledBorder(q.getText() + (q.isRequired() ? " *" : "")));
 
-        switch (q.getType()) {
-            case TEXT:
-                panel.add(new JTextField(20));
-                break;
-            case PARAGRAPH:
-                panel.add(new JScrollPane(new JTextArea(3, 20)));
-                break;
-            case MULTIPLE_CHOICE:
-                ButtonGroup bg = new ButtonGroup();
-                if (q instanceof ChoiceQuestion cq) {
-                    for (String opt : cq.getOptions()) {
-                        JRadioButton rb = new JRadioButton(opt);
-                        bg.add(rb);
-                        panel.add(rb);
-                    }
+        QuestionType type = q.getType();
+        if (QuestionType.TEXT.equals(type)) {
+            panel.add(new JTextField(20));
+        } else if (QuestionType.PARAGRAPH.equals(type)) {
+            panel.add(new JScrollPane(new JTextArea(3, 20)));
+        } else if (QuestionType.MULTIPLE_CHOICE.equals(type)) {
+            ButtonGroup bg = new ButtonGroup();
+            if (q instanceof ChoiceQuestion cq) {
+                for (String opt : cq.getOptions()) {
+                    JRadioButton rb = new JRadioButton(opt);
+                    bg.add(rb);
+                    panel.add(rb);
                 }
-                break;
-            case CHECKBOXES:
-                if (q instanceof ChoiceQuestion cq) {
-                    for (String opt : cq.getOptions()) {
-                        panel.add(new JCheckBox(opt));
-                    }
+            }
+        } else if (QuestionType.CHECKBOXES.equals(type)) {
+            if (q instanceof ChoiceQuestion cq) {
+                for (String opt : cq.getOptions()) {
+                    panel.add(new JCheckBox(opt));
                 }
-                break;
-            case DROPDOWN:
-                if (q instanceof ChoiceQuestion cq) {
-                    panel.add(new JComboBox<>(cq.getOptions().toArray(new String[0])));
-                }
-                break;
-            default:
-                panel.add(new JLabel("[Unsupported Types: " + q.getType() + "]"));
+            }
+        } else if (QuestionType.DROPDOWN.equals(type)) {
+            if (q instanceof ChoiceQuestion cq) {
+                panel.add(new JComboBox<>(cq.getOptions().toArray(new String[0])));
+            }
+        } else {
+            panel.add(new JLabel("[Unsupported Types: " + type + "]"));
         }
 
         return panel;

@@ -23,6 +23,8 @@
 
 package org.jscience.chemistry.spectroscopy;
 
+import org.jscience.mathematics.numbers.real.Real;
+
 /**
  * Nuclear Magnetic Resonance (NMR) spectroscopy models.
  *
@@ -32,6 +34,15 @@ package org.jscience.chemistry.spectroscopy;
  */
 public class NMRSpectrum {
 
+    // Common Gyromagnetic Ratios (rad/s/T)
+    public static final Real GAMMA_1H = Real.of("267.513e6");
+    public static final Real GAMMA_13C = Real.of("67.262e6");
+    public static final Real GAMMA_15N = Real.of("-27.116e6");
+    public static final Real GAMMA_31P = Real.of("108.291e6");
+
+    private NMRSpectrum() {
+    }
+
     /**
      * Calculates Larmor frequency.
      * v = (gamma * B0) / (2 * pi)
@@ -40,8 +51,8 @@ public class NMRSpectrum {
      * @param magneticField     B0 (Tesla)
      * @return Frequency (Hz)
      */
-    public static double calculateLarmorFrequency(double gyromagneticRatio, double magneticField) {
-        return (gyromagneticRatio * magneticField) / (2 * Math.PI);
+    public static Real calculateLarmorFrequency(Real gyromagneticRatio, Real magneticField) {
+        return gyromagneticRatio.multiply(magneticField).divide(Real.PI.multiply(Real.TWO));
     }
 
     /**
@@ -53,16 +64,10 @@ public class NMRSpectrum {
      * @param spectrometerFrequency v_spectrometer (Hz)
      * @return Chemical shift (ppm)
      */
-    public static double calculateChemicalShift(double frequencyObserved, double frequencyReference,
-            double spectrometerFrequency) {
-        return ((frequencyObserved - frequencyReference) / spectrometerFrequency) * 1e6;
+    public static Real calculateChemicalShift(Real frequencyObserved, Real frequencyReference,
+            Real spectrometerFrequency) {
+        return frequencyObserved.subtract(frequencyReference)
+                .divide(spectrometerFrequency)
+                .multiply(Real.of(1e6));
     }
-
-    // Common Gyromagnetic Ratios (rad/s/T)
-    public static final double GAMMA_1H = 267.513e6;
-    public static final double GAMMA_13C = 67.262e6;
-    public static final double GAMMA_15N = -27.116e6;
-    public static final double GAMMA_31P = 108.291e6;
 }
-
-

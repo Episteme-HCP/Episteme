@@ -52,25 +52,14 @@ public class School implements Identified<Identification>, org.jscience.util.Nam
 
     private static final long serialVersionUID = 1L;
 
-    /** Categorization of the institution type. */
-    public enum Type {
-        PRIMARY, SECONDARY, HIGH_SCHOOL, COLLEGE, UNIVERSITY,
-        VOCATIONAL, ONLINE, PRIVATE, PUBLIC, CHARTER
-    }
-
-    /** Educational level or tier. */
-    public enum Level {
-        PRESCHOOL, ELEMENTARY, MIDDLE, HIGH, UNDERGRADUATE, GRADUATE, DOCTORAL
-    }
-
     @Id
     private final Identification id;
     @Attribute
     private final String name;
     @Attribute
-    private Type type;
+    private SchoolType type;
     @Attribute
-    private Level level;
+    private SchoolLevel level;
     @Attribute
     private String location;
     @Attribute
@@ -92,7 +81,7 @@ public class School implements Identified<Identification>, org.jscience.util.Nam
      * @throws NullPointerException if inputs are null
      * @throws IllegalArgumentException if name is empty
      */
-    public School(String name, Type type) {
+    public School(String name, SchoolType type) {
         this.id = new SimpleIdentification(UUID.randomUUID().toString());
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
@@ -106,16 +95,15 @@ public class School implements Identified<Identification>, org.jscience.util.Nam
     }
 
     @Override
-
     public String getName() {
         return name;
     }
 
-    public Type getType() {
+    public SchoolType getType() {
         return type;
     }
 
-    public Level getLevel() {
+    public SchoolLevel getLevel() {
         return level;
     }
 
@@ -144,11 +132,11 @@ public class School implements Identified<Identification>, org.jscience.util.Nam
     }
 
     // Setters
-    public void setType(Type type) {
+    public void setType(SchoolType type) {
         this.type = type;
     }
 
-    public void setLevel(Level level) {
+    public void setLevel(SchoolLevel level) {
         this.level = level;
     }
 
@@ -192,9 +180,10 @@ public class School implements Identified<Identification>, org.jscience.util.Nam
     }
 
     // Notable institutions
+    // Notable institutions
     public static School mit() {
-        School s = new School("MIT", Type.UNIVERSITY);
-        s.setLevel(Level.UNDERGRADUATE);
+        School s = new School("MIT", SchoolType.UNIVERSITY);
+        s.setLevel(SchoolLevel.UNDERGRADUATE);
         s.setLocation("Cambridge, MA, USA");
         s.setFoundedYear(1861);
         s.setStudentCount(11500);

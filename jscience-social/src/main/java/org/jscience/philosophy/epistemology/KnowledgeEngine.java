@@ -22,6 +22,7 @@
  */
 package org.jscience.philosophy.epistemology;
 
+
 import org.jscience.philosophy.Belief;
 
 /**
@@ -46,7 +47,7 @@ public final class KnowledgeEngine {
      */
     public static Knowledge verify(Subject subject, Proposition proposition, Evidence justification) {
         if (proposition == null || !proposition.isTrue()) return null;
-        if (justification == null || justification.getReliability() < 0.5) return null; // threshold
+        if (justification == null || justification.getReliability().getValue().doubleValue() < 0.5) return null; // threshold
 
         // Find relevant belief in subject's system
         Belief matchingBelief = subject.getBeliefs().stream()

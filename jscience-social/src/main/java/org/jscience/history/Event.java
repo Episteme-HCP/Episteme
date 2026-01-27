@@ -57,26 +57,24 @@ public class Event implements ComprehensiveIdentification, Temporal<TimeCoordina
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    public enum Category {
-        POLITICAL, MILITARY, CULTURAL, SCIENTIFIC, ECONOMIC, RELIGIOUS, NATURAL, OTHER
-    }
+
 
     @Relation(type = Relation.Type.ONE_TO_ONE)
     protected final TimeCoordinate when;
 
     @Attribute
-    protected final Category category;
+    protected final EventCategory category;
 
-    public Event(String name, String description, TimeCoordinate when, Category category) {
+    public Event(String name, String description, TimeCoordinate when, EventCategory category) {
         this.id = new UUIDIdentification(UUID.randomUUID().toString());
         setName(Objects.requireNonNull(name, "Name cannot be null"));
         setComments(description);
         this.when = Objects.requireNonNull(when, "Time coordinate cannot be null");
-        this.category = category != null ? category : Category.OTHER;
+        this.category = category != null ? category : EventCategory.OTHER;
     }
 
     public Event(String name, TimeCoordinate when) {
-        this(name, null, when, Category.OTHER);
+        this(name, null, when, EventCategory.OTHER);
     }
 
     @Override
@@ -98,7 +96,7 @@ public class Event implements ComprehensiveIdentification, Temporal<TimeCoordina
         return when;
     }
 
-    public Category getCategory() {
+    public EventCategory getCategory() {
         return category;
     }
 

@@ -30,82 +30,16 @@ import java.util.Map;
 
 /**
  * Defines various voting systems and methods for determining winners in an election.
+ * Refactored to use the extensible {@link VotingMethod} registry.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 2.0
  * @since 1.0
  */
 public class VotingSystem {
 
-    /** Enumeration of supported voting methods. */
-    public enum Method {
-        // ===== PLURALITY/MAJORITY METHODS =====
-        /** Winner-takes-all based on plurality of votes. */
-        FIRST_PAST_THE_POST,
-        /** Two-Round System: runoff between top two if no majority. */
-        TWO_ROUND,
-        /** Anti-plurality (Veto) - vote for everyone except least favorite. */
-        ANTI_PLURALITY,
-
-        // ===== RANKED CHOICE METHODS =====
-        /** Instant Runoff Voting (Ranked Choice). */
-        INSTANT_RUNOFF,
-        /** Condorcet method (Pairwise comparisons). */
-        CONDORCET,
-        /** Borda Count method (Point-based ranking). */
-        BORDA,
-        /** Schulze method (Beatpath) - Condorcet completion. */
-        SCHULZE,
-        /** Copeland's method - Pairwise wins/losses. */
-        COPELAND,
-        /** Tideman's Ranked Pairs - Lock in pairwise wins. */
-        RANKED_PAIRS,
-        /** Minimax (Simpson-Kramer) - Minimize worst pairwise defeat. */
-        MINIMAX,
-        /** Kemeny-Young - Maximum agreement ranking. */
-        KEMENY_YOUNG,
-        /** Dodgson's method - Swaps to reach Condorcet winner. */
-        DODGSON,
-        /** Bucklin Voting - Accumulated majority ranking. */
-        BUCKLIN,
-        /** Coombs' Method - Eliminate most last-place votes. */
-        COOMBS,
-        /** Single Transferable Vote (multi-winner). */
-        STV,
-
-        // ===== CARDINAL/RATING METHODS =====
-        /** Approval Voting - approve multiple candidates. */
-        APPROVAL,
-        /** Range/Score Voting - rate candidates on a scale. */
-        RANGE,
-        /** STAR Voting - Score Then Automatic Runoff. */
-        STAR,
-        /** Majority Judgment - Median-based grading. */
-        MAJORITY_JUDGMENT,
-
-        // ===== PROPORTIONAL REPRESENTATION =====
-        /** Simple proportional based on vote share. */
-        PROPORTIONAL,
-        /** D'Hondt method (Jefferson) - favors larger parties. */
-        DHONDT,
-        /** Sainte-Laguë method (Webster) - more proportional. */
-        SAINTE_LAGUE,
-        /** Modified Sainte-Laguë - used in Nordic countries. */
-        MODIFIED_SAINTE_LAGUE,
-        /** Huntington-Hill - U.S. House apportionment. */
-        HUNTINGTON_HILL,
-        /** Largest Remainder with Hare quota (Hamilton's method). */
-        LARGEST_REMAINDER_HARE,
-        /** Largest Remainder with Droop quota. */
-        LARGEST_REMAINDER_DROOP,
-
-        // ===== MULTI-WINNER/OTHER =====
-        /** Single Non-Transferable Vote. */
-        SNTV,
-        /** Cumulative Voting - distribute multiple votes. */
-        CUMULATIVE
-    }
+    private VotingSystem() {}
 
     /**
      * Determines winner(s) based on aggregated vote counts and the specified method.
@@ -115,73 +49,47 @@ public class VotingSystem {
      * @param seatsAvailable Number of seats to fill (relevant for proportional representation)
      * @return List of winners (names or descriptions of allocations)
      */
-    public static List<String> determineWinners(Map<String, Long> votes, Method method, int seatsAvailable) {
+    public static List<String> determineWinners(Map<String, Long> votes, VotingMethod method, int seatsAvailable) {
         List<String> winners = new ArrayList<>();
 
         if (votes == null || votes.isEmpty())
             return winners;
 
-        switch (method) {
-            case FIRST_PAST_THE_POST:
-                // Find single candidate with max votes
-                votes.entrySet().stream()
-                        .max(Map.Entry.comparingByValue())
-                        .ifPresent(winnerEntry -> winners.add(winnerEntry.getKey()));
-                break;
-
-            case PROPORTIONAL:
-                return formatAllocation(votes, entry -> (double) entry.getValue() / votes.values().stream().mapToLong(Long::longValue).sum() * seatsAvailable);
-
-            case DHONDT:
-                return mapToWinnerList(ElectoralSimulations.allocateDHondt(votes, seatsAvailable));
-
-            case SAINTE_LAGUE:
-                return mapToWinnerList(ElectoralSimulations.allocateSainteLague(votes, seatsAvailable));
-
-            case MODIFIED_SAINTE_LAGUE:
-                return mapToWinnerList(ElectoralSimulations.allocateModifiedSainteLague(votes, seatsAvailable));
-
-            case HUNTINGTON_HILL:
-                return mapToWinnerList(ElectoralSimulations.allocateHuntingtonHill(votes, seatsAvailable));
-
-            case LARGEST_REMAINDER_HARE:
-                return mapToWinnerList(ElectoralSimulations.allocateLargestRemainderHare(votes, seatsAvailable));
-
-            case LARGEST_REMAINDER_DROOP:
-                return mapToWinnerList(ElectoralSimulations.allocateLargestRemainderDroop(votes, seatsAvailable));
-
-            case SNTV:
-                return mapToWinnerList(ElectoralSimulations.resolveSNTV(votes, seatsAvailable));
-
-            case CUMULATIVE:
-                return mapToWinnerList(ElectoralSimulations.resolveCumulative(votes, seatsAvailable));
-
-            case INSTANT_RUNOFF:
-            case CONDORCET:
-            case BORDA:
-            case SCHULZE:
-            case COPELAND:
-            case RANKED_PAIRS:
-            case MINIMAX:
-            case KEMENY_YOUNG:
-            case DODGSON:
-            case BUCKLIN:
-            case COOMBS:
-            case STV:
-            case TWO_ROUND:
-            case ANTI_PLURALITY:
-                throw new IllegalArgumentException("Method " + method + " requires full ranked ballots, not aggregated counts.");
-
-            case APPROVAL:
-                throw new IllegalArgumentException("Method APPROVAL requires a list of approval sets, not aggregated counts.");
-
-            case RANGE:
-            case STAR:
-            case MAJORITY_JUDGMENT:
-                throw new IllegalArgumentException("Method " + method + " requires cardinal scores/grades, not aggregated counts.");
-
-            default:
-                throw new UnsupportedOperationException("Voting method not supported with aggregated counts: " + method);
+        if (method == VotingMethod.FIRST_PAST_THE_POST) {
+            // Find single candidate with max votes
+            votes.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .ifPresent(winnerEntry -> winners.add(winnerEntry.getKey()));
+        } else if (method == VotingMethod.PROPORTIONAL) {
+            return formatAllocation(votes, entry -> (double) entry.getValue() / votes.values().stream().mapToLong(Long::longValue).sum() * seatsAvailable);
+        } else if (method == VotingMethod.DHONDT) {
+            return mapToWinnerList(ElectoralSimulations.allocateDHondt(votes, seatsAvailable));
+        } else if (method == VotingMethod.SAINTE_LAGUE) {
+            return mapToWinnerList(ElectoralSimulations.allocateSainteLague(votes, seatsAvailable));
+        } else if (method == VotingMethod.MODIFIED_SAINTE_LAGUE) {
+            return mapToWinnerList(ElectoralSimulations.allocateModifiedSainteLague(votes, seatsAvailable));
+        } else if (method == VotingMethod.HUNTINGTON_HILL) {
+            return mapToWinnerList(ElectoralSimulations.allocateHuntingtonHill(votes, seatsAvailable));
+        } else if (method == VotingMethod.LARGEST_REMAINDER_HARE) {
+            return mapToWinnerList(ElectoralSimulations.allocateLargestRemainderHare(votes, seatsAvailable));
+        } else if (method == VotingMethod.LARGEST_REMAINDER_DROOP) {
+            return mapToWinnerList(ElectoralSimulations.allocateLargestRemainderDroop(votes, seatsAvailable));
+        } else if (method == VotingMethod.SNTV) {
+            return mapToWinnerList(ElectoralSimulations.resolveSNTV(votes, seatsAvailable));
+        } else if (method == VotingMethod.CUMULATIVE) {
+            return mapToWinnerList(ElectoralSimulations.resolveCumulative(votes, seatsAvailable));
+        } else if (method == VotingMethod.INSTANT_RUNOFF || method == VotingMethod.CONDORCET || method == VotingMethod.BORDA
+                || method == VotingMethod.SCHULZE || method == VotingMethod.COPELAND || method == VotingMethod.RANKED_PAIRS
+                || method == VotingMethod.MINIMAX || method == VotingMethod.KEMENY_YOUNG || method == VotingMethod.DODGSON
+                || method == VotingMethod.BUCKLIN || method == VotingMethod.COOMBS || method == VotingMethod.STV
+                || method == VotingMethod.TWO_ROUND || method == VotingMethod.ANTI_PLURALITY) {
+            throw new IllegalArgumentException("Method " + method + " requires full ranked ballots, not aggregated counts.");
+        } else if (method == VotingMethod.APPROVAL) {
+            throw new IllegalArgumentException("Method APPROVAL requires a list of approval sets, not aggregated counts.");
+        } else if (method == VotingMethod.RANGE || method == VotingMethod.STAR || method == VotingMethod.MAJORITY_JUDGMENT) {
+            throw new IllegalArgumentException("Method " + method + " requires cardinal scores/grades, not aggregated counts.");
+        } else {
+            throw new UnsupportedOperationException("Voting method not supported with aggregated counts: " + method);
         }
         return winners;
     }
@@ -211,87 +119,48 @@ public class VotingSystem {
      * @param seatsAvailable Number of seats to fill
      * @return List of winners
      */
-    public static List<String> determineWinnersFromBallots(List<List<String>> ballots, Method method, int seatsAvailable) {
+    public static List<String> determineWinnersFromBallots(List<List<String>> ballots, VotingMethod method, int seatsAvailable) {
         List<String> winners = new ArrayList<>();
         if (ballots == null || ballots.isEmpty()) return winners;
 
-        switch (method) {
-            case FIRST_PAST_THE_POST:
-                return determineWinners(aggregateFirstPreferences(ballots), method, seatsAvailable);
-
-            case TWO_ROUND:
-                winners.add(ElectoralSimulations.resolveTwoRound(ballots));
-                break;
-
-            case INSTANT_RUNOFF:
-                winners.add(ElectoralSimulations.resolveInstantRunoff(ballots));
-                break;
-
-            case CONDORCET:
-                winners.add(ElectoralSimulations.resolveCondorcet(ballots));
-                break;
-
-            case SCHULZE:
-                winners.add(ElectoralSimulations.resolveSchulze(ballots));
-                break;
-
-            case COPELAND:
-                winners.add(ElectoralSimulations.resolveCopeland(ballots));
-                break;
-
-            case BORDA:
-                winners.add(ElectoralSimulations.resolveBorda(ballots));
-                break;
-
-            case ANTI_PLURALITY:
-                winners.add(ElectoralSimulations.resolveAntiPlurality(ballots));
-                break;
-
-            case BUCKLIN:
-                winners.add(ElectoralSimulations.resolveBucklin(ballots));
-                break;
-
-            case COOMBS:
-                winners.add(ElectoralSimulations.resolveCoombs(ballots));
-                break;
-
-            case RANKED_PAIRS:
-                winners.add(ElectoralSimulations.resolveRankedPairs(ballots));
-                break;
-
-            case MINIMAX:
-                winners.add(ElectoralSimulations.resolveMinimax(ballots));
-                break;
-
-            case DODGSON:
-                winners.add(ElectoralSimulations.resolveDodgson(ballots));
-                break;
-
-            case KEMENY_YOUNG:
-                winners.add(ElectoralSimulations.resolveKemenyYoung(ballots));
-                break;
-
-            case STV:
-                return mapToWinnerList(ElectoralSimulations.resolveSTV(ballots, seatsAvailable));
-
-            case APPROVAL:
-                winners.add(ElectoralSimulations.resolveApproval(ballots));
-                break;
-
-            case PROPORTIONAL:
-            case DHONDT:
-            case SAINTE_LAGUE:
-            case MODIFIED_SAINTE_LAGUE:
-            case LARGEST_REMAINDER_HARE:
-            case LARGEST_REMAINDER_DROOP:
-                return determineWinners(aggregateFirstPreferences(ballots), method, seatsAvailable);
-
-            case SNTV:
-            case CUMULATIVE:
-                return determineWinners(aggregateFirstPreferences(ballots), method, seatsAvailable);
-
-            default:
-                throw new UnsupportedOperationException("Voting method not supported with ballots: " + method);
+        if (method == VotingMethod.FIRST_PAST_THE_POST) {
+            return determineWinners(aggregateFirstPreferences(ballots), method, seatsAvailable);
+        } else if (method == VotingMethod.TWO_ROUND) {
+            winners.add(ElectoralSimulations.resolveTwoRound(ballots));
+        } else if (method == VotingMethod.INSTANT_RUNOFF) {
+            winners.add(ElectoralSimulations.resolveInstantRunoff(ballots));
+        } else if (method == VotingMethod.CONDORCET) {
+            winners.add(ElectoralSimulations.resolveCondorcet(ballots));
+        } else if (method == VotingMethod.SCHULZE) {
+            winners.add(ElectoralSimulations.resolveSchulze(ballots));
+        } else if (method == VotingMethod.COPELAND) {
+            winners.add(ElectoralSimulations.resolveCopeland(ballots));
+        } else if (method == VotingMethod.BORDA) {
+            winners.add(ElectoralSimulations.resolveBorda(ballots));
+        } else if (method == VotingMethod.ANTI_PLURALITY) {
+            winners.add(ElectoralSimulations.resolveAntiPlurality(ballots));
+        } else if (method == VotingMethod.BUCKLIN) {
+            winners.add(ElectoralSimulations.resolveBucklin(ballots));
+        } else if (method == VotingMethod.COOMBS) {
+            winners.add(ElectoralSimulations.resolveCoombs(ballots));
+        } else if (method == VotingMethod.RANKED_PAIRS) {
+            winners.add(ElectoralSimulations.resolveRankedPairs(ballots));
+        } else if (method == VotingMethod.MINIMAX) {
+            winners.add(ElectoralSimulations.resolveMinimax(ballots));
+        } else if (method == VotingMethod.DODGSON) {
+            winners.add(ElectoralSimulations.resolveDodgson(ballots));
+        } else if (method == VotingMethod.KEMENY_YOUNG) {
+            winners.add(ElectoralSimulations.resolveKemenyYoung(ballots));
+        } else if (method == VotingMethod.STV) {
+            return mapToWinnerList(ElectoralSimulations.resolveSTV(ballots, seatsAvailable));
+        } else if (method == VotingMethod.APPROVAL) {
+            winners.add(ElectoralSimulations.resolveApproval(ballots));
+        } else if (method == VotingMethod.PROPORTIONAL || method == VotingMethod.DHONDT || method == VotingMethod.SAINTE_LAGUE
+                || method == VotingMethod.MODIFIED_SAINTE_LAGUE || method == VotingMethod.LARGEST_REMAINDER_HARE
+                || method == VotingMethod.LARGEST_REMAINDER_DROOP || method == VotingMethod.SNTV || method == VotingMethod.CUMULATIVE) {
+            return determineWinners(aggregateFirstPreferences(ballots), method, seatsAvailable);
+        } else {
+            throw new UnsupportedOperationException("Voting method not supported with ballots: " + method);
         }
         return winners;
     }
@@ -303,22 +172,18 @@ public class VotingSystem {
      * @param method         The voting method algorithm to apply
      * @return List of winners
      */
-    public static List<String> determineWinnersFromCardinalData(List<Map<String, Integer>> data, Method method) {
+    public static List<String> determineWinnersFromCardinalData(List<Map<String, Integer>> data, VotingMethod method) {
         List<String> winners = new ArrayList<>();
         if (data == null || data.isEmpty()) return winners;
 
-        switch (method) {
-            case RANGE:
-                winners.add(ElectoralSimulations.resolveRange(data));
-                break;
-            case STAR:
-                winners.add(ElectoralSimulations.resolveSTAR(data));
-                break;
-            case MAJORITY_JUDGMENT:
-                winners.add(ElectoralSimulations.resolveMajorityJudgment(data));
-                break;
-            default:
-                throw new UnsupportedOperationException("Method " + method + " not supported with cardinal data.");
+        if (method == VotingMethod.RANGE) {
+            winners.add(ElectoralSimulations.resolveRange(data));
+        } else if (method == VotingMethod.STAR) {
+            winners.add(ElectoralSimulations.resolveSTAR(data));
+        } else if (method == VotingMethod.MAJORITY_JUDGMENT) {
+            winners.add(ElectoralSimulations.resolveMajorityJudgment(data));
+        } else {
+            throw new UnsupportedOperationException("Method " + method + " not supported with cardinal data.");
         }
         return winners;
     }
@@ -334,4 +199,3 @@ public class VotingSystem {
         return counts;
     }
 }
-

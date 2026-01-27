@@ -126,9 +126,9 @@ public final class DemographicData implements UniversalDataModel, Serializable {
         for (Group g : individuals) {
             for (Person p : g.getMembers()) {
                 int bucket = (p.getAge() / bucketSize) * bucketSize;
-                if (p.getGender() == Person.Gender.MALE) {
+                if (p.getGender() == Gender.MALE) {
                     males.put(bucket, males.getOrDefault(bucket, 0L) + 1);
-                } else if (p.getGender() == Person.Gender.FEMALE) {
+                } else if (p.getGender() == Gender.FEMALE) {
                     females.put(bucket, females.getOrDefault(bucket, 0L) + 1);
                 }
             }

@@ -24,9 +24,11 @@
 package org.jscience.chemistry.biochemistry;
 
 import org.jscience.chemistry.Molecule;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 /**
@@ -37,45 +39,20 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class AminoAcid extends Molecule {
+
+    private static final long serialVersionUID = 2L;
 
     // Static registry
     private static final List<AminoAcid> VALUES = new ArrayList<>();
-
-    // Constants will be initialized after load, but we can't assign to static final
-    // fields if we want them to be driven by JSON completely.
-    // However, to maintain API compatibility and convenience, we will attempt to
-    // find them in the loaded values.
-    // Hack: We can't really set "static final" fields from a loader method unless
-    // we do it in a static block that does the work.
-
-    // Standard Amino Acids (Exposed as public static final for ABI, but effectively
-    // lookups? No, they must be objects)
-    // We will initialize them by calling a private helper in the declaration.
-
     private static final java.util.Map<String, AminoAcid> CACHE = new java.util.HashMap<>();
 
     static {
         loadData();
     }
 
-    // We have to remove the 'final' from these if we want to set them from JSON, OR
-    // we keep them as is
-    // but the constructor puts them in the registry.
-    // BUT the user wanted EXTERNALIZATION. This means the properties (mass, pI)
-    // should come from JSON.
-    // So we CANNOT instantiate them with hardcoded values here.
-
-    // Solution:
-    // 1. Load JSON into a Map<String, AminoAcidDTO> or similar.
-    // 2. Initialize the constants by querying the map.
-    // 3. Since 'static final' fields are initialized at class load time, we can run
-    // the loader in a static block
-    // BEFORE the fields are initialized? No, fields are initialized in textual
-    // order?
-    // Actually, if we call a method to init the field, that method can ensure data
-    // is loaded.
-
+    // Standard Amino Acids
     public static final AminoAcid GLYCINE = getStandard("Glycine");
     public static final AminoAcid ALANINE = getStandard("Alanine");
     public static final AminoAcid VALINE = getStandard("Valine");
@@ -103,10 +80,6 @@ public class AminoAcid extends Molecule {
 
     private static AminoAcid getStandard(String name) {
         if (CACHE.isEmpty()) {
-            // Should have been loaded by static block top, but safety check or re-init?
-            // "static { loadData(); }" runs before fields if it is lexicographically
-            // before?
-            // OR we just ensure loadData() is called idemptotently.
             if (VALUES.isEmpty())
                 loadData();
         }
@@ -131,25 +104,29 @@ public class AminoAcid extends Molecule {
                             node.get("name").asText(),
                             node.get("three").asText(),
                             node.get("one").asText(),
-                            node.get("mass").asDouble(),
-                            node.get("pI").asDouble(),
+                            Real.of(node.get("mass").asDouble()),
+                            Real.of(node.get("pI").asDouble()),
                             node.get("type").asText());
                 }
             }
             is.close();
         } catch (Exception e) {
-            // Fallback for development if file missing/broken?
             e.printStackTrace();
         }
     }
 
+    @Attribute
     private final String threeLetterCode;
+    @Attribute
     private final String oneLetterCode;
-    private final double explicitMolecularWeight; // g/mol
-    private final double pI; // Isoelectric point
+    @Attribute
+    private final Real explicitMolecularWeight; // g/mol
+    @Attribute
+    private final Real pI; // Isoelectric point
+    @Attribute
     private final String classification;
 
-    private AminoAcid(String name, String three, String one, double mw, double pI, String classification) {
+    private AminoAcid(String name, String three, String one, Real mw, Real pI, String classification) {
         super(name);
         this.threeLetterCode = three;
         this.oneLetterCode = one;
@@ -176,18 +153,19 @@ public class AminoAcid extends Molecule {
     @Override
     public org.jscience.measure.Quantity<org.jscience.measure.quantity.Mass> getMolecularWeight() {
         // 1 u = 1.66053906660e-27 kg
-        double massInKg = explicitMolecularWeight * 1.66053906660e-27;
+        Real kgPerAmu = Real.of("1.66053906660e-27");
+        Real massInKg = explicitMolecularWeight.multiply(kgPerAmu);
         return org.jscience.measure.Quantities.create(massInKg, org.jscience.measure.Units.KILOGRAM);
     }
 
     /**
      * Gets the molar mass in g/mol.
      */
-    public double getMolarMass() {
+    public Real getMolarMass() {
         return explicitMolecularWeight;
     }
 
-    public double getIsoelectricPoint() {
+    public Real getIsoelectricPoint() {
         return pI;
     }
 
@@ -214,7 +192,7 @@ public class AminoAcid extends Molecule {
             if (aa.getName().equalsIgnoreCase(name))
                 return aa;
         }
-        throw new IllegalArgumentException("No enum constant " + name);
+        throw new IllegalArgumentException("No amino acid constant " + name);
     }
 
     /**
@@ -234,17 +212,17 @@ public class AminoAcid extends Molecule {
      * Subtracts water for peptide bond formation.
      * Returns value in g/mol.
      */
-    public static double peptideWeight(String sequence) {
-        double weight = 0;
+    public static Real peptideWeight(String sequence) {
+        Real weight = Real.ZERO;
         for (char c : sequence.toCharArray()) {
             AminoAcid aa = fromCode(c);
             if (aa != null) {
-                weight += aa.explicitMolecularWeight;
+                weight = weight.add(aa.explicitMolecularWeight);
             }
         }
-        // Subtract (n-1) * 18.015 for water loss in peptide bonds
+        // Subtract (n-1) * 18.01528 for water loss in peptide bonds
         int bonds = Math.max(0, sequence.length() - 1);
-        weight -= bonds * 18.015;
+        weight = weight.subtract(Real.of(18.01528).multiply(Real.of(bonds)));
         return weight;
     }
 
@@ -262,5 +240,3 @@ public class AminoAcid extends Molecule {
         return classification.equals("basic") || classification.equals("acidic");
     }
 }
-
-

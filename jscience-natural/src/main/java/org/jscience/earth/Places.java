@@ -34,12 +34,12 @@ public final class Places {
     /**
      * The planet Earth.
      */
-    public static final Place EARTH = new Place("Earth", Place.Type.CELESTIAL_BODY);
+    public static final Place EARTH = new Place("Earth", PlaceType.CELESTIAL_BODY);
 
     /**
      * Global location (unspecified).
      */
-    public static final Place GLOBAL = new Place("Global", Place.Type.GLOBAL);
+    public static final Place GLOBAL = new Place("Global", PlaceType.GLOBAL);
 
     private Places() {}
 }

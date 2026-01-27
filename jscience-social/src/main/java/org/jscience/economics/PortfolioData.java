@@ -4,6 +4,15 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.util.UniversalDataModel;
 import org.jscience.economics.money.Money;
 import org.jscience.economics.money.Currency;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
+import org.jscience.util.Named;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -11,36 +20,113 @@ import java.util.*;
  * Represents a collection of assets with price history and holdings.
  * Uses the Money and Quantity system for high-precision financial analysis.
  */
-public final class PortfolioData implements UniversalDataModel {
+@Persistent
+public final class PortfolioData implements UniversalDataModel, ComprehensiveIdentification {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<Holding> holdings = new ArrayList<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final List<Asset> watchlist = new ArrayList<>();
+
+    public PortfolioData() {
+        this(new org.jscience.util.identity.UUIDIdentification(UUID.randomUUID()));
+    }
+
+    public PortfolioData(Identification id) {
+        this.id = Objects.requireNonNull(id);
+    }
 
     @Override
     public String getModelType() { return "FINANCIAL_PORTFOLIO"; }
 
-    public record Asset(
-        String symbol,
-        String name,
-        Money currentPrice,
-        Money dailyChange,
-        Real dailyChangePercent,
-        long volume,
-        List<Money> priceHistory
-    ) {}
+    @Override
+    public Identification getId() {
+        return id;
+    }
 
-    public record Holding(
-        Asset asset,
-        Real quantity,
-        Money averageCost
-    ) {
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    @Persistent
+    public static class Asset implements Serializable, Named {
+        private static final long serialVersionUID = 1L;
+        @Attribute
+        private String symbol;
+        @Attribute
+        private String name;
+        @Attribute
+        private Money currentPrice;
+        @Attribute
+        private Money dailyChange;
+        @Attribute
+        private Real dailyChangePercent;
+        @Attribute
+        private long volume;
+        @Attribute
+        private List<Money> priceHistory;
+
+        public Asset() {}
+
+        public Asset(String symbol, String name, Money currentPrice, Money dailyChange,
+                     Real dailyChangePercent, long volume, List<Money> priceHistory) {
+            this.symbol = symbol;
+            this.name = name;
+            this.currentPrice = currentPrice;
+            this.dailyChange = dailyChange;
+            this.dailyChangePercent = dailyChangePercent;
+            this.volume = volume;
+            this.priceHistory = priceHistory;
+        }
+
+        public String getSymbol() { return symbol; }
+        public String getName() { return name; }
+        public Money getCurrentPrice() { return currentPrice; }
+        public Money getDailyChange() { return dailyChange; }
+        public Real getDailyChangePercent() { return dailyChangePercent; }
+        public long getVolume() { return volume; }
+        public List<Money> getPriceHistory() { return priceHistory; }
+    }
+
+    @Persistent
+    public static class Holding implements Serializable {
+        private static final long serialVersionUID = 1L;
+        @Relation(type = Relation.Type.MANY_TO_ONE)
+        private Asset asset;
+        @Attribute
+        private Real quantity;
+        @Attribute
+        private Money averageCost;
+
+        public Holding() {}
+
+        public Holding(Asset asset, Real quantity, Money averageCost) {
+            this.asset = asset;
+            this.quantity = quantity;
+            this.averageCost = averageCost;
+        }
+
+        public Asset getAsset() { return asset; }
+        public Real getQuantity() { return quantity; }
+        public Money getAverageCost() { return averageCost; }
+
         public Money totalValue() {
-            return asset.currentPrice().multiply(quantity);
+            return asset.getCurrentPrice().multiply(quantity);
         }
         public Money profitLoss() {
             return totalValue().subtract(averageCost.multiply(quantity));
         }
     }
-
-    private final List<Holding> holdings = new ArrayList<>();
-    private final List<Asset> watchlist = new ArrayList<>();
 
     public void addHolding(Asset asset, Real quantity, Money averageCost) {
         holdings.add(new Holding(asset, quantity, averageCost));

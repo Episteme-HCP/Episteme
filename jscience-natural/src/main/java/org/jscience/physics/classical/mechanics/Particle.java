@@ -30,11 +30,8 @@ import org.jscience.mathematics.sets.Reals;
 import org.jscience.mathematics.structures.SpatialOctree;
 
 import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.Acceleration;
 import org.jscience.measure.quantity.Energy;
-import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Velocity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.util.identity.Identification;
@@ -48,7 +45,7 @@ import java.util.List;
 
 /**
  * A particle in N-body simulation using Generic Linear Algebra.
- * Modernized to JScience.
+ * Modernized to use Real for all physical properties.
  * 
  * <p>
  * Implements {@link SpatialOctree.SpatialObject} for high-performance
@@ -94,7 +91,7 @@ public class Particle implements SpatialOctree.SpatialObject {
     }
 
     public Particle(Vector<Real> position, Vector<Real> velocity, Real mass) {
-        this(position, velocity, Quantities.create(mass.doubleValue(), Units.KILOGRAM));
+        this(position, velocity, Quantities.create(mass, Units.KILOGRAM));
     }
 
     private Vector<Real> createVector(double... values) {
@@ -103,6 +100,10 @@ public class Particle implements SpatialOctree.SpatialObject {
             list.add(Real.of(v));
         }
         return DenseVector.of(list, Reals.getInstance());
+    }
+
+    private Vector<Real> createVector(Real... values) {
+        return DenseVector.of(List.of(values), Reals.getInstance());
     }
 
     public Vector<Real> getPosition() {
@@ -149,13 +150,12 @@ public class Particle implements SpatialOctree.SpatialObject {
     }
 
     @Override
-    public double getMassValue() { // Note: changed from getMass to avoid conflict with getMass() returning
-                                   // Quantity
+    public double getMassValue() {
         return mass.to(Units.KILOGRAM).getValue().doubleValue();
     }
 
     public void setPosition(Real x, Real y, Real z) {
-        this.position = createVector(x.doubleValue(), y.doubleValue(), z.doubleValue());
+        this.position = createVector(x, y, z);
     }
 
     public Real distanceTo(Particle other) {
@@ -170,19 +170,23 @@ public class Particle implements SpatialOctree.SpatialObject {
         this.velocity = this.velocity.add(this.acceleration.multiply(dt));
     }
 
+    /**
+     * Calculates kinetic energy.
+     * E = 0.5 * m * v^2
+     */
     public Quantity<Energy> kineticEnergy() {
-        // E = 0.5 * m * v^2
-        double m = mass.to(Units.KILOGRAM).getValue().doubleValue();
-        double v = velocity.norm().doubleValue();
-        return Quantities.create(0.5 * m * v * v, Units.JOULE);
+        Real m = mass.to(Units.KILOGRAM).getValue();
+        Real v = velocity.norm();
+        Real e = Real.of(0.5).multiply(m).multiply(v.pow(2));
+        return Quantities.create(e, Units.JOULE);
     }
 
     public void setVelocity(Real x, Real y, Real z) {
-        this.velocity = createVector(x.doubleValue(), y.doubleValue(), z.doubleValue());
+        this.velocity = createVector(x, y, z);
     }
 
     public void setAcceleration(Real x, Real y, Real z) {
-        this.acceleration = createVector(x.doubleValue(), y.doubleValue(), z.doubleValue());
+        this.acceleration = createVector(x, y, z);
     }
 
     public void setVelocity(double x, double y, double z) {
@@ -191,37 +195,6 @@ public class Particle implements SpatialOctree.SpatialObject {
 
     public void setAcceleration(double x, double y, double z) {
         setAcceleration(Real.of(x), Real.of(y), Real.of(z));
-    }
-
-    public Particle(Quantity<Length> x, Quantity<Length> y, Quantity<Length> z, Quantity<Mass> mass) {
-        this.mass = mass;
-        this.position = createVector(
-                x.to(Units.METER).getValue().doubleValue(),
-                y.to(Units.METER).getValue().doubleValue(),
-                z.to(Units.METER).getValue().doubleValue());
-        this.velocity = createVector(0, 0, 0);
-        this.acceleration = createVector(0, 0, 0);
-    }
-
-    public void setPosition(Quantity<Length> x, Quantity<Length> y, Quantity<Length> z) {
-        this.position = createVector(
-                x.to(Units.METER).getValue().doubleValue(),
-                y.to(Units.METER).getValue().doubleValue(),
-                z.to(Units.METER).getValue().doubleValue());
-    }
-
-    public void setVelocity(Quantity<Velocity> x, Quantity<Velocity> y, Quantity<Velocity> z) {
-        this.velocity = createVector(
-                x.to(Units.METER_PER_SECOND).getValue().doubleValue(),
-                y.to(Units.METER_PER_SECOND).getValue().doubleValue(),
-                z.to(Units.METER_PER_SECOND).getValue().doubleValue());
-    }
-
-    public void setAcceleration(Quantity<Acceleration> x, Quantity<Acceleration> y, Quantity<Acceleration> z) {
-        this.acceleration = createVector(
-                x.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue(),
-                y.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue(),
-                z.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
     }
 
     @Override

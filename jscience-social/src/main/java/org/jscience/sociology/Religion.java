@@ -25,20 +25,27 @@ package org.jscience.sociology;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import org.jscience.earth.Place;
 import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+import org.jscience.philosophy.Belief;
 
 /**
  * Represents a religion, faith tradition, or spiritual system.
  * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
+ * Support for clergy members and holy sites added.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -46,8 +53,10 @@ import org.jscience.util.persistence.Persistent;
  */
 @Persistent
 public class Religion implements ComprehensiveIdentification {
+// ...
+// I will not replace the whole file. I will use multi_replace_file_content.
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     protected final Identification id;
@@ -55,18 +64,21 @@ public class Religion implements ComprehensiveIdentification {
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    /**
-     * Categories of religious systems based on theological structure.
-     */
+    @Deprecated
     public enum Type {
-        MONOTHEISTIC, POLYTHEISTIC, PANTHEISTIC, ATHEISTIC,
-        ANIMISTIC, SHAMANISTIC, PHILOSOPHICAL
+        @Deprecated MONOTHEISTIC, @Deprecated POLYTHEISTIC, @Deprecated PANTHEISTIC, @Deprecated ATHEISTIC,
+        @Deprecated ANIMISTIC, @Deprecated SHAMANISTIC, @Deprecated PHILOSOPHICAL;
+        
+        @Deprecated
+        public ReligionType toReligionType() {
+            return ReligionType.valueOf(this.name());
+        }
     }
 
-    public static final Religion BUDDHISM = new Religion("Buddhism", Type.PHILOSOPHICAL);
+    public static final Religion BUDDHISM = new Religion("Buddhism", ReligionType.PHILOSOPHICAL);
 
     @Attribute
-    private Type type;
+    private ReligionType type;
     
     @Attribute
     private long followers;
@@ -92,8 +104,14 @@ public class Religion implements ComprehensiveIdentification {
     @Attribute
     private final List<String> holidayList = new ArrayList<>();
 
-    @Attribute
-    private final List<org.jscience.philosophy.Belief> complexBeliefs = new ArrayList<>();
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<Belief> complexBeliefs = new ArrayList<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Person> clergy = new HashSet<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Place> holySites = new HashSet<>();
 
     /**
      * Creates a new religion with the specified name.
@@ -107,7 +125,7 @@ public class Religion implements ComprehensiveIdentification {
         if (trimmedName.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
-        this.id = new SimpleIdentification(trimmedName);
+        this.id = new SimpleIdentification("Religion:" + UUID.randomUUID());
         setName(trimmedName);
     }
 
@@ -116,9 +134,14 @@ public class Religion implements ComprehensiveIdentification {
      * @param name the name
      * @param type the theological type
      */
-    public Religion(String name, Type type) {
+    public Religion(String name, ReligionType type) {
         this(name);
         this.type = type;
+    }
+
+    @Deprecated
+    public Religion(String name, Type type) {
+        this(name, type != null ? type.toReligionType() : ReligionType.OTHER);
     }
 
     @Override
@@ -135,7 +158,7 @@ public class Religion implements ComprehensiveIdentification {
      * Returns the religious category.
      * @return the type
      */
-    public Type getType() {
+    public ReligionType getType() {
         return type;
     }
 
@@ -143,8 +166,17 @@ public class Religion implements ComprehensiveIdentification {
      * Sets the religious category.
      * @param type the type to set
      */
-    public void setType(Type type) {
+    public void setType(ReligionType type) {
         this.type = type;
+    }
+
+    @Deprecated
+    public Type getLegacyType() {
+        try {
+            return Type.valueOf(type.name());
+        } catch (Exception e) {
+            return Type.PHILOSOPHICAL;
+        }
     }
 
     public long getFollowers() {
@@ -191,11 +223,11 @@ public class Religion implements ComprehensiveIdentification {
         if (belief != null) beliefs.add(belief);
     }
 
-    public void addBelief(org.jscience.philosophy.Belief belief) {
+    public void addBelief(Belief belief) {
         if (belief != null) complexBeliefs.add(belief);
     }
 
-    public List<org.jscience.philosophy.Belief> getCoreBeliefs() {
+    public List<Belief> getCoreBeliefs() {
         return Collections.unmodifiableList(complexBeliefs);
     }
 
@@ -217,6 +249,22 @@ public class Religion implements ComprehensiveIdentification {
 
     public List<String> getHolidays() {
         return Collections.unmodifiableList(holidayList);
+    }
+
+    public void addClergyMember(Person person) {
+        if (person != null) clergy.add(person);
+    }
+
+    public Set<Person> getClergy() {
+        return Collections.unmodifiableSet(clergy);
+    }
+
+    public void addHolySite(Place place) {
+        if (place != null) holySites.add(place);
+    }
+
+    public Set<Place> getHolySites() {
+        return Collections.unmodifiableSet(holySites);
     }
 
     @Override

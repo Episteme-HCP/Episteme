@@ -23,18 +23,18 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import org.jscience.biology.Individual;
 import org.jscience.earth.Place;
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
 import org.jscience.util.Positioned;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
@@ -43,30 +43,26 @@ import org.jscience.util.persistence.Relation;
 /**
  * Represents a social interaction context where individuals assume specific roles.
  * Situations often occur at dedicated physical locations and involve common activities or conflicts.
+ * Modernized to implement ComprehensiveIdentification and use RoleKind.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 2.0
  * @since 1.0
  */
 @Persistent
-public class Situation implements Named, Commented, Positioned<Place>, Serializable {
+public class Situation implements ComprehensiveIdentification, Positioned<Place> {
 
-    private static final long serialVersionUID = 1L;
+
 
     @Id
-    private Identification identification;
+    private final Identification id;
 
     @Attribute
-    private String name;
-
-    @Attribute
-    private String comments;
-
-    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
+    private final Map<String, Object> traits = new HashMap<>();
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @Attribute
     private Place place;
@@ -80,31 +76,18 @@ public class Situation implements Named, Commented, Positioned<Place>, Serializa
      * @throws IllegalArgumentException if name is empty
      */
     public Situation(String name, String comments) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
-        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
-        this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
-        
-        this.identification = new SimpleIdentification(name + ":" + System.currentTimeMillis());
-        this.roles = new HashSet<>();
+        this.id = new SimpleIdentification(name + ":" + System.currentTimeMillis());
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
+        setComments(Objects.requireNonNull(comments, "Comments cannot be null"));
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
     }
 
     @Override
-    public String getComments() {
-        return comments;
-    }
-
-    @Override
-    public void setComments(String comments) {
-        this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
-    }
-
-    @Override
-    public java.util.Map<String, Object> getTraits() {
+    public Map<String, Object> getTraits() {
         return traits;
     }
 
@@ -132,8 +115,18 @@ public class Situation implements Named, Commented, Positioned<Place>, Serializa
      * @param roleName   the name of the role assumed
      * @param kind       the archetypal classification of the role
      * @return the created role instance
-     * @throws NullPointerException if individual or roleName is null
+     * @throws NullPointerException if individual, roleName or kind is null
      */
+    public Role addParticipant(Individual individual, String roleName, RoleKind kind) {
+        Role role = new Role(individual, roleName, this, kind);
+        roles.add(role);
+        return role;
+    }
+
+    /**
+     * Legacy method for integer-based role kinds.
+     */
+    @Deprecated
     public Role addParticipant(Individual individual, String roleName, int kind) {
         Role role = new Role(individual, roleName, this, kind);
         roles.add(role);
@@ -157,16 +150,25 @@ public class Situation implements Named, Commented, Positioned<Place>, Serializa
         roles.remove(Objects.requireNonNull(role, "Role cannot be null"));
     }
 
-    /**
-     * Returns the persistent identification for this situation.
-     * @return the identification
-     */
+    @Deprecated
     public Identification getIdentification() {
-        return identification;
+        return id;
     }
 
     @Override
     public String toString() {
-        return name + " at " + (place != null ? place.getName() : "Unknown location");
+        return getName() + " at " + (place != null ? place.getName() : "Unknown location");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Situation that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

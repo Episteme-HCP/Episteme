@@ -13,4 +13,9 @@ public class SSNIdentification extends Identification {
     public SSNIdentification(String value) {
         super(value);
     }
+
+    @Override
+    public String getScheme() {
+        return "SSN";
+    }
 }

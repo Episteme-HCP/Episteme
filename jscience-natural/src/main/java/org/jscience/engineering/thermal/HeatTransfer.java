@@ -23,12 +23,19 @@
 
 package org.jscience.engineering.thermal;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Area;
+import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Power;
+import org.jscience.measure.quantity.Temperature;
+import org.jscience.physics.PhysicalConstants;
 
 /**
+ * Fundamental heat transfer calculations.
+ * Modernized to use high-precision Real and typed Quantities.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -41,59 +48,76 @@ public class HeatTransfer {
 
     /**
      * Fourier's Law for heat conduction.
-     * Q = k * A * ÃŽâ€T / d
+     * Q = k * A * ΔT / d
      * 
-     * @param thermalConductivity   k (W/(mÃ‚Â·K))
-     * @param area                  Cross-sectional area (mÃ‚Â²)
-     * @param temperatureDifference ÃŽâ€T (K)
-     * @param thickness             d (m)
-     * @return Heat transfer rate (W)
+     * @param thermalConductivity   k (W/(m·K))
+     * @param area                  Cross-sectional area
+     * @param temperatureDifference ΔT
+     * @param thickness             d
+     * @return Heat transfer rate
      */
-    public static Quantity<Power> conduction(double thermalConductivity, double area,
-            double temperatureDifference, double thickness) {
-        double Q = thermalConductivity * area * temperatureDifference / thickness;
+    public static Quantity<Power> conduction(Real thermalConductivity, Quantity<Area> area,
+            Quantity<Temperature> temperatureDifference, Quantity<Length> thickness) {
+        
+        Real A = area.to(Units.SQUARE_METER).getValue();
+        Real dT = temperatureDifference.to(Units.KELVIN).getValue();
+        Real d = thickness.to(Units.METER).getValue();
+        
+        Real Q = thermalConductivity.multiply(A).multiply(dT).divide(d);
         return Quantities.create(Q, Units.WATT);
     }
 
     /**
      * Newton's Law of Cooling for convection.
-     * Q = h * A * ÃŽâ€T
+     * Q = h * A * ΔT
      * 
-     * @param convectionCoefficient h (W/(mÃ‚Â²Ã‚Â·K))
-     * @param area                  Surface area (mÃ‚Â²)
-     * @param temperatureDifference ÃŽâ€T (K)
-     * @return Heat transfer rate (W)
+     * @param convectionCoefficient h (W/(m²·K))
+     * @param area                  Surface area
+     * @param temperatureDifference ΔT
+     * @return Heat transfer rate
      */
-    public static Quantity<Power> convection(double convectionCoefficient, double area,
-            double temperatureDifference) {
-        double Q = convectionCoefficient * area * temperatureDifference;
+    public static Quantity<Power> convection(Real convectionCoefficient, Quantity<Area> area,
+            Quantity<Temperature> temperatureDifference) {
+            
+        Real A = area.to(Units.SQUARE_METER).getValue();
+        Real dT = temperatureDifference.to(Units.KELVIN).getValue();
+        
+        Real Q = convectionCoefficient.multiply(A).multiply(dT);
         return Quantities.create(Q, Units.WATT);
     }
 
     /**
      * Stefan-Boltzmann Law for radiation.
-     * Q = ÃŽÂµ * ÃÆ’ * A * (TÃ¢ÂÂ´ - T_surrÃ¢ÂÂ´)
+     * Q = ε * σ * A * (T⁴ - T_surr⁴)
      * 
-     * @param emissivity      ÃŽÂµ (0-1)
-     * @param area            Surface area (mÃ‚Â²)
-     * @param surfaceTemp     T (K)
-     * @param surroundingTemp T_surr (K)
-     * @return Heat transfer rate (W)
+     * @param emissivity      ε (0-1)
+     * @param area            Surface area
+     * @param surfaceTemp     T
+     * @param surroundingTemp T_surr
+     * @return Heat transfer rate
      */
-    public static Quantity<Power> radiation(double emissivity, double area,
-            double surfaceTemp, double surroundingTemp) {
-        double sigma = 5.67e-8; // Stefan-Boltzmann constant
-        double Q = emissivity * sigma * area * (Math.pow(surfaceTemp, 4) - Math.pow(surroundingTemp, 4));
+    public static Quantity<Power> radiation(Real emissivity, Quantity<Area> area,
+            Quantity<Temperature> surfaceTemp, Quantity<Temperature> surroundingTemp) {
+            
+        Real A = area.to(Units.SQUARE_METER).getValue();
+        Real T1 = surfaceTemp.to(Units.KELVIN).getValue();
+        Real T2 = surroundingTemp.to(Units.KELVIN).getValue();
+        Real sigma = PhysicalConstants.stefan_boltzmann; 
+        
+        Real Q = emissivity.multiply(sigma).multiply(A).multiply(T1.pow(4).subtract(T2.pow(4)));
         return Quantities.create(Q, Units.WATT);
     }
 
     /**
      * Thermal resistance for conduction.
      * R = d / (k * A)
+     * 
+     * @return Thermal resistance (K/W)
      */
-    public static double thermalResistance(double thickness, double thermalConductivity, double area) {
-        return thickness / (thermalConductivity * area);
+    public static Real thermalResistance(Quantity<Length> thickness, Real thermalConductivity, Quantity<Area> area) {
+        Real d = thickness.to(Units.METER).getValue();
+        Real A = area.to(Units.SQUARE_METER).getValue();
+        
+        return d.divide(thermalConductivity.multiply(A));
     }
 }
-
-

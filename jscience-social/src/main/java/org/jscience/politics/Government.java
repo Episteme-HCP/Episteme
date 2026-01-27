@@ -42,17 +42,8 @@ public class Government implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Common constitutional and administrative types of government.
-     */
-    public enum Type {
-        DEMOCRACY, REPUBLIC, MONARCHY, CONSTITUTIONAL_MONARCHY,
-        PARLIAMENTARY, PRESIDENTIAL, FEDERAL, UNITARY,
-        THEOCRACY, AUTHORITARIAN, TOTALITARIAN, OLIGARCHY
-    }
-
     private final String countryName;
-    private Type type;
+    private GovernmentForm type;
     private String headOfState;
     private String headOfGovernment;
     private String rulingParty;
@@ -67,7 +58,7 @@ public class Government implements Serializable {
      * @param type        initial government archetype
      * @throws NullPointerException if any argument is null
      */
-    public Government(String countryName, Type type) {
+    public Government(String countryName, GovernmentForm type) {
         this.countryName = Objects.requireNonNull(countryName, "Country name cannot be null");
         this.type = Objects.requireNonNull(type, "Type cannot be null");
     }
@@ -76,11 +67,11 @@ public class Government implements Serializable {
         return countryName;
     }
 
-    public Type getType() {
+    public GovernmentForm getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(GovernmentForm type) {
         this.type = Objects.requireNonNull(type, "Type cannot be null");
     }
 
@@ -152,7 +143,7 @@ public class Government implements Serializable {
      * @return US Government template
      */
     public static Government usGovernment() {
-        Government g = new Government("United States", Type.PRESIDENTIAL);
+        Government g = new Government("United States", GovernmentForm.PRESIDENTIAL_SYSTEM);
         g.setHeadOfState("President");
         g.setHeadOfGovernment("President");
         g.setLegislatureSeats(535);

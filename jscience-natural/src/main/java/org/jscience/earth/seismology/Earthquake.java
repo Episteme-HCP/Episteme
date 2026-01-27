@@ -23,6 +23,13 @@
 
 package org.jscience.earth.seismology;
 
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Angle;
+import org.jscience.measure.quantity.Length;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+
 /**
  * Represents a seismic event.
  * Standard domain model for geology applications.
@@ -31,34 +38,68 @@ package org.jscience.earth.seismology;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class Earthquake {
-    private final double lat;
-    private final double lon;
-    private final double mag;
-    private final double depth;
 
-    public Earthquake(double lat, double lon, double mag, double depth) {
-        this.lat = lat;
-        this.lon = lon;
-        this.mag = mag;
+
+    @Attribute
+    private final Quantity<Angle> latitude;
+    @Attribute
+    private final Quantity<Angle> longitude;
+    @Attribute
+    private final Real magnitude;
+    @Attribute
+    private final Quantity<Length> depth;
+
+    public Earthquake(Quantity<Angle> latitude, Quantity<Angle> longitude, Real magnitude, Quantity<Length> depth) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.magnitude = magnitude;
         this.depth = depth;
     }
 
+    public Earthquake(double latitude, double longitude, double magnitude, double depthKm) {
+        this.latitude = org.jscience.measure.Quantities.create(latitude, org.jscience.measure.Units.DEGREE_ANGLE);
+        this.longitude = org.jscience.measure.Quantities.create(longitude, org.jscience.measure.Units.DEGREE_ANGLE);
+        this.magnitude = Real.of(magnitude);
+        this.depth = org.jscience.measure.Quantities.create(depthKm, org.jscience.measure.Units.KILOMETER);
+    }
+
+    public Quantity<Angle> getLatitude() {
+        return latitude;
+    }
+
+    public Quantity<Angle> getLongitude() {
+        return longitude;
+    }
+
+    public Real getMagnitude() {
+        return magnitude;
+    }
+
+    public Quantity<Length> getDepth() {
+        return depth;
+    }
+
     public double getLat() {
-        return lat;
+        return latitude.to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
     }
 
     public double getLon() {
-        return lon;
+        return longitude.to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
     }
 
     public double getMag() {
-        return mag;
+        return magnitude.doubleValue();
     }
 
-    public double getDepth() {
-        return depth;
+    public double getDepthKm() {
+        return depth.to(org.jscience.measure.Units.KILOMETER).getValue().doubleValue();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Earthquake[Lat=%s, Lon=%s, Mag=%s, Depth=%s]", 
+            latitude, longitude, magnitude, depth);
     }
 }
-
-

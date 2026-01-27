@@ -41,6 +41,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * Defines a Reference Ellipsoid for geodetic calculations.
  * <p>
+ * Modernized to use Real for internal parameters to ensure high-precision 
+ * coordinate transformations.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -52,8 +54,8 @@ public class ReferenceEllipsoid {
     private static final Map<String, ReferenceEllipsoid> REGISTRY = new HashMap<>();
 
     // Hardcoded standard ellipsoids to ensure visibility and avoid static init dependency
-    public static final ReferenceEllipsoid WGS84 = new ReferenceEllipsoid("WGS84", "WGS84", 6378137.0, 298.257223563);
-    public static final ReferenceEllipsoid GRS80 = new ReferenceEllipsoid("GRS80", "GRS80", 6378137.0, 298.257222101);
+    public static final ReferenceEllipsoid WGS84 = new ReferenceEllipsoid("WGS84", "WGS84", "6378137.0", "298.257223563");
+    public static final ReferenceEllipsoid GRS80 = new ReferenceEllipsoid("GRS80", "GRS80", "6378137.0", "298.257222101");
 
     static {
         REGISTRY.put("WGS84", WGS84);
@@ -69,16 +71,20 @@ public class ReferenceEllipsoid {
     private final Real semiMinorAxis; // b = a(1 - f)
     private final Real eccentricitySquared; // e^2 = f(2-f)
 
-    public ReferenceEllipsoid(String name, String code, double semiMajorAxisMeters, double inverseFlatteningVal) {
+    public ReferenceEllipsoid(String name, String code, String semiMajorAxisMeters, String inverseFlatteningVal) {
         this.name = name;
         this.code = code;
         this.semiMajorAxis = Real.of(semiMajorAxisMeters);
         this.inverseFlattening = Real.of(inverseFlatteningVal);
 
-        // Derived parameters
+        // Derived parameters using Real for exactness
         this.flattening = Real.ONE.divide(this.inverseFlattening);
         this.semiMinorAxis = this.semiMajorAxis.multiply(Real.ONE.subtract(this.flattening));
         this.eccentricitySquared = this.flattening.multiply(Real.TWO.subtract(this.flattening));
+    }
+
+    public ReferenceEllipsoid(String name, String code, double semiMajorAxisMeters, double inverseFlatteningVal) {
+        this(name, code, String.valueOf(semiMajorAxisMeters), String.valueOf(inverseFlatteningVal));
     }
 
     private static void loadEllipsoids() {
@@ -95,8 +101,8 @@ public class ReferenceEllipsoid {
                     try {
                         String n = node.get("name").asText();
                         String c = node.get("code").asText();
-                        double a = node.get("semiMajorAxis").asDouble();
-                        double invF = node.get("inverseFlattening").asDouble();
+                        String a = node.get("semiMajorAxis").asText();
+                        String invF = node.get("inverseFlattening").asText();
 
                         ReferenceEllipsoid el = new ReferenceEllipsoid(n, c, a, invF);
                         REGISTRY.put(n.toUpperCase(), el);
@@ -124,11 +130,19 @@ public class ReferenceEllipsoid {
     }
 
     public Quantity<Length> getSemiMajorAxis() {
-        return Quantities.create(semiMajorAxis.doubleValue(), Units.METER);
+        return Quantities.create(semiMajorAxis, Units.METER);
+    }
+    
+    public Real getSemiMajorAxisValue() {
+        return semiMajorAxis;
     }
 
     public Quantity<Length> getSemiMinorAxis() {
-        return Quantities.create(semiMinorAxis.doubleValue(), Units.METER);
+        return Quantities.create(semiMinorAxis, Units.METER);
+    }
+    
+    public Real getSemiMinorAxisValue() {
+        return semiMinorAxis;
     }
 
     public Real getFlattening() {

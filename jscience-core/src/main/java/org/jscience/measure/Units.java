@@ -72,6 +72,12 @@ public final class Units {
         public static final Unit<Mass> KILOGRAM = new StandardUnit<>("kg", "kilogram", Dimension.MASS);
 
         /**
+         * The Unified Atomic Mass Unit: u (Dalton).
+         * 1 u = 1.66053906660e-27 kg.
+         */
+        public static final Unit<Mass> UNIFIED_ATOMIC_MASS = KILOGRAM.multiply(1.66053906660e-27);
+
+        /**
          * The SI unit of time: second (s).
          * <p>
          * Defined by the cesium-133 hyperfine transition frequency.

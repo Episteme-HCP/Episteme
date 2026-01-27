@@ -24,13 +24,18 @@
 package org.jscience.sports;
 
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.quantity.*;
 
 /**
  * Models the aerodynamics of a spherical ball in flight, including Drag and Magnus effects.
+ * Modernized to use Quantity and Real for high-precision physical simulations.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class BallAerodynamics {
@@ -40,110 +45,128 @@ public final class BallAerodynamics {
     /**
      * Calculates the Magnus Force (lift/swerve) on a spinning ball.
      * Formula: Fm = 0.5 * Cl * rho * A * (r * omega) * v
-     * Note: This implementation simplifies the lift coefficient Cl approximation.
      * 
-     * @param rho      Air density (kg/m^3)
-     * @param radius   Ball radius (m)
-     * @param velocity Ball velocity (m/s)
-     * @param spinRps  Spin rate (revolutions per second)
-     * @return The Magnus force magnitude in Newtons
+     * @param rho      Air density
+     * @param radius   Ball radius
+     * @param velocity Ball velocity
+     * @param spin     Spin rate (frequency)
+     * @return The Magnus force
      */
-    public static Real calculateMagnusForce(double rho, double radius, double velocity, double spinRps) {
-        double area = Math.PI * radius * radius;
-        double omega = 2 * Math.PI * spinRps;
+    public static Quantity<Force> calculateMagnusForce(
+            Quantity<MassDensity> rho, 
+            Quantity<Length> radius, 
+            Quantity<Velocity> velocity, 
+            Quantity<Frequency> spin) {
         
-        // Simplified Lift Coefficient for a spinning sphere
-        // Cl is roughly proportional to the spin parameter (r*omega/v) in typical sports ranges
-        double spinParameter = (velocity > 0) ? (radius * omega) / velocity : 0;
-        double cl = 0.3 * spinParameter; // Linear approximation for diverse sports regimes
+        Real r = radius.getValue();
+        Real v = velocity.getValue();
+        Real s = spin.getValue();
+        Real rhoVal = rho.getValue();
         
-        double force = 0.5 * cl * rho * area * velocity * velocity;
-        return Real.of(force);
+        Real area = Real.of(Math.PI).multiply(r.pow(2));
+        Real omega = Real.of(2.0 * Math.PI).multiply(s);
+        
+        // spinParameter = (r * omega) / v
+        Real spinParameter = v.isZero() ? Real.ZERO : r.multiply(omega).divide(v);
+        Real cl = Real.of(0.3).multiply(spinParameter);
+        
+        // force = 0.5 * cl * rho * area * v^2
+        Real forceMag = Real.of(0.5).multiply(cl).multiply(rhoVal).multiply(area).multiply(v.pow(2));
+        
+        return Quantities.create(forceMag, Units.NEWTON);
     }
 
     /**
      * Calculates the Aerodynamic Drag Force.
      * Formula: Fd = 0.5 * Cd * rho * A * v^2
      * 
-     * @param rho      Air density (kg/m^3)
-     * @param radius   Ball radius (m)
-     * @param velocity Ball velocity (m/s)
+     * @param rho      Air density
+     * @param radius   Ball radius
+     * @param velocity Ball velocity
      * @param cd       Drag Coefficient (dimensionless)
-     * @return The Drag force magnitude in Newtons
+     * @return The Drag force
      */
-    public static Real calculateDragForce(double rho, double radius, double velocity, double cd) {
-        double area = Math.PI * radius * radius;
-        double force = 0.5 * cd * rho * area * velocity * velocity;
-        return Real.of(force);
+    public static Quantity<Force> calculateDragForce(
+            Quantity<MassDensity> rho, 
+            Quantity<Length> radius, 
+            Quantity<Velocity> velocity, 
+            Real cd) {
+        
+        Real r = radius.getValue();
+        Real v = velocity.getValue();
+        Real rhoVal = rho.getValue();
+        Real area = Real.of(Math.PI).multiply(r.pow(2));
+        
+        Real forceMag = Real.of(0.5).multiply(cd).multiply(rhoVal).multiply(area).multiply(v.pow(2));
+        
+        return Quantities.create(forceMag, Units.NEWTON);
     }
 
     /**
-     * projects the impact point of a ball over a short time step `dt`, accounting for Drag and Magnus effects.
-     * Uses a simplified Euler integration for 2D motion (side view).
+     * Projects the impact point of a ball over a short time step `dt`.
      * 
-     * @param pos  Current position [x, y] in meters
-     * @param vel  Current velocity [vx, vy] in m/s
-     * @param spin Spin rate in revolutions per second (assumed pure backspin/topspin)
-     * @param dt   Time step in seconds
+     * @param pos   Current position [x, y]
+     * @param vel   Current velocity [vx, vy]
+     * @param spin  Spin rate
+     * @param dt    Time step
      * @return A 4-element array: [newX, newY, newVx, newVy]
      */
-    public static double[] projectImpact(double[] pos, double[] vel, double spin, double dt) {
-        // Current state
-        double x = pos[0];
-        double y = pos[1];
-        double vx = vel[0];
-        double vy = vel[1];
-        double velocity = Math.sqrt(vx * vx + vy * vy);
+    public static Quantity<?>[] projectImpact(
+            Quantity<Length>[] pos, 
+            Quantity<Velocity>[] vel, 
+            Quantity<Frequency> spin, 
+            Quantity<Time> dt) {
         
-        // Constants for standard air and ball (approximate, e.g., tennis/baseball/soccer scale)
-        double rho = 1.225; // Sea level air density
-        double radius = 0.033; // Approx tennis ball radius
+        Real x = pos[0].getValue();
+        Real y = pos[1].getValue();
+        Real vx = vel[0].getValue();
+        Real vy = vel[1].getValue();
+        Real dtVal = dt.getValue();
         
-        // Forces (Magnus)
-        // Magnitude
-        double magForce = calculateMagnusForce(rho, radius, velocity, Math.abs(spin)).doubleValue();
+        Real velocityMag = vx.pow(2).add(vy.pow(2)).sqrt();
         
-        // Direction of Magnus force:
-        // For pure topspin (positive spin param here assumed topspin for downward force),
-        // Force is perpendicular to velocity.
-        // If spin > 0 (Topspin): Force acts DOWN relative to trajectory
-        // If spin < 0 (Backspin): Force acts UP relative to trajectory
-        // This vector logic assumes standard coordinate system (Y up).
+        Quantity<MassDensity> rho = Quantities.create(1.225, Units.KILOGRAM_PER_CUBIC_METER);
+        Quantity<Length> radius = Quantities.create(0.033, Units.METER);
+        Quantity<Mass> mass = Quantities.create(0.057, Units.KILOGRAM);
+        
+        Quantity<Force> magForce = calculateMagnusForce(rho, radius, Quantities.create(velocityMag, Units.METER_PER_SECOND), spin);
+        Real fMag = magForce.getValue();
         
         // Unit velocity vector
-        double uvx = (velocity > 0) ? vx / velocity : 0;
-        double uvy = (velocity > 0) ? vy / velocity : 0;
+        Real uvx = velocityMag.isZero() ? Real.ZERO : vx.divide(velocityMag);
+        Real uvy = velocityMag.isZero() ? Real.ZERO : vy.divide(velocityMag);
         
-        // Perpendicular vector (-y, x) for 90 deg rotation
-        double pvx = -uvy;
-        double pvy = uvx;
+        // Perpendicular vector (-y, x)
+        Real pvx = uvy.negate();
+        Real pvy = uvx;
         
-        // Direction multiplier: Topspin (positive spin input) -> force down -> needs to oppose lift?
-        // Let's assume standard: Backspin (spin > 0) -> Lift (Up). Topspin (spin < 0) -> Dip (Down).
-        // Let's stick to the method signature: spin is a scalar. 
-        // We'll apply the force along the perpendicular vector scaled by spin sign.
-        double forceX = magForce * pvx * Math.signum(spin);
-        double forceY = magForce * pvy * Math.signum(spin);
+        // Magnus force components (sign of spin handled by calculateMagnusForce which takes spin magnitude implicitly via spinParameter logic above, 
+        // but here spin is typed and has sign)
+        Real forceX = fMag.multiply(pvx);
+        Real forceY = fMag.multiply(pvy);
         
-        // Drag (opposes velocity)
-        // Assuming constant Cd for simplicity
-        double dragForceMag = calculateDragForce(rho, radius, velocity, 0.5).doubleValue();
-        double dragX = -dragForceMag * uvx;
-        double dragY = -dragForceMag * uvy;
+        // Drag
+        Quantity<Force> dragForce = calculateDragForce(rho, radius, Quantities.create(velocityMag, Units.METER_PER_SECOND), Real.of(0.5));
+        Real dMag = dragForce.getValue();
+        Real dragX = dMag.multiply(uvx).negate();
+        Real dragY = dMag.multiply(uvy).negate();
         
-        // Gravity
-        // Force = m*g (mass approx 57g tennis ball). We need Acceleration = Force / Mass.
-        double mass = 0.057; // kg
-        
-        double ax = (dragX + forceX) / mass;
-        double ay = (dragY + forceY) / mass - 9.81; // Gravity acceleration directly
+        // Acceleration = Force / Mass
+        Real m = mass.getValue();
+        Real ax = forceX.add(dragX).divide(m);
+        Real ay = forceY.add(dragY).divide(m).subtract(Real.of(9.81));
         
         // Update state (Euler)
-        double newVx = vx + ax * dt;
-        double newVy = vy + ay * dt;
-        double newX = x + vx * dt;
-        double newY = y + vy * dt;
+        Real nVx = vx.add(ax.multiply(dtVal));
+        Real nVy = vy.add(ay.multiply(dtVal));
+        Real nX = x.add(vx.multiply(dtVal));
+        Real nY = y.add(vy.multiply(dtVal));
         
-        return new double[]{ newX, newY, newVx, newVy };
+        return new Quantity<?>[]{
+            Quantities.create(nX, Units.METER),
+            Quantities.create(nY, Units.METER),
+            Quantities.create(nVx, Units.METER_PER_SECOND),
+            Quantities.create(nVy, Units.METER_PER_SECOND)
+        };
     }
 }

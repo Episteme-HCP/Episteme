@@ -24,6 +24,13 @@
 package org.jscience.biology;
 
 import java.util.*;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a virus species in biological taxonomy.
@@ -35,18 +42,38 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class VirusSpecies {
 
+    @Id
     private final String name;
+    
+    @Attribute
     private final String commonName;
+    
+    @Attribute
     private final String family;
+    
+    @Attribute
     private final String genus;
-    private final Virus.GenomeType genomeType;
-    private final Virus.Morphology morphology;
+    
+    @Attribute
+    private final VirusGenomeType genomeType;
+    
+    @Attribute
+    private final VirusMorphology morphology;
+    
+    @Attribute
     private final List<String> hostSpecies = new ArrayList<>();
+    
+    @Attribute
     private final Map<String, String> additionalClassification = new LinkedHashMap<>();
+    
+    @Attribute
     private String description;
-    private double typicalDiameterNm;
+    
+    @Attribute
+    private Quantity<Length> typicalDiameter;
 
     /**
      * Creates a new VirusSpecies.
@@ -58,7 +85,7 @@ public class VirusSpecies {
      * @param morphology capsid shape
      */
     public VirusSpecies(String name, String family, String genus,
-            Virus.GenomeType genomeType, Virus.Morphology morphology) {
+            VirusGenomeType genomeType, VirusMorphology morphology) {
         this.name = Objects.requireNonNull(name);
         this.family = family;
         this.genus = genus;
@@ -71,7 +98,7 @@ public class VirusSpecies {
      * Creates a new VirusSpecies with common name.
      */
     public VirusSpecies(String name, String commonName, String family, String genus,
-            Virus.GenomeType genomeType, Virus.Morphology morphology) {
+            VirusGenomeType genomeType, VirusMorphology morphology) {
         this.name = Objects.requireNonNull(name);
         this.commonName = commonName;
         this.family = family;
@@ -97,11 +124,11 @@ public class VirusSpecies {
         return genus;
     }
 
-    public Virus.GenomeType getGenomeType() {
+    public VirusGenomeType getGenomeType() {
         return genomeType;
     }
 
-    public Virus.Morphology getMorphology() {
+    public VirusMorphology getMorphology() {
         return morphology;
     }
 
@@ -113,8 +140,8 @@ public class VirusSpecies {
         return description;
     }
 
-    public double getTypicalDiameterNm() {
-        return typicalDiameterNm;
+    public Quantity<Length> getTypicalDiameter() {
+        return typicalDiameter;
     }
 
     // Setters and builders
@@ -128,8 +155,13 @@ public class VirusSpecies {
         return this;
     }
 
-    public VirusSpecies setTypicalDiameterNm(double diameter) {
-        this.typicalDiameterNm = diameter;
+    public VirusSpecies setTypicalDiameter(Quantity<Length> diameter) {
+        this.typicalDiameter = diameter;
+        return this;
+    }
+
+    public VirusSpecies setTypicalDiameterNm(double diameterNm) {
+        this.typicalDiameter = Quantities.create(diameterNm, Units.NANOMETER);
         return this;
     }
 
@@ -144,7 +176,7 @@ public class VirusSpecies {
      * @return a Virus instance
      */
     public Virus createIndividual() {
-        return new Virus(name, family, genomeType, morphology, null, typicalDiameterNm);
+        return new Virus(name, family, genomeType, morphology, null, typicalDiameter);
     }
 
     @Override
@@ -173,7 +205,7 @@ public class VirusSpecies {
     public static VirusSpecies sarsCov2() {
         return new VirusSpecies("Severe acute respiratory syndrome coronavirus 2",
                 "SARS-CoV-2", "Coronaviridae", "Betacoronavirus",
-                Virus.GenomeType.RNA_SINGLE_STRANDED_POSITIVE, Virus.Morphology.ENVELOPED)
+                VirusGenomeType.RNA_SINGLE_STRANDED_POSITIVE, VirusMorphology.ENVELOPED)
                 .addHostSpecies("Homo sapiens")
                 .addHostSpecies("Rhinolophus affinis")
                 .setTypicalDiameterNm(120)
@@ -183,7 +215,7 @@ public class VirusSpecies {
     public static VirusSpecies influenzaA() {
         return new VirusSpecies("Influenza A virus", "Influenza A",
                 "Orthomyxoviridae", "Alphainfluenzavirus",
-                Virus.GenomeType.RNA_SINGLE_STRANDED_NEGATIVE, Virus.Morphology.ENVELOPED)
+                VirusGenomeType.RNA_SINGLE_STRANDED_NEGATIVE, VirusMorphology.ENVELOPED)
                 .addHostSpecies("Homo sapiens")
                 .addHostSpecies("Sus scrofa")
                 .addHostSpecies("Aves")
@@ -194,7 +226,7 @@ public class VirusSpecies {
     public static VirusSpecies hiv1() {
         return new VirusSpecies("Human immunodeficiency virus 1", "HIV-1",
                 "Retroviridae", "Lentivirus",
-                Virus.GenomeType.RNA_REVERSE_TRANSCRIBING, Virus.Morphology.ENVELOPED)
+                VirusGenomeType.RNA_REVERSE_TRANSCRIBING, VirusMorphology.ENVELOPED)
                 .addHostSpecies("Homo sapiens")
                 .setTypicalDiameterNm(120)
                 .setDescription("Causative agent of AIDS");
@@ -203,11 +235,9 @@ public class VirusSpecies {
     public static VirusSpecies bacteriophageT4() {
         return new VirusSpecies("Escherichia virus T4", "Bacteriophage T4",
                 "Myoviridae", "Tequatrovirus",
-                Virus.GenomeType.DNA_DOUBLE_STRANDED, Virus.Morphology.COMPLEX)
+                VirusGenomeType.DNA_DOUBLE_STRANDED, VirusMorphology.COMPLEX)
                 .addHostSpecies("Escherichia coli")
                 .setTypicalDiameterNm(200)
                 .setDescription("Well-studied bacterial virus");
     }
 }
-
-

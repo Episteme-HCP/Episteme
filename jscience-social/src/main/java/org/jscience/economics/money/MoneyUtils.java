@@ -1,24 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.economics.money;
@@ -26,7 +8,7 @@ package org.jscience.economics.money;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Utility class for financial calculations.
+ * Utility class for financial calculations using high-precision Real numbers.
  * <p>
  * Provides methods for computing interest rates, loan payments,
  * and other financial formulas.
@@ -52,9 +34,10 @@ public final class MoneyUtils {
      * @param numberOfPeriods number of periods
      * @return the future value
      */
-    public static double simpleInterestFutureValue(double principal, 
-            double interestRate, int numberOfPeriods) {
-        return principal * (1 + interestRate * numberOfPeriods);
+    public static Real simpleInterestFutureValue(Real principal, 
+            Real interestRate, int numberOfPeriods) {
+        // P * (1 + r * n)
+        return principal.multiply(Real.ONE.add(interestRate.multiply(Real.of(numberOfPeriods))));
     }
 
     /**
@@ -65,9 +48,11 @@ public final class MoneyUtils {
      * @param numberOfPeriods number of periods
      * @return the present value (initial deposit needed)
      */
-    public static double simpleInterestPresentValue(double futureValue, 
-            double interestRate, int numberOfPeriods) {
-        return futureValue / (1 + interestRate * numberOfPeriods);
+    public static Real simpleInterestPresentValue(Real futureValue, 
+            Real interestRate, int numberOfPeriods) {
+        // FV / (1 + r * n)
+        Real divisor = Real.ONE.add(interestRate.multiply(Real.of(numberOfPeriods)));
+        return futureValue.divide(divisor);
     }
 
     /**
@@ -78,9 +63,10 @@ public final class MoneyUtils {
      * @param numberOfPeriods number of periods
      * @return the annual interest rate
      */
-    public static double simpleInterestRate(double principal, double futureValue, 
+    public static Real simpleInterestRate(Real principal, Real futureValue, 
             int numberOfPeriods) {
-        return (futureValue / principal - 1) / numberOfPeriods;
+        // (FV / P - 1) / n
+        return futureValue.divide(principal).subtract(Real.ONE).divide(Real.of(numberOfPeriods));
     }
 
     /**
@@ -91,9 +77,10 @@ public final class MoneyUtils {
      * @param interestRate annual interest rate
      * @return the number of periods
      */
-    public static double simpleInterestPeriods(double principal, double futureValue, 
-            double interestRate) {
-        return (futureValue / principal - 1) / interestRate;
+    public static Real simpleInterestPeriods(Real principal, Real futureValue, 
+            Real interestRate) {
+        // (FV / P - 1) / r
+        return futureValue.divide(principal).subtract(Real.ONE).divide(interestRate);
     }
 
     // ===== Compound Interest =====
@@ -107,11 +94,15 @@ public final class MoneyUtils {
      * @param numberOfYears    number of years
      * @return the future value
      */
-    public static double compoundInterestFutureValue(double principal, 
-            double interestRate, int compoundsPerYear, int numberOfYears) {
-        double rate = interestRate / compoundsPerYear;
-        int periods = compoundsPerYear * numberOfYears;
-        return principal * Math.pow(1 + rate, periods);
+    public static Real compoundInterestFutureValue(Real principal, 
+            Real interestRate, int compoundsPerYear, int numberOfYears) {
+        // P * (1 + r/n)^(nt)
+        Real n = Real.of(compoundsPerYear);
+        Real ratePerPeriod = interestRate.divide(n);
+        int totalPeriods = compoundsPerYear * numberOfYears;
+        
+        Real factor = Real.ONE.add(ratePerPeriod).pow(totalPeriods);
+        return principal.multiply(factor);
     }
 
     /**
@@ -122,9 +113,11 @@ public final class MoneyUtils {
      * @param numberOfYears number of years
      * @return the future value
      */
-    public static double continuousInterestFutureValue(double principal, 
-            double interestRate, int numberOfYears) {
-        return principal * Math.exp(interestRate * numberOfYears);
+    public static Real continuousInterestFutureValue(Real principal, 
+            Real interestRate, int numberOfYears) {
+        // P * e^(rt)
+        Real exponent = interestRate.multiply(Real.of(numberOfYears));
+        return principal.multiply(exponent.exp());
     }
 
     /**
@@ -134,8 +127,10 @@ public final class MoneyUtils {
      * @param compoundsPerYear number of compounding periods
      * @return the effective annual rate
      */
-    public static double effectiveAnnualRate(double nominalRate, int compoundsPerYear) {
-        return Math.pow(1 + nominalRate / compoundsPerYear, compoundsPerYear) - 1;
+    public static Real effectiveAnnualRate(Real nominalRate, int compoundsPerYear) {
+        // (1 + r/n)^n - 1
+        Real n = Real.of(compoundsPerYear);
+        return Real.ONE.add(nominalRate.divide(n)).pow(compoundsPerYear).subtract(Real.ONE);
     }
 
     // ===== Loan Calculations =====
@@ -148,13 +143,15 @@ public final class MoneyUtils {
      * @param numberOfPeriods  total number of payments
      * @return the maximum loan amount
      */
-    public static double loanPrincipal(double paymentPerPeriod, 
-            double interestRate, int numberOfPeriods) {
-        if (interestRate == 0) {
-            return paymentPerPeriod * numberOfPeriods;
+    public static Real loanPrincipal(Real paymentPerPeriod, 
+            Real interestRate, int numberOfPeriods) {
+        // P = PMT * (1 - (1+r)^-n) / r
+        if (interestRate.equals(Real.ZERO)) {
+            return paymentPerPeriod.multiply(Real.of(numberOfPeriods));
         }
-        double factor = 1 - Math.pow(1 + interestRate, -numberOfPeriods);
-        return paymentPerPeriod * factor / interestRate;
+        Real onePlusR = Real.ONE.add(interestRate);
+        Real factor = Real.ONE.subtract(onePlusR.pow(-numberOfPeriods));
+        return paymentPerPeriod.multiply(factor).divide(interestRate);
     }
 
     /**
@@ -165,13 +162,15 @@ public final class MoneyUtils {
      * @param numberOfPeriods total number of payments
      * @return the periodic payment
      */
-    public static double loanPayment(double principal, double interestRate, 
+    public static Real loanPayment(Real principal, Real interestRate, 
             int numberOfPeriods) {
-        if (interestRate == 0) {
-            return principal / numberOfPeriods;
+        // PMT = P * r / (1 - (1+r)^-n)
+        if (interestRate.equals(Real.ZERO)) {
+            return principal.divide(Real.of(numberOfPeriods));
         }
-        double factor = 1 - Math.pow(1 + interestRate, -numberOfPeriods);
-        return principal * interestRate / factor;
+        Real onePlusR = Real.ONE.add(interestRate);
+        Real denominator = Real.ONE.subtract(onePlusR.pow(-numberOfPeriods));
+        return principal.multiply(interestRate).divide(denominator);
     }
 
     /**
@@ -184,15 +183,16 @@ public final class MoneyUtils {
      * @param paymentAmount       amount of each payment
      * @return the remaining balance
      */
-    public static double loanBalance(double principal, double annualRate, 
-            int paymentsPerYear, int yearsPaid, double paymentAmount) {
-        double periodRate = annualRate / paymentsPerYear;
+    public static Real loanBalance(Real principal, Real annualRate, 
+            int paymentsPerYear, int yearsPaid, Real paymentAmount) {
+        Real n = Real.of(paymentsPerYear);
+        Real periodRate = annualRate.divide(n);
         int periodsPaid = paymentsPerYear * yearsPaid;
         
-        double compoundFactor = Math.pow(1 + periodRate, periodsPaid);
-        double paymentsFactor = (compoundFactor - 1) / periodRate;
+        Real compoundFactor = Real.ONE.add(periodRate).pow(periodsPaid);
+        Real paymentsFactor = compoundFactor.subtract(Real.ONE).divide(periodRate);
         
-        return principal * compoundFactor - paymentAmount * paymentsFactor;
+        return principal.multiply(compoundFactor).subtract(paymentAmount.multiply(paymentsFactor));
     }
 
     /**
@@ -203,9 +203,9 @@ public final class MoneyUtils {
      * @param numberOfPeriods total number of payments
      * @return the total interest paid
      */
-    public static double totalInterestPaid(double principal, double payment, 
+    public static Real totalInterestPaid(Real principal, Real payment, 
             int numberOfPeriods) {
-        return payment * numberOfPeriods - principal;
+        return payment.multiply(Real.of(numberOfPeriods)).subtract(principal);
     }
 
     // ===== Money-based methods =====
@@ -214,16 +214,16 @@ public final class MoneyUtils {
      * Applies compound interest to a money amount.
      *
      * @param principal        the initial amount
-     * @param interestRate     annual interest rate (as decimal)
+     * @param interestRate     annual interest rate
      * @param compoundsPerYear compounding frequency
      * @param years            number of years
      * @return the future value
      */
-    public static Money compoundInterest(Money principal, double interestRate, 
+    public static Money compoundInterest(Money principal, Real interestRate, 
             int compoundsPerYear, int years) {
-        double futureValue = compoundInterestFutureValue(
-            principal.getValue().doubleValue(), interestRate, compoundsPerYear, years);
-        return Money.valueOf(Real.of(futureValue), principal.getCurrency());
+        Real futureValue = compoundInterestFutureValue(
+            principal.getValue(), interestRate, compoundsPerYear, years);
+        return Money.valueOf(futureValue, principal.getCurrency());
     }
 
     /**
@@ -234,10 +234,10 @@ public final class MoneyUtils {
      * @param years       loan term in years
      * @return the monthly payment
      */
-    public static Money monthlyMortgagePayment(Money principal, double annualRate, int years) {
-        double monthlyRate = annualRate / 12;
+    public static Money monthlyMortgagePayment(Money principal, Real annualRate, int years) {
+        Real monthlyRate = annualRate.divide(Real.of(12));
         int totalPayments = years * 12;
-        double payment = loanPayment(principal.getValue().doubleValue(), monthlyRate, totalPayments);
-        return Money.valueOf(Real.of(payment), principal.getCurrency());
+        Real payment = loanPayment(principal.getValue(), monthlyRate, totalPayments);
+        return Money.valueOf(payment, principal.getCurrency());
     }
 }

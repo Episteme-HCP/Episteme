@@ -24,6 +24,8 @@ package org.jscience.law.loaders;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.law.Statute;
+import org.jscience.law.StatuteStatus;
+import org.jscience.law.StatuteType;
 
 /**
  * Loader for International Treaties and United Nations legal documents.
@@ -41,7 +43,7 @@ public final class UnLawLoader extends AbstractResourceReader<Statute> implement
         // resourceId would be a treaty Registration Number or name
         if (resourceId != null && !resourceId.isEmpty()) {
             return new Statute(resourceId, "UN International Treaty", 
-                Statute.Type.TREATY, "International", 2025, Statute.Status.ENACTED);
+                StatuteType.TREATY, "International", 2025, StatuteStatus.ENACTED);
         }
         
         throw new Exception("Invalid UN Treaty identifier: " + resourceId);
@@ -50,7 +52,7 @@ public final class UnLawLoader extends AbstractResourceReader<Statute> implement
     @Override
     public Statute loadContent(String content) {
         return new Statute("UNMOCK", "Content-loaded UN Treaty", 
-            Statute.Type.TREATY, "International", 2025, Statute.Status.ENACTED);
+            StatuteType.TREATY, "International", 2025, StatuteStatus.ENACTED);
     }
 
     @Override

@@ -22,8 +22,8 @@
  */
 package org.jscience.philosophy.epistemology;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Dimensionless;
 
 /**
  * Evidence based on sensory experience, scientific experiments, or observation.
@@ -33,10 +33,8 @@ import java.util.Map;
  * @since 1.0
  */
 public class EmpiricalEvidence extends Evidence {
-    private Map<String, Object> traits = new HashMap<>();
-    @Override public Map<String, Object> getTraits() { return traits; }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Creates new EmpiricalEvidence.
@@ -45,12 +43,7 @@ public class EmpiricalEvidence extends Evidence {
      * @param description the observed facts
      * @param reliability confidence in the observation
      */
-    public EmpiricalEvidence(String source, String description, double reliability) {
-        super(source, description, reliability);
-    }
-
-    @Override
-    public String getEvidenceType() {
-        return "Empirical";
+    public EmpiricalEvidence(String source, String description, Quantity<Dimensionless> reliability) {
+        super(source, description, reliability, EvidenceKind.EMPIRICAL);
     }
 }

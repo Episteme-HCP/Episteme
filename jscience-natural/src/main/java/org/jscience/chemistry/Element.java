@@ -64,10 +64,6 @@ public class Element implements ComprehensiveIdentification {
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    public enum ElementCategory {
-        ALKALI_METAL, ALKALINE_EARTH_METAL, TRANSITION_METAL, POST_TRANSITION_METAL, CHEMICALLY_UNKNOWN, METALLOID,
-        NONMETAL, HALOGEN, NOBLE_GAS, LANTHANIDE, ACTINIDE, UNKNOWN
-    }
 
     @Attribute
     private int atomicNumber;
@@ -115,6 +111,10 @@ public class Element implements ComprehensiveIdentification {
     public Element(String name, String symbol) {
         this.id = new SimpleIdentification(symbol);
         setName(name);
+    }
+    
+    public void addAttribute(String key, Object value) {
+        traits.put(key, value);
     }
 
     @Override

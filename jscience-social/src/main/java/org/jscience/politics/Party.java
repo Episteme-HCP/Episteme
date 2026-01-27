@@ -43,11 +43,6 @@ public class Party implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /** Common political ideologies. */
-    public enum Ideology {
-        FAR_LEFT, LEFT, CENTER_LEFT, CENTER, CENTER_RIGHT, RIGHT, FAR_RIGHT,
-        GREEN, LIBERTARIAN, NATIONALIST, SOCIALIST, LIBERAL, CONSERVATIVE
-    }
 
     @Id
     private final String name;

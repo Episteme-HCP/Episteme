@@ -29,6 +29,7 @@ import java.util.Set;
 import org.jscience.biology.Individual;
 import org.jscience.economics.money.Wallet;
 import org.jscience.sociology.Role;
+import org.jscience.sociology.RoleKind;
 
 /**
  * Represents an autonomous actor in an economic system, which can be an 
@@ -63,6 +64,14 @@ public class EconomicAgent extends Role {
     /**
      * Protected constructor for specialized sub-types of agents (e.g., Banks, Factories).
      */
+    protected EconomicAgent(Individual individual, String name,
+            EconomicSituation situation, RoleKind kind) {
+        super(individual, name, situation, kind);
+        this.belongings = new HashSet<>();
+        this.wallet = new Wallet();
+    }
+
+    @Deprecated
     protected EconomicAgent(Individual individual, String name,
             EconomicSituation situation, int kind) {
         super(individual, name, situation, kind);

@@ -53,10 +53,6 @@ public final class Transaction implements ComprehensiveIdentification {
     /**
      * Transaction status.
      */
-    public enum Status {
-        PENDING, COMPLETED, CANCELLED, FAILED
-    }
-
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Organization seller;
 
@@ -82,7 +78,7 @@ public final class Transaction implements ComprehensiveIdentification {
     private final int quantity;
 
     @Attribute
-    private Status status;
+    private TransactionStatus status;
 
     /**
      * Creates a money transaction.
@@ -104,7 +100,7 @@ public final class Transaction implements ComprehensiveIdentification {
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
         this.share = null;
         this.quantity = 0;
-        this.status = Status.PENDING;
+        this.status = TransactionStatus.PENDING;
     }
 
     /**
@@ -132,7 +128,7 @@ public final class Transaction implements ComprehensiveIdentification {
         }
         this.quantity = quantity;
         this.amount = Money.valueOf(Real.ZERO, Currency.USD);
-        this.status = Status.PENDING;
+        this.status = TransactionStatus.PENDING;
     }
 
     private static String requireNonEmpty(String value, String name) {
@@ -186,7 +182,7 @@ public final class Transaction implements ComprehensiveIdentification {
         return quantity;
     }
 
-    public Status getStatus() {
+    public TransactionStatus getStatus() {
         return status;
     }
 
@@ -194,7 +190,7 @@ public final class Transaction implements ComprehensiveIdentification {
      * Updates the transaction status.
      * @param status the new status
      */
-    public void setStatus(Status status) {
+    public void setStatus(TransactionStatus status) {
         this.status = Objects.requireNonNull(status, "Status cannot be null");
     }
 
@@ -202,14 +198,14 @@ public final class Transaction implements ComprehensiveIdentification {
      * Marks the transaction as completed.
      */
     public void complete() {
-        this.status = Status.COMPLETED;
+        this.status = TransactionStatus.COMPLETED;
     }
 
     /**
      * Marks the transaction as cancelled.
      */
     public void cancel() {
-        this.status = Status.CANCELLED;
+        this.status = TransactionStatus.CANCELLED;
     }
 
     /**

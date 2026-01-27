@@ -25,16 +25,7 @@ package org.jscience.biology;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 import org.jscience.biology.taxonomy.Species;
 import org.jscience.earth.Place;
@@ -56,6 +47,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * Supports multiple reproduction modes including sexual and asexual.
  * </p>
  * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
+ * Modernized to use Extensible Enums for Sex, LifeStage, and ReproductionMode.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -64,7 +56,7 @@ import org.jscience.mathematics.numbers.real.Real;
 @Persistent
 public class Individual implements ComprehensiveIdentification, Positioned<Place> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     protected final Identification id;
@@ -72,26 +64,11 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    /** Biological sex of the individual. */
-    public enum Sex {
-        MALE, FEMALE, HERMAPHRODITE, ASEXUAL, UNKNOWN
-    }
-
-    /** Major life stages of the organism. */
-    public enum LifeStage {
-        EMBRYO, JUVENILE, ADULT, SENESCENT
-    }
-
-    /** Reproduction modes for different organisms. */
-    public enum ReproductionMode {
-        SEXUAL, ASEXUAL, BUDDING, FRAGMENTATION, PARTHENOGENESIS, BINARY_FISSION
-    }
-
     @Attribute
     private final Species species;
     
     @Attribute
-    private final Sex sex;
+    private final BiologicalSex sex;
     
     @Attribute
     private final LocalDate birthDate;
@@ -122,17 +99,11 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
 
     /**
      * Creates a new individual organism.
-     *
-     * @param id        unique identifier
-     * @param species   biological species
-     * @param sex       organism sex
-     * @param birthDate birth or creation date (can be null for historical/unknown cases)
-     * @throws NullPointerException if id or species is null
      */
-    public Individual(Identification id, Species species, Sex sex, LocalDate birthDate) {
+    public Individual(Identification id, Species species, BiologicalSex sex, LocalDate birthDate) {
         this.id = Objects.requireNonNull(id, "ID cannot be null");
         this.species = Objects.requireNonNull(species, "Species cannot be null");
-        this.sex = sex != null ? sex : Sex.UNKNOWN;
+        this.sex = sex != null ? sex : BiologicalSex.UNKNOWN;
         this.birthDate = birthDate;
         this.lifeStage = LifeStage.JUVENILE;
     }
@@ -140,21 +111,15 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
     /**
      * Helper constructor for String IDs.
      */
-    public Individual(String id, Species species, Sex sex, LocalDate birthDate) {
+    public Individual(String id, Species species, BiologicalSex sex, LocalDate birthDate) {
         this(new SimpleIdentification(id), species, sex, birthDate);
     }
 
-    /**
-     * Creates a new individual with the current date as birth date.
-     */
-    public Individual(Identification id, Species species, Sex sex) {
+    public Individual(Identification id, Species species, BiologicalSex sex) {
         this(id, species, sex, null);
     }
 
-    /**
-     * Helper constructor for String IDs.
-     */
-    public Individual(String id, Species species, Sex sex) {
+    public Individual(String id, Species species, BiologicalSex sex) {
         this(new SimpleIdentification(id), species, sex, null);
     }
 
@@ -168,11 +133,6 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         return traits;
     }
 
-    /**
-     * Finds all descendants of this individual.
-     * 
-     * @return a set of descendants
-     */
     public Set<Individual> getDescendants() {
         Set<Individual> descendants = new HashSet<>();
         collectDescendants(this, descendants);
@@ -187,11 +147,6 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         }
     }
 
-    /**
-     * Finds all ancestors of this individual.
-     * 
-     * @return a set of ancestors
-     */
     public Set<Individual> getAncestors() {
         Set<Individual> ancestors = new HashSet<>();
         collectAncestors(this, ancestors);
@@ -206,25 +161,14 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         }
     }
 
-    /**
-     * Checks if this individual is a descendant of another.
-     */
     public boolean isDescendantOf(Individual suspectedAncestor) {
         return getAncestors().contains(suspectedAncestor);
     }
 
-    /**
-     * Checks if this individual is an ancestor of another.
-     */
     public boolean isAncestorOf(Individual suspectedDescendant) {
         return getDescendants().contains(suspectedDescendant);
     }
 
-    /**
-     * Calculates the genealogical distance between two individuals.
-     * 
-     * @return distance in generations (1 for parent-child, 2 for grandparents/siblings), or -1 if no relation
-     */
     public int getGenealogicalDistance(Individual other) {
         if (this.equals(other)) return 0;
         
@@ -253,107 +197,55 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         return -1;
     }
 
-    /**
-     * Returns the species of this individual.
-     * @return the species
-     */
     public Species getSpecies() {
         return species;
     }
 
-    /**
-     * Returns the biological sex.
-     * @return the sex
-     */
-    public Sex getSex() {
+    public BiologicalSex getSex() {
         return sex;
     }
 
-    /**
-     * Returns the birth or creation date.
-     * @return the birth date
-     */
     public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    /**
-     * Returns the death date, or null if alive.
-     * @return the death date
-     */
     public LocalDate getDeathDate() {
         return deathDate;
     }
 
-    /**
-     * Sets the death date of the individual.
-     * @param deathDate the date of death
-     */
     public void setDeathDate(LocalDate deathDate) {
         this.deathDate = deathDate;
     }
 
-    /**
-     * Returns the current life stage.
-     * @return the life stage
-     */
     public LifeStage getLifeStage() {
         return lifeStage;
     }
 
-    /**
-     * Sets the life stage of the individual.
-     * @param stage the stage to set
-     */
     public void setLifeStage(LifeStage stage) {
         this.lifeStage = stage;
     }
 
-    /**
-     * Returns the reproduction mode used to create this individual.
-     * @return the reproduction mode
-     */
     public ReproductionMode getReproductionMode() {
         return reproductionMode;
     }
 
-    /**
-     * Sets the reproduction mode.
-     * @param mode the mode to set
-     */
     public void setReproductionMode(ReproductionMode mode) {
         this.reproductionMode = mode;
     }
 
-    /**
-     * Returns the current location of the individual.
-     * @return the place
-     */
     @Override
     public Place getPosition() {
         return place;
     }
 
-    /**
-     * Sets the current location.
-     * @param place the place to set
-     */
     public void setPosition(Place place) {
         this.place = place;
     }
 
-    /**
-     * Returns the territory associated with this individual.
-     * @return the territory place
-     */
     public Place getTerritory() {
         return territory;
     }
 
-    /**
-     * Sets the territory.
-     * @param territory the territory to set
-     */
     public void setTerritory(Place territory) {
         this.territory = territory;
     }
@@ -370,18 +262,10 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         }
     }
 
-    /**
-     * Returns an unmodifiable set of parents.
-     * @return set of parents
-     */
     public Set<Individual> getParents() {
         return Collections.unmodifiableSet(parents);
     }
 
-    /**
-     * Adds a parent to this individual and adds this as its child (double link).
-     * @param parent the parent to add
-     */
     public void addParent(Individual parent) {
         if (parent != null && !parents.contains(parent)) {
             parents.add(parent);
@@ -389,18 +273,10 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         }
     }
 
-    /**
-     * Returns an unmodifiable set of children.
-     * @return set of children
-     */
     public Set<Individual> getChildren() {
         return Collections.unmodifiableSet(children);
     }
 
-    /**
-     * Adds a child to this individual and sets this as its parent (double link).
-     * @param child the child to add
-     */
     public void addChild(Individual child) {
         if (child != null && !children.contains(child)) {
             children.add(child);
@@ -408,10 +284,6 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         }
     }
 
-    /**
-     * Adds a pathology name to the individual's history.
-     * @param pathologyName the pathology to add
-     */
     @SuppressWarnings("unchecked")
     public void addPathology(String pathologyName) {
         if (pathologyName != null) {
@@ -424,97 +296,52 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         }
     }
 
-    /**
-     * Returns the set of pathology names.
-     * @return set of pathologies
-     */
     @SuppressWarnings("unchecked")
     public Set<String> getPathologies() {
         return (Set<String>) getTrait("pathologies", Set.class);
     }
 
-    /**
-     * Returns the biography summary.
-     * @return summary or null
-     */
     public String getBiographySummary() {
         return (String) getTrait("biography_summary");
     }
 
-    /**
-     * Sets the biography summary.
-     * @param summary the summary
-     */
     public void setBiographySummary(String summary) {
         setTrait("biography_summary", summary);
     }
 
-    /**
-     * Registers a behavior that this individual is capable of exhibiting.
-     * @param behavior behavior to add
-     */
     public void addAvailableBehavior(Behavior behavior) {
         if (behavior != null) {
             availableBehaviors.add(behavior);
         }
     }
 
-    /**
-     * Returns an unmodifiable set of behaviors available to this individual.
-     * @return set of behaviors
-     */
     public Set<Behavior> getAvailableBehaviors() {
         return Collections.unmodifiableSet(availableBehaviors);
     }
 
-    /**
-     * Removes a behavior from the individual's available set.
-     * @param behavior behavior to remove
-     */
     public void removeAvailableBehavior(Behavior behavior) {
         availableBehaviors.remove(behavior);
     }
 
-    /**
-     * Checks if the individual is still alive.
-     * @return true if deathDate is null
-     */
     public boolean isAlive() {
         return deathDate == null;
     }
 
-    /**
-     * Calculates the age of the individual in years.
-     * @return age in years
-     */
     public int getAge() {
         LocalDate endDate = deathDate != null ? deathDate : LocalDate.now();
-        return Period.between(birthDate, endDate).getYears();
+        return birthDate != null ? Period.between(birthDate, endDate).getYears() : 0;
     }
 
-    /**
-     * Marks the individual as deceased.
-     * @param date the date of death
-     */
     public void die(LocalDate date) {
         this.deathDate = date;
         this.lifeStage = LifeStage.SENESCENT;
     }
 
-    /**
-     * Checks if this individual is a sibling of another individual.
-     * @param other the other individual
-     * @return true if they share at least one parent
-     */
     public boolean isSiblingOf(Individual other) {
         if (this == other || other == null) return false;
         return !Collections.disjoint(parents, other.parents);
     }
 
-    /**
-     * Returns a list of siblings.
-     * @return list of siblings
-     */
     public List<Individual> getSiblings() {
         Set<Individual> siblings = new HashSet<>();
         for (Individual parent : parents) {
@@ -527,11 +354,6 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         return new ArrayList<>(siblings);
     }
 
-    /**
-     * Clones this individual.
-     * @param newId identifier for the clone
-     * @return the new clone instance
-     */
     public Individual clone(String newId) {
         Individual clone = new Individual(newId, species, sex, LocalDate.now());
         clone.reproductionMode = ReproductionMode.ASEXUAL;
@@ -541,16 +363,8 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         return clone;
     }
 
-    /**
-     * Calculates the Wright's coefficient of inbreeding (F) for this individual.
-     * F = Σ (1/2)^(n1+n2+1) × (1 + FA)
-     * 
-     * @return inbreeding coefficient as a {@link Real} number
-     */
     public Real calculateInbreedingCoefficient() {
-        if (parents.size() < 2) {
-            return Real.ZERO;
-        }
+        if (parents.size() < 2) return Real.ZERO;
         
         List<Individual> parentList = new ArrayList<>(parents);
         Individual p1 = parentList.get(0);
@@ -564,9 +378,7 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         Set<Individual> commonAncestors = new HashSet<>(ancestors1);
         commonAncestors.retainAll(ancestors2);
         
-        if (commonAncestors.isEmpty()) {
-            return Real.ZERO;
-        }
+        if (commonAncestors.isEmpty()) return Real.ZERO;
         
         double fValue = 0.0;
         for (Individual ancestor : commonAncestors) {
@@ -580,16 +392,9 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
                 }
             }
         }
-        
         return Real.of(fValue);
     }
 
-    /**
-     * Calculates the coefficient of relationship (r) between this individual and another.
-     * 
-     * @param other the other individual
-     * @return relationship coefficient as a {@link Real} number
-     */
     public Real calculateRelationshipCoefficient(Individual other) {
         Objects.requireNonNull(other, "Other individual cannot be null");
         
@@ -601,9 +406,7 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         Set<Individual> commonAncestors = new HashSet<>(ancestorsA);
         commonAncestors.retainAll(ancestorsB);
         
-        if (commonAncestors.isEmpty()) {
-            return Real.ZERO;
-        }
+        if (commonAncestors.isEmpty()) return Real.ZERO;
         
         double rValue = 0.0;
         for (Individual ancestor : commonAncestors) {
@@ -615,16 +418,9 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
                 }
             }
         }
-        
         return Real.of(rValue);
     }
     
-    /**
-     * Calculates the order of succession based on primogeniture starting from this individual.
-     * 
-     * @param malePriority if true, males take priority over females
-     * @return unmodifiable ordered list of successors
-     */
     public List<Individual> calculateSuccessionOrder(boolean malePriority) {
         List<Individual> order = new ArrayList<>();
         collectSuccessors(this, order, malePriority);
@@ -636,8 +432,8 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
         
         currentChildren.sort((c1, c2) -> {
             if (malePriority) {
-                if (c1.getSex() == Sex.MALE && c2.getSex() != Sex.MALE) return -1;
-                if (c2.getSex() == Sex.MALE && c1.getSex() != Sex.MALE) return 1;
+                if (c1.getSex() == BiologicalSex.MALE && c2.getSex() != BiologicalSex.MALE) return -1;
+                if (c2.getSex() == BiologicalSex.MALE && c1.getSex() != BiologicalSex.MALE) return 1;
             }
             if (c1.getBirthDate() != null && c2.getBirthDate() != null) {
                 return c1.getBirthDate().compareTo(c2.getBirthDate());
@@ -663,7 +459,6 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
             paths.add(depth);
             return;
         }
-        
         for (Individual parent : current.getParents()) {
             findPaths(parent, target, depth + 1, paths, visited);
         }

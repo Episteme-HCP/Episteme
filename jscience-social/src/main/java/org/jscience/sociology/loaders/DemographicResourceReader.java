@@ -38,10 +38,11 @@ public final class DemographicResourceReader extends AbstractResourceReader<Demo
         DemographicData dd = new DemographicData();
         dd.setPopulationName("World 2025 (Integrated Sample)");
         
-        Group youth = new Group("Youth Sample", Group.Type.COMMUNITY);
+        Group youth = new Group("Youth Sample", org.jscience.sociology.GroupKind.COMMUNITY);
         Random rand = new Random();
         for (int i = 0; i < 100; i++) {
-            Person p = new Person("Student " + i, rand.nextBoolean() ? Person.Gender.MALE : Person.Gender.FEMALE);
+            Person p = new Person("Student " + i, rand.nextBoolean() ? org.jscience.biology.BiologicalSex.MALE : org.jscience.biology.BiologicalSex.FEMALE);
+            p.setGender(rand.nextBoolean() ? org.jscience.sociology.Gender.MALE : org.jscience.sociology.Gender.FEMALE);
             youth.addMember(p);
         }
         dd.addGroup(youth);

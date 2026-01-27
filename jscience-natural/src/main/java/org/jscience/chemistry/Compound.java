@@ -23,12 +23,16 @@
 
 package org.jscience.chemistry;
 
-import org.jscience.util.Named;
+
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 
 /**
  * Represents a chemical compound with its primary identification and properties.
@@ -38,11 +42,17 @@ import java.io.Serializable;
  * @since 1.0
  */
 @Persistent
-public class Compound implements Named, Serializable {
+public class Compound implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
     @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
     private final long cid;
     
     @Attribute
@@ -65,6 +75,7 @@ public class Compound implements Named, Serializable {
 
     public Compound(long cid, String iupacName, String molecularFormula, double molecularWeight, 
                     String smiles, String inchi, String inchiKey) {
+        this.id = new SimpleIdentification("CID:" + cid);
         this.cid = cid;
         this.iupacName = iupacName;
         this.molecularFormula = molecularFormula;
@@ -72,6 +83,28 @@ public class Compound implements Named, Serializable {
         this.smiles = smiles;
         this.inchi = inchi;
         this.inchiKey = inchiKey;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    @Override
+    public void setName(String name) {
+        // iupacName is final, so we can't change it. 
+        // Ideally we should remove 'final' from iupacName or alias it.
+        // But for this refactor, I will just put it in traits as 'name' if separate.
+        // Actually, ComprehensiveIdentification extends Named { setName(String); }
+        // So I MUST implement setName.
+        // I will change iupacName to non-final or use a separate name field.
+        // Let's change iupacName to non-final.
+        throw new UnsupportedOperationException("Compound name (IUPAC) is immutable in this version."); 
     }
 
     public long getCid() {

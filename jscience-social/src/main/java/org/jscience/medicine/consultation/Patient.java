@@ -1,7 +1,7 @@
 package org.jscience.medicine.consultation;
 
 import org.jscience.biology.Individual;
-import org.jscience.measure.Report;
+import org.jscience.methodology.ScientificReport;
 import org.jscience.sociology.Role;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Attribute;
@@ -57,7 +57,7 @@ public class Patient extends Role {
     private Set<Treatment> treatments;
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private List<Report> medicalRecords; //List of Records
+    private final List<ScientificReport> medicalReports; //List of Records
 
 /**
      * Creates a new Patient object.
@@ -76,7 +76,21 @@ public class Patient extends Role {
         this.bloodOxygen = 0;
         this.currentPathologies = Collections.emptySet();
         this.treatments = Collections.emptySet();
-        this.medicalRecords = new ArrayList<>();
+        this.medicalReports = new ArrayList<>();
+    }
+
+    public Patient(Individual individual) {
+        super(individual, "Patient", null, Role.CLIENT); // Assuming a default MedicalSituation or null is acceptable
+        this.bloodPressure = 0;
+        this.cardiacRate = 0;
+        this.temperature = 0;
+        this.normalTemperature = 0;
+        this.respiratoryRate = 0;
+        this.painScale = 0;
+        this.bloodOxygen = 0;
+        this.currentPathologies = Collections.emptySet();
+        this.treatments = Collections.emptySet();
+        this.medicalReports = new ArrayList<>();
     }
 
     /**
@@ -288,18 +302,25 @@ public class Patient extends Role {
      *
      * @return an unmodifiable view of medical records
      */
-    public List<Report> getMedicalRecords() {
-        return Collections.unmodifiableList(medicalRecords);
+    public List<ScientificReport> getMedicalReports() {
+        return new ArrayList<>(medicalReports);
     }
 
-    /**
-     * Adds a medical record to the patient's history.
-     *
-     * @param medicalRecord the report to add
-     * @throws NullPointerException if the record is null
-     */
-    public void addMedicalRecord(Report medicalRecord) {
-        medicalRecords.add(Objects.requireNonNull(medicalRecord, "Medical record cannot be null"));
+    public void addMedicalReport(ScientificReport report) {
+        if (report != null) {
+            medicalReports.add(report);
+        }
+    }
+
+    public void removeMedicalReport(ScientificReport report) {
+        medicalReports.remove(report);
+    }
+
+    public void setMedicalReports(List<ScientificReport> reports) {
+        if (reports != null) {
+            this.medicalReports.clear();
+            this.medicalReports.addAll(reports);
+        }
     }
 
     /**
@@ -307,8 +328,8 @@ public class Patient extends Role {
      *
      * @param medicalRecord the record to remove
      */
-    public void removeMedicalRecord(Report medicalRecord) {
-        medicalRecords.remove(medicalRecord);
+    public void removeMedicalRecord(ScientificReport medicalRecord) {
+        medicalReports.remove(medicalRecord);
     }
 
     /**
@@ -317,18 +338,8 @@ public class Patient extends Role {
      * @throws IndexOutOfBoundsException if there are no records to remove
      */
     public void removeLastMedicalRecord() {
-        if (!medicalRecords.isEmpty()) {
-            medicalRecords.remove(medicalRecords.size() - 1);
+        if (!medicalReports.isEmpty()) {
+            medicalReports.remove(medicalReports.size() - 1);
         }
-    }
-
-    /**
-     * Sets the complete patient record history.
-     *
-     * @param medicalRecords the new list of medical records
-     * @throws NullPointerException if the input list is null
-     */
-    public void setMedicalRecords(List<Report> medicalRecords) {
-        this.medicalRecords = new ArrayList<>(Objects.requireNonNull(medicalRecords, "Medical records list cannot be null"));
     }
 }

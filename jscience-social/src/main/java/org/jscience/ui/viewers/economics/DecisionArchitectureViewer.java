@@ -45,8 +45,8 @@ public final class DecisionArchitectureViewer extends AbstractViewer {
         matrixGrid.getChildren().clear();
         int row = 0;
         for (var entry : model.getPayoffMatrix().entrySet()) {
-            Label lbl = new Label(entry.getKey() + ": (" + entry.getValue().player1() + ", " + 
-                                  entry.getValue().player2() + ")");
+            Label lbl = new Label(entry.getKey() + ": (" + entry.getValue().getPlayer1() + ", " + 
+                                  entry.getValue().getPlayer2() + ")");
             lbl.setStyle("-fx-border-color: Gray; -fx-padding: 10; -fx-background-color: #222;");
             matrixGrid.add(lbl, row % 2, row / 2);
             row++;

@@ -31,6 +31,7 @@ package org.jscience.social;
 
 import org.jscience.economics.*;
 import org.jscience.sociology.*;
+import org.jscience.biology.BiologicalSex;
 import org.jscience.politics.*;
 import org.jscience.geography.*;
 import org.jscience.mathematics.numbers.real.Real;
@@ -61,8 +62,8 @@ public class SimulationEnginesTest {
     @Test
     public void testCensus() {
         List<Person> people = new ArrayList<>();
-        people.add(new Person("1", "A", Person.Gender.FEMALE, LocalDate.of(2000, 1, 1), "US"));
-        people.add(new Person("2", "B", Person.Gender.MALE, LocalDate.of(1950, 1, 1), "US"));
+        people.add(new Person("1", "A", BiologicalSex.FEMALE, LocalDate.of(2000, 1, 1), "US"));
+        people.add(new Person("2", "B", BiologicalSex.MALE, LocalDate.of(1950, 1, 1), "US"));
 
         Census census = new Census(people);
 
@@ -71,9 +72,9 @@ public class SimulationEnginesTest {
         double avgAge = census.getAverageAge();
         assertTrue(avgAge > 20 && avgAge < 100);
 
-        Map<Person.Gender, Long> genderDist = census.getGenderDistribution();
-        assertEquals(1L, genderDist.get(Person.Gender.FEMALE));
-        assertEquals(1L, genderDist.get(Person.Gender.MALE));
+        Map<Gender, Long> genderDist = census.getGenderDistribution();
+        assertEquals(1L, genderDist.get(Gender.FEMALE));
+        assertEquals(1L, genderDist.get(Gender.MALE));
     }
 
     @Test
@@ -83,11 +84,11 @@ public class SimulationEnginesTest {
         votes.put("Party B", 50L);
         votes.put("Party C", 25L);
 
-        List<String> fptpWinner = VotingSystem.determineWinners(votes, VotingSystem.Method.FIRST_PAST_THE_POST, 1);
+        List<String> fptpWinner = VotingSystem.determineWinners(votes, VotingMethod.FIRST_PAST_THE_POST, 1);
         assertEquals(1, fptpWinner.size());
         assertEquals("Party A", fptpWinner.get(0));
 
-        List<String> propWinners = VotingSystem.determineWinners(votes, VotingSystem.Method.PROPORTIONAL, 10);
+        List<String> propWinners = VotingSystem.determineWinners(votes, VotingMethod.PROPORTIONAL, 10);
         assertEquals(3, propWinners.size());
         assertTrue(propWinners.stream().anyMatch(w -> w.contains("Party A")));
     }

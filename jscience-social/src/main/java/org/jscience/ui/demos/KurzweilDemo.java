@@ -35,6 +35,7 @@ import org.jscience.ui.AbstractDemo;
 import org.jscience.history.HistoricalTimeline;
 import org.jscience.history.HistoricalEvent;
 import org.jscience.history.time.FuzzyTimePoint;
+import org.jscience.history.EventCategory;
 import org.jscience.ui.viewers.history.TimelineViewer;
 import org.jscience.ui.i18n.I18n;
 
@@ -130,7 +131,7 @@ public class KurzweilDemo extends AbstractDemo {
             // NOTE: Key is passed as label, TimelineViewer should translate it if it's a key.
             // Using I18n here directly means the stored event has the localized string.
             // Assuming HistoricalEvent doesn't store key but display string.
-            timeline.addEvent(new HistoricalEvent(I18n.getInstance().get(m.label, "Milestone"), date, HistoricalEvent.Category.SCIENTIFIC));
+            timeline.addEvent(new HistoricalEvent(I18n.getInstance().get(m.label, "Milestone"), date, EventCategory.SCIENTIFIC));
         }
 
         // Main content - two viewers

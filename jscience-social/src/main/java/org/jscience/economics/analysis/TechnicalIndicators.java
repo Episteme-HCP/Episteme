@@ -56,12 +56,12 @@ public final class TechnicalIndicators {
             return null;
         }
 
-        double sum = 0.0;
+        Real sum = Real.ZERO;
         int start = candles.size() - period;
         for (int i = start; i < candles.size(); i++) {
-            sum += candles.get(i).close.getAmount().doubleValue();
+            sum = sum.add(candles.get(i).close.getAmount());
         }
-        return Real.of(sum / period);
+        return sum.divide(Real.of(period));
     }
 
     /**
@@ -77,27 +77,28 @@ public final class TechnicalIndicators {
         }
 
         // Calculate returns
-        double[] returns = new double[period];
+        Real[] returns = new Real[period];
         int start = candles.size() - period - 1;
         for (int i = 0; i < period; i++) {
-            double prev = candles.get(start + i).close.getAmount().doubleValue();
-            double curr = candles.get(start + i + 1).close.getAmount().doubleValue();
-            returns[i] = (curr - prev) / prev;
+            Real prev = candles.get(start + i).close.getAmount();
+            Real curr = candles.get(start + i + 1).close.getAmount();
+            returns[i] = curr.subtract(prev).divide(prev);
         }
 
         // Mean of returns
-        double mean = 0.0;
-        for (double r : returns) {
-            mean += r;
+        Real mean = Real.ZERO;
+        for (Real r : returns) {
+            mean = mean.add(r);
         }
-        mean /= period;
+        mean = mean.divide(Real.of(period));
 
         // Standard deviation
-        double sumSq = 0.0;
-        for (double r : returns) {
-            sumSq += (r - mean) * (r - mean);
+        Real sumSq = Real.ZERO;
+        for (Real r : returns) {
+            Real diff = r.subtract(mean);
+            sumSq = sumSq.add(diff.multiply(diff));
         }
-        return Real.of(Math.sqrt(sumSq / period));
+        return sumSq.divide(Real.of(period)).sqrt();
     }
 
     /**
@@ -113,31 +114,30 @@ public final class TechnicalIndicators {
             return null;
         }
 
-        double gains = 0.0;
-        double losses = 0.0;
+        Real gains = Real.ZERO;
+        Real losses = Real.ZERO;
         int start = candles.size() - period - 1;
 
         for (int i = 0; i < period; i++) {
-            double prev = candles.get(start + i).close.getAmount().doubleValue();
-            double curr = candles.get(start + i + 1).close.getAmount().doubleValue();
-            double change = curr - prev;
-            if (change > 0) {
-                gains += change;
+            Real prev = candles.get(start + i).close.getAmount();
+            Real curr = candles.get(start + i + 1).close.getAmount();
+            Real change = curr.subtract(prev);
+            if (change.compareTo(Real.ZERO) > 0) {
+                gains = gains.add(change);
             } else {
-                losses -= change; // Make positive
+                losses = losses.subtract(change); // Make positive
             }
         }
 
-        if (losses == 0) {
+        if (losses.isZero()) {
             return Real.of(100.0); // All gains, max RSI
         }
 
-        double avgGain = gains / period;
-        double avgLoss = losses / period;
-        double rs = avgGain / avgLoss;
-        double rsi = 100.0 - (100.0 / (1.0 + rs));
-
-        return Real.of(rsi);
+        Real avgGain = gains.divide(Real.of(period));
+        Real avgLoss = losses.divide(Real.of(period));
+        Real rs = avgGain.divide(avgLoss);
+        // rsi = 100.0 - (100.0 / (1.0 + rs))
+        return Real.of(100).subtract(Real.of(100).divide(Real.ONE.add(rs)));
     }
 
     /**
@@ -148,31 +148,37 @@ public final class TechnicalIndicators {
      * @param stdMultiplier Standard deviation multiplier (typically 2)
      * @return Array of [lower, middle, upper] bands, or null if insufficient data
      */
-    public static Real[] bollingerBands(List<Candle> candles, int period, double stdMultiplier) {
+    public static Real[] bollingerBands(List<Candle> candles, int period, Real stdMultiplier) {
         Real middle = sma(candles, period);
         if (middle == null) {
             return null;
         }
 
         // Calculate standard deviation of closing prices
-        double sum = 0.0;
-        double sumSq = 0.0;
+        Real sum = Real.ZERO;
+        Real sumSq = Real.ZERO;
         int start = candles.size() - period;
         for (int i = start; i < candles.size(); i++) {
-            double price = candles.get(i).close.getAmount().doubleValue();
-            sum += price;
-            sumSq += price * price;
+            Real price = candles.get(i).close.getAmount();
+            sum = sum.add(price);
+            sumSq = sumSq.add(price.multiply(price));
         }
-        double mean = sum / period;
-        double variance = (sumSq / period) - (mean * mean);
-        double stdDev = Math.sqrt(variance);
+        Real periodReal = Real.of(period);
+        Real mean = sum.divide(periodReal);
+        // variance = (sumSq / period) - (mean * mean)
+        Real variance = sumSq.divide(periodReal).subtract(mean.multiply(mean));
+        Real stdDev = variance.sqrt();
 
-        double middleVal = middle.doubleValue();
+        Real offset = stdMultiplier.multiply(stdDev);
         return new Real[] {
-                Real.of(middleVal - stdMultiplier * stdDev), // Lower band
+                middle.subtract(offset), // Lower band
                 middle, // Middle band (SMA)
-                Real.of(middleVal + stdMultiplier * stdDev) // Upper band
+                middle.add(offset) // Upper band
         };
+    }
+
+    public static Real[] bollingerBands(List<Candle> candles, int period, double stdMultiplier) {
+        return bollingerBands(candles, period, Real.of(stdMultiplier));
     }
 
     /**
@@ -185,9 +191,10 @@ public final class TechnicalIndicators {
         if (candles == null || candles.size() < 2) {
             return null;
         }
-        double first = candles.get(0).close.getAmount().doubleValue();
-        double last = candles.get(candles.size() - 1).close.getAmount().doubleValue();
-        return Real.of((last - first) / first * 100.0);
+        Real first = candles.get(0).close.getAmount();
+        Real last = candles.get(candles.size() - 1).close.getAmount();
+        // (last - first) / first * 100.0
+        return last.subtract(first).divide(first).multiply(Real.of(100));
     }
 
     /**
@@ -198,14 +205,18 @@ public final class TechnicalIndicators {
      * @param threshold Percentage below SMA to trigger (e.g., 0.05 = 5%)
      * @return true if price is significantly below SMA
      */
-    public static boolean isBelowSMA(List<Candle> candles, int smaPeriod, double threshold) {
+    public static boolean isBelowSMA(List<Candle> candles, int smaPeriod, Real threshold) {
         Real smaVal = sma(candles, smaPeriod);
         if (smaVal == null || candles.isEmpty()) {
             return false;
         }
-        double currentPrice = candles.get(candles.size() - 1).close.getAmount().doubleValue();
-        double smaPrice = smaVal.doubleValue();
-        return currentPrice < smaPrice * (1 - threshold);
+        Real currentPrice = candles.get(candles.size() - 1).close.getAmount();
+        // currentPrice < smaPrice * (1 - threshold)
+        return currentPrice.compareTo(smaVal.multiply(Real.ONE.subtract(threshold))) < 0;
+    }
+
+    public static boolean isBelowSMA(List<Candle> candles, int smaPeriod, double threshold) {
+        return isBelowSMA(candles, smaPeriod, Real.of(threshold));
     }
 }
 

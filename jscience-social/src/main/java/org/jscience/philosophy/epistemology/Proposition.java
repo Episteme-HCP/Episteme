@@ -22,23 +22,30 @@
  */
 package org.jscience.philosophy.epistemology;
 
-import java.io.Serializable;
 import java.util.Objects;
-import org.jscience.util.Named;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 
 /**
  * Represents a statement or assertion that expresses something that can be true or false.
  * In epistemology, propositions are the primary objects of belief and knowledge.
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Proposition implements Named, Serializable {
+public class Proposition implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    private final String content;
+    private final Identification id;
+    private final Map<String, Object> traits = new HashMap<>();
+
     private boolean truthValue;
 
     /**
@@ -58,13 +65,19 @@ public class Proposition implements Named, Serializable {
      * @param truthValue the truth value
      */
     public Proposition(String content, boolean truthValue) {
-        this.content = Objects.requireNonNull(content, "Proposition content cannot be null");
+        this.id = new SimpleIdentification("Proposition:" + UUID.randomUUID());
+        setName(Objects.requireNonNull(content, "Proposition content cannot be null"));
         this.truthValue = truthValue;
     }
 
     @Override
-    public String getName() {
-        return content;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -72,7 +85,7 @@ public class Proposition implements Named, Serializable {
      * @return the content
      */
     public String getContent() {
-        return content;
+        return getName();
     }
 
     /**
@@ -94,18 +107,17 @@ public class Proposition implements Named, Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Proposition that = (Proposition) o;
-        return Objects.equals(content, that.content);
+        if (!(o instanceof Proposition that)) return false;
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(content);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return "Proposition[" + content + " is " + (truthValue ? "True" : "False") + "]";
+        return "Proposition[" + getName() + " is " + (truthValue ? "True" : "False") + "]";
     }
 }

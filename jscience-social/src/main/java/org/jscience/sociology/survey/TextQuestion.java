@@ -32,12 +32,12 @@ package org.jscience.sociology.survey;
 public class TextQuestion extends Question {
 
     public TextQuestion(String text) {
-        super(text, Type.TEXT);
+        super(text, QuestionType.TEXT);
     }
     
-    public TextQuestion(String text, Type type) {
+    public TextQuestion(String text, QuestionType type) {
         super(text, type);
-        if (type != Type.TEXT && type != Type.PARAGRAPH) {
+        if (type != QuestionType.TEXT && type != QuestionType.PARAGRAPH) {
             throw new IllegalArgumentException("Invalid type for TextQuestion: " + type);
         }
     }

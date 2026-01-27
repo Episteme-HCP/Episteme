@@ -23,38 +23,44 @@
 
 package org.jscience.history.time;
 
+
+import org.jscience.util.EnumRegistry;
+import org.jscience.util.ExtensibleEnum;
+
 /**
  * Precision levels for temporal data in historical contexts.
+ * Modernized to be an extensible enumeration.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 2.1
  */
-public enum TimePrecision {
-    /** Precise to the nanosecond/millisecond. */
-    EXACT,
-    
-    /** Precise to the day. */
-    DAY,
-    
-    /** Precise to the month. */
-    MONTH,
-    
-    /** Precise to the year. */
-    YEAR,
-    
-    /** Precise to the decade (e.g., 1920s). */
-    DECADE,
-    
-    /** Precise to the century. */
-    CENTURY,
-    
-    /** Precise to the millennium. */
-    MILLENNIUM,
-    
-    /** Approximate date (e.g., "circa"). */
-    APPROXIMATE,
-    
-    /** Unknown precision or date. */
-    UNKNOWN
+public class TimePrecision extends ExtensibleEnum {
+
+    private static final long serialVersionUID = 1L;
+
+    public static final EnumRegistry<TimePrecision> REGISTRY = new EnumRegistry<>();
+
+    public static final TimePrecision EXACT = new TimePrecision("EXACT", true);
+    public static final TimePrecision DAY = new TimePrecision("DAY", true);
+    public static final TimePrecision MONTH = new TimePrecision("MONTH", true);
+    public static final TimePrecision YEAR = new TimePrecision("YEAR", true);
+    public static final TimePrecision DECADE = new TimePrecision("DECADE", true);
+    public static final TimePrecision CENTURY = new TimePrecision("CENTURY", true);
+    public static final TimePrecision MILLENNIUM = new TimePrecision("MILLENNIUM", true);
+    public static final TimePrecision APPROXIMATE = new TimePrecision("APPROXIMATE", true);
+    public static final TimePrecision UNKNOWN = new TimePrecision("UNKNOWN", true);
+
+    private TimePrecision(String name, boolean builtIn) {
+        super(name);
+        REGISTRY.register(this);
+    }
+
+    public static TimePrecision valueOf(String name) {
+        return REGISTRY.valueOf(name);
+    }
+
+    public static TimePrecision valueOf(int ordinal) {
+        return REGISTRY.valueOf(ordinal);
+    }
 }

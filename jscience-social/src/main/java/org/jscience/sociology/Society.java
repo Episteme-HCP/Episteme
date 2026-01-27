@@ -23,53 +23,60 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import org.jscience.earth.Place;
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
+import org.jscience.linguistics.Language;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
-import org.jscience.util.Commented;
+import org.jscience.util.Positioned;
 
 /**
  * Represents a society, defined by its type, culture, institutions, and geographic location.
  * Provides a framework for modeling societal development levels, from hunter-gatherer to information societies.
+ * Modernized to implement ComprehensiveIdentification and support enhanced features like multilinguality.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
-public class Society implements org.jscience.util.Positioned<Place>, Identified<Identification>, Named, Commented, Serializable {
+public class Society implements Positioned<Place>, ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    /**
-     * Categories of societal development stages.
-     */
+    @Deprecated
     public enum Type {
-        HUNTER_GATHERER, PASTORAL, HORTICULTURAL, AGRICULTURAL,
-        INDUSTRIAL, POST_INDUSTRIAL, INFORMATION
+        @Deprecated HUNTER_GATHERER, @Deprecated PASTORAL, @Deprecated HORTICULTURAL, @Deprecated AGRICULTURAL,
+        @Deprecated INDUSTRIAL, @Deprecated POST_INDUSTRIAL, @Deprecated INFORMATION;
+        
+        @Deprecated
+        public SocietyType toSocietyType() {
+            return SocietyType.valueOf(this.name());
+        }
     }
 
     @Id
     private final Identification id;
     
     @Attribute
-    private final String name;
+    private final Map<String, Object> traits = new HashMap<>();
     
     @Attribute
-    private Type type;
+    private SocietyType type;
     
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Culture culture;
@@ -80,13 +87,17 @@ public class Society implements org.jscience.util.Positioned<Place>, Identified<
     @Attribute
     private String governmentType;
     
-    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
-    
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Group> institutions = new ArrayList<>();
     
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Place location;
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Language> languages = new HashSet<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Religion> religions = new HashSet<>();
 
     /**
      * Creates a new society with the specified name.
@@ -96,9 +107,9 @@ public class Society implements org.jscience.util.Positioned<Place>, Identified<
      * @throws IllegalArgumentException if name is empty
      */
     public Society(String name) {
-        this.id = new SimpleIdentification(UUID.randomUUID().toString());
-        this.name = Objects.requireNonNull(name, "Name cannot be null").trim();
-        if (this.name.isEmpty()) {
+        this.id = new UUIDIdentification(UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Name cannot be null").trim());
+        if (getName().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
     }
@@ -108,9 +119,14 @@ public class Society implements org.jscience.util.Positioned<Place>, Identified<
      * @param name the name
      * @param type the societal type
      */
-    public Society(String name, Type type) {
+    public Society(String name, SocietyType type) {
         this(name);
         this.type = type;
+    }
+
+    @Deprecated
+    public Society(String name, Type type) {
+        this(name, type != null ? type.toSocietyType() : SocietyType.OTHER);
     }
 
     @Override
@@ -119,15 +135,15 @@ public class Society implements org.jscience.util.Positioned<Place>, Identified<
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
      * Returns the societal type/development stage.
      * @return the type
      */
-    public Type getType() {
+    public SocietyType getType() {
         return type;
     }
 
@@ -135,8 +151,17 @@ public class Society implements org.jscience.util.Positioned<Place>, Identified<
      * Sets the societal type.
      * @param type the type to set
      */
-    public void setType(Type type) {
+    public void setType(SocietyType type) {
         this.type = type;
+    }
+
+    @Deprecated
+    public Type getLegacyType() {
+        try {
+            return Type.valueOf(type.name());
+        } catch (Exception e) {
+            return Type.AGRICULTURAL;
+        }
     }
 
     /**
@@ -187,11 +212,6 @@ public class Society implements org.jscience.util.Positioned<Place>, Identified<
         this.governmentType = governmentType;
     }
 
-    @Override
-    public java.util.Map<String, Object> getTraits() {
-        return traits;
-    }
-
     /**
      * Adds an institutional group to the society.
      * @param institution the institution group
@@ -223,8 +243,36 @@ public class Society implements org.jscience.util.Positioned<Place>, Identified<
         this.location = location;
     }
 
+    public void addLanguage(Language language) {
+        if (language != null) languages.add(language);
+    }
+
+    public Set<Language> getLanguages() {
+        return Collections.unmodifiableSet(languages);
+    }
+
+    public void addReligion(Religion religion) {
+        if (religion != null) religions.add(religion);
+    }
+
+    public Set<Religion> getReligions() {
+        return Collections.unmodifiableSet(religions);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Society other)) return false;
+        return Objects.equals(id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     @Override
     public String toString() {
-        return String.format("Society '%s' (%s), population: %d", name, type, populationCount);
+        return String.format("Society '%s' (%s), population: %d", getName(), type, populationCount);
     }
 }

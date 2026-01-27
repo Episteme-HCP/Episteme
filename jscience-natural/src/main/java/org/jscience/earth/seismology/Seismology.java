@@ -26,9 +26,14 @@ package org.jscience.earth.seismology;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
+import org.jscience.measure.Unit;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Energy;
 import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Time;
+import org.jscience.measure.quantity.Velocity;
+import org.jscience.earth.EarthSciencesConstants;
+
 
 /**
  * Seismology calculations for earthquake analysis.
@@ -48,14 +53,17 @@ import org.jscience.measure.quantity.Length;
  */
 public class Seismology {
 
-    /** P-wave velocity in Earth's crust (km/s) */
-    public static final Real VP_CRUST = Real.of(6.0);
+    public static final Unit<Velocity> KILOMETER_PER_SECOND = Units.KILOMETER.divide(Units.SECOND).asType(Velocity.class);
+    
+    /** P-wave velocity in Earth's crust: ~6.0 km/s */
+    public static final Quantity<Velocity> VP_CRUST = Quantities.create(6.0, KILOMETER_PER_SECOND);
 
-    /** S-wave velocity in Earth's crust (km/s) */
-    public static final Real VS_CRUST = Real.of(3.5);
+    /** S-wave velocity in Earth's crust: ~3.5 km/s */
+    public static final Quantity<Velocity> VS_CRUST = Quantities.create(3.5, KILOMETER_PER_SECOND);
 
     /** Earth's radius (km) */
-    public static final Real EARTH_RADIUS_KM = Real.of(6371.0);
+    public static final Quantity<Length> EARTH_RADIUS = Quantities.create(EarthSciencesConstants.EARTH_RADIUS_MEAN / 1000.0, Units.KILOMETER);
+
 
     private Seismology() {
     }
@@ -67,10 +75,10 @@ public class Seismology {
      * log10(M0) = 1.5 * ML + 16.1 (CGS units, dyne-cm)
      * 
      * @param localMagnitude ML (Richter scale)
-     * @return seismic moment in NÃ‚Â·m
+     * @return seismic moment in N·m
      */
     public static Real magnitudeToMoment(Real localMagnitude) {
-        // CGS to SI: 1 dyne-cm = 1e-7 NÃ‚Â·m
+        // CGS to SI: 1 dyne-cm = 1e-7 N·m
         Real log10M0_cgs = localMagnitude.multiply(Real.of(1.5)).add(Real.of(16.1));
         Real m0_cgs = Real.of(10).pow(log10M0_cgs);
         return m0_cgs.multiply(Real.of(1e-7));
@@ -78,7 +86,7 @@ public class Seismology {
 
     /**
      * Convert seismic moment to moment magnitude (Mw).
-     * Mw = (2/3) * log10(M0) - 10.7 (SI units, NÃ‚Â·m)
+     * Mw = (2/3) * log10(M0) - 10.7 (SI units, N·m)
      */
     public static Real momentToMagnitude(Real seismicMoment) {
         return seismicMoment.log10().multiply(Real.of(2.0).divide(Real.of(3.0)))
@@ -95,7 +103,7 @@ public class Seismology {
     public static Quantity<Energy> energyReleased(Real magnitude) {
         Real logE = magnitude.multiply(Real.of(1.5)).add(Real.of(4.8));
         Real joules = Real.of(10).pow(logE);
-        return Quantities.create(joules.doubleValue(), Units.JOULE);
+        return Quantities.create(joules, Units.JOULE);
     }
 
     /**
@@ -111,35 +119,35 @@ public class Seismology {
     /**
      * P-wave travel time for crustal path.
      * 
-     * @param distanceKm epicentral distance in km
-     * @return travel time in seconds
+     * @param distance epicentral distance
+     * @return travel time as Quantity
      */
-    public static Real pWaveTravelTime(Real distanceKm) {
-        return distanceKm.divide(VP_CRUST);
+    public static Quantity<Time> pWaveTravelTime(Quantity<Length> distance) {
+        return distance.divide(VP_CRUST).asType(Time.class);
     }
 
     /**
      * S-wave travel time for crustal path.
      */
-    public static Real sWaveTravelTime(Real distanceKm) {
-        return distanceKm.divide(VS_CRUST);
+    public static Quantity<Time> sWaveTravelTime(Quantity<Length> distance) {
+        return distance.divide(VS_CRUST).asType(Time.class);
     }
 
     /**
      * S-P time difference (used for locating earthquakes).
      */
-    public static Real spTimeDifference(Real distanceKm) {
-        return sWaveTravelTime(distanceKm).subtract(pWaveTravelTime(distanceKm));
+    public static Quantity<Time> spTimeDifference(Quantity<Length> distance) {
+        return sWaveTravelTime(distance).subtract(pWaveTravelTime(distance));
     }
 
     /**
      * Estimate distance from S-P time difference.
      */
-    public static Quantity<Length> distanceFromSpTime(Real spTimeSeconds) {
+    public static Quantity<Length> distanceFromSpTime(Quantity<Time> spTime) {
         // d = sp_time * Vp * Vs / (Vp - Vs)
-        Real distanceKm = spTimeSeconds.multiply(VP_CRUST).multiply(VS_CRUST)
-                .divide(VP_CRUST.subtract(VS_CRUST));
-        return Quantities.create(distanceKm.multiply(Real.of(1000)).doubleValue(), Units.METER);
+        Quantity<?> product = VP_CRUST.multiply(VS_CRUST);
+        Quantity<Velocity> diff = VP_CRUST.subtract(VS_CRUST);
+        return spTime.multiply(product.divide(diff).getValue()).asType(Length.class);
     }
 
     // === Intensity ===
@@ -149,13 +157,14 @@ public class Seismology {
      * Approximate empirical relationship.
      * 
      * @param magnitude  earthquake magnitude
-     * @param distanceKm epicentral distance
+     * @param distance epicentral distance
      * @return estimated MMI (I-XII scale)
      */
-    public static int estimateIntensity(Real magnitude, Real distanceKm) {
+    public static int estimateIntensity(Real magnitude, Quantity<Length> distance) {
         // Simplified attenuation model
-        // mmi = 1.5 * mag - 3.5 * log10(max(dist, 1)) + 3
-        Real dist = distanceKm.max(Real.ONE);
+        // mmi = 1.5 * mag - 3.5 * log10(max(distKm, 1)) + 3
+        double dKm = distance.to(Units.KILOMETER).getValue().doubleValue();
+        Real dist = Real.of(Math.max(dKm, 1.0));
         Real mmi = magnitude.multiply(Real.of(1.5))
                 .subtract(dist.log10().multiply(Real.of(3.5)))
                 .add(Real.of(3));
@@ -222,7 +231,7 @@ public class Seismology {
     /**
      * Estimate annual frequency of earthquakes at magnitude level.
      * Based on Gutenberg-Richter law: log10(N) = a - bM
-     * Using global average: a Ã¢â€°Ë† 8, b Ã¢â€°Ë† 1
+     * Using global average: a ≈ 8, b ≈ 1
      */
     public static Real annualFrequency(Real magnitude) {
         return Real.of(10).pow(Real.of(8).subtract(magnitude));
@@ -237,7 +246,7 @@ public class Seismology {
     public static Quantity<Length> ruptureLength(Real magnitude) {
         Real logL = magnitude.multiply(Real.of(0.5)).subtract(Real.of(1.88));
         Real lengthKm = Real.of(10).pow(logL);
-        return Quantities.create(lengthKm.multiply(Real.of(1000)).doubleValue(), Units.METER);
+        return Quantities.create(lengthKm, Units.KILOMETER);
     }
 
     /**
@@ -247,8 +256,6 @@ public class Seismology {
     public static Quantity<Length> averageSlip(Real magnitude) {
         Real logD = magnitude.multiply(Real.of(0.5)).subtract(Real.of(3.58));
         Real slipM = Real.of(10).pow(logD);
-        return Quantities.create(slipM.doubleValue(), Units.METER);
+        return Quantities.create(slipM, Units.METER);
     }
 }
-
-

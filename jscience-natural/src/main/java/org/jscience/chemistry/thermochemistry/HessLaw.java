@@ -23,6 +23,7 @@
 
 package org.jscience.chemistry.thermochemistry;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
@@ -52,30 +53,30 @@ public class HessLaw {
 
     /**
      * Calculates the enthalpy of reaction using Hess's Law.
-     * ÃŽâ€H_rxn = ÃŽÂ£(ÃŽâ€Hf products) - ÃŽÂ£(ÃŽâ€Hf reactants)
+     * ΔH_rxn = Σ(ΔHf products) - Σ(ΔHf reactants)
      * 
-     * @param productEnthalpies  Map of product formula to (coefficient, ÃŽâ€Hf in
+     * @param productEnthalpies  Map of product formula to (coefficient, ΔHf in
      *                           kJ/mol)
-     * @param reactantEnthalpies Map of reactant formula to (coefficient, ÃŽâ€Hf in
+     * @param reactantEnthalpies Map of reactant formula to (coefficient, ΔHf in
      *                           kJ/mol)
      * @return Enthalpy of reaction in kJ/mol
      */
     public static Quantity<Energy> calculateEnthalpyOfReaction(
-            Map<String, double[]> productEnthalpies,
-            Map<String, double[]> reactantEnthalpies) {
+            Map<String, Real[]> productEnthalpies,
+            Map<String, Real[]> reactantEnthalpies) {
 
-        double sumProducts = 0;
-        for (double[] coeffAndEnthalpy : productEnthalpies.values()) {
-            sumProducts += coeffAndEnthalpy[0] * coeffAndEnthalpy[1];
+        Real sumProducts = Real.ZERO;
+        for (Real[] coeffAndEnthalpy : productEnthalpies.values()) {
+            sumProducts = sumProducts.add(coeffAndEnthalpy[0].multiply(coeffAndEnthalpy[1]));
         }
 
-        double sumReactants = 0;
-        for (double[] coeffAndEnthalpy : reactantEnthalpies.values()) {
-            sumReactants += coeffAndEnthalpy[0] * coeffAndEnthalpy[1];
+        Real sumReactants = Real.ZERO;
+        for (Real[] coeffAndEnthalpy : reactantEnthalpies.values()) {
+            sumReactants = sumReactants.add(coeffAndEnthalpy[0].multiply(coeffAndEnthalpy[1]));
         }
 
-        double deltaH = sumProducts - sumReactants;
-        return Quantities.create(deltaH * 1000, Units.JOULE); // kJ -> J
+        Real deltaH = sumProducts.subtract(sumReactants);
+        return Quantities.create(deltaH.multiply(Real.of(1000)), Units.JOULE); // kJ -> J
     }
 
     /**
@@ -85,5 +86,3 @@ public class HessLaw {
         return enthalpyOfReaction.to(Units.JOULE).getValue().doubleValue() < 0;
     }
 }
-
-

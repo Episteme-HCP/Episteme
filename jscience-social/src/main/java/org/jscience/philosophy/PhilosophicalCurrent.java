@@ -24,6 +24,9 @@ package org.jscience.philosophy;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Objects;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a well-defined group of philosophical ideas or schools of thought.
@@ -31,13 +34,18 @@ import java.util.Set;
  * <p> A philosophical current consists of multiple models that together form 
  *      a cohesive system of belief.</p>
  *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
+ * @version 7.0
+ * @since 1.0
  */
+@Persistent
 public class PhilosophicalCurrent extends Belief {
 
+    private static final long serialVersionUID = 2L;
+
     /** The models belonging to this philosophical current. */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Model> models = new HashSet<>();
 
     /**
@@ -66,9 +74,7 @@ public class PhilosophicalCurrent extends Belief {
      * @throws IllegalArgumentException if the models set is null
      */
     public void setModels(Set<Model> models) {
-        if (models == null) {
-            throw new IllegalArgumentException("The set of models cannot be null");
-        }
+        Objects.requireNonNull(models, "The set of models cannot be null");
         this.models.clear();
         this.models.addAll(models);
     }
@@ -79,7 +85,9 @@ public class PhilosophicalCurrent extends Belief {
      * @param model the model to add
      */
     public void addModel(Model model) {
-        models.add(model);
+        if (model != null) {
+            models.add(model);
+        }
     }
 
     /**

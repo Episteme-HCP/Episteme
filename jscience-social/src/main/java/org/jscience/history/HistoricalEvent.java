@@ -25,13 +25,13 @@ public class HistoricalEvent extends Event implements org.jscience.util.Position
     private final Place location;
 
     public HistoricalEvent(String name, String description, TimeCoordinate startDate, TimeCoordinate endDate,
-            Event.Category category, Place location) {
+            EventCategory category, Place location) {
         super(name, description, startDate, category);
         this.endDate = endDate != null ? endDate : startDate;
         this.location = location;
     }
 
-    public HistoricalEvent(String name, TimeCoordinate date, Event.Category category) {
+    public HistoricalEvent(String name, TimeCoordinate date, EventCategory category) {
         this(name, null, date, date, category, null);
     }
 

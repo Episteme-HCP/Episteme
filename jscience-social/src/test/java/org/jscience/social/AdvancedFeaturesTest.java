@@ -25,6 +25,7 @@ package org.jscience.social;
 
 import org.jscience.economics.*;
 import org.jscience.sociology.*;
+import org.jscience.biology.BiologicalSex;
 import org.jscience.geography.*;
 import org.jscience.linguistics.*;
 import org.jscience.economics.money.Money;
@@ -52,10 +53,10 @@ public class AdvancedFeaturesTest {
 
     @Test
     public void testSocialNetwork() {
-        SocialNetwork sn = new SocialNetwork();
-        Person alice = new Person("P1", "Alice", Person.Gender.FEMALE, LocalDate.of(1990, 1, 1), "USA");
-        Person bob = new Person("P2", "Bob", Person.Gender.MALE, LocalDate.of(1992, 2, 2), "UK");
-        Person charlie = new Person("P3", "Charlie", Person.Gender.MALE, LocalDate.of(1985, 3, 3), "France");
+        SocialNetwork sn = new SocialNetwork("Test Network");
+        Person alice = new Person("P1", "Alice", BiologicalSex.FEMALE, LocalDate.of(1990, 1, 1), "USA");
+        Person bob = new Person("P2", "Bob", BiologicalSex.MALE, LocalDate.of(1992, 2, 2), "UK");
+        Person charlie = new Person("P3", "Charlie", BiologicalSex.MALE, LocalDate.of(1985, 3, 3), "France");
 
         sn.addConnection(alice, bob);
         sn.addConnection(bob, charlie);

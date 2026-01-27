@@ -24,6 +24,8 @@ package org.jscience.law.loaders;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.law.Statute;
+import org.jscience.law.StatuteStatus;
+import org.jscience.law.StatuteType;
 
 /**
  * Loader for French legal documents via the Légifrance OpenData API.
@@ -43,8 +45,16 @@ public final class LegifranceLoader extends AbstractResourceReader<Statute> impl
         
         // Mock implementation for now
         if (resourceId.startsWith("JORF") || resourceId.startsWith("LEGI")) {
-            return new Statute(resourceId, "Loi de mock (Légifrance)", 
-                Statute.Type.REGULATION, "France", 2025, Statute.Status.ENACTED);
+            Statute statute = new Statute(resourceId, "Loi de mock (Légifrance)", 
+                StatuteType.REGULATION, "France", 2025, StatuteStatus.ENACTED);
+            
+            // Populate ComprehensiveIdentification traits
+            statute.getTraits().put("source", "Legifrance API (Mock)");
+            statute.getTraits().put("originalId", resourceId);
+            statute.getTraits().put("language", "fr");
+            statute.getTraits().put("url", API_BASE + "consult/jorf?textCid=" + resourceId);
+            
+            return statute;
         }
         
         throw new Exception("Invalid Légifrance identifier: " + resourceId);
@@ -54,7 +64,7 @@ public final class LegifranceLoader extends AbstractResourceReader<Statute> impl
     public Statute loadContent(String content) {
         // Parse raw JSON/XML from Légifrance
         return new Statute("LEGIMOCK", "Content-loaded Statute", 
-            Statute.Type.REGULATION, "France", 2025, Statute.Status.ENACTED);
+            StatuteType.REGULATION, "France", 2025, StatuteStatus.ENACTED);
     }
 
     @Override

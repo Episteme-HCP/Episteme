@@ -35,7 +35,7 @@ public final class RealEstateValuation {
      * @return the estimated property value as a {@link Real} number.
      * @throws ArithmeticException if {@code capRate} is zero.
      */
-    public static Real valuateByCapRate(double netOperatingIncome, double capRate) {
-        return Real.of(netOperatingIncome / capRate);
+    public static Real valuateByCapRate(Real netOperatingIncome, Real capRate) {
+        return netOperatingIncome.divide(capRate);
     }
 }

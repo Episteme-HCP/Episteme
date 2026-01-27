@@ -23,15 +23,16 @@
 
 package org.jscience.sociology;
 
+import java.util.Set;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Utility class for modeling social capital and analyzing network properties.
- * Provides metrics for network density and trust based on reciprocity.
+ * Provides metrics for network density, trust, and capital types (Bonding vs Bridging).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public final class SocialCapitalModel {
@@ -49,8 +50,11 @@ public final class SocialCapitalModel {
      */
     public static Real calculateDensity(int nodes, int edges, boolean directed) {
         if (nodes < 2) return Real.ZERO;
-        double possible = directed ? (double) nodes * (nodes - 1) : (double) nodes * (nodes - 1) / 2.0;
-        return Real.of(edges / possible);
+        Real n = Real.of(nodes);
+        Real e = Real.of(edges);
+        Real possible = directed ? n.multiply(n.subtract(Real.ONE)) 
+                                : n.multiply(n.subtract(Real.ONE)).divide(Real.of(2));
+        return e.divide(possible);
     }
 
     /**
@@ -62,7 +66,61 @@ public final class SocialCapitalModel {
      */
     public static Real reciprocityIndex(int mutualLinks, int totalLinks) {
         if (totalLinks == 0) return Real.ZERO;
-        // For directed graphs, reciprocity is typically 2 * mutual / total
-        return Real.of((double) 2 * mutualLinks / totalLinks);
+        return Real.of(2).multiply(Real.of(mutualLinks)).divide(Real.of(totalLinks));
+    }
+
+    /**
+     * Calculates the "Bonding Social Capital" of a person within a specific group.
+     * This is measured as the ratio of ties within the group to the group size.
+     * 
+     * @param person the person to analyze
+     * @param group  the group they belong to
+     * @param network the social network
+     * @return internal tie ratio
+     */
+    public static Real calculateBondingCapital(Person person, Group group, SocialNetwork network) {
+        if (group == null || group.size() <= 1) return Real.ZERO;
+        
+        long internalTies = network.getNeighbors(person).stream()
+                .filter(neighbor -> group.getMembers().contains(neighbor))
+                .count();
+        
+        return Real.of(internalTies).divide(Real.of(group.size() - 1));
+    }
+
+    /**
+     * Calculates the "Bridging Social Capital" of a person.
+     * Measured as the number of ties to people outside their primary groups.
+     * 
+     * @param person the person to analyze
+     * @param primaryGroups the groups the person belongs to
+     * @param network the social network
+     * @return count of external ties
+     */
+    public static Real calculateBridgingCapital(Person person, Set<Group> primaryGroups, SocialNetwork network) {
+        Set<Person> neighbors = network.getNeighbors(person);
+        long externalTies = neighbors.stream()
+                .filter(neighbor -> primaryGroups.stream().noneMatch(g -> g.getMembers().contains(neighbor)))
+                .count();
+        
+        return Real.of(externalTies);
+    }
+
+    /**
+     * Estimates "Social Cohesion" of a group.
+     * Average of all internal bonding capital scores.
+     * 
+     * @param group the group
+     * @param network the network
+     * @return cohesion index
+     */
+    public static Real calculateSocialCohesion(Group group, SocialNetwork network) {
+        if (group == null || group.size() < 2) return Real.ONE;
+        
+        Real totalBonding = group.getMembers().stream()
+                .map(p -> calculateBondingCapital(p, group, network))
+                .reduce(Real.ZERO, Real::add);
+                
+        return totalBonding.divide(Real.of(group.size()));
     }
 }

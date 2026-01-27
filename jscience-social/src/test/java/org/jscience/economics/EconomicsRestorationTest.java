@@ -27,7 +27,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.jscience.earth.Place;
+import org.jscience.earth.PlaceType;
 import org.jscience.sociology.Person;
+import org.jscience.biology.BiologicalSex;
 
 import java.time.LocalDate;
 import org.jscience.economics.money.Money;
@@ -38,12 +40,12 @@ public class EconomicsRestorationTest {
     @Test
     public void testFactoryAndWorkers() {
         // Setup
-        Place london = new Place("London", Place.Type.CITY);
+        Place london = new Place("London", PlaceType.CITY);
         Money initialCapital = Money.usd(10000.0);
         Factory widgetFactory = new Factory("Acme Widgets", london, initialCapital);
 
-        Person alice = new Person("A001", "Alice", Person.Gender.FEMALE, LocalDate.of(1990, 5, 20), "USA");
-        // Person bob = new Person("B002", "Bob", Person.Gender.MALE, LocalDate.of(1985,
+        Person alice = new Person("A001", "Alice", BiologicalSex.FEMALE, LocalDate.of(1990, 5, 20), "USA");
+        // Person bob = new Person("B002", "Bob", BiologicalSex.MALE, LocalDate.of(1985,
         // 8, 15), "UK");
 
         // Test Worker Assignment

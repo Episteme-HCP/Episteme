@@ -27,18 +27,19 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
+import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.List;
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.jscience.util.Named;
+import java.util.UUID;
+import java.util.Objects;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
@@ -52,12 +53,18 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Molecule implements Named {
+public class Molecule implements ComprehensiveIdentification {
+    private static final long serialVersionUID = 2L;
 
     @Id
-    private Identification identification;
+    private final Identification id;
+
     @Attribute
-    private final String name;
+    protected final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
+    private String name; // Kept as explicit field for convenience but sync with traits
+
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Atom> atoms;
     @Relation(type = Relation.Type.ONE_TO_MANY)
@@ -65,11 +72,27 @@ public class Molecule implements Named {
     private final Map<Atom, List<Bond>> atomBonds;
 
     public Molecule(String name) {
-        this.identification = new SimpleIdentification("MOL-" + name + "-" + System.nanoTime());
-        this.name = name;
+        this.id = new SimpleIdentification("MOL:" + UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Molecule name cannot be null"));
         this.atoms = new ArrayList<>();
         this.bonds = new ArrayList<>();
         this.atomBonds = new HashMap<>();
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+        ComprehensiveIdentification.super.setName(name);
     }
 
     // --- Building methods ---
@@ -160,11 +183,13 @@ public class Molecule implements Named {
 
     /**
      * Molecular weight (sum of atomic masses).
+     * Uses Real for high precision.
      */
     public Quantity<Mass> getMolecularWeight() {
-        double totalMassKg = atoms.stream()
-                .mapToDouble(a -> a.getElement().getAtomicMass().to(Units.KILOGRAM).getValue().doubleValue())
-                .sum();
+        Real totalMassKg = Real.ZERO;
+        for (Atom a : atoms) {
+            totalMassKg = totalMassKg.add(a.getElement().getAtomicMass().to(Units.KILOGRAM).getValue());
+        }
         return Quantities.create(totalMassKg, Units.KILOGRAM);
     }
 
@@ -173,5 +198,3 @@ public class Molecule implements Named {
         return String.format("%s (%s, MW=%.2f u)", name, getFormula(), getMolecularWeight().getValue().doubleValue());
     }
 }
-
-

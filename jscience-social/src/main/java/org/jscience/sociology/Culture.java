@@ -23,17 +23,19 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.jscience.linguistics.Language;
 import org.jscience.philosophy.Belief;
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
@@ -43,45 +45,41 @@ import org.jscience.util.persistence.Relation;
  * Represents the cumulative shared elements of a social group or civilization.
  * A culture encompasses values (beliefs), norms (rituals), and societal artifacts,
  * as well as identifying traits like language and technological sophistication.
+ * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
-public class Culture implements Named, Commented, Serializable {
+public class Culture implements ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
-    private Identification identification;
+    private final Identification id;
 
     @Attribute
-    private String name;
+    private final Map<String, Object> traits = new HashMap<>();
 
-    @Attribute
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Language language;
 
     @Attribute
     private int technologicalLevel;
 
     @Relation(type = Relation.Type.MANY_TO_MANY)
-    private Set<Belief> beliefs;
+    private Set<Belief> beliefs = new HashSet<>();
 
-    @Relation(type = Relation.Type.MANY_TO_MANY)
-    private Set<Celebration> celebrations;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Celebration> celebrations = new HashSet<>();
 
-    @Relation(type = Relation.Type.MANY_TO_MANY)
-    private Set<Ritual> rituals;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Ritual> rituals = new HashSet<>();
 
     @Attribute
     private int maritalType;
-
-    @Attribute
-    private String comments;
-
-    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
 
     /**
      * Creates a new Culture with specified traits.
@@ -99,15 +97,15 @@ public class Culture implements Named, Commented, Serializable {
     public Culture(String name, Language language, int technologicalLevel,
             Set<Belief> beliefs, Set<Celebration> celebrations, Set<Ritual> rituals,
             int maritalType, String comments) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.id = new UUIDIdentification(UUID.randomUUID());
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
         this.language = Objects.requireNonNull(language, "Language cannot be null");
-        this.beliefs = new HashSet<>(Objects.requireNonNull(beliefs, "Beliefs set cannot be null"));
-        this.celebrations = new HashSet<>(Objects.requireNonNull(celebrations, "Celebrations set cannot be null"));
-        this.rituals = new HashSet<>(Objects.requireNonNull(rituals, "Rituals set cannot be null"));
-        this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
+        if (beliefs != null) this.beliefs.addAll(beliefs);
+        if (celebrations != null) this.celebrations.addAll(celebrations);
+        if (rituals != null) this.rituals.addAll(rituals);
+        setComments(Objects.requireNonNull(comments, "Comments cannot be null"));
         this.technologicalLevel = technologicalLevel;
         this.maritalType = maritalType;
-        this.identification = new SimpleIdentification(name + ":" + System.currentTimeMillis());
     }
 
     /** Legacy constructor. */
@@ -116,8 +114,13 @@ public class Culture implements Named, Commented, Serializable {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -128,12 +131,20 @@ public class Culture implements Named, Commented, Serializable {
         return language;
     }
 
+    public void setLanguage(Language language) {
+        this.language = Objects.requireNonNull(language);
+    }
+
     /**
      * Returns the technological advancement level.
      * @return the level
      */
     public int getTechnologicalLevel() {
         return technologicalLevel;
+    }
+
+    public void setTechnologicalLevel(int technologicalLevel) {
+        this.technologicalLevel = technologicalLevel;
     }
 
     /**
@@ -152,16 +163,15 @@ public class Culture implements Named, Commented, Serializable {
         return Collections.unmodifiableSet(celebrations);
     }
 
-    /** Legacy method to add celebration by name. */
-    public void addCelebration(String name) {
-        if (name != null) {
-            celebrations.add(new Celebration(name));
-        }
-    }
-
     public void addCelebration(Celebration celebration) {
         if (celebration != null) {
             celebrations.add(celebration);
+        }
+    }
+
+    public void addCelebration(String name) {
+        if (name != null) {
+            addCelebration(new Celebration(name));
         }
     }
 
@@ -181,31 +191,24 @@ public class Culture implements Named, Commented, Serializable {
         return maritalType;
     }
 
-    @Override
-    public String getComments() {
-        return comments;
+    public void setMaritalType(int maritalType) {
+        this.maritalType = maritalType;
     }
 
     @Override
-    public void setComments(String comments) {
-        this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Culture that)) return false;
+        return Objects.equals(id, that.id);
     }
 
     @Override
-    public java.util.Map<String, Object> getTraits() {
-        return traits;
-    }
-
-    /**
-     * Returns the persistent identification for this culture.
-     * @return the identification
-     */
-    public Identification getIdentification() {
-        return identification;
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return name;
+        return getName();
     }
 }

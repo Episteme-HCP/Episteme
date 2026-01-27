@@ -23,13 +23,17 @@
 
 package org.jscience.engineering.mechanics;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Force;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Pressure;
 
 /**
+ * Beam deflection calculations.
+ * Modernized to use high-precision Real and typed Quantities.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -42,69 +46,86 @@ public class BeamDeflection {
 
     /**
      * Maximum deflection for simply supported beam with center point load.
-     * ÃŽÂ´_max = P * LÃ‚Â³ / (48 * E * I)
+     * δ_max = P * L³ / (48 * E * I)
      * 
      * @param load            Point load (N)
      * @param length          Beam length (m)
-     * @param elasticModulus  Young's modulus E (Pa)
-     * @param momentOfInertia Second moment of area I (mÃ¢ÂÂ´)
+     * @param elasticModulus  Young's modulus E
+     * @param momentOfInertia Second moment of area I (m⁴)
      * @return Maximum deflection
      */
     public static Quantity<Length> simplySupported_CenterLoad(
             Quantity<Force> load, Quantity<Length> length,
-            double elasticModulus, double momentOfInertia) {
+            Quantity<Pressure> elasticModulus, Real momentOfInertia) {
 
-        double P = load.to(Units.NEWTON).getValue().doubleValue();
-        double L = length.to(Units.METER).getValue().doubleValue();
+        Real P = load.to(Units.NEWTON).getValue();
+        Real L = length.to(Units.METER).getValue();
+        Real E = elasticModulus.to(Units.PASCAL).getValue();
+        Real I = momentOfInertia;
 
-        double deflection = P * L * L * L / (48 * elasticModulus * momentOfInertia);
+        Real deflection = P.multiply(L.pow(3)).divide(Real.of(48).multiply(E).multiply(I));
         return Quantities.create(deflection, Units.METER);
     }
 
     /**
      * Maximum deflection for cantilever beam with end load.
-     * ÃŽÂ´_max = P * LÃ‚Â³ / (3 * E * I)
+     * δ_max = P * L³ / (3 * E * I)
      */
     public static Quantity<Length> cantilever_EndLoad(
             Quantity<Force> load, Quantity<Length> length,
-            double elasticModulus, double momentOfInertia) {
+            Quantity<Pressure> elasticModulus, Real momentOfInertia) {
 
-        double P = load.to(Units.NEWTON).getValue().doubleValue();
-        double L = length.to(Units.METER).getValue().doubleValue();
+        Real P = load.to(Units.NEWTON).getValue();
+        Real L = length.to(Units.METER).getValue();
+        Real E = elasticModulus.to(Units.PASCAL).getValue();
+        Real I = momentOfInertia;
 
-        double deflection = P * L * L * L / (3 * elasticModulus * momentOfInertia);
+        Real deflection = P.multiply(L.pow(3)).divide(Real.of(3).multiply(E).multiply(I));
         return Quantities.create(deflection, Units.METER);
     }
 
     /**
      * Simply supported beam with uniformly distributed load.
-     * ÃŽÂ´_max = 5 * w * LÃ¢ÂÂ´ / (384 * E * I)
+     * δ_max = 5 * w * L⁴ / (384 * E * I)
      * 
-     * @param loadPerMeter Distributed load (N/m)
+     * @param loadPerMeter Distributed load (N/m) - here passed as Force/Length usually, or just N/m Real. 
+     *                     Using Force/Length is clearer, but for now we take Force (total?) or N/m?
+     *                     Code implies w is N/m. Quantity<Force> divided by Quantity<Length> is ForcePerLength.
+     *                     For simplicity, we take Real (N/m) or Quantity<Force> per meter? 
+     *                     Let's use Quantity<Force> and divide by meter unit implicitly? No, w is load PER meter.
+     *                     Let's use Real for loadVal (N/m).
      */
     public static Quantity<Length> simplySupported_UniformLoad(
-            double loadPerMeter, Quantity<Length> length,
-            double elasticModulus, double momentOfInertia) {
+            Real loadPerMeter, Quantity<Length> length,
+            Quantity<Pressure> elasticModulus, Real momentOfInertia) {
 
-        double L = length.to(Units.METER).getValue().doubleValue();
-        double deflection = 5 * loadPerMeter * L * L * L * L / (384 * elasticModulus * momentOfInertia);
+        Real w = loadPerMeter;
+        Real L = length.to(Units.METER).getValue();
+        Real E = elasticModulus.to(Units.PASCAL).getValue();
+        Real I = momentOfInertia;
+
+        Real deflection = Real.of(5).multiply(w).multiply(L.pow(4))
+                .divide(Real.of(384).multiply(E).multiply(I));
         return Quantities.create(deflection, Units.METER);
     }
 
     /**
      * Rectangle moment of inertia.
-     * I = b * hÃ‚Â³ / 12
+     * I = b * h³ / 12
      */
-    public static double rectangleMomentOfInertia(double width, double height) {
-        return width * Math.pow(height, 3) / 12;
+    public static Real rectangleMomentOfInertia(Quantity<Length> width, Quantity<Length> height) {
+        Real w = width.to(Units.METER).getValue();
+        Real h = height.to(Units.METER).getValue();
+        return w.multiply(h.pow(3)).divide(Real.of(12));
     }
 
     /**
      * Circular cross-section moment of inertia.
-     * I = Ãâ‚¬ * rÃ¢ÂÂ´ / 4
+     * I = π * r⁴ / 4
      */
-    public static double circleMomentOfInertia(double radius) {
-        return Math.PI * Math.pow(radius, 4) / 4;
+    public static Real circleMomentOfInertia(Quantity<Length> radius) {
+        Real r = radius.to(Units.METER).getValue();
+        return Real.PI.multiply(r.pow(4)).divide(Real.of(4));
     }
 }
 

@@ -24,6 +24,11 @@
 package org.jscience.sociology;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.sets.Reals;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -58,26 +63,33 @@ public final class Demography implements Serializable {
      * Performs a Leslie Matrix projection to estimate the next generation's population.
      * P(t+1) = L * P(t).
      *
-     * @param population current population vector by age group
-     * @param fertility  fertility rates per age group
-     * @param survival   survival probabilities per age group
+     * @param population current population vector by age group (Real)
+     * @param fertility  fertility rates per age group (Real)
+     * @param survival   survival probabilities per age group (Real)
      * @return predicted population vector for the next time step
      */
-    public static double[] projectLeslie(double[] population, double[] fertility, double[] survival) {
-        int n = population.length;
-        double[] next = new double[n];
+    public static Vector<Real> projectLeslie(Vector<Real> population, Vector<Real> fertility, Vector<Real> survival) {
+        int n = population.dimension();
+        List<Real> next = new ArrayList<>(n);
+        for (int k = 0; k < n; k++) next.add(Real.ZERO);
 
         // New births (first row of Leslie matrix)
+        Real term0 = Real.ZERO;
         for (int i = 0; i < n; i++) {
-            next[0] += population[i] * fertility[i];
+            Real pop = population.get(i);
+            Real fert = (i < fertility.dimension()) ? fertility.get(i) : Real.ZERO;
+            term0 = term0.add(pop.multiply(fert));
         }
+        next.set(0, term0);
 
         // Aging (sub-diagonal)
         for (int i = 0; i < n - 1; i++) {
-            next[i + 1] = population[i] * survival[i];
+            Real pop = population.get(i);
+            Real surv = (i < survival.dimension()) ? survival.get(i) : Real.ZERO;
+            next.set(i + 1, pop.multiply(surv));
         }
 
-        return next;
+        return DenseVector.of(next, Reals.getInstance());
     }
 
     /**
@@ -92,7 +104,7 @@ public final class Demography implements Serializable {
         if (women15to49 == 0) {
             return Real.ZERO;
         }
-        return Real.of(1000.0 * children0to4 / women15to49);
+        return Real.of(1000).multiply(Real.of(children0to4)).divide(Real.of(women15to49));
     }
 
     /**
@@ -103,13 +115,13 @@ public final class Demography implements Serializable {
      * @param femaleSurvival female survival probabilities per age cohort
      * @return the NRR as a Real number
      */
-    public static Real netReproductionRate(double[] ageFertility, double[] femaleSurvival) {
-        double nrr = 0;
-        int len = Math.min(ageFertility.length, femaleSurvival.length);
+    public static Real netReproductionRate(Vector<Real> ageFertility, Vector<Real> femaleSurvival) {
+        Real nrr = Real.ZERO;
+        int len = Math.min(ageFertility.dimension(), femaleSurvival.dimension());
         for (int i = 0; i < len; i++) {
-            nrr += ageFertility[i] * femaleSurvival[i];
+            nrr = nrr.add(ageFertility.get(i).multiply(femaleSurvival.get(i)));
         }
-        return Real.of(nrr);
+        return nrr;
     }
 
     /**
@@ -119,20 +131,20 @@ public final class Demography implements Serializable {
      * @param deathRate death rate per 1000 individuals
      * @return the transition stage (1 to 5)
      */
-    public static int estimateTransitionStage(double birthRate, double deathRate) {
-        if (birthRate > 35 && deathRate > 30) {
+    public static int estimateTransitionStage(Real birthRate, Real deathRate) {
+        if (birthRate.compareTo(Real.of(35)) > 0 && deathRate.compareTo(Real.of(30)) > 0) {
             return 1; // High stationary
         }
-        if (birthRate > 30 && deathRate < 20) {
+        if (birthRate.compareTo(Real.of(30)) > 0 && deathRate.compareTo(Real.of(20)) < 0) {
             return 2; // Early expanding
         }
-        if (birthRate < 30 && deathRate < 15 && birthRate > deathRate) {
+        if (birthRate.compareTo(Real.of(30)) < 0 && deathRate.compareTo(Real.of(15)) < 0 && birthRate.compareTo(deathRate) > 0) {
             return 3; // Late expanding
         }
-        if (birthRate < 15 && deathRate < 15) {
+        if (birthRate.compareTo(Real.of(15)) < 0 && deathRate.compareTo(Real.of(15)) < 0) {
             return 4; // Low stationary
         }
-        if (birthRate < deathRate) {
+        if (birthRate.compareTo(deathRate) < 0) {
             return 5; // Declining
         }
         return 3;

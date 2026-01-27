@@ -36,6 +36,14 @@ import org.jscience.measure.quantity.Energy;
 import org.jscience.measure.quantity.Frequency;
 import org.jscience.measure.quantity.Temperature;
 
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import java.util.UUID;
+
 /**
  * Chemical reaction with equation balancing and stoichiometry.
  *
@@ -43,8 +51,18 @@ import org.jscience.measure.quantity.Temperature;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ChemicalReaction {
+@Persistent
+public class ChemicalReaction implements ComprehensiveIdentification {
 
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
     private final Map<String, Integer> reactants; // Compound -> coefficient
     private final Map<String, Integer> products; // Compound -> coefficient
     private final String equation;
@@ -54,6 +72,8 @@ public class ChemicalReaction {
     private Quantity<Frequency> preExponentialFactor; // A (Arrhenius) - simplified unit inverse time
 
     protected ChemicalReaction(Map<String, Integer> reactants, Map<String, Integer> products, String equation) {
+        this.id = new SimpleIdentification("RXN:" + UUID.randomUUID());
+        setName(equation);
         this.reactants = reactants;
         this.products = products;
         this.equation = equation;
@@ -61,6 +81,16 @@ public class ChemicalReaction {
         this.gibbsFreeEnergy = Quantities.create(0, Units.JOULE);
         this.activationEnergy = Quantities.create(0, Units.JOULE);
         this.preExponentialFactor = Quantities.create(0, Units.HERTZ); // 1/s
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     // ... parse methods ...

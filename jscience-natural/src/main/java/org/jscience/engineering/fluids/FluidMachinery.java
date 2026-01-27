@@ -24,10 +24,21 @@
 package org.jscience.engineering.fluids;
 
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Frequency;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.MassDensity;
+import org.jscience.measure.quantity.Power;
+import org.jscience.measure.quantity.Pressure;
+import org.jscience.measure.quantity.Velocity;
+import org.jscience.measure.quantity.VolumetricFlowRate;
 import org.jscience.physics.PhysicalConstants;
 
 /**
  * Fluid machinery calculations.
+ * Modernized to use high-precision Real and typed Quantities.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,116 +46,147 @@ import org.jscience.physics.PhysicalConstants;
  */
 public class FluidMachinery {
 
-    /** Water density (kg/mÃ‚Â³) */
-    public static final Real RHO_WATER = Real.of(1000);
+    /** Water density (kg/m³) */
+    public static final Quantity<MassDensity> RHO_WATER = Quantities.create(1000, Units.KILOGRAM.divide(Units.CUBIC_METER).asType(MassDensity.class));
 
     /** Use PhysicalConstants for standard gravity */
     private static final Real G = PhysicalConstants.g_n;
 
+    private FluidMachinery() {}
+
     /**
      * Pump hydraulic power.
-     * P_h = ÃÂ * g * Q * H
+     * P_h = ρ * g * Q * H
      */
-    public static Real hydraulicPower(Real density, Real flowRate, Real head) {
-        return density.multiply(G).multiply(flowRate).multiply(head);
+    public static Quantity<Power> hydraulicPower(Quantity<MassDensity> density, Quantity<VolumetricFlowRate> flowRate, Quantity<Length> head) {
+        Real rho = density.to(Units.KILOGRAM.divide(Units.CUBIC_METER).asType(MassDensity.class)).getValue();
+        Real q = flowRate.to(Units.CUBIC_METER.divide(Units.SECOND).asType(VolumetricFlowRate.class)).getValue();
+        Real h = head.to(Units.METER).getValue();
+        
+        Real power = rho.multiply(G).multiply(q).multiply(h);
+        return Quantities.create(power, Units.WATT);
     }
 
     /**
      * Pump efficiency.
-     * ÃŽÂ· = P_hydraulic / P_shaft
+     * η = P_hydraulic / P_shaft
      */
-    public static Real pumpEfficiency(Real hydraulicPower, Real shaftPower) {
-        return hydraulicPower.divide(shaftPower);
+    public static Real pumpEfficiency(Quantity<Power> hydraulicPower, Quantity<Power> shaftPower) {
+        Real ph = hydraulicPower.to(Units.WATT).getValue();
+        Real ps = shaftPower.to(Units.WATT).getValue();
+        return ph.divide(ps);
     }
 
     /**
      * Affinity laws: flow rate vs speed.
+     * Q2 = Q1 * (N2 / N1)
      */
-    public static Real affinityFlowRate(Real Q1, Real N1, Real N2) {
-        return Q1.multiply(N2).divide(N1);
+    public static Quantity<VolumetricFlowRate> affinityFlowRate(Quantity<VolumetricFlowRate> Q1, Quantity<Frequency> N1, Quantity<Frequency> N2) {
+        Real q1 = Q1.getValue();
+        Real n1 = N1.to(Units.HERTZ).getValue();
+        Real n2 = N2.to(Units.HERTZ).getValue();
+        
+        Real q2 = q1.multiply(n2).divide(n1);
+        return Quantities.create(q2, Q1.getUnit());
     }
 
     /**
      * Affinity laws: head vs speed.
+     * H2 = H1 * (N2 / N1)²
      */
-    public static Real affinityHead(Real H1, Real N1, Real N2) {
-        return H1.multiply(N2.divide(N1).pow(2));
+    public static Quantity<Length> affinityHead(Quantity<Length> H1, Quantity<Frequency> N1, Quantity<Frequency> N2) {
+        Real h1 = H1.getValue();
+        Real n1 = N1.to(Units.HERTZ).getValue();
+        Real n2 = N2.to(Units.HERTZ).getValue();
+        
+        Real h2 = h1.multiply(n2.divide(n1).pow(2));
+        return Quantities.create(h2, H1.getUnit());
     }
 
     /**
      * Affinity laws: power vs speed.
+     * P2 = P1 * (N2 / N1)³
      */
-    public static Real affinityPower(Real P1, Real N1, Real N2) {
-        return P1.multiply(N2.divide(N1).pow(3));
+    public static Quantity<Power> affinityPower(Quantity<Power> P1, Quantity<Frequency> N1, Quantity<Frequency> N2) {
+        Real p1 = P1.getValue();
+        Real n1 = N1.to(Units.HERTZ).getValue();
+        Real n2 = N2.to(Units.HERTZ).getValue();
+        
+        Real p2 = p1.multiply(n2.divide(n1).pow(3));
+        return Quantities.create(p2, P1.getUnit());
     }
 
     /**
      * Net Positive Suction Head available.
+     * NPSH_a = (P_atm / (ρg)) + H_s - H_f - (P_vap / (ρg))
      */
-    public static Real npshAvailable(Real atmosphericPressure, Real suctionHeight,
-            Real frictionLoss, Real vaporPressure, Real density) {
-        return atmosphericPressure.divide(density.multiply(G)).add(suctionHeight)
-                .subtract(frictionLoss).subtract(vaporPressure.divide(density.multiply(G)));
+    public static Quantity<Length> npshAvailable(Quantity<Pressure> atmosphericPressure, Quantity<Length> suctionHeight,
+            Quantity<Length> frictionLoss, Quantity<Pressure> vaporPressure, Quantity<MassDensity> density) {
+            
+        Real pAtm = atmosphericPressure.to(Units.PASCAL).getValue();
+        Real rho = density.to(Units.KILOGRAM.divide(Units.CUBIC_METER).asType(MassDensity.class)).getValue();
+        Real hS = suctionHeight.to(Units.METER).getValue();
+        Real hF = frictionLoss.to(Units.METER).getValue();
+        Real pVap = vaporPressure.to(Units.PASCAL).getValue();
+        
+        Real term1 = pAtm.divide(rho.multiply(G));
+        Real term4 = pVap.divide(rho.multiply(G));
+        
+        Real npsh = term1.add(hS).subtract(hF).subtract(term4);
+        return Quantities.create(npsh, Units.METER);
     }
 
     /**
      * Cavitation number.
+     * σ = (P - P_vap) / (0.5 * ρ * v²)
      */
-    public static Real cavitationNumber(Real pressure, Real vaporPressure,
-            Real density, Real velocity) {
-        return pressure.subtract(vaporPressure).divide(
-                Real.of(0.5).multiply(density).multiply(velocity.pow(2)));
+    public static Real cavitationNumber(Quantity<Pressure> pressure, Quantity<Pressure> vaporPressure,
+            Quantity<MassDensity> density, Quantity<Velocity> velocity) {
+            
+        Real p = pressure.to(Units.PASCAL).getValue();
+        Real pVap = vaporPressure.to(Units.PASCAL).getValue();
+        Real rho = density.to(Units.KILOGRAM.divide(Units.CUBIC_METER).asType(MassDensity.class)).getValue();
+        Real v = velocity.to(Units.METERS_PER_SECOND).getValue();
+        
+        return p.subtract(pVap).divide(Real.of(0.5).multiply(rho).multiply(v.pow(2)));
     }
 
     /**
-     * Specific speed (dimensionless).
+     * Specific speed (dimensionless-ish).
+     * Ns = N * sqrt(Q) / H^(3/4)
+     * Using RPM, m³/s, m often; here we keep it consistent with base units but return Real.
      */
-    public static Real specificSpeed(Real rpm, Real flowRate, Real head) {
-        return rpm.multiply(flowRate.sqrt()).divide(head.pow(Real.of(0.75)));
+    public static Real specificSpeed(Quantity<Frequency> speed, Quantity<VolumetricFlowRate> flowRate, Quantity<Length> head) {
+        // Standard definition is N(rpm)*sqrt(Q)/H^0.75
+        // Let's use strict units.
+        Real nm = speed.to(Units.HERTZ).getValue().multiply(Real.of(60));
+        Real q = flowRate.to(Units.CUBIC_METER.divide(Units.SECOND).asType(VolumetricFlowRate.class)).getValue();
+        Real h = head.to(Units.METER).getValue();
+        
+        return nm.multiply(q.sqrt()).divide(h.pow(Real.of(0.75)));
     }
 
     /**
      * Turbine power output.
+     * P = η * ρ * g * Q * H
      */
-    public static Real turbinePower(Real efficiency, Real density, Real flowRate, Real head) {
-        return efficiency.multiply(density).multiply(G).multiply(flowRate).multiply(head);
+    public static Quantity<Power> turbinePower(Real efficiency, Quantity<MassDensity> density, Quantity<VolumetricFlowRate> flowRate, Quantity<Length> head) {
+        Real rho = density.to(Units.KILOGRAM.divide(Units.CUBIC_METER).asType(MassDensity.class)).getValue();
+        Real q = flowRate.to(Units.CUBIC_METER.divide(Units.SECOND).asType(VolumetricFlowRate.class)).getValue();
+        Real h = head.to(Units.METER).getValue();
+        
+        Real power = efficiency.multiply(rho).multiply(G).multiply(q).multiply(h);
+        return Quantities.create(power, Units.WATT);
     }
 
     /**
      * Pelton wheel jet velocity.
+     * v = Cv * sqrt(2 * g * H)
      */
-    public static Real peltonJetVelocity(Real head, Real velocityCoefficient) {
-        return velocityCoefficient.multiply(Real.TWO.multiply(G).multiply(head).sqrt());
-    }
-
-    /**
-     * Optimal bucket speed for Pelton wheel.
-     */
-    public static Real peltonOptimalBucketSpeed(Real jetVelocity) {
-        return jetVelocity.divide(Real.TWO);
-    }
-
-    /**
-     * Francis turbine runner speed.
-     */
-    public static Real runnerSpeed(Real diameter, Real rpm) {
-        return Real.PI.multiply(diameter).multiply(rpm).divide(Real.of(60));
-    }
-
-    /**
-     * Compressor isentropic work.
-     */
-    public static Real isentropicWork(Real gamma, Real R, Real T1, Real P1, Real P2) {
-        Real exponent = gamma.subtract(Real.ONE).divide(gamma);
-        return gamma.divide(gamma.subtract(Real.ONE)).multiply(R).multiply(T1)
-                .multiply(P2.divide(P1).pow(exponent).subtract(Real.ONE));
-    }
-
-    /**
-     * Fan laws (same as affinity laws).
-     */
-    public static Real fanFlowRate(Real Q1, Real D1, Real D2, Real N1, Real N2) {
-        return Q1.multiply(D2.divide(D1).pow(3)).multiply(N2.divide(N1));
+    public static Quantity<Velocity> peltonJetVelocity(Quantity<Length> head, Real velocityCoefficient) {
+        Real h = head.to(Units.METER).getValue();
+        Real v = velocityCoefficient.multiply(Real.TWO.multiply(G).multiply(h).sqrt());
+        return Quantities.create(v, Units.METERS_PER_SECOND);
     }
 }
 

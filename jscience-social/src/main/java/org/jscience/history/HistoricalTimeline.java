@@ -45,7 +45,7 @@ public class HistoricalTimeline extends Timeline<HistoricalEvent> {
      * @param category the category to filter by
      * @return filtered unmodifiable list of events
      */
-    public List<HistoricalEvent> getEventsByCategory(Event.Category category) {
+    public List<HistoricalEvent> getEventsByCategory(EventCategory category) {
         Objects.requireNonNull(category, "Category cannot be null");
         return events.stream()
                 .filter(e -> e.getCategory() == category)

@@ -29,6 +29,8 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a point on the Earth defined by latitude, longitude, and height.
@@ -37,11 +39,16 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class GeodeticCoordinate implements EarthCoordinate {
 
+    @Attribute
     private final Quantity<Angle> latitude;
+    @Attribute
     private final Quantity<Angle> longitude;
+    @Attribute
     private final Quantity<Length> height;
+    @Attribute
     private final ReferenceEllipsoid ellipsoid;
 
     public GeodeticCoordinate(Quantity<Angle> latitude, Quantity<Angle> longitude, Quantity<Length> height,
@@ -86,44 +93,45 @@ public class GeodeticCoordinate implements EarthCoordinate {
      * Calculates the internal radius of curvature in the prime vertical (N).
      * N = a / sqrt(1 - e^2 * sin^2(phi))
      * 
-     * @return N in meters
+     * @return N as Real
      */
     public Real getPrimeVerticalRadius() {
-        double a = ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
-        double e2 = ellipsoid.getEccentricitySquared().doubleValue();
+        Real a = ellipsoid.getSemiMajorAxisValue();
+        Real e2 = ellipsoid.getEccentricitySquared();
 
         double phi = latitude.to(Units.RADIAN).getValue().doubleValue();
-        double sinPhi = Math.sin(phi);
-        double denom = Math.sqrt(1.0 - e2 * sinPhi * sinPhi);
+        Real sinPhi = Real.of(Math.sin(phi));
+        Real denom = Real.of(1.0).subtract(e2.multiply(sinPhi.pow(2))).sqrt();
 
-        return Real.of(a / denom);
+        return a.divide(denom);
     }
 
     /**
      * Converts to Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
+     * Uses Real for all intermediate products to prevent rounding drift.
      * 
      * @return ECEFCoordinate [X, Y, Z]
      */
     public ECEFCoordinate toECEF() {
-        double a = ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
-        double e2 = ellipsoid.getEccentricitySquared().doubleValue();
+        Real a = ellipsoid.getSemiMajorAxisValue();
+        Real e2 = ellipsoid.getEccentricitySquared();
 
         double phi = latitude.to(Units.RADIAN).getValue().doubleValue();
         double lambda = longitude.to(Units.RADIAN).getValue().doubleValue();
-        double h = height.to(Units.METER).getValue().doubleValue();
+        Real h = height.to(Units.METER).getValue();
 
-        double sinPhi = Math.sin(phi);
-        double cosPhi = Math.cos(phi);
-        double sinLambda = Math.sin(lambda);
-        double cosLambda = Math.cos(lambda);
+        Real sinPhi = Real.of(Math.sin(phi));
+        Real cosPhi = Real.of(Math.cos(phi));
+        Real sinLambda = Real.of(Math.sin(lambda));
+        Real cosLambda = Real.of(Math.cos(lambda));
 
-        double N = a / Math.sqrt(1.0 - e2 * sinPhi * sinPhi);
+        Real N = a.divide(Real.of(1.0).subtract(e2.multiply(sinPhi.pow(2))).sqrt());
 
-        double x = (N + h) * cosPhi * cosLambda;
-        double y = (N + h) * cosPhi * sinLambda;
-        double z = (N * (1.0 - e2) + h) * sinPhi;
+        Real x = N.add(h).multiply(cosPhi).multiply(cosLambda);
+        Real y = N.add(h).multiply(cosPhi).multiply(sinLambda);
+        Real z = N.multiply(Real.of(1.0).subtract(e2)).add(h).multiply(sinPhi);
 
-        return new ECEFCoordinate(Real.of(x), Real.of(y), Real.of(z), ellipsoid);
+        return new ECEFCoordinate(x, y, z, ellipsoid);
     }
 
     @Override
@@ -138,12 +146,10 @@ public class GeodeticCoordinate implements EarthCoordinate {
 
     @Override
     public String toString() {
-        return String.format("Geodetic[Lat=%.6f°, Lon=%.6f°, H=%.2fm, %s]", 
+        return String.format("Geodetic[Lat=%.6f°, Lon=%.6f°, H=%.2f, %s]", 
             latitude.to(Units.DEGREE_ANGLE).getValue().doubleValue(),
             longitude.to(Units.DEGREE_ANGLE).getValue().doubleValue(),
-            height.to(Units.METER).getValue().doubleValue(),
+            height,
             ellipsoid.getName());
     }
 }
-
-

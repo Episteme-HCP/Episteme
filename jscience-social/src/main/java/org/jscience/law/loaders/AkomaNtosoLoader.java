@@ -26,6 +26,8 @@ package org.jscience.law.loaders;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.law.Article;
 import org.jscience.law.Statute;
+import org.jscience.law.StatuteStatus;
+import org.jscience.law.StatuteType;
 import org.jscience.util.Numbering;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -76,7 +78,10 @@ public final class AkomaNtosoLoader extends AbstractResourceReader<Statute> impl
             title = titles.item(0).getTextContent().trim();
         }
 
-        Statute statute = new Statute("AKN-" + id, title, Statute.Type.ACT, "International", 2025, Statute.Status.ENACTED);
+        Statute statute = new Statute("AKN-" + id, title, StatuteType.ACT, "International", 2025, StatuteStatus.ENACTED);
+
+        // Parse metadata if available
+        parseMetadata(root, statute);
 
         // Parse articles
         NodeList articleNodes = actPart.getElementsByTagName("article");
@@ -88,6 +93,44 @@ public final class AkomaNtosoLoader extends AbstractResourceReader<Statute> impl
         }
 
         return statute;
+    }
+
+    private void parseMetadata(Element root, Statute statute) {
+        NodeList metaList = root.getElementsByTagName("meta");
+        if (metaList.getLength() == 0) return;
+        Element meta = (Element) metaList.item(0);
+
+        // Date
+        NodeList dateNodes = meta.getElementsByTagName("FRBRdate");
+        for (int i = 0; i < dateNodes.getLength(); i++) {
+            Element el = (Element) dateNodes.item(i);
+            String name = el.getAttribute("name");
+            String date = el.getAttribute("date");
+            if (date != null && !date.isEmpty()) {
+                 statute.getTraits().put("date." + name, date);
+                 if ("enacted".equalsIgnoreCase(name) || "generation".equalsIgnoreCase(name)) {
+                     try {
+                         if (date.length() >= 4) {
+                            statute.setYearEnacted(Integer.parseInt(date.substring(0, 4)));
+                         }
+                     } catch (NumberFormatException ignored) {}
+                 }
+            }
+        }
+
+        // Author
+        NodeList authorNodes = meta.getElementsByTagName("FRBRauthor");
+        if (authorNodes.getLength() > 0) {
+            String author = ((Element)authorNodes.item(0)).getAttribute("href");
+            statute.getTraits().put("author", author);
+        }
+        
+        // URI
+        NodeList uriNodes = meta.getElementsByTagName("FRBRuri");
+        if (uriNodes.getLength() > 0) {
+            String uri = ((Element)uriNodes.item(0)).getAttribute("value");
+            statute.getTraits().put("definedBy", uri);
+        }
     }
 
     private Element findActPart(Element root) {
@@ -104,7 +147,7 @@ public final class AkomaNtosoLoader extends AbstractResourceReader<Statute> impl
         try {
             return loadFromInputStream(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)), "content");
         } catch (Exception e) {
-            return new Statute("ERROR", "Invalid XML Content", Statute.Type.REGULATION, "Error", 0, Statute.Status.PROPOSED);
+            return new Statute("ERROR", "Invalid XML Content", StatuteType.REGULATION, "Error", 0, StatuteStatus.PROPOSED);
         }
     }
 

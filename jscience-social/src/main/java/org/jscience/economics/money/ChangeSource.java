@@ -23,6 +23,7 @@
 
 package org.jscience.economics.money;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.util.UnavailableDataException;
 
 /**
@@ -30,14 +31,8 @@ import org.jscience.util.UnavailableDataException;
  * <p>
  * Implementations retrieve current exchange rates from various sources
  * such as banks, financial exchanges, or online services.
- * <p>
- * Common data sources include:
- * <ul>
- *   <li>Bank of Canada: http://www.bankofcanada.ca/en/financial_markets/csv/exchange_eng.csv</li>
- *   <li>OANDA: http://www.oanda.com/convert/fxdaily</li>
- *   <li>XE: http://www.xe.com</li>
- *   <li>ECB: European Central Bank exchange rates</li>
- * </ul>
+ * Modernized to use Real for exchange rates to ensure high precision.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -47,29 +42,34 @@ public interface ChangeSource {
 
     /**
      * Converts an amount from one currency to another.
-     * <p>
-     * The conversion uses the current exchange rate from this source,
-     * which may include commissions, fees, or spreads.
      *
      * @param amount the amount to convert
      * @param target the target currency
      * @return the converted amount in the target currency
      * @throws UnavailableDataException if exchange rate data cannot be retrieved
-     * @throws IllegalArgumentException if amount or target is null
      */
     Money getConverted(Money amount, Currency target) throws UnavailableDataException;
 
     /**
      * Returns the current exchange rate between two currencies.
+     * Use Real for internal and API representation.
      *
      * @param source the source currency
      * @param target the target currency
-     * @return the exchange rate (units of target per unit of source)
+     * @return the exchange rate as Real (units of target per unit of source)
      * @throws UnavailableDataException if exchange rate data cannot be retrieved
      */
-    default double getExchangeRate(Currency source, Currency target) throws UnavailableDataException {
-        Money oneUnit = Money.valueOf(1.0, source);
+    default Real getExchangeRate(Currency source, Currency target) throws UnavailableDataException {
+        Money oneUnit = Money.valueOf(Real.ONE, source);
         Money converted = getConverted(oneUnit, target);
-        return converted.getValue().doubleValue();
+        return converted.getValue();
+    }
+
+    /**
+     * Returns the current exchange rate between two currencies as double.
+     * Convenience method for display or export.
+     */
+    default double getExchangeRateValue(Currency source, Currency target) throws UnavailableDataException {
+        return getExchangeRate(source, target).doubleValue();
     }
 }

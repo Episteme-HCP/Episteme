@@ -26,7 +26,7 @@ public interface TimeCoordinate extends Temporal<TimeCoordinate>, Comparable<Tim
      * 
      * @return the precision level
      */
-    Precision getPrecision();
+    TimePrecision getPrecision();
 
     /**
      * Returns whether this coordinate represents a range or has uncertainty.
