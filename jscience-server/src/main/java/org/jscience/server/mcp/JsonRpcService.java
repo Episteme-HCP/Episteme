@@ -124,14 +124,34 @@ public class JSONRpcService {
             type = "SPATIAL_GEOMETRY";
             summary = "Global Migration Flow Dataset (2025)";
             content.put("model_type", type);
-            content.put("locations_count", 150);
-            content.put("total_magnitude", 1.25e7);
+            var md = content.putObject("metadata");
+            md.put("name", summary);
+            md.put("source", "Synthetic Data");
+            var q = content.putObject("quantities");
+            q.putObject("locations_count").put("value", 150).put("unit", "ONE");
+            q.putObject("total_magnitude").put("value", 1.25e7).put("unit", "ONE");
         } else if (modelName.contains("Portfolio")) {
             type = "FINANCIAL_PORTFOLIO";
             summary = "ESG High-Growth Portfolio";
             content.put("model_type", type);
-            content.put("assets_count", 24);
-            content.put("total_value_usd", 4500000.0);
+            var md = content.putObject("metadata");
+            md.put("name", summary);
+            md.put("risk_profile", "Aggressive");
+            var q = content.putObject("quantities");
+            q.putObject("assets_count").put("value", 24).put("unit", "ONE");
+            q.putObject("total_value").put("value", 4500000.0).put("unit", "USD");
+        } else if (modelName.contains("Epidemiology") || modelName.contains("SIR")) {
+            type = "EPIDEMIOLOGICAL_SIR";
+            summary = "COVID-19 Simulation Run B";
+            content.put("model_type", type);
+            var md = content.putObject("metadata");
+            md.put("name", summary);
+            md.put("virus", "SARS-CoV-2");
+            var q = content.putObject("quantities");
+            q.putObject("susceptible").put("value", 9500000).put("unit", "ONE");
+            q.putObject("infected").put("value", 50000).put("unit", "ONE");
+            q.putObject("recovered").put("value", 450000).put("unit", "ONE");
+            q.putObject("r0").put("value", 2.5).put("unit", "ONE");
         } else {
             content.put("summary", summary);
         }

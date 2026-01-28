@@ -86,7 +86,24 @@ class JScienceClient:
         print(f"📦 Loading data model: {name}...")
         # Mocking generic response
         if "Spatial" in name:
-            return {"type": "SPATIAL_GEOMETRY", "locations": 150}
+            return {
+                "model_type": "SPATIAL_GEOMETRY", 
+                "metadata": {"name": "Global Migration", "source": "Synthetic"},
+                "quantities": {
+                    "locations_count": {"value": 150, "unit": "ONE"},
+                    "total_magnitude": {"value": 1.25e7, "unit": "ONE"}
+                }
+            }
+        elif "SIR" in name:
+            return {
+                "model_type": "EPIDEMIOLOGICAL_SIR",
+                "metadata": {"name": "SIR Simulation", "virus": "Test Virus"},
+                "quantities": {
+                    "susceptible": {"value": 1000, "unit": "ONE"},
+                    "infected": {"value": 10, "unit": "ONE"},
+                    "r0": {"value": 2.5, "unit": "ONE"}
+                }
+            }
         return {"type": "GENERIC_MODEL", "name": name}
 
 

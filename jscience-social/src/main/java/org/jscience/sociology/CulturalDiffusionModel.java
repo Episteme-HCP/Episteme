@@ -24,10 +24,13 @@
 package org.jscience.sociology;
 
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Models the diffusion of culture, innovations, or rumors through a population.
@@ -38,65 +41,63 @@ import org.jscience.mathematics.numbers.real.Real;
  * @version 1.1
  * @since 1.0
  */
-public final class CulturalDiffusionModel {
+public final class CulturalDiffusionModel implements UniversalDataModel {
 
-    private CulturalDiffusionModel() {}
+    private final String name;
+    private Real marketPotential = Real.of(1000000);
+    private Real p = Real.of(0.03); // Innovation
+    private Real q = Real.of(0.38); // Imitation
+    private Real currentAdopters = Real.ZERO;
 
-    /**
-     * Categorizes an adopter based on their position in the adoption timeline.
-     * Uses standard diffusion of innovations percentages (e.g., Rogers).
-     *
-     * @param cumulativePercent the percentile of adoption (0-100)
-     * @return the corresponding AdoptionStatus
-     */
-    public static AdoptionStatus getAdopterType(Real cumulativePercent) {
-        if (cumulativePercent.compareTo(Real.of(2.5)) <= 0) return AdoptionStatus.INNOVATOR;
-        if (cumulativePercent.compareTo(Real.of(16.0)) <= 0) return AdoptionStatus.EARLY_ADOPTER;
-        if (cumulativePercent.compareTo(Real.of(50.0)) <= 0) return AdoptionStatus.EARLY_MAJORITY;
-        if (cumulativePercent.compareTo(Real.of(84.0)) <= 0) return AdoptionStatus.LATE_MAJORITY;
-        return AdoptionStatus.LAGGARD;
+    public CulturalDiffusionModel(String name) {
+        this.name = name;
+    }
+
+    public void setParameters(Real p, Real q, Real marketPotential) {
+        this.p = p;
+        this.q = q;
+        this.marketPotential = marketPotential;
     }
 
     /**
      * Calculates the number of new adopters at time t using the Bass Diffusion Model.
-     * Formula: n(t) = [p + (q/M) * N(t)] * [M - N(t)]
-     *
-     * @param p                coefficient of innovation
-     * @param q                coefficient of imitation
-     * @param marketPotential  total potential number of adopters (M)
-     * @param previousAdopters cumulative number of adopters before time t (N(t))
-     * @return number of new adopters at time t
      */
-    public static Real bassDiffusionModel(Real p, Real q, Real marketPotential, Real previousAdopters) {
+    public Real calculateNewAdopters() {
         if (marketPotential.isZero()) return Real.ZERO;
         
-        Real imitationEffect = q.divide(marketPotential).multiply(previousAdopters);
+        Real imitationEffect = q.divide(marketPotential).multiply(currentAdopters);
         Real probabilityOfAdoption = p.add(imitationEffect);
-        Real remainingPotential = marketPotential.subtract(previousAdopters);
+        Real remainingPotential = marketPotential.subtract(currentAdopters);
         
         return probabilityOfAdoption.multiply(remainingPotential);
     }
 
-    /**
-     * Estimates the "Cultural Distance" between two societies or groups.
-     * Calculates the Euclidean distance between value maps.
-     *
-     * @param values1 map of cultural dimensions/values for group 1
-     * @param values2 map of cultural dimensions/values for group 2
-     * @return the calculated distance
-     */
-    public static Real culturalDistance(Map<String, Real> values1, Map<String, Real> values2) {
-        Real sumSq = Real.ZERO;
-        Set<String> allKeys = new HashSet<>(values1.keySet());
-        allKeys.addAll(values2.keySet());
+    public void step() {
+        Real newAdopters = calculateNewAdopters();
+        currentAdopters = currentAdopters.add(newAdopters);
+    }
 
-        Real defaultVal = Real.of(0.5);
-        for (String key : allKeys) {
-            Real v1 = values1.getOrDefault(key, defaultVal);
-            Real v2 = values2.getOrDefault(key, defaultVal);
-            Real diff = v1.subtract(v2);
-            sumSq = sumSq.add(diff.multiply(diff));
-        }
-        return sumSq.sqrt();
+    @Override
+    public String getModelType() {
+        return "CULTURAL_DIFFUSION_BASS";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("name", name);
+        meta.put("innovation_coefficient", p.doubleValue());
+        meta.put("imitation_coefficient", q.doubleValue());
+        return meta;
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> qMap = new HashMap<>();
+        qMap.put("total_adopters", Quantities.create(currentAdopters.doubleValue(), Units.ONE));
+        qMap.put("market_potential", Quantities.create(marketPotential.doubleValue(), Units.ONE));
+        qMap.put("adoption_rate", Quantities.create(currentAdopters.divide(marketPotential).doubleValue(), Units.ONE));
+        return qMap;
     }
 }
+

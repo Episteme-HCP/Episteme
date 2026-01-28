@@ -24,11 +24,15 @@
 package org.jscience.economics;
 
 import java.util.Random;
+import java.util.Map;
+import java.util.HashMap;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
 
 /**
  * Simulates macroeconomic factors over time.
- * * <p>
+ * <p>
  * <b>Reference:</b><br>
  * Zeigler, B. P., Praehofer, H., & Kim, T. G. (2000). <i>Theory of Modeling and Simulation</i>. Academic Press.
  * </p>
@@ -37,35 +41,33 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MacroModel {
+public class MacroModel implements UniversalDataModel {
 
+    private final String name;
     private final Economy economy;
     private final Random random;
 
-    public MacroModel(Economy economy) {
+    public MacroModel(String name, Economy economy) {
+        this.name = name;
         this.economy = economy;
         this.random = new Random();
     }
 
     /**
      * Simulates one year of economic activity.
-     * Updates GDP, Inflation, and Unemployment based on simplified volatility.
      */
     public void simulateYear() {
-        // Simple random walk model for demonstration
         Real gdpGrowth = Real.of(0.02 + (random.nextGaussian() * 0.015));
         Real inflationChange = Real.of(random.nextGaussian() * 0.5);
         Real unemploymentChange = gdpGrowth.negate().multiply(Real.of(50))
-                .add(Real.of(random.nextGaussian() * 0.2)); // Okun's Law approx
+                .add(Real.of(random.nextGaussian() * 0.2));
 
-        // Update GDP
         if (economy.getGDP() != null) {
             org.jscience.economics.money.Money currentGDP = economy.getGDP();
             org.jscience.economics.money.Money newGDP = currentGDP.multiply(Real.ONE.add(gdpGrowth));
             economy.setGDP(newGDP);
         }
 
-        // Update Rates
         Real currentInflation = economy.getInflationRate() != null ? economy.getInflationRate() : Real.ZERO;
         Real currentUnemployment = economy.getUnemploymentRate() != null ? economy.getUnemploymentRate() : Real.ZERO;
 
@@ -89,6 +91,25 @@ public class MacroModel {
             return org.jscience.economics.money.Money.usd(0.0);
         return economy.getGDP().multiply(Real.ONE.add(assumedGrowthRate).pow(Real.of(years)));
     }
+
+    @Override
+    public String getModelType() {
+        return "MACROECONOMIC_SIMULATION";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>(economy.getMetadata());
+        meta.put("model_name", name);
+        return meta;
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        return economy.getQuantities();
+    }
 }
+
+
 
 

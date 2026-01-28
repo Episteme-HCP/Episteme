@@ -92,4 +92,27 @@ public final class ArchitecturalModel implements UniversalDataModel, Serializabl
 
     public List<Ray> getRays() { return Collections.unmodifiableList(rays); }
     public List<VectorField> getLoadPaths() { return Collections.unmodifiableList(loadPaths); }
+
+    @Override
+    public java.util.Map<String, Object> getMetadata() {
+        java.util.Map<String, Object> meta = new java.util.HashMap<>();
+        meta.put("ray_count", rays.size());
+        meta.put("load_path_count", loadPaths.size());
+        return meta;
+    }
+
+    @Override
+    public java.util.Map<String, org.jscience.measure.Quantity<?>> getQuantities() {
+        java.util.Map<String, org.jscience.measure.Quantity<?>> q = new java.util.HashMap<>();
+        double totalRayLength = rays.stream()
+            .mapToDouble(r -> Math.sqrt(Math.pow(r.x2().subtract(r.x1()).doubleValue(), 2) + Math.pow(r.y2().subtract(r.y1()).doubleValue(), 2)))
+            .sum();
+        double totalMagnitude = loadPaths.stream().mapToDouble(vf -> vf.magnitude().doubleValue()).sum();
+        
+        q.put("total_path_length", org.jscience.measure.Quantities.create(totalRayLength, org.jscience.measure.Units.METER));
+        q.put("total_structural_magnitude", org.jscience.measure.Quantities.create(totalMagnitude, org.jscience.measure.Units.NEWTON));
+        return q;
+    }
 }
+
+

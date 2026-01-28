@@ -30,6 +30,10 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Frequency;
 import org.jscience.measure.quantity.Time;
 
+import org.jscience.util.UniversalDataModel;
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * SIR (Susceptible-Infected-Recovered) epidemic model.
  * * <p>
@@ -41,7 +45,8 @@ import org.jscience.measure.quantity.Time;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SIRModel {
+public class SIRModel implements UniversalDataModel {
+
 
     private final Quantity<Frequency> beta;
     private final Quantity<Frequency> gamma;
@@ -192,6 +197,25 @@ public class SIRModel {
                 Quantities.create(1.8 / 86400.0, Units.HERTZ),
                 Quantities.create(0.125 / 86400.0, Units.HERTZ));
     }
+
+    @Override
+    public String getModelType() {
+        return "EPIDEMIOLOGICAL_SIR";
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> quantities = new HashMap<>();
+        quantities.put("transmission_rate", beta);
+        quantities.put("recovery_rate", gamma);
+        quantities.put("susceptible", Quantities.create(S.doubleValue(), Units.ONE));
+        quantities.put("infected", Quantities.create(I.doubleValue(), Units.ONE));
+        quantities.put("recovered", Quantities.create(R.doubleValue(), Units.ONE));
+        quantities.put("total_population", Quantities.create(population, Units.ONE));
+        quantities.put("r0", Quantities.create(getR0().doubleValue(), Units.ONE));
+        return quantities;
+    }
 }
+
 
 

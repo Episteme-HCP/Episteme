@@ -40,6 +40,8 @@ import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
+import org.jscience.util.UniversalDataModel;
+
 import java.util.UUID;
 import java.util.Map;
 import java.util.HashMap;
@@ -56,7 +58,8 @@ import java.util.HashMap;
  * @since 1.0
  */
 @Persistent
-public abstract class Economy implements ComprehensiveIdentification {
+public abstract class Economy implements ComprehensiveIdentification, UniversalDataModel {
+
 
     private static final long serialVersionUID = 3L;
 
@@ -208,4 +211,24 @@ public abstract class Economy implements ComprehensiveIdentification {
     public void setUnemploymentRate(Real rate) {
         this.unemploymentRate = (rate != null) ? rate : Real.ZERO;
     }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>(traits);
+        meta.put("id", id.toString());
+        meta.put("organization_count", organizations.size());
+        meta.put("central_bank", centralBank != null ? centralBank.getName() : "None");
+        return meta;
+    }
+
+    @Override
+    public Map<String, org.jscience.measure.Quantity<?>> getQuantities() {
+        Map<String, org.jscience.measure.Quantity<?>> q = new HashMap<>();
+        if (cachedGDP != null) q.put("gdp", cachedGDP);
+        q.put("inflation_rate", org.jscience.measure.Quantities.create(inflationRate.doubleValue(), org.jscience.measure.Units.ONE));
+        q.put("unemployment_rate", org.jscience.measure.Quantities.create(unemploymentRate.doubleValue(), org.jscience.measure.Units.ONE));
+        q.put("total_asset_value", getValue());
+        return q;
+    }
 }
+

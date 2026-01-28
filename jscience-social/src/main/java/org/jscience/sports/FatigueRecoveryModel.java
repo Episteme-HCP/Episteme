@@ -23,55 +23,67 @@
 
 package org.jscience.sports;
 
-import org.jscience.mathematics.numbers.real.Real;
+
+import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Time;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Provides mathematical models for optimizing athlete recovery and tapering phases.
  * Based on the Banister Impulse-Response performance model.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
  */
-public final class FatigueRecoveryModel {
+public final class FatigueRecoveryModel implements UniversalDataModel {
 
-    private FatigueRecoveryModel() {}
+    private final String athleteName;
+    private double fitness = 100.0;
+    private double fatigue = 0.0;
+    private double tau1 = 45.0; // Fitness decay (days)
+    private double tau2 = 15.0; // Fatigue decay (days)
+    private double baselinePerformance = 500.0;
+
+    public FatigueRecoveryModel(String athleteName) {
+        this.athleteName = athleteName;
+    }
+
+    public void setFitness(double f) { this.fitness = f; }
+    public void setFatigue(double f) { this.fatigue = f; }
+    public void setDecayConstants(double t1, double t2) { this.tau1 = t1; this.tau2 = t2; }
 
     /**
      * Predicts athletic performance using Banister's Performance Model.
-     * Formula: P(t) = P0 + (Fitness * e^(-t/tau1)) - (Fatigue * e^(-t/tau2))
-     * 
-     * @param p0       baseline performance
-     * @param fitness  current fitness level
-     * @param fatigue  current fatigue level
-     * @param restDays days elapsed since the last training impulse
-     * @param tau1     time constant for fitness decay
-     * @param tau2     time constant for fatigue decay
-     * @return predicted performance as a Real number
      */
-    public static Real predictPerformance(double p0, double fitness, double fatigue, 
-                                          int restDays, double tau1, double tau2) {
-        double perf = p0 + (fitness * Math.exp(-restDays / tau1)) - 
-                           (fatigue * Math.exp(-restDays / tau2));
-        return Real.of(perf);
+    public Quantity<?> predictPerformance(Quantity<Time> restTime) {
+        double t = restTime.to(Units.DAY).getValue().doubleValue();
+        double perf = baselinePerformance + (fitness * Math.exp(-t / tau1)) - 
+                           (fatigue * Math.exp(-t / tau2));
+        return Quantities.create(perf, Units.ONE);
     }
 
-    /**
-     * Determines the optimal number of tapering days to achieve maximum performance.
-     * 
-     * @return the day count (0-30) that yields the highest predicted performance
-     */
-    public static int findOptimalTaper(double fitness, double fatigue, double tau1, double tau2) {
-        int bestDay = 0;
-        double maxPerf = -Double.MAX_VALUE;
-        for (int d = 0; d < 30; d++) {
-            double p = predictPerformance(0, fitness, fatigue, d, tau1, tau2).doubleValue();
-            if (p > maxPerf) {
-                maxPerf = p;
-                bestDay = d;
-            }
-        }
-        return bestDay;
+    @Override
+    public String getModelType() {
+        return "ATHLETE_RECOVERY_BANISTER";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("athlete_name", athleteName);
+        meta.put("tau_fitness", tau1);
+        meta.put("tau_fatigue", tau2);
+        return meta;
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> q = new HashMap<>();
+        q.put("current_fitness", Quantities.create(fitness, Units.ONE));
+        q.put("current_fatigue", Quantities.create(fatigue, Units.ONE));
+        q.put("predicted_immediate_performance", predictPerformance(Quantities.create(0, Units.DAY)));
+        return q;
     }
 }
+

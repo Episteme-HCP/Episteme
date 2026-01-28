@@ -4,6 +4,8 @@
  */
 
 package org.jscience.geography.loaders.gml;
+ 
+import org.jscience.earth.loaders.gml.GMLGeometry;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

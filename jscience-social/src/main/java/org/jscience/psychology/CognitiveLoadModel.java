@@ -38,9 +38,30 @@ import org.jscience.util.persistence.Persistent;
  * @version 1.2
  * @since 1.0
  */
-public final class CognitiveLoadModel {
+import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-    private CognitiveLoadModel() {}
+/**
+ * Models cognitive load based on Sweller's Cognitive Load Theory (CLT).
+ */
+public final class CognitiveLoadModel implements UniversalDataModel {
+
+    private final String learnerName;
+    private final List<LoadFactor> tasks = new ArrayList<>();
+    private Real workingMemoryCapacity = Real.of(7.0); // Miller's Magic Number
+
+    public CognitiveLoadModel(String learnerName) {
+        this.learnerName = learnerName;
+    }
+
+    public void setWorkingMemoryCapacity(Real capacity) { this.workingMemoryCapacity = capacity; }
+    public void addTask(LoadFactor task) { tasks.add(task); }
 
     /**
      * Represents the components of cognitive load involved in a task.
@@ -73,6 +94,45 @@ public final class CognitiveLoadModel {
         public Real getGermane() { return germane; }
     }
 
+    public CognitiveState evaluateCurrentLoad() {
+        if (tasks.isEmpty()) return null;
+        LoadFactor current = tasks.get(tasks.size() - 1);
+        Real total = current.getIntrinsic().add(current.getExtraneous()).add(current.getGermane());
+        Real available = workingMemoryCapacity.subtract(total);
+        boolean overloaded = total.compareTo(workingMemoryCapacity) > 0;
+
+        String rec = "Optimal load balance.";
+        if (overloaded) {
+            rec = "Reduce extraneous load.";
+        }
+        return new CognitiveState(total, available, overloaded, rec);
+    }
+
+    @Override
+    public String getModelType() {
+        return "COGNITIVE_LOAD_SWELLER";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("learner_name", learnerName);
+        meta.put("task_count", tasks.size());
+        meta.put("wm_capacity", workingMemoryCapacity.doubleValue());
+        return meta;
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> q = new HashMap<>();
+        CognitiveState state = evaluateCurrentLoad();
+        if (state != null) {
+            q.put("total_cognitive_load", Quantities.create(state.getTotalLoad().doubleValue(), Units.ONE));
+            q.put("available_resource", Quantities.create(state.getAvailableResource().doubleValue(), Units.ONE));
+        }
+        return q;
+    }
+
     /**
      * Represents the resulting cognitive state of an individual performing a task.
      */
@@ -103,65 +163,5 @@ public final class CognitiveLoadModel {
         public boolean isOverloaded() { return overloaded; }
         public String getRecommendation() { return recommendation; }
     }
-
-    /**
-     * Evaluates the total cognitive load against a working memory capacity.
-     * 
-     * @param factor                the load factors of the task
-     * @param workingMemoryCapacity the capacity of the learner
-     * @return the evaluated cognitive state
-     */
-    public static CognitiveState evaluateLoad(LoadFactor factor, Real workingMemoryCapacity) {
-        Real total = factor.getIntrinsic().add(factor.getExtraneous()).add(factor.getGermane());
-        Real available = workingMemoryCapacity.subtract(total);
-        boolean overloaded = total.compareTo(workingMemoryCapacity) > 0;
-
-        String rec = "Optimal load balance.";
-        if (overloaded) {
-            rec = "Reduce extraneous load by simplifying presentation or reduce intrinsic load by segmentation.";
-        } else if (factor.getGermane().compareTo(Real.of(0.2)) < 0 && available.compareTo(Real.of(0.3)) > 0) {
-            rec = "Potential to increase challenge to foster schema construction (increase germane load).";
-        }
-
-        return new CognitiveState(total, available, overloaded, rec);
-    }
-
-    /**
-     * Estimates intrinsic load based on element interactivity.
-     * Formula: I = log2(N_elements * N_interactions)
-     * 
-     * @param elements     number of distinct information elements
-     * @param interactions number of interacting relationships between elements
-     * @return estimated intrinsic load score
-     */
-    public static Real estimateIntrinsicLoad(int elements, int interactions) {
-        if (elements <= 0) return Real.ZERO;
-        // log2(x) = log(x) / log(2)
-        double val = Math.log(elements * (interactions + 1.0)) / Math.log(2.0);
-        return Real.of(val);
-    }
-
-    /**
-     * Calculates the instructional efficiency of the learning task.
-     * Efficiency = Germane / (Intrinsic + Extraneous)
-     * 
-     * @param f the load factors
-     * @return efficiency ratio
-     */
-    public static Real learningEfficiency(LoadFactor f) {
-        Real denominator = f.getIntrinsic().add(f.getExtraneous());
-        if (denominator.isZero()) return Real.ZERO;
-        return f.getGermane().divide(denominator);
-    }
-
-    /**
-     * Calculates a penalty for the Redundancy Effect.
-     *
-     * @param identicalFormatCount number of redundant streams
-     * @return calculated extraneous load penalty
-     */
-    public static Real redundancyPenalty(int identicalFormatCount) {
-        if (identicalFormatCount <= 1) return Real.ZERO;
-        return Real.of(0.1).multiply(Real.of(identicalFormatCount - 1));
-    }
 }
+

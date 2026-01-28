@@ -23,26 +23,33 @@
 
 package org.jscience.earth.atmosphere;
 
-import org.jscience.mathematics.numbers.real.Real;
 import java.util.*;
 
 /**
  * Simplified climate model for radiative balance and greenhouse effect simulations.
  */
-public final class ClimateModel {
+import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Temperature;
+import org.jscience.measure.quantity.Length;
 
-    private ClimateModel() {}
+/**
+ * Simplified climate model for radiative balance and greenhouse effect simulations.
+ */
+public final class ClimateModel implements UniversalDataModel {
 
-    public static final double SOLAR_CONSTANT = 1361.0;  // W/m²
-    public static final double STEFAN_BOLTZMANN = 5.67e-8;  // W/(m²·K⁴)
+    public static final Quantity<?> SOLAR_CONSTANT = Quantities.create(1361.0, Units.WATT.divide(Units.SQUARE_METER));
+    public static final Quantity<?> STEFAN_BOLTZMANN = Quantities.create(5.67e-8, Units.WATT.divide(Units.SQUARE_METER).divide(Units.KELVIN.pow(4)));
     public static final double EARTH_ALBEDO = 0.30;
 
     public record ClimateState(
-        double globalMeanTemperature,  // Kelvin
+        Quantity<Temperature> globalMeanTemperature,
         double co2Concentration,       // ppm
         double ch4Concentration,       // ppb
-        double radiativeForcing,       // W/m²
-        double seaLevel,               // meters relative to 1990
+        Quantity<?> radiativeForcing,   // W/m²
+        Quantity<Length> seaLevel,
         int year
     ) {}
 
@@ -59,127 +66,134 @@ public final class ClimateModel {
     public static final EmissionScenario RCP_85 = new EmissionScenario("RCP 8.5", 50, 600, 0.01);
     public static final EmissionScenario BUSINESS_AS_USUAL = new EmissionScenario("BAU", 40, 500, 0.008);
 
+    private final List<ClimateState> history = new ArrayList<>();
+    private final String name;
+
+    public ClimateModel(String name) {
+        this.name = name;
+        this.history.add(currentState());
+    }
+
     /**
      * Calculates equilibrium temperature without greenhouse effect.
      */
-    public static Real calculateBlackbodyTemperature(double albedo) {
+    public static Quantity<Temperature> calculateBlackbodyTemperature(double albedo) {
         // Te = (S(1-α) / 4σ)^0.25
-        double flux = SOLAR_CONSTANT * (1 - albedo) / 4;
-        double temp = Math.pow(flux / STEFAN_BOLTZMANN, 0.25);
-        return Real.of(temp);
+        double S = SOLAR_CONSTANT.getValue().doubleValue();
+        double sigma = STEFAN_BOLTZMANN.getValue().doubleValue();
+        double flux = S * (1 - albedo) / 4;
+        double temp = Math.pow(flux / sigma, 0.25);
+        return Quantities.create(temp, Units.KELVIN);
     }
 
     /**
      * Calculates radiative forcing from CO2 concentration.
      * ΔF = 5.35 × ln(C/C₀)
      */
-    public static Real co2RadiativeForcing(double currentCO2, double preindustrialCO2) {
+    public static Quantity<?> co2RadiativeForcing(double currentCO2, double preindustrialCO2) {
         double forcing = 5.35 * Math.log(currentCO2 / preindustrialCO2);
-        return Real.of(forcing);
+        return Quantities.create(forcing, Units.WATT.divide(Units.SQUARE_METER));
     }
 
     /**
      * Calculates radiative forcing from methane.
      * ΔF = 0.036 × (sqrt(M) - sqrt(M₀))
      */
-    public static Real ch4RadiativeForcing(double currentCH4, double preindustrialCH4) {
+    public static Quantity<?> ch4RadiativeForcing(double currentCH4, double preindustrialCH4) {
         double forcing = 0.036 * (Math.sqrt(currentCH4) - Math.sqrt(preindustrialCH4));
-        return Real.of(forcing);
+        return Quantities.create(forcing, Units.WATT.divide(Units.SQUARE_METER));
     }
 
     /**
      * Converts radiative forcing to temperature change.
      * ΔT = λ × ΔF (climate sensitivity parameter)
      */
-    public static Real temperatureChange(Real radiativeForcing, double climateSensitivity) {
-        return radiativeForcing.multiply(Real.of(climateSensitivity));
+    public static Quantity<Temperature> temperatureChange(Quantity<?> radiativeForcing, double climateSensitivity) {
+        double dt = radiativeForcing.getValue().doubleValue() * climateSensitivity;
+        return Quantities.create(dt, Units.KELVIN);
     }
 
     /**
      * Projects climate forward under a given scenario.
      */
-    public static List<ClimateState> projectClimate(ClimateState initial, 
-            EmissionScenario scenario, int years) {
+    public void simulate(EmissionScenario scenario, int years) {
+        ClimateState last = history.get(history.size() - 1);
         
-        List<ClimateState> projection = new ArrayList<>();
-        projection.add(initial);
-        
-        double co2 = initial.co2Concentration();
-        double ch4 = initial.ch4Concentration();
-        double temp = initial.globalMeanTemperature();
-        double seaLevel = initial.seaLevel();
+        double co2 = last.co2Concentration();
+        double ch4 = last.ch4Concentration();
+        double temp = last.globalMeanTemperature().getValue().doubleValue();
+        double seaLevel = last.seaLevel().to(Units.METER).getValue().doubleValue();
         
         double preindustrialCO2 = 280.0;
         double preindustrialCH4 = 700.0;
         double climateSensitivity = 0.8; // °C per W/m²
         
         for (int y = 1; y <= years; y++) {
-            // Update concentrations
-            // Airborne fraction of CO2 emissions
-            co2 += scenario.annualCO2EmissionGt() * 0.45; // ~45% stays in atmosphere
-            ch4 += scenario.annualCH4EmissionMt() * 0.001; // Simplified
-            
-            // CH4 has ~10 year lifetime
+            co2 += scenario.annualCO2EmissionGt() * 0.45;
+            ch4 += scenario.annualCH4EmissionMt() * 0.001;
             ch4 *= 0.9;
             
-            // Calculate forcing
-            double co2Forcing = co2RadiativeForcing(co2, preindustrialCO2).doubleValue();
-            double ch4Forcing = ch4RadiativeForcing(ch4, preindustrialCH4).doubleValue();
+            double co2Forcing = co2RadiativeForcing(co2, preindustrialCO2).getValue().doubleValue();
+            double ch4Forcing = ch4RadiativeForcing(ch4, preindustrialCH4).getValue().doubleValue();
             double totalForcing = co2Forcing + ch4Forcing;
             
-            // Temperature response (with thermal inertia)
             double equilibriumTemp = 288.0 + climateSensitivity * totalForcing;
-            temp = temp + 0.03 * (equilibriumTemp - temp); // Slow approach
+            temp = temp + 0.03 * (equilibriumTemp - temp);
             
-            // Sea level rise (simplified thermal expansion + ice melt)
             double tempAnomaly = temp - 288.0;
             seaLevel += 0.003 * tempAnomaly + 0.001 * Math.max(0, tempAnomaly - 1);
             
-            projection.add(new ClimateState(
-                temp, co2, ch4, totalForcing, seaLevel, initial.year() + y
+            history.add(new ClimateState(
+                Quantities.create(temp, Units.KELVIN),
+                co2, ch4, 
+                Quantities.create(totalForcing, Units.WATT.divide(Units.SQUARE_METER)),
+                Quantities.create(seaLevel, Units.METER),
+                last.year() + y
             ));
         }
-        
-        return projection;
     }
 
-    /**
-     * Calculates cumulative carbon budget for a temperature target.
-     */
-    public static Real carbonBudget(double targetTempRise, double currentTempRise,
-            double climateSensitivity) {
-        
-        // Remaining forcing budget
-        double remainingForcing = (targetTempRise - currentTempRise) / climateSensitivity;
-        
-        // Convert to CO2 (approximately)
-        double co2Budget = remainingForcing / 5.35 * 280 * 2.1; // GtC
-        
-        return Real.of(Math.max(0, co2Budget));
+    public List<ClimateState> getHistory() {
+        return Collections.unmodifiableList(history);
     }
 
-    /**
-     * Estimates ice sheet contribution to sea level based on warming.
-     */
-    public static Real iceSheetSeaLevelContribution(double warming, int years) {
-        double greenlandRate = warming > 1.5 ? 0.003 : 0.001; // m/year
-        double antarcticRate = warming > 2.0 ? 0.002 : 0.0005;
-        
-        double total = (greenlandRate + antarcticRate) * years;
-        return Real.of(total);
+    @Override
+    public String getModelType() {
+        return "CLIMATE_PROJECTION";
     }
 
-    /**
-     * Creates initial state for present day (2024 approximate values).
-     */
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("name", name);
+        meta.put("history_size", history.size());
+        if (!history.isEmpty()) {
+            meta.put("current_year", history.get(history.size() - 1).year());
+        }
+        return meta;
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> q = new HashMap<>();
+        if (!history.isEmpty()) {
+            ClimateState last = history.get(history.size() - 1);
+            q.put("global_mean_temperature", last.globalMeanTemperature());
+            q.put("radiative_forcing", last.radiativeForcing());
+            q.put("sea_level_rise", last.seaLevel());
+        }
+        return q;
+    }
+
     public static ClimateState currentState() {
         return new ClimateState(
-            288.5,    // ~15.35°C global mean
-            420.0,    // CO2 in 2024
-            1900.0,   // CH4 in ppb
-            3.2,      // Total forcing
-            0.20,     // Sea level rise since 1990
+            Quantities.create(288.5, Units.KELVIN),
+            420.0,
+            1900.0,
+            Quantities.create(3.2, Units.WATT.divide(Units.SQUARE_METER)),
+            Quantities.create(0.20, Units.METER),
             2024
         );
     }
 }
+

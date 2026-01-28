@@ -27,35 +27,42 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.jscience.mathematics.numbers.real.Real;
+import java.util.HashMap;
+
+import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Temperature;
+import org.jscience.measure.quantity.Length;
 
 /**
  * Analytical model for the Urban Heat Island (UHI) effect. It estimates the 
  * temperature differential between urban and rural areas based on land cover, 
  * geometry (sky view factor), and anthropogenic heat sources.
  */
-public final class UrbanHeatIslandModel {
+public final class UrbanHeatIslandModel implements UniversalDataModel {
 
-    private UrbanHeatIslandModel() {}
+    private final String name;
+    private final List<UrbanZone> zones = new ArrayList<>();
+    private Quantity<?> ambientSolarIrradiance; // W/m2
+
+    public UrbanHeatIslandModel(String name) {
+        this.name = name;
+    }
+
+    public void addZone(UrbanZone zone) { zones.add(zone); }
+    public void setAmbientSolarIrradiance(Quantity<?> irradiance) { this.ambientSolarIrradiance = irradiance; }
 
     /**
      * Categories of urban land cover with their associated thermal properties.
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+     */
     public enum LandCover {
-        /** Natural vegetation, high evapotranspiration and moderate albedo. */
         VEGETATION(0.25, 0.40), 
-        /** Dark road surfaces, very low albedo and high thermal storage. */
         ASPHALT(0.10, 0.90),
-        /** Structural concrete, moderate albedo and high thermal mass. */
         CONCRETE(0.30, 0.85),
-        /** Water bodies, low albedo and high thermal capacity. */
         WATER(0.08, 0.98),
-        /** Cool roofs or light-colored roofing materials. */
         ROOF_LIGHT(0.60, 0.85),
-        /** Traditional dark roofing materials. */
         ROOF_DARK(0.15, 0.90);
 
         private final double albedo;
@@ -75,9 +82,9 @@ public final class UrbanHeatIslandModel {
      */
     public record UrbanZone(
         String name,
-        Map<LandCover, Double> surfaceComposition, // Fraction 0.0 to 1.0
-        double skyViewFactor, // 0.0 to 1.0 (1.0 = open sky, 0.0 = deep canyon)
-        double anthropogenicHeatFlux // W/m2 (from traffic, appliances, AC systems)
+        Map<LandCover, Double> surfaceComposition,
+        double skyViewFactor,
+        Quantity<?> anthropogenicHeatFlux // W/m2
     ) implements Serializable {
         private static final long serialVersionUID = 2L;
     }
@@ -85,76 +92,58 @@ public final class UrbanHeatIslandModel {
     /**
      * Calculates the estimated Urban Heat Island (UHI) intensity as a temperature 
      * anomaly relative to the surrounding rural environment.
-     * Formula: ΔT ≈ (Q_ant + Q_solar_abs) * (1 - SVF) / h
-     * 
-     * @param zone the urban zone to analyze
-     * @param solarIrradiance current incident solar radiation in W/m2
-     * @return the temperature difference in Kelvins (K)
      */
-    public static Real calculateUHIIntensity(UrbanZone zone, double solarIrradiance) {
-        if (zone == null || zone.surfaceComposition() == null) return Real.ZERO;
+    public Quantity<Temperature> calculateUHIIntensity(UrbanZone zone) {
+        if (zone == null || ambientSolarIrradiance == null) return null;
         
         double avgAlbedo = 0;
         double totalFraction = 0;
         for (var entry : zone.surfaceComposition().entrySet()) {
-            avgAlbedo += entry.getKey().getAlbedo() * entry.getValue();
-            totalFraction += entry.getValue();
+            avgAlbedo += entry.getKey().getAlbedo() * (entry.getValue() != null ? entry.getValue() : 0.0);
+            totalFraction += (entry.getValue() != null ? entry.getValue() : 0.0);
         }
         
         if (totalFraction > 0) avgAlbedo /= totalFraction;
 
-        // Absorbed radiation flux
-        double absorbedFlux = solarIrradiance * (1 - avgAlbedo);
+        double solar = ambientSolarIrradiance.getValue().doubleValue();
+        double absorbedFlux = solar * (1 - avgAlbedo);
+        double anthro = zone.anthropogenicHeatFlux().getValue().doubleValue();
         
-        // Simplified semi-empirical model for UHI intensity
-        // Magnitude is driven by anthropogenic heat and poorly dissipated solar gain
-        double intensity = (zone.anthropogenicHeatFlux() + absorbedFlux * 0.2) * (1 - Math.max(0, Math.min(1.0, zone.skyViewFactor())));
+        double intensity = (anthro + absorbedFlux * 0.2) * (1 - Math.max(0, Math.min(1.0, zone.skyViewFactor())));
         
-        return Real.of(Math.max(0, intensity / 20.0));
+        return Quantities.create(Math.max(0, intensity / 20.0), Units.KELVIN);
     }
 
-    /**
-     * Generates a list of targeted architectural and urban planning mitigation 
-     * strategies based on the zone's specific vulnerabilities.
-     * 
-     * @param zone the zone under evaluation
-     * @param currentUHI the calculated heat island intensity
-     * @return list of recommended interventions
-     */
-    public static List<String> suggestMitigation(UrbanZone zone, Real currentUHI) {
-        List<String> strategies = new ArrayList<>();
-        if (zone == null || currentUHI == null) return strategies;
-        
-        double uhiValue = currentUHI.doubleValue();
-
-        if (uhiValue > 3.0) {
-            strategies.add("Critical: Increase Sky View Factor by reducing building heights or widening streets to improve long-wave radiation loss.");
-        }
-        
-        double vegFraction = zone.surfaceComposition().getOrDefault(LandCover.VEGETATION, 0.0);
-        if (vegFraction < 0.3) {
-            strategies.add("Install green roofs or urban forests to increase latent heat cooling through evapotranspiration.");
-        }
-
-        double asphaltFraction = zone.surfaceComposition().getOrDefault(LandCover.ASPHALT, 0.0);
-        if (asphaltFraction > 0.4) {
-            strategies.add("Replace dark asphalt with 'Cool Pavements' (permeable, high-albedo materials) to reduce short-wave absorption.");
-        }
-
-        return strategies;
+    public static Quantity<?> estimateSkyViewFactor(Quantity<Length> buildingHeight, Quantity<Length> streetWidth) {
+        double H = buildingHeight.to(Units.METER).getValue().doubleValue();
+        double W = streetWidth.to(Units.METER).getValue().doubleValue();
+        if (W <= 0) return Quantities.create(0.0, Units.ONE);
+        double svf = Math.cos(Math.atan(H / (W / 2.0)));
+        return Quantities.create(svf, Units.ONE);
     }
 
-    /**
-     * Estimates the Sky View Factor (SVF) for a symmetrical urban canyon geometry.
-     * Formula: SVF = cos(atan(H / (W/2)))
-     * 
-     * @param buildingHeight average height of buildings (H)
-     * @param streetWidth average width of the street (W)
-     * @return SVF coefficient (0.0 to 1.0)
-     */
-    public static Real estimateSkyViewFactor(double buildingHeight, double streetWidth) {
-        if (streetWidth <= 0) return Real.ZERO;
-        double svf = Math.cos(Math.atan(buildingHeight / (streetWidth / 2.0)));
-        return Real.of(Math.max(0, Math.min(1.0, svf)));
+    @Override
+    public String getModelType() {
+        return "URBAN_HEAT_ISLAND";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("name", name);
+        meta.put("urban_zones_count", zones.size());
+        return meta;
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> q = new HashMap<>();
+        if (!zones.isEmpty()) {
+            UrbanZone primary = zones.get(0);
+            Quantity<Temperature> intensity = calculateUHIIntensity(primary);
+            if (intensity != null) q.put("primary_zone_uhi_intensity", intensity);
+            q.put("primary_zone_heat_flux", primary.anthropogenicHeatFlux());
+        }
+        return q;
     }
 }

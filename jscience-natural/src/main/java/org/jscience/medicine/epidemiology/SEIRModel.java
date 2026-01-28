@@ -29,6 +29,9 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Frequency;
 import org.jscience.measure.quantity.Time;
+import org.jscience.util.UniversalDataModel;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * SEIR (Susceptible-Exposed-Infected-Recovered) epidemic model.
@@ -54,7 +57,7 @@ import org.jscience.measure.quantity.Time;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SEIRModel {
+public class SEIRModel implements UniversalDataModel {
 
     private final Quantity<Frequency> beta; // Transmission rate
     private final Quantity<Frequency> sigma; // Incubation rate (1/latent period)
@@ -233,6 +236,24 @@ public class SEIRModel {
                 Quantities.create(1.875 / 86400.0, Units.HERTZ),
                 Quantities.create(0.1 / 86400.0, Units.HERTZ),
                 Quantities.create(0.125 / 86400.0, Units.HERTZ));
+    }
+
+    @Override
+    public String getModelType() {
+        return "EPIDEMIOLOGICAL_SEIR";
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> q = new HashMap<>();
+        q.put("susceptible", Quantities.create(S.doubleValue(), Units.ONE));
+        q.put("exposed", Quantities.create(E.doubleValue(), Units.ONE));
+        q.put("infected", Quantities.create(I.doubleValue(), Units.ONE));
+        q.put("recovered", Quantities.create(R.doubleValue(), Units.ONE));
+        q.put("total_population", Quantities.create(population, Units.ONE));
+        q.put("r0", Quantities.create(getR0().doubleValue(), Units.ONE));
+        q.put("effective_r", Quantities.create(getEffectiveR().doubleValue(), Units.ONE));
+        return q;
     }
 }
 

@@ -28,6 +28,8 @@ import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.*;
 
+import org.jscience.util.UniversalDataModel;
+
 /**
  * Represents an SBML model for systems biology.
  * <p>
@@ -40,7 +42,8 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SBMLModel {
+public class SBMLModel implements UniversalDataModel {
+
 
     private String id;
     private String name;
@@ -286,4 +289,30 @@ public class SBMLModel {
                 ", reactions=" + reactions.size() +
                 '}';
     }
+
+    @Override
+    public String getModelType() {
+        return "SYSTEMS_BIOLOGY_SBML";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("id", id);
+        meta.put("name", name);
+        meta.put("sbml_level", level);
+        meta.put("sbml_version", version);
+        meta.put("notes", notes);
+        return meta;
+    }
+
+    @Override
+    public Map<String, org.jscience.measure.Quantity<?>> getQuantities() {
+        Map<String, org.jscience.measure.Quantity<?>> q = new HashMap<>();
+        q.put("species_count", org.jscience.measure.Quantities.create(species.size(), org.jscience.measure.Units.ONE));
+        q.put("reaction_count", org.jscience.measure.Quantities.create(reactions.size(), org.jscience.measure.Units.ONE));
+        q.put("compartment_count", org.jscience.measure.Quantities.create(compartments.size(), org.jscience.measure.Units.ONE));
+        return q;
+    }
 }
+

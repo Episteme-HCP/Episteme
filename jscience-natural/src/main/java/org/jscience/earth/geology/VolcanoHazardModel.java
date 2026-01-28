@@ -23,56 +23,97 @@
 
 package org.jscience.earth.geology;
 
-import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Advanced Volcanic Hazard Model.
  * Includes Energy Cone models for Pyroclastic Flows and Ash Dispersion.
  */
-public final class VolcanoHazardModel {
+import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Velocity;
+import java.util.Map;
+import java.util.HashMap;
 
-    private VolcanoHazardModel() {}
+/**
+ * Advanced Volcanic Hazard Model.
+ * Includes Energy Cone models for Pyroclastic Flows and Ash Dispersion.
+ */
+public final class VolcanoHazardModel implements UniversalDataModel {
+
+    private final String name;
+    private Quantity<Length> ventHeight;
+    private double mobilityRatio = 0.2; // H/L
+    private Quantity<Velocity> windSpeed;
+    private Quantity<?> massDischargeRate; // kg/s
+
+    public VolcanoHazardModel(String name) {
+        this.name = name;
+    }
+
+    public void setVentHeight(Quantity<Length> height) { this.ventHeight = height; }
+    public void setMobilityRatio(double ratio) { this.mobilityRatio = ratio; }
+    public void setWindSpeed(Quantity<Velocity> speed) { this.windSpeed = speed; }
+    public void setMassDischargeRate(Quantity<?> rate) { this.massDischargeRate = rate; }
 
     /**
      * Predicts Pyroclastic Flow runout distance using the "Energy Cone" model (H/L ratio).
-     * 
-     * @param height Vent height (m)
-     * @param hlRatio Mobility ratio (H/L), typical values 0.1 to 0.3
      */
-    public static Real pyroclasticRunout(double height, double hlRatio) {
-        return Real.of(height / hlRatio);
+    public Quantity<Length> getPyroclasticRunout() {
+        if (ventHeight == null) return null;
+        double height = ventHeight.to(Units.METER).getValue().doubleValue();
+        return Quantities.create(height / mobilityRatio, Units.METER);
     }
 
     /**
      * Estimates ash fall thickness using a spatial decay model.
      * T(d) = T0 * exp(-k * d)
-     * 
-     * @param thicknessAtVent T0 in cm
-     * @param distanceKm d in km
-     * @param windSpeed m/s
      */
-    public static Real ashThickness(double thicknessAtVent, double distanceKm, double windSpeed) {
-        // Distortion due to wind (simplified)
-        double k = 0.5 / (1.0 + windSpeed * 0.1);
-        return Real.of(thicknessAtVent * Math.exp(-k * distanceKm));
+    public Quantity<Length> getAshThickness(Quantity<Length> distance, Quantity<Length> thicknessAtVent) {
+        double d = distance.to(Units.KILOMETER).getValue().doubleValue();
+        double t0 = thicknessAtVent.to(Units.CENTIMETER).getValue().doubleValue();
+        double ws = windSpeed != null ? windSpeed.to(Units.METER_PER_SECOND).getValue().doubleValue() : 0.0;
+        
+        double k = 0.5 / (1.0 + ws * 0.1);
+        double t = t0 * Math.exp(-k * d);
+        return Quantities.create(t, Units.CENTIMETER);
     }
 
     /**
      * Calculates the plume height using the Morton, Taylor and Turner (MTT) model.
      * H = 1.67 * (Q^0.25)
-     * 
-     * @param massDischargeRate Q (kg/s)
-     * @return Plume height in Km
      */
-    public static Real estimatePlumeHeight(double massDischargeRate) {
-        return Real.of(1.67 * Math.pow(massDischargeRate, 0.25));
+    public Quantity<Length> getPlumeHeight() {
+        if (massDischargeRate == null) return null;
+        double Q = massDischargeRate.getValue().doubleValue();
+        return Quantities.create(1.67 * Math.pow(Q, 0.25), Units.KILOMETER);
     }
 
-    /**
-     * Evaluates the risk level based on population density and flow proximity.
-     */
-    public static double combinedRiskScore(double distToVent, double plumeHeight, double popDensity) {
-        double sourceTerm = plumeHeight / distToVent;
-        return Math.min(1.0, sourceTerm * popDensity / 1000.0);
+    @Override
+    public String getModelType() {
+        return "VOLCANIC_HAZARD";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("name", name);
+        meta.put("mobility_ratio", mobilityRatio);
+        return meta;
+    }
+
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> q = new HashMap<>();
+        if (ventHeight != null) q.put("vent_height", ventHeight);
+        if (windSpeed != null) q.put("wind_speed", windSpeed);
+        Quantity<Length> runout = getPyroclasticRunout();
+        if (runout != null) q.put("pyroclastic_runout", runout);
+        Quantity<Length> plume = getPlumeHeight();
+        if (plume != null) q.put("plume_height", plume);
+        return q;
     }
 }
+

@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.jscience.util.UniversalDataModel;
+
 /**
  * A robust, persistent implementation of the {@link Experiment} interface.
  * <p>
@@ -55,7 +57,8 @@ import java.util.UUID;
  * @since 1.0
  */
 @Persistent
-public class ScientificExperiment<I, R> implements Experiment<I, R> {
+public class ScientificExperiment<I, R> implements Experiment<I, R>, UniversalDataModel {
+
 
     @Override
     public java.util.concurrent.CompletableFuture<R> run(I input) {
@@ -170,4 +173,33 @@ public class ScientificExperiment<I, R> implements Experiment<I, R> {
 
     public Instant getEndDate() { return endDate; }
     public void setEndDate(Instant endDate) { this.endDate = endDate; }
+
+    // --- UniversalDataModel implementation ---
+
+    @Override
+    public String getModelType() {
+        return "SCIENTIFIC_EXPERIMENT";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>(traits);
+        meta.put("id", id.toString());
+        meta.put("name", name);
+        meta.put("author_count", authors.size());
+        meta.put("start_date", startDate != null ? startDate.toString() : null);
+        return meta;
+    }
+
+    @Override
+    public Map<String, org.jscience.measure.Quantity<?>> getQuantities() {
+        Map<String, org.jscience.measure.Quantity<?>> quantities = new HashMap<>();
+        quantities.put("observation_count", org.jscience.measure.Quantities.create(observations.size(), org.jscience.measure.Units.ONE));
+        if (startDate != null && endDate != null) {
+            long durationSec = endDate.getEpochSecond() - startDate.getEpochSecond();
+            quantities.put("duration", org.jscience.measure.Quantities.create(durationSec, org.jscience.measure.Units.SECOND));
+        }
+        return quantities;
+    }
 }
+

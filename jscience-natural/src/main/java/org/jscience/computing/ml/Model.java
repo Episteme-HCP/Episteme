@@ -7,6 +7,7 @@ package org.jscience.computing.ml;
 
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.util.UniversalDataModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ import java.util.Map;
  * Base class for all machine learning models.
  */
 @Persistent
-public class Model implements Serializable {
+public class Model implements Serializable, UniversalDataModel {
+
     private static final long serialVersionUID = 1L;
 
     @Attribute
@@ -75,5 +77,28 @@ public class Model implements Serializable {
     
     public List<MiningField> getMiningFields() {
         return Collections.unmodifiableList(miningFields);
+    }
+
+    // --- UniversalDataModel implementation ---
+
+    @Override
+    public String getModelType() {
+        return "MACHINE_LEARNING_MODEL";
+    }
+
+    @Override
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>(traits);
+        meta.put("name", name);
+        meta.put("data_field_count", dataFields.size());
+        meta.put("mining_field_count", miningFields.size());
+        return meta;
+    }
+
+    @Override
+    public Map<String, org.jscience.measure.Quantity<?>> getQuantities() {
+        Map<String, org.jscience.measure.Quantity<?>> q = new HashMap<>();
+        q.put("field_count", org.jscience.measure.Quantities.create(dataFields.size() + miningFields.size(), org.jscience.measure.Units.ONE));
+        return q;
     }
 }

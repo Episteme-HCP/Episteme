@@ -41,7 +41,7 @@ public class SimulationEnginesTest {
     @Test
     public void testMacroModel() {
         Economy eco = Economy.usa();
-        MacroModel model = new MacroModel(eco);
+        MacroModel model = new MacroModel("US Economy Simulator", eco);
 
         double initialGDP = eco.getGDP().getAmount().doubleValue();
         model.simulateYear();
