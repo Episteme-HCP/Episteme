@@ -21,6 +21,6 @@
  * SOFTWARE.
  */
 /**
- * Provides the {@link org.jscience.ml.openmath} module.
+ * Provides the {@link org.jscience.ml.openmath.io} module.
  */
-package org.jscience.mathematics.loaders.openmath;
+package org.jscience.ml.openmath.io;

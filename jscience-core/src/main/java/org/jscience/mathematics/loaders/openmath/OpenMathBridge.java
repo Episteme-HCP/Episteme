@@ -44,35 +44,43 @@ public final class OpenMathBridge {
      * Converts an OpenMath object to an Expression.
      */
     public static Expression<?> convert(Object omObj) {
-        if (omObj instanceof OpenMathVariable v) {
+        if (omObj instanceof OMVariable v) {
             return new Variable<>(v.getName());
-        } else if (omObj instanceof Long l) {
-            return ConstantExpression.valueOf(l.doubleValue());
+        } else if (omObj instanceof OMInteger i) {
+            return ConstantExpression.valueOf(Double.parseDouble(i.getInteger()));
+        } else if (omObj instanceof OMFloat f) {
+            return ConstantExpression.valueOf(f.doubleValue());
         } else if (omObj instanceof Number n) {
             return ConstantExpression.valueOf(n.doubleValue());
-        } else if (omObj instanceof OpenMathApplication app) {
-            return convertApplication(app);
-        } else if (omObj instanceof OpenMathSymbol s) {
-            // Un-applied symbol could be treated as a constant or variable
+        } else if (omObj instanceof OMBinding app) {
+             return null; 
+        } else if (omObj instanceof OMForeign app) { 
+             return null; 
+        } else if (omObj instanceof OMApplication app) {
+            return convertApplication(app); 
+        } else if (omObj instanceof OMSymbol s) {
             return new Variable<>(s.getName());
         }
         return null;
     }
 
-    private static Expression<?> convertApplication(OpenMathApplication app) {
-        Object operator = app.getOperator();
-        if (!(operator instanceof OpenMathSymbol sym)) return null;
+    private static Expression<?> convertApplication(OMApplication app) {
+        if (app.getLength() == 0) return null;
+        OMObject operatorObj = app.getElementAt(0);
+        if (!(operatorObj instanceof OMSymbol sym)) return null;
 
-        String cd = sym.getContentDictionary();
+        String cd = sym.getCd();
         String name = sym.getName();
 
+        // Operands match app elements from index 1 to end
         java.util.List<Expression<?>> operands = new java.util.ArrayList<>();
-        for (Object arg : app.getArguments()) {
-            Expression<?> e = convert(arg);
+        int length = app.getLength();
+        for (int i = 1; i < length; i++) {
+            Expression<?> e = convert(app.getElementAt(i));
             if (e != null) operands.add(e);
         }
 
-        if (operands.isEmpty() && !app.getArguments().isEmpty()) return null;
+        if (operands.isEmpty() && length > 1) return null; // Arguments failed to convert
 
         // Arith1 Content Dictionary
         if ("arith1".equals(cd)) {
@@ -82,7 +90,7 @@ public final class OpenMathBridge {
                 case "minus" -> (operands.size() == 2) ? subtractAny(operands.get(0), operands.get(1)) :
                                 (operands.size() == 1) ? operands.get(0).negate() : null;
                 case "divide" -> (operands.size() == 2) ? divideAny(operands.get(0), operands.get(1)) : null;
-                case "power" -> (operands.size() == 2) ? powerAny(operands.get(0), parseInteger(app.getArguments().get(1))) : null;
+                case "power" -> (operands.size() == 2) ? powerAny(operands.get(0), parseInteger(app.getElementAt(2))) : null; 
                 default -> null;
             };
         }
@@ -116,6 +124,7 @@ public final class OpenMathBridge {
     }
 
     private static int parseInteger(Object obj) {
+        if (obj instanceof OMInteger i) return i.intValue();
         if (obj instanceof Number n) return n.intValue();
         return 1;
     }
