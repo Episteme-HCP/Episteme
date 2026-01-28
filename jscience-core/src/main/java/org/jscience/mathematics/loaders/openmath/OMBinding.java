@@ -49,7 +49,7 @@ public class OMBinding extends OMObject {
     /**
      * Stores the variables. <p>
      */
-    protected Vector variables = new Vector();
+    protected Vector<OMObject> variables = new Vector<>();
 
     /**
      * Stores the body. <p>
@@ -70,7 +70,7 @@ public class OMBinding extends OMObject {
      * @param newVariables a Vector with the bound variables.
      * @param newBody      the body.
      */
-    public OMBinding(OMObject newBinder, Vector newVariables, OMObject newBody) {
+    public OMBinding(OMObject newBinder, Vector<OMObject> newVariables, OMObject newBody) {
         super();
 
         binder = newBinder;
@@ -110,7 +110,7 @@ public class OMBinding extends OMObject {
      *
      * @return the variables, or <b>null</b> if not set.
      */
-    public Vector getVariables() {
+    public Vector<OMObject> getVariables() {
         return variables;
     }
 
@@ -119,7 +119,7 @@ public class OMBinding extends OMObject {
      *
      * @param newVariables the variables.
      */
-    public void setVariables(Vector newVariables) {
+    public void setVariables(Vector<OMObject> newVariables) {
         variables = newVariables;
     }
 
@@ -148,7 +148,7 @@ public class OMBinding extends OMObject {
      * @return the variable.
      */
     public OMObject getVariableAt(int index) {
-        return (OMObject) variables.elementAt(index);
+        return variables.elementAt(index);
     }
 
     /**
@@ -219,7 +219,7 @@ public class OMBinding extends OMObject {
      * @return the first variable.
      */
     public OMObject firstVariable() {
-        return (OMObject) variables.firstElement();
+        return variables.firstElement();
     }
 
     /**
@@ -228,7 +228,7 @@ public class OMBinding extends OMObject {
      * @return the last variable.
      */
     public OMObject lastVariable() {
-        return (OMObject) variables.lastElement();
+        return variables.lastElement();
     }
 
     /**
@@ -236,14 +236,14 @@ public class OMBinding extends OMObject {
      */
     public String toString() {
         StringBuffer result = new StringBuffer();
-        Enumeration enumeration = variables.elements();
+        Enumeration<OMObject> enumeration = variables.elements();
 
         result.append("<OMBIND>");
         result.append(binder);
         result.append("<OMBVAR>");
 
         for (; enumeration.hasMoreElements();) {
-            OMObject object = (OMObject) enumeration.nextElement();
+            OMObject object = enumeration.nextElement();
             result.append(object.toString());
         }
 
@@ -263,13 +263,15 @@ public class OMBinding extends OMObject {
         binding.variables = this.variables;
         binding.body = this.body;
 
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
-            binding.setAttribute(key, value);
+            String key = keys.nextElement();
+            Object value = values.nextElement();
+            if (value instanceof String) {
+                binding.setAttribute(key, (String) value);
+            }
         }
 
         return binding;
@@ -281,23 +283,25 @@ public class OMBinding extends OMObject {
     public Object copy() {
         OMBinding binding = new OMBinding();
         binding.binder = (OMObject) this.binder.copy();
-        binding.variables = new Vector();
+        binding.variables = new Vector<>();
         binding.body = (OMObject) this.body.copy();
 
-        Enumeration variables = this.variables.elements();
+        Enumeration<OMObject> variables = this.variables.elements();
 
         for (; variables.hasMoreElements();) {
-            binding.variables.addElement(((OMObject) variables.nextElement()).copy());
+            binding.variables.addElement((OMObject) variables.nextElement().copy());
         }
 
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            binding.setAttribute(key, value);
+            if (value instanceof String) {
+                binding.setAttribute(key, (String) value);
+            }
         }
 
         return binding;
@@ -331,12 +335,12 @@ public class OMBinding extends OMObject {
                 return false;
 
             if (variables.size() == binding.variables.size()) {
-                Enumeration enum1 = variables.elements();
-                Enumeration enum2 = binding.variables.elements();
+                Enumeration<OMObject> enum1 = variables.elements();
+                Enumeration<OMObject> enum2 = binding.variables.elements();
 
                 for (; enum1.hasMoreElements();) {
-                    OMObject object1 = (OMObject) enum1.nextElement();
-                    OMObject object2 = (OMObject) enum2.nextElement();
+                    OMObject object1 = enum1.nextElement();
+                    OMObject object2 = enum2.nextElement();
 
                     if (!object1.isSame(object2))
                         return false;
@@ -351,8 +355,8 @@ public class OMBinding extends OMObject {
      * Determines if this is a valid object. <p>
      */
     public boolean isValid() {
-        for (Enumeration enumeration = variables.elements(); enumeration.hasMoreElements();) {
-            OMObject object = (OMObject) enumeration.nextElement();
+        for (Enumeration<OMObject> enumeration = variables.elements(); enumeration.hasMoreElements();) {
+            OMObject object = enumeration.nextElement();
             if (!object.isValid())
                 return false;
         }
@@ -383,9 +387,9 @@ public class OMBinding extends OMObject {
         * Make sure the source is not a bound variable, otherwise we just
         * return the current OMBinding.
         */
-        for (Enumeration enumeration = variables.elements();
+        for (Enumeration<OMObject> enumeration = variables.elements();
              enumeration.hasMoreElements();) {
-            OMObject object = (OMObject) enumeration.nextElement();
+            OMObject object = enumeration.nextElement();
             if (source.isSame(object))
                 return this;
         }
@@ -440,10 +444,10 @@ public class OMBinding extends OMObject {
         * the variable vector.
         */
         if (var instanceof OMVariable) {
-            Enumeration enumeration = variables.elements();
+            Enumeration<OMObject> enumeration = variables.elements();
             int i = 0;
             for (; enumeration.hasMoreElements();) {
-                OMObject object = (OMObject) enumeration.nextElement();
+                OMObject object = enumeration.nextElement();
                 if (var.isSame(object)) {
                     removeVariableAt(i);
                 }
@@ -498,10 +502,10 @@ public class OMBinding extends OMObject {
         * binding.
         */
         if (source instanceof OMVariable) {
-            Enumeration enumeration = variables.elements();
+            Enumeration<OMObject> enumeration = variables.elements();
             int i = 0;
             for (; enumeration.hasMoreElements();) {
-                OMObject object = (OMObject) enumeration.nextElement();
+                OMObject object = enumeration.nextElement();
                 if (source.isSame(object)) {
                     setVariableAt(dest, i);
                     return replace(source, dest);

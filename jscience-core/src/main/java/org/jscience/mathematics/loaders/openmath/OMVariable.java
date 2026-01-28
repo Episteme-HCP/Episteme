@@ -123,9 +123,10 @@ public class OMVariable extends OMObject {
      *
      * @return a shallow copy.
      */
+    @SuppressWarnings("unchecked")
     public Object clone() {
         OMVariable variable = new OMVariable();
-        variable.attributes = (Hashtable) attributes.clone();
+        variable.attributes = (Hashtable<String, Object>) attributes.clone();
 
         return variable;
     }
@@ -137,14 +138,14 @@ public class OMVariable extends OMObject {
      */
     public Object copy() {
         OMVariable variable = new OMVariable();
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            variable.setAttribute(key, value);
+            variable.setAttribute(key, (String) value);
         }
 
         return variable;

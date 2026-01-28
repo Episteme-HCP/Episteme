@@ -64,9 +64,10 @@ public class OMReference extends OMObject {
      *
      * @return the clone.
      */
+    @SuppressWarnings("unchecked")
     public Object clone() {
         OMReference clone = new OMReference();
-        clone.attributes = (Hashtable) attributes.clone();
+        clone.attributes = (Hashtable<String, Object>) attributes.clone();
 
         return clone;
     }
@@ -78,12 +79,12 @@ public class OMReference extends OMObject {
      */
     public Object copy() {
         OMReference copy = new OMReference();
-        copy.attributes = new Hashtable();
+        copy.attributes = new Hashtable<>();
 
-        Enumeration enumeration = attributes.keys();
+        Enumeration<String> enumeration = attributes.keys();
 
         for (; enumeration.hasMoreElements();) {
-            String key = (String) enumeration.nextElement();
+            String key = enumeration.nextElement();
             String value = (String) attributes.get(key);
             copy.attributes.put(new String(key), new String(value));
         }

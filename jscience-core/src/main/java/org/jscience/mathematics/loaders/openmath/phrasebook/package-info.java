@@ -23,4 +23,4 @@
 /**
  * Provides the {@link org.jscience.ml.openmath.phrasebook} module.
  */
-package org.jscience.ml.openmath.phrasebook;
+package org.jscience.mathematics.loaders.openmath.phrasebook;

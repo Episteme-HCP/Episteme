@@ -161,9 +161,10 @@ public class OMSymbol extends OMObject {
      *
      * @return the cloned object.
      */
+    @SuppressWarnings("unchecked")
     public Object clone() {
         OMSymbol symbol = new OMSymbol();
-        symbol.attributes = (Hashtable) attributes.clone();
+        symbol.attributes = (Hashtable<String, Object>) attributes.clone();
 
         return symbol;
     }
@@ -175,14 +176,14 @@ public class OMSymbol extends OMObject {
      */
     public Object copy() {
         OMSymbol symbol = new OMSymbol();
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            symbol.setAttribute(key, value);
+            symbol.setAttribute(key, (String) value);
         }
 
         return symbol;

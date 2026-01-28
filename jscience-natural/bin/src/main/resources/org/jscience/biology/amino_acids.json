@@ -1,0 +1,204 @@
+{
+    "description": "Amino Acid Properties Database",
+    "version": "1.0",
+    "aminoAcids": [
+        {
+            "symbol": "A",
+            "code3": "Ala",
+            "name": "Alanine",
+            "molecularWeight": 89.09,
+            "pI": 6.00,
+            "hydropathy": 1.8,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "R",
+            "code3": "Arg",
+            "name": "Arginine",
+            "molecularWeight": 174.20,
+            "pI": 10.76,
+            "hydropathy": -4.5,
+            "category": "positive"
+        },
+        {
+            "symbol": "N",
+            "code3": "Asn",
+            "name": "Asparagine",
+            "molecularWeight": 132.12,
+            "pI": 5.41,
+            "hydropathy": -3.5,
+            "category": "polar"
+        },
+        {
+            "symbol": "D",
+            "code3": "Asp",
+            "name": "Aspartic acid",
+            "molecularWeight": 133.10,
+            "pI": 2.77,
+            "hydropathy": -3.5,
+            "category": "negative"
+        },
+        {
+            "symbol": "C",
+            "code3": "Cys",
+            "name": "Cysteine",
+            "molecularWeight": 121.16,
+            "pI": 5.07,
+            "hydropathy": 2.5,
+            "category": "polar"
+        },
+        {
+            "symbol": "E",
+            "code3": "Glu",
+            "name": "Glutamic acid",
+            "molecularWeight": 147.13,
+            "pI": 3.22,
+            "hydropathy": -3.5,
+            "category": "negative"
+        },
+        {
+            "symbol": "Q",
+            "code3": "Gln",
+            "name": "Glutamine",
+            "molecularWeight": 146.15,
+            "pI": 5.65,
+            "hydropathy": -3.5,
+            "category": "polar"
+        },
+        {
+            "symbol": "G",
+            "code3": "Gly",
+            "name": "Glycine",
+            "molecularWeight": 75.07,
+            "pI": 5.97,
+            "hydropathy": -0.4,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "H",
+            "code3": "His",
+            "name": "Histidine",
+            "molecularWeight": 155.16,
+            "pI": 7.59,
+            "hydropathy": -3.2,
+            "category": "positive"
+        },
+        {
+            "symbol": "I",
+            "code3": "Ile",
+            "name": "Isoleucine",
+            "molecularWeight": 131.17,
+            "pI": 6.02,
+            "hydropathy": 4.5,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "L",
+            "code3": "Leu",
+            "name": "Leucine",
+            "molecularWeight": 131.17,
+            "pI": 5.98,
+            "hydropathy": 3.8,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "K",
+            "code3": "Lys",
+            "name": "Lysine",
+            "molecularWeight": 146.19,
+            "pI": 9.74,
+            "hydropathy": -3.9,
+            "category": "positive"
+        },
+        {
+            "symbol": "M",
+            "code3": "Met",
+            "name": "Methionine",
+            "molecularWeight": 149.21,
+            "pI": 5.74,
+            "hydropathy": 1.9,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "F",
+            "code3": "Phe",
+            "name": "Phenylalanine",
+            "molecularWeight": 165.19,
+            "pI": 5.48,
+            "hydropathy": 2.8,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "P",
+            "code3": "Pro",
+            "name": "Proline",
+            "molecularWeight": 115.13,
+            "pI": 6.30,
+            "hydropathy": -1.6,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "S",
+            "code3": "Ser",
+            "name": "Serine",
+            "molecularWeight": 105.09,
+            "pI": 5.68,
+            "hydropathy": -0.8,
+            "category": "polar"
+        },
+        {
+            "symbol": "T",
+            "code3": "Thr",
+            "name": "Threonine",
+            "molecularWeight": 119.12,
+            "pI": 5.60,
+            "hydropathy": -0.7,
+            "category": "polar"
+        },
+        {
+            "symbol": "W",
+            "code3": "Trp",
+            "name": "Tryptophan",
+            "molecularWeight": 204.23,
+            "pI": 5.89,
+            "hydropathy": -0.9,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "Y",
+            "code3": "Tyr",
+            "name": "Tyrosine",
+            "molecularWeight": 181.19,
+            "pI": 5.66,
+            "hydropathy": -1.3,
+            "category": "polar"
+        },
+        {
+            "symbol": "V",
+            "code3": "Val",
+            "name": "Valine",
+            "molecularWeight": 117.15,
+            "pI": 5.96,
+            "hydropathy": 4.2,
+            "category": "nonpolar"
+        },
+        {
+            "symbol": "U",
+            "code3": "Sec",
+            "name": "Selenocysteine",
+            "molecularWeight": 168.05,
+            "pI": 5.47,
+            "hydropathy": null,
+            "category": "special"
+        },
+        {
+            "symbol": "O",
+            "code3": "Pyl",
+            "name": "Pyrrolysine",
+            "molecularWeight": 255.31,
+            "pI": null,
+            "hydropathy": null,
+            "category": "special"
+        }
+    ]
+}

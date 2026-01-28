@@ -146,14 +146,16 @@ public class OMByteArray extends OMObject {
         OMByteArray array = new OMByteArray();
         array.byteArray = this.byteArray;
 
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            array.setAttribute(key, value);
+            if (value instanceof String) {
+                array.setAttribute(key, (String) value);
+            }
         }
 
         return array;
@@ -168,14 +170,16 @@ public class OMByteArray extends OMObject {
         OMByteArray array = new OMByteArray();
         array.byteArray = this.byteArray;
 
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            array.setAttribute(key, value);
+            if (value instanceof String) {
+                array.setAttribute(key, (String) value);
+            }
         }
 
         return array;

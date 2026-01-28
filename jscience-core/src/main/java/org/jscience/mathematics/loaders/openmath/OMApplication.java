@@ -43,7 +43,7 @@ public class OMApplication extends OMObject {
     /**
      * Stores the elements. <p>
      */
-    protected Vector elements = new Vector();
+    protected Vector<OMObject> elements = new Vector<>();
 
     /**
      * Constructor. <p>
@@ -74,12 +74,12 @@ public class OMApplication extends OMObject {
      */
     public String toString() {
         StringBuffer result = new StringBuffer();
-        Enumeration enumeration = elements.elements();
+        Enumeration<OMObject> enumeration = elements.elements();
 
         result.append("<OMA>");
 
         for (; enumeration.hasMoreElements();) {
-            OMObject object = (OMObject) enumeration.nextElement();
+            OMObject object = enumeration.nextElement();
             result.append(object.toString());
         }
 
@@ -87,203 +87,93 @@ public class OMApplication extends OMObject {
         return result.toString();
     }
 
-    /**
-     * Clones the object performing a shallow copy. <p>
-     * <p/>
-     * <p/>
-     * <i>Note:</i> a shallow does not create separate copies of the child
-     * elements. So if you change anything in one of the child elements you
-     * are possibly changing some other object as well.
-     * </p>
-     *
-     * @return a clone of the object.
-     */
     public Object clone() {
         OMApplication application = new OMApplication();
-        application.elements = this.elements;
+        application.elements = new Vector<>(this.elements);
 
         return application;
     }
 
-    /**
-     * Copies the object performing a full copy. <p>
-     * <p/>
-     * <p/>
-     * <i>Note:</i> a full copy will create separate copies of all its child
-     * elements as well.
-     * </p>
-     *
-     * @return a copy of the object.
-     */
     public Object copy() {
         OMApplication application = new OMApplication();
-        Enumeration enumeration = this.elements.elements();
+        Enumeration<OMObject> enumeration = this.elements.elements();
         OMObject object = null;
 
         for (; enumeration.hasMoreElements();) {
-            object = (OMObject) enumeration.nextElement();
+            object = enumeration.nextElement();
             application.addElement((OMObject) object.copy());
         }
 
         return application;
     }
 
-    /**
-     * Are we a composite object. <p>
-     *
-     * @return <b>true</b> if we are a composite object,
-     *         <b>false</b> if we are not.
-     */
     public boolean isComposite() {
         return true;
     }
 
-    /**
-     * Are we an atom object. <p>
-     *
-     * @return <b>true</b> if we are an atom object,
-     *         <b>false</b> if we are not.
-     */
     public boolean isAtom() {
         return false;
     }
 
-    /**
-     * Get the length of the application (aka the number of elements). <p>
-     *
-     * @return the number of elements.
-     */
     public int getLength() {
         return elements.size();
     }
 
-    /**
-     * Get the elements. <p>
-     *
-     * @return the vector of elements.
-     */
-    public Vector getElements() {
+    public Vector<OMObject> getElements() {
         return elements;
     }
 
-    /**
-     * Set the elements. <p>
-     *
-     * @param newElements a vector with elements.
-     */
-    public void setElements(Vector newElements) {
+    public void setElements(Vector<OMObject> newElements) {
         elements = newElements;
     }
 
-    /**
-     * Gets the element at the given index. <p>
-     *
-     * @param index the index of the elements to get.
-     * @return the element at the given index.
-     */
     public OMObject getElementAt(int index) {
-        return (OMObject) elements.elementAt(index);
+        return elements.elementAt(index);
     }
 
-    /**
-     * Sets an element. <p>
-     *
-     * @param object the object.
-     * @param index  the index.
-     */
     public void setElementAt(OMObject object, int index) {
         elements.setElementAt(object, index);
     }
 
-    /**
-     * Inserts an element at. <p>
-     *
-     * @param object the object to insert at index
-     * @param index  the index to insert at.
-     */
     public void insertElementAt(OMObject object, int index) {
         elements.insertElementAt(object, index);
     }
 
-    /**
-     * Removes an element at. <p>
-     *
-     * @param index the index to remove the object.
-     */
     public void removeElementAt(int index) {
         elements.removeElementAt(index);
     }
 
-    /**
-     * Adds an element. <p>
-     *
-     * @param object adds an object (at the end).
-     */
     public void addElement(OMObject object) {
         elements.addElement(object);
     }
-
-    /**
-     * Removes an element. <p>
-     * <p/>
-     * <p/>
-     * <i>Note: This removes the first occurence of the given element. If you
-     * want to remove all the references to the given object, continue to
-     * use this method until it returns <b>false</b>.</i>
-     * </p>
-     *
-     * @param object removes the first occurence of the given object.
-     * @return <b>true</b> if the object was found (and removed),
-     *         <b>false</b> otherwise.
-     */
 
     public boolean removeElement(OMObject object) {
         return elements.removeElement(object);
     }
 
-    /**
-     * Remove all elements. <p>
-     */
     public void removeAllElements() {
         elements.removeAllElements();
     }
 
-    /**
-     * Gets the first element. <p>
-     *
-     * @return the first element.
-     */
     public OMObject firstElement() {
-        return (OMObject) elements.firstElement();
+        return elements.firstElement();
     }
 
-    /**
-     * Gets the last element. <p>
-     *
-     * @return the last element.
-     */
     public OMObject lastElement() {
-        return (OMObject) elements.lastElement();
+        return elements.lastElement();
     }
 
-    /**
-     * Determines if this is the same object. <p>
-     *
-     * @param object the object to compare against.
-     * @return <b>true</b> if this is the same object,
-     *         <b>false</b> if it is not.
-     */
     public boolean isSame(OMObject object) {
         if (object instanceof OMApplication) {
             OMApplication application = (OMApplication) object;
 
             if (application.getLength() == getLength()) {
-                Enumeration enumeration1 = application.getElements().elements();
-                Enumeration enumeration2 = elements.elements();
+                Enumeration<OMObject> enumeration1 = application.getElements().elements();
+                Enumeration<OMObject> enumeration2 = elements.elements();
 
                 for (; enumeration1.hasMoreElements();) {
-                    OMObject object1 = (OMObject) enumeration1.nextElement();
-                    OMObject object2 = (OMObject) enumeration2.nextElement();
+                    OMObject object1 = enumeration1.nextElement();
+                    OMObject object2 = enumeration2.nextElement();
 
                     if (!object1.isSame(object2))
                         return false;
@@ -294,18 +184,12 @@ public class OMApplication extends OMObject {
         return false;
     }
 
-    /**
-     * Determines if this is a valid object. <p>
-     *
-     * @return <b>true</b> if this is valid object,
-     *         <b>false</b> if it is not.
-     */
     public boolean isValid() {
         if (elements.size() > 0) {
-            Enumeration enumeration = elements.elements();
+            Enumeration<OMObject> enumeration = elements.elements();
 
             for (; enumeration.hasMoreElements();) {
-                OMObject object = (OMObject) enumeration.nextElement();
+                OMObject object = enumeration.nextElement();
                 if (!object.isValid())
                     return false;
             }
@@ -315,17 +199,10 @@ public class OMApplication extends OMObject {
         return false;
     }
 
-    /**
-     * Replace any occurrence of source to destination. <p>
-     *
-     * @param source the source object.
-     * @param dest   the destination object.
-     * @return the application with the replacing.
-     */
     public OMObject replace(OMObject source, OMObject dest) {
         int i = 0;
-        for (Enumeration enumeration = elements.elements(); enumeration.hasMoreElements();) {
-            OMObject object = (OMObject) enumeration.nextElement();
+        for (Enumeration<OMObject> enumeration = elements.elements(); enumeration.hasMoreElements();) {
+            OMObject object = enumeration.nextElement();
             if (source.isSame(object)) {
                 elements.setElementAt(dest, i);
             } else if (object instanceof OMApplication) {

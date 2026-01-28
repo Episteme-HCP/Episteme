@@ -27,7 +27,7 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.codec;
+package org.jscience.mathematics.loaders.openmath.codec;
 
 /**
  * The Codec can throw an exception. This is the most general one.<p></p>

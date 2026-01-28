@@ -27,11 +27,11 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.util;
+package org.jscience.mathematics.loaders.openmath.util;
 
-import org.jscience.ml.openmath.OMObject;
-import org.jscience.ml.openmath.io.OMXMLReader;
-import org.jscience.ml.openmath.io.OMXMLWriter;
+import org.jscience.mathematics.loaders.openmath.OMObject;
+import org.jscience.mathematics.loaders.openmath.io.OMXMLReader;
+import org.jscience.mathematics.loaders.openmath.io.OMXMLWriter;
 
 import org.xml.sax.InputSource;
 

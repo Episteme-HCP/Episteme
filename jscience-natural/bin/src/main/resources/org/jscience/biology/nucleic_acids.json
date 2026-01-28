@@ -1,0 +1,171 @@
+{
+    "description": "Nucleic Acid Types and Analogues",
+    "version": "1.0",
+    "types": [
+        {
+            "id": "DNA",
+            "name": "Deoxyribonucleic Acid",
+            "bases": [
+                "A",
+                "T",
+                "G",
+                "C"
+            ],
+            "backbone": "phosphate-deoxyribose",
+            "pairing": {
+                "A": "T",
+                "T": "A",
+                "G": "C",
+                "C": "G"
+            }
+        },
+        {
+            "id": "RNA",
+            "name": "Ribonucleic Acid",
+            "bases": [
+                "A",
+                "U",
+                "G",
+                "C"
+            ],
+            "backbone": "phosphate-ribose",
+            "pairing": {
+                "A": "U",
+                "U": "A",
+                "G": "C",
+                "C": "G"
+            }
+        },
+        {
+            "id": "PNA",
+            "name": "Peptide Nucleic Acid",
+            "bases": [
+                "A",
+                "T",
+                "G",
+                "C"
+            ],
+            "backbone": "N-(2-aminoethyl)glycine",
+            "pairing": {
+                "A": "T",
+                "T": "A",
+                "G": "C",
+                "C": "G"
+            },
+            "properties": {
+                "charge": "neutral",
+                "nuclease_resistant": true,
+                "protease_resistant": true,
+                "binding_affinity": "high"
+            }
+        },
+        {
+            "id": "LNA",
+            "name": "Locked Nucleic Acid",
+            "bases": [
+                "A",
+                "T",
+                "G",
+                "C"
+            ],
+            "backbone": "phosphate-2'-O,4'-C-methylene-ribose",
+            "pairing": {
+                "A": "T",
+                "T": "A",
+                "G": "C",
+                "C": "G"
+            },
+            "properties": {
+                "thermal_stability": "high",
+                "binding_affinity": "very_high"
+            }
+        },
+        {
+            "id": "TNA",
+            "name": "Threose Nucleic Acid",
+            "bases": [
+                "A",
+                "T",
+                "G",
+                "C"
+            ],
+            "backbone": "phosphate-threose",
+            "pairing": {
+                "A": "T",
+                "T": "A",
+                "G": "C",
+                "C": "G"
+            },
+            "properties": {
+                "prebiotic_candidate": true
+            }
+        },
+        {
+            "id": "GNA",
+            "name": "Glycol Nucleic Acid",
+            "bases": [
+                "A",
+                "T",
+                "G",
+                "C"
+            ],
+            "backbone": "phosphate-glycerol",
+            "pairing": {
+                "A": "T",
+                "T": "A",
+                "G": "C",
+                "C": "G"
+            },
+            "properties": {
+                "simple_backbone": true,
+                "prebiotic_candidate": true
+            }
+        },
+        {
+            "id": "HNA",
+            "name": "Hexitol Nucleic Acid",
+            "bases": [
+                "A",
+                "T",
+                "G",
+                "C"
+            ],
+            "backbone": "phosphate-hexitol",
+            "pairing": {
+                "A": "T",
+                "T": "A",
+                "G": "C",
+                "C": "G"
+            },
+            "properties": {
+                "six_membered_sugar": true
+            }
+        }
+    ],
+    "modifiedBases": [
+        {
+            "symbol": "m5C",
+            "name": "5-methylcytosine",
+            "parent": "C",
+            "role": "epigenetic"
+        },
+        {
+            "symbol": "m6A",
+            "name": "N6-methyladenosine",
+            "parent": "A",
+            "role": "epigenetic"
+        },
+        {
+            "symbol": "I",
+            "name": "Inosine",
+            "parent": "A",
+            "role": "editing"
+        },
+        {
+            "symbol": "Ψ",
+            "name": "Pseudouridine",
+            "parent": "U",
+            "role": "stability"
+        }
+    ]
+}

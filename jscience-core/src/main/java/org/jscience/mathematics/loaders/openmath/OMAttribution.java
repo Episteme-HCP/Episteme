@@ -48,7 +48,7 @@ public class OMAttribution extends OMObject {
     /**
      * Stores the attributions. <p>
      */
-    protected Hashtable attributions = new Hashtable();
+    protected Hashtable<OMObject, OMObject> attributions = new Hashtable<>();
 
     /**
      * Constructor. <p>
@@ -63,7 +63,7 @@ public class OMAttribution extends OMObject {
      * @param newAttributions the table of attributions.
      * @param newConstructor  the attribution constructor.
      */
-    public OMAttribution(Hashtable newAttributions, OMObject newConstructor) {
+    public OMAttribution(Hashtable<OMObject, OMObject> newAttributions, OMObject newConstructor) {
         super();
 
         attributions = newAttributions;
@@ -82,7 +82,7 @@ public class OMAttribution extends OMObject {
      *
      * @return the hashtable of attributions.
      */
-    public Hashtable getAttributions() {
+    public Hashtable<OMObject, OMObject> getAttributions() {
         return attributions;
     }
 
@@ -91,7 +91,7 @@ public class OMAttribution extends OMObject {
      *
      * @param newAttributions the hashtable of attributions
      */
-    public void setAttributions(Hashtable newAttributions) {
+    public void setAttributions(Hashtable<OMObject, OMObject> newAttributions) {
         attributions = newAttributions;
     }
 
@@ -139,7 +139,7 @@ public class OMAttribution extends OMObject {
      * @return the attribution value found, or <b>null</b> if not found.
      */
     public OMObject get(OMObject key) {
-        return (OMObject) attributions.get(key);
+        return attributions.get(key);
     }
 
     /**
@@ -176,7 +176,7 @@ public class OMAttribution extends OMObject {
      *
      * @return an enumeration of the keys.
      */
-    public Enumeration getKeys() {
+    public Enumeration<OMObject> getKeys() {
         return attributions.keys();
     }
 
@@ -185,7 +185,7 @@ public class OMAttribution extends OMObject {
      *
      * @return an enumeration of the values.
      */
-    public Enumeration getValues() {
+    public Enumeration<OMObject> getValues() {
         return attributions.elements();
     }
 
@@ -194,12 +194,12 @@ public class OMAttribution extends OMObject {
      */
     public String toString() {
         StringBuffer result = new StringBuffer();
-        Enumeration enumeration = attributions.keys();
+        Enumeration<OMObject> enumeration = attributions.keys();
         result.append("<OMATTR><OMATP>");
 
         for (; enumeration.hasMoreElements();) {
-            OMObject key = (OMObject) enumeration.nextElement();
-            OMObject value = (OMObject) attributions.get(key);
+            OMObject key = enumeration.nextElement();
+            OMObject value = attributions.get(key);
 
             result.append(key.toString());
             result.append(value.toString());
@@ -224,20 +224,20 @@ public class OMAttribution extends OMObject {
 
             newAttribution.setConstructor(newConstructor.getConstructor());
 
-            Enumeration enumeration = newConstructor.getKeys();
+            Enumeration<OMObject> enumeration = newConstructor.getKeys();
 
             for (; enumeration.hasMoreElements();) {
-                OMObject key = (OMObject) enumeration.nextElement();
-                OMObject value = (OMObject) newConstructor.get(key);
-                newAttribution.put((OMObject) key, (OMObject) value);
+                OMObject key = enumeration.nextElement();
+                OMObject value = newConstructor.get(key);
+                newAttribution.put(key, value);
             }
 
             enumeration = getKeys();
 
             for (; enumeration.hasMoreElements();) {
-                OMObject key = (OMObject) enumeration.nextElement();
-                OMObject value = (OMObject) get(key);
-                newAttribution.put((OMObject) key, (OMObject) value);
+                OMObject key = enumeration.nextElement();
+                OMObject value = get(key);
+                newAttribution.put(key, value);
             }
 
             return newAttribution;
@@ -258,20 +258,22 @@ public class OMAttribution extends OMObject {
     /**
      * Clones the object (shallow copy).
      */
+    @SuppressWarnings("unchecked")
     public Object clone() {
         OMAttribution attribution = new OMAttribution();
         attribution.constructor = constructor;
-        attribution.attributions = (Hashtable) attributions.clone();
+        attribution.attributions = (Hashtable<OMObject, OMObject>) attributions.clone();
         return attribution;
     }
 
     /**
      * Copies the object (full copy).
      */
+    @SuppressWarnings("unchecked")
     public Object copy() {
         OMAttribution attribution = new OMAttribution();
         attribution.constructor = (OMObject) constructor.copy();
-        attribution.attributions = (Hashtable) attributions.clone();
+        attribution.attributions = (Hashtable<OMObject, OMObject>) attributions.clone();
         return attribution;
     }
 

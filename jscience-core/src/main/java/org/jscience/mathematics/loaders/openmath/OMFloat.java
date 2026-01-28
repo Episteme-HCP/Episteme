@@ -152,7 +152,7 @@ public class OMFloat extends OMObject {
      */
     public double doubleValue() {
         if (getAttribute("dec") != null) {
-            return new Double((String) getAttribute("dec")).doubleValue();
+            return Double.valueOf((String) getAttribute("dec")).doubleValue();
         }
 
         throw new NumberFormatException();
@@ -167,7 +167,7 @@ public class OMFloat extends OMObject {
      */
     public float floatValue() {
         if (getAttribute("dec") != null) {
-            return new Float((String) getAttribute("dec")).floatValue();
+            return Float.valueOf((String) getAttribute("dec")).floatValue();
         }
 
         throw new NumberFormatException();
@@ -212,14 +212,16 @@ public class OMFloat extends OMObject {
     public Object clone() {
         OMFloat cloneFloat = new OMFloat();
 
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            cloneFloat.setAttribute(key, value);
+            if (value instanceof String) {
+                cloneFloat.setAttribute(key, (String) value);
+            }
         }
 
         return cloneFloat;
@@ -233,14 +235,16 @@ public class OMFloat extends OMObject {
     public Object copy() {
         OMFloat copyFloat = new OMFloat();
 
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            copyFloat.setAttribute(key, value);
+            if (value instanceof String) {
+                copyFloat.setAttribute(key, (String) value);
+            }
         }
 
         return copyFloat;

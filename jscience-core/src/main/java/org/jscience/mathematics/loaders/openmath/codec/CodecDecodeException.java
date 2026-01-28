@@ -27,7 +27,7 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.codec;
+package org.jscience.mathematics.loaders.openmath.codec;
 
 /**
  * An exception to signal a big problem while decoding from backengine to

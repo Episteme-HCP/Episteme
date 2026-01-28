@@ -23,4 +23,4 @@
 /**
  * Provides the {@link org.jscience.ml.openmath.util} module.
  */
-package org.jscience.ml.openmath.util;
+package org.jscience.mathematics.loaders.openmath.util;

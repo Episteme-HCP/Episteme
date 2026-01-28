@@ -27,7 +27,7 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.phrasebook;
+package org.jscience.mathematics.loaders.openmath.phrasebook;
 
 import java.util.Vector;
 
@@ -58,7 +58,7 @@ public abstract class Phrasebook {
      * @return the result.
      * @throws PhrasebookException thrown when a major error occurs.
      */
-    public String perform(String fMethod, Vector fArguments)
+    public String perform(String fMethod, Vector<Object> fArguments)
             throws PhrasebookException {
         throw new PhrasebookException("Subclasses should implement this");
     }
@@ -77,7 +77,7 @@ public abstract class Phrasebook {
      * @return the result.
      * @throws PhrasebookException thrown when a major error occurs.
      */
-    public Object execute(String fMethod, Vector fArguments)
+    public Object execute(String fMethod, Vector<Object> fArguments)
             throws PhrasebookException {
         throw new PhrasebookException("Subclasses should implement this");
     }

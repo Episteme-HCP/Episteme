@@ -27,9 +27,9 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.io;
+package org.jscience.mathematics.loaders.openmath.io;
 
-import org.jscience.ml.openmath.*;
+import org.jscience.mathematics.loaders.openmath.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -189,14 +189,14 @@ public class OMXMLWriter extends Writer {
      *
      * @param fAttributes the table with the attributes.
      */
-    private void writeAttributes(Hashtable fAttributes) {
+    private void writeAttributes(Hashtable<String, Object> fAttributes) {
         if (fAttributes != null) {
-            Enumeration tKeys = fAttributes.keys();
+            Enumeration<String> tKeys = fAttributes.keys();
 
             for (; tKeys.hasMoreElements();) {
-                Object tKey = tKeys.nextElement();
+                String tKey = tKeys.nextElement();
 
-                mPrintWriter.print(" " + tKey.toString() + "=\"");
+                mPrintWriter.print(" " + tKey + "=\"");
                 mPrintWriter.print(fAttributes.get(tKey).toString() + "\"");
             }
         }
@@ -215,10 +215,10 @@ public class OMXMLWriter extends Writer {
         writeAttributes(fApplication.getAttributes());
         mPrintWriter.println(">");
 
-        Enumeration tEnum = fApplication.getElements().elements();
+        Enumeration<OMObject> tEnum = fApplication.getElements().elements();
 
         for (; tEnum.hasMoreElements();) {
-            OMObject tKey = (OMObject) tEnum.nextElement();
+            OMObject tKey = tEnum.nextElement();
             writeElement(fIndent + 1, tKey);
         }
 
@@ -246,7 +246,7 @@ public class OMXMLWriter extends Writer {
             mPrintWriter.println();
         }
 
-        Hashtable tHashtable = fAttribution.getAttributions();
+        Hashtable<OMObject, OMObject> tHashtable = fAttribution.getAttributions();
 
         writeIndent(fIndent + 1);
         mPrintWriter.print("<OMATP>");
@@ -255,13 +255,13 @@ public class OMXMLWriter extends Writer {
             mPrintWriter.println();
         }
 
-        Enumeration tEnum = tHashtable.keys();
+        Enumeration<OMObject> tEnum = tHashtable.keys();
 
         for (; tEnum.hasMoreElements();) {
-            OMObject tKey = (OMObject) tEnum.nextElement();
+            OMObject tKey = tEnum.nextElement();
             writeElement(fIndent + 2, tKey);
 
-            OMObject tValue = (OMObject) tHashtable.get(tKey);
+            OMObject tValue = tHashtable.get(tKey);
             writeElement(fIndent + 2, tValue);
         }
 
@@ -272,7 +272,7 @@ public class OMXMLWriter extends Writer {
             mPrintWriter.println();
         }
 
-        OMObject tObject = (OMObject) fAttribution.getConstructor();
+        OMObject tObject = fAttribution.getConstructor();
         writeElement(fIndent + 1, tObject);
 
         writeIndent(fIndent);
@@ -309,10 +309,10 @@ public class OMXMLWriter extends Writer {
             mPrintWriter.println();
         }
 
-        Enumeration tEnum = fBinding.getVariables().elements();
+        Enumeration<OMObject> tEnum = fBinding.getVariables().elements();
 
         for (; tEnum.hasMoreElements();) {
-            OMObject tObject = (OMObject) tEnum.nextElement();
+            OMObject tObject = tEnum.nextElement();
 
             writeElement(fIndent + 2, tObject);
         }
@@ -446,13 +446,13 @@ public class OMXMLWriter extends Writer {
             mPrintWriter.println();
         }
 
-        OMObject tObject = (OMObject) fError.getSymbol();
+        OMObject tObject = fError.getSymbol();
         writeElement(fIndent + 1, tObject);
 
-        Enumeration tEnum = fError.getElements().elements();
+        Enumeration<OMObject> tEnum = fError.getElements().elements();
 
         for (; tEnum.hasMoreElements();) {
-            OMObject tKey = (OMObject) tEnum.nextElement();
+            OMObject tKey = tEnum.nextElement();
             writeElement(fIndent + 1, tKey);
         }
 

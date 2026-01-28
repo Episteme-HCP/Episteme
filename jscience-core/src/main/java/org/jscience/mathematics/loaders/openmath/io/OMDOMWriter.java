@@ -27,9 +27,9 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.io;
+package org.jscience.mathematics.loaders.openmath.io;
 
-import org.jscience.ml.openmath.*;
+import org.jscience.mathematics.loaders.openmath.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -267,13 +267,13 @@ public class OMDOMWriter {
             /*
             * Add the attributes.
             */
-            Hashtable attributes = object.getAttributes();
-            Enumeration keys = attributes.keys();
-            Enumeration values = attributes.elements();
+            Hashtable<String, Object> attributes = object.getAttributes();
+            Enumeration<String> keys = attributes.keys();
+            Enumeration<Object> values = attributes.elements();
             Element element = (Element) node;
 
             for (; keys.hasMoreElements();) {
-                String key = (String) keys.nextElement();
+                String key = keys.nextElement();
                 String value = (String) values.nextElement();
                 element.setAttribute(key, value);
             }

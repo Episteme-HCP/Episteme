@@ -47,7 +47,7 @@ public abstract class OMObject implements Serializable, Cloneable {
     /**
      * Stores the attribute table. <p>
      */
-    protected Hashtable attributes = new Hashtable();
+    protected Hashtable<String, Object> attributes = new Hashtable<>();
 
     /**
      * Constructor. <p>
@@ -124,7 +124,7 @@ public abstract class OMObject implements Serializable, Cloneable {
      *
      * @return the hashtable with attributes.
      */
-    public Hashtable getAttributes() {
+    public Hashtable<String, Object> getAttributes() {
         return this.attributes;
     }
 
@@ -139,7 +139,7 @@ public abstract class OMObject implements Serializable, Cloneable {
      *
      * @param newAttributes the attributes to set.
      */
-    public void setAttributes(Hashtable newAttributes) {
+    public void setAttributes(Hashtable<String, Object> newAttributes) {
         attributes = newAttributes;
     }
 
@@ -156,7 +156,7 @@ public abstract class OMObject implements Serializable, Cloneable {
      * @return the value of the attribute.
      */
     public Object getAttribute(String name) {
-        return (Object) attributes.get(name);
+        return attributes.get(name);
     }
 
     /**

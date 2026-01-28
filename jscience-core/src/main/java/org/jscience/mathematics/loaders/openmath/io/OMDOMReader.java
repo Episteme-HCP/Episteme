@@ -27,9 +27,9 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.io;
+package org.jscience.mathematics.loaders.openmath.io;
 
-import org.jscience.ml.openmath.*;
+import org.jscience.mathematics.loaders.openmath.*;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
@@ -327,13 +327,14 @@ public class OMDOMReader {
                     tChild = tChild.getNextSibling();
                 }
 
-                tChild = tChild.getNextSibling();
-
-                while (getElementIndex(tChild.getNodeName()) != 11) {
-                    tChild = tChild.getNextSibling();
+                if (tChild != null) {
+                    while (getElementIndex(tChild.getNodeName()) != 11) {
+                        tChild = tChild.getNextSibling();
+                        if (tChild == null) break;
+                    }
                 }
 
-                Node tChild2 = tChild.getFirstChild();
+                Node tChild2 = (tChild != null) ? tChild.getFirstChild() : null;
 
                 while (tChild2 != null) {
                     OMObject tVariable = null;
@@ -392,7 +393,9 @@ public class OMDOMReader {
                     tChild = tChild.getNextSibling();
                 }
 
-                tChild = tChild.getNextSibling();
+                if (tChild != null) {
+                   tChild = tChild.getNextSibling();
+                }
 
                 while (tChild != null) {
                     if ((getElementIndex(tChild.getNodeName()) >= 1)

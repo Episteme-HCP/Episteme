@@ -48,7 +48,7 @@ public class OMError extends OMObject {
     /**
      * Stores the errors. <p>
      */
-    protected Vector elements = new Vector();
+    protected Vector<OMObject> elements = new Vector<>();
 
     /**
      * Constructor. <p>
@@ -100,7 +100,7 @@ public class OMError extends OMObject {
      *
      * @return the elements
      */
-    public Vector getElements() {
+    public Vector<OMObject> getElements() {
         return elements;
     }
 
@@ -109,7 +109,7 @@ public class OMError extends OMObject {
      *
      * @param newElements the elements to set.
      */
-    public void setElements(Vector newElements) {
+    public void setElements(Vector<OMObject> newElements) {
         elements = newElements;
     }
 
@@ -120,7 +120,7 @@ public class OMError extends OMObject {
      * @return the element at the given index.
      */
     public OMObject getElementAt(int index) {
-        return (OMObject) elements.elementAt(index);
+        return elements.elementAt(index);
     }
 
     /**
@@ -191,7 +191,7 @@ public class OMError extends OMObject {
      * @return the first element.
      */
     public OMObject firstElement() {
-        return (OMObject) elements.firstElement();
+        return elements.firstElement();
     }
 
     /**
@@ -200,7 +200,7 @@ public class OMError extends OMObject {
      * @return the last element.
      */
     public OMObject lastElement() {
-        return (OMObject) elements.lastElement();
+        return elements.lastElement();
     }
 
     /**
@@ -210,13 +210,13 @@ public class OMError extends OMObject {
      */
     public String toString() {
         StringBuffer result = new StringBuffer();
-        Enumeration enumeration = elements.elements();
+        Enumeration<OMObject> enumeration = elements.elements();
 
         result.append("<OME>");
         result.append(symbol.toString());
 
         for (; enumeration.hasMoreElements();) {
-            OMObject object = (OMObject) enumeration.nextElement();
+            OMObject object = enumeration.nextElement();
             result.append(object.toString());
         }
 
@@ -247,9 +247,9 @@ public class OMError extends OMObject {
         OMError error = new OMError();
         error.symbol = (OMSymbol) this.symbol.copy();
 
-        Enumeration errors = this.elements.elements();
+        Enumeration<OMObject> errors = this.elements.elements();
         for (; errors.hasMoreElements();) {
-            error.elements.addElement(((OMObject) errors.nextElement()).copy());
+            error.elements.addElement((OMObject) errors.nextElement().copy());
         }
 
         return error;
@@ -285,12 +285,12 @@ public class OMError extends OMObject {
             if (!error.getSymbol().isSame(getSymbol()))
                 return false;
 
-            Enumeration enumeration1 = error.elements.elements();
-            Enumeration enumeration2 = elements.elements();
+            Enumeration<OMObject> enumeration1 = error.elements.elements();
+            Enumeration<OMObject> enumeration2 = elements.elements();
 
             for (; enumeration1.hasMoreElements();) {
-                OMObject object1 = (OMObject) enumeration1.nextElement();
-                OMObject object2 = (OMObject) enumeration2.nextElement();
+                OMObject object1 = enumeration1.nextElement();
+                OMObject object2 = enumeration2.nextElement();
 
                 if (!object1.isSame(object2))
                     return false;
@@ -307,8 +307,8 @@ public class OMError extends OMObject {
      */
     public boolean isValid() {
         if (symbol != null && symbol.isValid()) {
-            for (Enumeration enumeration = elements.elements(); enumeration.hasMoreElements();) {
-                OMObject object = (OMObject) enumeration.nextElement();
+            for (Enumeration<OMObject> enumeration = elements.elements(); enumeration.hasMoreElements();) {
+                OMObject object = enumeration.nextElement();
                 if (!object.isValid())
                     return false;
             }
@@ -326,8 +326,8 @@ public class OMError extends OMObject {
      */
     public OMObject replace(OMObject source, OMObject dest) {
         int i = 0;
-        for (Enumeration enumeration = elements.elements(); enumeration.hasMoreElements();) {
-            OMObject object = (OMObject) enumeration.nextElement();
+        for (Enumeration<OMObject> enumeration = elements.elements(); enumeration.hasMoreElements();) {
+            OMObject object = enumeration.nextElement();
             if (source.isSame(object)) {
                 elements.setElementAt(dest, i);
             }

@@ -27,11 +27,11 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.codec;
+package org.jscience.mathematics.loaders.openmath.codec;
 
-import org.jscience.ml.openmath.OMObject;
-import org.jscience.ml.openmath.io.OMXMLReader;
-import org.jscience.ml.openmath.io.OMXMLWriter;
+import org.jscience.mathematics.loaders.openmath.OMObject;
+import org.jscience.mathematics.loaders.openmath.io.OMXMLReader;
+import org.jscience.mathematics.loaders.openmath.io.OMXMLWriter;
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
@@ -131,10 +131,12 @@ public abstract class CDCodec {
      */
     public String decode(String syntax) throws CodecDecodeException {
         StringWriter stringWriter = new StringWriter();
-        OMXMLWriter xmlWriter = new OMXMLWriter(stringWriter);
-        OMObject object = decodeOMObject(syntax);
-
-        xmlWriter.writeObject(object);
+        try (OMXMLWriter xmlWriter = new OMXMLWriter(stringWriter)) {
+            OMObject object = decodeOMObject(syntax);
+            xmlWriter.writeObject(object);
+        } catch (Exception e) {
+            throw new CodecDecodeException("Decoding failed: " + e.getMessage());
+        }
 
         return stringWriter.toString();
     }

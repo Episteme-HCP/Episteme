@@ -24,6 +24,9 @@
 package org.jscience.mathematics.loaders.openmath;
 
 import org.jscience.mathematics.symbolic.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.function.BiFunction;
 
 /**
  * Bridge between OpenMath structures and JScience Symbolic Expressions.
@@ -52,9 +55,9 @@ public final class OpenMathBridge {
             return ConstantExpression.valueOf(f.doubleValue());
         } else if (omObj instanceof Number n) {
             return ConstantExpression.valueOf(n.doubleValue());
-        } else if (omObj instanceof OMBinding app) {
+        } else if (omObj instanceof OMBinding) {
              return null; 
-        } else if (omObj instanceof OMForeign app) { 
+        } else if (omObj instanceof OMForeign) { 
              return null; 
         } else if (omObj instanceof OMApplication app) {
             return convertApplication(app); 
@@ -73,7 +76,7 @@ public final class OpenMathBridge {
         String name = sym.getName();
 
         // Operands match app elements from index 1 to end
-        java.util.List<Expression<?>> operands = new java.util.ArrayList<>();
+        List<Expression<?>> operands = new ArrayList<>();
         int length = app.getLength();
         for (int i = 1; i < length; i++) {
             Expression<?> e = convert(app.getElementAt(i));
@@ -129,8 +132,8 @@ public final class OpenMathBridge {
         return 1;
     }
 
-    private static Expression<?> combine(java.util.List<Expression<?>> exprs, 
-                                       java.util.function.BiFunction<Expression<?>, Expression<?>, Expression<?>> op) {
+    private static Expression<?> combine(List<Expression<?>> exprs, 
+                                       BiFunction<Expression<?>, Expression<?>, Expression<?>> op) {
         if (exprs.isEmpty()) return null;
         Expression<?> result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {

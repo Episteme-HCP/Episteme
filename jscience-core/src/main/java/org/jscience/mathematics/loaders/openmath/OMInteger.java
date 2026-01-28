@@ -72,7 +72,7 @@ public class OMInteger extends OMObject {
     public OMInteger(long newLong) {
         super();
 
-        integer = new Long(newLong).toString();
+        integer = Long.valueOf(newLong).toString();
     }
 
 /**
@@ -83,7 +83,7 @@ public class OMInteger extends OMObject {
     public OMInteger(int newInteger) {
         super();
 
-        integer = new Integer(newInteger).toString();
+        integer = Integer.valueOf(newInteger).toString();
     }
 
 /**
@@ -150,7 +150,7 @@ public class OMInteger extends OMObject {
      * @param newLong the integer to set (as Long).
      */
     public void setInteger(long newLong) {
-        integer = new Long(newLong).toString();
+        integer = Long.valueOf(newLong).toString();
     }
 
     /**
@@ -159,7 +159,7 @@ public class OMInteger extends OMObject {
      * @param newInteger the integer to set (as int).
      */
     public void setInteger(int newInteger) {
-        integer = new Integer(newInteger).toString();
+        integer = Integer.valueOf(newInteger).toString();
     }
 
     /**
@@ -177,7 +177,7 @@ public class OMInteger extends OMObject {
      * @return the integer (as long).
      */
     public long longValue() {
-        return new Long(integer).longValue();
+        return Long.valueOf(integer).longValue();
     }
 
     /**
@@ -186,7 +186,7 @@ public class OMInteger extends OMObject {
      * @return the integer (as int).
      */
     public int intValue() {
-        return new Integer(integer).intValue();
+        return Integer.valueOf(integer).intValue();
     }
 
     /**
@@ -238,14 +238,14 @@ public class OMInteger extends OMObject {
         OMInteger copyInteger = new OMInteger();
         copyInteger.integer = new String(integer);
 
-        Enumeration keys = attributes.keys();
-        Enumeration values = attributes.elements();
+        Enumeration<String> keys = attributes.keys();
+        Enumeration<Object> values = attributes.elements();
 
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            String value = (String) values.nextElement();
+            String key = keys.nextElement();
+            Object value = values.nextElement();
 
-            copyInteger.setAttribute(key, value);
+            copyInteger.setAttribute(key, (String) value);
         }
 
         return copyInteger;

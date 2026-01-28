@@ -23,4 +23,4 @@
 /**
  * Provides the {@link org.jscience.ml.openmath.codec} module.
  */
-package org.jscience.ml.openmath.codec;
+package org.jscience.mathematics.loaders.openmath.codec;

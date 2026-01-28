@@ -27,9 +27,9 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.io;
+package org.jscience.mathematics.loaders.openmath.io;
 
-import org.jscience.ml.openmath.*;
+import org.jscience.mathematics.loaders.openmath.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -68,7 +68,7 @@ public class OMXMLReader extends DefaultHandler {
      * vector. This vector grows/shrinks during parsing. It is used to
      * easily keep track of the current parent object in the tree. <p>
      */
-    protected Vector mElementStack = new Vector();
+    protected Vector<OMObject> mElementStack = new Vector<>();
 
     /**
      * Stores the input-source. <p>
@@ -194,7 +194,7 @@ public class OMXMLReader extends DefaultHandler {
             * If you don't put <OMOBJ>...</OMOBJ> around your object it
             * will still be read. This is to facilitate easy reading.
             */
-            mOMObject = (OMObject) mElementStack.lastElement();
+            mOMObject = mElementStack.lastElement();
         }
     }
 
@@ -209,17 +209,17 @@ public class OMXMLReader extends DefaultHandler {
     public void endElement(String fNamespaceURI, String fLocalName, String fRawName) throws SAXException {
         if (foreign == 0) {
             if (fLocalName.equals("OMOBJ")) {
-                mOMObject = (OMObject) mElementStack.lastElement();
+                mOMObject = mElementStack.lastElement();
                 mElementStack.removeElement(mElementStack.lastElement());
             } else {
                 if (mElementStack.size() > 1) {
-                    OMObject tObject = (OMObject) mElementStack.elementAt(mElementStack.size() - 2);
+                    OMObject tObject = mElementStack.elementAt(mElementStack.size() - 2);
                     int tIndex = getElementIndex(tObject.getType());
 
                     switch (tIndex) {
                         case 1: /* OMA */ {
                             OMApplication tApplication = (OMApplication) tObject;
-                            OMObject tElement = (OMObject) mElementStack.lastElement();
+                            OMObject tElement = mElementStack.lastElement();
 
                             tApplication.addElement(tElement);
                             mElementStack.removeElement(mElementStack.lastElement());
@@ -228,15 +228,15 @@ public class OMXMLReader extends DefaultHandler {
 
                         case 2: /* OMATTR */ {
                             OMAttribution tAttribution = (OMAttribution) tObject;
-                            OMObject tElement = (OMObject) mElementStack.lastElement();
+                            OMObject tElement = mElementStack.lastElement();
 
                             if (mElementStack.lastElement() instanceof OMVector) {
                                 OMVector tVector = (OMVector) mElementStack.lastElement();
-                                Enumeration tEnum = tVector.getElements().elements();
+                                Enumeration<OMObject> tEnum = tVector.getElements().elements();
 
                                 for (; tEnum.hasMoreElements();) {
-                                    OMObject tKey = (OMObject) tEnum.nextElement();
-                                    OMObject tValue = (OMObject) tEnum.nextElement();
+                                    OMObject tKey = tEnum.nextElement();
+                                    OMObject tValue = tEnum.nextElement();
 
                                     tAttribution.put(tKey, tValue);
                                 }
@@ -249,14 +249,14 @@ public class OMXMLReader extends DefaultHandler {
 
                         case 4: /* OMBIND */ {
                             OMBinding tBinding = (OMBinding) tObject;
-                            OMObject tElement = (OMObject) mElementStack.lastElement();
+                            OMObject tElement = mElementStack.lastElement();
 
                             if (mElementStack.lastElement() instanceof OMVector) {
                                 OMVector tVector = (OMVector) mElementStack.lastElement();
-                                Enumeration tEnum = tVector.getElements().elements();
+                                Enumeration<OMObject> tEnum = tVector.getElements().elements();
 
                                 for (; tEnum.hasMoreElements();) {
-                                    OMObject tVariable = (OMObject) tEnum.nextElement();
+                                    OMObject tVariable = tEnum.nextElement();
 
                                     tBinding.addVariable(tVariable);
                                 }
@@ -273,7 +273,7 @@ public class OMXMLReader extends DefaultHandler {
 
                         case 5: /* OME */ {
                             OMError tError = (OMError) tObject;
-                            OMObject tElement = (OMObject) mElementStack.lastElement();
+                            OMObject tElement = mElementStack.lastElement();
 
                             if (tError.getSymbol() == null) {
                                 tError.setSymbol((OMSymbol) tElement);
@@ -287,12 +287,12 @@ public class OMXMLReader extends DefaultHandler {
                         default: {
                             if (tObject instanceof OMVector) {
                                 OMVector tVector = (OMVector) tObject;
-                                tVector.addElement((OMObject) mElementStack.lastElement());
+                                tVector.addElement(mElementStack.lastElement());
                             }
 
                             if (tObject instanceof OMRoot) {
                                 OMRoot root = (OMRoot) tObject;
-                                root.setObject((OMObject) mElementStack.lastElement());
+                                root.setObject(mElementStack.lastElement());
                             }
 
                             mElementStack.removeElement(mElementStack.lastElement());
@@ -398,7 +398,7 @@ public class OMXMLReader extends DefaultHandler {
      */
     public void startDocument() {
         mOMObject = null;
-        mElementStack = new Vector();
+        mElementStack = new Vector<>();
     }
 
     /**
@@ -536,7 +536,7 @@ public class OMXMLReader extends DefaultHandler {
         /**
          * Stores the vector elements. <p>
          */
-        protected Vector mElements = new Vector();
+        protected Vector<OMObject> mElements = new Vector<>();
 
         /**
          * Constructor. <p>
@@ -559,7 +559,7 @@ public class OMXMLReader extends DefaultHandler {
          *
          * @return the vector of elements.
          */
-        public Vector getElements() {
+        public Vector<OMObject> getElements() {
             return mElements;
         }
 

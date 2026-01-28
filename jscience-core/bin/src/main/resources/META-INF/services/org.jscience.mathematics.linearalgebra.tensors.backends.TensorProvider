@@ -1,0 +1,5 @@
+org.jscience.mathematics.linearalgebra.tensors.backends.CPUDenseTensorProvider
+org.jscience.mathematics.linearalgebra.tensors.backends.CPUSparseTensorProvider
+org.jscience.mathematics.linearalgebra.tensors.backends.ND4JNativeTensorProvider
+org.jscience.mathematics.linearalgebra.tensors.backends.ND4JCUDATensorProvider
+org.jscience.mathematics.linearalgebra.tensors.backends.ND4JSparseTensorProvider

@@ -27,9 +27,9 @@
  *
  * ---------------------------------------------------------------------------
  */
-package org.jscience.ml.openmath.codec;
+package org.jscience.mathematics.loaders.openmath.codec;
 
-import org.jscience.ml.openmath.OMObject;
+import org.jscience.mathematics.loaders.openmath.OMObject;
 
 import java.util.Hashtable;
 
@@ -48,7 +48,7 @@ public abstract class Codec {
      * set of CD's. Note that if you put a CD which belongs to the core in
      * this  hashtable it IS used. <p>
      */
-    protected Hashtable mCDs = new Hashtable();
+    protected Hashtable<String, String> mCDs = new Hashtable<>();
 
     /**
      * Constructor. <p>
