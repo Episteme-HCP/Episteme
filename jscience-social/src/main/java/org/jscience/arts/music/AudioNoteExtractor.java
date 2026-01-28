@@ -95,7 +95,7 @@ public final class AudioNoteExtractor {
         int pitchIndex = midiInt % 12;
         if (pitchIndex < 0) pitchIndex += 12;
         
-        Note.Pitch pitch = Note.Pitch.values()[pitchIndex];
-        return new Note(pitch, octave, Note.Duration.QUARTER, cents, 1.0);
+        Pitch pitch = Pitch.values()[pitchIndex];
+        return new Note(pitch, octave, Duration.QUARTER, cents, 1.0);
     }
 }

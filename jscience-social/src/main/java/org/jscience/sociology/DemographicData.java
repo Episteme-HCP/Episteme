@@ -152,4 +152,12 @@ public final class DemographicData implements UniversalDataModel, Serializable {
         total += individuals.stream().mapToLong(Group::size).sum();
         return total;
     }
+
+    @Override
+    public Map<String, org.jscience.measure.Quantity<?>> getQuantities() {
+        Map<String, org.jscience.measure.Quantity<?>> quantities = new HashMap<>();
+        quantities.put("total_population", org.jscience.measure.Quantities.create(getTotalPopulation(), org.jscience.measure.Units.ONE));
+        return quantities;
+    }
 }
+

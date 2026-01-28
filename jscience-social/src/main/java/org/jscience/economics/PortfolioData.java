@@ -169,4 +169,12 @@ public final class PortfolioData implements UniversalDataModel, ComprehensiveIde
         }
         return total;
     }
+
+    @Override
+    public java.util.Map<String, org.jscience.measure.Quantity<?>> getQuantities() {
+        java.util.Map<String, org.jscience.measure.Quantity<?>> quantities = new java.util.HashMap<>();
+        quantities.put("total_value_usd", getTotalPortfolioValue(Currency.USD));
+        return quantities;
+    }
 }
+

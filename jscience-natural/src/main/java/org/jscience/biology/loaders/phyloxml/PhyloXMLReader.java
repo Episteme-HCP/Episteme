@@ -1,130 +1,43 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.biology.loaders.phyloxml;
 
 import org.jscience.io.AbstractResourceReader;
-import org.jscience.biology.evolution.PhylogeneticTree;
-import org.jscience.biology.taxonomy.Species;
 
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.*;
 import java.io.*;
-import java.util.List;
-import java.util.logging.Logger;
-
 /**
  * PhyloXML Reader for phylogenetic tree data.
- * <p>
- * PhyloXML is an XML format for phylogenetic trees and associated data.
- * This reader parses phylogeny elements including clades, taxonomic information,
- * and evolutionary events.
- * </p>
- * <p>
- * <b>Supported Elements:</b>
- * <ul>
- *   <li>Phylogeny metadata (name, description, rooted status)</li>
- *   <li>Clade hierarchy with branch lengths</li>
- *   <li>Taxonomy (scientific name, common name, rank)</li>
- *   <li>Sequence data associations</li>
- *   <li>Evolutionary events (speciation, duplication)</li>
- *   <li>Confidence values (bootstrap, posterior probability)</li>
- * </ul>
- * </p>
- * * @see <a href="http://www.phyloxml.org/">PhyloXML.org</a>
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
 
-    private static final Logger LOGGER = Logger.getLogger(PhyloXMLReader.class.getName());
-    
-    
     public PhyloXMLReader() {
     }
 
-    // ===== ResourceReader interface =====
-    
-    @Override
-    public String getResourcePath() {
-        return null; // File-based, path provided at load time
+    @Override public String getResourcePath() { return null; }
+    @Override public Class<PhyloXMLDocument> getResourceType() { return PhyloXMLDocument.class; }
+    @Override public String getName() { return "PhyloXML Reader"; }
+    @Override public String getDescription() { return "Reads phylogenetic trees from PhyloXML format"; }
+    @Override public String getLongDescription() { 
+        return "PhyloXML is the standard XML format for phylogenetic trees and associated data."; 
     }
-
-    @Override
-    public Class<PhyloXMLDocument> getResourceType() {
-        return PhyloXMLDocument.class;
-    }
-
-    @Override
-    public String getName() {
-        return "PhyloXML Reader";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Reads phylogenetic trees from PhyloXML format";
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "PhyloXML is an XML format for phylogenetic trees and associated data " +
-               "including taxonomy, sequences, and evolutionary events.";
-    }
-
-    @Override
-    public String getCategory() {
-        return "Biology";
-    }
-
-    @Override
-    public String[] getSupportedVersions() {
-        return new String[] {"1.10", "1.00"};
-    }
+    @Override public String getCategory() { return "Biology"; }
+    @Override public String[] getSupportedVersions() { return new String[] {"1.10", "1.00"}; }
 
     @Override
     protected PhyloXMLDocument loadFromSource(String resourceId) throws Exception {
         File file = new File(resourceId);
-        if (file.exists()) {
-            return read(file);
-        }
-        // Try as resource path
+        if (file.exists()) return read(file);
         try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            if (is != null) {
-                return read(is);
-            }
+            if (is != null) return read(is);
         }
         throw new PhyloXMLException("Resource not found: " + resourceId);
     }
 
-    @Override
-    protected PhyloXMLDocument loadFromInputStream(InputStream is, String id) throws Exception {
-        return read(is);
-    }
-
-    /**
-     * Reads phylogenetic data from an input stream.
-     */
     public PhyloXMLDocument read(InputStream input) throws PhyloXMLException {
         try {
             DocumentBuilder builder = org.jscience.io.SecureXMLFactory.createSecureDocumentBuilder();
@@ -135,9 +48,6 @@ public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
         }
     }
 
-    /**
-     * Reads phylogenetic data from a file.
-     */
     public PhyloXMLDocument read(File file) throws PhyloXMLException {
         try (FileInputStream fis = new FileInputStream(file)) {
             return read(fis);
@@ -148,119 +58,79 @@ public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
 
     private PhyloXMLDocument parseDocument(Document doc) {
         PhyloXMLDocument result = new PhyloXMLDocument();
-        
         NodeList phylogenies = doc.getElementsByTagName("phylogeny");
         for (int i = 0; i < phylogenies.getLength(); i++) {
-            Element phyloElem = (Element) phylogenies.item(i);
-            result.addPhylogeny(parsePhylogeny(phyloElem));
+            result.addPhylogeny(parsePhylogeny((Element) phylogenies.item(i)));
         }
-        
         return result;
     }
 
-    private Phylogeny parsePhylogeny(Element elem) {
-        Phylogeny phylo = new Phylogeny();
-        
-        // Attributes
+    private PhyloXMLPhylogeny parsePhylogeny(Element elem) {
+        PhyloXMLPhylogeny phylo = new PhyloXMLPhylogeny();
         phylo.setRooted("true".equals(elem.getAttribute("rooted")));
         phylo.setBranchLengthUnit(elem.getAttribute("branch_length_unit"));
         
-        // Name
-        String name = getChildText(elem, "name");
-        if (name != null) phylo.setName(name);
+        phylo.setName(getChildText(elem, "name"));
+        phylo.setDescription(getChildText(elem, "description"));
         
-        // Description
-        String desc = getChildText(elem, "description");
-        if (desc != null) phylo.setDescription(desc);
-        
-        // Root clade
         Element cladeElem = getFirstChildElement(elem, "clade");
         if (cladeElem != null) {
             phylo.setRootClade(parseClade(cladeElem));
         }
-        
         return phylo;
     }
 
-    private Clade parseClade(Element elem) {
-        Clade clade = new Clade();
+    private PhyloXMLClade parseClade(Element elem) {
+        PhyloXMLClade clade = new PhyloXMLClade();
         
-        // Branch length
         String branchLength = getChildText(elem, "branch_length");
         if (branchLength != null) {
-            try {
-                clade.setBranchLength(Double.parseDouble(branchLength));
-            } catch (NumberFormatException e) {
-                LOGGER.fine("Invalid branch length: " + branchLength);
-            }
+            try { clade.setBranchLength(Double.parseDouble(branchLength)); } catch (Exception e) {}
         }
         
-        // Name
-        String name = getChildText(elem, "name");
-        if (name != null) clade.setName(name);
+        clade.setName(getChildText(elem, "name"));
         
-        // Confidence
         Element confElem = getFirstChildElement(elem, "confidence");
         if (confElem != null) {
-            String type = confElem.getAttribute("type");
-            String valueStr = confElem.getTextContent();
-            try {
-                clade.addConfidence(type, Double.parseDouble(valueStr.trim()));
-            } catch (NumberFormatException e) {
-                LOGGER.fine("Invalid confidence value: " + valueStr);
-            }
+            try { clade.addConfidence(confElem.getAttribute("type"), Double.parseDouble(confElem.getTextContent().trim())); } catch (Exception e) {}
         }
         
-        // Taxonomy
         Element taxElem = getFirstChildElement(elem, "taxonomy");
-        if (taxElem != null) {
-            clade.setTaxonomy(parseTaxonomy(taxElem));
-        }
+        if (taxElem != null) clade.setTaxonomy(parseTaxonomy(taxElem));
         
-        // Sequence
         Element seqElem = getFirstChildElement(elem, "sequence");
-        if (seqElem != null) {
-            clade.setSequence(parseSequence(seqElem));
-        }
+        if (seqElem != null) clade.setSequence(parseSequence(seqElem));
         
-        // Events
         Element eventsElem = getFirstChildElement(elem, "events");
-        if (eventsElem != null) {
-            clade.setEvents(parseEvents(eventsElem));
-        }
+        if (eventsElem != null) clade.setEvents(parseEvents(eventsElem));
         
-        // Child clades (recursive)
         NodeList children = elem.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (child instanceof Element && "clade".equals(child.getLocalName())) {
+            if (child instanceof Element && ("clade".equals(child.getLocalName()) || "clade".equals(((Element)child).getTagName()))) {
                 clade.addChild(parseClade((Element) child));
             }
         }
-        
         return clade;
     }
 
-    private Taxonomy parseTaxonomy(Element elem) {
-        Taxonomy tax = new Taxonomy();
+    private PhyloXMLTaxonomy parseTaxonomy(Element elem) {
+        PhyloXMLTaxonomy tax = new PhyloXMLTaxonomy();
         tax.setScientificName(getChildText(elem, "scientific_name"));
         tax.setCommonName(getChildText(elem, "common_name"));
         tax.setRank(getChildText(elem, "rank"));
-        
-        String code = getChildText(elem, "code");
-        if (code != null) tax.setCode(code);
+        tax.setCode(getChildText(elem, "code"));
         
         Element idElem = getFirstChildElement(elem, "id");
         if (idElem != null) {
             tax.setIdProvider(idElem.getAttribute("provider"));
             tax.setId(idElem.getTextContent().trim());
         }
-        
         return tax;
     }
 
-    private SequenceInfo parseSequence(Element elem) {
-        SequenceInfo seq = new SequenceInfo();
+    private PhyloXMLSequenceInfo parseSequence(Element elem) {
+        PhyloXMLSequenceInfo seq = new PhyloXMLSequenceInfo();
         seq.setName(getChildText(elem, "name"));
         seq.setSymbol(getChildText(elem, "symbol"));
         seq.setAccession(getChildText(elem, "accession"));
@@ -269,26 +139,13 @@ public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
         return seq;
     }
 
-    private Events parseEvents(Element elem) {
-        Events events = new Events();
-        
-        String speciations = getChildText(elem, "speciations");
-        if (speciations != null) {
-            try {
-                events.setSpeciations(Integer.parseInt(speciations.trim()));
-            } catch (NumberFormatException e) { }
-        }
-        
-        String duplications = getChildText(elem, "duplications");
-        if (duplications != null) {
-            try {
-                events.setDuplications(Integer.parseInt(duplications.trim()));
-            } catch (NumberFormatException e) { }
-        }
-        
-        String type = getChildText(elem, "type");
-        if (type != null) events.setType(type);
-        
+    private PhyloXMLEvents parseEvents(Element elem) {
+        PhyloXMLEvents events = new PhyloXMLEvents();
+        String spec = getChildText(elem, "speciations");
+        if (spec != null) try { events.setSpeciations(Integer.parseInt(spec)); } catch (Exception e) {}
+        String dupl = getChildText(elem, "duplications");
+        if (dupl != null) try { events.setDuplications(Integer.parseInt(dupl)); } catch (Exception e) {}
+        events.setType(getChildText(elem, "type"));
         return events;
     }
 
@@ -303,9 +160,7 @@ public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
             Node child = children.item(i);
             if (child instanceof Element) {
                 Element elem = (Element) child;
-                if (name.equals(elem.getLocalName()) || name.equals(elem.getTagName())) {
-                    return elem;
-                }
+                if (name.equals(elem.getLocalName()) || name.equals(elem.getTagName())) return elem;
             }
         }
         return null;

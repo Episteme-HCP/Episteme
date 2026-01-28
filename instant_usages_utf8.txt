@@ -1,0 +1,450 @@
+﻿c:\Silvere\Encours\Developpement\JScience\jscience-server\src\test\java\org\jscience\server\auth\OidcProviderTest.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\test\java\org\jscience\server\auth\OidcProviderTest.java:                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\test\java\org\jscience\server\auth\OidcProviderTest.java:                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\test\java\org\jscience\server\auth\OidcProviderTest.java:                .expirationTime(Date.from(Instant.now().minusSeconds(3600))) // Expired
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\test\java\org\jscience\server\auth\OidcProviderTest.java:                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\test\java\org\jscience\server\auth\OidcProviderTest.java:                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:            Instant timestamp,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:        log(new AuditEvent(Instant.now(), EventType.AUTH_LOGIN_SUCCESS,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:        log(new AuditEvent(Instant.now(), EventType.AUTH_LOGIN_FAILURE,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:        log(new AuditEvent(Instant.now(), EventType.AUTHZ_ACCESS_GRANTED,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:        log(new AuditEvent(Instant.now(), EventType.AUTHZ_ACCESS_DENIED,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:        log(new AuditEvent(Instant.now(), EventType.TASK_SUBMITTED,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:        log(new AuditEvent(Instant.now(), EventType.SECURITY_RATE_LIMITED,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\security\AuditLogger.java:        log(new AuditEvent(Instant.now(), EventType.SECURITY_SUSPICIOUS_ACTIVITY,
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\HeartbeatMonitor.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\HeartbeatMonitor.java:        private volatile Instant lastHeartbeat;
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\HeartbeatMonitor.java:            this.lastHeartbeat = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\HeartbeatMonitor.java:        public Instant getLastHeartbeat() {
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\HeartbeatMonitor.java:        info.lastHeartbeat = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\HeartbeatMonitor.java:        Instant now = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CircuitBreaker.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CircuitBreaker.java:    private final AtomicReference<Instant> lastFailureTime = new AtomicReference<>(Instant.MIN);
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CircuitBreaker.java:            if (Duration.between(lastFailureTime.get(), Instant.now()).compareTo(openDuration) > 0) {
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CircuitBreaker.java:        lastFailureTime.set(Instant.now());
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CheckpointManager.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CheckpointManager.java:        private final Instant timestamp;
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CheckpointManager.java:            this.timestamp = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CheckpointManager.java:        public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\resilience\CheckpointManager.java:        Instant cutoff = Instant.now().minus(maxAge);
+c:\Silvere\Encours\Developpement\JScience\jscience-featured-apps\src\main\java\org\jscience\apps\economics\MarketCrashApp.java:        java.time.Instant time = java.time.Instant.now().minus(java.time.Duration.ofDays(500));
+c:\Silvere\Encours\Developpement\JScience\jscience-database\src\main\java\org\jscience\database\PersistenceManager.java:                } else if (type == java.time.Instant.class || type == java.time.LocalDateTime.class) {
+c:\Silvere\Encours\Developpement\JScience\jscience-database\src\main\java\org\jscience\database\PersistenceManager.java:        if (val instanceof java.time.LocalDate || val instanceof java.time.Instant) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\ui\viewers\history\TimelineViewer.java:            return Real.of(coordinate.toInstant().atZone(java.time.ZoneOffset.UTC).getYear());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sports\Match.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sports\Match.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sports\Match.java:        return date.toInstant();
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\util\Temporal.java: * @param <T> The type of the temporal coordinate (e.g., Instant, TimeCoordinate).
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\survey\SurveyResponse.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\survey\SurveyResponse.java:    private final Instant timestamp;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\survey\SurveyResponse.java:        this.timestamp = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\survey\SurveyResponse.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:public class Role implements ComprehensiveIdentification, Temporal<Instant> {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:    private Instant timestamp;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:        this.timestamp = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:        this.timestamp = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:    public Instant getWhen() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\sociology\Role.java:    public void setTimestamp(Instant timestamp) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\tests\mathematics\quasicrystal\Quasicrystal.java:     * Instantiate class.
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\tests\mathematics\montecarlo\MonteCarlo.java:     * Instantiate class.
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\psychology\Decision.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\psychology\Decision.java:    Instant timestamp
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\psychology\Decision.java:            Instant.now()
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\VotingSystem.java:            winners.add(ElectoralSimulations.resolveInstantRunoff(ballots));
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\ui\i18n\I18N.java:                throws IllegalAccessException, InstantiationException, java.io.IOException {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\VotingEngine.java:            return List.of(ElectoralSimulations.resolveInstantRunoff(rankedBallots));
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\ElectoralSimulations.java: * Instant Runoff Voting (IRV) and Single Transferable Vote (STV).
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\ElectoralSimulations.java:     * Resolves an Instant Runoff (Ranked Choice) election.
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\ElectoralSimulations.java:    public static String resolveInstantRunoff(List<List<String>> ballots) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:public class Conflict implements Named, Commented, Positioned<Place>, Temporal<Instant>, Serializable {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    private final Instant startingDate;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    private Instant endDate;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    public Conflict(String name, Set<Group> involvedGroups, Place place, Instant startingDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    public Instant getWhen() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    public Instant getStartingDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    public Instant getEndDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\politics\Conflict.java:    public void setEndDate(Instant endDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:    private Instant startDate;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:    private Instant endDate;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:        this.startDate = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:    public Instant getStartDate() { return startDate; }
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:    public void setStartDate(Instant startDate) { this.startDate = startDate; }
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:    public Instant getEndDate() { return endDate; }
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificExperiment.java:    public void setEndDate(Instant endDate) { this.endDate = endDate; }
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificDescription.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificDescription.java:    private Instant date;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificDescription.java:        this.date = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificDescription.java:    public Instant getDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificDescription.java:    public void setDate(Instant date) {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificAnalysis.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificAnalysis.java:    private Instant date;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificAnalysis.java:        this.date = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificAnalysis.java:    public Instant getDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\ScientificAnalysis.java:    public void setDate(Instant date) {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Sample.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Sample.java:    private Instant samplingDate;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Sample.java:        this.samplingDate = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Sample.java:    public Instant getSamplingDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Sample.java:    public void setSamplingDate(Instant samplingDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Observation.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Observation.java:    private final Instant timestamp;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Observation.java:        this(Instant.now(), value, "default", new HashMap<>());
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Observation.java:    public Observation(Instant timestamp, T value, String tag, Map<String, Object> traits) {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\methodology\Observation.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\MeasureInstrument.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\MeasureInstrument.java:    private Instant lastCalibration;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\MeasureInstrument.java:        history.add(new MeasurementRecord<>(Instant.now(), value));
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\MeasureInstrument.java:            lastCalibration = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\MeasureInstrument.java:        Instant threshold = Instant.now().minusSeconds(maxAgeHours * 3600L);
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\MeasureInstrument.java:    public Instant getLastCalibration() {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\MeasureInstrument.java:    public record MeasurementRecord<Q extends Quantity<Q>>(Instant timestamp, Quantity<Q> value) {
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\Calibration.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\Calibration.java:public record Calibration(Instant date, String performedBy, String result, Instant nextDue) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:    private final Instant instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:    public TimePoint(Instant instant) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:        this.instant = Objects.requireNonNull(instant, "Instant cannot be null");
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:    public static TimePoint of(Instant instant) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:        return new TimePoint(Instant.now());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:    public Instant toInstant() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimePoint.java:        return this.instant.compareTo(o.toInstant());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:    private final Instant start;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:    private final Instant end;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:    public TimeInterval(Instant start, Instant end) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:    public Instant getStart() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:    public Instant getEnd() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:    public Instant toInstant() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:        return Instant.ofEpochMilli((start.toEpochMilli() + end.toEpochMilli()) / 2);
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:    public boolean contains(Instant instant) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeInterval.java:        return this.start.compareTo(o.toInstant());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeCoordinate.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\TimeCoordinate.java:    Instant toInstant();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimePoint.java:    public java.time.Instant toInstant() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimePoint.java:            return java.time.Instant.MIN;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimePoint.java:            return LocalDate.of((int)y, m, d).atStartOfDay(ZoneOffset.UTC).toInstant();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimePoint.java:            return java.time.Instant.MIN;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimePoint.java:        return this.toInstant().compareTo(other.toInstant());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimeInterval.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimeInterval.java:    public Instant toInstant() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimeInterval.java:        long startMs = start.toInstant().toEpochMilli();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimeInterval.java:        long endMs = end.toInstant().toEpochMilli();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\time\FuzzyTimeInterval.java:        return Instant.ofEpochMilli((startMs + endMs) / 2);
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\loaders\CSVTimeSeriesReader.java:                            TimePoint tp = TimePoint.of(date.atStartOfDay(ZoneOffset.UTC).toInstant());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\HistoricalTimeline.java:                .filter(e -> e.getWhen().toInstant().isBefore(java.time.Instant.EPOCH)) // Simplistic check for BCE
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\HistoricalTimeline.java:                    earliest.get().getWhen().toInstant(),
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\HistoricalTimeline.java:                    latest.get().getWhen().toInstant()).toDays() / 365;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\HistoricalEventCorrelator.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\HistoricalEventCorrelator.java:        Instant e = earlier.toInstant();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\HistoricalEventCorrelator.java:        Instant l = later.toInstant();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\GeologicalTimeScale.java:                .filter(e -> e.getWhen().toInstant().isBefore(point.toInstant())) // Simplistic check
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\Event.java:        return this.when.toInstant().isBefore(other.when.toInstant());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\Event.java:        return this.when.toInstant().isAfter(other.when.toInstant());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\clock\ChronologyAlgebras.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\clock\ChronologyAlgebras.java:     * @param temporal the temporal object (LocalDate, Instant, Date, etc.)
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\clock\ChronologyAlgebras.java:        if (temporal instanceof Instant i) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\clock\ChronologicalOperator.java:        java.time.Instant start = a.getStart().isAfter(b.getStart()) ? a.getStart() : b.getStart();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\clock\ChronologicalOperator.java:        java.time.Instant end = a.getEnd().isBefore(b.getEnd()) ? a.getEnd() : b.getEnd();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\clock\ChronologicalOperator.java:        java.time.Instant start = a.getStart().isBefore(b.getStart()) ? a.getStart() : b.getStart();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\clock\ChronologicalOperator.java:        java.time.Instant end = a.getEnd().isAfter(b.getEnd()) ? a.getEnd() : b.getEnd();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\calendars\CalendarCoordinate.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\calendars\CalendarCoordinate.java:    public Instant toInstant() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\calendars\CalendarCoordinate.java:        // Convert to Rata Die, then to Gregorian, then to java.time.Instant
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\calendars\CalendarCoordinate.java:                .atStartOfDay(ZoneOffset.UTC).toInstant();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\calendars\CalendarCoordinate.java:        return this.toInstant().compareTo(o.toInstant());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\BorderEvolution.java:        return date.toInstant().atZone(ZoneOffset.UTC).getYear();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\archeology\Item.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\archeology\Item.java:    private final Instant discoveryDate;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\archeology\Item.java:                Instant discoveryDate, Place originalPosition) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\archeology\Item.java:            dating != null ? dating.toInstant() : Instant.now(), identification, Money.usd(0));
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\history\archeology\Item.java:    public Instant getDiscoveryDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\javascientificpackages.html:            <DT><A HREF="http://www.componentsource.com/BuyComponents/ProductCatalog/ProductPage.asp?Browse=Y&Key=0&ProductOptions=4045_49X" ADD_DATE="1135825666" LAST_VISIT="1165609855" LAST_MODIFIED="1027531786">ComponentSource - Product Page foráInstant Installer</A>
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\geography\TimedBoundary.java:        this.states.add(new BoundaryState(new TimePoint(java.time.Instant.EPOCH), initial));
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Vehicle.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Vehicle.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Tool.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Tool.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Thing.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Thing.java:            Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Solid.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Solid.java:            Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Robot.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Robot.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Road.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Road.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\PhysicalObject.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\PhysicalObject.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Natural.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Natural.java:            Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Mineral.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Mineral.java:        Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Machine.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Machine.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Liquid.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Liquid.java:            Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Installation.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Installation.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Gas.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Gas.java:            Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Fossil.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Fossil.java:            Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Food.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Food.java:    default Instant getExpirationDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Creature.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Creature.java:            Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Clothes.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Clothes.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Building.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Building.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Artifact.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\resources\Artifact.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:public class Resource extends PotentialResource implements Positioned<Place>, Temporal<Instant> {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:    private final Instant productionDate;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:             community.getPosition(), Instant.now());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:        Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:        Community producer, Place productionPlace, Instant productionDate) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:    public Instant getWhen() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Resource.java:    public Instant getProductionDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Organigram.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Organigram.java:public class Organigram implements ComprehensiveIdentification, Temporal<Instant> {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Organigram.java:    private Instant timestamp;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Organigram.java:        this.timestamp = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Organigram.java:    public Instant getWhen() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Organigram.java:    public void setTimestamp(Instant timestamp) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\Organigram.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Transaction.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Transaction.java:    private final Instant date;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Transaction.java:    public Transaction(Organization seller, Organization buyer, Instant date,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Transaction.java:    public Transaction(Organization seller, Organization buyer, Instant date,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Transaction.java:    public Instant getDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Receipt.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Receipt.java:    private final Instant date;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Receipt.java:    public Receipt(Organization seller, Organization buyer, Instant date,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Receipt.java:    public Receipt(Organization seller, Organization buyer, Instant date,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Receipt.java:    public Instant getDate() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Quote.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Quote.java:    private Instant quoteTime;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Quote.java:        this.quoteTime = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Quote.java:                 String market, Money openPrice, Instant quoteTime) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Quote.java:    public Instant getQuoteTime() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Quote.java:    public void setQuoteTime(Instant quoteTime) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Quote.java:    public void update(long volume, Money value, Instant quoteTime) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    private final Instant emission;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    public Coin(Identification identification, Instant emission, Money value) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    public Coin(Identification id, Instant emission, Money value, String mintMark) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    public Coin(double value, Identification identification, Instant emission, Currency currency) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    public Instant getEmission() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    public static Coin usPenny(Identification id, Instant emission) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    public static Coin usQuarter(Identification id, Instant emission) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Coin.java:    public static Coin euro(Identification id, Instant emission, double value) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Check.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Check.java:    private final Instant emission;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Check.java:                 Organization receiver, Instant emission, Money value) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Check.java:                 Organization receiver, Instant emission, double amount, Currency currency) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\money\Check.java:    public Instant getEmission() {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\MaterialResource.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\MaterialResource.java:        this(name, description, amount, producer, producer.getPosition(), Instant.now(), id, value);
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\MaterialResource.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\loaders\AlphaVantageQuoteReader.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\loaders\AlphaVantageQuoteReader.java:        quote.update(volume, Money.usd(price), Instant.now());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\HumanResource.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\HumanResource.java:        super(name, description, amount, producer, producer.getPosition(), Instant.now());
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\HumanResource.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\sociology\forms\FormParser.java:        } catch (InstantiationException e) {
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\arts\Artwork.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\arts\Artwork.java:             productionDate != null ? productionDate.toInstant() : Instant.now(),
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\arts\Artwork.java:            Community producer, Place productionPlace, Instant productionDate,
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\arts\ArtMarketAnalyzer.java:        return date != null ? date.toInstant().atZone(ZoneOffset.UTC).getYear() : 2000;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\arts\ArtCritiqueEngine.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\arts\ArtCritiqueEngine.java:        Instant date = artwork.getProductionDate();
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\architecture\traffic\Vehicle.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\architecture\traffic\Vehicle.java:        super(name, "", Quantities.create(1, Units.ONE), null, null, Instant.now(), 
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\geography\coordinates\LteSupport.java:        // Instantiate the LTE SRF using the lon and lat obtained from the above conversion
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\geography\coordinates\HsrDataSet.java:    private static boolean _subClassesNotInstantiated = true;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\geography\coordinates\HsrDataSet.java:        if (_subClassesNotInstantiated) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\geography\coordinates\HsrDataSet.java:        _subClassesNotInstantiated = false;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\architecture\Building.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\architecture\Building.java:              buildDate != null ? buildDate.toInstant() : Instant.now(), 
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\geography\coordinates\BaseSRF_3D.java:     * // then Instantiate a 3D CD coordinate as the reference coordinate
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\geography\coordinates\BaseSRF.java: // Instantiate a 3D Celestiocentric coordinate
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\engineering\eventdriven\Model.java:     * @throws InstantiationException   if a problem occurs when creating the
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\engineering\eventdriven\Model.java:            InstantiationException {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\engineering\eventdriven\Engine.java:     * @throws InstantiationException   if the entity cannot be instantiated.
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\engineering\eventdriven\Engine.java:            throws StateProcessingException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-client\src\test\java\org\jscience\ui\demos\ViewerProviderI18NTest.java:        void i18nManagerCanBeInstantiated() {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\awt\util\MessageBox.java:        // Instantiate label for display of text
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\awt\util\MessageBox.java:        // Instantiate the OK button in the dialog box
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\computing\game\JDefaultGame.java:        } catch (InstantiationException e) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\computing\distributed\server\SingleServerWrapper.java:        } catch (InstantiationException ine) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\computing\ai\planning\InternalDomain.java:        //-- Instantiate an object of the class that represents the planning
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\computing\ai\blackboard\Controller.java: * the blackboard architecture.  Instantiations of this class are responsible
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\astronomy\solarsystem\artificialsatellites\PropagatorFactory.java:        } catch (InstantiationException e) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\ml\xhtml-math11-f.dtd:  <!-- Instantiate SVG 1.1 DTD  .................................... -->
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\ml\xhtml-math11-f.dtd:<!-- Instantiate XHTML 1.1 DTD  .................................. -->
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:    // InstantiationAssistant for creating objects in XMLArrayElements
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:    protected InstantiationAssistant watson;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:    public XMLArray(String parentName, InstantiationAssistant assistant) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:    public InstantiationAssistant getInstantiationAssistant() {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:     * Sets the InstantiationAssistant of this XMLArray
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:     * @param assistant new InstantiationAssistant
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:    public void setInstantiationAssistant(InstantiationAssistant assistant) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:     * Load an arbitrary array. Instantiate child objects via the
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:     * parameter InstantiationAssistant
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:     * @param assistant The InstantiationAssistant to use
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:        InstantiationAssistant assistant)
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:         * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:            throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:                    "Problem in XMLArrayElement : my InstantiationAssistant can't create " +
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\XMLArray.java:                ((XMLArray) (result)).setInstantiationAssistant(watson);
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\InstantiationAssistant.java: * The GLD user documentation defines InstantiationAssistant as  "Your friendly
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\InstantiationAssistant.java: * figure out which InstantiationAssistant to use : for an inner class it will
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\InstantiationAssistant.java:public interface InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\InstantiationAssistant.java:     * @throws InstantiationException In case something goes wrong
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\xml\InstantiationAssistant.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\util\ArrayUtils.java:     * @throws InstantiationException If this method wants to create objects,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\util\ArrayUtils.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\infrastructure\SPData.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\infrastructure\SPData.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\infrastructure\SPData.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\infrastructure\Node.java:    TwoStageLoader, InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\infrastructure\Node.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\infrastructure\Node.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\ml\om\util\SchemaLoader.java:            } catch (InstantiationException ie) {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\ml\gml\xml\schema\XMLSchema.java:    //    public static final String TIME_INSTANT_SIMPLE_TYPE = "timeInstant";
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\ml\gml\GMLSchema.java:     * Instantiates a GML schema object from the given full path or URL.
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3TLCWorkInProgress.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3TLCWorkInProgress.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3TLCWorkInProgress.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3Opt.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3Opt.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3Opt.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3B1.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3B1.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC3B1.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\GenNeuralTLC.java:    TwoStageLoader, InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\GenNeuralTLC.java:    protected InstantiationAssistant assistant;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\GenNeuralTLC.java:    // InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\GenNeuralTLC.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\GenNeuralTLC.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\GenNeuralTLC.java:                "GenNeural InstantiationAssistant cannot make instances of " +
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ5.java:public class ACGJ5 extends TLController implements InstantiationAssistant,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ5.java:    protected InstantiationAssistant assistant = this;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ5.java:    // InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ5.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ5.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ5.java:                "ACGJ5 InstantiationAssistant cannot make instances of " +
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCOpt.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCOpt.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCOpt.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCOpt.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ4.java:public class ACGJ4 extends TLController implements InstantiationAssistant,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ4.java:    protected InstantiationAssistant assistant = this;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ4.java:    // InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ4.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ4.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ4.java:                "ACGJ4 InstantiationAssistant cannot make instances of " +
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3FixedValue.java:    implements InstantiationAssistant, XMLSerializable {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3FixedValue.java:    protected InstantiationAssistant assistant = this;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3FixedValue.java:    // InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3FixedValue.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3FixedValue.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3.java:public class ACGJ3 extends TLController implements InstantiationAssistant,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3.java:    protected InstantiationAssistant assistant = this;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3.java:    // InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ3.java:                "ACGJ3 InstantiationAssistant cannot make instances of " +
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ2.java:    TwoStageLoader, InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ2.java:    // InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ2.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ2.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ2.java:                "ACGJ2 InstantiationAssistant cannot make instances of " +
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ1.java:    TwoStageLoader, InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ1.java:    protected InstantiationAssistant assistant;
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ1.java:    // InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ1.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ1.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\ACGJ1.java:                "ACGJ1 InstantiationAssistant cannot make instances of " +
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCDestless.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCDestless.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCDestless.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2TLCDestless.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2Final.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2Final.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2Final.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2Final.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2B1.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2B1.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2B1.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC2B1.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCOpt.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCOpt.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCOpt.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCOpt.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCFix.java:public class TC1TLCFix extends TLController implements Colearning, InstantiationAssistant {    // TLC vars
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCFix.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCFix.java:            ClassNotFoundException, InstantiationException, IllegalAccessException { //	System.out.println("Called TC1TLC-opt instantiation assistant");
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCDestless.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCDestless.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCDestless.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1TLCDestless.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1B1.java:    InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1B1.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1B1.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\TC1B1.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL6TLC.java:public class SL6TLC extends TLController implements InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL6TLC.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL6TLC.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL6TLC.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL5TLC.java:public class SL5TLC extends TLController implements InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL5TLC.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL5TLC.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL5TLC.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL4TLC.java:public class SL4TLC extends TLController implements InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL4TLC.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL4TLC.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL4TLC.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL3TLC.java:public class SL3TLC extends TLController implements InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL3TLC.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL3TLC.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL3TLC.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL2TLC.java:public class SL2TLC extends TLController implements InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL2TLC.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL2TLC.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL2TLC.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL1TLC.java:public class SL1TLC extends TLController implements InstantiationAssistant {
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL1TLC.java:    // XMLSerializable, SecondStageLoader and InstantiationAssistant implementation
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL1TLC.java:     * @throws InstantiationException DOCUMENT ME!
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\architecture\traffic\algorithms\tlc\SL1TLC.java:        throws ClassNotFoundException, InstantiationException,
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\media\audio\dsp\processors\SchroederReverb.java:        // Instantiate the comb filters and the allpass networks
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\media\audio\dsp\filters\IIRLowpassFilterDesign.java:        // Instantiate highpass filter designer
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\media\audio\dsp\filters\IIRHighpassFilterDesign.java:        // Instantiate highpass filter designer
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\src\org\jscience\media\audio\dsp\filters\IIRBandpassFilterDesign.java:        // Instantiate bandpass filter designer
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\ressources\javascientificpackages.html:            <DT><A HREF="http://www.componentsource.com/BuyComponents/ProductCatalog/ProductPage.asp?Browse=Y&Key=0&ProductOptions=4045_49X" ADD_DATE="1135825666" LAST_VISIT="1165609855" LAST_MODIFIED="1027531786">ComponentSource - Product Page foráInstant Installer</A>
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\ressources\ml\xhtml-math11-f.dtd:  <!-- Instantiate SVG 1.1 DTD  .................................... -->
+c:\Silvere\Encours\Developpement\JScience\jscience-old-v1\ressources\ml\xhtml-math11-f.dtd:<!-- Instantiate XHTML 1.1 DTD  .................................. -->
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\test\java\org\jscience\ui\demos\ViewerProviderI18NTest.java:        void i18nManagerCanBeInstantiated() {
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\biology\lsystems\LSystemViewer.java:        else draw2DInstant(commands);
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\biology\lsystems\LSystemViewer.java:    private void draw2DInstant(String commands) {
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\loaders\HorizonsEphemerisReader.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\loaders\HorizonsEphemerisReader.java:        public final Instant time;
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\loaders\HorizonsEphemerisReader.java:        public EphemerisPoint(Instant time, DenseVector<Real> pos, DenseVector<Real> vel) {
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\loaders\HorizonsEphemerisReader.java:                            Instant tp = Instant.ofEpochMilli(millisSinceEpoch);
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\methodology\experiment\Subject.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\methodology\experiment\Subject.java:    private final Instant startTime;
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\methodology\experiment\Subject.java:        this.startTime = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\methodology\experiment\Subject.java:    public Instant getStartTime() {
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\earth\atmosphere\WeatherInfo.java:import java.time.Instant;
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\earth\atmosphere\WeatherInfo.java:    private final Instant timestamp;
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\earth\atmosphere\WeatherInfo.java:    public Instant getTimestamp() {
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\earth\atmosphere\WeatherInfo.java:        private Instant timestamp = Instant.now();
+c:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\earth\atmosphere\WeatherInfo.java:        public Builder timestamp(Instant t) {

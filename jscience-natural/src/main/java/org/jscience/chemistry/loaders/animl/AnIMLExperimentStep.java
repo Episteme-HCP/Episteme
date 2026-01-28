@@ -53,10 +53,6 @@ public class AnIMLExperimentStep {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -73,6 +69,21 @@ public class AnIMLExperimentStep {
         this.techniqueName = techniqueName;
     }
 
+    private AnIMLResult result;
+    private AnIMLMethod method;
+
+    public String getExperimentStepId() {
+        return id;
+    }
+
+    public void setExperimentStepId(String id) {
+        this.id = id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getTechniqueUri() {
         return techniqueUri;
     }
@@ -81,7 +92,36 @@ public class AnIMLExperimentStep {
         this.techniqueUri = techniqueUri;
     }
 
+    public AnIMLResult getResult() {
+        return result;
+    }
+
+    public void setResult(AnIMLResult result) {
+        this.result = result;
+    }
+
+    public AnIMLMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(AnIMLMethod method) {
+        this.method = method;
+    }
+
     public List<AnIMLSeriesData> getSeriesData() {
+        // Return results series if available, otherwise internal list
+        if (result != null && !result.getSeriesSet().isEmpty()) {
+            List<AnIMLSeriesData> data = new ArrayList<>();
+            for (AnIMLSeries s : result.getSeriesSet()) {
+                AnIMLSeriesData sd = new AnIMLSeriesData();
+                sd.setName(s.getName());
+                sd.setValues(s.getData());
+                sd.setUnitLabel(s.getUnit());
+                sd.setDependency(s.getSeriesType());
+                data.add(sd);
+            }
+            return data;
+        }
         return Collections.unmodifiableList(seriesData);
     }
 

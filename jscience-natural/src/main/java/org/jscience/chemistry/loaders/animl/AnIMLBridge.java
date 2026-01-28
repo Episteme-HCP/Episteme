@@ -5,15 +5,13 @@
 
 package org.jscience.chemistry.loaders.animl;
 
-import org.jscience.chemistry.Molecule;
 import org.jscience.chemistry.spectroscopy.Spectrum;
 import org.jscience.chemistry.spectroscopy.SpectralPeak;
-import org.jscience.chemistry.experiment.Experiment;
-import org.jscience.chemistry.experiment.Sample;
-import org.jscience.chemistry.experiment.Measurement;
+import org.jscience.methodology.ScientificExperiment;
+import org.jscience.methodology.Sample;
+import org.jscience.methodology.Observation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Bridge for converting AnIML DTOs to core JScience analytical chemistry objects.
@@ -25,10 +23,9 @@ import java.util.List;
  * <h2>Architecture</h2>
  * <pre>
  * AnIML → AnIMLReader → AnIML DTOs → AnIMLBridge → Core Objects
- *                                                   ├── Experiment
+ *                                                   ├── ScientificExperiment
  *                                                   ├── Sample
- *                                                   ├── Measurement
- *                                                   └── Spectrum
+ *                                                   └── Observation (capturing Spectrum)
  * </pre>
  *
  * @author Silvere Martin-Michiellot
@@ -38,25 +35,25 @@ import java.util.List;
 public class AnIMLBridge {
 
     /**
-     * Converts AnIML document to JScience Experiment.
+     * Converts AnIML document to JScience ScientificExperiment.
      *
      * @param animlDoc the parsed AnIML document
      * @return an Experiment object with samples and results
      */
-    public Experiment toExperiment(AnIMLDocument animlDoc) {
+    public ScientificExperiment<Map<String, Object>, Object> toExperiment(AnIMLDocument animlDoc) {
         if (animlDoc == null) {
             return null;
         }
         
-        Experiment experiment = new Experiment(animlDoc.getName());
+        ScientificExperiment<Map<String, Object>, Object> experiment = new ScientificExperiment<>(animlDoc.getName());
         experiment.setTrait("animl.version", animlDoc.getVersion());
         
         // Convert sample set
         if (animlDoc.getSampleSet() != null) {
             for (AnIMLSample animlSample : animlDoc.getSampleSet().getSamples()) {
-                Sample sample = convertSample(animlSample);
+                Sample<?> sample = convertSample(animlSample);
                 if (sample != null) {
-                    experiment.addSample(sample);
+                    experiment.setTrait("sample." + sample.getName(), sample);
                 }
             }
         }
@@ -64,9 +61,9 @@ public class AnIMLBridge {
         // Convert experiment steps
         if (animlDoc.getExperimentStepSet() != null) {
             for (AnIMLExperimentStep step : animlDoc.getExperimentStepSet().getSteps()) {
-                Measurement measurement = convertExperimentStep(step);
-                if (measurement != null) {
-                    experiment.addMeasurement(measurement);
+                Observation<Object> obs = convertExperimentStep(step);
+                if (obs != null) {
+                    experiment.record(obs);
                 }
             }
         }
@@ -82,12 +79,12 @@ public class AnIMLBridge {
     /**
      * Converts AnIML sample to JScience Sample.
      */
-    public Sample convertSample(AnIMLSample animlSample) {
+    public Sample<?> convertSample(AnIMLSample animlSample) {
         if (animlSample == null) {
             return null;
         }
         
-        Sample sample = new Sample(animlSample.getName());
+        Sample<String> sample = new Sample<>(animlSample.getName());
         sample.setTrait("animl.sample.id", animlSample.getSampleId());
         sample.setTrait("barcode", animlSample.getBarcode());
         sample.setTrait("container.type", animlSample.getContainerType());
@@ -95,23 +92,21 @@ public class AnIMLBridge {
         
         // Add location if available
         if (animlSample.getLocation() != null) {
-            sample.setTrait("location", animlSample.getLocation());
+            sample.setPosition(animlSample.getLocation());
         }
         
         return sample;
     }
 
     /**
-     * Converts AnIML experiment step to JScience Measurement.
+     * Converts AnIML experiment step to JScience Observation.
      */
-    public Measurement convertExperimentStep(AnIMLExperimentStep step) {
+    public Observation<Object> convertExperimentStep(AnIMLExperimentStep step) {
         if (step == null) {
             return null;
         }
         
-        Measurement measurement = new Measurement(step.getName());
-        measurement.setTrait("animl.step.id", step.getExperimentStepId());
-        measurement.setTrait("technique.name", step.getTechniqueName());
+        Object capturedValue = null;
         
         // Convert result data
         if (step.getResult() != null) {
@@ -119,25 +114,32 @@ public class AnIMLBridge {
             
             // Check if this is spectral data
             if (result.getSeriesSet() != null && !result.getSeriesSet().isEmpty()) {
-                Spectrum spectrum = convertToSpectrum(result);
-                measurement.setSpectrum(spectrum);
+                capturedValue = convertToSpectrum(result);
+            } else {
+                capturedValue = result.getName(); // Fallback
             }
-            
-            // Add scalar results
-            if (result.getParameters() != null) {
-                for (AnIMLParameter param : result.getParameters()) {
-                    measurement.setTrait(param.getName(), param.getValue());
-                }
+        } else {
+            capturedValue = step.getTechniqueName();
+        }
+        
+        Observation<Object> observation = new Observation<>(capturedValue);
+        observation.setTag(step.getName());
+        observation.setTrait("animl.step.id", step.getExperimentStepId());
+        observation.setTrait("technique.name", step.getTechniqueName());
+        
+        if (step.getResult() != null && step.getResult().getParameters() != null) {
+            for (AnIMLParameter param : step.getResult().getParameters()) {
+                observation.setTrait(param.getName(), param.getValue());
             }
         }
         
         // Add method information
         if (step.getMethod() != null) {
-            measurement.setTrait("method.name", step.getMethod().getName());
-            measurement.setTrait("method.author", step.getMethod().getAuthor());
+            observation.setTrait("method.name", step.getMethod().getName());
+            observation.setTrait("method.author", step.getMethod().getAuthor());
         }
         
-        return measurement;
+        return observation;
     }
 
     /**

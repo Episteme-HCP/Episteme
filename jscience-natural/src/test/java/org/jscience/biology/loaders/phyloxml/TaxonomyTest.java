@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for Taxonomy.
+ * Automated baseline test for PhyloXMLTaxonomy.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -20,6 +20,6 @@ public class TaxonomyTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(Taxonomy.class);
+        assertNotNull(PhyloXMLTaxonomy.class);
     }
 }

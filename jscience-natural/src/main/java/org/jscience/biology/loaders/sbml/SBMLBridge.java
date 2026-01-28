@@ -23,10 +23,8 @@
 
 package org.jscience.biology.loaders.sbml;
 
-import org.jscience.biology.taxonomy.Species;
-import org.jscience.chemistry.Molecule;
-import org.jscience.chemistry.ChemicalReaction;
 import org.jscience.biology.BioChemicalReaction;
+import org.jscience.chemistry.Molecule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -189,23 +187,23 @@ public class SBMLBridge {
         BioChemicalReaction reaction = new BioChemicalReaction(name);
         
         // Add reactants
-        Map<String, Double> reactants = sbmlReaction.getReactants();
+        Map<String, org.jscience.mathematics.numbers.real.Real> reactants = sbmlReaction.getReactants();
         if (reactants != null) {
-            for (Map.Entry<String, Double> entry : reactants.entrySet()) {
+            for (Map.Entry<String, org.jscience.mathematics.numbers.real.Real> entry : reactants.entrySet()) {
                 Molecule m = moleculeMap.get(entry.getKey());
                 if (m != null) {
-                    reaction.addReactant(m, entry.getValue());
+                    reaction.addReactant(m, entry.getValue().doubleValue());
                 }
             }
         }
         
         // Add products
-        Map<String, Double> products = sbmlReaction.getProducts();
+        Map<String, org.jscience.mathematics.numbers.real.Real> products = sbmlReaction.getProducts();
         if (products != null) {
-            for (Map.Entry<String, Double> entry : products.entrySet()) {
+            for (Map.Entry<String, org.jscience.mathematics.numbers.real.Real> entry : products.entrySet()) {
                 Molecule m = moleculeMap.get(entry.getKey());
                 if (m != null) {
-                    reaction.addProduct(m, entry.getValue());
+                    reaction.addProduct(m, entry.getValue().doubleValue());
                 }
             }
         }

@@ -27,7 +27,15 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.classical.mechanics.Particle;
 
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
+
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 import org.jscience.measure.Quantity;
@@ -46,7 +54,13 @@ import org.jscience.measure.Units;
  * @since 1.0
  */
 @Persistent
-public class Atom extends Particle {
+public class Atom extends Particle implements ComprehensiveIdentification {
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private final Element element;
@@ -59,6 +73,7 @@ public class Atom extends Particle {
 
     public Atom(Element element, Vector<Real> position) {
         super(position, position.multiply(Real.ZERO), calculateMass(element, null));
+        this.id = new SimpleIdentification("ATOM:" + UUID.randomUUID());
         this.element = element;
         this.formalCharge = Quantities.create(0, Units.COULOMB);
         this.isotope = null;
@@ -67,6 +82,7 @@ public class Atom extends Particle {
 
     public Atom(Isotope isotope, Vector<Real> position) {
         super(position, position.multiply(Real.ZERO), calculateMass(isotope.getElement(), isotope));
+        this.id = new SimpleIdentification("ATOM:" + UUID.randomUUID());
         this.element = isotope.getElement();
         this.isotope = isotope;
         this.formalCharge = Quantities.create(0, Units.COULOMB);
@@ -120,6 +136,40 @@ public class Atom extends Particle {
 
     public Isotope getIsotope() {
         return isotope;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    /**
+     * Returns the x-coordinate of this atom.
+     * @return the x-coordinate
+     */
+    public double getX() {
+        return getPosition().get(0).doubleValue();
+    }
+
+    /**
+     * Returns the y-coordinate of this atom.
+     * @return the y-coordinate
+     */
+    public double getY() {
+        return getPosition().dimension() > 1 ? getPosition().get(1).doubleValue() : 0.0;
+    }
+
+    /**
+     * Returns the z-coordinate of this atom.
+     * @return the z-coordinate
+     */
+    public double getZ() {
+        return getPosition().dimension() > 2 ? getPosition().get(2).doubleValue() : 0.0;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**

@@ -8,12 +8,10 @@ package org.jscience.biology.loaders.biopax;
 import org.jscience.biology.Pathway;
 import org.jscience.biology.BioChemicalReaction;
 import org.jscience.chemistry.Molecule;
-import org.jscience.biology.macromolecules.Protein;
+import org.jscience.biology.Protein;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Bridge for converting BioPAX DTOs to core JScience biological pathway objects.

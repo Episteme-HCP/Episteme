@@ -49,6 +49,21 @@ public class ThermoMLDataReport {
     private String title;
     private String source;
     private String doi;
+    private String version;
+    private String citation;
+    private final List<ThermoMLPureCompoundProperty> pureCompoundProperties = new ArrayList<>();
+    private final List<ThermoMLMixtureProperty> mixtureProperties = new ArrayList<>();
+
+    public String getVersion() { return version; }
+    public void setVersion(String v) { this.version = v; }
+    public String getCitation() { return citation; }
+    public void setCitation(String c) { this.citation = c; }
+
+    public List<ThermoMLPureCompoundProperty> getPureCompoundProperties() { return pureCompoundProperties; }
+    public void addPureCompoundProperty(ThermoMLPureCompoundProperty p) { pureCompoundProperties.add(p); }
+
+    public List<ThermoMLMixtureProperty> getMixtureProperties() { return mixtureProperties; }
+    public void addMixtureProperty(ThermoMLMixtureProperty p) { mixtureProperties.add(p); }
 
     /**
      * Creates an empty data report.

@@ -22,11 +22,10 @@
  */
 
 /**
- * GML (Geography Markup Language) loader for geospatial data.
- * <p>
- * Parses GML 3.2 files containing geographic features, geometries,
- * and coordinate reference systems.
- * </p>
- * @see <a href="https://www.ogc.org/standards/gml">OGC GML Standard</a>
+ * Core functionality for the org.jscience.geography.loaders.gml package in the JScience library.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 package org.jscience.earth.loaders.gml;

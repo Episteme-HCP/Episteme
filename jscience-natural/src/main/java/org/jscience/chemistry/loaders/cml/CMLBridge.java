@@ -15,6 +15,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.sets.Reals;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
 
 /**
  * Bridge for converting CML (Chemical Markup Language) DTOs to core JScience chemistry objects.
@@ -109,19 +114,29 @@ public class CMLBridge {
         String elementSymbol = cmlAtom.getElementType();
         Element element = PeriodicTable.getElement(elementSymbol);
         
-        Atom atom = new Atom(element);
-        atom.setTrait("cml.id", cmlAtom.getId());
+        // CML coordinates are typically in Angstroms, convert to meters if needed
+        // but core Atom position is a Vector<Real>.
+        double x = cmlAtom.getX3() != null ? cmlAtom.getX3() : 0.0;
+        double y = cmlAtom.getY3() != null ? cmlAtom.getY3() : 0.0;
+        double z = cmlAtom.getZ3() != null ? cmlAtom.getZ3() : 0.0;
         
-        // Set 3D coordinates if available
-        if (cmlAtom.getX3() != null) {
-            atom.setX(cmlAtom.getX3());
-            atom.setY(cmlAtom.getY3());
-            atom.setZ(cmlAtom.getZ3());
-        }
+        List<Real> coords = new ArrayList<>();
+        coords.add(Real.of(x));
+        coords.add(Real.of(y));
+        coords.add(Real.of(z));
+        
+        org.jscience.mathematics.linearalgebra.Vector<Real> position = 
+            DenseVector.of(coords, Reals.getInstance());
+        
+        Atom atom = new Atom(element, position);
+        atom.setTrait("cml.id", cmlAtom.getId());
         
         // Set formal charge
         if (cmlAtom.getFormalCharge() != null) {
-            atom.setFormalCharge(cmlAtom.getFormalCharge());
+            atom.setFormalCharge(Quantities.create(
+                cmlAtom.getFormalCharge(), 
+                Units.COULOMB
+            ));
         }
         
         // Set isotope if specified
@@ -148,21 +163,21 @@ public class CMLBridge {
             return null;
         }
         
-        int order = parseBondOrder(cmlBond.getOrder());
-        return new Bond(atom1, atom2, order);
+        org.jscience.chemistry.BondType type = parseBondOrder(cmlBond.getOrder());
+        return new Bond(atom1, atom2, type);
     }
 
     /**
-     * Parses CML bond order string to integer.
+     * Parses CML bond order string to BondType.
      */
-    private int parseBondOrder(String order) {
-        if (order == null) return 1;
+    private org.jscience.chemistry.BondType parseBondOrder(String order) {
+        if (order == null) return org.jscience.chemistry.BondType.SINGLE;
         return switch (order.toUpperCase()) {
-            case "S", "1", "SINGLE" -> 1;
-            case "D", "2", "DOUBLE" -> 2;
-            case "T", "3", "TRIPLE" -> 3;
-            case "A", "AROMATIC" -> 4; // Aromatic represented as 4
-            default -> 1;
+            case "S", "1", "SINGLE" -> org.jscience.chemistry.BondType.SINGLE;
+            case "D", "2", "DOUBLE" -> org.jscience.chemistry.BondType.DOUBLE;
+            case "T", "3", "TRIPLE" -> org.jscience.chemistry.BondType.TRIPLE;
+            case "A", "AROMATIC" -> org.jscience.chemistry.BondType.AROMATIC;
+            default -> org.jscience.chemistry.BondType.SINGLE;
         };
     }
 

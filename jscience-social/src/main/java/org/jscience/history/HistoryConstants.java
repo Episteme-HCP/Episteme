@@ -52,9 +52,10 @@ public final class HistoryConstants {
     public static final Real UNIX_EPOCH = Real.ZERO;
 
     /** Number of seconds in a standard Julian year. */
-    public static final double JULIAN_YEAR_SECONDS = 31557600.0;
+    public static final Quantity<Time> JULIAN_YEAR = Quantities.create(365.25, Units.DAY);
 
     /** Estimated age of the Universe (v2024 estimate: ~13.787 billion years). */
+
     public static final Quantity<Time> UNIVERSE_AGE = Quantities.create(Real.of("13.787e9"), Units.YEAR);
 
     /** Estimated age of the Solar System (~4.571 billion years). */

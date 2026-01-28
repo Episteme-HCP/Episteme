@@ -62,7 +62,8 @@ public class Seismology {
     public static final Quantity<Velocity> VS_CRUST = Quantities.create(3.5, KILOMETER_PER_SECOND);
 
     /** Earth's radius (km) */
-    public static final Quantity<Length> EARTH_RADIUS = Quantities.create(EarthSciencesConstants.EARTH_RADIUS_MEAN / 1000.0, Units.KILOMETER);
+    public static final Quantity<Length> EARTH_RADIUS = EarthSciencesConstants.EARTH_RADIUS_MEAN.to(Units.KILOMETER);
+
 
 
     private Seismology() {

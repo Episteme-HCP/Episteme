@@ -26,9 +26,14 @@ package org.jscience.util;
 import java.util.Map;
 import java.util.HashMap;
 
+import java.util.Collections;
+import org.jscience.measure.Quantity;
+
 /**
  * Common interface for all universal data models in JScience.
- * Provides a unified way to access metadata and structure.
+ * Provides a unified way to access metadata and structure,
+ * facilitating integration with external interfaces (MCP, Python, Web).
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -36,7 +41,7 @@ import java.util.HashMap;
 public interface UniversalDataModel {
 
     /**
-     * Returns a map of metadata for this model (e.g., creation date, source, units).
+     * Returns a map of metadata for this model (e.g., creation date, source).
      */
     default Map<String, Object> getMetadata() {
         return new HashMap<>();
@@ -44,8 +49,17 @@ public interface UniversalDataModel {
 
     /**
      * Returns a unique identifier for the type of data model.
+     * Examples: "SPATIAL_GEOMETRY", "ECONOMIC_PORTFOLIO", "ARCHITECTURAL_PLAN".
      */
     String getModelType();
+
+    /**
+     * Returns the primary physical values associated with this model.
+     * This allows generic tools to extract and convert measurements.
+     */
+    default Map<String, Quantity<?>> getQuantities() {
+        return Collections.emptyMap();
+    }
 
     /**
      * Validates the data model for consistency.
@@ -54,3 +68,4 @@ public interface UniversalDataModel {
         return true;
     }
 }
+

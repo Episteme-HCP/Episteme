@@ -23,106 +23,56 @@
 
 package org.jscience.geography;
 
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
+import org.jscience.mathematics.geometry.boundaries.Boundary;
+import org.jscience.util.Temporal;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
+
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.jscience.mathematics.geometry.boundaries.Boundary;
 
 /**
- * A boundary that changes over time.
- * <p>
- * This is useful for representing historical borders, moving entities, 
- * or seasonal geographical phenomena. It maintains a list of time points
- * and corresponding boundary states.
- * </p>
+ * A geographic boundary that changes over time.
+ * Stores multiple states, each representing the boundary at a specific point in time.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class TimedBoundary implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * A snapshot of a boundary at a specific time.
-     */
-    public static class BoundaryState implements Serializable, Comparable<BoundaryState> {
-        private static final long serialVersionUID = 1L;
-        
-        private final Instant timestamp;
-        private final Boundary<?> boundary;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<BoundaryState> states = new ArrayList<>();
 
-        public BoundaryState(Instant timestamp, Boundary<?> boundary) {
-            this.timestamp = Objects.requireNonNull(timestamp);
-            this.boundary = Objects.requireNonNull(boundary);
-        }
-
-        public Instant getTimestamp() {
-            return timestamp;
-        }
-
-        public Boundary<?> getBoundary() {
-            return boundary;
-        }
-
-        @Override
-        public int compareTo(BoundaryState other) {
-            return this.timestamp.compareTo(other.timestamp);
-        }
-    }
-
-    /** The name or identifier for this timed boundary. */
-    private final String name;
-
-    /** The sequence of boundary states over time. */
-    private final List<BoundaryState> states;
-
-    /**
-     * Creates a new TimedBoundary with an initial state.
-     *
-     * @param name    the name of the boundary
-     * @param initial the initial boundary state
-     */
-    public TimedBoundary(String name, Boundary<?> initial) {
-        this.name = Objects.requireNonNull(name);
-        this.states = new ArrayList<>();
-        this.states.add(new BoundaryState(Instant.EPOCH, initial));
+    public TimedBoundary() {
     }
 
     /**
-     * Creates a TimedBoundary with pre-defined states.
-     *
-     * @param name   the name
-     * @param states the list of boundary states
+     * Adds a boundary state at a given time.
+     * The states are kept sorted by time.
      */
-    public TimedBoundary(String name, List<BoundaryState> states) {
-        this.name = Objects.requireNonNull(name);
-        this.states = new ArrayList<>(states);
-        Collections.sort(this.states);
-    }
-
-    /**
-     * Adds a new boundary state at the specified time.
-     *
-     * @param timestamp when this boundary becomes active
-     * @param boundary  the boundary at this time
-     */
-    public void addState(Instant timestamp, Boundary<?> boundary) {
+    public void addState(TimeCoordinate timestamp, Boundary<?> boundary) {
         states.add(new BoundaryState(timestamp, boundary));
         Collections.sort(states);
     }
 
+    public List<BoundaryState> getStates() {
+        return Collections.unmodifiableList(states);
+    }
+
     /**
-     * Returns the boundary valid at the given time.
-     *
-     * @param time the time to query
-     * @return the boundary at that time
+     * Returns the boundary active at the given time.
      */
-    public Boundary<?> getAt(Instant time) {
+    public Boundary<?> getAt(TimeCoordinate time) {
         Boundary<?> result = null;
         for (BoundaryState state : states) {
             if (state.getTimestamp().compareTo(time) <= 0) {
@@ -135,49 +85,41 @@ public class TimedBoundary implements Serializable {
     }
 
     /**
-     * Returns the boundary valid at the given epoch milliseconds.
-     *
-     * @param epochMillis epoch milliseconds
-     * @return the boundary at that time
-     */
-    public Boundary<?> getAt(long epochMillis) {
-        return getAt(Instant.ofEpochMilli(epochMillis));
-    }
-
-    /**
-     * Returns the current boundary state.
-     *
-     * @return the most recent boundary
+     * Returns the current boundary.
      */
     public Boundary<?> getCurrent() {
-        return getAt(Instant.now());
+        return getAt(TimePoint.now());
     }
 
     /**
-     * Returns all boundary states.
-     *
-     * @return unmodifiable list of states
+     * Represents a snapshot of a boundary at a specific time.
      */
-    public List<BoundaryState> getStates() {
-        return Collections.unmodifiableList(states);
-    }
+    public static class BoundaryState implements Serializable, Comparable<BoundaryState>, Temporal<TimeCoordinate> {
+        private static final long serialVersionUID = 1L;
+        private final TimeCoordinate timestamp;
+        private final Boundary<?> boundary;
 
-    /**
-     * Returns the number of states.
-     */
-    public int getStateCount() {
-        return states.size();
-    }
+        public BoundaryState(TimeCoordinate timestamp, Boundary<?> boundary) {
+            this.timestamp = Objects.requireNonNull(timestamp);
+            this.boundary = Objects.requireNonNull(boundary);
+        }
 
-    /**
-     * Returns the name of this timed boundary.
-     */
-    public String getName() {
-        return name;
-    }
+        public TimeCoordinate getTimestamp() {
+            return timestamp;
+        }
 
-    @Override
-    public String toString() {
-        return String.format("TimedBoundary[%s, %d states]", name, states.size());
+        public Boundary<?> getBoundary() {
+            return boundary;
+        }
+
+        @Override
+        public TimeCoordinate getWhen() {
+            return timestamp;
+        }
+
+        @Override
+        public int compareTo(BoundaryState other) {
+            return this.timestamp.compareTo(other.timestamp);
+        }
     }
 }

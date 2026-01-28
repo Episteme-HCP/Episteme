@@ -50,16 +50,17 @@ import org.jscience.measure.quantity.Length;
 public class Geodesy {
 
 	/** WGS84 Earth equatorial radius (meters) */
-	public static final Real EARTH_RADIUS_EQUATORIAL = Real.of(EarthSciencesConstants.EARTH_RADIUS_EQUATORIAL);
+	public static final Real EARTH_RADIUS_EQUATORIAL = Real.of(EarthSciencesConstants.EARTH_RADIUS_EQUATORIAL.to(Units.METER).getValue().doubleValue());
 
 	/** WGS84 Earth polar radius (meters) */
-	public static final Real EARTH_RADIUS_POLAR = Real.of(EarthSciencesConstants.EARTH_RADIUS_POLAR);
+	public static final Real EARTH_RADIUS_POLAR = Real.of(EarthSciencesConstants.EARTH_RADIUS_POLAR.to(Units.METER).getValue().doubleValue());
 
 	/** WGS84 flattening */
-	public static final Real FLATTENING = Real.of(EarthSciencesConstants.FLATTENING);
+	public static final Real FLATTENING = Real.of(EarthSciencesConstants.FLATTENING.getValue().doubleValue());
 
 	/** Mean Earth radius (meters) */
-	private static final Real MEAN_RADIUS = Real.of(EarthSciencesConstants.EARTH_RADIUS_MEAN);
+	private static final Real MEAN_RADIUS = Real.of(EarthSciencesConstants.EARTH_RADIUS_MEAN.to(Units.METER).getValue().doubleValue());
+
 
 	private Geodesy() {
 	}

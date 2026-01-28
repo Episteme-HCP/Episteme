@@ -66,21 +66,35 @@ public class MusicXMLReader extends CompositionLoader {
 
         Composition composition = new Composition(title, "Composer: " + composer, TimePoint.now(), null);
 
-        // Map parts to tracks
+        // Map parts to internal model
         NodeList parts = root.getElementsByTagName("part");
         for (int i = 0; i < parts.getLength(); i++) {
             Element partElem = (Element) parts.item(i);
             String partId = partElem.getAttribute("id");
-            Track track = new Track(partId, "MusicXML Part");
+            Part part = new Part(partId);
+            part.setInstrumentName("MusicXML Part");
             
-            NodeList notes = partElem.getElementsByTagName("note");
-            for (int j = 0; j < notes.getLength(); j++) {
-                Element noteElem = (Element) notes.item(j);
-                parseNote(noteElem, track);
+            // For simplicity, one measure for all notes in MusicXML (or we could split by <measure> tags)
+            // Ideally we should iterate over <measure> tags inside <part>
+            NodeList measures = partElem.getElementsByTagName("measure");
+            for (int m = 0; m < measures.getLength(); m++) {
+                Element measElem = (Element) measures.item(m);
+                int number = Integer.parseInt(measElem.getAttribute("number"));
+                Measure measure = new Measure(number);
+                
+                NodeList notes = measElem.getElementsByTagName("note");
+                for (int j = 0; j < notes.getLength(); j++) {
+                    Element noteElem = (Element) notes.item(j);
+                    parseNote(noteElem, measure);
+                }
+                
+                if (!measure.getNotes().isEmpty()) {
+                    part.addMeasure(measure);
+                }
             }
             
-            if (!track.getNotes().isEmpty()) {
-                composition.addTrack(track);
+            if (!part.getMeasures().isEmpty()) {
+                composition.addPart(part);
             }
         }
         
@@ -95,7 +109,7 @@ public class MusicXMLReader extends CompositionLoader {
         return defaultValue;
     }
 
-    private void parseNote(Element noteElem, Track track) {
+    private void parseNote(Element noteElem, Measure measure) {
         boolean isRest = noteElem.getElementsByTagName("rest").getLength() > 0;
         
         NodeList durationList = noteElem.getElementsByTagName("duration");
@@ -125,7 +139,7 @@ public class MusicXMLReader extends CompositionLoader {
                 } catch (NumberFormatException e) {}
                 
                 int midiNumber = pitchToMidi(step, octave, alter);
-                track.addNote(Note.fromMidi(midiNumber, duration));
+                measure.addNote(Note.fromMidi(midiNumber, duration));
             }
         }
     }

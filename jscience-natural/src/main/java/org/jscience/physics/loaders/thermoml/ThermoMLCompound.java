@@ -43,6 +43,9 @@ public class ThermoMLCompound {
     private String inchiKey;
     private String smiles;
     private int compoundIndex;
+    private String commonName;
+    private String iupacName;
+    private String regNum;
 
     /**
      * Creates a new compound.
@@ -64,6 +67,24 @@ public class ThermoMLCompound {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getCommonName() { return commonName != null ? commonName : name; }
+    public void setCommonName(String n) { this.commonName = n; }
+
+    public String getIUPACName() { return iupacName; }
+    public void setIUPACName(String n) { this.iupacName = n; }
+
+    public String getRegNum() { return regNum; }
+    public void setRegNum(String r) { this.regNum = r; }
+
+    public String getCASRegistryNumber() { return casNumber; }
+    public void setCASRegistryNumber(String r) { this.casNumber = r; }
+
+    public String getStandardInChI() { return inchi; }
+    public void setStandardInChI(String i) { this.inchi = i; }
+
+    public String getStandardInChIKey() { return inchiKey; }
+    public void setStandardInChIKey(String k) { this.inchiKey = k; }
 
     public String getCasNumber() {
         return casNumber;

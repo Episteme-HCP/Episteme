@@ -34,7 +34,9 @@ public enum Organelle {
 
     NUCLEUS("Contains genetic material (DNA)"),
     MITOCHONDRIA("Powerhouse, generates ATP via respiration"),
+    MITOCHONDRION("Powerhouse, generates ATP via respiration"),
     RIBOSOME("Site of protein synthesis"),
+    ENDOPLASMIC_RETICULUM("Protein synthesis and lipid synthesis"),
     ENDOPLASMIC_RETICULUM_ROUGH("Protein synthesis and folding"),
     ENDOPLASMIC_RETICULUM_SMOOTH("Lipid synthesis, detoxification"),
     GOLGI_APPARATUS("Packaging and secretion of proteins"),

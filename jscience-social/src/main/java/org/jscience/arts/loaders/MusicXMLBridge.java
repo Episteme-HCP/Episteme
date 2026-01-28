@@ -15,8 +15,6 @@ import org.jscience.arts.music.TimeSignature;
 import org.jscience.arts.music.KeySignature;
 import org.jscience.arts.music.Dynamics;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Bridge for converting MusicXML DTOs to core JScience music theory objects.
@@ -156,19 +154,22 @@ public class MusicXMLBridge {
         }
         
         // Convert pitch
-        Pitch pitch = null;
+        // Convert pitch
+        Pitch pitch = Pitch.C;
+        int octave = 4;
+        
         if (mxmlNote.getPitch() != null) {
-            pitch = new Pitch(
-                mxmlNote.getPitch().getStep(),
-                mxmlNote.getPitch().getOctave(),
-                mxmlNote.getPitch().getAlter()
-            );
+            String step = mxmlNote.getPitch().getStep();
+            int alter = mxmlNote.getPitch().getAlter();
+            octave = mxmlNote.getPitch().getOctave();
+            
+            pitch = mapToPitch(step, alter);
         }
         
         // Convert duration
         Duration duration = convertDuration(mxmlNote.getDuration(), mxmlNote.getType());
         
-        Note note = new Note(pitch, duration);
+        Note note = new Note(pitch, octave, duration);
         
         // Set additional properties
         note.setTrait("voice", mxmlNote.getVoice());
@@ -207,6 +208,24 @@ public class MusicXMLBridge {
             case "32nd" -> Duration.THIRTY_SECOND;
             case "64th" -> Duration.SIXTY_FOURTH;
             default -> Duration.QUARTER;
+        };
+    }
+
+    /**
+     * Maps MusicXML step and alter to JScience Pitch.
+     */
+    private Pitch mapToPitch(String step, int alter) {
+        if (step == null) return Pitch.C;
+        
+        return switch (step.toUpperCase()) {
+            case "C" -> (alter >= 1) ? Pitch.C_SHARP : Pitch.C;
+            case "D" -> (alter >= 1) ? Pitch.D_SHARP : ((alter <= -1) ? Pitch.C_SHARP : Pitch.D);
+            case "E" -> (alter <= -1) ? Pitch.D_SHARP : Pitch.E;
+            case "F" -> (alter >= 1) ? Pitch.F_SHARP : Pitch.F;
+            case "G" -> (alter >= 1) ? Pitch.G_SHARP : ((alter <= -1) ? Pitch.F_SHARP : Pitch.G);
+            case "A" -> (alter >= 1) ? Pitch.A_SHARP : ((alter <= -1) ? Pitch.G_SHARP : Pitch.A);
+            case "B" -> (alter <= -1) ? Pitch.A_SHARP : Pitch.B;
+            default -> Pitch.C;
         };
     }
 }

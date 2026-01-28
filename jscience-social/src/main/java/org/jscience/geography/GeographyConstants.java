@@ -23,6 +23,14 @@
 
 package org.jscience.geography;
 
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.measure.quantity.Acceleration;
+
+
 /**
  * Standard physical and geometric constants for Earth-based geographical 
  * calculations.
@@ -40,26 +48,27 @@ public final class GeographyConstants {
      * Approximate mass of the Earth in kilograms (kg).
      * Reference: 5.972 × 10^24 kg.
      */
-    public static final double EARTH_MASS = 5.972235E24;
+    public static final Quantity<Mass> EARTH_MASS = Quantities.create(5.972235E24, Units.KILOGRAM);
 
     /** 
      * Nominal mean radius of the Earth as defined by the IUGG in meters (m).
      */
-    public static final double EARTH_MEAN_RADIUS = 6371000.79;
+    public static final Quantity<Length> EARTH_MEAN_RADIUS = Quantities.create(6371000.79, Units.METER);
 
     /** 
      * Equatorial radius (semi-major axis) of the Earth (WGS84) in meters (m).
      */
-    public static final double EARTH_EQUATORIAL_RADIUS = 6378137.0;
+    public static final Quantity<Length> EARTH_EQUATORIAL_RADIUS = Quantities.create(6378137.0, Units.METER);
 
     /** 
      * Polar radius (semi-minor axis) of the Earth (WGS84) in meters (m).
      */
-    public static final double EARTH_POLAR_RADIUS = 6356752.3142;
+    public static final Quantity<Length> EARTH_POLAR_RADIUS = Quantities.create(6356752.3142, Units.METER);
 
     /** 
      * Average acceleration due to gravity on the Earth's surface (standard gravity) 
      * in meters per second squared (m/s²).
      */
-    public static final double STANDARD_GRAVITY = 9.80665;
+    public static final Quantity<Acceleration> STANDARD_GRAVITY = Quantities.create(9.80665, Units.METERS_PER_SECOND_SQUARED);
 }
+

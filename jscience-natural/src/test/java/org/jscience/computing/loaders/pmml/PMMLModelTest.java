@@ -19,7 +19,6 @@ public class PMMLModelTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
         assertNotNull(PMMLModel.class);
     }
 }

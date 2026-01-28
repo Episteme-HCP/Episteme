@@ -1,63 +1,31 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.biology.loaders.phyloxml;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Represents a PhyloXML document containing one or more phylogenies.
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Represents a parsed PhyloXML document.
  */
 public class PhyloXMLDocument {
-    
-    private final List<Phylogeny> phylogenies = new ArrayList<>();
+    private final List<PhyloXMLPhylogeny> phylogenies = new ArrayList<>();
 
-    public PhyloXMLDocument() {
-    }
-
-    public void addPhylogeny(Phylogeny phylogeny) {
+    public void addPhylogeny(PhyloXMLPhylogeny phylogeny) {
         if (phylogeny != null) {
             phylogenies.add(phylogeny);
         }
     }
 
-    public List<Phylogeny> getPhylogenies() {
+    public List<PhyloXMLPhylogeny> getPhylogenies() {
         return Collections.unmodifiableList(phylogenies);
     }
-
-    public Phylogeny getFirstPhylogeny() {
+    
+    public PhyloXMLPhylogeny getPhylogeny() {
         return phylogenies.isEmpty() ? null : phylogenies.get(0);
-    }
-
-    public int getPhylogenyCount() {
-        return phylogenies.size();
-    }
-
-    @Override
-    public String toString() {
-        return "PhyloXMLDocument{phylogenies=" + phylogenies.size() + "}";
     }
 }

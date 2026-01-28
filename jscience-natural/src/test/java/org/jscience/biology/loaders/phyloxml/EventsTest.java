@@ -19,7 +19,6 @@ public class EventsTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(Events.class);
+        assertNotNull(PhyloXMLEvents.class);
     }
 }

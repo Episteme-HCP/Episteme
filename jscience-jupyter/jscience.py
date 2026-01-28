@@ -59,6 +59,38 @@ class JScienceClient:
             "system_load": 0.45
         }
 
+    def convert_units(self, value, from_unit, to_unit):
+        """
+        Convert scientific units using the JScience engine.
+        """
+        print(f"🔄 Converting {value} {from_unit} to {to_unit}...")
+        # In a real implementation, this would call a gRPC or MCP endpoint
+        return value # Mock same value for now
+
+    def get_constant(self, name, category=None):
+        """
+        Retrieve a scientific constant by name.
+        """
+        print(f"🔍 Fetching constant: {name}...")
+        constants = {
+            "PI": 3.141592653589793,
+            "SPEED_OF_LIGHT": 299792458,
+            "EARTH_MASS": 5.9722e24
+        }
+        return constants.get(name.upper(), "Unknown Constant")
+
+    def get_data_model(self, name):
+        """
+        Retrieve a scientific data model (Spatial, Economic, etc.)
+        """
+        print(f"📦 Loading data model: {name}...")
+        # Mocking generic response
+        if "Spatial" in name:
+            return {"type": "SPATIAL_GEOMETRY", "locations": 150}
+        return {"type": "GENERIC_MODEL", "name": name}
+
+
+
     def wait_for_result(self, task_id, timeout=30):
         """Poll for task result"""
         print(f"⏳ Waiting for result of {task_id}...")

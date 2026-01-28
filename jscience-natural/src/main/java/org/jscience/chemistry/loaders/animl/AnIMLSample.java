@@ -41,12 +41,24 @@ public class AnIMLSample {
     public AnIMLSample() {
     }
 
-    public String getId() {
+    public String getSampleId() {
         return id;
+    }
+
+    public void setSampleId(String id) {
+        this.id = id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setContainerId(String id) {
+        this.containerId = id;
+    }
+
+    public void setSourceDataLocation(String loc) {
+        this.sourceDataLocation = loc;
     }
 
     public String getName() {
@@ -57,14 +69,6 @@ public class AnIMLSample {
         this.name = name;
     }
 
-    public String getContainerId() {
-        return containerId;
-    }
-
-    public void setContainerId(String containerId) {
-        this.containerId = containerId;
-    }
-
     public String getBarcode() {
         return barcode;
     }
@@ -73,12 +77,16 @@ public class AnIMLSample {
         this.barcode = barcode;
     }
 
-    public String getSourceDataLocation() {
-        return sourceDataLocation;
+    public String getContainerType() {
+        return containerId; // Mapping containerId to containerType for now
     }
 
-    public void setSourceDataLocation(String sourceDataLocation) {
-        this.sourceDataLocation = sourceDataLocation;
+    public String getSourceType() {
+        return "Unknown"; // Default
+    }
+
+    public String getLocation() {
+        return sourceDataLocation;
     }
 
     @Override

@@ -25,7 +25,9 @@ package org.jscience.geography;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.util.UniversalDataModel;
+import org.jscience.measure.Quantity;
 import java.util.*;
+
 
 /**
  * Universal data model for spatial visualization.
@@ -67,6 +69,14 @@ public class SpatialDataSet implements UniversalDataModel {
         if (maxY == null || y.compareTo(maxY) > 0) maxY = y;
     }
 
+    @Override
+    public Map<String, Quantity<?>> getQuantities() {
+        Map<String, Quantity<?>> quantities = new HashMap<>();
+        double totalIntensity = flows.stream().mapToDouble(f -> f.intensity().doubleValue()).sum();
+        quantities.put("total_flow_intensity", org.jscience.measure.Quantities.create(totalIntensity, org.jscience.measure.Units.ONE));
+        return quantities;
+    }
+
     public List<Location> getLocations() { return Collections.unmodifiableList(locations); }
     public List<Flow> getFlows() { return Collections.unmodifiableList(flows); }
     public Real getMinX() { return minX; }
@@ -74,3 +84,4 @@ public class SpatialDataSet implements UniversalDataModel {
     public Real getMinY() { return minY; }
     public Real getMaxY() { return maxY; }
 }
+

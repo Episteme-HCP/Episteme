@@ -24,6 +24,7 @@
 package org.jscience.util.identity;
 
 import java.io.Serializable;
+import java.util.Map;
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
 
@@ -37,6 +38,30 @@ import org.jscience.util.Named;
  * @since 1.0
  */
 public interface ComprehensiveIdentification extends Identified<Identification>, Named, Commented, Serializable {
+
+    /**
+     * Returns the traits map for this entity.
+     * @return the traits map
+     */
+    Map<String, Object> getTraits();
+
+    /**
+     * Returns a trait value by name.
+     * @param name the trait name
+     * @return the trait value, or null if not found
+     */
+    default Object getTrait(String name) {
+        return getTraits().get(name);
+    }
+
+    /**
+     * Sets a trait value.
+     * @param name the trait name
+     * @param value the trait value
+     */
+    default void setTrait(String name, Object value) {
+        getTraits().put(name, value);
+    }
 
     @Override
     default String getName() {

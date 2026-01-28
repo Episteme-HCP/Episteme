@@ -19,7 +19,6 @@ public class PathwayTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(Pathway.class);
+        assertNotNull(BioPAXPathway.class);
     }
 }

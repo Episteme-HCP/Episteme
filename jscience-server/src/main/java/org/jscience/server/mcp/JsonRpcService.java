@@ -86,22 +86,92 @@ public class JSONRpcService {
     }
 
     private String callTool(JsonNode params, JsonNode id) {
-        // Mock execution
         String name = params.get("name").asText();
         LOG.info("Executing tool: {}", name);
         
-        // Return dummy success
         try {
             var response = mapper.createObjectNode();
             response.put("jsonrpc", "2.0");
             response.set("id", id);
             var result = response.putObject("result");
-            result.put("content", "Tool execution simulated successfully");
+            
+            if ("convert_units".equals(name)) {
+                return executeConvertUnits(params.get("arguments"), response);
+            } else if ("get_constant".equals(name)) {
+                return executeGetConstant(params.get("arguments"), response);
+            } else if ("get_data_model".equals(name)) {
+                return executeGetDataModel(params.get("arguments"), response);
+            }
+            
+            result.put("content", "Unknown tool name: " + name);
             return mapper.writeValueAsString(response);
-        } catch(IOException e) {
-            return "{}";
+        } catch(Exception e) {
+            LOG.error("Error executing tool", e);
+            return error(id, -32000, "Internal error: " + e.getMessage());
         }
     }
+
+    private String executeGetDataModel(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
+        String modelName = args.get("name").asText();
+        String type = "UNKNOWN";
+        String summary = "Requested data model: " + modelName;
+        
+        // Mocked response for demo
+        var resultNode = response.get("result");
+        var content = ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).putObject("content");
+        
+        if (modelName.contains("Spatial")) {
+            type = "SPATIAL_GEOMETRY";
+            summary = "Global Migration Flow Dataset (2025)";
+            content.put("model_type", type);
+            content.put("locations_count", 150);
+            content.put("total_magnitude", 1.25e7);
+        } else if (modelName.contains("Portfolio")) {
+            type = "FINANCIAL_PORTFOLIO";
+            summary = "ESG High-Growth Portfolio";
+            content.put("model_type", type);
+            content.put("assets_count", 24);
+            content.put("total_value_usd", 4500000.0);
+        } else {
+            content.put("summary", summary);
+        }
+        
+        return mapper.writeValueAsString(response);
+    }
+
+    private String executeConvertUnits(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
+
+        double value = args.get("value").asDouble();
+        String from = args.get("from").asText();
+        String to = args.get("to").asText();
+        
+        // Mock implementation for now, in a real app would use Units.valueOf(from) etc.
+        double resultValue = value; // placeholder
+        
+        var resultNode = response.get("result");
+        ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).put("content", 
+            String.format("%f %s = %f %s (Simulated)", value, from, resultValue, to));
+        return mapper.writeValueAsString(response);
+    }
+
+    private String executeGetConstant(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
+        String category = args.has("category") ? args.get("category").asText() : "UNKNOWN";
+        String name = args.get("name").asText().toUpperCase();
+        
+        String value = "Unknown constant";
+        
+        // Basic lookup for common constants
+        if ("PI".equals(name)) value = "3.141592653589793";
+        else if ("E".equals(name)) value = "2.718281828459045";
+        else if ("SPEED_OF_LIGHT".equals(name)) value = "299792458 m/s";
+        else if ("EARTH_MASS".equals(name)) value = "5.972235e24 kg";
+        
+        var resultNode = response.get("result");
+        ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).put("content", 
+            String.format("Constant %s: %s", name, value));
+        return mapper.writeValueAsString(response);
+    }
+
 
     private String error(JsonNode id, int code, String message) {
         return String.format("{\"jsonrpc\": \"2.0\", \"id\": %s, \"error\": {\"code\": %d, \"message\": \"%s\"}}",

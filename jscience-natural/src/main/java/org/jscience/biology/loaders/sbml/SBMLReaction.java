@@ -132,19 +132,19 @@ public class SBMLReaction {
     }
 
     // FBC extension
-    public Real getLowerFluxBound() {
+    public Real getLowerBound() {
         return lowerFluxBound;
     }
 
-    public void setLowerFluxBound(Real lowerFluxBound) {
+    public void setLowerBound(Real lowerFluxBound) {
         this.lowerFluxBound = lowerFluxBound;
     }
 
-    public Real getUpperFluxBound() {
+    public Real getUpperBound() {
         return upperFluxBound;
     }
 
-    public void setUpperFluxBound(Real upperFluxBound) {
+    public void setUpperBound(Real upperFluxBound) {
         this.upperFluxBound = upperFluxBound;
     }
 

@@ -35,9 +35,13 @@ public class SBMLGeneProduct {
     private String id;
     private String name;
     private String label;
+    private String metaId;
 
     public SBMLGeneProduct() {
     }
+
+    public String getMetaId() { return metaId; }
+    public void setMetaId(String metaId) { this.metaId = metaId; }
 
     public String getId() {
         return id;

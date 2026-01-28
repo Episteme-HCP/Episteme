@@ -32,20 +32,10 @@ import java.io.*;
 /**
  * GML Reader for Geography Markup Language data.
  * <p>
- * GML is an OGC (Open Geospatial Consortium) standard XML encoding for
- * geographic features including points, lines, polygons, and complex geometries.
+ * This reader has been moved to JScience Social to leverage the unified 
+ * GML parsing engine for human and physical geography applications.
  * </p>
- * <p>
- * <b>Supported GML 3.2 Elements:</b>
- * <ul>
- *   <li>Feature collections</li>
- *   <li>Points, LineStrings, Polygons</li>
- *   <li>MultiPoint, MultiLineString, MultiPolygon</li>
- *   <li>Coordinate reference systems</li>
- *   <li>Feature properties and attributes</li>
- * </ul>
- * </p>
- * * @see <a href="https://www.ogc.org/standards/gml">OGC GML Standard</a>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -58,11 +48,13 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
     public GMLReader() {
     }
 
-    @Override public String getResourcePath() { return null; }
+    @Override public String getResourcePath() { return "/data/geography/"; }
     @Override public Class<GMLDocument> getResourceType() { return GMLDocument.class; }
     @Override public String getName() { return "GML Reader"; }
     @Override public String getDescription() { return "Reads geographic features from GML format"; }
-    @Override public String getLongDescription() { return "GML is the OGC standard for geographic feature encoding including points, lines, polygons, and complex geometries."; }
+    @Override public String getLongDescription() { 
+        return "GML is the OGC standard for geographic feature encoding including points, lines, polygons, and complex geometries."; 
+    }
     @Override public String getCategory() { return "Geography"; }
     @Override public String[] getSupportedVersions() { return new String[] {"3.2", "3.1", "2.1"}; }
 
@@ -74,11 +66,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
             if (is != null) return read(is);
         }
         throw new GMLException("Resource not found: " + resourceId);
-    }
-
-    @Override
-    protected GMLDocument loadFromInputStream(InputStream is, String id) throws Exception {
-        return read(is);
     }
 
     /**
@@ -111,14 +98,12 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
         
         result.setSrsName(root.getAttribute("srsName"));
         
-        // Parse feature members
         parseFeatureMembers(root, result);
         
         return result;
     }
 
     private void parseFeatureMembers(Element root, GMLDocument result) {
-        // Try gml:featureMember
         NodeList members = root.getElementsByTagNameNS(GML_NS, "featureMember");
         if (members.getLength() == 0) {
             members = root.getElementsByTagNameNS(GML_NS_OLD, "featureMember");
@@ -126,7 +111,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
         
         for (int i = 0; i < members.getLength(); i++) {
             Element memberElem = (Element) members.item(i);
-            // The actual feature is the first child element
             NodeList children = memberElem.getChildNodes();
             for (int j = 0; j < children.getLength(); j++) {
                 if (children.item(j) instanceof Element) {
@@ -136,7 +120,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
             }
         }
         
-        // Try gml:featureMembers (plural)
         NodeList membersList = root.getElementsByTagNameNS(GML_NS, "featureMembers");
         if (membersList.getLength() == 0) {
             membersList = root.getElementsByTagNameNS(GML_NS_OLD, "featureMembers");
@@ -161,19 +144,16 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
         }
         feature.setTypeName(elem.getLocalName());
         
-        // Parse properties and geometry
         NodeList children = elem.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             if (children.item(i) instanceof Element) {
                 Element child = (Element) children.item(i);
                 String localName = child.getLocalName();
                 
-                // Check if it's a geometry
                 GMLGeometry geom = tryParseGeometry(child);
                 if (geom != null) {
                     feature.setGeometry(geom);
                 } else {
-                    // It's a property
                     feature.setProperty(localName, child.getTextContent().trim());
                 }
             }
@@ -202,7 +182,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
             case "MultiSurface":
                 return parseMultiPolygon(elem);
             default:
-                // Check for nested geometry in property elements
                 NodeList children = elem.getChildNodes();
                 for (int i = 0; i < children.getLength(); i++) {
                     if (children.item(i) instanceof Element) {
@@ -218,7 +197,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
         GMLPoint point = new GMLPoint();
         point.setSrsName(elem.getAttribute("srsName"));
         
-        // Try pos
         Element posElem = getFirstChildElement(elem, "pos");
         if (posElem != null) {
             double[] coords = parseCoordinateString(posElem.getTextContent());
@@ -229,7 +207,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
             }
         }
         
-        // Try coordinates
         Element coordsElem = getFirstChildElement(elem, "coordinates");
         if (coordsElem != null) {
             double[] coords = parseCoordinateString(coordsElem.getTextContent().replace(",", " "));
@@ -247,7 +224,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
         GMLLineString line = new GMLLineString();
         line.setSrsName(elem.getAttribute("srsName"));
         
-        // Try posList
         Element posListElem = getFirstChildElement(elem, "posList");
         if (posListElem != null) {
             String srsDim = posListElem.getAttribute("srsDimension");
@@ -262,7 +238,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
             }
         }
         
-        // Try coordinates
         Element coordsElem = getFirstChildElement(elem, "coordinates");
         if (coordsElem != null) {
             String[] tuples = coordsElem.getTextContent().trim().split("\\s+");
@@ -284,7 +259,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
         GMLPolygon polygon = new GMLPolygon();
         polygon.setSrsName(elem.getAttribute("srsName"));
         
-        // Exterior ring
         Element exterior = getFirstChildElement(elem, "exterior");
         if (exterior != null) {
             Element ring = getFirstChildElement(exterior, "LinearRing");
@@ -294,7 +268,6 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
             }
         }
         
-        // Interior rings (holes)
         NodeList interiors = elem.getElementsByTagNameNS(GML_NS, "interior");
         for (int i = 0; i < interiors.getLength(); i++) {
             Element interior = (Element) interiors.item(i);

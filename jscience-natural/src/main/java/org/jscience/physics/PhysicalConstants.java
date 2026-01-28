@@ -180,13 +180,24 @@ public final class PhysicalConstants {
         public static final Quantity<ElectricPermittivity> ELECTRIC_CONSTANT = EPSILON_0;
 
         // Remaining legacy/derived constants can be added as needed or computed
-        public static final Real mu_0 = Real.of(1.25663706212e-6); // Approx derived
+        public static final Quantity<MagneticPermeability> MU_0_QTY = Quantities.create(1.25663706212e-6, 
+                Units.HENRY.divide(Units.METER).asType(MagneticPermeability.class));
+        public static final Real mu_0 = (Real) MU_0_QTY.getValue();
 
-        // Astronomical (Legacy)
-        public static final Real AU = Real.of(1.495978707e11);
-        public static final Real ly = Real.of(9.4607304725808e15);
-        public static final Real pc = Real.of(3.0856775814913673e16);
-        public static final Real M_sun = Real.of(1.98892e30);
+
+        // Astronomical (Legacy and Quantity)
+        public static final Quantity<Length> ASTRONOMICAL_UNIT_QTY = Quantities.create(1.495978707e11, Units.METER);
+        public static final Real AU = (Real) ASTRONOMICAL_UNIT_QTY.getValue();
+
+        public static final Quantity<Length> LIGHT_YEAR_QTY = Quantities.create(9.4607304725808e15, Units.METER);
+        public static final Real ly = (Real) LIGHT_YEAR_QTY.getValue();
+
+        public static final Quantity<Length> PARSEC_QTY = Quantities.create(3.0856775814913673e16, Units.METER);
+        public static final Real pc = (Real) PARSEC_QTY.getValue();
+
+        public static final Quantity<Mass> SOLAR_MASS_QTY = Quantities.create(1.98892e30, Units.KILOGRAM);
+        public static final Real M_sun = (Real) SOLAR_MASS_QTY.getValue();
+
 
         // Quantum Constants
         public static final Quantity<Action> REDUCED_PLANCK = HBAR;
@@ -208,7 +219,9 @@ public final class PhysicalConstants {
         public static final Real alpha = FINE_STRUCTURE_REF.getValue();
 
         // Electron volt
-        public static final Real eV = e; // Value in Joules match elementary charge numeric value if J/C=V=1?
+        public static final Quantity<Energy> ELECTRON_VOLT_QTY = Quantities.create(1.602176634e-19, Units.JOULE);
+        public static final Real eV = (Real) ELECTRON_VOLT_QTY.getValue();
+
         // No, eV is unit of energy. 1 eV = 1.602...e-19 J.
         // So PhysicalConstants.eV should likely be the conversion factor or Real value
         // in Joules.

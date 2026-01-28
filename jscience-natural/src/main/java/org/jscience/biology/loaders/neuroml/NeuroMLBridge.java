@@ -23,7 +23,6 @@
 
 package org.jscience.biology.loaders.neuroml;
 
-import org.jscience.biology.cell.Cell;
 import org.jscience.biology.cell.Organelle;
 import org.jscience.biology.neuroscience.Neuron;
 import org.jscience.biology.neuroscience.NeuronMorphology;
@@ -82,7 +81,7 @@ public class NeuroMLBridge {
      * @param model the parsed NeuroML model
      * @return list of Neuron objects
      */
-    public List<Neuron> toNeurons(NeuroMLModel model) {
+    public List<Neuron> toNeurons(NeuroMLDocument model) {
         List<Neuron> neurons = new ArrayList<>();
         if (model == null || model.getCells() == null) {
             return neurons;
@@ -152,10 +151,9 @@ public class NeuroMLBridge {
             }
         }
         
-        // Convert segment groups
         if (morphology.getSegmentGroups() != null) {
             for (SegmentGroup sg : morphology.getSegmentGroups()) {
-                nm.addSegmentGroup(sg.getId(), sg.getMemberIds());
+                nm.addSegmentGroup(sg.getId(), sg.getMemberSegmentIds());
             }
         }
         
@@ -176,16 +174,13 @@ public class NeuroMLBridge {
      * Transfers biophysical properties to the neuron.
      */
     private void transferBiophysicalProperties(Neuron neuron, BiophysicalProperties bioProps) {
-        neuron.setTrait("membrane.capacitance", bioProps.getMembraneCapacitance());
-        neuron.setTrait("axial.resistance", bioProps.getAxialResistance());
-        neuron.setTrait("resting.potential", bioProps.getInitVoltage());
-        neuron.setTrait("threshold.voltage", bioProps.getSpikeThreshold());
+        neuron.setTrait("membrane.capacitance", bioProps.getSpecificCapacitance());
         
         // Transfer ion channel densities
-        Map<String, Double> channelDensities = bioProps.getChannelDensities();
+        List<ChannelDensity> channelDensities = bioProps.getChannelDensities();
         if (channelDensities != null) {
-            for (Map.Entry<String, Double> entry : channelDensities.entrySet()) {
-                neuron.setTrait("channel." + entry.getKey(), entry.getValue());
+            for (ChannelDensity cd : channelDensities) {
+                neuron.setTrait("channel." + cd.getIonChannel(), cd.getCondDensity());
             }
         }
     }
@@ -196,16 +191,13 @@ public class NeuroMLBridge {
      * @param model the parsed NeuroML model
      * @return a NeuralNetwork containing populations and projections
      */
-    public NeuralNetwork toNeuralNetwork(NeuroMLModel model) {
-        if (model == null) {
+    public NeuralNetwork toNeuralNetwork(NeuroMLDocument model) {
+        if (model == null || model.getNetworks().isEmpty()) {
             return null;
         }
         
-        Network network = model.getNetwork();
-        if (network == null) {
-            return null;
-        }
-        
+        // Use first network for simplicity in bridge
+        Network network = model.getNetworks().get(0);
         NeuralNetwork nn = new NeuralNetwork(network.getId());
         
         // Build neuron lookup map
@@ -217,7 +209,7 @@ public class NeuroMLBridge {
         // Add populations
         if (network.getPopulations() != null) {
             for (Population pop : network.getPopulations()) {
-                String cellType = pop.getCellType();
+                String cellType = pop.getComponent();
                 Neuron template = neuronMap.get(cellType);
                 
                 for (int i = 0; i < pop.getSize(); i++) {
@@ -232,16 +224,10 @@ public class NeuroMLBridge {
         // Add projections (synaptic connections)
         if (network.getProjections() != null) {
             for (Projection proj : network.getProjections()) {
-                if (proj.getConnections() != null) {
-                    for (Connection conn : proj.getConnections()) {
-                        Synapse synapse = new Synapse(proj.getSynapse());
-                        synapse.setTrait("pre.cell", conn.getPreCellId());
-                        synapse.setTrait("post.cell", conn.getPostCellId());
-                        synapse.setTrait("weight", conn.getWeight());
-                        synapse.setTrait("delay", conn.getDelay());
-                        nn.addSynapse(synapse);
-                    }
-                }
+                Synapse synapse = new Synapse(proj.getSynapse());
+                synapse.setTrait("source", proj.getPresynapticPopulation());
+                synapse.setTrait("target", proj.getPostsynapticPopulation());
+                nn.addSynapse(synapse);
             }
         }
         
@@ -268,7 +254,7 @@ public class NeuroMLBridge {
         
         // Neurons have specific organelles
         cell.addOrganelle(Organelle.NUCLEUS);
-        cell.addOrganelle(Organelle.MITOCHONDRION);
+        cell.addOrganelle(Organelle.MITOCHONDRIA);
         cell.addOrganelle(Organelle.ENDOPLASMIC_RETICULUM);
         cell.addOrganelle(Organelle.GOLGI_APPARATUS);
         

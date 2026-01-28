@@ -23,6 +23,14 @@
 
 package org.jscience.earth;
 
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.measure.quantity.Dimensionless;
+
+
 /**
  * Constants and enumerations for earth sciences (geology, meteorology, climatology).
  * <p>
@@ -34,19 +42,20 @@ public final class EarthSciencesConstants {
     private EarthSciencesConstants() {}
 
     /** WGS84 Earth equatorial radius (meters) */
-    public static final double EARTH_RADIUS_EQUATORIAL = 6378137.0;
+    public static final Quantity<Length> EARTH_RADIUS_EQUATORIAL = Quantities.create(6378137.0, Units.METER);
 
     /** WGS84 Earth polar radius (meters) */
-    public static final double EARTH_RADIUS_POLAR = 6356752.314245;
+    public static final Quantity<Length> EARTH_RADIUS_POLAR = Quantities.create(6356752.314245, Units.METER);
 
     /** WGS84 flattening */
-    public static final double FLATTENING = 1.0 / 298.257223563;
+    public static final Quantity<Dimensionless> FLATTENING = Quantities.create(1.0 / 298.257223563, Units.ONE);
 
     /** Mean Earth radius (meters) */
-    public static final double EARTH_RADIUS_MEAN = 6371000.0;
+    public static final Quantity<Length> EARTH_RADIUS_MEAN = Quantities.create(6371000.0, Units.METER);
 
     /** Earth mass (kg) */
-    public static final double EARTH_MASS = 5.9722e24;
+    public static final Quantity<Mass> EARTH_MASS = Quantities.create(5.9722e24, Units.KILOGRAM);
+
 
 
     /**

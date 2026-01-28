@@ -6,140 +6,96 @@
 package org.jscience.biology.loaders.phyloxml;
 
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.biology.taxonomy.ConservationStatus;
 import org.jscience.biology.evolution.PhylogeneticTree;
 import org.jscience.biology.evolution.Clade;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Bridge for converting PhyloXML DTOs to core JScience evolutionary biology objects.
- * <p>
- * PhyloXML is the XML standard for phylogenetic trees. This bridge converts
- * parsed PhyloXML structures to the core JScience evolution and taxonomy domain.
- * </p>
- *
- * <h2>Architecture</h2>
- * <pre>
- * PhyloXML → PhyloXMLReader → Clade DTOs → PhyloXMLBridge → Core JScience Objects
- *                                                           ├── PhylogeneticTree
- *                                                           ├── Clade
- *                                                           └── Species
- * </pre>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class PhyloXMLBridge {
 
     /**
-     * Converts PhyloXML phylogeny to JScience PhylogeneticTree.
-     *
-     * @param phyloModel the parsed PhyloXML model
-     * @return a PhylogeneticTree object
+     * Converts PhyloXML document to JScience PhylogeneticTree.
      */
-    public PhylogeneticTree toPhylogeneticTree(PhyloXMLModel phyloModel) {
-        if (phyloModel == null || phyloModel.getPhylogeny() == null) {
+    public PhylogeneticTree toPhylogeneticTree(PhyloXMLDocument doc) {
+        if (doc == null || doc.getPhylogeny() == null) {
             return null;
         }
         
-        PhyloXMLPhylogeny phylogeny = phyloModel.getPhylogeny();
+        PhyloXMLPhylogeny phylogeny = doc.getPhylogeny();
         PhylogeneticTree tree = new PhylogeneticTree(phylogeny.getName());
         
         tree.setTrait("phyloxml.rooted", phylogeny.isRooted());
-        tree.setTrait("phyloxml.rerootable", phylogeny.isRerootable());
+        tree.setTrait("phyloxml.branch_length_unit", phylogeny.getBranchLengthUnit());
         
-        // Convert root clade
         if (phylogeny.getClade() != null) {
-            Clade root = convertClade(phylogeny.getClade());
-            tree.setRoot(root);
+            tree.setRoot(convertClade(phylogeny.getClade()));
         }
         
         return tree;
     }
 
     /**
-     * Recursively converts PhyloXML clade to JScience Clade.
+     * Recursively converts PhyloXML clade DTO to core JScience Clade.
      */
-    public Clade convertClade(PhyloXMLClade phyloClade) {
-        if (phyloClade == null) {
+    public Clade convertClade(PhyloXMLClade dto) {
+        if (dto == null) {
             return null;
         }
         
-        String name = phyloClade.getName();
-        Clade clade = new Clade(name != null ? name : "unnamed");
+        Clade clade = new Clade(dto.getName());
+        clade.setBranchLength(dto.getBranchLength());
         
-        // Set branch length
-        if (phyloClade.getBranchLength() != null) {
-            clade.setBranchLength(phyloClade.getBranchLength());
-        }
-        
-        // Set confidence/bootstrap
-        if (phyloClade.getConfidence() != null) {
-            clade.setTrait("confidence", phyloClade.getConfidence());
-            clade.setTrait("confidence.type", phyloClade.getConfidenceType());
+        // Transfer confidence values as traits
+        for (String type : dto.getConfidenceValues().keySet()) {
+            clade.setTrait("confidence." + type, dto.getConfidenceValues().get(type));
         }
         
         // Convert taxonomy to Species if present
-        if (phyloClade.getTaxonomy() != null) {
-            Species species = convertTaxonomy(phyloClade.getTaxonomy());
-            clade.setSpecies(species);
+        if (dto.getTaxonomy() != null) {
+            clade.setSpecies(convertTaxonomy(dto.getTaxonomy()));
         }
         
-        // Convert events (speciation, duplication, etc.)
-        if (phyloClade.getEvents() != null) {
-            clade.setTrait("events.type", phyloClade.getEvents().getType());
-            clade.setTrait("events.duplications", phyloClade.getEvents().getDuplications());
-            clade.setTrait("events.speciations", phyloClade.getEvents().getSpeciations());
+        // Convert events as traits
+        if (dto.getEvents() != null) {
+            clade.setTrait("events.speciations", dto.getEvents().getSpeciations());
+            clade.setTrait("events.duplications", dto.getEvents().getDuplications());
+            clade.setTrait("events.type", dto.getEvents().getType());
         }
         
-        // Recursively convert child clades
-        if (phyloClade.getClades() != null) {
-            for (PhyloXMLClade child : phyloClade.getClades()) {
-                Clade childClade = convertClade(child);
-                if (childClade != null) {
-                    clade.addChild(childClade);
-                }
-            }
+        // Recursive children
+        for (PhyloXMLClade childDto : dto.getChildren()) {
+            clade.addChild(convertClade(childDto));
         }
         
         return clade;
     }
 
     /**
-     * Converts PhyloXML taxonomy to JScience Species.
+     * Converts PhyloXML taxonomy DTO to JScience Species.
      */
-    public Species convertTaxonomy(PhyloXMLTaxonomy taxonomy) {
-        if (taxonomy == null) {
+    public Species convertTaxonomy(PhyloXMLTaxonomy dto) {
+        if (dto == null) {
             return null;
         }
         
-        String commonName = taxonomy.getCommonName();
-        String scientificName = taxonomy.getScientificName();
+        String commonName = dto.getCommonName();
+        String scientificName = dto.getScientificName();
         
         if (scientificName == null || scientificName.isEmpty()) {
-            scientificName = taxonomy.getCode();
+            scientificName = dto.getCode();
         }
         if (commonName == null || commonName.isEmpty()) {
             commonName = scientificName;
         }
         
         Species species = new Species(commonName, scientificName);
-        
-        // Set taxonomic ranks
-        if (taxonomy.getRank() != null) {
-            species.setTrait("rank", taxonomy.getRank());
-        }
-        
-        // Set taxonomy identifiers
-        if (taxonomy.getId() != null) {
-            species.setTrait("taxonomy.id", taxonomy.getId());
-            species.setTrait("taxonomy.id.provider", taxonomy.getIdProvider());
-        }
+        species.setTrait("rank", dto.getRank());
+        species.setTrait("taxonomy.id", dto.getId());
+        species.setTrait("taxonomy.provider", dto.getIdProvider());
         
         return species;
     }
@@ -147,9 +103,8 @@ public class PhyloXMLBridge {
     /**
      * Extracts all species from a PhyloXML tree.
      */
-    public List<Species> extractSpecies(PhyloXMLModel phyloModel) {
+    public List<Species> extractSpecies(PhylogeneticTree tree) {
         List<Species> species = new ArrayList<>();
-        PhylogeneticTree tree = toPhylogeneticTree(phyloModel);
         if (tree != null && tree.getRoot() != null) {
             collectSpecies(tree.getRoot(), species);
         }

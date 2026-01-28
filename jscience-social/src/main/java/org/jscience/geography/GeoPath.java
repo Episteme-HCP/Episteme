@@ -23,8 +23,13 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.coordinates.EarthCoordinate;
 import org.jscience.earth.coordinates.GeodeticCoordinate;
+import org.jscience.mathematics.geometry.boundaries.Boundary;
+import org.jscience.mathematics.geometry.boundaries.BoundingBox;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
+
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
@@ -32,11 +37,11 @@ import org.jscience.util.Named;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 
 /**
  * Represents a sequence of geodetic coordinates forming a path, route, or boundary.
@@ -46,7 +51,9 @@ import java.util.Objects;
  * @since 1.0
  */
 @Persistent
-public class GeoPath implements Named, Serializable {
+public class GeoPath implements Named, Boundary<EarthCoordinate> {
+
+
 
     private static final long serialVersionUID = 1L;
 
@@ -123,4 +130,111 @@ public class GeoPath implements Named, Serializable {
     public String toString() {
         return String.format("Path: %s (%d points, %s)", name, points.size(), getLength());
     }
+
+    // --- Boundary implementation ---
+    
+    @Override
+    public int getDimension() {
+        return 1;
+    }
+
+    @Override
+    public boolean contains(EarthCoordinate point) {
+
+        if (point == null) return false;
+        // Exact containment on a path is rare, but we check vertices
+        for (GeodeticCoordinate p : points) {
+            if (p.equals(point)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return points.isEmpty();
+    }
+
+    @Override
+    public EarthCoordinate getCentroid() {
+        if (points.isEmpty()) return null;
+        double sumLat = 0, sumLon = 0, sumH = 0;
+        for (GeodeticCoordinate p : points) {
+            sumLat += p.getLatitude().to(Units.DEGREE_ANGLE).getValue().doubleValue();
+            sumLon += p.getLongitude().to(Units.DEGREE_ANGLE).getValue().doubleValue();
+            sumH += p.getHeight().to(Units.METER).getValue().doubleValue();
+        }
+        return new GeodeticCoordinate(sumLat / points.size(), sumLon / points.size(), sumH / points.size());
+    }
+
+    @Override
+    public BoundingBox<EarthCoordinate> getBoundingBox() {
+        if (points.isEmpty()) return null;
+        double minLat = Double.POSITIVE_INFINITY;
+        double maxLat = Double.NEGATIVE_INFINITY;
+        double minLon = Double.POSITIVE_INFINITY;
+        double maxLon = Double.NEGATIVE_INFINITY;
+        
+        for (GeodeticCoordinate p : points) {
+            double lat = p.getLatitude().to(Units.DEGREE_ANGLE).getValue().doubleValue();
+            double lon = p.getLongitude().to(Units.DEGREE_ANGLE).getValue().doubleValue();
+            if (lat < minLat) minLat = lat;
+            if (lat > maxLat) maxLat = lat;
+            if (lon < minLon) minLon = lon;
+            if (lon > maxLon) maxLon = lon;
+        }
+        
+        return new GeoBoundingBox(
+            new GeodeticCoordinate(minLat, minLon, 0),
+            new GeodeticCoordinate(maxLat, maxLon, 0)
+        );
+    }
+
+
+
+    @Override
+    public Real getMeasure() {
+        return getLength().to(Units.METER).getValue();
+    }
+
+    @Override
+    public Real getBoundaryMeasure() {
+        return Real.ZERO;
+    }
+
+    @Override
+    public boolean intersects(Boundary<EarthCoordinate> other) {
+        if (other == null) return false;
+        BoundingBox<EarthCoordinate> bbox = getBoundingBox();
+        BoundingBox<EarthCoordinate> otherBbox = other.getBoundingBox();
+        if (bbox == null || otherBbox == null) return false;
+        return bbox.intersects(otherBbox);
+    }
+
+
+    @Override
+    public Boundary<EarthCoordinate> union(Boundary<EarthCoordinate> other) {
+        return null;
+    }
+
+    @Override
+    public Boundary<EarthCoordinate> intersection(Boundary<EarthCoordinate> other) {
+        return null;
+    }
+
+    @Override
+    public Boundary<EarthCoordinate> convexHull() {
+        return null;
+    }
+
+    @Override
+    public Boundary<EarthCoordinate> translate(EarthCoordinate offset) {
+        return this;
+    }
+
+    @Override
+    public Boundary<EarthCoordinate> scale(Real factor) {
+        return this;
+    }
 }
+
+

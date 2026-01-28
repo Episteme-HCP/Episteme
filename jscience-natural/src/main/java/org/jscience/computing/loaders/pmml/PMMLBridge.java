@@ -13,11 +13,6 @@ import org.jscience.computing.ml.ClusteringModel;
 import org.jscience.computing.ml.DataField;
 import org.jscience.computing.ml.MiningField;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Bridge for converting PMML DTOs to core JScience machine learning objects.
  * <p>

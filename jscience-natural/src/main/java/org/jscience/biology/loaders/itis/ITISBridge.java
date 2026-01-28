@@ -6,8 +6,6 @@
 package org.jscience.biology.loaders.itis;
 
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.biology.taxonomy.ConservationStatus;
-import org.jscience.biology.taxonomy.TaxonomicRank;
 
 import java.util.ArrayList;
 import java.util.List;

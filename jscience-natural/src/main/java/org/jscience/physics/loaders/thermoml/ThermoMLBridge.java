@@ -8,8 +8,8 @@ package org.jscience.physics.loaders.thermoml;
 import org.jscience.chemistry.Molecule;
 import org.jscience.chemistry.thermodynamics.ThermodynamicProperty;
 import org.jscience.chemistry.thermodynamics.ThermodynamicDataset;
-import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
+import org.jscience.measure.Quantities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -128,12 +128,12 @@ public class ThermoMLBridge {
         tp.setTrait("thermoml.property.group", prop.getPropertyGroup());
         
         // Add measurement conditions
-        tp.setTemperature(Quantity.of(prop.getTemperature(), Units.KELVIN));
-        tp.setPressure(Quantity.of(prop.getPressure(), Units.PASCAL));
+        tp.setTemperature(Quantities.create(prop.getTemperature(), Units.KELVIN));
+        tp.setPressure(Quantities.create(prop.getPressure(), Units.PASCAL));
         
         // Add property value with uncertainty
         tp.setValue(prop.getValue());
-        if (prop.getUncertainty() != null) {
+        if (prop.getUncertainty() != 0) {
             tp.setUncertainty(prop.getUncertainty());
         }
         tp.setUnit(prop.getUnit());
@@ -157,7 +157,7 @@ public class ThermoMLBridge {
         if (prop.getComponents() != null) {
             List<Molecule> components = new ArrayList<>();
             for (ThermoMLMixtureComponent mc : prop.getComponents()) {
-                Molecule mol = compoundMap.get(mc.getCompoundRegNum());
+                Molecule mol = compoundMap.get(String.valueOf(mc.getCompoundIndex()));
                 if (mol != null) {
                     components.add(mol);
                     tp.setTrait("mole.fraction." + mol.getName(), mc.getMoleFraction());
@@ -167,8 +167,8 @@ public class ThermoMLBridge {
         }
         
         // Add measurement conditions and value
-        tp.setTemperature(Quantity.of(prop.getTemperature(), Units.KELVIN));
-        tp.setPressure(Quantity.of(prop.getPressure(), Units.PASCAL));
+        tp.setTemperature(Quantities.create(prop.getTemperature(), Units.KELVIN));
+        tp.setPressure(Quantities.create(prop.getPressure(), Units.PASCAL));
         tp.setValue(prop.getValue());
         tp.setUnit(prop.getUnit());
         

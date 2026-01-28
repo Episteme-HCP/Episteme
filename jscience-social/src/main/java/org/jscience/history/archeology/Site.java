@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.jscience.earth.Place;
 import org.jscience.earth.PlaceType;
 import org.jscience.earth.coordinates.EarthCoordinate;
@@ -118,7 +119,7 @@ public class Site extends Place {
         private String material;
 
         public Item(String type, String material) {
-            this.id = java.util.UUID.randomUUID().toString();
+            this.id = UUID.randomUUID().toString();
             this.type = type;
             this.material = material;
         }

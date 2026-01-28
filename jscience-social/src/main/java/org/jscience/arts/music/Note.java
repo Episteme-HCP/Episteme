@@ -23,11 +23,18 @@
 
 package org.jscience.arts.music;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Frequency;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
+
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a musical note with microtonal and dynamic properties.
@@ -35,31 +42,23 @@ import org.jscience.measure.Units;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Note {
+@Persistent
+public class Note implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    public enum Pitch {
-        C, C_SHARP, D, D_SHARP, E, F, F_SHARP, G, G_SHARP, A, A_SHARP, B
-    }
-
-    public enum Duration {
-        WHOLE(1.0), HALF(0.5), QUARTER(0.25), EIGHTH(0.125), SIXTEENTH(0.0625), THIRTY_SECOND(0.03125);
-
-        private final double value;
-
-        Duration(double value) {
-            this.value = value;
-        }
-
-        public double getValue() {
-            return value;
-        }
-    }
-
+    @Attribute
     private final Pitch pitch;
+    @Attribute
     private final int octave;
+    @Attribute
     private final Duration duration;
+    @Attribute
     private final int cents; // Microtonal adjustment in cents
-    private final double velocity; // 0.0 to 1.0 (dynamic)
+    @Attribute
+    private double velocity; // 0.0 to 1.0 (dynamic)
+    
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
 
     public Note(Pitch pitch, int octave, Duration duration, int cents, double velocity) {
         this.pitch = pitch;
@@ -75,6 +74,10 @@ public class Note {
 
     public Note(Pitch pitch, int octave) {
         this(pitch, octave, Duration.QUARTER);
+    }
+
+    public Note(Pitch pitch, Duration duration) {
+        this(pitch, 4, duration);
     }
 
     public Pitch getPitch() { return pitch; }
@@ -123,6 +126,30 @@ public class Note {
             }
         }
         return new Note(pitch, octave, duration);
+    }
+    
+    public static Note rest(Duration duration) {
+        // A rest is represented by a null pitch for now, or we could handle it differently
+        return new Note(null, 0, duration, 0, 0.0);
+    }
+
+    public void setTrait(String key, Object value) {
+        traits.put(key, value);
+    }
+
+    public Object getTrait(String key) {
+        return traits.get(key);
+    }
+
+    public void setDynamics(Dynamics dynamics) {
+        // Approximate mapping from Dynamics enum to velocity
+        // Assuming Dynamics is available or we accept Object. 
+        // If Dynamics is an enum, we can switch on it.
+        // For now, if Dynamics is not standard, we might need to rely on trait.
+        setTrait("dynamics", dynamics);
+        // Simple mapping if possible (pseudo-code)
+        // if (dynamics.name().equals("FF")) this.velocity = 0.9;
+        // else ...
     }
 
     public static final Note MIDDLE_C = new Note(Pitch.C, 4);

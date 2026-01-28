@@ -35,7 +35,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18N;
 import org.jscience.biology.Taxon;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.biology.io.PhylogeneticTreeReader;
+import org.jscience.biology.loaders.PhylogeneticTreeReader;
 
 import javafx.application.Platform;
 import java.util.ArrayList;

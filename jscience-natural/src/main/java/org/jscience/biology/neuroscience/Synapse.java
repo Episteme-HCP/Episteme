@@ -23,6 +23,17 @@
 
 package org.jscience.biology.neuroscience;
 
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * Synapse connecting two neurons.
  *
@@ -30,29 +41,64 @@ package org.jscience.biology.neuroscience;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Synapse {
+@Persistent
+public class Synapse implements ComprehensiveIdentification {
+    private static final long serialVersionUID = 1L;
 
-    private final SpikingNeuron postSynaptic;
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
+    private String synapseType;
+
+    @Attribute
     private double weight;
 
+    @Attribute
+    private double delay;
+
+    private SpikingNeuron postSynaptic;
+
+    /**
+     * Creates a synapse with a specific type (for bridge use).
+     */
+    public Synapse(String synapseType) {
+        this.id = new SimpleIdentification("SYN:" + UUID.randomUUID());
+        this.synapseType = synapseType;
+        setName(synapseType);
+    }
+
+    /**
+     * Creates a synapse between spiking neurons.
+     */
     public Synapse(SpikingNeuron pre, SpikingNeuron post, double weight, double delay) {
+        this.id = new SimpleIdentification("SYN:" + UUID.randomUUID());
         this.postSynaptic = post;
         this.weight = weight;
+        this.delay = delay;
+        setName("synapse");
+    }
 
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
      * Propagates spike from pre to post.
-     * In a simple stepping simulation, this might be called if preSynaptic spiked.
-     * 
-     * @param current current injection magnitude (usually related to weight)
      */
     public void transmit() {
-        // Simplified: instantaneous or handled by network queue
-        // Here we just add current to post based on weight
-        postSynaptic.addInputCurrent(org.jscience.mathematics.numbers.real.Real.of(weight));
-        // Note: Realistically, weight is conductance or current multiplier.
-        // If weight is Amps, we add directly.
+        if (postSynaptic != null) {
+            postSynaptic.addInputCurrent(org.jscience.mathematics.numbers.real.Real.of(weight));
+        }
     }
 
     public double getWeight() {
@@ -63,7 +109,19 @@ public class Synapse {
         this.weight = weight;
     }
 
-    // STDP implementation could go here (modify weight based on spike timing)
+    public double getDelay() {
+        return delay;
+    }
+
+    public void setDelay(double delay) {
+        this.delay = delay;
+    }
+
+    public String getSynapseType() {
+        return synapseType;
+    }
+
+    public void setSynapseType(String synapseType) {
+        this.synapseType = synapseType;
+    }
 }
-
-

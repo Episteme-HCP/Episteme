@@ -42,6 +42,15 @@ public class SBMLSpecies {
     private boolean boundaryCondition = false;
     private boolean constant = false;
     private boolean hasOnlySubstanceUnits = false;
+    
+    // FBC extension fields
+    private String formula;
+    private Integer charge;
+
+    public String getFormula() { return formula; }
+    public void setFormula(String formula) { this.formula = formula; }
+    public Integer getCharge() { return charge; }
+    public void setCharge(Integer charge) { this.charge = charge; }
 
     public SBMLSpecies() {
     }

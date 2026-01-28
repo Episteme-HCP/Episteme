@@ -25,7 +25,10 @@ package org.jscience.arts.loaders;
 
 import org.jscience.arts.music.Composition;
 import org.jscience.arts.music.Note;
-import org.jscience.arts.music.Track;
+import org.jscience.arts.music.Pitch;
+import org.jscience.arts.music.Duration;
+import org.jscience.arts.music.Part;
+import org.jscience.arts.music.Measure;
 
 import javax.sound.midi.*;
 import java.io.File;
@@ -55,7 +58,12 @@ public class MidiLoader extends CompositionLoader {
         Composition composition = new Composition(resourceId, "Imported MIDI", null, null);
         
         for (javax.sound.midi.Track midiTrack : sequence.getTracks()) {
-            Track track = new Track("Track " + midiTrack.size(), "General MIDI");
+            Part part = new Part("Track " + composition.getParts().size());
+            part.setInstrumentName("General MIDI");
+            
+            Measure measure = new Measure(1);
+            measure.setTimeSignature(composition.getTimeSignature());
+            measure.setKeySignature(composition.getKeySignature());
             
             for (int i = 0; i < midiTrack.size(); i++) {
                 MidiEvent event = midiTrack.get(i);
@@ -66,15 +74,16 @@ public class MidiLoader extends CompositionLoader {
                         int key = sm.getData1();
                         int velocity = sm.getData2();
                         
-                        Note.Pitch pitch = Note.Pitch.values()[key % 12];
+                        Pitch pitch = Pitch.values()[key % 12];
                         int octave = (key / 12) - 1;
                         
-                        track.addNote(new Note(pitch, octave, Note.Duration.QUARTER, 0, velocity / 127.0));
+                        measure.addNote(new Note(pitch, octave, Duration.QUARTER, 0, velocity / 127.0));
                     }
                 }
             }
-            if (!track.getNotes().isEmpty()) {
-                composition.addTrack(track);
+            if (!measure.getNotes().isEmpty()) {
+                part.addMeasure(measure);
+                composition.addPart(part);
             }
         }
         

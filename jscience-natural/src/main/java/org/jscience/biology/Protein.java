@@ -31,6 +31,10 @@ import java.util.Collections;
 import java.util.List;
 
 
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Relation;
+import org.jscience.util.persistence.Persistent;
+
 /**
  * Represents a protein structure composed of polypeptide chains.
  *
@@ -38,28 +42,24 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class Protein extends Molecule {
+    private static final long serialVersionUID = 2L;
 
+    @Attribute
     private final String pdbId;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Chain> chains = new ArrayList<>();
-    private String name;
 
     public Protein(String pdbId) {
         super(pdbId);
         this.pdbId = pdbId;
-        this.name = pdbId;
+        setName(pdbId);
     }
 
     public String getPdbId() {
         return pdbId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void addChain(Chain chain) {
@@ -76,6 +76,23 @@ public class Protein extends Molecule {
         return Collections.unmodifiableList(chains);
     }
 
+    /**
+     * Sets the sequence for this protein. 
+     * Creates a single default chain if the sequence is provided.
+     * @param sequence the protein sequence (one-letter codes)
+     */
+    public void setSequence(String sequence) {
+        if (sequence == null) return;
+        Chain chain = new Chain("A");
+        for (int i = 0; i < sequence.length(); i++) {
+            char code = sequence.charAt(i);
+            // We don't have atomic detail from a simple sequence, but we can create the residues
+            Residue residue = new Residue(AminoAcid.fromCode(code).getThreeLetterCode(), i + 1);
+            chain.addResidue(residue);
+        }
+        addChain(chain);
+    }
+
     public Chain getChain(String chainId) {
         for (Chain c : chains) {
             if (c.getChainId().equals(chainId))
@@ -86,8 +103,12 @@ public class Protein extends Molecule {
 
     // --- Inner Classes ---
 
+    @Persistent
     public static class Chain {
+        @Attribute
         private final String chainId;
+
+        @Relation(type = Relation.Type.ONE_TO_MANY)
         private final List<Residue> residues = new ArrayList<>();
 
         public Chain(String chainId) {
@@ -122,10 +143,15 @@ public class Protein extends Molecule {
         }
     }
 
+    @Persistent
     public static class Residue {
+        @Attribute
         private final String name; // e.g., "GLY"
+        @Attribute
         private final int sequenceNumber;
+        @Attribute
         private final AminoAcid aminoAcidType; // Reference to type definition
+        @Relation(type = Relation.Type.ONE_TO_MANY)
         private final List<Atom> atoms = new ArrayList<>();
 
         public Residue(String name, int sequenceNumber) {
@@ -134,13 +160,6 @@ public class Protein extends Molecule {
             // Try to resolve standard AminoAcid type
             AminoAcid type = null;
             try {
-                // Name in PDB is 3-letter uppercase, e.g. "ALA"
-                // AminoAcid.valueOf uses full name e.g. "Glycine"?
-                // No, we have static constants but no lookup by 3-letter code efficiently
-                // exposed in AminoAcid class currently
-                // except maybe iterating values.
-                // Or we can add a lookup to AminoAcid.
-                // For now, let's try a simple helper or iteration.
                 type = lookupBy3Letter(name);
             } catch (Exception e) {
                 // Unknown residue

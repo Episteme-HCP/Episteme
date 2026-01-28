@@ -55,7 +55,17 @@ import java.util.UUID;
  * @since 1.0
  */
 @Persistent
-public abstract class ScientificExperiment<I, R> implements Experiment<I, R> {
+public class ScientificExperiment<I, R> implements Experiment<I, R> {
+
+    @Override
+    public java.util.concurrent.CompletableFuture<R> run(I input) {
+        return java.util.concurrent.CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public Hypothesis<R> getHypothesis() {
+        return null; // Can be specified by subclasses or via traits
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -149,7 +159,7 @@ public abstract class ScientificExperiment<I, R> implements Experiment<I, R> {
     /**
      * Records an observation derived from the experiment execution.
      */
-    protected void addObservation(Observation<R> observation) {
+    public void record(Observation<R> observation) {
         if (observation != null) {
             observations.add(observation);
         }

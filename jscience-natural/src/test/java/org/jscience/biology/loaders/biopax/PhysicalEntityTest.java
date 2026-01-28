@@ -19,7 +19,6 @@ public class PhysicalEntityTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(PhysicalEntity.class);
+        assertNotNull(BioPAXPhysicalEntity.class);
     }
 }

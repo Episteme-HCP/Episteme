@@ -23,8 +23,6 @@
 
 package org.jscience.chemistry.loaders.animl;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,9 +38,19 @@ import java.util.List;
  */
 public class AnIMLDocument {
 
-    private final List<AnIMLSample> samples = new ArrayList<>();
-    private final List<AnIMLExperimentStep> experimentSteps = new ArrayList<>();
+    private String name;
+    private final AnIMLSampleSet sampleSet = new AnIMLSampleSet();
+    private final AnIMLExperimentStepSet experimentStepSet = new AnIMLExperimentStepSet();
+    private AnIMLAuditTrail auditTrail;
     private String version;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public AnIMLSampleSet getSampleSet() { return sampleSet; }
+    public AnIMLExperimentStepSet getExperimentStepSet() { return experimentStepSet; }
+    public AnIMLAuditTrail getAuditTrail() { return auditTrail; }
+    public void setAuditTrail(AnIMLAuditTrail trail) { this.auditTrail = trail; }
 
     /**
      * Creates an empty AnIML document.
@@ -61,33 +69,24 @@ public class AnIMLDocument {
     /**
      * Returns an unmodifiable list of samples.
      */
-    public List<AnIMLSample> getSamples() {
-        return Collections.unmodifiableList(samples);
-    }
-
-    /**
-     * Adds a sample to this document.
-     */
     public void addSample(AnIMLSample sample) {
         if (sample != null) {
-            samples.add(sample);
+            sampleSet.addSample(sample);
         }
     }
 
-    /**
-     * Returns an unmodifiable list of experiment steps.
-     */
-    public List<AnIMLExperimentStep> getExperimentSteps() {
-        return Collections.unmodifiableList(experimentSteps);
+    public List<AnIMLSample> getSamples() {
+        return sampleSet.getSamples();
     }
 
-    /**
-     * Adds an experiment step to this document.
-     */
     public void addExperimentStep(AnIMLExperimentStep step) {
         if (step != null) {
-            experimentSteps.add(step);
+            experimentStepSet.addStep(step);
         }
+    }
+
+    public List<AnIMLExperimentStep> getExperimentSteps() {
+        return experimentStepSet.getSteps();
     }
 
     /**
@@ -95,7 +94,7 @@ public class AnIMLDocument {
      */
     public int getTotalSeriesCount() {
         int count = 0;
-        for (AnIMLExperimentStep step : experimentSteps) {
+        for (AnIMLExperimentStep step : getExperimentSteps()) {
             count += step.getSeriesData().size();
         }
         return count;
@@ -104,8 +103,8 @@ public class AnIMLDocument {
     @Override
     public String toString() {
         return "AnIMLDocument{" +
-                "samples=" + samples.size() +
-                ", experimentSteps=" + experimentSteps.size() +
+                "samples=" + getSamples().size() +
+                ", experimentSteps=" + getExperimentSteps().size() +
                 ", totalSeries=" + getTotalSeriesCount() +
                 '}';
     }

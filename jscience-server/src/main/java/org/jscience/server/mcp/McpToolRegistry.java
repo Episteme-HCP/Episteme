@@ -50,9 +50,15 @@ public class McpToolRegistry {
         // In a real implementation, we would scan the BeanContext
         // For this prototype, we manually register core tools
         registerTool("convert_units", "Convert scientific units", 
-            "{\"value\": \"number\", \"from\": \"string\", \"to\": \"string\"}");
+            "{\"properties\": {\"value\": {\"type\": \"number\"}, \"from\": {\"type\": \"string\"}, \"to\": {\"type\": \"string\"}}, \"required\": [\"value\", \"from\", \"to\"]}");
+        registerTool("get_constant", "Retrieve scientific constants (e.g., PI, SPEED_OF_LIGHT, EARTH_MASS)",
+            "{\"properties\": {\"category\": {\"type\": \"string\", \"enum\": [\"MATH\", \"PHYSICS\", \"EARTH\", \"GEOGRAPHY\", \"HISTORY\"]}, \"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}");
         registerTool("balance_reaction", "Balance chemical equation",
-            "{\"equation\": \"string\"}");
+            "{\"properties\": {\"equation\": {\"type\": \"string\"}}, \"required\": [\"equation\"]}");
+        registerTool("get_data_model", "Retrieve a structured scientific data model by name (e.g., 'Global Migration Spatial Dataset')",
+            "{\"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}");
+
+
         LOG.info("Registered {} MCP tools", tools.size());
     }
 

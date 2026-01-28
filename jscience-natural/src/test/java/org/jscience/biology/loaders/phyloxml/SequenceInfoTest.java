@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for SequenceInfo.
+ * Automated baseline test for PhyloXMLSequenceInfo.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -20,6 +20,6 @@ public class SequenceInfoTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(SequenceInfo.class);
+        assertNotNull(PhyloXMLSequenceInfo.class);
     }
 }

@@ -19,7 +19,6 @@ public class CladeTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(Clade.class);
+        assertNotNull(PhyloXMLClade.class);
     }
 }

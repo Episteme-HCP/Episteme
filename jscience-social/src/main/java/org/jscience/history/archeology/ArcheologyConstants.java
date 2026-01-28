@@ -28,10 +28,13 @@ import org.jscience.history.HistoricalPeriod;
 import org.jscience.mathematics.algebra.Interval;
 import org.jscience.mathematics.algebra.intervals.RealInterval;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Units;
+
 
 /**
  * Constants useful for archaeology and geological time scales.
  * All intervals are expressed in seconds relative to the Unix Epoch (1970-01-01T00:00:00Z).
+
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -52,7 +55,8 @@ public final class ArcheologyConstants {
     @Deprecated public static final int MODERN = 3;
     @Deprecated public static final int CONTEMPORARY = 4;
 
-    private static final double YEAR = HistoryConstants.JULIAN_YEAR_SECONDS;
+    private static final double YEAR = HistoryConstants.JULIAN_YEAR.to(Units.SECOND).getValue().doubleValue();
+
 
     /** Holocene Epoch interval (~10,000 years ago to present). */
     public static final Interval<Real> HOLOCENE = RealInterval.closed(-1.0e4 * YEAR, 0.0);

@@ -19,7 +19,6 @@ public class InteractionTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(Interaction.class);
+        assertNotNull(BioPAXInteraction.class);
     }
 }
