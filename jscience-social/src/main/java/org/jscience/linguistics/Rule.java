@@ -27,16 +27,17 @@ package org.jscience.linguistics;
  * The Rule class defines a rule used by a grammar to parse a language.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.1
+ * @since 1.0
  */
-public abstract class Rule extends Object {
+public abstract class Rule {
     //defines the transformation of a vector of symbols into another vector of symbols (terminals or not)
     /**
-     * DOCUMENT ME!
+     * Transforms a string based on this linguistic rule.
      *
-     * @param string DOCUMENT ME!
+     * @param string the input string to transform
      *
-     * @return DOCUMENT ME!
+     * @return an array of transformed strings or symbols
      */
     public abstract String[] transform(String string);
 }

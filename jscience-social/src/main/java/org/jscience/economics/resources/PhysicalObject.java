@@ -23,12 +23,12 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
 import org.jscience.economics.Community;
 import org.jscience.economics.money.Money;
 import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 import org.jscience.util.identity.Identification;
+import org.jscience.history.time.TimeCoordinate;
 
 /**
  * Represents a crafted object that can be moved and used (e.g., tools, appliances, small structures).
@@ -47,7 +47,7 @@ public abstract class PhysicalObject extends Artifact {
      * Initializes a new physical object.
      */
     public PhysicalObject(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Identification identification, Money value) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
     }

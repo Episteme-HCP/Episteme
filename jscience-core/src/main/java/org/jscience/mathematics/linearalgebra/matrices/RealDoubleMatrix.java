@@ -160,23 +160,43 @@ public class RealDoubleMatrix extends GenericMatrix<Real> {
         int n = other.cols();
         int p = this.cols();
 
-        // Use Heap storage for result by default for Java access speed
-        // Unless both inputs are direct? For now default to Heap for safety.
-        HeapRealDoubleMatrixStorage resStorage = new HeapRealDoubleMatrixStorage(m, n);
-
-        // Extremely naive loop for now, providers should replace this
-        for (int i = 0; i < m; i++) {
-            for (int k = 0; k < p; k++) {
-                double valA = this.doubleStorage.getDouble(i, k);
-                for (int j = 0; j < n; j++) {
-                    double valB = other.doubleStorage.getDouble(k, j);
-                    double current = resStorage.getDouble(i, j);
-                    resStorage.setDouble(i, j, current + valA * valB);
-                }
+        RealDoubleMatrix result = RealDoubleMatrix.direct(m, n);
+        
+        java.util.ServiceLoader<org.jscience.technical.backend.math.MatrixBackend> loader = 
+            java.util.ServiceLoader.load(org.jscience.technical.backend.math.MatrixBackend.class);
+        
+        // Find first available backend or fallback
+        org.jscience.technical.backend.math.MatrixBackend backend = null;
+        for (org.jscience.technical.backend.math.MatrixBackend b : loader) {
+            if (b.isAvailable()) {
+                backend = b;
+                break;
             }
         }
+        
+        if (backend != null) {
+            backend.dgemm(
+                m, p, n,
+                this.getBuffer(), p,
+                other.getBuffer(), n,
+                result.getBuffer(), n,
+                1.0, 0.0
+            );
+        } else {
+             // Fallback to naive implementation if no backend found
+             for (int i = 0; i < m; i++) {
+                for (int k = 0; k < p; k++) {
+                    double valA = this.doubleStorage.getDouble(i, k);
+                    for (int j = 0; j < n; j++) {
+                        double valB = other.doubleStorage.getDouble(k, j);
+                        double current = result.doubleStorage.getDouble(i, j);
+                        result.set(i, j, current + valA * valB);
+                    }
+                }
+             }
+        }
 
-        return new RealDoubleMatrix(resStorage);
+        return result;
     }
 
     @Override

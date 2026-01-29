@@ -24,23 +24,24 @@
 package org.jscience.linguistics;
 
 /**
- * The Translation class provides a means to
+ * The Translation class provides biological and linguistic translation support.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.1
+ * @since 1.0
  */
-public abstract class Translation extends Object {
-    /** DOCUMENT ME! */
+public abstract class Translation {
+    /** The source text to be translated. */
     private Text text;
 
-    /** DOCUMENT ME! */
+    /** The target language for the translation. */
     private Language target;
 
-/**
+    /**
      * Creates a new Translation object.
      *
-     * @param text   DOCUMENT ME!
-     * @param target DOCUMENT ME!
+     * @param text   the source text
+     * @param target the target language
      */
     public Translation(Text text, Language target) {
         if ((text != null) && (target != null)) {
@@ -53,27 +54,27 @@ public abstract class Translation extends Object {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the source text of this translation.
      *
-     * @return DOCUMENT ME!
+     * @return the source text
      */
     public Text getText() {
         return text;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the target language of this translation.
      *
-     * @return DOCUMENT ME!
+     * @return the target language
      */
     public Language getTargetLanguage() {
         return target;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the translated version of the text.
      *
-     * @return DOCUMENT ME!
+     * @return the translated text
      */
     public abstract Text getTranslatedText();
 }

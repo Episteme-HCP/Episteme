@@ -5,6 +5,7 @@
 
 package org.jscience.economics;
 
+import org.jscience.economics.models.SolowGrowthModel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

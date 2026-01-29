@@ -45,34 +45,22 @@ import java.util.regex.Pattern;
  * @since 1.0
  */
 public class SyntaxGeneralizer {
-    /**
-     * DOCUMENT ME!
-     */
+    /** Represents a generic or unknown category for generalization. */
     private static final String OTHER = "OTHER";
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** Mapping from specific phrase types to generalized types. */
     private final Map<String, String> my_type2gen_type;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** Mapping from specific edge labels to generalized labels. */
     private final Map<String, String> my_label2gen_label;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** Mapping from specific POS tags to generalized tags. */
     private final Map<String, String> my_tag2gen_tag;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** Reusable regex pattern for generalization matching. */
     private Pattern pattern;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** Reusable regex matcher for generalization matching. */
     private Matcher matcher;
 
 /**
@@ -121,11 +109,11 @@ public class SyntaxGeneralizer {
     }
 
     /**
-     * DOCUMENT ME!
+     * Generalizes a phrase type using the internal mapping.
      *
-     * @param type DOCUMENT ME!
+     * @param type the specific phrase type to generalize
      *
-     * @return DOCUMENT ME!
+     * @return the generalized phrase type, or "OTHER" if no match is found
      */
     protected String getGeneralType(String type) {
         for (String regex : my_type2gen_type.keySet()) {
@@ -141,11 +129,11 @@ public class SyntaxGeneralizer {
     }
 
     /**
-     * DOCUMENT ME!
+     * Generalizes a POS tag using the internal mapping.
      *
-     * @param tag DOCUMENT ME!
+     * @param tag the specific POS tag to generalize
      *
-     * @return DOCUMENT ME!
+     * @return the generalized POS tag, or "OTHER" if no match is found
      */
     protected String getGeneralTag(String tag) {
         for (String regex : my_tag2gen_tag.keySet()) {
@@ -161,11 +149,11 @@ public class SyntaxGeneralizer {
     }
 
     /**
-     * DOCUMENT ME!
+     * Generalizes an edge label using the internal mapping.
      *
-     * @param label DOCUMENT ME!
+     * @param label the specific edge label to generalize
      *
-     * @return DOCUMENT ME!
+     * @return the generalized label, or "OTHER" if no match is found
      */
     protected String getGeneralLabel(String label) {
         for (String regex : my_label2gen_label.keySet()) {
@@ -181,12 +169,12 @@ public class SyntaxGeneralizer {
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if an item (type, label, or tag) matches a specific general category.
      *
-     * @param item DOCUMENT ME!
-     * @param general_item DOCUMENT ME!
+     * @param item         the item to check
+     * @param general_item the general category to match against
      *
-     * @return DOCUMENT ME!
+     * @return true if the item belongs to the general category, false otherwise
      */
     protected boolean isCaseOf(String item, String general_item) {
         if ((getGeneralLabel(item)).equals(general_item)) {
@@ -277,9 +265,9 @@ public class SyntaxGeneralizer {
     /**
      * Returns the (general) grammatical function of this node.
      *
-     * @param node DOCUMENT ME!
+     * @param node the node to inspect
      *
-     * @return DOCUMENT ME!
+     * @return the generalized grammatical function (edge label)
      */
     public String getGrammaticalFunction(GraphNode node) {
         if (node.hasMother()) {
@@ -295,9 +283,9 @@ public class SyntaxGeneralizer {
     /**
      * Returns the (general) phrase type of this node.
      *
-     * @param node DOCUMENT ME!
+     * @param node the non-terminal node to inspect
      *
-     * @return DOCUMENT ME!
+     * @return the generalized phrase type
      */
     public String getPhraseType(NT node) {
         return this.getGeneralType(node.getCat());
@@ -306,9 +294,9 @@ public class SyntaxGeneralizer {
     /**
      * Returns the (general) POS tag of this terminal.
      *
-     * @param node DOCUMENT ME!
+     * @param node the terminal node to inspect
      *
-     * @return DOCUMENT ME!
+     * @return the generalized POS tag
      */
     public String getPos(T node) {
         return this.getGeneralTag(node.getPos());

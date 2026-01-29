@@ -21,7 +21,7 @@ public class FitsCard {
     public static final int KEY_LENGTH = 8;
 
     /** the number of cards in a FITS block = 2880/80 */
-    public static final int CARDS_PER_BLOCK = FitsFile.BLOCK_SIZE / LENGTH;
+    public static final int CARDS_PER_BLOCK = FITSFile.BLOCK_SIZE / LENGTH;
 
     /** the value to use for padding out an incomplete block (80 ASCII spaces) */
     public static final byte[] PADDING = {

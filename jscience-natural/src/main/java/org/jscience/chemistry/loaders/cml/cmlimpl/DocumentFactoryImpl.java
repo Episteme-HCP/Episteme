@@ -48,16 +48,16 @@ import javax.xml.parsers.SAXParserFactory;
  * @since 1.0
  */
 public class DocumentFactoryImpl implements CMLDocumentFactory {
-    /** DOCUMENT ME! */
+    /** The singleton instance of the CML document factory. */
     static CMLDocumentFactory theDocumentFactory = null;
 
-    /** DOCUMENT ME! */
+    /** The fully qualified class name for the abstract CML document implementation. */
     public final static String ABSTRACT_CMLDOCUMENT = "org.jscience.chemistry.loaders.cml.cmlimpl.AbstractCMLDocumentImpl";
 
-    /** DOCUMENT ME! */
+    /** The fully qualified class name for the default CML document implementation. */
     public final static String DEFAULT_CMLDOCUMENT = "org.jscience.chemistry.loaders.cml.cmlimpl.CMLDocumentImpl";
 
-    /** Description of the Field */
+    /** The class name used to instantiate new CML documents. */
     protected String documentClassName;
 
 /**
@@ -78,24 +78,20 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
     }
 
     /**
-     * create a CMLDocument class of document can be set through
-     * setDocumentClassName, default is DEFAULT_CMLDOCUMENT, at present
-     * org.jscience.chemistry.loaders.cml.cmlimpl.AbstractCMLDocumentImpl
+     * Creates a CMLDocument instance using the current documentClassName.
      *
-     * @return Description of the Return Value
+     * @return the newly created CML document
      */
     public AbstractCMLDocument createDocument() {
         return this.createDocument(documentClassName);
     }
 
     /**
-     * create a CMLDocument class of document can be set through
-     * setDocumentClassName, default is DEFAULT_CMLDOCUMENT, at present
-     * org.jscience.chemistry.loaders.cml.cmlimpl.AbstractCMLDocumentImpl
+     * Creates a CMLDocument instance using the specified class name.
      *
-     * @param documentClassName Description of the Parameter
+     * @param documentClassName the class name of the document to create
      *
-     * @return Description of the Return Value
+     * @return the newly created CML document, or null if creation failed
      */
     public AbstractCMLDocument createDocument(String documentClassName) {
         AbstractCMLDocument doc = null;
@@ -149,13 +145,11 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
     }
 
     /**
-     * Creates a new DocumentFactory this creates Documents and
-     * elements determined by the CMLDocumentImpl If elements of type
-     * PMRELementImpl are required use newAbstractInstance();
+     * Creates a new DocumentFactory for the specified document class.
      *
-     * @param documentClassName Description of the Parameter
+     * @param documentClassName the class name for the factory's documents
      *
-     * @return Description of the Return Value
+     * @return the new document factory instance
      */
     public static CMLDocumentFactory newInstance(String documentClassName) {
         /*
@@ -174,14 +168,13 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
     }
 
     /**
-     * Convenience method to parseSAX an XML document into a
-     * CMLDocument all classes are CML Objects where possible.
+     * Convenience method to parse an XML string into a CMLDocument.
      *
-     * @param xmlString represents a well-formed XML document
+     * @param xmlString the well-formed XML string to parse
      *
-     * @return CMLDocument corresponding to String
+     * @return the resulting CML document
      *
-     * @throws CMLException Description of the Exception
+     * @throws CMLException if parsing fails or result is invalid
      */
     public AbstractCMLDocument parseString(String xmlString)
         throws CMLException {
@@ -197,29 +190,30 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
     }
 
     /**
-     * Description of the Method whitespace is ignored
+     * Parses an XML document via SAX (whitespace is ignored).
      *
-     * @param is Description of the Parameter
+     * @param is the input source
      *
-     * @return Description of the Return Value
+     * @return the parsed CML document
      *
-     * @throws IOException Description of the Exception
+     * @throws CMLException if a parsing error occurrs
+     * @throws IOException  if an I/O error occurs
      */
     public AbstractCMLDocument parseSAX(InputSource is)
         throws org.jscience.chemistry.loaders.cml.CMLException, IOException {
         return parseSAX(is, false);
     }
 
-    // restored, PMR
     /**
-     * Description of the Method whitespace is ignored
+     * Parses an XML document via SAX into an existing DOM (whitespace is ignored).
      *
-     * @param is Description of the Parameter
-     * @param doc Description of the Parameter
+     * @param is  the input source
+     * @param doc the target document for the parsed elements
      *
-     * @return Description of the Return Value
+     * @return the root element of the parsed content
      *
-     * @throws IOException Description of the Exception
+     * @throws CMLException if a parsing error occurrs
+     * @throws IOException  if an I/O error occurs
      */
     public Element parseSAX(InputSource is, AbstractCMLDocument doc)
         throws org.jscience.chemistry.loaders.cml.CMLException, IOException {
@@ -227,15 +221,15 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
     }
 
     /**
-     * Description of the Method whitespace is ignored
+     * Parses an XML document via SAX with optional debugging (whitespace is ignored).
      *
-     * @param is Description of the Parameter
-     * @param debug Description of the Parameter
+     * @param is    the input source
+     * @param debug true to enable debug output
      *
-     * @return Description of the Return Value
+     * @return the parsed CML document
      *
-     * @throws IOException Description of the Exception
-     * @throws . Description of the Exception
+     * @throws CMLException if a parsing error occurrs
+     * @throws IOException  if an I/O error occurs
      */
     public AbstractCMLDocument parseSAX(InputSource is, boolean debug)
         throws org.jscience.chemistry.loaders.cml.CMLException, IOException {

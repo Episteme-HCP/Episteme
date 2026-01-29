@@ -24,8 +24,13 @@
 package org.jscience.media.backends;
 
 import org.jscience.media.AudioBackend;
+import org.jscience.technical.backend.algorithms.FFTProvider;
+import org.jscience.technical.backend.algorithms.MulticoreFFTProvider;
 import javax.sound.sampled.*;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Standard JavaSound implementation.
@@ -35,12 +40,56 @@ import java.io.File;
  */
 public class JavaSoundBackend implements AudioBackend {
     private Clip clip;
+    private double[] audioData;
+    private AudioFormat format;
+    private final FFTProvider fftProvider = new MulticoreFFTProvider();
     
     @Override
     public void load(String path) throws Exception {
-        AudioInputStream ais = AudioSystem.getAudioInputStream(new File(path));
-        clip = AudioSystem.getClip();
-        clip.open(ais);
+        File file = new File(path);
+        try (AudioInputStream ais = AudioSystem.getAudioInputStream(file)) {
+            format = ais.getFormat();
+            
+            // Read all bytes to compute spectrum later
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ais.transferTo(baos);
+            byte[] bytes = baos.toByteArray();
+            
+            // Convert to double samples (assuming 16-bit PCM for now, common for WAV)
+            audioData = convertToDouble(bytes, format);
+            
+            // Re-open for playback
+            try (AudioInputStream playbackStream = AudioSystem.getAudioInputStream(file)) {
+                clip = AudioSystem.getClip();
+                clip.open(playbackStream);
+            }
+        }
+    }
+
+    private double[] convertToDouble(byte[] bytes, AudioFormat format) {
+        int sampleSizeInBits = format.getSampleSizeInBits();
+        int channels = format.getChannels();
+        boolean isBigEndian = format.isBigEndian();
+        
+        int bytesPerSample = sampleSizeInBits / 8;
+        int n = bytes.length / (bytesPerSample * channels);
+        double[] samples = new double[n];
+        
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        buffer.order(isBigEndian ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+        
+        for (int i = 0; i < n; i++) {
+            double sum = 0;
+            for (int c = 0; c < channels; c++) {
+                if (sampleSizeInBits == 16) {
+                    sum += buffer.getShort();
+                } else if (sampleSizeInBits == 8) {
+                    sum += buffer.get();
+                }
+            }
+            samples[i] = sum / channels;
+        }
+        return samples;
     }
 
     @Override public void play() { if(clip!=null) clip.start(); }
@@ -51,9 +100,39 @@ public class JavaSoundBackend implements AudioBackend {
     
     @Override
     public float[] getSpectrum() {
-        // Real FFT implementation requires buffering the audio stream.
-        // Returning empty spectrum for now to avoid fake data.
-        return new float[128];
+        if (clip == null || audioData == null || !clip.isRunning()) {
+            return new float[128];
+        }
+
+        int framePos = clip.getFramePosition();
+        int windowSize = 256; // Power of 2
+        float[] spectrum = new float[128];
+        
+        if (framePos + windowSize > audioData.length) {
+            return spectrum;
+        }
+
+        double[] real = new double[windowSize];
+        double[] imag = new double[windowSize];
+        System.arraycopy(audioData, framePos, real, 0, windowSize);
+        
+        // Windowing function (Hamming)
+        for (int i = 0; i < windowSize; i++) {
+            double window = 0.54 - 0.46 * Math.cos(2 * Math.PI * i / (windowSize - 1));
+            real[i] *= window;
+        }
+        
+        double[][] result = fftProvider.transform(real, imag);
+        double[] resReal = result[0];
+        double[] resImag = result[1];
+        
+        // Magnitude spectrum (first half)
+        for (int i = 0; i < 128; i++) {
+            double mag = Math.sqrt(resReal[i] * resReal[i] + resImag[i] * resImag[i]) / windowSize;
+            spectrum[i] = (float) mag;
+        }
+        
+        return spectrum;
     }
 
     @Override public String getBackendName() { return "Standard JavaSound"; }

@@ -45,7 +45,8 @@ import java.util.Objects;
  * an individual.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.1
+ * @since 1.0
  */
 
 //some variables are relevant only for vertebrates (but this is mostly the kind of cases a veterinary or physics has)
@@ -85,8 +86,8 @@ public class Patient extends Role {
 /**
      * Creates a new Patient object.
      *
-     * @param individual DOCUMENT ME!
-     * @param situation  DOCUMENT ME!
+     * @param individual the individual who is a patient
+     * @param situation  the medical situation context
      */
     public Patient(Individual individual, MedicalSituation situation) {
         super(individual, "Patient", situation, Role.CLIENT);
@@ -117,36 +118,36 @@ public class Patient extends Role {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the blood pressure of the patient.
      *
-     * @return DOCUMENT ME!
+     * @return the blood pressure in Pascals
      */
     public float getBloodPressure() {
         return bloodPressure;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the blood pressure of the patient.
      *
-     * @param pressure DOCUMENT ME!
+     * @param pressure the blood pressure in Pascals
      */
     public void setBloodPressure(float pressure) {
         this.bloodPressure = pressure;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the cardiac rate of the patient.
      *
-     * @return DOCUMENT ME!
+     * @return the cardiac rate in beats per second
      */
     public float getCardiacRate() {
         return cardiacRate;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the cardiac rate of the patient.
      *
-     * @param rate DOCUMENT ME!
+     * @param rate the cardiac rate in beats per second
      */
     public void setCardiacRate(float rate) {
         this.cardiacRate = rate;
@@ -154,18 +155,18 @@ public class Patient extends Role {
 
     //we could also have a field for normal cardiac rate of an adult individual from this Species at rest
     /**
-     * DOCUMENT ME!
+     * Returns the body temperature of the patient.
      *
-     * @return DOCUMENT ME!
+     * @return the temperature in Kelvin
      */
     public float getTemperature() {
         return temperature;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the body temperature of the patient.
      *
-     * @param temperature DOCUMENT ME!
+     * @param temperature the temperature in Kelvin
      */
     public void setTemperature(float temperature) {
         this.temperature = temperature;
@@ -173,72 +174,72 @@ public class Patient extends Role {
 
     //the normal temperature for this Species, assuming a healthy adult individual
     /**
-     * DOCUMENT ME!
+     * Returns the normal body temperature for this patient's species.
      *
-     * @return DOCUMENT ME!
+     * @return the normal temperature in Kelvin
      */
     public float getNormalTemperature() {
         return normalTemperature;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the normal body temperature for this patient's species.
      *
-     * @param normalTemperature DOCUMENT ME!
+     * @param normalTemperature the normal temperature in Kelvin
      */
     public void setNormalTemperature(float normalTemperature) {
         this.normalTemperature = normalTemperature;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the respiratory rate of the patient.
      *
-     * @return DOCUMENT ME!
+     * @return the respiratory rate in breaths per second
      */
     public float getRespiratoryRate() {
         return respiratoryRate;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the respiratory rate of the patient.
      *
-     * @param respiratoryRate DOCUMENT ME!
+     * @param respiratoryRate the respiratory rate in breaths per second
      */
     public void setRespiratoryRate(float respiratoryRate) {
         this.respiratoryRate = respiratoryRate;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the pain scale level of the patient.
      *
-     * @return DOCUMENT ME!
+     * @return the pain scale value (0 to 10)
      */
     public float getPainScale() {
         return painScale;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the pain scale level of the patient.
      *
-     * @param painScale DOCUMENT ME!
+     * @param painScale the pain scale value (0 to 10)
      */
     public void setPainScale(float painScale) {
         this.painScale = painScale;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the blood oxygen level of the patient.
      *
-     * @return DOCUMENT ME!
+     * @return the blood oxygen percentage
      */
     public float getBloodOxygen() {
         return bloodOxygen;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the blood oxygen level of the patient.
      *
-     * @param bloodOxygen DOCUMENT ME!
+     * @param bloodOxygen the blood oxygen percentage
      */
     public void setBloodOxygen(float bloodOxygen) {
         this.bloodOxygen = bloodOxygen;

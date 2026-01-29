@@ -35,47 +35,47 @@ import org.w3c.dom.mathml.MathMLFnElement;
  */
 public class MathMLFnElementImpl extends MathMLContentContainerImpl
     implements MathMLFnElement {
-/**
+    /**
      * Constructs a MathML function element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLFnElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the definition URL of the function.
      *
-     * @return DOCUMENT ME!
+     * @return the definition URL
      */
     public String getDefinitionURL() {
         return getAttribute("definitionURL");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the definition URL of the function.
      *
-     * @param definitionURL DOCUMENT ME!
+     * @param definitionURL the definition URL to set
      */
     public void setDefinitionURL(String definitionURL) {
         setAttribute("definitionURL", definitionURL);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the encoding of the function definition.
      *
-     * @return DOCUMENT ME!
+     * @return the encoding
      */
     public String getEncoding() {
         return getAttribute("encoding");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the encoding of the function definition.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the encoding to set
      */
     public void setEncoding(String encoding) {
         setAttribute("encoding", encoding);

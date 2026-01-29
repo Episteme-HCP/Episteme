@@ -47,10 +47,10 @@ public class CyclicVector extends Vector<Object> {
         this(new Vector<>());
     }
 
-/**
-     * create from a (non-empty) vector
+    /**
+     * Creates a new CyclicVector from an existing vector.
      *
-     * @param vector DOCUMENT ME!
+     * @param vector the vector to copy elements from
      */
     public CyclicVector(Vector<?> vector) {
         for (Enumeration<?> e = vector.elements(); e.hasMoreElements();) {
@@ -59,14 +59,13 @@ public class CyclicVector extends Vector<Object> {
     }
 
     /**
-     * creates an Enumeration starting with (first) element containing
-     * startObject.
+     * Creates an Enumeration starting with the first element that contains startObject.
      *
-     * @param startObject DOCUMENT ME!
+     * @param startObject the object to start the iteration from
      *
-     * @return DOCUMENT ME!
+     * @return a cyclic enumeration of the vector's elements
      *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @throws IllegalArgumentException if the startObject is not found in the vector
      */
     public Enumeration<Object> elements(Object startObject)
         throws IllegalArgumentException {
@@ -81,22 +80,22 @@ public class CyclicVector extends Vector<Object> {
     }
 
     /**
-     * creates an Enumeration starting at index
+     * Creates an Enumeration starting at the specified index.
      *
-     * @param startIndex DOCUMENT ME!
+     * @param startIndex the index to start the iteration from
      *
-     * @return DOCUMENT ME!
+     * @return a cyclic enumeration of the vector's elements
      *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @throws IllegalArgumentException if the startIndex is out of bounds
      */
     public Enumeration<Object> elements(int startIndex) throws IllegalArgumentException {
         return new CyclicVectorEnumeration(this, startIndex);
     }
 
     /**
-     * DOCUMENT ME!
+     * Test main method for CyclicVector.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments: size and start index
      */
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -145,30 +144,27 @@ public class CyclicVector extends Vector<Object> {
 
 
 /**
- * DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision: 1.3 $
+ * Helper class to provide cyclic enumeration over a Vector.
  */
 class CyclicVectorEnumeration implements Enumeration<Object> {
-    /** DOCUMENT ME! */
+    /** The vector to iterate over. */
     Vector<Object> vector;
 
-    /** DOCUMENT ME! */
+    /** The index where the iteration started. */
     int startIndex;
 
-    /** DOCUMENT ME! */
+    /** The current index in the iteration. */
     int currentIndex;
 
-    /** DOCUMENT ME! */
+    /** Whether the full cycle has been completed. */
     boolean finished;
 
-/**
+    /**
      * Creates a new CyclicVectorEnumeration object.
      *
-     * @param vector     DOCUMENT ME!
-     * @param startIndex DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param vector     the vector to iterate over
+     * @param startIndex the index to start from
+     * @throws IllegalArgumentException if the startIndex is out of bounds
      */
     public CyclicVectorEnumeration(Vector<Object> vector, int startIndex)
         throws IllegalArgumentException {
@@ -184,20 +180,20 @@ class CyclicVectorEnumeration implements Enumeration<Object> {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns true if the iteration has more elements.
      *
-     * @return DOCUMENT ME!
+     * @return true if there are more elements
      */
     public boolean hasMoreElements() {
         return !finished;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the next element in the cyclic iteration.
      *
-     * @return DOCUMENT ME!
+     * @return the next object
      *
-     * @throws NoSuchElementException DOCUMENT ME!
+     * @throws NoSuchElementException if the iteration is finished or the vector is empty
      */
     public Object nextElement() throws NoSuchElementException {
         if (finished) {

@@ -43,27 +43,27 @@ import java.util.ArrayList;
  * @since 1.0
  */
 public class VNode implements Serializable {
-    /** DOCUMENT ME! */
+    /** The identifier of the virtual node. */
     private String id;
 
-    /** DOCUMENT ME! */
+    /** The mother node. */
     private NT mother;
 
-    /** DOCUMENT ME! */
+    /** The edge label to the mother. */
     private String edge;
 
-    /** DOCUMENT ME! */
+    /** The list of secondary daughters. */
     private ArrayList<GraphNode> secDaughters;
-    /** DOCUMENT ME! */
+    /** The list of edge labels for secondary daughters. */
     private ArrayList<String> secEdges;
 
-    /** DOCUMENT ME! */
+    /** The verbosity level for debugging. */
     private int verbosity = 0;
 
-/**
+    /**
      * Creates a new VNode object.
      *
-     * @param new_id DOCUMENT ME!
+     * @param new_id the identifier for the new node
      */
     public VNode(String new_id) {
         id = new_id;
@@ -73,11 +73,11 @@ public class VNode implements Serializable {
         secEdges = new ArrayList<>();
     }
 
-/**
-     * Creates a new VNode object.
+    /**
+     * Creates a new VNode object with verbosity.
      *
-     * @param new_id    DOCUMENT ME!
-     * @param verbosity DOCUMENT ME!
+     * @param new_id the identifier for the new node
+     * @param verbosity the level of verbosity
      */
     public VNode(String new_id, int verbosity) {
         id = new_id;
@@ -89,10 +89,10 @@ public class VNode implements Serializable {
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a secondary daughter and its edge label.
      *
-     * @param secDaughter DOCUMENT ME!
-     * @param secEdge DOCUMENT ME!
+     * @param secDaughter the secondary daughter node
+     * @param secEdge the edge label
      */
     public void addSecDaughter(GraphNode secDaughter, String secEdge) {
         secDaughters.add(secDaughter);
@@ -100,45 +100,45 @@ public class VNode implements Serializable {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the mother node.
      *
-     * @param newMother DOCUMENT ME!
+     * @param newMother the mother node
      */
     public void setMother(NT newMother) {
         mother = newMother;
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the identifier of this virtual node.
      *
-     * @return DOCUMENT ME!
+     * @return the identifier
      */
     public String getId() {
         return id;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns true if this virtual node has an assigned mother.
      *
-     * @return DOCUMENT ME!
+     * @return true if mother is set
      */
     private boolean hasMother() {
         return (mother != null);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the edge label to the mother node.
      *
-     * @param newEdge DOCUMENT ME!
+     * @param newEdge the edge label
      */
     public void setEdge2Mother(String newEdge) {
         edge = newEdge;
     }
 
     /**
-     * DOCUMENT ME!
+     * Transfers the stored information to the newly created graph node.
      *
-     * @param node DOCUMENT ME!
+     * @param node the graph node to associate with this virtual information
      */
     public void addInfo(GraphNode node) {
         for (int i = 0; i < secDaughters.size(); i++) {

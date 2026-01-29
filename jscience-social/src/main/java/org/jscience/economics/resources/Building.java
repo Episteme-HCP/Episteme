@@ -23,7 +23,6 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +31,7 @@ import org.jscience.economics.money.Money;
 import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 import org.jscience.util.identity.Identification;
+import org.jscience.history.time.TimeCoordinate;
 
 /**
  * Represents a human-made physical structure such as a house, factory, or skyscraper.
@@ -51,7 +51,7 @@ public class Building extends Artifact implements Store {
      * Initializes a new building resource.
      */
     public Building(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Identification identification, Money value) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.contents = new HashSet<>();

@@ -84,7 +84,7 @@ public class JumboXMLHandler extends Handler {
     }
 
     /**
-     * DOCUMENT ME!
+     * Initializes the error manager for this handler.
      */
     private void init() {
         errorManager = new ErrorManager();

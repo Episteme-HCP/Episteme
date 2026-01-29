@@ -39,8 +39,8 @@ public class MathMLRadicalElementImpl extends MathMLElementImpl
 /**
      * Constructs a MathML radical element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLRadicalElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -48,27 +48,27 @@ public class MathMLRadicalElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the radicand of this element.
      *
-     * @return DOCUMENT ME!
+     * @return the radicand element
      */
     public MathMLElement getRadicand() {
         return (MathMLElement) getFirstChild();
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the radicand of this element.
      *
-     * @param radicand DOCUMENT ME!
+     * @param radicand the new radicand element
      */
     public void setRadicand(MathMLElement radicand) {
         replaceChild(radicand, getFirstChild());
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the index of this radical (for mroot).
      *
-     * @return DOCUMENT ME!
+     * @return the index element, or null for msqrt
      */
     public MathMLElement getIndex() {
         if (getLocalName().equals("msqrt")) {
@@ -79,9 +79,9 @@ public class MathMLRadicalElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the index of this radical.
      *
-     * @param index DOCUMENT ME!
+     * @param index the new index element
      */
     public void setIndex(MathMLElement index) {
         replaceChild(index, item(1));

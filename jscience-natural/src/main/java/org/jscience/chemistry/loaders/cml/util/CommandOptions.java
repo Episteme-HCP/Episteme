@@ -28,40 +28,41 @@ import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * Container and processor for a collection of command-line options.
+ * Handles argument parsing and usage reporting.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class CommandOptions {
-    /** DOCUMENT ME! */
+    /** Logger for this class. */
     static Logger logger = Logger.getLogger(CommandOptions.class.getName());
 
-    /** DOCUMENT ME! */
+    /** Convenience constant for Level.FINE. */
     static Level MYFINE = Level.FINE;
 
-    /** DOCUMENT ME! */
+    /** Convenience constant for Level.FINEST. */
     static Level MYFINEST = Level.FINEST;
 
     static {
         logger.setLevel(Level.INFO);
     }
 
-    /** DOCUMENT ME! */
+    /** A string of blanks used for formatting usage output. */
     static String BLANK = "                                                            ";
 
-    /** DOCUMENT ME! */
+    /** Predefined option for enabling debug output. */
     static CommandOption DEBUG = new CommandOption("-DEBUG", Boolean.class,
             null, Boolean.FALSE, "debug");
 
-    /** DOCUMENT ME! */
+    /** The manager that defines the options and logic. */
     CommandOptionManager commandOptionManager;
 
-    /** DOCUMENT ME! */
+    /** The raw command-line arguments. */
     String[] args;
 
-    /** DOCUMENT ME! */
+    /** The array of supported options. */
     CommandOption[] option = null;
 
 /**
@@ -71,11 +72,11 @@ public class CommandOptions {
         ;
     }
 
-/**
+    /**
      * Creates a new CommandOptions object.
      *
-     * @param args DOCUMENT ME!
-     * @param com  DOCUMENT ME!
+     * @param args the command-line arguments to parse
+     * @param com  the manager for these options
      */
     public CommandOptions(String[] args, CommandOptionManager com) {
         this.args = args;
@@ -91,19 +92,18 @@ public class CommandOptions {
     }
 
     /**
-     * subclass should override this
+     * Returns the array of default options. Subclasses should override this to add more.
      *
-     * @return DOCUMENT ME!
+     * @return the array of CommandOption objects
      */
     protected CommandOption[] extendOptions() {
         return new CommandOption[] { DEBUG, };
     }
 
-    // combines options from this and CommandOptions
     /**
-     * DOCUMENT ME!
+     * Aggregates options from the class hierarchy.
      *
-     * @return DOCUMENT ME!
+     * @return the complete array of options
      */
     protected CommandOption[] getOptions() {
         if (option == null) {
@@ -150,9 +150,9 @@ public class CommandOptions {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the command option manager.
      *
-     * @param commandOptionManager DOCUMENT ME!
+     * @param commandOptionManager the manager to set
      */
     public void setCommandOptionManager(
         CommandOptionManager commandOptionManager) {
@@ -160,16 +160,16 @@ public class CommandOptions {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the command option manager.
      *
-     * @return DOCUMENT ME!
+     * @return the manager
      */
     public CommandOptionManager getCommandOptionManager() {
         return commandOptionManager;
     }
 
     /**
-     * DOCUMENT ME!
+     * Analyzes and processes the command-line arguments.
      */
     void analyzeArgs() {
         int argCount = 0;
@@ -206,7 +206,7 @@ public class CommandOptions {
     }
 
     /**
-     * DOCUMENT ME!
+     * Prints current options and their values to standard output for debugging.
      */
     void debug() {
         System.out.println("\nOptions and values:\n");
@@ -217,11 +217,11 @@ public class CommandOptions {
     }
 
     /**
-     * DOCUMENT ME!
+     * Finds the index of the option matching the given argument prefix.
      *
-     * @param arg DOCUMENT ME!
+     * @param arg the argument to match
      *
-     * @return DOCUMENT ME!
+     * @return the index in the option array, or UNKNOWN/AMBIGUOUS
      */
     int getOptionIndex(String arg) {
         int found = CommandOptionManager.UNKNOWN;
@@ -242,9 +242,9 @@ public class CommandOptions {
     }
 
     /**
-     * DOCUMENT ME!
+     * Prints the usage information to the specified stream.
      *
-     * @param out DOCUMENT ME!
+     * @param out the print stream to output to
      */
     public void usage(java.io.PrintStream out) {
         getOptions();
@@ -257,9 +257,9 @@ public class CommandOptions {
     }
 
     /**
-     * DOCUMENT ME!
+     * Triggers the processing of the options via the manager.
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception if processing fails
      */
     public void process() throws Exception {
         commandOptionManager.process(this);

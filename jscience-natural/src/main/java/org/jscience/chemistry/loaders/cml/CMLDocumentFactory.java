@@ -100,26 +100,28 @@ public interface CMLDocumentFactory {
 
     //*/
     /**
-     * parses XML document into DOM, creating a new ownerDocument
+     * Parses an XML document into the DOM, creating a new owner document.
      *
-     * @param is - the input
-     * @param debug
+     * @param is    the input source
+     * @param debug whether to enable debugging
      *
-     * @return DOCUMENT ME!
+     * @return the parsed CML document
      *
-     * @throws IOException - domain or IO
+     * @throws IOException            if an I/O error occurs
+     * @throws CMLException           if a CML-specific error occurs
      */
     AbstractCMLDocument parseSAX(InputSource is, boolean debug)
         throws IOException, org.jscience.chemistry.loaders.cml.CMLException;
 
     /**
-     * as above but debug is false
+     * Parses an XML document into the DOM, creating a new owner document (debug is false).
      *
-     * @param is - the input
+     * @param is the input source
      *
-     * @return DOCUMENT ME!
+     * @return the parsed CML document
      *
-     * @throws IOException - domain or IO
+     * @throws IOException            if an I/O error occurs
+     * @throws CMLException           if a CML-specific error occurs
      */
     AbstractCMLDocument parseSAX(InputSource is)
         throws IOException, org.jscience.chemistry.loaders.cml.CMLException;

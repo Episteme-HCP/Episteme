@@ -40,30 +40,30 @@ import java.util.Vector;
 public interface SaxHandler extends ContentHandler, DTDHandler, EntityResolver,
     ErrorHandler {
     /**
-     * DOCUMENT ME!
+     * Sets whether to ignore ignorable whitespace during parsing.
      *
-     * @param ignoreWhite DOCUMENT ME!
+     * @param ignoreWhite true to ignore whitespace, false otherwise
      */
     public void setIgnoreWhite(boolean ignoreWhite);
 
     /**
-     * DOCUMENT ME!
+     * Returns true if any errors were encountered during parsing.
      *
-     * @return DOCUMENT ME!
+     * @return true if errors occurred, false otherwise
      */
     public boolean hasErrors();
 
     /**
-     * DOCUMENT ME!
+     * Returns a vector of error messages encountered during parsing.
      *
-     * @return DOCUMENT ME!
+     * @return a vector of error strings
      */
     public Vector<String> getErrorVector();
 
     /**
-     * DOCUMENT ME!
+     * Returns true if debugging is enabled for the handler.
      *
-     * @return DOCUMENT ME!
+     * @return the debug status
      */
     public boolean getDebug();
 }

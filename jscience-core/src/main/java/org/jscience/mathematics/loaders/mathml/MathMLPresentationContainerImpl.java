@@ -43,8 +43,8 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
 /**
      * Constructs a MathML presentation container.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLPresentationContainerImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -52,18 +52,18 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the number of arguments in this container.
      *
-     * @return DOCUMENT ME!
+     * @return the argument count
      */
     public int getNArguments() {
         return getArgumentsGetLength();
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the list of arguments in this container.
      *
-     * @return DOCUMENT ME!
+     * @return the argument list
      */
     public MathMLNodeList getArguments() {
         return new MathMLNodeList() {
@@ -78,9 +78,9 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the list of declarations in this container.
      *
-     * @return DOCUMENT ME!
+     * @return the declaration list
      */
     public MathMLNodeList getDeclarations() {
         return new MathMLNodeList() {
@@ -95,13 +95,11 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets a specific argument by index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the 1-based index of the argument
+     * @return the argument element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLElement getArgument(int index) throws DOMException {
         Node arg = getArgumentsItem(index - 1);
@@ -115,14 +113,12 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets or replaces an argument at a specific index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newArgument the new argument element
+     * @param index       the 1-based index (if index is length+1, it appends)
+     * @return the replaced or appended element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLElement setArgument(MathMLElement newArgument, int index)
         throws DOMException {
@@ -142,14 +138,12 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts an argument at a specific index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newArgument the new argument element
+     * @param index       the 1-based index to insert before (0 or length+1 appends)
+     * @return the inserted element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLElement insertArgument(MathMLElement newArgument, int index)
         throws DOMException {
@@ -169,13 +163,11 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes an argument at a specific index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the 1-based index of the argument to remove
+     * @return the removed element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLElement removeArgument(int index) throws DOMException {
         Node arg = getArgumentsItem(index - 1);
@@ -189,24 +181,21 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes an argument at a specific index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the 1-based index of the argument to delete
+     * @throws DOMException if the index is out of bounds
      */
     public void deleteArgument(int index) throws DOMException {
         removeArgument(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets a specific declaration by index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the 1-based index of the declaration
+     * @return the declaration element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLDeclareElement getDeclaration(int index)
         throws DOMException {
@@ -221,14 +210,12 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets or replaces a declaration at a specific index.
      *
-     * @param newDeclaration DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newDeclaration the new declaration element
+     * @param index          the 1-based index
+     * @return the replaced or appended element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLDeclareElement setDeclaration(
         MathMLDeclareElement newDeclaration, int index)
@@ -249,14 +236,12 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a declaration at a specific index.
      *
-     * @param newDeclaration DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newDeclaration the new declaration element
+     * @param index          the 1-based index (0 or length+1 appends)
+     * @return the inserted element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLDeclareElement insertDeclaration(
         MathMLDeclareElement newDeclaration, int index)
@@ -277,13 +262,11 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes a declaration at a specific index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the 1-based index of the declaration to remove
+     * @return the removed element
+     * @throws DOMException if the index is out of bounds
      */
     public MathMLDeclareElement removeDeclaration(int index)
         throws DOMException {
@@ -298,20 +281,19 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes a declaration at a specific index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the 1-based index of the declaration to delete
+     * @throws DOMException if the index is out of bounds
      */
     public void deleteDeclaration(int index) throws DOMException {
         removeDeclaration(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper method to calculate the number of arguments.
      *
-     * @return DOCUMENT ME!
+     * @return the number of non-declaration children
      */
     private int getArgumentsGetLength() {
         final int length = getLength();
@@ -327,11 +309,10 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper method to retrieve an argument node by index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param index the 0-based index
+     * @return the argument node, or null if index is out of bounds
      */
     private Node getArgumentsItem(int index) {
         final int argsLength = getArgumentsGetLength();
@@ -355,9 +336,9 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper method to calculate the number of declarations.
      *
-     * @return DOCUMENT ME!
+     * @return the number of declaration children
      */
     private int getDeclarationsGetLength() {
         final int length = getLength();
@@ -373,11 +354,10 @@ public class MathMLPresentationContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper method to retrieve a declaration node by index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param index the 0-based index
+     * @return the declaration node, or null if index is out of bounds
      */
     private Node getDeclarationsItem(int index) {
         final int declLength = getDeclarationsGetLength();

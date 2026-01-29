@@ -23,7 +23,7 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
 import java.util.HashSet;
 import java.util.Set;
 import org.jscience.economics.Community;
@@ -63,7 +63,7 @@ public abstract class Machine extends Tool {
      * Initializes a new machine.
      */
     public Machine(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Identification identification, Money value) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.active = false;

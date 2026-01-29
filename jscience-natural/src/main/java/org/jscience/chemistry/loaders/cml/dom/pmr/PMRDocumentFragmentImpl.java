@@ -44,8 +44,8 @@ public class PMRDocumentFragmentImpl extends PMRNodeImpl
 /**
      * Creates a new PMRDocumentFragmentImpl object.
      *
-     * @param dt  DOCUMENT ME!
-     * @param doc DOCUMENT ME!
+     * @param dt  the generic W3C document fragment to delegate to
+     * @param doc the owner CML document
      */
     public PMRDocumentFragmentImpl(DocumentFragment dt, PMRDocument doc) {
         super(dt, doc);

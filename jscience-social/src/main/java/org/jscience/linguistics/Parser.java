@@ -37,12 +37,12 @@ import javax.swing.tree.TreeModel;
 //parsed object isreturned as a tree whose node are applied rules and terminals the elements of the String
 public interface Parser {
     /**
-     * DOCUMENT ME!
+     * Parses the given string using the provided grammar.
      *
-     * @param grammar DOCUMENT ME!
-     * @param string DOCUMENT ME!
+     * @param grammar the grammar to use for parsing
+     * @param string the string to parse
      *
-     * @return DOCUMENT ME!
+     * @return a TreeModel representing the parsed structure, where nodes are rules and leaves are terminals
      */
     public TreeModel parse(Grammar grammar, String string);
 }

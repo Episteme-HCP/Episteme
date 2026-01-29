@@ -38,8 +38,8 @@ public class MathMLFencedElementImpl extends MathMLPresentationContainerImpl
 /**
      * Constructs a MathML fenced element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLFencedElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,54 +47,54 @@ public class MathMLFencedElementImpl extends MathMLPresentationContainerImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the opening delimiter of the fenced element.
      *
-     * @return DOCUMENT ME!
+     * @return the opening delimiter
      */
     public String getOpen() {
         return getAttribute("open");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the opening delimiter of the fenced element.
      *
-     * @param open DOCUMENT ME!
+     * @param open the new opening delimiter
      */
     public void setOpen(String open) {
         setAttribute("open", open);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the closing delimiter of the fenced element.
      *
-     * @return DOCUMENT ME!
+     * @return the closing delimiter
      */
     public String getClose() {
         return getAttribute("close");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the closing delimiter of the fenced element.
      *
-     * @param close DOCUMENT ME!
+     * @param close the new closing delimiter
      */
     public void setClose(String close) {
         setAttribute("close", close);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the separators used between elements in the fenced element.
      *
-     * @return DOCUMENT ME!
+     * @return the separators string
      */
     public String getSeparators() {
         return getAttribute("separators");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the separators used between elements in the fenced element.
      *
-     * @param separators DOCUMENT ME!
+     * @param separators the new separators string
      */
     public void setSeparators(String separators) {
         setAttribute("separators", separators);

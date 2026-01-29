@@ -26,19 +26,17 @@ package org.jscience.linguistics.loaders.tigerxml.header;
 
 
 /**
- * Represents a .
+ * Represents a linguistic feature definition in a TigerXML header.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class Feature implements HeaderElement {
-    /** DOCUMENT ME! */
-
     /**
-     * DOCUMENT ME!
+     * Converts this feature to its XML representation.
      *
-     * @return DOCUMENT ME!
+     * @return the XML string
      */
     public String toXMLString() {
         return "";

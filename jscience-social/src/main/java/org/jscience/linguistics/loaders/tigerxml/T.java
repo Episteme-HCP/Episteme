@@ -43,19 +43,19 @@ public class T extends GraphNode {
 
     private static final long serialVersionUID = 1L;
 
-    /** DOCUMENT ME! */
+    /** The Part-of-Speech tag. */
     private String pos;
 
-    /** DOCUMENT ME! */
+    /** The morphological information. */
     private String morph;
 
-    /** DOCUMENT ME! */
+    /** The surface word form. */
     private String word;
 
-    /** DOCUMENT ME! */
+    /** The lemma of the word. */
     private String lemma;
 
-    /** DOCUMENT ME! */
+    /** The position of this terminal in the sentence. */
     private int position;
 
     /**
@@ -117,54 +117,54 @@ public class T extends GraphNode {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the lemma.
      *
-     * @return DOCUMENT ME!
+     * @return the lemma
      */
     public String getLemma() {
         return this.lemma;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the lemma.
      *
-     * @param lemma DOCUMENT ME!
+     * @param lemma the new lemma
      */
     public void setLemma(String lemma) {
         this.lemma = lemma;
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the POS tag.
      *
-     * @return DOCUMENT ME!
+     * @return the POS tag
      */
     public String getPos() {
         return this.pos;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the POS tag.
      *
-     * @param newpos DOCUMENT ME!
+     * @param newpos the new POS tag
      */
     public void setPos(String newpos) {
         this.pos = newpos;
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the morphology.
      *
-     * @return DOCUMENT ME!
+     * @return the morphology
      */
     public String getMorph() {
         return this.morph;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the morphology.
      *
-     * @param newmorph DOCUMENT ME!
+     * @param newmorph the new morphology
      */
     public void setMorph(String newmorph) {
         this.morph = newmorph;
@@ -180,18 +180,18 @@ public class T extends GraphNode {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the surface word.
      *
-     * @param newWord DOCUMENT ME!
+     * @param newWord the new word
      */
     public void setWord(String newWord) {
         this.word = newWord;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the position of this terminal in the sentence.
      *
-     * @param position DOCUMENT ME!
+     * @param position the new position
      */
     public void setPosition(int position) {
         this.position = position;
@@ -199,18 +199,18 @@ public class T extends GraphNode {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the position of this terminal.
      *
-     * @return DOCUMENT ME!
+     * @return the position
      */
     public int getPosition() {
         return this.position;
     }
 
     /**
-     * DOCUMENT ME!
+     * Prints this terminal node to an XML file.
      *
-     * @param out_xml DOCUMENT ME!
+     * @param out_xml the file writer
      */
     protected void print2XML(FileWriter out_xml) {
         try {

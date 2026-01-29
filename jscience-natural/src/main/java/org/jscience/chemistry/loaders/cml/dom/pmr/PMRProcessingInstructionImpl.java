@@ -44,8 +44,8 @@ public class PMRProcessingInstructionImpl extends PMRNodeImpl
 /**
      * Creates a new PMRProcessingInstructionImpl object.
      *
-     * @param processingInstruction DOCUMENT ME!
-     * @param doc                   DOCUMENT ME!
+     * @param processingInstruction the generic W3C processing instruction to delegate to
+     * @param doc                   the owner CML document
      */
     public PMRProcessingInstructionImpl(
         ProcessingInstruction processingInstruction, PMRDocument doc) {
@@ -53,27 +53,27 @@ public class PMRProcessingInstructionImpl extends PMRNodeImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the target of this processing instruction.
      *
-     * @return DOCUMENT ME!
+     * @return the target
      */
     public String getTarget() {
         return ((ProcessingInstruction) delegateNode).getTarget();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the content of this processing instruction.
      *
-     * @return DOCUMENT ME!
+     * @return the data
      */
     public String getData() {
         return ((ProcessingInstruction) delegateNode).getData();
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the content of this processing instruction.
      *
-     * @param data DOCUMENT ME!
+     * @param data the new data
      */
     public void setData(String data) {
         ((ProcessingInstruction) delegateNode).setData(data);

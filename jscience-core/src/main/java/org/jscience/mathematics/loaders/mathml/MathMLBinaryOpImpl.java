@@ -31,20 +31,20 @@ package org.jscience.mathematics.loaders.mathml;
  * @since 1.0
  */
 public class MathMLBinaryOpImpl extends MathMLPredefinedSymbolImpl {
-/**
+    /**
      * Constructs a MathML predefined symbol (binary operation).
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLBinaryOpImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the arity of the binary operation.
      *
-     * @return DOCUMENT ME!
+     * @return "2" for binary operations
      */
     public String getArity() {
         return "2";

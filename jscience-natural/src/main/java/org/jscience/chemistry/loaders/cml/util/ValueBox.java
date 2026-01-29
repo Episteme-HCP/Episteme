@@ -29,24 +29,24 @@ import javax.swing.*;
 
 
 /**
- * DOCUMENT ME!
+ * A Swing JPanel containing a label and a combo box for selecting values.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class ValueBox extends JPanel {
-    /** DOCUMENT ME! */
+    /** The combo box component. */
     JComboBox<String> comboBox;
 
-    /** DOCUMENT ME! */
+    /** The array of possible values. */
     String[] values;
 
-/**
+    /**
      * Creates a new ValueBox object.
      *
-     * @param prompt DOCUMENT ME!
-     * @param values DOCUMENT ME!
+     * @param prompt the text for the label
+     * @param values the array of values for the combo box
      */
     public ValueBox(String prompt, String[] values) {
         this.values = values;
@@ -62,36 +62,36 @@ public class ValueBox extends JPanel {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the selected index in the combo box.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index to select
      */
     public void setSelectedIndex(int index) {
         comboBox.setSelectedIndex(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the currently selected index.
      *
-     * @return DOCUMENT ME!
+     * @return the index
      */
     public int getSelectedIndex() {
         return comboBox.getSelectedIndex();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the currently selected value string.
      *
-     * @return DOCUMENT ME!
+     * @return the value string
      */
     public String getSelectedValue() {
         return (String) values[comboBox.getSelectedIndex()];
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the selected value by matching the given string.
      *
-     * @param value DOCUMENT ME!
+     * @param value the string value to select
      */
     public void setSelectedValue(String value) {
         int index = CMLUtils.indexOf(value, values, values.length);

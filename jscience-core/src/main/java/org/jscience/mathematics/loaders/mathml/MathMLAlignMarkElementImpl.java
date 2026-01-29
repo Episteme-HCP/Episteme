@@ -38,8 +38,8 @@ public class MathMLAlignMarkElementImpl extends MathMLElementImpl
 /**
      * Constructs a MathML align mark element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLAlignMarkElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,18 +47,18 @@ public class MathMLAlignMarkElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the edge attribute of the alignment mark.
      *
-     * @return DOCUMENT ME!
+     * @return the edge value
      */
     public String getEdge() {
         return getAttribute("edge");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the edge attribute of the alignment mark.
      *
-     * @param edge DOCUMENT ME!
+     * @param edge the new edge value
      */
     public void setEdge(String edge) {
         setAttribute("edge", edge);

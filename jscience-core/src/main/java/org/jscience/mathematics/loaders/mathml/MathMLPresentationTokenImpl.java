@@ -39,8 +39,8 @@ public class MathMLPresentationTokenImpl extends MathMLElementImpl
 /**
      * Constructs a MathML presentation token.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLPresentationTokenImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -48,99 +48,99 @@ public class MathMLPresentationTokenImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the mathvariant attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the variant name (e.g., "bold", "italic")
      */
     public String getMathvariant() {
         return getAttribute("mathvariant");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the mathvariant attribute.
      *
-     * @param mathvariant DOCUMENT ME!
+     * @param mathvariant the variant name
      */
     public void setMathvariant(String mathvariant) {
         setAttribute("mathvariant", mathvariant);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the mathsize attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the size (e.g., "small", "14pt")
      */
     public String getMathsize() {
         return getAttribute("mathsize");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the mathsize attribute.
      *
-     * @param mathsize DOCUMENT ME!
+     * @param mathsize the size
      */
     public void setMathsize(String mathsize) {
         setAttribute("mathsize", mathsize);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the mathfamily attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the font family
      */
     public String getMathfamily() {
         return getAttribute("mathfamily");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the mathfamily attribute.
      *
-     * @param mathfamily DOCUMENT ME!
+     * @param mathfamily the font family
      */
     public void setMathfamily(String mathfamily) {
         setAttribute("mathfamily", mathfamily);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the mathcolor attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the color (e.g., "#000000", "red")
      */
     public String getMathcolor() {
         return getAttribute("mathcolor");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the mathcolor attribute.
      *
-     * @param mathcolor DOCUMENT ME!
+     * @param mathcolor the color
      */
     public void setMathcolor(String mathcolor) {
         setAttribute("mathcolor", mathcolor);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the mathbackground attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the background color
      */
     public String getMathbackground() {
         return getAttribute("mathbackground");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the mathbackground attribute.
      *
-     * @param mathbackground DOCUMENT ME!
+     * @param mathbackground the background color
      */
     public void setMathbackground(String mathbackground) {
         setAttribute("mathbackground", mathbackground);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the content nodes of this token.
      *
-     * @return DOCUMENT ME!
+     * @return the list of content nodes
      */
     public MathMLNodeList getContents() {
         return (MathMLNodeList) getChildNodes();

@@ -38,8 +38,8 @@ public class MathMLAlignGroupElementImpl extends MathMLElementImpl
 /**
      * Constructs a MathML align group element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLAlignGroupElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,18 +47,18 @@ public class MathMLAlignGroupElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the group alignment attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the group alignment
      */
     public String getGroupalign() {
         return getAttribute("groupalign");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the group alignment attribute.
      *
-     * @param groupalign DOCUMENT ME!
+     * @param groupalign the new group alignment
      */
     public void setGroupalign(String groupalign) {
         setAttribute("groupalign", groupalign);

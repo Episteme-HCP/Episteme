@@ -38,62 +38,62 @@ public class MathMLSpaceElementImpl extends MathMLElementImpl
 /**
      * Constructs a MathML space element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLSpaceElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the value of the width attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the width
      */
     public String getWidth() {
         return getAttribute("width");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of the width attribute.
      *
-     * @param width DOCUMENT ME!
+     * @param width the width to set
      */
     public void setWidth(String width) {
         setAttribute("width", width);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the value of the height attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the height
      */
     public String getHeight() {
         return getAttribute("height");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of the height attribute.
      *
-     * @param height DOCUMENT ME!
+     * @param height the height to set
      */
     public void setHeight(String height) {
         setAttribute("height", height);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the value of the depth attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the depth
      */
     public String getDepth() {
         return getAttribute("depth");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of the depth attribute.
      *
-     * @param depth DOCUMENT ME!
+     * @param depth the depth to set
      */
     public void setDepth(String depth) {
         setAttribute("depth", depth);

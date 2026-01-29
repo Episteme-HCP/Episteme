@@ -30,7 +30,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18N;
-import org.jscience.economics.StrategicModel;
+import org.jscience.economics.models.StrategicModel;
 
 /**
  * Visualizes game theory matrices, decision trees, and Pareto optimality.
@@ -67,7 +67,7 @@ public final class DecisionArchitectureViewer extends AbstractViewer {
         // Update Matrix
         matrixGrid.getChildren().clear();
         int row = 0;
-        for (var entry : model.getPayoffMatrix().entrySet()) {
+        for (java.util.Map.Entry<String, StrategicModel.Payoff> entry : model.getPayoffMatrix().entrySet()) {
             Label lbl = new Label(entry.getKey() + ": (" + entry.getValue().getPlayer1() + ", " + 
                                   entry.getValue().getPlayer2() + ")");
             lbl.setStyle("-fx-border-color: Gray; -fx-padding: 10; -fx-background-color: #222;");
@@ -79,7 +79,7 @@ public final class DecisionArchitectureViewer extends AbstractViewer {
         paretoChart.getData().clear();
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName("Scenarios");
-        for (var point : model.getParetoFrontier()) {
+        for (org.jscience.mathematics.numbers.real.Real[] point : model.getParetoFrontier()) {
             series.getData().add(new XYChart.Data<>(point[0].doubleValue(), point[1].doubleValue()));
         }
         paretoChart.getData().add(series);

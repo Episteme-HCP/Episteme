@@ -31,13 +31,13 @@ package org.jscience.linguistics.loaders.tigerxml.header;
  * @since 1.0
  */
 public class EdgeLabel implements HeaderElement {
-    /** DOCUMENT ME! */
+    /** The label name. */
     private String name;
 
-    /** DOCUMENT ME! */
+    /** The description of the label. */
     private String description;
 
-    /** DOCUMENT ME! */
+    /** True if this is a secondary edge label. */
     private boolean secondary;
 
     public String getName() { return name; }
@@ -45,9 +45,9 @@ public class EdgeLabel implements HeaderElement {
     public boolean isSecondary() { return secondary; }
 
     /**
-     * DOCUMENT ME!
+     * Converts this edge label to its XML representation.
      *
-     * @return DOCUMENT ME!
+     * @return the XML string
      */
     public String toXMLString() {
         return "";

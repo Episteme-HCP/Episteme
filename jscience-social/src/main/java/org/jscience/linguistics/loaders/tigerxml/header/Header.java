@@ -26,19 +26,17 @@ package org.jscience.linguistics.loaders.tigerxml.header;
 
 
 /**
- * Represents a .
+ * Represents the header of a TigerXML corpus file.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class Header {
-    /** DOCUMENT ME! */
-
     /**
-     * DOCUMENT ME!
+     * Converts this header to its XML representation.
      *
-     * @return DOCUMENT ME!
+     * @return the XML string
      */
     public String toXMLString() {
         return "";

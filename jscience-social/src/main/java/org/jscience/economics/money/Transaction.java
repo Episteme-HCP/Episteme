@@ -31,8 +31,8 @@ import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.history.time.TimeCoordinate;
 
-import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -60,7 +60,7 @@ public final class Transaction implements ComprehensiveIdentification {
     private final Organization buyer;
 
     @Attribute
-    private final Instant date;
+    private final TimeCoordinate date;
 
     @Id
     private final Identification id;
@@ -90,7 +90,7 @@ public final class Transaction implements ComprehensiveIdentification {
      * @param description    transaction description
      * @param amount         the monetary amount
      */
-    public Transaction(Organization seller, Organization buyer, Instant date,
+    public Transaction(Organization seller, Organization buyer, TimeCoordinate date,
                        Identification id, String description, Money amount) {
         this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
         this.buyer = Objects.requireNonNull(buyer, "Buyer cannot be null");
@@ -114,7 +114,7 @@ public final class Transaction implements ComprehensiveIdentification {
      * @param share          the share being traded
      * @param quantity       number of shares
      */
-    public Transaction(Organization seller, Organization buyer, Instant date,
+    public Transaction(Organization seller, Organization buyer, TimeCoordinate date,
                        Identification id, String description, 
                        Share share, int quantity) {
         this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
@@ -158,7 +158,7 @@ public final class Transaction implements ComprehensiveIdentification {
         return buyer;
     }
 
-    public Instant getDate() {
+    public TimeCoordinate getDate() {
         return date;
     }
 

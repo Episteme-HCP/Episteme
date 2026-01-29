@@ -40,113 +40,113 @@ import org.w3c.dom.mathml.MathMLNodeList;
  */
 public class MathMLElementImpl extends ElementNSImpl implements MathMLElement,
     MathMLNodeList {
-    /** DOCUMENT ME! */
+    /** The MathML namespace URI. */
     static final String mathmlURI = "http://www.w3.org/1998/Math/MathML";
 
-/**
+    /**
      * Constructs a MathML element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, mathmlURI, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the class attribute value.
      *
-     * @return DOCUMENT ME!
+     * @return the class name
      */
     public String getClassName() {
         return getAttribute("class");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the class attribute value.
      *
-     * @param className DOCUMENT ME!
+     * @param className the class name to set
      */
     public void setClassName(String className) {
         setAttribute("class", className);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the style attribute value.
      *
-     * @return DOCUMENT ME!
+     * @return the element style
      */
     public String getMathElementStyle() {
         return getAttribute("style");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the style attribute value.
      *
-     * @param mathElementStyle DOCUMENT ME!
+     * @param mathElementStyle the style to set
      */
     public void setMathElementStyle(String mathElementStyle) {
         setAttribute("style", mathElementStyle);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the id attribute value.
      *
-     * @return DOCUMENT ME!
+     * @return the element id
      */
     public String getId() {
         return getAttribute("id");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the id attribute value.
      *
-     * @param id DOCUMENT ME!
+     * @param id the id to set
      */
     public void setId(String id) {
         setAttribute("id", id);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the xlink:href attribute value.
      *
-     * @return DOCUMENT ME!
+     * @return the href link
      */
     public String getHref() {
         return getAttribute("xlink:href");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the xlink:href attribute value.
      *
-     * @param href DOCUMENT ME!
+     * @param href the href link to set
      */
     public void setHref(String href) {
         setAttribute("xlink:href", href);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the xref attribute value.
      *
-     * @return DOCUMENT ME!
+     * @return the cross-reference
      */
     public String getXref() {
         return getAttribute("xref");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the xref attribute value.
      *
-     * @param xref DOCUMENT ME!
+     * @param xref the cross-reference to set
      */
     public void setXref(String xref) {
         setAttribute("xref", xref);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the nearest ancestor math element.
      *
-     * @return DOCUMENT ME!
+     * @return the owner math element, or null if this is the math element
      */
     public MathMLMathElement getOwnerMathElement() {
         if (this instanceof MathMLMathElement) {

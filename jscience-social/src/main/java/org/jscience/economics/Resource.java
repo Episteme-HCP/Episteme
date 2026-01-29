@@ -27,6 +27,8 @@ import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 import org.jscience.util.Positioned;
 import org.jscience.util.Temporal;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
@@ -34,7 +36,6 @@ import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -49,7 +50,7 @@ import java.util.UUID;
  * @since 1.0
  */
 @Persistent
-public class Resource extends PotentialResource implements Positioned<Place>, Temporal<Instant> {
+public class Resource extends PotentialResource implements Positioned<Place>, Temporal<TimeCoordinate> {
 
     private static final long serialVersionUID = 2L;
 
@@ -66,7 +67,7 @@ public class Resource extends PotentialResource implements Positioned<Place>, Te
     private Place place;
 
     @Attribute
-    private final Instant productionDate;
+    private final TimeCoordinate productionDate;
 
     /**
      * Creates a new Resource object.
@@ -79,20 +80,20 @@ public class Resource extends PotentialResource implements Positioned<Place>, Te
     public Resource(String name, String description, Quantity<?> amount,
         Community community) {
         this(new UUIDIdentification(UUID.randomUUID().toString()), name, description, amount, community, 
-             community.getPosition(), Instant.now());
+             community.getPosition(), TimePoint.now());
     }
 
     /**
      * Creates a new Resource object.
      */
     public Resource(String name, String description, Quantity<?> amount,
-        Community producer, Place productionPlace, Instant productionDate) {
+        Community producer, Place productionPlace, TimeCoordinate productionDate) {
         this(new UUIDIdentification(UUID.randomUUID().toString()), name, description, amount, 
              producer, productionPlace, productionDate);
     }
 
     public Resource(Identification id, String name, String description, Quantity<?> amount,
-        Community producer, Place productionPlace, Instant productionDate) {
+        Community producer, Place productionPlace, TimeCoordinate productionDate) {
         super(id, name, description, amount);
 
         this.producer = Objects.requireNonNull(producer, "Producer cannot be null");
@@ -146,16 +147,16 @@ public class Resource extends PotentialResource implements Positioned<Place>, Te
     }
 
     @Override
-    public Instant getWhen() {
+    public TimeCoordinate getWhen() {
         return productionDate;
     }
 
     @Deprecated
-    public Instant getTimestamp() {
+    public TimeCoordinate getTimestamp() {
         return productionDate;
     }
 
-    public Instant getProductionDate() {
+    public TimeCoordinate getProductionDate() {
         return productionDate;
     }
 

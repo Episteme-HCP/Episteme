@@ -23,7 +23,7 @@
 
 package org.jscience.sports;
 
-import java.time.Instant;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -120,8 +120,8 @@ public class Match implements ComprehensiveIdentification, Temporal<TimeCoordina
         return date;
     }
 
-    public Instant getTimestamp() {
-        return date.toInstant();
+    public TimeCoordinate getTimestamp() {
+        return date;
     }
 
     public Sport getSport() {

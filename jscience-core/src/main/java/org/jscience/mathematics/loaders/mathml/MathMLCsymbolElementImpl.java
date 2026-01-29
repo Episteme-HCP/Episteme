@@ -35,11 +35,11 @@ import org.w3c.dom.mathml.MathMLCsymbolElement;
  */
 public class MathMLCsymbolElementImpl extends MathMLContentTokenImpl
     implements MathMLCsymbolElement {
-/**
+    /**
      * Constructs a MathML content symbol element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLCsymbolElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {

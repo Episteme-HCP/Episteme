@@ -38,11 +38,11 @@ import org.w3c.dom.mathml.MathMLVectorElement;
  */
 public class MathMLVectorElementImpl extends MathMLElementImpl
     implements MathMLVectorElement {
-/**
+    /**
      * Constructs a MathML <code>vector</code> element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLVectorElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -50,22 +50,22 @@ public class MathMLVectorElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of components in the vector.
      *
-     * @return DOCUMENT ME!
+     * @return the component count
      */
     public int getNcomponents() {
         return getComponentsGetLength();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the component at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the component index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the content element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLContentElement getComponent(int index)
         throws DOMException {
@@ -80,14 +80,14 @@ public class MathMLVectorElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the component at the specified index.
      *
-     * @param newComponent DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newComponent the new component element
+     * @param index        the component index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the new component element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLContentElement setComponent(
         MathMLContentElement newComponent, int index) throws DOMException {
@@ -107,14 +107,14 @@ public class MathMLVectorElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a component at the specified index.
      *
-     * @param newComponent DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newComponent the new component to insert
+     * @param index        the index where to insert (0 for end)
      *
-     * @return DOCUMENT ME!
+     * @return the inserted component element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLContentElement insertComponent(
         MathMLContentElement newComponent, int index) throws DOMException {
@@ -134,13 +134,13 @@ public class MathMLVectorElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the component at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the component index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the removed component element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLContentElement removeComponent(int index)
         throws DOMException {
@@ -155,20 +155,20 @@ public class MathMLVectorElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes the component at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the component index (1-based)
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public void deleteComponent(int index) throws DOMException {
         removeComponent(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of content elements.
      *
-     * @return DOCUMENT ME!
+     * @return the component count
      */
     private int getComponentsGetLength() {
         final int length = getLength();
@@ -184,11 +184,11 @@ public class MathMLVectorElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the component at the specified 0-based index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the 0-based index
      *
-     * @return DOCUMENT ME!
+     * @return the component node, or null if out of bounds
      */
     private Node getComponentsItem(int index) {
         final int componentsLength = getComponentsGetLength();

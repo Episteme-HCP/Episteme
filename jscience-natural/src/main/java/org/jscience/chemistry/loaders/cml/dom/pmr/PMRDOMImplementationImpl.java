@@ -36,7 +36,7 @@ import org.w3c.dom.DocumentType;
  */
 public class PMRDOMImplementationImpl extends PMRNodeImpl
     implements DOMImplementation {
-    /** DOCUMENT ME! */
+    /** The underlying generic W3C DOM implementation. */
     protected DOMImplementation domImplementation;
 
 /**
@@ -46,23 +46,23 @@ public class PMRDOMImplementationImpl extends PMRNodeImpl
         super();
     }
 
-/**
-     * Creates a new PMRDOMImplementationImpl object.
+    /**
+     * Creates a new PMRDOMImplementationImpl that wraps a base implementation.
      *
-     * @param di DOCUMENT ME!
+     * @param di the base DOM implementation to wrap
      */
     protected PMRDOMImplementationImpl(DOMImplementation di) {
         this.domImplementation = di;
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new DOM Document of the specified type with its document element.
      *
-     * @param s DOCUMENT ME!
-     * @param t DOCUMENT ME!
-     * @param dt DOCUMENT ME!
+     * @param s  the namespace URI of the document element to create
+     * @param t  the qualified name of the document element to be created
+     * @param dt the type of document to be created or null
      *
-     * @return DOCUMENT ME!
+     * @return a new PMRDocument object with its document element
      */
     public Document createDocument(String s, String t, DocumentType dt) {
         Document doc = domImplementation.createDocument(s, t, dt);
@@ -71,37 +71,37 @@ public class PMRDOMImplementationImpl extends PMRNodeImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Test if the DOM implementation implements a specific feature.
      *
-     * @param feature DOCUMENT ME!
-     * @param version DOCUMENT ME!
+     * @param feature the name of the feature to test
+     * @param version the version number of the feature to test
      *
-     * @return DOCUMENT ME!
+     * @return true if the feature is implemented, false otherwise
      */
     public boolean hasFeature(String feature, String version) {
         return domImplementation.hasFeature(feature, version);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an object which implements the specialized APIs of the specified feature.
      *
-     * @param feature DOCUMENT ME!
-     * @param version DOCUMENT ME!
+     * @param feature the name of the feature
+     * @param version the version number of the feature
      *
-     * @return DOCUMENT ME!
+     * @return the specialized object or null
      */
     public Object getFeature(String feature, String version) {
         return domImplementation.getFeature(feature, version);
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates an empty DocumentType node.
      *
-     * @param s DOCUMENT ME!
-     * @param t DOCUMENT ME!
-     * @param v DOCUMENT ME!
+     * @param s the qualified name of the document type to be created
+     * @param t the public identifier of the external subset
+     * @param v the system identifier of the external subset
      *
-     * @return DOCUMENT ME!
+     * @return a new DocumentType node with ownerDocument set to null
      */
     public DocumentType createDocumentType(String s, String t, String v) {
         DocumentType dt = domImplementation.createDocumentType(s, t, v);

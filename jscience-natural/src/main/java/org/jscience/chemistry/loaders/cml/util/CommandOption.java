@@ -28,49 +28,46 @@ import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * Represents a single command-line option for JVM-based tools.
+ * Supports various types including Boolean, String, Double, etc.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class CommandOption {
-    /** DOCUMENT ME! */
+    /** The logger instance for this class. */
     static Logger logger = Logger.getLogger(CommandOption.class.getName());
 
-    /** DOCUMENT ME! */
+    /** Convenience constant for the FINE logging level. */
     static Level MYFINE = Level.FINE;
 
-    /** DOCUMENT ME! */
+    /** Convenience constant for the FINEST logging level. */
     static Level MYFINEST = Level.FINEST;
-
-    static {
-        logger.setLevel(Level.INFO);
-    }
-
-    /** DOCUMENT ME! */
+    
+    /** The option name (stored in uppercase). */
     String name;
 
-    /** DOCUMENT ME! */
+    /** The class representing the type of this option's value. */
     Class<?> classx;
 
-    /** DOCUMENT ME! */
+    /** An array of allowed values for this option. */
     CommandOptionValue[] optionValue;
 
-    /** DOCUMENT ME! */
+    /** The current value of this option. */
     Object value;
 
-    /** DOCUMENT ME! */
+    /** A brief description of this option for usage reporting. */
     String desc;
 
-/**
+    /**
      * Creates a new CommandOption object.
      *
-     * @param name        DOCUMENT ME!
-     * @param classx      DOCUMENT ME!
-     * @param optionValue DOCUMENT ME!
-     * @param value       DOCUMENT ME!
-     * @param desc        DOCUMENT ME!
+     * @param name        the name of the option
+     * @param classx      the expected value type
+     * @param optionValue allowed value descriptors (can be null)
+     * @param value       the default value
+     * @param desc        the option description
      */
     public CommandOption(String name, Class<?> classx,
         CommandOptionValue[] optionValue, Object value, String desc) {
@@ -86,54 +83,54 @@ public class CommandOption {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of this option.
      *
-     * @param value DOCUMENT ME!
+     * @param value the new value
      */
     public void setValue(Object value) {
         this.value = value;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the current value of this option.
      *
-     * @return DOCUMENT ME!
+     * @return the value
      */
     public Object getValue() {
         return this.value;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of this option.
      *
-     * @return DOCUMENT ME!
+     * @return the name
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the class type of this option.
      *
-     * @return DOCUMENT ME!
+     * @return the class type
      */
     public Class<?> getClassx() {
         return this.classx;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the description of this option.
      *
-     * @return DOCUMENT ME!
+     * @return the description
      */
     public String getDescription() {
         return this.desc;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a string representing the usage documentation for this option.
      *
-     * @return DOCUMENT ME!
+     * @return the usage string
      */
     String usageString() {
         String s = "";
@@ -177,12 +174,12 @@ public class CommandOption {
     }
 
     /**
-     * interprets arg.
+     * Interprets command line arguments to set this option's value.
      *
-     * @param args DOCUMENT ME!
-     * @param argCount DOCUMENT ME!
+     * @param args     the command line arguments
+     * @param argCount the current position in the arguments array
      *
-     * @return DOCUMENT ME!
+     * @return the updated argument count position
      */
     int process(String[] args, int argCount) {
         int count = argCount;
@@ -229,9 +226,9 @@ public class CommandOption {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a string representation of this option and its current value.
      *
-     * @return DOCUMENT ME!
+     * @return the string representation
      */
     public String toString() {
         String s = "";

@@ -48,15 +48,15 @@ import java.util.Set;
 public class OrganizationTask extends Task {
     //usually lower than sum of energy and human costs thanks to the fact that big groups work usually faster
     //you may also count in that cost the price of using the machines, renting the building, etc....
-    /** DOCUMENT ME! */
+    /** The human work cost in hours. */
     @Attribute
     private Real humanCost; //the number of hours of man work
 
-    /** DOCUMENT ME! */
+    /** The adjusted cost including energy and resource expenses. */
     @Attribute
     private Money adjustedCost; //the adjusted cost depending on the price of the energy and the human work
 
-    /** DOCUMENT ME! */
+    /** The kind of task (see EconomicsConstants). */
     @Attribute
     private int kind;
 
@@ -64,9 +64,9 @@ public class OrganizationTask extends Task {
     /**
      * Creates a new OrganizationTask object.
      *
-     * @param name DOCUMENT ME!
-     * @param resources DOCUMENT ME!
-     * @param products DOCUMENT ME!
+     * @param name the name of the task
+     * @param resources the set of required resources
+     * @param products the set of resulting products
      */
     public OrganizationTask(String name, Set<Resource> resources, Set<Resource> products) {
         super(name, resources, products);
@@ -76,9 +76,9 @@ public class OrganizationTask extends Task {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the human cost.
      *
-     * @return DOCUMENT ME!
+     * @return the human cost
      */
     public Real getHumanCost() {
         return humanCost;
@@ -86,18 +86,18 @@ public class OrganizationTask extends Task {
 
     //should always be positive or zero
     /**
-     * DOCUMENT ME!
+     * Sets the human cost.
      *
-     * @param cost DOCUMENT ME!
+     * @param cost the human cost
      */
     public void setHumanCost(Real cost) {
         humanCost = cost;
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the adjusted cost.
      *
-     * @return DOCUMENT ME!
+     * @return the adjusted cost
      */
     public Money getAdjustedCost() {
         return adjustedCost;
@@ -105,9 +105,9 @@ public class OrganizationTask extends Task {
 
     //this is the only cost actually used in the system to produce work
     /**
-     * DOCUMENT ME!
+     * Sets the adjusted cost.
      *
-     * @param cost DOCUMENT ME!
+     * @param cost the adjusted cost
      */
     public void setAdjustedCost(Money cost) {
         if (cost != null) {
@@ -119,21 +119,19 @@ public class OrganizationTask extends Task {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the task kind.
      *
-     * @return DOCUMENT ME!
+     * @return the kind
      */
     public int getKind() {
         return kind;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the task kind.
      *
-     * @param kind DOCUMENT ME!
+     * @param kind the kind
      */
-
-    // see EconomicsConstants processes
     public void setKind(int kind) {
         this.kind = kind;
     }

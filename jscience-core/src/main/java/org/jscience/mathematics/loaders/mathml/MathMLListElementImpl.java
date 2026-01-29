@@ -36,38 +36,38 @@ import org.w3c.dom.mathml.MathMLListElement;
  */
 public class MathMLListElementImpl extends MathMLContentContainerImpl
     implements MathMLListElement {
-/**
+    /**
      * Constructs a MathML <code>list</code> element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLListElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns whether the list is defined explicitly (by enumeration).
      *
-     * @return DOCUMENT ME!
+     * @return true if explicit, false if defined by constraint
      */
     public boolean getIsExplicit() {
         return !(getFirstChild() instanceof MathMLBvarElement);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the ordering of the list elements.
      *
-     * @return DOCUMENT ME!
+     * @return the ordering attribute value
      */
     public String getOrdering() {
         return getAttribute("order");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the ordering of the list elements.
      *
-     * @param ordering DOCUMENT ME!
+     * @param ordering the ordering to set
      */
     public void setOrdering(String ordering) {
         setAttribute("order", ordering);

@@ -38,8 +38,8 @@ public class MathMLEncloseElementImpl extends MathMLPresentationContainerImpl
 /**
      * Constructs a MathML enclose element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLEncloseElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,18 +47,18 @@ public class MathMLEncloseElementImpl extends MathMLPresentationContainerImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the notation attribute of the enclose element.
      *
-     * @return DOCUMENT ME!
+     * @return the notation value
      */
     public String getNotation() {
         return getAttribute("notation");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the notation attribute of the enclose element.
      *
-     * @param notation DOCUMENT ME!
+     * @param notation the new notation value
      */
     public void setNotation(String notation) {
         setAttribute("notation", notation);

@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * The xml-annotation element is used to store XML-based annotations in MathML.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,17 +32,17 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLXMLAnnotationElement extends MathMLElement {
     /**
-     * DOCUMENT ME!
+     * Returns the encoding of the annotation.
      *
-     * @return DOCUMENT ME!
+     * @return the encoding string
      */
     public String getEncoding();
 
     /**
-     * DOCUMENT ME!
+     * Sets the encoding of the annotation.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the encoding string to set
      */
     public void setEncoding(String encoding);
 }
-;
+

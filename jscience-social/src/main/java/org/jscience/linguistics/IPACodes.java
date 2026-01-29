@@ -36,617 +36,617 @@ package org.jscience.linguistics;
 public class IPACodes {
     //THE INTERNATIONAL PHONETIC ALPHABET(revised to 1993, updated 1996)
     //pulmonic consonants
-    /** DOCUMENT ME! */
+    /** Voiceless plosive bilabial. */
     public final static String UNICODE0070 = "voiceless plosive bilabial";
 
-    /** DOCUMENT ME! */
+    /** Voiced plosive bilabial. */
     public final static String UNICODE0062 = "voiced plosive bilabial";
 
-    /** DOCUMENT ME! */
+    /** Voiced nasal bilabial. */
     public final static String UNICODE006D = "voiced nasal bilabial";
 
-    /** DOCUMENT ME! */
+    /** Voiced trill bilabial (bilabial trill). */
     public final static String UNICODE0299 = "voiced trill bilabial"; //bilabial trill
 
-    /** DOCUMENT ME! */
+    /** Voiceless fricative bilabial (voiceless bilabial fricative). */
     public final static String UNICODE0278 = "voiceless fricative bilabial"; //voiceless bilabial fricative
 
-    /** DOCUMENT ME! */
+    /** Voiced fricative bilabial (greek small letter beta). */
     public final static String UNICODE03B2 = "voiced fricative bilabial"; //greek small letter beta
 
-    /** DOCUMENT ME! */
+    /** Voiced nasal labiodental (voiced labiodental nasal). */
     public final static String UNICODE0271 = "voiced nasal labiodental"; //voiced labiodental nasal
 
-    /** DOCUMENT ME! */
+    /** Voiceless fricative labiodental. */
     public final static String UNICODE0066 = "voiceless fricative labiodental";
 
-    /** DOCUMENT ME! */
+    /** Voiced fricative labiodental. */
     public final static String UNICODE0076 = "voiced fricative labiodental";
 
-    /** DOCUMENT ME! */
+    /** Voiced approximant labiodental (voiced labiodental approximant). */
     public final static String UNICODE028B = "voiced approximant labiodental"; //voiced labiodental approximant
 
-    /** DOCUMENT ME! */
+    /** Voiceless plosive alveolar. */
     public final static String UNICODE0074 = "voiceless plosive alveolar";
 
-    /** DOCUMENT ME! */
+    /** Voiced plosive alveolar. */
     public final static String UNICODE0064 = "voiced plosive alveolar";
 
-    /** DOCUMENT ME! */
+    /** Voiced nasal alveolar. */
     public final static String UNICODE006E = "voiced nasal alveolar";
 
-    /** DOCUMENT ME! */
+    /** Voiced trill alveolar. */
     public final static String UNICODE0072 = "voiced trill alveolar";
 
-    /** DOCUMENT ME! */
+    /** Voiced tap or flap alveolar (voiced alveolar flap or tap). */
     public final static String UNICODE027E = "voiced tap or flap alveolar"; //voiced alveolar flap or tap
 
-    /** DOCUMENT ME! */
+    /** Voiceless fricative dental (greek small letter theta). */
     public final static String UNICODE03B8 = "voiceless fricative dental"; //? greek small letter theta
 
-    /** DOCUMENT ME! */
+    /** Voiced fricative dental (latin small letter eth). */
     public final static String UNICODE00F0 = "voiced fricative dental"; // latin small letter eth
 
-    /** DOCUMENT ME! */
+    /** Voiceless fricative alveolar. */
     public final static String UNICODE0073 = "voiceless fricative alveolar";
 
-    /** DOCUMENT ME! */
+    /** Voiced fricative alveolar. */
     public final static String UNICODE007A = "voiced fricative alveolar";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless fricative postalveolar. */
     public final static String UNICODE0283 = "voiceless fricative postalveolar"; //� voiceless postalveolar fricative
 
-    /** DOCUMENT ME! */
+    /** Voiced fricative postalveolar (voiced postalveolar fricative). */
     public final static String UNICODE0292 = "voiced fricative postalveolar"; //voiced postalveolar fricative
 
-    /** DOCUMENT ME! */
+    /** Voiceless lateral fricative alveolar (voiceless alveolar lateral fricative). */
     public final static String UNICODE026C = "voiceless lateral  fricative alveolar"; //voiceless alveolar lateral fricative
 
-    /** DOCUMENT ME! */
-    public final static String UNICODE026E = "voiced lateral  fricative alveolar"; //� voiced lateral fricative
+    /** Voiced lateral fricative alveolar (voiced lateral fricative). */
+    public final static String UNICODE026E = "voiced lateral  fricative alveolar"; // voiced lateral fricative
 
-    /** DOCUMENT ME! */
-    public final static String UNICODE0279 = "voiced approximant alveolar"; //� voiced alveolar approximant
+    /** Voiced approximant alveolar (voiced alveolar approximant). */
+    public final static String UNICODE0279 = "voiced approximant alveolar"; // voiced alveolar approximant
 
-    /** DOCUMENT ME! */
+    /** Voiced lateral approximant alveolar. */
     public final static String UNICODE006C = "voiced lateral approximant alveolar";
 
-    /** DOCUMENT ME! */
+    /** Voiceless plosive retroflex (voiceless retroflex stop). */
     public final static String UNICODE0288 = "voiceless plosive retroflex"; //voiceless retroflex stop
 
-    /** DOCUMENT ME! */
+    /** Voiced plosive retroflex (voiced retroflex stop). */
     public final static String UNICODE0256 = "voiced plosive retroflex"; //voiced retroflex stop
 
-    /** DOCUMENT ME! */
+    /** Voiced nasal retroflex (voiced retroflex nasal). */
     public final static String UNICODE0273 = "voiced nasal retroflex"; //voiced retroflex nasal
 
-    /** DOCUMENT ME! */
+    /** Voiced tap or flap retroflex (voiced retroflex flap). */
     public final static String UNICODE027D = "voiced tap or flap retroflex"; //voiced retroflex flap
 
-    /** DOCUMENT ME! */
-    public final static String UNICODE0282 = "voiceless fricative retroflex"; //� voiceless retroflex fricative
+    /** Voiceless fricative retroflex (voiceless retroflex fricative). */
+    public final static String UNICODE0282 = "voiceless fricative retroflex"; // voiceless retroflex fricative
 
-    /** DOCUMENT ME! */
+    /** Voiced fricative retroflex (voiced retroflex fricative). */
     public final static String UNICODE0290 = "voiced fricative retroflex"; //voiced retroflex fricative
 
-    /** DOCUMENT ME! */
+    /** Voiced approximant retroflex (voiced retroflex approximant). */
     public final static String UNICODE027B = "voiced approximant retroflex"; //voiced retroflex approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced lateral approximant retroflex. */
     public final static String UNICODE026D = "voiced lateral approximant retroflex"; //� voiced retroflex lateral
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless plosive palatal. */
     public final static String UNICODE0063 = "voiceless plosive palatal";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced plosive palatal. */
     public final static String UNICODE025F = "voiced plosive palatal"; //voiced palatal stop
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced nasal palatal. */
     public final static String UNICODE0272 = "voiced nasal palatal"; //voiced palatal nasal
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless fricative palatal. */
     public final static String UNICODE00E7 = "voiceless fricative palatal"; //latin small letter c with cedilla
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced fricative palatal. */
     public final static String UNICODE029D = "voiced fricative palatal"; //voiced palatal fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced approximant palatal. */
     public final static String UNICODE006A = "voiced approximant palatal";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced lateral approximant palatal. */
     public final static String UNICODE028E = "voiced lateral approximant palatal"; //voiced lateral approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless plosive velar. */
     public final static String UNICODE006B = "voiceless plosive velar";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced plosive velar. */
     public final static String UNICODE0261 = "voiced plosive velar"; //� voiced velar stop
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced nasal velar. */
     public final static String UNICODE014B = "voiced nasal velar"; //latin small letter eng
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless fricative velar. */
     public final static String UNICODE0078 = "voiceless fricative velar";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced fricative velar. */
     public final static String UNICODE0263 = "voiced fricative velar"; //� voiced velar fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced approximant velar. */
     public final static String UNICODE0270 = "voiced approximant velar"; //voiced velar approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced lateral approximant velar. */
     public final static String UNICODE029F = "voiced lateral approximant velar"; //velar lateral approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless plosive uvular. */
     public final static String UNICODE0071 = "voiceless plosive uvular";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced plosive uvular. */
     public final static String UNICODE0262 = "voiced plosive uvular"; //voiced uvular stop
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced nasal uvular. */
     public final static String UNICODE0274 = "voiced nasal uvular"; //voiced uvular nasal
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced trill uvular. */
     public final static String UNICODE0280 = "voiced trill uvular"; //voiced uvular trill
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless fricative uvular. */
     public final static String UNICODE03C7 = "voiceless fricative uvular"; //greek small letter chi
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced fricative uvular. */
     public final static String UNICODE0281 = "voiced fricative uvular"; //voiced uvular fricative or approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless fricative pharyngeal. */
     public final static String UNICODE0127 = "voiceless fricative pharyngeal"; //latin small letter h with stroke
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced fricative pharyngeal. */
     public final static String UNICODE0295 = "voiced fricative pharyngeal"; //voiced pharyngeal fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless plosive glottal. */
     public final static String UNICODE0294 = "voiceless plosive glottal"; //LATIN LETTER GLOTTAL STOP
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless fricative glottal. */
     public final static String UNICODE0068 = "voiceless fricative glottal";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced fricative glottal. */
     public final static String UNICODE0266 = "voiced fricative glottal"; //breathy-voiced glottal fricative
 
     //consonants (non-pulmonic)
-    /** DOCUMENT ME! */
+    /** Constant for bilabial click. */
     public final static String UNICODE0298 = "bilabial click"; //LATIN LETTER BILABIAL CLICK
 
-    /** DOCUMENT ME! */
+    /** Constant for dental click. */
     public final static String UNICODE01C0 = "dental click"; // latin letter dental click
 
-    /** DOCUMENT ME! */
+    /** Constant for (post)alveolar click. */
     public final static String UNICODE01C3 = "(post)alveolar click"; //latin letter retroflex click
 
-    /** DOCUMENT ME! */
+    /** Constant for palatoalveolar click. */
     public final static String UNICODE01C2 = "palatoalveolar click";
 
-    /** DOCUMENT ME! */
+    /** Constant for alveolar lateral click. */
     public final static String UNICODE01C1 = "alveolar lateral click"; //latin letter lateral click
 
-    /** DOCUMENT ME! */
+    /** Constant for bilabial voiced implosive. */
     public final static String UNICODE0253 = "bilabial voiced implosive"; //� implosive bilabial stop
 
-    /** DOCUMENT ME! */
+    /** Constant for dental or alveolar voiced implosive. */
     public final static String UNICODE0257 = "dental or alveolar voiced implosive"; //� implosive dental or alveolar stop
 
-    /** DOCUMENT ME! */
+    /** Constant for palatal voiced implosive. */
     public final static String UNICODE0284 = "palatal voiced implosive"; //� implosive palatal stop
 
-    /** DOCUMENT ME! */
+    /** Constant for velar voiced implosive. */
     public final static String UNICODE0260 = "velar voiced implosive"; //implosive velar stop
 
-    /** DOCUMENT ME! */
+    /** Constant for uvular voiced implosive. */
     public final static String UNICODE029B = "uvular voiced implosive"; //voiced uvular implosive
 
-    /** DOCUMENT ME! */
+    /** Constant for ejective. */
     public final static String UNICODE2019 = "ejective";
 
     //vowels
-    /** DOCUMENT ME! */
+    /** Constant for front closed vowel. */
     public final static String UNICODE0069 = "front closed vowel";
 
-    /** DOCUMENT ME! */
+    /** Constant for front closed vowel. */
     public final static String UNICODE0079 = "front closed vowel";
 
-    /** DOCUMENT ME! */
+    /** Constant for central closed vowel. */
     public final static String UNICODE0268 = "central closed vowel"; //high central unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for central closed vowel. */
     public final static String UNICODE0289 = "central closed vowel"; //high central rounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back closed vowel. */
     public final static String UNICODE026F = "back closed vowel"; //high back unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back closed vowel. */
     public final static String UNICODE0075 = "back closed vowel";
 
-    /** DOCUMENT ME! */
+    /** Constant for front closed vowel. */
     public final static String UNICODE026A = "front closed vowel"; //semi-high front unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for front closed vowel. */
     public final static String UNICODE028F = "front closed vowel"; //� semi-high front rounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back closed vowel. */
     public final static String UNICODE028A = "back closed vowel"; //� semi-high back rounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for front closed-mid vowel. */
     public final static String UNICODE0065 = "front closed-mid vowel";
 
-    /** DOCUMENT ME! */
+    /** Constant for front closed-mid vowel. */
     public final static String UNICODE00F8 = "front closed-mid vowel"; //latin small letter o with stroke
 
-    /** DOCUMENT ME! */
+    /** Constant for central closed-mid vowel. */
     public final static String UNICODE0258 = "central closed-mid vowel"; //upper-mid central unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for central closed-mid vowel. */
     public final static String UNICODE0275 = "central closed-mid vowel"; //rounded mid-central vowel, i.e. rounded schwa
 
-    /** DOCUMENT ME! */
+    /** Constant for back closed-mid vowel. */
     public final static String UNICODE0264 = "back closed-mid vowel"; //� upper-mid back unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back closed-mid vowel. */
     public final static String UNICODE006F = "back closed-mid vowel";
 
-    /** DOCUMENT ME! */
+    /** Constant for central closed-mid vowel. */
     public final static String UNICODE0259 = "central closed-mid vowel"; //mid-central unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for front opened-mid vowel. */
     public final static String UNICODE025B = "front opened-mid vowel"; //lower-mid front unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for front opened-mid vowel. */
     public final static String UNICODE0153 = "front opened-mid vowel"; //latin small ligature oe
 
-    /** DOCUMENT ME! */
+    /** Constant for central opened-mid vowel. */
     public final static String UNICODE025C = "central opened-mid vowel"; //lower-mid central unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for central opened-mid vowel. */
     public final static String UNICODE025E = "central opened-mid vowel"; //lower-mid central rounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back opened-mid vowel. */
     public final static String UNICODE028C = "back opened-mid vowel"; //� lower-mid back unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back opened-mid vowel. */
     public final static String UNICODE0254 = "back opened-mid vowel"; //lower-mid back rounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for front opened-mid vowel. */
     public final static String UNICODE00E6 = "front opened-mid vowel"; //latin small letter ae
 
-    /** DOCUMENT ME! */
+    /** Constant for central opened-mid vowel. */
     public final static String UNICODE0250 = "central opened-mid vowel"; //� low central unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for central opened vowel. */
     public final static String UNICODE0061 = "central opened vowel";
 
-    /** DOCUMENT ME! */
+    /** Constant for central opened vowel. */
     public final static String UNICODE0276 = "central opened vowel"; //low front rounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back opened vowel. */
     public final static String UNICODE0251 = "back opened vowel"; //� low back unrounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for back opened vowel. */
     public final static String UNICODE0252 = "back opened vowel"; //� low back rounded vowel
 
     //other symbols
-    /** DOCUMENT ME! */
+    /** Constant for voiceless labial-velar fricative. */
     public final static String UNICODE028D = "voiceless labial-velar fricative"; //voiceless rounded labiovelar approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced labial-velar approximant. */
     public final static String UNICODE0077 = "voiced labial-velar approximant";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced labial-palatal approximant. */
     public final static String UNICODE0265 = "voiced labial-palatal approximant"; //� voiced rounded palatal approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless epiglottal fricative. */
     public final static String UNICODE029C = "voiceless epiglottal fricative"; //� voiceless epiglottal fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced epiglottal fricative. */
     public final static String UNICODE02A2 = "voiced epiglottal fricative"; //voiced epiglottal fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for epiglottal plosive. */
     public final static String UNICODE02A1 = "epiglottal plosive"; //voiced epiglottal stop
 
-    /** DOCUMENT ME! */
+    /** Constant for alveolo-palatal fricative. */
     public final static String UNICODE0255 = "alveolo-palatal fricative"; //� voiceless alveolo-palatal laminal fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for alveolo-palatal fricative. */
     public final static String UNICODE0291 = "alveolo-palatal fricative"; //� voiced alveolo-palatal laminal fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced alveolar lateral flap. */
     public final static String UNICODE027A = "voiced alveolar lateral flap"; //� voiced lateral flap
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless coarticulated velar and palatoalveolar fricative. */
     public final static String UNICODE0267 = "voiceless coarticulated velar and palatoalveolar fricative"; //voiceless coarticulated velar and palatoalveolar fricative
 
     //Affricates and double articulations can be represented by two symbols joined by a tie bar if necessary.
-    /** DOCUMENT ME! */
+    /** Constant for tie bar. */
     public final static String UNICODE0361 = "tie bar";
 
     //suprasegmentals
-    /** DOCUMENT ME! */
+    /** Constant for primary stress. */
     public final static String UNICODE02C8 = "primary stress";
 
-    /** DOCUMENT ME! */
+    /** Constant for secondary stress. */
     public final static String UNICODE02CC = "secondary stress";
 
-    /** DOCUMENT ME! */
+    /** Constant for long. */
     public final static String UNICODE02D0 = "long";
 
-    /** DOCUMENT ME! */
+    /** Constant for half-long. */
     public final static String UNICODE02D1 = "half-long";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra-short. */
     public final static String UNICODE0306 = "extra-short";
 
-    /** DOCUMENT ME! */
+    /** Constant for minor (foot) group. */
     public final static String UNICODE007C = "minor (foot) group";
 
-    /** DOCUMENT ME! */
+    /** Constant for major (intonation) group. */
     public final static String UNICODE2016 = "major (intonation) group";
 
-    /** DOCUMENT ME! */
+    /** Constant for syllabic break. */
     public final static String UNICODE002E = "syllabic break";
 
-    /** DOCUMENT ME! */
+    /** Constant for linking (absence of a break). */
     public final static String UNICODE203F = "linking (absence of a break)";
 
     //diacritics, diacritics may be placed above a symbol with a descender
-    /** DOCUMENT ME! */
+    /** Constant for ring above. */
     public final static String UNICODE030A = "ring above";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiceless. */
     public final static String UNICODE0325 = "voiceless";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced. */
     public final static String UNICODE032C = "voiced";
 
-    /** DOCUMENT ME! */
+    /** Constant for aspirated. */
     public final static String UNICODE02B0 = "aspirated";
 
-    /** DOCUMENT ME! */
+    /** Constant for more rounded. */
     public final static String UNICODE0339 = "more rounded";
 
-    /** DOCUMENT ME! */
+    /** Constant for less rounded. */
     public final static String UNICODE031C = "less rounded";
 
-    /** DOCUMENT ME! */
+    /** Constant for advanced. */
     public final static String UNICODE031F = "advanced";
 
-    /** DOCUMENT ME! */
+    /** Constant for retracted. */
     public final static String UNICODE0320 = "retracted";
 
-    /** DOCUMENT ME! */
+    /** Constant for centralized. */
     public final static String UNICODE0308 = "centralized";
 
-    /** DOCUMENT ME! */
+    /** Constant for mid-centralized. */
     public final static String UNICODE033D = "mid-centralized";
 
-    /** DOCUMENT ME! */
+    /** Constant for syllabic. */
     public final static String UNICODE0329 = "syllabic";
 
-    /** DOCUMENT ME! */
+    /** Constant for non-syllabic. */
     public final static String UNICODE032F = "non-syllabic";
 
-    /** DOCUMENT ME! */
+    /** Constant for rhoticity. */
     public final static String UNICODE02DE = "rhoticity";
 
-    /** DOCUMENT ME! */
+    /** Constant for breathy voiced. */
     public final static String UNICODE0324 = "breathy voiced";
 
-    /** DOCUMENT ME! */
+    /** Constant for creaky voiced. */
     public final static String UNICODE0330 = "creaky voiced";
 
-    /** DOCUMENT ME! */
+    /** Constant for linguolabial. */
     public final static String UNICODE033C = "linguolabial";
 
-    /** DOCUMENT ME! */
+    /** Constant for labialized. */
     public final static String UNICODE02B7 = "labialized";
 
-    /** DOCUMENT ME! */
+    /** Constant for palatalized. */
     public final static String UNICODE02B2 = "palatalized";
 
-    /** DOCUMENT ME! */
+    /** Constant for velarized. */
     public final static String UNICODE02E0 = "velarized";
 
-    /** DOCUMENT ME! */
+    /** Constant for pharyngealized. */
     public final static String UNICODE02E4 = "pharyngealized";
 
-    /** DOCUMENT ME! */
+    /** Constant for dental. */
     public final static String UNICODE032A = "dental";
 
-    /** DOCUMENT ME! */
+    /** Constant for apical. */
     public final static String UNICODE033A = "apical";
 
-    /** DOCUMENT ME! */
+    /** Constant for laminal. */
     public final static String UNICODE033B = "laminal";
 
-    /** DOCUMENT ME! */
+    /** Constant for nasalized. */
     public final static String UNICODE0303 = "nasalized";
 
-    /** DOCUMENT ME! */
+    /** Constant for nasal release. */
     public final static String UNICODE207F = "nasal release";
 
-    /** DOCUMENT ME! */
+    /** Constant for lateral release. */
     public final static String UNICODE02E1 = "lateral release";
 
-    /** DOCUMENT ME! */
+    /** Constant for no audible release. */
     public final static String UNICODE031A = "no audible release";
 
-    /** DOCUMENT ME! */
+    /** Constant for velarized or pharyngealized. */
     public final static String UNICODE0334 = "velarized or pharyngealized";
 
-    /** DOCUMENT ME! */
+    /** Constant for velarized or pharyngealized. */
     public final static String UNICODE026B = "velarized or pharyngealized"; //velarized voiced alveolar lateral approximant
 
-    /** DOCUMENT ME! */
+    /** Constant for raised. */
     public final static String UNICODE031D = "raised";
 
-    /** DOCUMENT ME! */
+    /** Constant for lowered. */
     public final static String UNICODE031E = "lowered";
 
-    /** DOCUMENT ME! */
+    /** Constant for advanced tongue root. */
     public final static String UNICODE0318 = "advanced tongue root";
 
-    /** DOCUMENT ME! */
+    /** Constant for retracted tongue root. */
     public final static String UNICODE0319 = "retracted tongue root";
 
     //tones and word accents
-    /** DOCUMENT ME! */
+    /** Constant for extra high level. */
     public final static String UNICODE030B = "extra high level";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra high level. */
     public final static String UNICODE02E5 = "extra high level";
 
-    /** DOCUMENT ME! */
+    /** Constant for high level. */
     public final static String UNICODE0301 = "high level";
 
-    /** DOCUMENT ME! */
+    /** Constant for high level. */
     public final static String UNICODE02E6 = "high level";
 
-    /** DOCUMENT ME! */
+    /** Constant for mid level. */
     public final static String UNICODE0304 = "mid level";
 
-    /** DOCUMENT ME! */
+    /** Constant for mid level. */
     public final static String UNICODE02E7 = "mid level";
 
-    /** DOCUMENT ME! */
+    /** Constant for low level. */
     public final static String UNICODE0300 = "low level";
 
-    /** DOCUMENT ME! */
+    /** Constant for low level. */
     public final static String UNICODE02E8 = "low level";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra low level. */
     public final static String UNICODE030F = "extra low level";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra low level. */
     public final static String UNICODE02E9 = "extra low level";
 
-    /** DOCUMENT ME! */
+    /** Constant for downstep. */
     public final static String UNICODE2193 = "downstep";
 
-    /** DOCUMENT ME! */
+    /** Constant for upstep. */
     public final static String UNICODE2191 = "upstep";
 
     //not supported:
     //rising
     //falling
-    /** DOCUMENT ME! */
+    /** Constant for rise. */
     public final static String UNICODE030C = "rise";
 
-    /** DOCUMENT ME! */
+    /** Constant for fall. */
     public final static String UNICODE0302 = "fall";
 
     //high rising
     //low rising
     //rising-falling
-    /** DOCUMENT ME! */
+    /** Constant for global rise. */
     public final static String UNICODE2197 = "global rise";
 
-    /** DOCUMENT ME! */
+    /** Constant for global fall. */
     public final static String UNICODE2198 = "global fall";
 
     //some useful precomposed characters that do not fit into the official IPA
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0297 = "extra IPA character"; //palatal (or alveolar) click
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE02A3 = "extra IPA character"; //voiced dental affricate
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE02A4 = "extra IPA character"; //voiced postalveolar affricate
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE02A5 = "extra IPA character"; //voiced alveolo-palatal affricate
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE025D = "extra IPA character"; //rhotacized lower-mid central vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE029A = "extra IPA character"; //lower-mid front rounded vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0269 = "extra IPA character"; //semi-high front unrounded vowel, obsoleted by IPA in 1989, preferred use is 026A
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE029E = "extra IPA character"; //proposed for velar click, withdrawn by IPA in 1970
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0142 = "extra IPA character";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE02A0 = "extra IPA character"; //voiceless uvular implosive
 
     //public final static String UNICODE029A = "extra IPA character";//lower-mid front rounded vowel
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE027C = "extra IPA character"; //voiced strident apico-alveolar trill, obsoleted by IPA in 1989
 
     //public final static String UNICODE029F = "extra IPA character";//velar lateral approximant
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0285 = "extra IPA character"; //apical retroflex vowel
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0286 = "extra IPA character"; //palatalized voiceless postalveolar fricative
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0161 = "extra IPA character";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0287 = "extra IPA character"; //dental click (sound of "tsk tsk")
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE02A8 = "extra IPA character"; //voiceless alveolo-palatal affricate
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE02A7 = "extra IPA character"; //voiceless postalveolar affricate
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE02A6 = "extra IPA character"; //voiceless dental affricate
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE03BB = "extra IPA character"; //greek small letter lamda
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE019B = "extra IPA character";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE017E = "extra IPA character";
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE0296 = "extra IPA character"; //lateral click
 
-    /** DOCUMENT ME! */
+    /** Constant for extra IPA character. */
     public final static String UNICODE01BE = "extra IPA character";
 
     //miscellaneous modifiers
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02B1 = "miscellaneous IPA modifier"; //modifier letter small h with hook
 
     //public final static String UNICODE02B2 = "miscellaneous IPA modifier";
     //public final static String UNICODE02E1 = "miscellaneous IPA modifier";
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02B3 = "miscellaneous IPA modifier";
 
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02B4 = "miscellaneous IPA modifier"; //modifier letter small turned r
 
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02B5 = "miscellaneous IPA modifier"; //modifier letter small turned r with hook
 
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02B6 = "miscellaneous IPA modifier"; //modifier letter small capital inverted r
 
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02E2 = "miscellaneous IPA modifier";
 
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02B8 = "miscellaneous IPA modifier";
 
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02E3 = "miscellaneous IPA modifier";
 
-    /** DOCUMENT ME! */
+    /** Constant for miscellaneous IPA modifier. */
     public final static String UNICODE02C0 = "miscellaneous IPA modifier"; //modifier letter glottal stop
 
     //public final static String UNICODE02E1 = "miscellaneous IPA modifier";
@@ -673,45 +673,44 @@ public class IPACodes {
     //missing 025A, 0277, 027F, 0293
     public final static String UNICODE025A = "rhotacized schwa";
 
-    /** DOCUMENT ME! */
+    /** Constant for semi-high back rounded vowel. */
     public final static String UNICODE0277 = "semi-high back rounded vowel"; //obsoleted by IPA in 1989, use 028A
 
-    /** DOCUMENT ME! */
+    /** Constant for apical dental vowel. */
     public final static String UNICODE027F = "apical dental vowel";
 
-    /** DOCUMENT ME! */
+    /** Constant for palatalized voiced postalveolar fricative. */
     public final static String UNICODE0293 = "palatalized voiced postalveolar fricative";
 
     //Extended IPA for disordered speech
     //as noted on the IPA unicode chart
-    /** DOCUMENT ME! */
+    /** Constant for velopharyngeal fricative. */
     public final static String UNICODE02A9 = "velopharyngeal fricative";
 
-    /** DOCUMENT ME! */
+    /** Constant for lateral alveolar fricative (lisp). */
     public final static String UNICODE02AA = "lateral alveolar fricative (lisp)";
 
-    /** DOCUMENT ME! */
+    /** Constant for voiced lateral alveolar fricative. */
     public final static String UNICODE02AB = "voiced lateral alveolar fricative";
 
-    /** DOCUMENT ME! */
+    /** Constant for audible lip smack. */
     public final static String UNICODE02AC = "audible lip smack";
 
-    /** DOCUMENT ME! */
+    /** Constant for audible teeth gnashing. */
     public final static String UNICODE02AD = "audible teeth gnashing";
 
     //additions for sinology
-    /** DOCUMENT ME! */
+    /** Constant for nameless, latin small letter turned H with fishhook. */
     public final static String UNICODE02AE = "nameless, latin small letter turned H with fishhook";
 
-    /** DOCUMENT ME! */
+    /** Constant for nameless, latin small letter turned H with fishhook and tail. */
     public final static String UNICODE02AF = "nameless, latin small letter turned H with fishhook and tail";
 
     /**
-     * DOCUMENT ME!
+     * Checks if the given character code corresponds to an IPA symbol defined in this class.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i the character code (Unicode)
+     * @return true if it is a defined IPA code
      */
     public static boolean isIPA(int i) {
         return (i == 0x0070) || (i == 0x0062) || (i == 0x006D) ||

@@ -23,7 +23,7 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Energy;
 
@@ -56,9 +56,9 @@ public interface Food {
     /**
      * Returns the expiration date ("best before" date) of the food.
      * 
-     * @return the expiration instant, or null if non-perishable or unknown
+     * @return the expiration coordinate, or null if non-perishable or unknown
      */
-    default Instant getExpirationDate() {
+    default TimeCoordinate getExpirationDate() {
         return null;
     }
 }

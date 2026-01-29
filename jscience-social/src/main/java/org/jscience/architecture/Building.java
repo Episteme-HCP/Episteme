@@ -23,7 +23,7 @@
 
 package org.jscience.architecture;
 
-import java.time.Instant;
+import org.jscience.history.time.TimePoint;
 import java.util.UUID;
 import org.jscience.economics.money.Money;
 import org.jscience.economics.resources.Artifact;
@@ -91,7 +91,7 @@ public class Building extends Artifact {
     public Building(String name, Style style, Type type, TimeCoordinate buildDate,
             String architect, Place location, double heightMeters) {
         super(name, "", Quantities.create(1, Units.ONE), null, location, 
-              buildDate != null ? buildDate.toInstant() : Instant.now(), 
+              buildDate != null ? buildDate : TimePoint.now(), 
               new UUIDIdentification(UUID.randomUUID().toString()), Money.usd(0));
         this.style = style;
         this.type = type;

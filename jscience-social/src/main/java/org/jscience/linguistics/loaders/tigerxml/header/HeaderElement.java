@@ -24,7 +24,7 @@
 package org.jscience.linguistics.loaders.tigerxml.header;
 
 /**
- * Represents a .
+ * Common interface for all TigerXML header elements.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,9 +32,9 @@ package org.jscience.linguistics.loaders.tigerxml.header;
  */
 public interface HeaderElement {
     /**
-     * DOCUMENT ME!
+     * Converts this element to its XML representation.
      *
-     * @return DOCUMENT ME!
+     * @return the XML string
      */
     public String toXMLString();
 }

@@ -23,7 +23,6 @@
 
 package org.jscience.history.archeology;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,6 +39,7 @@ import org.jscience.economics.resources.PhysicalObject;
 import org.jscience.earth.Place;
 import org.jscience.earth.Places;
 import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
 import org.jscience.methodology.ScientificDescription;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.persistence.Attribute;
@@ -63,7 +63,7 @@ public class Item extends PhysicalObject {
     private final Set<Human> discoverers;
 
     @Attribute
-    private final Instant discoveryDate;
+    private final TimeCoordinate discoveryDate;
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Place originalPosition;
@@ -89,9 +89,9 @@ public class Item extends PhysicalObject {
 
     public Item(String name, String description, Organization organization,
                 TimeCoordinate dating, Identification identification, Set<Human> discoverers,
-                Instant discoveryDate, Place originalPosition) {
+                TimeCoordinate discoveryDate, Place originalPosition) {
         super(name, description, org.jscience.measure.Quantities.create(1, org.jscience.measure.Units.ONE), organization, Places.EARTH,
-            dating != null ? dating.toInstant() : Instant.now(), identification, Money.usd(0));
+            dating != null ? dating : TimePoint.now(), identification, Money.usd(0));
 
         this.dating = Objects.requireNonNull(dating, "Dating cannot be null");
         this.discoverers = new HashSet<>(Objects.requireNonNull(discoverers, "Discoverers cannot be null"));
@@ -124,7 +124,7 @@ public class Item extends PhysicalObject {
         return Collections.unmodifiableSet(discoverers);
     }
 
-    public Instant getDiscoveryDate() {
+    public TimeCoordinate getDiscoveryDate() {
         return discoveryDate;
     }
 

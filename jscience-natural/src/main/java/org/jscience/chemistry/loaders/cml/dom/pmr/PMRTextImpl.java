@@ -28,7 +28,7 @@ import org.w3c.dom.Text;
 
 
 /**
- * DOCUMENT ME!
+ * Implementation of the {@link Text} interface for the CML DOM.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -43,10 +43,10 @@ public class PMRTextImpl extends PMRCharacterDataImpl implements Text {
     }
 
     /**
-     * Constructor for the PMRTextImpl object.
+     * Creates a new PMRTextImpl object.
      *
-     * @param text Description of the Parameter
-     * @param doc  DOCUMENT ME!
+     * @param text the generic W3C text node to delegate to
+     * @param doc  the owner CML document
      */
     public PMRTextImpl(Text text, PMRDocument doc) {
         super(text, doc);
@@ -74,12 +74,9 @@ public class PMRTextImpl extends PMRCharacterDataImpl implements Text {
 
     /**
      * Returns all text of <code>Text</code> nodes logically-adjacent text
-     * nodes to this node, concatenated in document order. <br>
-     * For instance, in the example below <code>wholeText</code> on the
-     * <code>Text</code> node that contains "bar" returns "barfoo", while on
-     * the <code>Text</code> node that contains "foo" it returns "barfoo".
+     * nodes to this node, concatenated in document order.
      *
-     * @return DOCUMENT ME!
+     * @return the concatenated text
      * @since DOM Level 3
      */
     public String getWholeText() {
@@ -87,14 +84,10 @@ public class PMRTextImpl extends PMRCharacterDataImpl implements Text {
     }
 
     /**
-     * Returns whether this text node contains <a
-     * href='http://www.w3.org/TR/2004/REC-xml-infoset-20040204#infoitem.character'>
-     * element content whitespace</a>, often abusively called "ignorable
-     * whitespace". The text node is determined to contain whitespace in
-     * element content during the load of the document or if validation occurs
-     * while using <code>Document.normalizeDocument()</code>.
+     * Returns whether this text node contains element content whitespace,
+     * often called "ignorable whitespace".
      *
-     * @return DOCUMENT ME!
+     * @return true if whitespace in element content, false otherwise
      * @since DOM Level 3
      */
     public boolean isElementContentWhitespace() {

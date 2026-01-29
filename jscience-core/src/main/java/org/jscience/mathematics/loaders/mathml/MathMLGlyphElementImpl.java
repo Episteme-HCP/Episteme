@@ -38,62 +38,62 @@ public class MathMLGlyphElementImpl extends MathMLElementImpl
 /**
      * Constructs a MathML glyph element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLGlyphElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the alt attribute of the glyph.
      *
-     * @return DOCUMENT ME!
+     * @return the alternative text
      */
     public String getAlt() {
         return getAttribute("alt");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the alt attribute of the glyph.
      *
-     * @param alt DOCUMENT ME!
+     * @param alt the new alternative text
      */
     public void setAlt(String alt) {
         setAttribute("alt", alt);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the font family attribute of the glyph.
      *
-     * @return DOCUMENT ME!
+     * @return the font family
      */
     public String getFontfamily() {
         return getAttribute("fontfamily");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the font family attribute of the glyph.
      *
-     * @param fontfamily DOCUMENT ME!
+     * @param fontfamily the new font family
      */
     public void setFontfamily(String fontfamily) {
         setAttribute("fontfamily", fontfamily);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the index attribute of the glyph.
      *
-     * @return DOCUMENT ME!
+     * @return the glyph index
      */
     public int getIndex() {
         return Integer.parseInt(getAttribute("index"));
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the index attribute of the glyph.
      *
-     * @param index DOCUMENT ME!
+     * @param index the new glyph index
      */
     public void setIndex(int index) {
         setAttribute("index", Integer.toString(index));

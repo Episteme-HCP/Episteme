@@ -24,8 +24,9 @@
 package org.jscience.psychology;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
 
 /**
  * Represents a discrete decision made by an agent (Individual or Organization).
@@ -40,7 +41,7 @@ public record Decision(
     String subject,
     String choice,
     String rationale,
-    Instant timestamp
+    TimeCoordinate timestamp
 ) implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,7 +58,7 @@ public record Decision(
             Objects.requireNonNull(subject, "Subject cannot be null"),
             Objects.requireNonNull(choice, "Choice cannot be null"),
             Objects.requireNonNull(rationale, "Rationale cannot be null"),
-            Instant.now()
+            TimePoint.now()
         );
     }
 }

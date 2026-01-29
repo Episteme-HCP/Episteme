@@ -31,8 +31,8 @@ import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.history.time.TimeCoordinate;
 
-import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -63,7 +63,7 @@ public final class Check implements ComprehensiveIdentification {
     private final Organization receiver;
 
     @Attribute
-    private final Instant emission;
+    private final TimeCoordinate emission;
 
     @Attribute
     private final Money value;
@@ -79,7 +79,7 @@ public final class Check implements ComprehensiveIdentification {
      * @throws NullPointerException if any argument is null
      */
     public Check(Identification id, Account emitter,
-                 Organization receiver, Instant emission, Money value) {
+                 Organization receiver, TimeCoordinate emission, Money value) {
         this.id = Objects.requireNonNull(id, "Identification cannot be null");
         this.emitter = Objects.requireNonNull(emitter, "Emitter cannot be null");
         this.receiver = Objects.requireNonNull(receiver, "Receiver cannot be null");
@@ -99,7 +99,7 @@ public final class Check implements ComprehensiveIdentification {
      * @param currency       the currency
      */
     public Check(Identification identification, Account emitter,
-                 Organization receiver, Instant emission, double amount, Currency currency) {
+                 Organization receiver, TimeCoordinate emission, double amount, Currency currency) {
         this(identification, emitter, receiver, emission, 
              Money.valueOf(Real.of(amount), currency));
     }
@@ -142,7 +142,7 @@ public final class Check implements ComprehensiveIdentification {
      * Returns the emission date/time.
      * @return the emission instant
      */
-    public Instant getEmission() {
+    public TimeCoordinate getEmission() {
         return emission;
     }
 

@@ -38,8 +38,8 @@ public class MathMLAnnotationElementImpl extends MathMLElementImpl
 /**
      * Constructs a MathML annotation element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLAnnotationElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,36 +47,36 @@ public class MathMLAnnotationElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the content body of the annotation.
      *
-     * @return DOCUMENT ME!
+     * @return the body text
      */
     public String getBody() {
         return getFirstChild().getNodeValue();
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the content body of the annotation.
      *
-     * @param body DOCUMENT ME!
+     * @param body the new body text
      */
     public void setBody(String body) {
         getFirstChild().setNodeValue(body);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the encoding attribute of the annotation.
      *
-     * @return DOCUMENT ME!
+     * @return the encoding
      */
     public String getEncoding() {
         return getAttribute("encoding");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the encoding attribute of the annotation.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the new encoding
      */
     public void setEncoding(String encoding) {
         setAttribute("encoding", encoding);

@@ -42,19 +42,19 @@ public interface AbstractCMLDocument extends PMRDocument, CMLNode {
     /** the package name */
     static String PACKAGE_NAME = "org.jscience.chemistry.loaders.cml";
 
-    /** DOCUMENT ME! */
+    /** Constant representing an empty or null DTD identifier. */
     static String NULL_DTD = "";
 
-    /** DOCUMENT ME! */
+    /** Constant representing a null namespace identifier. */
     static String NULL_NAMESPACE = "null";
 
-    /** DOCUMENT ME! */
+    /** The default character encoding used for CML output. */
     static String DEFAULT_OUTPUT_ENCODING = "ISO-8859-1";
 
-    /** DOCUMENT ME! */
+    /** The default DTD file name for CML output. */
     static String DEFAULT_OUTPUT_DTD = "cml.dtd";
 
-    /** DOCUMENT ME! */
+    /** The default namespace URI for CML output. */
     static String DEFAULT_OUTPUT_NAMESPACE = org.jscience.chemistry.loaders.cml.AbstractBase.NAMESPACE_URI;
 
     /**
@@ -94,11 +94,11 @@ public interface AbstractCMLDocument extends PMRDocument, CMLNode {
     Element createSubclassedElement(String tagName);
 
     /**
-     * DOCUMENT ME!
+     * Wraps an existing W3C Element in a CML-specific subclass implementation.
      *
-     * @param oldEl DOCUMENT ME!
+     * @param oldEl the generic W3C element to subclass
      *
-     * @return DOCUMENT ME!
+     * @return the subclassed element instance
      */
     Element subclass(Element oldEl);
 

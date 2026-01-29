@@ -15,15 +15,15 @@ import java.util.Map;
  * it has a method for writing the file.
  * <p/>
  * Subclasses like
- * {@link InputStreamFitsFile} and
- * {@link RandomAccessFitsFile} provide the functionality to read from a FITS
+ * {@link InputStreamFITSFile} and
+ * {@link RandomAccessFITSFile} provide the functionality to read from a FITS
  * data source. The HDU access methods in this class allow you to read only
  * part of a FITS file in order to minimize memory usage and I/O, even though
  * only the subclasses can take advantage of them.
  * <p/>
  * *****************************************************************************
  */
-public class FitsFile {
+public class FITSFile {
     /**
      * ******************************************
      * The number of bytes in a single FITS block -
@@ -77,7 +77,7 @@ public class FitsFile {
      * primary HDU.
      * ************************************************************************
      */
-    public FitsFile() {
+    public FITSFile() {
         isComplete = false;
 
         hdus = new ArrayList();
@@ -157,7 +157,7 @@ public class FitsFile {
      * memory. So this method allows you to save memory and the time it takes to
      * read the HDU contents if all you are interested in is the header keywords.
      * Note that only certain types of FITS files (in particular
-     * {@link RandomAccessFitsFile}) can take advantage of the hint. The header
+     * {@link RandomAccessFITSFile}) can take advantage of the hint. The header
      * keywords are always read.
      *
      * @param number the index of the HDU with zero being the primary HDU.
@@ -239,8 +239,8 @@ public class FitsFile {
      *                       is unlikely to ever happen.
      *                       **************************************************************************
      */
-    public static FitsFile createEmpty() throws FitsException {
-        FitsFile fits = new FitsFile();
+    public static FITSFile createEmpty() throws FitsException {
+        FITSFile fits = new FITSFile();
 
         FitsImageData data = new FitsImageData();
         FitsHeader header = data.createHeader("PRIMARY");
@@ -251,4 +251,4 @@ public class FitsFile {
 
         return fits;
     } // end of createEmpty method
-} // end of FitsFile class
+} // end of FITSFile class

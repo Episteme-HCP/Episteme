@@ -73,7 +73,7 @@ public final class GeologicalTimeScale extends Timeline<Event> {
         return getEvents().stream()
                 .filter(e -> e instanceof GeologicalEra)
                 .map(e -> (GeologicalEra) e)
-                .filter(e -> e.getWhen().toInstant().isBefore(point.toInstant())) // Simplistic check
+                .filter(e -> e.getWhen().compareTo(point) < 0) // Simplistic check
                 .toList();
     }
 }

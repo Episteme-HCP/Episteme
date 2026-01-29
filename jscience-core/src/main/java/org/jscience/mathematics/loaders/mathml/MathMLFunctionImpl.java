@@ -31,20 +31,20 @@ package org.jscience.mathematics.loaders.mathml;
  * @since 1.0
  */
 public class MathMLFunctionImpl extends MathMLPredefinedSymbolImpl {
-/**
+    /**
      * Constructs a MathML predefined symbol (function).
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLFunctionImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the arity of the function.
      *
-     * @return DOCUMENT ME!
+     * @return the number of arguments this function accepts
      */
     public String getArity() {
         return "1";

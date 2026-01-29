@@ -43,8 +43,8 @@ public class PMRCommentImpl extends PMRCharacterDataImpl implements Comment {
 /**
      * Creates a new PMRCommentImpl object.
      *
-     * @param comment DOCUMENT ME!
-     * @param doc     DOCUMENT ME!
+     * @param comment the generic W3C comment to delegate to
+     * @param doc     the owner CML document
      */
     public PMRCommentImpl(Comment comment, PMRDocument doc) {
         super(comment, doc);

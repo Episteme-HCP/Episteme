@@ -46,16 +46,16 @@ import java.util.Hashtable;
  * @since 1.0
  */
 public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
-    /** DOCUMENT ME! */
+    /** The public identifier for the MathML 2.0 DTD. */
     private static final String DOCTYPE_PUBLIC = "-//W3C//DTD MathML 2.0//EN";
 
-    /** DOCUMENT ME! */
+    /** The system identifier for the MathML 2.0 DTD. */
     private static final String DOCTYPE_SYSTEM = "http://www.w3.org/TR/MathML2/dtd/mathml2.dtd";
 
-    /** DOCUMENT ME! */
+    /** Map of MathML element names to their corresponding implementation classes. */
     private static final Hashtable<String, Class<?>> _elementTypesMathML;
 
-    /** DOCUMENT ME! */
+    /** The constructor signature used for instantiating MathML elements. */
     private static final Class<?>[] _elemClassSigMathML = new Class<?>[] {
             MathMLDocumentImpl.class, String.class
         };
@@ -272,9 +272,9 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Document Type Definition (DTD) associated with this document.
      *
-     * @return DOCUMENT ME!
+     * @return the document type
      */
     public DocumentType getDoctype() {
         if (docType == null) {
@@ -286,9 +286,10 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the root element of the MathML document.
+     * If no root element exists, a new "math" element is created.
      *
-     * @return DOCUMENT ME!
+     * @return the root element
      */
     public Element getDocumentElement() {
         Node math;
@@ -304,15 +305,15 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
     }
 
     /**
-     * Xerces specific
+     * Creates an element of the given qualified name and namespace URI (Xerces specific).
      *
-     * @param namespaceURI DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
-     * @param localpart DOCUMENT ME!
+     * @param namespaceURI  the namespace URI of the element to create
+     * @param qualifiedName the qualified name of the element type to instantiate
+     * @param localpart     the local part of the qualified name
      *
-     * @return DOCUMENT ME!
+     * @return a new Element object
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the element cannot be created
      */
     public Element createElementNS(String namespaceURI, String qualifiedName,
         String localpart) throws DOMException {
@@ -320,15 +321,16 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates an element of the given qualified name and namespace URI.
+     * Special handling is provided for MathML elements to instantiate specific implementation classes.
      *
-     * @param namespaceURI DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param namespaceURI  the namespace URI of the element to create
+     * @param qualifiedName the qualified name of the element type to instantiate
      *
-     * @return DOCUMENT ME!
+     * @return a new Element object
      *
-     * @throws DOMException DOCUMENT ME!
-     * @throws IllegalStateException DOCUMENT ME!
+     * @throws DOMException if the element cannot be created
+     * @throws IllegalStateException if an internal error occurs during instantiation
      */
     public Element createElementNS(String namespaceURI, String qualifiedName)
         throws DOMException {
@@ -379,27 +381,27 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the referrer of the document.
      *
-     * @return DOCUMENT ME!
+     * @return the referrer URL, or null if not applicable
      */
     public String getReferrer() {
         return null;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the domain of the document.
      *
-     * @return DOCUMENT ME!
+     * @return the domain name, or null if not applicable
      */
     public String getDomain() {
         return null;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the URI of the document.
      *
-     * @return DOCUMENT ME!
+     * @return the document URI, or null if not applicable
      */
     public String getURI() {
         return null;

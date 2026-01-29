@@ -42,23 +42,23 @@ class JumboConsoleHandler extends ConsoleHandler {
     }
 
     /**
-     * DOCUMENT ME!
+     * Publishes a log record to the console.
      *
-     * @param record DOCUMENT ME!
+     * @param record the log record to publish
      */
     public void publish(LogRecord record) {
         //System.out.println(record.getLevel()+"/"+record.getMessage());
     }
 
     /**
-     * DOCUMENT ME!
+     * Flushes any buffered log output.
      */
     public void flush() {
         System.out.flush();
     }
 
     /**
-     * DOCUMENT ME!
+     * Closes the console handler.
      */
     public void close() {
         super.close();

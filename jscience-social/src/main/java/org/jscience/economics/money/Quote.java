@@ -25,9 +25,10 @@ package org.jscience.economics.money;
 
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -76,7 +77,7 @@ public final class Quote implements Serializable {
     private Money change;
 
     @Attribute
-    private Instant quoteTime;
+    private TimeCoordinate quoteTime;
 
     /**
      * Creates a new Quote with basic information.
@@ -94,7 +95,7 @@ public final class Quote implements Serializable {
         this.volume = 0;
         this.value = Money.usd(0);
         this.openPrice = Money.usd(0);
-        this.quoteTime = Instant.now();
+        this.quoteTime = TimePoint.now();
     }
 
     /**
@@ -109,7 +110,7 @@ public final class Quote implements Serializable {
      * @param quoteTime the time of the quote
      */
     public Quote(String symbol, String company, long volume, Money value,
-                 String market, Money openPrice, Instant quoteTime) {
+                 String market, Money openPrice, TimeCoordinate quoteTime) {
         this.symbol = requireNonEmpty(symbol, "Symbol");
         this.company = requireNonEmpty(company, "Company");
         this.market = requireNonEmpty(market, "Market");
@@ -168,7 +169,7 @@ public final class Quote implements Serializable {
         return change;
     }
 
-    public Instant getQuoteTime() {
+    public TimeCoordinate getQuoteTime() {
         return quoteTime;
     }
 
@@ -217,7 +218,7 @@ public final class Quote implements Serializable {
         this.change = change;
     }
 
-    public void setQuoteTime(Instant quoteTime) {
+    public void setQuoteTime(TimeCoordinate quoteTime) {
         this.quoteTime = quoteTime;
     }
 
@@ -228,7 +229,7 @@ public final class Quote implements Serializable {
      * @param value     the new price
      * @param quoteTime the time of update
      */
-    public void update(long volume, Money value, Instant quoteTime) {
+    public void update(long volume, Money value, TimeCoordinate quoteTime) {
         setVolume(volume);
         setValue(value);
         setQuoteTime(quoteTime);

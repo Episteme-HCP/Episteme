@@ -25,7 +25,7 @@ package org.jscience.economics;
 
 import org.jscience.mathematics.discrete.RootedTree;
 import org.jscience.util.Temporal;
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -51,7 +51,7 @@ import org.jscience.util.identity.ComprehensiveIdentification;
  * @since 1.0
  */
 @Persistent
-public class Organigram implements ComprehensiveIdentification, Temporal<Instant> {
+public class Organigram implements ComprehensiveIdentification, Temporal<TimeCoordinate> {
 
     private static final long serialVersionUID = 2L;
 
@@ -62,7 +62,7 @@ public class Organigram implements ComprehensiveIdentification, Temporal<Instant
     private final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
-    private Instant timestamp;
+    private TimeCoordinate timestamp;
 
     /** The actual hierarchical structure of organizational unit names. */
     private RootedTree<String> structure;
@@ -84,7 +84,7 @@ public class Organigram implements ComprehensiveIdentification, Temporal<Instant
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
-        this.timestamp = Instant.now();
+        this.timestamp = org.jscience.history.time.TimePoint.now();
         this.structure = new RootedTree<>(name);
         this.workers = new HashSet<>();
     }
@@ -100,11 +100,11 @@ public class Organigram implements ComprehensiveIdentification, Temporal<Instant
     }
 
     @Override
-    public Instant getWhen() {
+    public TimeCoordinate getWhen() {
         return timestamp;
     }
 
-    public void setTimestamp(Instant timestamp) {
+    public void setTimestamp(TimeCoordinate timestamp) {
         this.timestamp = Objects.requireNonNull(timestamp);
     }
 
@@ -113,7 +113,7 @@ public class Organigram implements ComprehensiveIdentification, Temporal<Instant
      * @return the timestamp
      */
     @Deprecated
-    public Instant getTimestamp() {
+    public TimeCoordinate getTimestamp() {
         return timestamp;
     }
 

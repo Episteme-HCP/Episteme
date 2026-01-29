@@ -28,37 +28,37 @@ import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * Represents a descriptor for an allowed value for a CommandOption.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class CommandOptionValue {
-    /** DOCUMENT ME! */
+    /** Logger for this class. */
     static Logger logger = Logger.getLogger(CommandOptionValue.class.getName());
 
-    /** DOCUMENT ME! */
+    /** Convenience constant for Level.FINE. */
     static Level MYFINE = Level.FINE;
 
-    /** DOCUMENT ME! */
+    /** Convenience constant for Level.FINEST. */
     static Level MYFINEST = Level.FINEST;
 
     static {
         logger.setLevel(Level.INFO);
     }
 
-    /** DOCUMENT ME! */
+    /** The name/string of this option value. */
     String name;
 
-    /** DOCUMENT ME! */
+    /** A description of what this value signifies. */
     String desc;
 
-/**
+    /**
      * Creates a new CommandOptionValue object.
      *
-     * @param name DOCUMENT ME!
-     * @param desc DOCUMENT ME!
+     * @param name the literal value name
+     * @param desc the description of this value
      */
     public CommandOptionValue(String name, String desc) {
         this.name = name;
@@ -66,9 +66,9 @@ public class CommandOptionValue {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a string representing the usage documentation for this value.
      *
-     * @return DOCUMENT ME!
+     * @return the usage string
      */
     public String usage() {
         return CommandOptions.BLANK.substring(0, 20) +

@@ -6,14 +6,14 @@ import java.util.Iterator;
 
 /**
  * ***********************************************************************
- * Represents a FitsFile which can be read from a RandomAccessFile data source.
+ * Represents a FITSFile which can be read from a RandomAccessFile data source.
  * A random access data source allows you to skip over HDUs and then go back
  * to read them later. So this class can take full advantage of the
  * hints given to the getHDU methods. Note however that the "NEED_DATA_LATER"
  * option is not currently well tested and may contain bugs.
  * ************************************************************************
  */
-public class RandomAccessFitsFile extends FitsFile {
+public class RandomAccessFITSFile extends FITSFile {
     RandomAccessFile file;
     long first_new_byte;
 
@@ -22,10 +22,10 @@ public class RandomAccessFitsFile extends FitsFile {
      * Create a FITS file object which can be read from the given RandomAccessFile.
      *
      * @param file the data source
-     * @throws IOException if there was trouble creating the FitsFile
+     * @throws IOException if there was trouble creating the FITSFile
      *                     ************************************************************************
      */
-    public RandomAccessFitsFile(RandomAccessFile file)
+    public RandomAccessFITSFile(RandomAccessFile file)
             throws IOException {
         super();
 
@@ -60,7 +60,7 @@ public class RandomAccessFitsFile extends FitsFile {
          ******************/
         FitsHeader header = hdu.getHeader();
 
-        for (byte[] data = new byte[FitsFile.BLOCK_SIZE];
+        for (byte[] data = new byte[FITSFile.BLOCK_SIZE];
              (file.read(data) == data.length) && !header.add(data);)
             ;
 
@@ -79,7 +79,7 @@ public class RandomAccessFitsFile extends FitsFile {
         /*******************************************************
          * update the new data indicator to just after this HDU *
          *******************************************************/
-        first_new_byte += (FitsFile.BLOCK_SIZE * hdu.blockCount());
+        first_new_byte += (FITSFile.BLOCK_SIZE * hdu.blockCount());
 
         if (first_new_byte >= file.length()) {
             isComplete = true;
@@ -97,8 +97,8 @@ public class RandomAccessFitsFile extends FitsFile {
      *
      * @param hdu  the HDU whose data will be read.
      * @param when the hint flag telling when to read the data
-     *             this must be either {@linkcFitsFile#NEED_DATA_NOW} or
-     *             {@linkcFitsFile#NEED_DATA_LATER}
+     *             this must be either {@linkcFITSFile#NEED_DATA_NOW} or
+     *             {@linkcFITSFile#NEED_DATA_LATER}
      *             for the former it will call {@link #fillInData(FitsHDU)} in the current
      *             thread. For the latter it will do the same in a separate thread and
      *             return immediately.
@@ -106,9 +106,9 @@ public class RandomAccessFitsFile extends FitsFile {
      *             ************************************************************************
      */
     private void fillInData(FitsHDU hdu, int when) throws IOException {
-        if (when == FitsFile.NEED_DATA_NOW) {
+        if (when == FITSFile.NEED_DATA_NOW) {
             fillInData(hdu);
-        } else if (when == FitsFile.NEED_DATA_LATER) {
+        } else if (when == FITSFile.NEED_DATA_LATER) {
             new DataFiller(hdu).start();
         }
     } // end of fillInData method
@@ -167,13 +167,13 @@ public class RandomAccessFitsFile extends FitsFile {
      * ***********************************************************************
      * returns an HDU specified by number. The data for this HDU will have been
      * read before this method returns. This method is the same as calling
-     * {@link #getHDU(int,int)} with {@link FitsFile#NEED_DATA_NOW}.
+     * {@link #getHDU(int,int)} with {@link FITSFile#NEED_DATA_NOW}.
      *
      * @param number the index of HDU to be read. The primary HDU is numbered 0.
      *               ************************************************************************
      */
     public FitsHDU getHDU(int number) throws IOException {
-        return getHDU(number, FitsFile.NEED_DATA_NOW);
+        return getHDU(number, FITSFile.NEED_DATA_NOW);
     }
 
     /**
@@ -184,10 +184,10 @@ public class RandomAccessFitsFile extends FitsFile {
      * @param number the index of HDU to be read. The primary HDU is numbered 0.
      * @param when   a hint as to when to read the data part of the HDU.
      *               <ul>
-     *               <li> {@link FitsFile#NEED_DATA_NOW} - read the data before returning
-     *               <li> {@link FitsFile#NEED_DATA_LATER} - read the data in a separate thread
+     *               <li> {@link FITSFile#NEED_DATA_NOW} - read the data before returning
+     *               <li> {@link FITSFile#NEED_DATA_LATER} - read the data in a separate thread
      *               after returning
-     *               <li> {@link FitsFile#DATA_NOT_NEEDED} - don't read the data
+     *               <li> {@link FITSFile#DATA_NOT_NEEDED} - don't read the data
      *               </ul>
      * @return the specified HDU.
      *         ****************************************************************************
@@ -224,7 +224,7 @@ public class RandomAccessFitsFile extends FitsFile {
     /**
      * ***********************************************************************
      * returns an HDU specified by name. This is the same as calling
-     * {@link #getHDU(String,int)} with {@link FitsFile#NEED_DATA_NOW}
+     * {@link #getHDU(String,int)} with {@link FITSFile#NEED_DATA_NOW}
      *
      * @param name the EXTNAME value for the desired HDU or "PRIMARY" for the
      *             primary HDU.
@@ -233,7 +233,7 @@ public class RandomAccessFitsFile extends FitsFile {
      *                     ************************************************************************
      */
     public FitsHDU getHDU(String name) throws IOException {
-        return getHDU(name, FitsFile.NEED_DATA_NOW);
+        return getHDU(name, FITSFile.NEED_DATA_NOW);
     } // end of getHDU method
 
     /**
@@ -244,10 +244,10 @@ public class RandomAccessFitsFile extends FitsFile {
      *             primary HDU.
      * @param when a hint as to when to read the data part of the HDU.
      *             <ul>
-     *             <li> {@link FitsFile#NEED_DATA_NOW} - read the data before returning
-     *             <li> {@link FitsFile#NEED_DATA_LATER} - read the data in a separate thread
+     *             <li> {@link FITSFile#NEED_DATA_NOW} - read the data before returning
+     *             <li> {@link FITSFile#NEED_DATA_LATER} - read the data in a separate thread
      *             after returning
-     *             <li> {@link FitsFile#DATA_NOT_NEEDED} - don't read the data
+     *             <li> {@link FITSFile#DATA_NOT_NEEDED} - don't read the data
      *             </ul>
      * @throws IOEXCEPTION            if there was a problem with the underlying I/O or
      *                                the FITS format.
@@ -315,4 +315,4 @@ public class RandomAccessFitsFile extends FitsFile {
             }
         } // end of run method
     } // end of DataFille embedded class *************************************
-} // end of RandomAccessFitsFile class
+} // end of RandomAccessFITSFile class

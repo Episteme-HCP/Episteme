@@ -36,11 +36,11 @@ import org.w3c.dom.mathml.MathMLConditionElement;
  */
 public class MathMLConditionElementImpl extends MathMLElementImpl
     implements MathMLConditionElement {
-/**
+    /**
      * Constructs a MathML condition element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLConditionElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -48,18 +48,18 @@ public class MathMLConditionElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the condition expression.
      *
-     * @return DOCUMENT ME!
+     * @return the apply element representing the condition
      */
     public MathMLApplyElement getCondition() {
         return (MathMLApplyElement) getFirstChild();
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the condition expression.
      *
-     * @param condition DOCUMENT ME!
+     * @param condition the apply element to set as the condition
      */
     public void setCondition(MathMLApplyElement condition) {
         replaceChild(condition, getFirstChild());

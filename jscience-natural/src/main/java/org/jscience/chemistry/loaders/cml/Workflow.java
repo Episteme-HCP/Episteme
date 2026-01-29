@@ -31,16 +31,16 @@ package org.jscience.chemistry.loaders.cml;
  */
 public interface Workflow {
     /**
-     * run the workflow
+     * Runs the workflow.
      *
-     * @throws CMLException DOCUMENT ME!
+     * @throws CMLException if the workflow fails to execute
      */
     void run() throws CMLException;
 
     /**
-     * get the CMLDocument for object creation
+     * Gets the CMLDocument for object creation.
      *
-     * @return DOCUMENT ME!
+     * @return the associated CML document
      */
     AbstractCMLDocument getCMLDocument();
 

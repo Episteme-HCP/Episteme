@@ -34,7 +34,8 @@ import org.jscience.economics.WorkSituation;
  * or conflict. Situations happen usually at dedicated places.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.1
+ * @since 1.0
  */
 
 //you may prefer this class to org.jscience.sociology.Situations.WORKING
@@ -44,8 +45,8 @@ public class MedicalSituation extends WorkSituation {
     /**
      * Creates a new MedicalSituation object.
      *
-     * @param name DOCUMENT ME!
-     * @param comments DOCUMENT ME!
+     * @param name the name of the medical situation
+     * @param comments additional comments or observations
      */
     public MedicalSituation(String name, String comments) {
         super(name, comments);
@@ -53,10 +54,10 @@ public class MedicalSituation extends WorkSituation {
 
     //builds out a doctor
     /**
-     * DOCUMENT ME!
+     * Adds a doctor to the medical situation.
      *
-     * @param individual DOCUMENT ME!
-     * @param organization DOCUMENT ME!
+     * @param individual the individual taking the doctor role
+     * @param organization the organization the doctor belongs to
      */
     public void addDoctor(Individual individual, Organization organization) {
         super.addRole(new Doctor(individual, this, organization));
@@ -64,9 +65,9 @@ public class MedicalSituation extends WorkSituation {
 
     //builds out a patient
     /**
-     * DOCUMENT ME!
+     * Adds a patient to the medical situation.
      *
-     * @param individual DOCUMENT ME!
+     * @param individual the individual taking the patient role
      */
     public void addPatient(Individual individual) {
         super.addRole(new Patient(individual, this));

@@ -105,7 +105,7 @@ public class FitsData {
      * *************************************************************************
      */
     public int blockCount() {
-        return ((data.length + FitsFile.BLOCK_SIZE) - 1) / FitsFile.BLOCK_SIZE;
+        return ((data.length + FITSFile.BLOCK_SIZE) - 1) / FITSFile.BLOCK_SIZE;
     }
 
     /**
@@ -120,13 +120,13 @@ public class FitsData {
     /**
      * ************************************************************************
      * update the number of bytes which have been set in the data array.
-     * This method is used by the subclasses of {@link FitsFile} to indicate
+     * This method is used by the subclasses of {@link FITSFile} to indicate
      * the fraction of the raw data array which has been read from a data source.
      * This method should not be called by the general user.
      *
      * @param valid_bytes the new number of valid bytes in the raw data array
      * @throws FitsException never, however subclasses may do so.
-     * @see FitsFile#getHDU(int,int)
+     * @see FITSFile#getHDU(int,int)
      *      *************************************************************************
      */
     public void setValidBytes(int valid_bytes) throws FitsException {
@@ -154,8 +154,8 @@ public class FitsData {
     /**
      * ************************************************************************
      * returns true if the data array has been completely read. This will only
-     * return false if {@link FitsFile#getHDU(int,int)} was called with the
-     * {@link FitsFile#NEED_DATA_LATER} hint.
+     * return false if {@link FITSFile#getHDU(int,int)} was called with the
+     * {@link FITSFile#NEED_DATA_LATER} hint.
      * *************************************************************************
      */
     public boolean isComplete() {

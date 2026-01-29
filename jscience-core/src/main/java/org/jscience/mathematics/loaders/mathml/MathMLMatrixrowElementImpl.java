@@ -38,11 +38,11 @@ import org.w3c.dom.mathml.MathMLMatrixrowElement;
  */
 public class MathMLMatrixrowElementImpl extends MathMLElementImpl
     implements MathMLMatrixrowElement {
-/**
+    /**
      * Constructs a MathML <code>matrixrow</code> element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element type
      */
     public MathMLMatrixrowElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -50,22 +50,22 @@ public class MathMLMatrixrowElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of entries in the matrix row.
      *
-     * @return DOCUMENT ME!
+     * @return the number of entries
      */
     public int getNEntries() {
         return getEntriesGetLength();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the entry at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the entry to retrieve (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the entry at the given index
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLContentElement getEntry(int index) throws DOMException {
         Node entry = getEntriesItem(index - 1);
@@ -79,14 +79,14 @@ public class MathMLMatrixrowElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the entry at the specified index, replacing any existing entry.
      *
-     * @param newEntry DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newEntry the new entry to set
+     * @param index    the index where the entry should be set (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the new entry
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLContentElement setEntry(MathMLContentElement newEntry,
         int index) throws DOMException {
@@ -106,14 +106,14 @@ public class MathMLMatrixrowElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new entry at the specified index.
      *
-     * @param newEntry DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newEntry the new entry to insert
+     * @param index    the index where the entry should be inserted (0-based)
      *
-     * @return DOCUMENT ME!
+     * @return the new entry
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLContentElement insertEntry(MathMLContentElement newEntry,
         int index) throws DOMException {
@@ -133,13 +133,13 @@ public class MathMLMatrixrowElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the entry at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the entry to remove (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the removed entry
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLContentElement removeEntry(int index)
         throws DOMException {
@@ -154,20 +154,20 @@ public class MathMLMatrixrowElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes the entry at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the entry to delete (1-based)
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public void deleteEntry(int index) throws DOMException {
         removeEntry(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper method to calculate the number of entries.
      *
-     * @return DOCUMENT ME!
+     * @return the number of entry children
      */
     private int getEntriesGetLength() {
         final int length = getLength();
@@ -183,11 +183,10 @@ public class MathMLMatrixrowElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper method to retrieve an entry by its index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param index the 0-based index of the entry
+     * @return the entry node, or null if index is out of bounds
      */
     private Node getEntriesItem(int index) {
         final int entriesLength = getEntriesGetLength();

@@ -38,8 +38,8 @@ public class MathMLStringLitElementImpl extends MathMLPresentationTokenImpl
 /**
      * Constructs a MathML string literal element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLStringLitElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,36 +47,36 @@ public class MathMLStringLitElementImpl extends MathMLPresentationTokenImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the left quote attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the left quote
      */
     public String getLquote() {
         return getAttribute("lquote");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the left quote attribute.
      *
-     * @param lquote DOCUMENT ME!
+     * @param lquote the left quote
      */
     public void setLquote(String lquote) {
         setAttribute("lquote", lquote);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the right quote attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the right quote
      */
     public String getRquote() {
         return getAttribute("rquote");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the right quote attribute.
      *
-     * @param rquote DOCUMENT ME!
+     * @param rquote the right quote
      */
     public void setRquote(String rquote) {
         setAttribute("rquote", rquote);

@@ -35,11 +35,11 @@ import org.w3c.dom.mathml.MathMLPredefinedSymbol;
  */
 public class MathMLPredefinedSymbolImpl extends MathMLElementImpl
     implements MathMLPredefinedSymbol {
-/**
+    /**
      * Constructs a MathML predefined symbol.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLPredefinedSymbolImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,54 +47,54 @@ public class MathMLPredefinedSymbolImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the definition URL of the symbol.
      *
-     * @return DOCUMENT ME!
+     * @return the definition URL
      */
     public String getDefinitionURL() {
         return getAttribute("definitionURL");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the definition URL of the symbol.
      *
-     * @param definitionURL DOCUMENT ME!
+     * @param definitionURL the definition URL to set
      */
     public void setDefinitionURL(String definitionURL) {
         setAttribute("definitionURL", definitionURL);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the encoding of the symbol.
      *
-     * @return DOCUMENT ME!
+     * @return the encoding
      */
     public String getEncoding() {
         return getAttribute("encoding");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the encoding of the symbol.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the encoding to set
      */
     public void setEncoding(String encoding) {
         setAttribute("encoding", encoding);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the arity of the symbol.
      *
-     * @return DOCUMENT ME!
+     * @return the arity (always "0" for predefined symbols)
      */
     public String getArity() {
         return "0";
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the symbol.
      *
-     * @return DOCUMENT ME!
+     * @return the local name of the element
      */
     public String getSymbolName() {
         return getLocalName();

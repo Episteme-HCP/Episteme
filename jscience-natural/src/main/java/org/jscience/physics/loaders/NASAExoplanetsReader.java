@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Connector to NASA Exoplanet Archive.
+ * Connector to Nasa Exoplanet Archive.
  * <p>
  * <b>What it does</b>: Provides access to the catalog of confirmed exoplanets.
  * </p>
@@ -43,7 +43,7 @@ import java.util.List;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see <a href="https://exoplanetarchive.ipac.caltech.edu/">NASA Exoplanet Archive</a>
+ * @see <a href="https://exoplanetarchive.ipac.caltech.edu/">Nasa Exoplanet Archive</a>
  */
 public class NASAExoplanetsReader extends AbstractResourceReader<ExoplanetInfo> {
 
@@ -67,7 +67,7 @@ public class NASAExoplanetsReader extends AbstractResourceReader<ExoplanetInfo> 
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("reader.nasaexoplanetsreader.name", "NASA Exoplanets");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.nasaexoplanetsreader.name", "Nasa Exoplanets");
     }
 
     @Override
@@ -77,12 +77,12 @@ public class NASAExoplanetsReader extends AbstractResourceReader<ExoplanetInfo> 
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("reader.nasaexoplanetsreader.desc", "Confirmed exoplanets from NASA Archive.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.nasaexoplanetsreader.desc", "Confirmed exoplanets from Nasa Archive.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("reader.nasaexoplanetsreader.longdesc", "Provides access to the catalog of confirmed exoplanets from the NASA Exoplanet Archive.");
+        return org.jscience.ui.i18n.I18N.getInstance().get("reader.nasaexoplanetsreader.longdesc", "Provides access to the catalog of confirmed exoplanets from the Nasa Exoplanet Archive.");
     }
 
     @Override
@@ -120,7 +120,7 @@ public class NASAExoplanetsReader extends AbstractResourceReader<ExoplanetInfo> 
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to query NASA Exoplanet Archive", e);
+            throw new RuntimeException("Failed to query Nasa Exoplanet Archive", e);
         }
     }
 

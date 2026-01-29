@@ -69,9 +69,9 @@ public class FitsHDU {
      * If the data section is uninitialized, then this method returns null.
      * The data can be uninitialized if the HDU is being created in memory and
      * you have not yet called {@link #initData() }, or you did not require the data
-     * to be read when you obtained the HDU from the {@link FitsFile}.
+     * to be read when you obtained the HDU from the {@link FITSFile}.
      *
-     * @see FitsFile#getHDU(int,int)
+     * @see FITSFile#getHDU(int,int)
      *      ************************************************************************
      */
     public FitsData getData() {

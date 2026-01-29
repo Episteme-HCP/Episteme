@@ -35,11 +35,11 @@ import org.w3c.dom.mathml.MathMLBvarElement;
  */
 public class MathMLBvarElementImpl extends MathMLContentContainerImpl
     implements MathMLBvarElement {
-/**
+    /**
      * Constructs a MathML bounded variable element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLBvarElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);

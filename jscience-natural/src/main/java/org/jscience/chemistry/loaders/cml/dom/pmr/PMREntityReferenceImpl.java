@@ -44,8 +44,8 @@ public class PMREntityReferenceImpl extends PMRNodeImpl
 /**
      * Creates a new PMREntityReferenceImpl object.
      *
-     * @param er  DOCUMENT ME!
-     * @param doc DOCUMENT ME!
+     * @param er  the generic W3C entity reference to delegate to
+     * @param doc the owner CML document
      */
     public PMREntityReferenceImpl(EntityReference er, PMRDocument doc) {
         super(er, doc);

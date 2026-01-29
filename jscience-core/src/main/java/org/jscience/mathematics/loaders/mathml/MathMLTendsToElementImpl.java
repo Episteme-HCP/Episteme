@@ -35,11 +35,11 @@ import org.w3c.dom.mathml.MathMLTendsToElement;
  */
 public class MathMLTendsToElementImpl extends MathMLPredefinedSymbolImpl
     implements MathMLTendsToElement {
-/**
+    /**
      * Constructs a MathML <code>tendsto</code> element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLTendsToElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,18 +47,18 @@ public class MathMLTendsToElementImpl extends MathMLPredefinedSymbolImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the type of the tendsto element.
      *
-     * @return DOCUMENT ME!
+     * @return the type (above, below, or two-sided)
      */
     public String getType() {
         return getAttribute("type");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the type of the tendsto element.
      *
-     * @param type DOCUMENT ME!
+     * @param type the type to set
      */
     public void setType(String type) {
         setAttribute("type", type);

@@ -37,69 +37,69 @@ import org.w3c.dom.mathml.MathMLElement;
  */
 public class MathMLApplyElementImpl extends MathMLContentContainerImpl
     implements MathMLApplyElement {
-/**
+    /**
      * Constructs a MathML <code>apply</code> element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLApplyElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the operator element (first child).
      *
-     * @return DOCUMENT ME!
+     * @return the operator element
      */
     public MathMLElement getOperator() {
         return (MathMLElement) getFirstChild();
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the operator element.
      *
-     * @param operator DOCUMENT ME!
+     * @param operator the operator element to set
      */
     public void setOperator(MathMLElement operator) {
         replaceChild(operator, getFirstChild());
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the lower limit element.
      *
-     * @return DOCUMENT ME!
+     * @return the lowlimit element
      */
     public MathMLElement getLowLimit() {
         return (MathMLElement) getNodeByName("lowlimit");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the lower limit element.
      *
-     * @param lowlimit DOCUMENT ME!
+     * @param lowlimit the lowlimit element to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the element cannot be set
      */
     public void setLowLimit(MathMLElement lowlimit) throws DOMException {
         setNodeByName(lowlimit, "lowlimit");
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the upper limit element.
      *
-     * @return DOCUMENT ME!
+     * @return the uplimit element
      */
     public MathMLElement getUpLimit() {
         return (MathMLElement) getNodeByName("uplimit");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the upper limit element.
      *
-     * @param uplimit DOCUMENT ME!
+     * @param uplimit the uplimit element to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the element cannot be set
      */
     public void setUpLimit(MathMLElement uplimit) throws DOMException {
         setNodeByName(uplimit, "uplimit");

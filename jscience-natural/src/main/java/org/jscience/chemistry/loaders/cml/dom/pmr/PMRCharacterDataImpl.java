@@ -43,87 +43,87 @@ public class PMRCharacterDataImpl extends PMRNodeImpl implements CharacterData {
 /**
      * Creates a new PMRCharacterDataImpl object.
      *
-     * @param cd  DOCUMENT ME!
-     * @param doc DOCUMENT ME!
+     * @param cd  the generic W3C character data to delegate to
+     * @param doc the owner CML document
      */
     public PMRCharacterDataImpl(CharacterData cd, PMRDocument doc) {
         super(cd, doc);
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes a range of characters from the node.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
+     * @param i the character offset at which to start deleting
+     * @param j the number of characters to delete
      */
     public void deleteData(int i, int j) {
         ((CharacterData) delegateNode).deleteData(i, j);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the character data of the node.
      *
-     * @return DOCUMENT ME!
+     * @return the character data
      */
     public String getData() {
         return ((CharacterData) delegateNode).getData();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a specified substring of the character data.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
+     * @param i the offset of the first character to extract
+     * @param j the number of characters to extract
      *
-     * @return DOCUMENT ME!
+     * @return the specified substring
      */
     public String substringData(int i, int j) {
         return ((CharacterData) delegateNode).substringData(i, j);
     }
 
     /**
-     * DOCUMENT ME!
+     * Appends a string to the end of the character data.
      *
-     * @param s DOCUMENT ME!
+     * @param s the string to append
      */
     public void appendData(String s) {
         ((CharacterData) delegateNode).appendData(s);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the new character data for the node.
      *
-     * @param s DOCUMENT ME!
+     * @param s the new character data
      */
     public void setData(String s) {
         ((CharacterData) delegateNode).setData(s);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of characters in the node.
      *
-     * @return DOCUMENT ME!
+     * @return the character count
      */
     public int getLength() {
         return ((CharacterData) delegateNode).getLength();
     }
 
     /**
-     * DOCUMENT ME!
+     * Replaces a range of characters with a new string.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param s DOCUMENT ME!
+     * @param i the offset at which to start replacing
+     * @param j the number of characters to replace
+     * @param s the replacement string
      */
     public void replaceData(int i, int j, String s) {
         ((CharacterData) delegateNode).replaceData(i, j, s);
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a string at the specified offset.
      *
-     * @param i DOCUMENT ME!
-     * @param s DOCUMENT ME!
+     * @param i the character offset at which to insert
+     * @param s the string to insert
      */
     public void insertData(int i, String s) {
         ((CharacterData) delegateNode).insertData(i, s);

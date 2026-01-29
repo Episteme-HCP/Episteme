@@ -23,7 +23,7 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,7 +51,7 @@ public abstract class Vehicle extends Machine implements Store {
      * Initializes a new vehicle.
      */
     public Vehicle(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Identification identification, Money value) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.contents = new HashSet<>();

@@ -37,56 +37,56 @@ import org.w3c.dom.mathml.MathMLNodeList;
  */
 public class MathMLContentTokenImpl extends MathMLElementImpl
     implements MathMLContentToken {
-/**
+    /**
      * Constructs a MathML content token.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLContentTokenImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the definition URL of the token.
      *
-     * @return DOCUMENT ME!
+     * @return the definition URL
      */
     public String getDefinitionURL() {
         return getAttribute("definitionURL");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the definition URL of the token.
      *
-     * @param definitionURL DOCUMENT ME!
+     * @param definitionURL the definition URL to set
      */
     public void setDefinitionURL(String definitionURL) {
         setAttribute("definitionURL", definitionURL);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the encoding of the token.
      *
-     * @return DOCUMENT ME!
+     * @return the encoding
      */
     public String getEncoding() {
         return getAttribute("encoding");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the encoding of the token.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the encoding to set
      */
     public void setEncoding(String encoding) {
         setAttribute("encoding", encoding);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a list of arguments (excluding sep elements).
      *
-     * @return DOCUMENT ME!
+     * @return the argument list
      */
     public MathMLNodeList getArguments() {
         return new MathMLNodeList() {
@@ -101,11 +101,11 @@ public class MathMLContentTokenImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the argument index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the argument node
      */
     public Node getArgument(int index) {
         Node arg = getArgumentsItem(index - 1);
@@ -114,35 +114,35 @@ public class MathMLContentTokenImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the argument at the specified index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newArgument the new argument node
+     * @param index       the argument index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the replaced node
      */
     public Node setArgument(Node newArgument, int index) {
         return replaceChild(newArgument, getArgumentsItem(index - 1));
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts an argument at the specified index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newArgument the new argument to insert
+     * @param index       the index where to insert (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the inserted node
      */
     public Node insertArgument(Node newArgument, int index) {
         return insertBefore(newArgument, getArgumentsItem(index - 1));
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the argument index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the removed node
      */
     public Node removeArgument(int index) {
         Node arg = getArgumentsItem(index - 1);
@@ -151,18 +151,18 @@ public class MathMLContentTokenImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the argument index (1-based)
      */
     public void deleteArgument(int index) {
         removeArgument(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of arguments (excluding sep elements).
      *
-     * @return DOCUMENT ME!
+     * @return the argument count
      */
     private int getArgumentsGetLength() {
         final int length = getLength();
@@ -180,11 +180,11 @@ public class MathMLContentTokenImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the argument at the specified 0-based index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the 0-based index
      *
-     * @return DOCUMENT ME!
+     * @return the argument node, or null if out of bounds
      */
     private Node getArgumentsItem(int index) {
         final int argsLength = getArgumentsGetLength();

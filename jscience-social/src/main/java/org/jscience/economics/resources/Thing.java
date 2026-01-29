@@ -24,7 +24,7 @@
 package org.jscience.economics.resources;
 
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.economics.Community;
 import org.jscience.economics.Resource;
 import org.jscience.earth.Place;
@@ -46,7 +46,7 @@ public class Thing extends Resource {
      * Initializes a new physical thing.
      */
     public Thing(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate) {
+            Community producer, Place productionPlace, TimeCoordinate productionDate) {
         super(name, description, amount, producer, productionPlace, productionDate);
     }
 

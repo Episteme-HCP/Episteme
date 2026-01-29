@@ -31,20 +31,20 @@ package org.jscience.mathematics.loaders.mathml;
  * @since 1.0
  */
 public class MathMLNaryRelImpl extends MathMLPredefinedSymbolImpl {
-/**
+    /**
      * Constructs a MathML predefined symbol (n-ary relation).
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLNaryRelImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the arity of the n-ary relation.
      *
-     * @return DOCUMENT ME!
+     * @return "variable" for n-ary relations
      */
     public String getArity() {
         return "variable";

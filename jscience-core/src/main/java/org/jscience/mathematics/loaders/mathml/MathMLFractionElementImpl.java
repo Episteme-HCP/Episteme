@@ -39,8 +39,8 @@ public class MathMLFractionElementImpl extends MathMLElementImpl
 /**
      * Constructs a MathML fraction element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLFractionElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -48,54 +48,54 @@ public class MathMLFractionElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the line thickness attribute of the fraction.
      *
-     * @return DOCUMENT ME!
+     * @return the line thickness
      */
     public String getLinethickness() {
         return getAttribute("linethickness");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the line thickness attribute of the fraction.
      *
-     * @param linethickness DOCUMENT ME!
+     * @param linethickness the new line thickness
      */
     public void setLinethickness(String linethickness) {
         setAttribute("linethickness", linethickness);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the numerator element of the fraction.
      *
-     * @return DOCUMENT ME!
+     * @return the numerator element
      */
     public MathMLElement getNumerator() {
         return (MathMLElement) getFirstChild();
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the numerator element of the fraction.
      *
-     * @param numerator DOCUMENT ME!
+     * @param numerator the new numerator element
      */
     public void setNumerator(MathMLElement numerator) {
         replaceChild(numerator, getFirstChild());
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the denominator element of the fraction.
      *
-     * @return DOCUMENT ME!
+     * @return the denominator element
      */
     public MathMLElement getDenominator() {
         return (MathMLElement) item(1);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the denominator element of the fraction.
      *
-     * @param denominator DOCUMENT ME!
+     * @param denominator the new denominator element
      */
     public void setDenominator(MathMLElement denominator) {
         replaceChild(denominator, item(1));

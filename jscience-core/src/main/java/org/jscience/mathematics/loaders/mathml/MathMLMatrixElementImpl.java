@@ -39,11 +39,11 @@ import org.w3c.dom.mathml.MathMLNodeList;
  */
 public class MathMLMatrixElementImpl extends MathMLElementImpl
     implements MathMLMatrixElement {
-/**
+    /**
      * Constructs a MathML <code>matrix</code> element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLMatrixElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -51,27 +51,27 @@ public class MathMLMatrixElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of rows in the matrix.
      *
-     * @return DOCUMENT ME!
+     * @return the row count
      */
     public int getNrows() {
         return getRowsGetLength();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of columns in the matrix.
      *
-     * @return DOCUMENT ME!
+     * @return the column count
      */
     public int getNcols() {
         return getRow(1).getNEntries();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a list of all matrix rows.
      *
-     * @return DOCUMENT ME!
+     * @return the list of row elements
      */
     public MathMLNodeList getRows() {
         return new MathMLNodeList() {
@@ -86,13 +86,13 @@ public class MathMLMatrixElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the row at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the row index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the matrix row element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLMatrixrowElement getRow(int index) throws DOMException {
         Node row = getRowsItem(index - 1);
@@ -106,14 +106,14 @@ public class MathMLMatrixElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the row at the specified index.
      *
-     * @param newRow DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newRow the new row element
+     * @param index  the row index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the new row element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLMatrixrowElement setRow(MathMLMatrixrowElement newRow,
         int index) throws DOMException {
@@ -133,14 +133,14 @@ public class MathMLMatrixElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a row at the specified index.
      *
-     * @param newRow DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newRow the new row element to insert
+     * @param index  the index where to insert (0 for end)
      *
-     * @return DOCUMENT ME!
+     * @return the inserted row element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLMatrixrowElement insertRow(MathMLMatrixrowElement newRow,
         int index) throws DOMException {
@@ -160,13 +160,13 @@ public class MathMLMatrixElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the row at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the row index (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the removed row element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public MathMLMatrixrowElement removeRow(int index)
         throws DOMException {
@@ -181,20 +181,20 @@ public class MathMLMatrixElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes the row at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the row index (1-based)
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if out of bounds
      */
     public void deleteRow(int index) throws DOMException {
         removeRow(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of matrixrow elements.
      *
-     * @return DOCUMENT ME!
+     * @return the row count
      */
     private int getRowsGetLength() {
         final int length = getLength();
@@ -210,11 +210,11 @@ public class MathMLMatrixElementImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the row at the specified 0-based index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the 0-based index
      *
-     * @return DOCUMENT ME!
+     * @return the row node, or null if out of bounds
      */
     private Node getRowsItem(int index) {
         final int rowsLength = getRowsGetLength();

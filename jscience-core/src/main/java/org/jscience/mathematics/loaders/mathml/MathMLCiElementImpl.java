@@ -35,29 +35,29 @@ import org.w3c.dom.mathml.MathMLCiElement;
  */
 public class MathMLCiElementImpl extends MathMLContentTokenImpl
     implements MathMLCiElement {
-/**
+    /**
      * Constructs a MathML content identifier element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLCiElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the type of the identifier.
      *
-     * @return DOCUMENT ME!
+     * @return the identifier type
      */
     public String getType() {
         return getAttribute("type");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the type of the identifier.
      *
-     * @param type DOCUMENT ME!
+     * @param type the identifier type to set
      */
     public void setType(String type) {
         setAttribute("type", type);

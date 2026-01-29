@@ -101,11 +101,11 @@ public class Event implements ComprehensiveIdentification, Temporal<TimeCoordina
     }
 
     public boolean happensBefore(Event other) {
-        return this.when.toInstant().isBefore(other.when.toInstant());
+        return this.when.compareTo(other.when) < 0;
     }
 
     public boolean happensAfter(Event other) {
-        return this.when.toInstant().isAfter(other.when.toInstant());
+        return this.when.compareTo(other.when) > 0;
     }
 
     @Override

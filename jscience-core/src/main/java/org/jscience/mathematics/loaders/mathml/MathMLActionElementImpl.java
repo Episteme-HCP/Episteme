@@ -38,8 +38,8 @@ public class MathMLActionElementImpl extends MathMLPresentationContainerImpl
 /**
      * Constructs a MathML action element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLActionElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,36 +47,36 @@ public class MathMLActionElementImpl extends MathMLPresentationContainerImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the action type attribute of the action element.
      *
-     * @return DOCUMENT ME!
+     * @return the action type
      */
     public String getActiontype() {
         return getAttribute("actiontype");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the action type attribute of the action element.
      *
-     * @param actiontype DOCUMENT ME!
+     * @param actiontype the new action type
      */
     public void setActiontype(String actiontype) {
         setAttribute("actiontype", actiontype);
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the selection attribute of the action element.
      *
-     * @return DOCUMENT ME!
+     * @return the selection value
      */
     public String getSelection() {
         return getAttribute("selection");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the selection attribute of the action element.
      *
-     * @param selection DOCUMENT ME!
+     * @param selection the new selection value
      */
     public void setSelection(String selection) {
         setAttribute("selection", selection);

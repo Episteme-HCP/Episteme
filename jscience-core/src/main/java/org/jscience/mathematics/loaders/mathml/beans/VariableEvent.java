@@ -27,44 +27,45 @@ import java.util.EventObject;
 
 
 /**
- * DOCUMENT ME!
+ * Event fired when a MathML variable value changes.
  *
- * @author $author$
- * @version $Revision: 1.2 $
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public final class VariableEvent extends EventObject {
-    /** DOCUMENT ME! */
+    /** The name of the variable. */
     private String variable;
-
-    /** DOCUMENT ME! */
+ 
+    /** The new value of the variable. */
     private Object value;
-
-/**
+ 
+    /**
      * Creates a new VariableEvent object.
      *
-     * @param src DOCUMENT ME!
-     * @param var DOCUMENT ME!
-     * @param val DOCUMENT ME!
+     * @param src the source of the event
+     * @param var the variable name
+     * @param val the variable value
      */
     public VariableEvent(Object src, String var, Object val) {
         super(src);
         variable = var;
         value = val;
     }
-
+ 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the variable.
      *
-     * @return DOCUMENT ME!
+     * @return the variable name
      */
     public String getVariable() {
         return variable;
     }
-
+ 
     /**
-     * DOCUMENT ME!
+     * Returns the value of the variable.
      *
-     * @return DOCUMENT ME!
+     * @return the variable value
      */
     public Object getValue() {
         return value;

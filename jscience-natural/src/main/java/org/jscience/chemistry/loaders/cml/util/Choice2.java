@@ -33,34 +33,34 @@ package org.jscience.chemistry.loaders.cml.util;
  * @since 1.0
  */
 public class Choice2 {
-    /** DOCUMENT ME! */
+    /** Constant for choice X (value 0). */
     public static final Choice2 X = new Choice2(0);
 
-    /** DOCUMENT ME! */
+    /** Constant for choice Y (value 1). */
     public static final Choice2 Y = new Choice2(1);
 
-    /** DOCUMENT ME! */
+    /** Constant for choice zero (value 0). */
     public static final Choice2 zero = new Choice2(0);
 
-    /** DOCUMENT ME! */
+    /** Constant for choice one (value 1). */
     public static final Choice2 one = new Choice2(1);
 
-    /** DOCUMENT ME! */
+    /** The integer value represented by this choice. */
     int value;
 
-/**
+    /**
      * Creates a new Choice2 object.
      *
-     * @param i DOCUMENT ME!
+     * @param i the integer value for this choice
      */
     Choice2(int i) {
         this.value = i;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the integer value of this choice.
      *
-     * @return DOCUMENT ME!
+     * @return the integer value
      */
     public int getValue() {
         return value;

@@ -36,16 +36,16 @@ import java.util.ArrayList;
  * @since 1.0
  */
 public class Path {
-    /** DOCUMENT ME! */
+    /** The sequence of steps in the path. */
     protected ArrayList<Step> steps;
 
-    /** DOCUMENT ME! */
+    /** The current position in the path iteration. */
     private int cursor;
 
-    /** DOCUMENT ME! */
+    /** True if the start node is hierarchically below the end node. */
     protected boolean start_below_end;
 
-    /** DOCUMENT ME! */
+    /** True if the end node is hierarchically below the start node. */
     protected boolean end_below_start;
 
     /**
@@ -54,10 +54,10 @@ public class Path {
      */
     protected int verbosity = 0;
 
-/**
-     * Creates a new Path object.
+    /**
+     * Creates a new Path object starting at the given node.
      *
-     * @param node DOCUMENT ME!
+     * @param node the starting node
      */
     private Path(GraphNode node) {
         steps = new ArrayList<>();
@@ -68,11 +68,11 @@ public class Path {
         end_below_start = false;
     }
 
-/**
-     * Creates a new Path object.
+    /**
+     * Creates a new Path object starting at the given node with verbosity.
      *
-     * @param node      DOCUMENT ME!
-     * @param verbosity DOCUMENT ME!
+     * @param node the starting node
+     * @param verbosity the level of verbosity
      */
     private Path(GraphNode node, int verbosity) {
         this.verbosity = verbosity;
@@ -141,9 +141,9 @@ public class Path {
     }
 
     /**
-     * DOCUMENT ME!
+     * Determines if the path stays within a single argument domain.
      *
-     * @return DOCUMENT ME!
+     * @return true if it's a single argument domain
      */
     protected boolean oneArgumentDomain() {
         boolean came_to_s_from_above = false;
@@ -238,10 +238,7 @@ public class Path {
      * class.
      *
      * @param node The <tt>GraphNode</tt> to start the path from.
-     * @param verbosity DOCUMENT ME!
-     *
-     * @return A <tt>Path</tt> instance representing a path from <tt>node</tt>
-     *         to the root node.
+     * @param verbosity the level of verbosity
      */
     public static final Path getPathToTop(GraphNode node, int verbosity) {
         Path path = new Path(node, verbosity);
@@ -340,21 +337,15 @@ public class Path {
     } // method append
 
     /**
-     * DOCUMENT ME!
+     * Appends a node to the path in the given direction.
      *
-     * @param node DOCUMENT ME!
-     * @param dir DOCUMENT ME!
+     * @param node the node to add
+     * @param dir the direction of the step ("up" or "down")
      */
     private void suffixNode(GraphNode node, String dir) {
         (this.steps).add(new Step(node, dir, this.verbosity));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param node DOCUMENT ME!
-     * @param dir DOCUMENT ME!
-     */
 
     /**
      * Inverts this path by reversing the order of the nodes and
@@ -379,9 +370,9 @@ public class Path {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the previous step in the path.
      *
-     * @return DOCUMENT ME!
+     * @return the previous step
      */
     private Step getPrevStep() {
         cursor--;
@@ -411,9 +402,9 @@ public class Path {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the next step in the path.
      *
-     * @return DOCUMENT ME!
+     * @return the next step
      */
     private Step getNextStep() {
         cursor++;
@@ -443,9 +434,9 @@ public class Path {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the first step in the path and resets the cursor.
      *
-     * @return DOCUMENT ME!
+     * @return the first step
      */
     private Step getFirstStep() {
         cursor = 0;
@@ -463,9 +454,9 @@ public class Path {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the last step in the path and sets the cursor to it.
      *
-     * @return DOCUMENT ME!
+     * @return the last step
      */
     private Step getLastStep() {
         cursor = (steps.size() - 1);
@@ -483,14 +474,14 @@ public class Path {
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the first step from the path.
      */
     public void removeFirst() {
         steps.remove(0);
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the last step from the path.
      */
     public void removeLast() {
         steps.remove(steps.size() - 1);
@@ -517,33 +508,30 @@ public class Path {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @author $author$
-     * @version $Revision: 1.3 $
+     * A single step in a syntax tree path.
      */
     private class Step {
-        /** DOCUMENT ME! */
+        /** Direction UP. */
         protected static final String UP = "up";
 
-        /** DOCUMENT ME! */
+        /** Direction DOWN. */
         protected static final String DOWN = "down";
 
-        /** DOCUMENT ME! */
+        /** Undefined direction. */
         protected static final String UNDEF = "";
 
-        /** DOCUMENT ME! */
+        /** The graph node for this step. */
         private GraphNode node;
 
-        /** DOCUMENT ME! */
+        /** The direction taken to reach this node. */
         private String direction;
 
-/**
+        /**
          * Creates a new Step object.
          *
-         * @param new_node      DOCUMENT ME!
-         * @param new_direction DOCUMENT ME!
-         * @param verbosity     DOCUMENT ME!
+         * @param new_node      the graph node for this step
+         * @param new_direction the direction of the step
+         * @param verbosity     the level of verbosity
          */
         Step(GraphNode new_node, String new_direction, int verbosity) {
             setNode(new_node);
@@ -551,56 +539,56 @@ public class Path {
         } // constructor Step
 
         /**
-         * DOCUMENT ME!
+         * Gets the node of this step.
          *
-         * @return DOCUMENT ME!
+         * @return the graph node
          */
         GraphNode getNode() {
             return node;
         }
 
         /**
-         * DOCUMENT ME!
+         * Gets the direction of this step.
          *
-         * @return DOCUMENT ME!
+         * @return the direction string
          */
         String getDirection() {
             return direction;
         }
 
         /**
-         * DOCUMENT ME!
+         * Sets the node for this step.
          *
-         * @param new_node DOCUMENT ME!
+         * @param new_node the new graph node
          */
         void setNode(GraphNode new_node) {
             node = new_node;
         }
 
         /**
-         * DOCUMENT ME!
+         * Sets the direction for this step.
          *
-         * @param new_direction DOCUMENT ME!
+         * @param new_direction the direction ("up", "down", or "")
          */
         void setDirection(String new_direction) {
             direction = new_direction;
         }
 
         /**
-         * DOCUMENT ME!
+         * Returns true if this is the first node in the path (direction is undefined).
          *
-         * @return DOCUMENT ME!
+         * @return true if it's the first node
          */
         boolean isFirstNode() {
             return (direction.equals(UNDEF));
         }
 
         /**
-         * DOCUMENT ME!
+         * Compares this step with another.
          *
-         * @param step DOCUMENT ME!
+         * @param step the other step
          *
-         * @return DOCUMENT ME!
+         * @return true if nodes and directions are equal
          */
         boolean equals(Step step) {
             return (((this.getNode()).equals(step.getNode())) &&
@@ -608,18 +596,18 @@ public class Path {
         } // method equals
 
         /**
-         * DOCUMENT ME!
+         * Checks if the node of this step is equal to the node of another step.
          *
-         * @param step DOCUMENT ME!
+         * @param step the other step
          *
-         * @return DOCUMENT ME!
+         * @return true if nodes are equal
          */
         boolean hasEqualNode(Step step) {
             return ((this.getNode()).equals(step.getNode()));
         } // method equals
 
         /**
-         * DOCUMENT ME!
+         * Inverts the direction of this step (UP to DOWN, DOWN to UP).
          */
         void invertDirection() {
             if (direction.equals(UP)) {

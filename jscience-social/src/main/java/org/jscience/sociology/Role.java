@@ -23,12 +23,12 @@
 
 package org.jscience.sociology;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.jscience.biology.Individual;
 import org.jscience.util.Temporal;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
@@ -46,7 +46,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Role implements ComprehensiveIdentification, Temporal<Instant> {
+public class Role implements ComprehensiveIdentification, Temporal<TimeCoordinate> {
 
 
 
@@ -69,7 +69,7 @@ public class Role implements ComprehensiveIdentification, Temporal<Instant> {
     private Situation situation;
 
     @Attribute
-    private Instant timestamp;
+    private TimeCoordinate timestamp;
 
     @Attribute
     private RoleKind kind;
@@ -89,7 +89,7 @@ public class Role implements ComprehensiveIdentification, Temporal<Instant> {
         this.individual = Objects.requireNonNull(individual, "Individual cannot be null");
         this.situation = Objects.requireNonNull(situation, "Situation cannot be null");
         this.kind = Objects.requireNonNull(kind, "RoleKind cannot be null");
-        this.timestamp = Instant.now();
+        this.timestamp = org.jscience.history.time.TimePoint.now();
         this.individual.addRole(this);
     }
 
@@ -119,7 +119,7 @@ public class Role implements ComprehensiveIdentification, Temporal<Instant> {
         this.id = new SimpleIdentification("Template:" + name);
         setName(name);
         this.kind = Objects.requireNonNull(kind, "RoleKind cannot be null");
-        this.timestamp = Instant.now();
+        this.timestamp = org.jscience.history.time.TimePoint.now();
     }
 
     @Deprecated
@@ -166,12 +166,7 @@ public class Role implements ComprehensiveIdentification, Temporal<Instant> {
     }
 
     @Override
-    public Instant getWhen() {
-        return timestamp;
-    }
-
-    @Deprecated
-    public Instant getTimestamp() {
+    public TimeCoordinate getWhen() {
         return timestamp;
     }
 
@@ -179,7 +174,7 @@ public class Role implements ComprehensiveIdentification, Temporal<Instant> {
      * Sets the timestamp for this role.
      * @param timestamp the timestamp to set
      */
-    public void setTimestamp(Instant timestamp) {
+    public void setTimestamp(TimeCoordinate timestamp) {
         this.timestamp = timestamp;
     }
 

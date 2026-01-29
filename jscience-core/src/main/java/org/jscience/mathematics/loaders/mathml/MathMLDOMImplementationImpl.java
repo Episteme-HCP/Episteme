@@ -39,7 +39,7 @@ import org.w3c.dom.mathml.MathMLDocument;
  */
 public class MathMLDOMImplementationImpl extends DOMImplementationImpl
     implements MathMLDOMImplementation {
-    /** DOCUMENT ME! */
+    /** Shared instance of the MathML DOM implementation. */
     private static final MathMLDOMImplementation singleton = new MathMLDOMImplementationImpl();
 
 /**
@@ -50,18 +50,18 @@ public class MathMLDOMImplementationImpl extends DOMImplementationImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new MathML document.
      *
-     * @return DOCUMENT ME!
+     * @return a new MathML document instance
      */
     public final MathMLDocument createMathMLDocument() {
         return new MathMLDocumentImpl();
     }
 
     /**
-     * NON-DOM: Obtain and return a single shared object
+     * Returns the shared DOM implementation instance.
      *
-     * @return DOCUMENT ME!
+     * @return the shared DOM implementation
      */
     public static DOMImplementation getDOMImplementation() {
         return singleton;

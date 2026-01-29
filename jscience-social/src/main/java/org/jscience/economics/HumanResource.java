@@ -24,7 +24,8 @@
 package org.jscience.economics;
 
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
 import java.util.Objects;
 import org.jscience.economics.money.Money;
 import org.jscience.earth.Place;
@@ -50,12 +51,12 @@ public class HumanResource extends Resource implements Property {
      */
     public HumanResource(String name, String description, Quantity<?> amount,
             Community producer, Money value) {
-        super(name, description, amount, producer, producer.getPosition(), Instant.now());
+        super(name, description, amount, producer, producer.getPosition(), TimePoint.now());
         this.value = Objects.requireNonNull(value, "Value cannot be null");
     }
 
     public HumanResource(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Money value) {
         super(name, description, amount, producer, productionPlace, productionDate);
         this.value = Objects.requireNonNull(value, "Value cannot be null");

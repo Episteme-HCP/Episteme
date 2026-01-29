@@ -32,7 +32,9 @@ import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -63,7 +65,7 @@ public class SurveyResponse implements ComprehensiveIdentification {
     private final Person respondent; // Can be null for anonymous
 
     @Attribute
-    private final Instant timestamp;
+    private final TimeCoordinate timestamp;
 
     @Attribute
     private final Map<String, Object> answers = new HashMap<>(); // Question ID -> Answer value
@@ -72,7 +74,7 @@ public class SurveyResponse implements ComprehensiveIdentification {
         this.id = new UUIDIdentification();
         this.survey = Objects.requireNonNull(survey, "Survey cannot be null");
         this.respondent = respondent;
-        this.timestamp = Instant.now();
+        this.timestamp = TimePoint.now();
         setName("Response to " + survey.getTitle());
     }
 
@@ -94,7 +96,7 @@ public class SurveyResponse implements ComprehensiveIdentification {
         return respondent;
     }
 
-    public Instant getTimestamp() {
+    public TimeCoordinate getTimestamp() {
         return timestamp;
     }
 

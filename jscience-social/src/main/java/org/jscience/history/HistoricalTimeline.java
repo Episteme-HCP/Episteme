@@ -81,8 +81,10 @@ public class HistoricalTimeline extends Timeline<HistoricalEvent> {
      * @return unmodifiable list of BCE events
      */
     public List<HistoricalEvent> getBceEvents() {
+        // Year 1 AD start
+        java.time.Instant yearOneAd = java.time.OffsetDateTime.of(1, 1, 1, 0, 0, 0, 0, java.time.ZoneOffset.UTC).toInstant();
         return events.stream()
-                .filter(e -> e.getWhen().toInstant().isBefore(java.time.Instant.EPOCH)) // Simplistic check for BCE
+                .filter(e -> e.getWhen().toInstant().isBefore(yearOneAd))
                 .sorted(Comparator.comparing(Event::getWhen))
                 .toList();
     }

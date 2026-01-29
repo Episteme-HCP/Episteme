@@ -23,7 +23,7 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.economics.Community;
 import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
@@ -43,7 +43,7 @@ public class Solid extends Natural {
      * Initializes a new solid resource.
      */
     public Solid(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate) {
+            Community producer, Place productionPlace, TimeCoordinate productionDate) {
         super(name, description, amount, producer, productionPlace, productionDate);
     }
 }

@@ -9,7 +9,7 @@ import java.io.InputStream;
  * assumes no buffering in the underlying stream, so there is no way to skip
  * an HDU and then go back to read it later.
  */
-public class InputStreamFitsFile extends FitsFile {
+public class InputStreamFITSFile extends FITSFile {
     /**
      * DOCUMENT ME!
      */
@@ -21,7 +21,7 @@ public class InputStreamFitsFile extends FitsFile {
      * @param file the data source
      * @throws IOException if there was a problem creating the file.
      */
-    public InputStreamFitsFile(InputStream file) throws IOException {
+    public InputStreamFITSFile(InputStream file) throws IOException {
         super();
 
         this.file = file;
@@ -78,7 +78,7 @@ public class InputStreamFitsFile extends FitsFile {
         FitsHeader header = hdu.getHeader();
 
         /** read the header one block at a time */
-        byte[] buffer = new byte[FitsFile.BLOCK_SIZE];
+        byte[] buffer = new byte[FITSFile.BLOCK_SIZE];
 
         while (readBlock(buffer) && !header.add(buffer))
             ;
@@ -124,8 +124,8 @@ public class InputStreamFitsFile extends FitsFile {
 
     // private void fillInData(FitsHDU hdu, int when) throws IOException{
     //
-    // if(     when==FitsFile.NEED_DATA_NOW  ) fillInData(hdu);
-    // else if(when==FitsFile.NEED_DATA_LATER) new DataFiller(hdu).start();
+    // if(     when==FITSFile.NEED_DATA_NOW  ) fillInData(hdu);
+    // else if(when==FITSFile.NEED_DATA_LATER) new DataFiller(hdu).start();
     //
     // } // end of fillInData method
 
@@ -202,7 +202,7 @@ public class InputStreamFitsFile extends FitsFile {
      * @throws IOException DOCUMENT ME!
      */
     public FitsHDU getHDU(int number) throws IOException {
-        return getHDU(number, FitsFile.NEED_DATA_NOW);
+        return getHDU(number, FITSFile.NEED_DATA_NOW);
     }
 
     /**
@@ -254,7 +254,7 @@ public class InputStreamFitsFile extends FitsFile {
      * @throws IOException DOCUMENT ME!
      */
     public FitsHDU getHDU(String name) throws IOException {
-        return getHDU(name, FitsFile.NEED_DATA_NOW);
+        return getHDU(name, FITSFile.NEED_DATA_NOW);
     } // end of getHDU method
 
     /**
@@ -296,4 +296,4 @@ public class InputStreamFitsFile extends FitsFile {
         throw new NoSuchFitsHDUException("Can't get HDU" + name + " in " +
                 this);
     } // end of getHDU method
-} // end of InputStreamFitsFile class
+} // end of InputStreamFITSFile class

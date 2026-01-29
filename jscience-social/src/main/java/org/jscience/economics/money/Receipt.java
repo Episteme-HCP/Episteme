@@ -31,8 +31,8 @@ import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.history.time.TimeCoordinate;
 
-import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -57,7 +57,7 @@ public final class Receipt implements ComprehensiveIdentification {
     private final Organization buyer;
 
     @Attribute
-    private final Instant date;
+    private final TimeCoordinate date;
 
     @Id
     private final Identification id;
@@ -84,7 +84,7 @@ public final class Receipt implements ComprehensiveIdentification {
      * @param description    transaction description
      * @param amount         the monetary amount
      */
-    public Receipt(Organization seller, Organization buyer, Instant date,
+    public Receipt(Organization seller, Organization buyer, TimeCoordinate date,
                    Identification id, String description, Money amount) {
         this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
         this.buyer = Objects.requireNonNull(buyer, "Buyer cannot be null");
@@ -107,7 +107,7 @@ public final class Receipt implements ComprehensiveIdentification {
      * @param share          the share being traded
      * @param quantity       number of shares
      */
-    public Receipt(Organization seller, Organization buyer, Instant date,
+    public Receipt(Organization seller, Organization buyer, TimeCoordinate date,
                    Identification id, String description, 
                    Share share, int quantity) {
         this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
@@ -150,7 +150,7 @@ public final class Receipt implements ComprehensiveIdentification {
         return buyer;
     }
 
-    public Instant getDate() {
+    public TimeCoordinate getDate() {
         return date;
     }
 

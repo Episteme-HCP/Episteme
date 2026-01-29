@@ -86,7 +86,7 @@ public class FitsHeader {
      * add a block of 2880 bytes to the header. This method is useful
      * for reading a header from a data source. The general user will probably
      * not need this method, since it is used internally by the {@link
-     * FitsFile} subclasses. If the array is larger than 2880 bytes, only the
+     * FITSFile} subclasses. If the array is larger than 2880 bytes, only the
      * first 2880 bytes will be read.
      *
      * @param block an array of 2880 bytes to add to this header.

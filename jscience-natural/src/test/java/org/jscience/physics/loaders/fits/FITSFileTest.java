@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for FitsFile.
+ * Automated baseline test for FITSFile.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

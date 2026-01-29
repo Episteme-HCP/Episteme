@@ -37,11 +37,11 @@ import org.w3c.dom.mathml.*;
  */
 public class MathMLContentContainerImpl extends MathMLElementImpl
     implements MathMLContentContainer {
-/**
+    /**
      * Constructs a MathML content container.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element type
      */
     public MathMLContentContainerImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -49,20 +49,20 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>condition</code> child element.
      *
-     * @return DOCUMENT ME!
+     * @return the condition element
      */
     public MathMLConditionElement getCondition() {
         return (MathMLConditionElement) getNodeByName("condition");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the <code>condition</code> child element.
      *
-     * @param condition DOCUMENT ME!
+     * @param condition the condition element to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the condition element cannot be set
      */
     public void setCondition(MathMLConditionElement condition)
         throws DOMException {
@@ -70,40 +70,40 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>degree</code> child element.
      *
-     * @return DOCUMENT ME!
+     * @return the degree element
      */
     public MathMLElement getOpDegree() {
         return (MathMLElement) getNodeByName("degree");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the <code>degree</code> child element.
      *
-     * @param opDegree DOCUMENT ME!
+     * @param opDegree the degree element to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the degree element cannot be set
      */
     public void setOpDegree(MathMLElement opDegree) throws DOMException {
         setNodeByName(opDegree, "degree");
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>domainofapplication</code> child element.
      *
-     * @return DOCUMENT ME!
+     * @return the domain of application element
      */
     public MathMLElement getDomainOfApplication() {
         return (MathMLElement) getNodeByName("domainofapplication");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the <code>domainofapplication</code> child element.
      *
-     * @param domainOfApplication DOCUMENT ME!
+     * @param domainOfApplication the domain of application element to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the element cannot be set
      */
     public void setDomainOfApplication(MathMLElement domainOfApplication)
         throws DOMException {
@@ -111,20 +111,20 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>momentabout</code> child element.
      *
-     * @return DOCUMENT ME!
+     * @return the moment about element
      */
     public MathMLElement getMomentAbout() {
         return (MathMLElement) getNodeByName("momentabout");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the <code>momentabout</code> child element.
      *
-     * @param momentAbout DOCUMENT ME!
+     * @param momentAbout the moment about element to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the element cannot be set
      */
     public void setMomentAbout(MathMLElement momentAbout)
         throws DOMException {
@@ -132,20 +132,20 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of bound variables.
      *
-     * @return DOCUMENT ME!
+     * @return the number of bound variables
      */
     public int getNBoundVariables() {
         return getBoundVariablesGetLength();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the bound variable at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the bound variable (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the bound variable
      */
     public MathMLBvarElement getBoundVariable(int index) {
         Node bvar = getBoundVariablesItem(index - 1);
@@ -154,14 +154,14 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the bound variable at the specified index.
      *
-     * @param newBvar DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newBvar the new bound variable to set
+     * @param index   the index of the bound variable (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the new bound variable
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the bound variable cannot be set
      */
     public MathMLBvarElement setBoundVariable(MathMLBvarElement newBvar,
         int index) throws DOMException {
@@ -170,14 +170,14 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new bound variable at the specified index.
      *
-     * @param newBvar DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newBvar the new bound variable to insert
+     * @param index   the index where to insert (0 for start)
      *
-     * @return DOCUMENT ME!
+     * @return the new bound variable
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if the bound variable cannot be inserted
      */
     public MathMLBvarElement insertBoundVariable(MathMLBvarElement newBvar,
         int index) throws DOMException {
@@ -190,11 +190,11 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the bound variable at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the bound variable to remove (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the removed bound variable
      */
     public MathMLBvarElement removeBoundVariable(int index) {
         Node bvar = getBoundVariablesItem(index - 1);
@@ -203,27 +203,27 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes the bound variable at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the bound variable to delete (1-based)
      */
     public void deleteBoundVariable(int index) {
         removeBoundVariable(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of arguments.
      *
-     * @return DOCUMENT ME!
+     * @return the number of arguments
      */
     public int getNArguments() {
         return getArgumentsGetLength();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a list of arguments.
      *
-     * @return DOCUMENT ME!
+     * @return the argument list
      */
     public MathMLNodeList getArguments() {
         return new MathMLNodeList() {
@@ -238,9 +238,9 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a list of declarations.
      *
-     * @return DOCUMENT ME!
+     * @return the declaration list
      */
     public MathMLNodeList getDeclarations() {
         return new MathMLNodeList() {
@@ -255,13 +255,13 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the argument to retrieve (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the argument
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLElement getArgument(int index) throws DOMException {
         Node arg = getArgumentsItem(index - 1);
@@ -275,14 +275,14 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the argument at the specified index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newArgument the new argument to set
+     * @param index       the index where to set (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the new argument
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLElement setArgument(MathMLElement newArgument, int index)
         throws DOMException {
@@ -302,14 +302,14 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new argument at the specified index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newArgument the new argument to insert
+     * @param index       the index where to insert (0 for end)
      *
-     * @return DOCUMENT ME!
+     * @return the inserted argument
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLElement insertArgument(MathMLElement newArgument, int index)
         throws DOMException {
@@ -329,13 +329,13 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the argument to remove (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the removed argument
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLElement removeArgument(int index) throws DOMException {
         Node arg = getArgumentsItem(index - 1);
@@ -349,24 +349,24 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the argument to delete (1-based)
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public void deleteArgument(int index) throws DOMException {
         removeArgument(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the declaration at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the declaration (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the declaration element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLDeclareElement getDeclaration(int index)
         throws DOMException {
@@ -381,14 +381,14 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the declaration at the specified index.
      *
-     * @param newDeclaration DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newDeclaration the new declaration to set
+     * @param index          the index where to set (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the new declaration
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLDeclareElement setDeclaration(
         MathMLDeclareElement newDeclaration, int index)
@@ -409,14 +409,14 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new declaration at the specified index.
      *
-     * @param newDeclaration DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newDeclaration the new declaration to insert
+     * @param index          the index where to insert (0 for end)
      *
-     * @return DOCUMENT ME!
+     * @return the inserted declaration
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLDeclareElement insertDeclaration(
         MathMLDeclareElement newDeclaration, int index)
@@ -437,13 +437,13 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the declaration at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the declaration to remove (1-based)
      *
-     * @return DOCUMENT ME!
+     * @return the removed declaration
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public MathMLDeclareElement removeDeclaration(int index)
         throws DOMException {
@@ -458,20 +458,20 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Deletes the declaration at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the index of the declaration to delete (1-based)
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds
      */
     public void deleteDeclaration(int index) throws DOMException {
         removeDeclaration(index);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of bound variable elements.
      *
-     * @return DOCUMENT ME!
+     * @return the count of bound variables
      */
     private int getBoundVariablesGetLength() {
         final int length = getLength();
@@ -487,11 +487,11 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the bound variable at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the 0-based index
      *
-     * @return DOCUMENT ME!
+     * @return the bound variable node, or null if out of bounds
      */
     private Node getBoundVariablesItem(int index) {
         final int bvarLength = getDeclarationsGetLength();
@@ -515,9 +515,9 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of argument elements (non-declare nodes).
      *
-     * @return DOCUMENT ME!
+     * @return the count of arguments
      */
     private int getArgumentsGetLength() {
         final int length = getLength();
@@ -533,11 +533,11 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the 0-based index
      *
-     * @return DOCUMENT ME!
+     * @return the argument node, or null if out of bounds
      */
     private Node getArgumentsItem(int index) {
         final int argsLength = getArgumentsGetLength();
@@ -561,9 +561,9 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of declaration elements.
      *
-     * @return DOCUMENT ME!
+     * @return the count of declarations
      */
     private int getDeclarationsGetLength() {
         final int length = getLength();
@@ -579,11 +579,11 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the declaration at the specified index.
      *
-     * @param index DOCUMENT ME!
+     * @param index the 0-based index
      *
-     * @return DOCUMENT ME!
+     * @return the declaration node, or null if out of bounds
      */
     private Node getDeclarationsItem(int index) {
         final int declLength = getDeclarationsGetLength();
@@ -607,11 +607,11 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Finds a child node by its local name.
      *
-     * @param name DOCUMENT ME!
+     * @param name the local name to search for
      *
-     * @return DOCUMENT ME!
+     * @return the matching node, or null if not found
      */
     protected Node getNodeByName(String name) {
         final int length = getLength();
@@ -631,10 +631,10 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Replaces the child node with the given local name.
      *
-     * @param newNode DOCUMENT ME!
-     * @param name DOCUMENT ME!
+     * @param newNode the new node to set
+     * @param name    the local name of the node to replace
      */
     protected void setNodeByName(Node newNode, String name) {
         final int length = getLength();

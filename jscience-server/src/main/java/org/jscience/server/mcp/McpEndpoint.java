@@ -43,13 +43,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @RestController
 @RequestMapping("/mcp")
-public class McpEndpoint {
+public class MCPEndpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(McpEndpoint.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MCPEndpoint.class);
     private final CopyOnWriteArrayList<SseEmitter> emitters = new CopyOnWriteArrayList<>();
-    private final JSONRpcService jsonRpcService;
+    private final JSONRPCService jsonRpcService;
 
-    public McpEndpoint(JSONRpcService jsonRpcService) {
+    public MCPEndpoint(JSONRPCService jsonRpcService) {
         this.jsonRpcService = jsonRpcService;
     }
 

@@ -24,7 +24,7 @@
 package org.jscience.chemistry.loaders.cml.util;
 
 /**
- * DOCUMENT ME!
+ * Interface for managing and processing command-line options.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

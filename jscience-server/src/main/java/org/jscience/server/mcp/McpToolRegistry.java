@@ -34,15 +34,15 @@ import java.util.function.Function;
 
 /**
  * Registry for executable MCP Tools.
- * Scans for services annotated with @McpTool and registers them.
+ * Scans for services annotated with @MCPTool and registers them.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Service
-public class McpToolRegistry {
+public class MCPToolRegistry {
 
-    private static final Logger LOG = LoggerFactory.getLogger(McpToolRegistry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MCPToolRegistry.class);
     private final Map<String, ToolDefinition> tools = new ConcurrentHashMap<>();
 
     @PostConstruct

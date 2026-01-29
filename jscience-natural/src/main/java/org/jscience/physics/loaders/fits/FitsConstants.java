@@ -24,7 +24,7 @@
 package org.jscience.physics.loaders.fits;
 
 /**
- * Standard FITS Constants.
+ * Standard Fits Constants.
  * * @author Silvere Martin-Michiellot
  * <p>
  * <b>Reference:</b><br>

@@ -27,8 +27,8 @@ package org.jscience.linguistics;
 
 
 /**
- * The SemanticNetwork class provides a placeholder for the semantic
- * information that can be extracted from a text..
+ * The SemanticNetwork class provides a representation for the semantic
+ * information that can be extracted from a text.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -38,27 +38,27 @@ public class SemanticNetwork {
     //A semantic network is often used as a form of knowledge representation. It is a directed graph consisting of vertices which represent concepts and edges which represent semantic relations between the concepts.
     //Semantic networks are a common type of machine-readable dictionary.
     //Important semantic relations:
-    /** DOCUMENT ME! */
+    /** Unknown or undefined semantic relation. */
     public final static int UNKNOWN = 0;
 
-    /** DOCUMENT ME! */
+    /** Meronymy relation (A is part of B). */
     public final static int MERONYMY = 1; // (A is part of B)
 
-    /** DOCUMENT ME! */
+    /** Holonymy relation (B has A as a part of itself). */
     public final static int HOLONYMY = 2; // (B has A as a part of itself)
 
-    /** DOCUMENT ME! */
+    /** Hyponymy relation (A is subordinate of B; A is kind of B). */
     public final static int HYPONYMY = 4; //(or troponymy) (A is subordinate of B; A is kind of B)
 
-    /** DOCUMENT ME! */
+    /** Hypernymy relation (A is superordinate of B). */
     public final static int HYPERNYMY = 8; // (A is superordinate of B)
 
-    /** DOCUMENT ME! */
+    /** Synonymy relation (A denotes the same as B). */
     public final static int SYNONYMY = 16; // (A denotes the same as B)
 
-    /** DOCUMENT ME! */
+    /** Antonymy relation (A denotes the opposite of B). */
     public final static int ANTONYMY = 32; // (A denotes the opposite of B)
 
-    /** DOCUMENT ME! */
+    /** Other miscellaneous or custom semantic relation. */
     public final static int OTHER = 64;
 }

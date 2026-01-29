@@ -35,14 +35,14 @@ import javax.xml.parsers.DocumentBuilder;
 
 
 /**
- * DOCUMENT ME!
+ * A wrapper for {@link DocumentBuilder} that returns {@link PMRDocumentImpl} instances.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class PMRDocumentBuilder extends DocumentBuilder {
-    /** DOCUMENT ME! */
+    /** The underlying generic document builder. */
     protected DocumentBuilder documentBuilder;
 
 /**
@@ -51,31 +51,28 @@ public class PMRDocumentBuilder extends DocumentBuilder {
     protected PMRDocumentBuilder() {
     }
 
-/**
-     * the default DocumentBuilder
+    /**
+     * Creates a new PMRDocumentBuilder that wraps a default DocumentBuilder.
      *
-     * @param documentBuilder DOCUMENT ME!
+     * @param documentBuilder the base document builder to wrap
      */
     public PMRDocumentBuilder(DocumentBuilder documentBuilder) {
         this.documentBuilder = documentBuilder;
     }
 
-/**
-     * default unimplemented
+    /**
+     * Default unimplemented constructor.
      *
-     * @param className DOCUMENT ME!
+     * @param className the name of the builder class (currently unused)
      */
     public PMRDocumentBuilder(String className) {
     }
 
     /**
      * Specify the EntityResolver to be used to resolve entities
-     * present in the XML document to be parsed. Setting this to null will
-     * result in the underlying implementation using it's own default
-     * implementation and behavior. Parameters: er - The EntityResolver to be
-     * used to resolve entities present in the XML document to be parsed.
+     * present in the XML document to be parsed.
      *
-     * @param er DOCUMENT ME!
+     * @param er the EntityResolver to be used
      */
     public void setEntityResolver(EntityResolver er) {
         documentBuilder.setEntityResolver(er);
@@ -83,12 +80,9 @@ public class PMRDocumentBuilder extends DocumentBuilder {
 
     /**
      * Specify the ErrorHandler to be used to report errors present in
-     * the XML document to be parsed. Setting this to null will result in the
-     * underlying implementation using it's own default implementation and
-     * behavior. Parameters: eh - The ErrorHandler to be used to report errors
-     * present in the XML document to be parsed.
+     * the XML document to be parsed.
      *
-     * @param eh DOCUMENT ME!
+     * @param eh the ErrorHandler to be used
      */
     public void setErrorHandler(ErrorHandler eh) {
         documentBuilder.setErrorHandler(eh);
@@ -96,17 +90,14 @@ public class PMRDocumentBuilder extends DocumentBuilder {
 
     /**
      * Parse the content of the given InputStream as an XML document
-     * and return a new DOM Document object. Parameters: is - InputStream
-     * containing the content to be parsed. Throws: java.io.IOException - If
-     * any IO errors occur. SAXException - If any parse errors occur.
-     * java.lang.IllegalArgumentException - If the InputStream is null See
-     * Also: DocumentHandler
+     * and return a new DOM Document object.
      *
-     * @param is DOCUMENT ME!
+     * @param is InputStream containing the content to be parsed.
      *
-     * @return DOCUMENT ME!
+     * @return a new PMRDocument object.
      *
-     * @throws SAXException DOCUMENT ME!
+     * @throws SAXException     if any parse errors occur.
+     * @throws java.io.IOException if any IO errors occur.
      */
     public Document parse(java.io.InputStream is)
         throws SAXException, java.io.IOException {
@@ -115,19 +106,15 @@ public class PMRDocumentBuilder extends DocumentBuilder {
 
     /**
      * Parse the content of the given InputStream as an XML document
-     * and return a new DOM Document object. Parameters: is - InputStream
-     * containing the content to be parsed. systemId - Provide a base for
-     * resolving relative URIs. Returns: A new DOM Document object. Throws:
-     * java.io.IOException - If any IO errors occur. SAXException - If any
-     * parse errors occur. java.lang.IllegalArgumentException - If the
-     * InputStream is null. See Also: DocumentHandler
+     * and return a new DOM Document object.
      *
-     * @param is DOCUMENT ME!
-     * @param systemId DOCUMENT ME!
+     * @param is       InputStream containing the content to be parsed.
+     * @param systemId base URI for resolving relative URIs.
      *
-     * @return DOCUMENT ME!
+     * @return a new PMRDocument object.
      *
-     * @throws SAXException DOCUMENT ME!
+     * @throws SAXException     if any parse errors occur.
+     * @throws java.io.IOException if any IO errors occur.
      */
     public Document parse(java.io.InputStream is, java.lang.String systemId)
         throws SAXException, java.io.IOException {
@@ -136,17 +123,14 @@ public class PMRDocumentBuilder extends DocumentBuilder {
 
     /**
      * Parse the content of the given URI as an XML document and return
-     * a new DOM Document object. Parameters: uri - The location of the
-     * content to be parsed. Returns: A new DOM Document object. Throws:
-     * java.io.IOException - If any IO errors occur. SAXException - If any
-     * parse errors occur. java.lang.IllegalArgumentException - If the URI is
-     * null. See Also: DocumentHandler
+     * a new DOM Document object.
      *
-     * @param uri DOCUMENT ME!
+     * @param uri the location of the content to be parsed.
      *
-     * @return DOCUMENT ME!
+     * @return a new PMRDocument object.
      *
-     * @throws SAXException DOCUMENT ME!
+     * @throws SAXException     if any parse errors occur.
+     * @throws java.io.IOException if any IO errors occur.
      */
     public Document parse(java.lang.String uri)
         throws SAXException, java.io.IOException {
@@ -155,17 +139,14 @@ public class PMRDocumentBuilder extends DocumentBuilder {
 
     /**
      * Parse the content of the given file as an XML document and
-     * return a new DOM Document object. Parameters: f - The file containing
-     * the XML to parse. Returns: A new DOM Document object. Throws:
-     * java.io.IOException - If any IO errors occur. SAXException - If any
-     * parse errors occur. java.lang.IllegalArgumentException - If the file is
-     * null. See Also: DocumentHandler
+     * return a new DOM Document object.
      *
-     * @param f DOCUMENT ME!
+     * @param f the file containing the XML to parse.
      *
-     * @return DOCUMENT ME!
+     * @return a new PMRDocument object.
      *
-     * @throws SAXException DOCUMENT ME!
+     * @throws SAXException     if any parse errors occur.
+     * @throws java.io.IOException if any IO errors occur.
      */
     public Document parse(java.io.File f)
         throws SAXException, java.io.IOException {
@@ -174,18 +155,14 @@ public class PMRDocumentBuilder extends DocumentBuilder {
 
     /**
      * Parse the content of the given input source as an XML document
-     * and return a new DOM Document object. Parameters: is - InputSource
-     * containing the content to be parsed. Returns: A new DOM Document
-     * object. Throws: java.io.IOException - If any IO errors occur.
-     * SAXException - If any parse errors occur.
-     * java.lang.IllegalArgumentException - If the InputSource is null. See
-     * Also: DocumentHandler
+     * and return a new DOM Document object.
      *
-     * @param is DOCUMENT ME!
+     * @param is InputSource containing the content to be parsed.
      *
-     * @return DOCUMENT ME!
+     * @return a new PMRDocument object.
      *
-     * @throws SAXException DOCUMENT ME!
+     * @throws SAXException     if any parse errors occur.
+     * @throws java.io.IOException if any IO errors occur.
      */
     public Document parse(InputSource is)
         throws SAXException, java.io.IOException {
@@ -195,35 +172,27 @@ public class PMRDocumentBuilder extends DocumentBuilder {
     }
 
     /**
-     * Indicates whether or not this parser is configured to understand
-     * namespaces. Returns: true if this parser is configured to understand
-     * namespaces; false otherwise.
+     * Indicates whether or not this parser is configured to understand namespaces.
      *
-     * @return DOCUMENT ME!
+     * @return true if namespace aware, false otherwise
      */
     public boolean isNamespaceAware() {
         return documentBuilder.isNamespaceAware();
     }
 
     /**
-     * Indicates whether or not this parser is configured to validate
-     * XML documents. Returns: true if this parser is configured to validate
-     * XML documents; false otherwise.
+     * Indicates whether or not this parser is configured to validate XML documents.
      *
-     * @return DOCUMENT ME!
+     * @return true if validating, false otherwise
      */
     public boolean isValidating() {
         return documentBuilder.isValidating();
     }
 
     /**
-     * Obtain a new instance of a DOM PMRDocument object to build a DOM
-     * tree with. An alternative way to create a DOM Document object is to use
-     * the getDOMImplementation method to get a DOM Level 2 DOMImplementation
-     * object and then use DOM Level 2 methods on that object to create a DOM
-     * Document object. Returns: A new instance of a DOM PMRDocument object.
+     * Obtain a new instance of a DOM {@link PMRDocument} object to build a DOM tree with.
      *
-     * @return DOCUMENT ME!
+     * @return a new PMRDocument instance
      */
     public Document newDocument() {
         Document doc = documentBuilder.newDocument();

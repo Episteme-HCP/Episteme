@@ -44,8 +44,8 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CudaNBodyProvider implements NBodyProvider {
-    private static final Logger LOGGER = Logger.getLogger(CudaNBodyProvider.class.getName());
+public class CUDANBodyProvider implements NBodyProvider {
+    private static final Logger LOGGER = Logger.getLogger(CUDANBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
     private final boolean gpuAvailable;
@@ -53,7 +53,7 @@ public class CudaNBodyProvider implements NBodyProvider {
     /**
      * Creates a new CUDA N-Body provider.
      */
-    public CudaNBodyProvider() {
+    public CUDANBodyProvider() {
         CUDABackend backend = null;
         boolean available = false;
         try {

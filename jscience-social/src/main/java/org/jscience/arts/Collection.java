@@ -23,15 +23,15 @@
 
 package org.jscience.arts;
 
-import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
@@ -48,7 +48,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Collection implements Identified<Identification>, Named, Serializable {
+public class Collection implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 2L;
 
@@ -56,7 +56,7 @@ public class Collection implements Identified<Identification>, Named, Serializab
     private final Identification id;
     
     @Attribute
-    private String name;
+    private final Map<String, Object> traits = new HashMap<>();
     
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Artwork> artworks;
@@ -67,7 +67,7 @@ public class Collection implements Identified<Identification>, Named, Serializab
      */
     public Collection(String name) {
         this.id = new UUIDIdentification(UUID.randomUUID().toString());
-        this.name = Objects.requireNonNull(name, "Collection name cannot be null.");
+        setName(name);
         this.artworks = new HashSet<>();
     }
     
@@ -81,16 +81,23 @@ public class Collection implements Identified<Identification>, Named, Serializab
     }
 
     @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    @Override
     public String getName() {
-        return name;
+        String n = (String) getTrait("name");
+        return n != null ? n : "Untitled Collection";
     }
 
     /**
      * Sets a new name for the collection.
      * @param name the new name
      */
+    @Override
     public void setName(String name) {
-        this.name = Objects.requireNonNull(name, "Collection name cannot be null.");
+        setTrait("name", Objects.requireNonNull(name, "Collection name cannot be null."));
     }
 
     /**

@@ -23,7 +23,7 @@
 
 package org.jscience.architecture.traffic;
 
-import java.time.Instant;
+import org.jscience.history.time.TimePoint;
 import java.util.UUID;
 import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.economics.money.Money;
@@ -64,7 +64,7 @@ public class Vehicle extends Machine {
      * @param name descriptive label for the vehicle (e.g., "Car-A1")
      */
     public Vehicle(String name) {
-        super(name, "", Quantities.create(1, Units.ONE), null, null, Instant.now(), 
+        super(name, "", Quantities.create(1, Units.ONE), null, null, TimePoint.now(), 
               new UUIDIdentification(UUID.randomUUID().toString()), Money.usd(0));
         this.speed = Real.ZERO;
     }

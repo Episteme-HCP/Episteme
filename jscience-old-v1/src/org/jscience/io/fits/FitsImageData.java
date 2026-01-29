@@ -309,7 +309,7 @@ public class FitsImageData extends FitsData {
      * ***********************************************************************
      * update the number of valid bytes.
      * This overrides the parent class method to also track the number of valid
-     * full pixels. This would be nice if we actually had a FitsFile class
+     * full pixels. This would be nice if we actually had a FITSFile class
      * which read pixels a few at a time, but we don't. At some point this
      * whole setValidBytes framework may get stripped out.
      * ************************************************************************

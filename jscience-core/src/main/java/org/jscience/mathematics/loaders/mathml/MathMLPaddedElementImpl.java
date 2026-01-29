@@ -35,11 +35,11 @@ import org.w3c.dom.mathml.MathMLPaddedElement;
  */
 public class MathMLPaddedElementImpl extends MathMLPresentationContainerImpl
     implements MathMLPaddedElement {
-/**
+    /**
      * Constructs a MathML padded element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element type
      */
     public MathMLPaddedElementImpl(MathMLDocumentImpl owner,
         String qualifiedName) {
@@ -47,72 +47,72 @@ public class MathMLPaddedElementImpl extends MathMLPresentationContainerImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the value of the <code>width</code> attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the width
      */
     public String getWidth() {
         return getAttribute("width");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of the <code>width</code> attribute.
      *
-     * @param width DOCUMENT ME!
+     * @param width the width to set
      */
     public void setWidth(String width) {
         setAttribute("width", width);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the value of the <code>lspace</code> attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the left space
      */
     public String getLspace() {
         return getAttribute("lspace");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of the <code>lspace</code> attribute.
      *
-     * @param lspace DOCUMENT ME!
+     * @param lspace the left space to set
      */
     public void setLspace(String lspace) {
         setAttribute("lspace", lspace);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the value of the <code>height</code> attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the height
      */
     public String getHeight() {
         return getAttribute("height");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of the <code>height</code> attribute.
      *
-     * @param height DOCUMENT ME!
+     * @param height the height to set
      */
     public void setHeight(String height) {
         setAttribute("height", height);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the value of the <code>depth</code> attribute.
      *
-     * @return DOCUMENT ME!
+     * @return the depth
      */
     public String getDepth() {
         return getAttribute("depth");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the value of the <code>depth</code> attribute.
      *
-     * @param depth DOCUMENT ME!
+     * @param depth the depth to set
      */
     public void setDepth(String depth) {
         setAttribute("depth", depth);

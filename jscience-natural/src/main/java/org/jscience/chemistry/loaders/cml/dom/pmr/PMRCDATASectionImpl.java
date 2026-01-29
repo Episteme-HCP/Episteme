@@ -43,8 +43,8 @@ public class PMRCDATASectionImpl extends PMRTextImpl implements CDATASection {
 /**
      * Creates a new PMRCDATASectionImpl object.
      *
-     * @param dt  DOCUMENT ME!
-     * @param doc DOCUMENT ME!
+     * @param dt  the generic W3C CDATA section to delegate to
+     * @param doc the owner CML document
      */
     public PMRCDATASectionImpl(CDATASection dt, PMRDocument doc) {
         super(dt, doc);

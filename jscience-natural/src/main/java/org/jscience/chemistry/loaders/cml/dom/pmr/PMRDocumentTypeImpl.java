@@ -44,62 +44,62 @@ public class PMRDocumentTypeImpl extends PMRNodeImpl implements DocumentType {
 /**
      * Creates a new PMRDocumentTypeImpl object.
      *
-     * @param dt  DOCUMENT ME!
-     * @param doc DOCUMENT ME!
+     * @param dt  the generic W3C document type to delegate to
+     * @param doc the owner CML document
      */
     public PMRDocumentTypeImpl(DocumentType dt, PMRDocument doc) {
         super(dt, doc);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the internal subset as a string.
      *
-     * @return DOCUMENT ME!
+     * @return the internal subset
      */
     public String getInternalSubset() {
         return ((DocumentType) delegateNode).getInternalSubset();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a NamedNodeMap containing the notations declared in the DTD.
      *
-     * @return DOCUMENT ME!
+     * @return the notations map
      */
     public NamedNodeMap getNotations() {
         return ((DocumentType) delegateNode).getNotations();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the DTD (i.e., the name immediately following the DOCTYPE keyword).
      *
-     * @return DOCUMENT ME!
+     * @return the DTD name
      */
     public String getName() {
         return ((DocumentType) delegateNode).getName();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a NamedNodeMap containing the general entities declared in the DTD.
      *
-     * @return DOCUMENT ME!
+     * @return the entities map
      */
     public NamedNodeMap getEntities() {
         return ((DocumentType) delegateNode).getEntities();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the system identifier of the external subset.
      *
-     * @return DOCUMENT ME!
+     * @return the system ID
      */
     public String getSystemId() {
         return ((DocumentType) delegateNode).getSystemId();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the public identifier of the external subset.
      *
-     * @return DOCUMENT ME!
+     * @return the public ID
      */
     public String getPublicId() {
         return ((DocumentType) delegateNode).getPublicId();

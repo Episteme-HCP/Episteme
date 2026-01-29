@@ -35,20 +35,20 @@ import org.w3c.dom.mathml.MathMLCnElement;
  */
 public class MathMLCnElementImpl extends MathMLContentTokenImpl
     implements MathMLCnElement {
-/**
+    /**
      * Constructs a MathML numeric content element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLCnElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the type of the number (real, integer, complex, etc.).
      *
-     * @return DOCUMENT ME!
+     * @return the number type, defaults to "real"
      */
     public String getType() {
         String type = getAttribute("type");
@@ -61,18 +61,18 @@ public class MathMLCnElementImpl extends MathMLContentTokenImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the type of the number.
      *
-     * @param type DOCUMENT ME!
+     * @param type the number type to set
      */
     public void setType(String type) {
         setAttribute("type", type);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the base of the number representation.
      *
-     * @return DOCUMENT ME!
+     * @return the number base, defaults to "10"
      */
     public String getBase() {
         String base = getAttribute("base");
@@ -85,18 +85,18 @@ public class MathMLCnElementImpl extends MathMLContentTokenImpl
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the base of the number representation.
      *
-     * @param base DOCUMENT ME!
+     * @param base the number base to set
      */
     public void setBase(String base) {
         setAttribute("base", base);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of arguments (parts separated by sep elements).
      *
-     * @return DOCUMENT ME!
+     * @return the argument count
      */
     public int getNargs() {
         final int length = getLength();

@@ -38,13 +38,13 @@ import java.io.IOException;
  * @since 1.0
  */
 @Service
-public class JSONRpcService {
+public class JSONRPCService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JSONRpcService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JSONRPCService.class);
     private final ObjectMapper mapper = new ObjectMapper();
-    private final McpToolRegistry registry;
+    private final MCPToolRegistry registry;
 
-    public JSONRpcService(McpToolRegistry registry) {
+    public JSONRPCService(MCPToolRegistry registry) {
         this.registry = registry;
     }
 

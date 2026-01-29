@@ -24,6 +24,7 @@
 package org.jscience.social;
 
 import org.jscience.economics.*;
+import org.jscience.economics.models.MacroModel;
 import org.jscience.sociology.*;
 import org.jscience.biology.BiologicalSex;
 import org.jscience.politics.*;

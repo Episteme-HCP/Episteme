@@ -24,7 +24,6 @@
 package org.jscience.politics;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,6 +35,7 @@ import org.jscience.earth.Place;
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
 import org.jscience.util.Temporal;
+import org.jscience.history.time.TimeCoordinate;
 
 /**
  * Represents a political or social conflict between multiple populations or groups.
@@ -45,15 +45,15 @@ import org.jscience.util.Temporal;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Conflict implements Named, Commented, Positioned<Place>, Temporal<Instant>, Serializable {
+public class Conflict implements Named, Commented, Positioned<Place>, Temporal<TimeCoordinate>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private String name;
     private final Set<Group> groups = new HashSet<>();
     private Place place;
-    private final Instant startingDate;
-    private Instant endDate;
+    private final TimeCoordinate startingDate;
+    private TimeCoordinate endDate;
     private String comments;
 
     /**
@@ -66,7 +66,7 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<I
      * @throws NullPointerException if any mandatory argument is null
      * @throws IllegalArgumentException if name is empty or no groups are involved
      */
-    public Conflict(String name, Set<Group> involvedGroups, Place place, Instant startingDate) {
+    public Conflict(String name, Set<Group> involvedGroups, Place place, TimeCoordinate startingDate) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         
@@ -121,12 +121,8 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<I
         this.place = Objects.requireNonNull(place, "Place cannot be null");
     }
 
-    public Instant getTimestamp() {
-        return startingDate;
-    }
-
     @Override
-    public Instant getWhen() {
+    public TimeCoordinate getWhen() {
         return startingDate;
     }
 
@@ -134,7 +130,7 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<I
      * Returns the exact starting timestamp.
      * @return starting date
      */
-    public Instant getStartingDate() {
+    public TimeCoordinate getStartingDate() {
         return startingDate;
     }
 
@@ -142,7 +138,7 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<I
      * Returns the timestamp when the conflict was resolved or ceased.
      * @return end date, or null if ongoing
      */
-    public Instant getEndDate() {
+    public TimeCoordinate getEndDate() {
         return endDate;
     }
 
@@ -150,7 +146,7 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<I
      * Sets the timestamp for conflict resolution.
      * @param endDate the resolution date
      */
-    public void setEndDate(Instant endDate) {
+    public void setEndDate(TimeCoordinate endDate) {
         this.endDate = endDate;
     }
 

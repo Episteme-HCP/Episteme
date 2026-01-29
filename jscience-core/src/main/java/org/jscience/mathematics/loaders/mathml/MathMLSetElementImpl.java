@@ -36,38 +36,38 @@ import org.w3c.dom.mathml.MathMLSetElement;
  */
 public class MathMLSetElementImpl extends MathMLContentContainerImpl
     implements MathMLSetElement {
-/**
+    /**
      * Constructs a MathML <code>set</code> element.
      *
-     * @param owner         DOCUMENT ME!
-     * @param qualifiedName DOCUMENT ME!
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
      */
     public MathMLSetElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
         super(owner, qualifiedName);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns whether the set is defined explicitly (by enumeration).
      *
-     * @return DOCUMENT ME!
+     * @return true if explicit, false if defined by constraint
      */
     public boolean getIsExplicit() {
         return !(getFirstChild() instanceof MathMLBvarElement);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the type of the set.
      *
-     * @return DOCUMENT ME!
+     * @return the set type
      */
     public String getType() {
         return getAttribute("type");
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the type of the set.
      *
-     * @param type DOCUMENT ME!
+     * @param type the set type to set
      */
     public void setType(String type) {
         setAttribute("type", type);
