@@ -43,6 +43,7 @@ public class FITSReader extends AbstractResourceReader<NativeMatrix> implements 
     private final MemorySegment fitsPtr;
     private final boolean isShared;
     private static final MethodHandle FFOPEN;
+    private static final MethodHandle FFGEKY;
     private static final MethodHandle FFCLOS;
     private static final MethodHandle FFGPVE;
     private static final boolean AVAILABLE;
@@ -55,6 +56,10 @@ public class FITSReader extends AbstractResourceReader<NativeMatrix> implements 
             // int ffopen(fitsfile **fptr, const char *filename, int iomode, int *status)
             FFOPEN = linker.downcallHandle(lookup.find("ffopen").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            // int ffgky(fitsfile *fptr, int datatype, const char *keyname, void *value, char *comment, int *status)
+            FFGEKY = linker.downcallHandle(lookup.find("ffgky").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
             
             // int ffclos(fitsfile *fptr, int *status)
             FFCLOS = linker.downcallHandle(lookup.find("ffclos").get(),
@@ -107,11 +112,28 @@ public class FITSReader extends AbstractResourceReader<NativeMatrix> implements 
     protected NativeMatrix loadFromSource(String resourceId) throws Exception {
         Path path = Paths.get(resourceId);
         try (FITSReader reader = new FITSReader(path)) {
-            // Placeholder: need dimensions from header. 
-            // In a full implementation, we'd read NAXIS1, NAXIS2 first.
-            NativeMatrix matrix = new NativeMatrix(1, 1);
-            reader.readImage(1, 1, matrix);
+            long naxis1 = reader.readKeyLong("NAXIS1");
+            long naxis2 = reader.readKeyLong("NAXIS2");
+            
+            NativeMatrix matrix = new NativeMatrix((int) naxis2, (int) naxis1);
+            reader.readImage(1, naxis1 * naxis2, matrix);
             return matrix;
+        }
+    }
+
+    public long readKeyLong(String keyName) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment keySegment = arena.allocateFrom(keyName);
+            MemorySegment valPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            MemorySegment status = arena.allocate(ValueLayout.JAVA_INT);
+            status.set(ValueLayout.JAVA_INT, 0, 0);
+            
+            // TLONGLONG = 81
+            int res = (int) FFGEKY.invokeExact(fitsPtr, 81, keySegment, valPtr, MemorySegment.NULL, status);
+            if (res != 0) return 0;
+            return valPtr.get(ValueLayout.JAVA_LONG, 0);
+        } catch (Throwable t) {
+            return 0;
         }
     }
 

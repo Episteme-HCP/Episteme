@@ -45,6 +45,9 @@ public class HDF5Reader extends AbstractResourceReader<NativeMatrix> {
     private static final MethodHandle H5F_OPEN;
     private static final MethodHandle H5F_CLOSE;
     private static final MethodHandle H5D_OPEN;
+    private static final MethodHandle H5D_GET_SPACE;
+    private static final MethodHandle H5S_GET_SIMPLE_EXTENT_DIMS;
+    private static final MethodHandle H5S_CLOSE;
     private static final MethodHandle H5D_READ;
     private static final MethodHandle H5D_CLOSE;
     private static final boolean AVAILABLE;
@@ -60,13 +63,19 @@ public class HDF5Reader extends AbstractResourceReader<NativeMatrix> {
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             H5D_OPEN = linker.downcallHandle(lookup.find("H5Dopen2").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+            H5D_GET_SPACE = linker.downcallHandle(lookup.find("H5Dget_space").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
+            H5S_GET_SIMPLE_EXTENT_DIMS = linker.downcallHandle(lookup.find("H5Sget_simple_extent_dims").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            H5S_CLOSE = linker.downcallHandle(lookup.find("H5Sclose").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             H5D_READ = linker.downcallHandle(lookup.find("H5Dread").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
             H5D_CLOSE = linker.downcallHandle(lookup.find("H5Dclose").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             AVAILABLE = true;
         } else {
-            H5F_OPEN = H5F_CLOSE = H5D_OPEN = H5D_READ = H5D_CLOSE = null;
+            H5F_OPEN = H5F_CLOSE = H5D_OPEN = H5D_GET_SPACE = H5S_GET_SIMPLE_EXTENT_DIMS = H5S_CLOSE = H5D_READ = H5D_CLOSE = null;
             AVAILABLE = false;
         }
     }
@@ -99,12 +108,42 @@ public class HDF5Reader extends AbstractResourceReader<NativeMatrix> {
     protected NativeMatrix loadFromSource(String resourceId) throws Exception {
         Path path = Paths.get(resourceId);
         try (HDF5Reader reader = new HDF5Reader(path)) {
-            // By default, try to read a dataset named "data" or "matrix"
-            // This is a simplified implementation for the resource framework
-            NativeMatrix matrix = new NativeMatrix(1, 1); // Temporary placeholder size
-            // In a real implementation, we would query dimensions first
-            reader.readMatrix("data", matrix);
+            String datasetName = "data"; // Default
+            long[] dims = reader.getDatasetDimensions(datasetName);
+            if (dims == null || dims.length < 2) {
+                throw new IOException("Dataset 'data' not found or has wrong dimensionality");
+            }
+            
+            NativeMatrix matrix = new NativeMatrix((int) dims[0], (int) dims[1]);
+            reader.readMatrix(datasetName, matrix);
             return matrix;
+        }
+    }
+
+    public long[] getDatasetDimensions(String datasetName) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment nameSegment = arena.allocateFrom(datasetName);
+            long datasetId = (long) H5D_OPEN.invokeExact(fileId, nameSegment, 0L);
+            if (datasetId < 0) return null;
+            
+            try {
+                long spaceId = (long) H5D_GET_SPACE.invokeExact(datasetId);
+                try {
+                    MemorySegment dimsSeg = arena.allocate(ValueLayout.JAVA_LONG, 2);
+                    int ndims = (int) H5S_GET_SIMPLE_EXTENT_DIMS.invokeExact(spaceId, dimsSeg, MemorySegment.NULL);
+                    long[] result = new long[ndims];
+                    for (int i = 0; i < ndims; i++) {
+                        result[i] = dimsSeg.get(ValueLayout.JAVA_LONG, (long) i * 8);
+                    }
+                    return result;
+                } finally {
+                    H5S_CLOSE.invokeExact(spaceId);
+                }
+            } finally {
+                H5D_CLOSE.invokeExact(datasetId);
+            }
+        } catch (Throwable t) {
+            return null;
         }
     }
 

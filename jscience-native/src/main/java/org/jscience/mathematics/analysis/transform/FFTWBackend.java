@@ -30,6 +30,21 @@ public class FFTWBackend implements FFTBackend {
     private static final MethodHandle DDESTROY_PLAN;
     private static final boolean AVAILABLE;
 
+    public static final int FFTW_ESTIMATE = 64;
+    public static final int FFTW_MEASURE = 0;
+    public static final int FFTW_PATIENT = 32;
+    public static final int FFTW_EXHAUSTIVE = 8;
+    
+    private final int flags;
+
+    public FFTWBackend() {
+        this(FFTW_ESTIMATE);
+    }
+
+    public FFTWBackend(int flags) {
+        this.flags = flags;
+    }
+
     static {
         Linker linker = Linker.nativeLinker();
         SymbolLookup lookup = SymbolLookup.libraryLookup("fftw3", Arena.global());
@@ -69,7 +84,7 @@ public class FFTWBackend implements FFTBackend {
     public void forward(int n, DoubleBuffer input, DoubleBuffer output) {
         if (!AVAILABLE) throw new UnsupportedOperationException("FFTW3 library not found");
         try {
-            MemorySegment plan = (MemorySegment) DPLAN_R2C_1D.invokeExact(n, MemorySegment.ofBuffer(input), MemorySegment.ofBuffer(output), 64);
+            MemorySegment plan = (MemorySegment) DPLAN_R2C_1D.invokeExact(n, MemorySegment.ofBuffer(input), MemorySegment.ofBuffer(output), flags);
             try {
                 DEXECUTE.invokeExact(plan);
             } finally {
@@ -84,7 +99,7 @@ public class FFTWBackend implements FFTBackend {
     public void backward(int n, DoubleBuffer input, DoubleBuffer output) {
         if (!AVAILABLE) throw new UnsupportedOperationException("FFTW3 library not found");
         try {
-            MemorySegment plan = (MemorySegment) DPLAN_C2R_1D.invokeExact(n, MemorySegment.ofBuffer(input), MemorySegment.ofBuffer(output), 64);
+            MemorySegment plan = (MemorySegment) DPLAN_C2R_1D.invokeExact(n, MemorySegment.ofBuffer(input), MemorySegment.ofBuffer(output), flags);
             try {
                 DEXECUTE.invokeExact(plan);
             } finally {

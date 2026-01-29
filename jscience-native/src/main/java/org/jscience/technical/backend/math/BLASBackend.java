@@ -26,6 +26,12 @@ public class BLASBackend implements MatrixBackend {
     private static final MethodHandle DGEMM_HANDLE;
     private static final boolean AVAILABLE;
 
+    public static final int CblasRowMajor = 101;
+    public static final int CblasColMajor = 102;
+    public static final int CblasNoTrans = 111;
+    public static final int CblasTrans = 112;
+    public static final int CblasConjTrans = 113;
+
     static {
         Linker linker = Linker.nativeLinker();
         SymbolLookup lookup = SymbolLookup.libraryLookup("libopenblas", java.lang.foreign.Arena.global());
@@ -80,7 +86,7 @@ public class BLASBackend implements MatrixBackend {
             MemorySegment segC = MemorySegment.ofBuffer(C);
 
             // CblasRowMajor = 101, CblasNoTrans = 111
-            DGEMM_HANDLE.invokeExact(101, 111, 111, rowsA, colsB, colsA,
+            DGEMM_HANDLE.invokeExact(CblasRowMajor, CblasNoTrans, CblasNoTrans, rowsA, colsB, colsA,
                 alpha, segA, lda, segB, ldb, beta, segC, ldc);
         } catch (Throwable t) {
             throw new RuntimeException("CBLAS call failed", t);
@@ -91,7 +97,7 @@ public class BLASBackend implements MatrixBackend {
     public void multiply(NativeMatrix A, NativeMatrix B, NativeMatrix C, double alpha, double beta) {
         if (!AVAILABLE) throw new UnsupportedOperationException("BLAS native library not found");
         try {
-            DGEMM_HANDLE.invokeExact(101, 111, 111, A.rows(), B.cols(), A.cols(),
+            DGEMM_HANDLE.invokeExact(CblasRowMajor, CblasNoTrans, CblasNoTrans, A.rows(), B.cols(), A.cols(),
                 alpha, A.segment(), A.cols(), B.segment(), B.cols(), beta, C.segment(), C.cols());
         } catch (Throwable t) {
             throw new RuntimeException("CBLAS call failed", t);
