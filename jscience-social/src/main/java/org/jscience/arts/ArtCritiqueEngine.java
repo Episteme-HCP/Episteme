@@ -93,7 +93,7 @@ public final class ArtCritiqueEngine {
     public static List<CritiqueResult> evaluate(Artwork artwork, List<String> observedTechniques) {
         List<CritiqueResult> results = new ArrayList<>();
         
-        Instant date = artwork.getProductionDate();
+        Instant date = artwork.getProductionDate().toInstant();
         int year = date != null ? date.atZone(ZoneOffset.UTC).getYear() : 1500;
 
         List<TechnicalStandard> periodStandards = STANDARDS.stream()

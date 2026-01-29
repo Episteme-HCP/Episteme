@@ -23,7 +23,6 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
 import org.jscience.economics.Community;
 import org.jscience.economics.MaterialResource;
 import org.jscience.economics.money.Money;
@@ -32,11 +31,12 @@ import org.jscience.measure.Quantity;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.history.time.TimeCoordinate;
+
 
 /**
  * Represents a resource created by human craftsmanship (an artifact).
  * Artifacts are the result of human craftsmanship and have a specific purpose.
- * They can be represented in 3D through a J3D Group.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -55,7 +55,7 @@ public class Artifact extends MaterialResource {
      * Initializes a new artifact.
      */
     public Artifact(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Identification identification, Money value) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.broken = false;

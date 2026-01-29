@@ -33,12 +33,14 @@ import org.jscience.ui.i18n.I18N;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jscience.history.time.TimePoint;
+import org.jscience.mathematics.numbers.real.Real;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.time.Instant;
 
 /**
  * Modern stock quote reader using Alpha Vantage API.
@@ -166,16 +168,16 @@ public class AlphaVantageQuoteReader extends AbstractResourceReader<Quote> {
         }
 
         String sym = globalQuote.path("01. symbol").asText(symbol);
-        org.jscience.mathematics.numbers.real.Real price = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("05. price").asText("0.0"));
-        org.jscience.mathematics.numbers.real.Real open = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("02. open").asText("0.0"));
-        org.jscience.mathematics.numbers.real.Real high = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("03. high").asText("0.0"));
-        org.jscience.mathematics.numbers.real.Real low = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("04. low").asText("0.0"));
+        Real price = Real.of(globalQuote.path("05. price").asText("0.0"));
+        Real open = Real.of(globalQuote.path("02. open").asText("0.0"));
+        Real high = Real.of(globalQuote.path("03. high").asText("0.0"));
+        Real low = Real.of(globalQuote.path("04. low").asText("0.0"));
         long volume = globalQuote.path("06. volume").asLong(0);
-        org.jscience.mathematics.numbers.real.Real change = org.jscience.mathematics.numbers.real.Real.of(globalQuote.path("09. change").asText("0.0"));
+        Real change = Real.of(globalQuote.path("09. change").asText("0.0"));
         String changePercent = globalQuote.path("10. change percent").asText("0%");
 
         Quote quote = new Quote(sym, sym, "Alpha Vantage");
-        quote.update(volume, Money.usd(price), Instant.now());
+        quote.update(volume, Money.usd(price), TimePoint.now());
         quote.setOpenPrice(Money.usd(open));
         quote.setHighPrice(Money.usd(high));
         quote.setLowPrice(Money.usd(low));

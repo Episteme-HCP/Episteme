@@ -34,8 +34,11 @@ import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;
 
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.util.Stack;
 import java.util.Vector;
+import java.util.logging.LogRecord;
 
 
 /**
@@ -44,40 +47,40 @@ import java.util.Vector;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
+public class SaxHandlerImpl extends DefaultHandler
     implements SaxHandler {
-    /** DOCUMENT ME! */
+    /** The CML document being populated by the handler. */
     AbstractCMLDocument doc;
 
-    /** DOCUMENT ME! */
+    /** Stack to manage the hierarchical structure of CML nodes during parsing. */
     Stack<Node> stack;
 
     // the node which determines the data type; always mirrors the input
-    /** DOCUMENT ME! */
+    /** The current node being processed in the input document. */
     Node currentNode;
 
     // the Node to add new elements to; mirrors the output data structure
     //    Node currentParent = null;
-    /** DOCUMENT ME! */
+    /** Vector to store error messages encountered during parsing. */
     Vector<String> errorVector;
 
-    /** DOCUMENT ME! */
+    /** Flag to enable or disable debugging output. */
     boolean debug = false;
 
-    /** DOCUMENT ME! */
+    /** The original root element of the document, if it existed. */
     Element oldRootElement = null;
 
-    /** DOCUMENT ME! */
+    /** The new root element created during the parsing process. */
     Element newRootElement = null;
 
-    /** DOCUMENT ME! */
+    /** Flag to indicate whether ignorable whitespace should be skipped. */
     boolean ignoreWhite = false;
 
-/**
+    /**
      * Creates a new SaxHandlerImpl object.
      *
-     * @param d     DOCUMENT ME!
-     * @param debug DOCUMENT ME!
+     * @param d     the document to populate
+     * @param debug true to enable debugging output
      */
     public SaxHandlerImpl(AbstractCMLDocument d, boolean debug) {
         this.doc = d;
@@ -109,82 +112,107 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
         }
     }
 
+
     /**
-     * DOCUMENT ME!
+     * Adds an error message to the internal error vector.
      *
-     * @param s DOCUMENT ME!
+     * @param s the error message string
      */
     void addError(String s) {
         errorVector.addElement(s);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets whether to ignore ignorable whitespace during parsing.
      *
-     * @param ignoreWhite DOCUMENT ME!
+     * @param ignoreWhite true to ignore whitespace, false otherwise
      */
     public void setIgnoreWhite(boolean ignoreWhite) {
         this.ignoreWhite = ignoreWhite;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns true if any errors were encountered during parsing.
      *
-     * @return DOCUMENT ME!
+     * @return true if errors occurred, false otherwise
      */
     public boolean hasErrors() {
         return errorVector.size() > 0;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a vector of error messages encountered during parsing.
      *
-     * @return DOCUMENT ME!
+     * @return a vector of error strings
      */
     public Vector<String> getErrorVector() {
         return errorVector;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the newly created root element.
      *
-     * @return DOCUMENT ME!
+     * @return the new root element
      */
     Element getNewRootElement() {
         return newRootElement;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the current parsing stack.
      *
-     * @return DOCUMENT ME!
+     * @return the stack of nodes
      */
     Stack<Node> getStack() {
         return stack;
     }
 
     /**
-     * DOCUMENT ME!
+     * Enables or disables debugging output.
      *
-     * @param debug DOCUMENT ME!
+     * @param debug true to enable, false to disable
      */
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the current debug status.
      *
-     * @return DOCUMENT ME!
+     * @return true if debug is on
      */
     public boolean getDebug() {
         return this.debug;
     }
 
     /**
-     * DOCUMENT ME!
+     * Publishes a log record. Currently commented out but originally intended to
+     * print level and message.
      *
-     * @param s DOCUMENT ME!
+     * @param record the log record to publish
+     */
+    public void publish(LogRecord record) {
+        //System.out.println(record.getLevel()+"/"+record.getMessage());
+    }
+
+    /**
+     * Flushes any buffered output.
+     */
+    public void flush() {
+        System.out.flush();
+    }
+
+    /**
+     * Closes the handler and releases all resources.
+     */
+    public void close() {
+        //        System.out.println("CLOSECONSOLE");
+    }
+
+    /**
+     * Outputs a debug message if debugging is enabled.
+     *
+     * @param s the debug message
      */
     protected void debug(String s) {
         if (debug) {
@@ -192,13 +220,12 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
         }
     }
 
-    // ============================== SAX CALLBACKS ====================== //
     /**
-     * DOCUMENT ME!
+     * SAX callback for character data.
      *
-     * @param ch DOCUMENT ME!
-     * @param start DOCUMENT ME!
-     * @param length DOCUMENT ME!
+     * @param ch     the character array
+     * @param start  the start position
+     * @param length the number of characters
      */
     public void characters(char[] ch, int start, int length) {
         String content = new String(ch, start, length);
@@ -223,7 +250,7 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for the end of the document.
      */
     public void endDocument() {
         debug("End doc: ");
@@ -249,11 +276,11 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for the end of an element.
      *
-     * @param uri DOCUMENT ME!
-     * @param localName DOCUMENT ME!
-     * @param qName DOCUMENT ME!
+     * @param uri       the namespace URI
+     * @param localName the local name
+     * @param qName     the qualified name
      */
     public void endElement(String uri, String localName, String qName) {
         debug("endElement " + localName);
@@ -272,18 +299,18 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for recoverable parse errors.
      *
-     * @param e DOCUMENT ME!
+     * @param e the SAX parse exception
      */
     public void error(SAXParseException e) {
         System.err.println("SAX Error: " + e);
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for fatal parse errors.
      *
-     * @param e DOCUMENT ME!
+     * @param e the fatal SAX parse exception
      */
     public void fatalError(SAXParseException e) {
         String msg = "" + e + " at " + e.getLineNumber() + ":" +
@@ -292,26 +319,26 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for ignorable whitespace.
      *
-     * @param ch DOCUMENT ME!
-     * @param start DOCUMENT ME!
-     * @param length DOCUMENT ME!
+     * @param ch     the character array
+     * @param start  the start position
+     * @param length the number of characters
      */
     public void ignorableWhitespace(char[] ch, int start, int length) {
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for processing instructions.
      *
-     * @param target DOCUMENT ME!
-     * @param data DOCUMENT ME!
+     * @param target the target string
+     * @param data   the data string
      */
     public void processingInstruction(String target, String data) {
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for the start of the document.
      */
     public void startDocument() {
         debug("startDOCUMENT");
@@ -322,12 +349,12 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for the start of an element.
      *
-     * @param uri DOCUMENT ME!
-     * @param localName DOCUMENT ME!
-     * @param qName DOCUMENT ME!
-     * @param attributes DOCUMENT ME!
+     * @param uri        the namespace URI
+     * @param localName  the local name
+     * @param qName      the qualified name
+     * @param attributes the element attributes
      */
     public void startElement(String uri, String localName, String qName,
         Attributes attributes) {
@@ -409,21 +436,21 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for the start of a prefix mapping.
      *
-     * @param prefix DOCUMENT ME!
-     * @param uri DOCUMENT ME!
+     * @param prefix the namespace prefix
+     * @param uri    the namespace URI
      */
     public void startPrefixMapping(String prefix, String uri) {
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for unparsed entity declarations.
      *
-     * @param name DOCUMENT ME!
-     * @param publicId DOCUMENT ME!
-     * @param systemId DOCUMENT ME!
-     * @param notationName DOCUMENT ME!
+     * @param name         the entity name
+     * @param publicId     the public identifier
+     * @param systemId     the system identifier
+     * @param notationName the name of the notation
      */
     public void unparsedEntityDecl(String name, String publicId,
         String systemId, String notationName) {
@@ -431,9 +458,9 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * SAX callback for parse warnings.
      *
-     * @param e DOCUMENT ME!
+     * @param e the SAX parse warning
      */
     public void warning(SAXParseException e) {
         String s = "" + e + " at " + e.getLineNumber() + ":" +
@@ -448,11 +475,11 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     }
 
     /**
-     * DOCUMENT ME!
+     * Test main method for parsing experiments.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception if a test error occurs
      */
     public static void main(String[] args) throws Exception {
         /*

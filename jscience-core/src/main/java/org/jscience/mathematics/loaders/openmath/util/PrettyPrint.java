@@ -101,12 +101,10 @@ public class PrettyPrint {
         OMXMLReader reader = new OMXMLReader(new InputSource(inputStream));
         OMObject object = reader.readObject();
 
-        OutputStreamWriter writer = new OutputStreamWriter(new PrintStream(
-                    outputStream));
-        OMXMLWriter xmlWriter = new OMXMLWriter(writer);
-
-        xmlWriter.writeObject(object);
-        xmlWriter.flush();
+        try (OMXMLWriter xmlWriter = new OMXMLWriter(new OutputStreamWriter(new PrintStream(outputStream)))) {
+            xmlWriter.writeObject(object);
+            xmlWriter.flush();
+        }
     }
 
     /**

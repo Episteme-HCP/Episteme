@@ -1,5 +1,6 @@
 package org.jscience.earth.loaders.gml;
 
+import org.jscience.geography.loaders.gml.GMLReader;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

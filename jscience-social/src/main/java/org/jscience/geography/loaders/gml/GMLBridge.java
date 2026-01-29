@@ -8,7 +8,6 @@ import org.jscience.geography.GeoMap;
 import org.jscience.geography.GeoPath;
 import org.jscience.geography.GeoPolygon;
 import org.jscience.mathematics.geometry.boundaries.PointBoundary;
-import org.jscience.earth.loaders.gml.*;
 
 
 import java.util.ArrayList;

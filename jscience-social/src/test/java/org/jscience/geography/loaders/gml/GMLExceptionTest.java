@@ -5,7 +5,6 @@
 
 package org.jscience.geography.loaders.gml;
  
-import org.jscience.earth.loaders.gml.GMLException;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

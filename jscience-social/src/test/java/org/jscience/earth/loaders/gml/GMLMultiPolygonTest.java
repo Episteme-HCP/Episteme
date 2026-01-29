@@ -5,6 +5,7 @@
 
 package org.jscience.earth.loaders.gml;
 
+import org.jscience.geography.loaders.gml.GMLMultiPolygon;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

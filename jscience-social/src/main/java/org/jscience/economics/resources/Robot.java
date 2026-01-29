@@ -23,7 +23,7 @@
 
 package org.jscience.economics.resources;
 
-import java.time.Instant;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.economics.Community;
 import org.jscience.economics.TaskProcessor;
 import org.jscience.economics.money.Money;
@@ -47,7 +47,7 @@ public abstract class Robot extends Machine implements TaskProcessor {
      * Initializes a new robot.
      */
     public Robot(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Identification identification, Money value) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
     }

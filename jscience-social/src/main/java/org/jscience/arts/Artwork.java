@@ -23,7 +23,6 @@
 
 package org.jscience.arts;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -34,6 +33,7 @@ import org.jscience.economics.money.Money;
 import org.jscience.economics.resources.Artifact;
 import org.jscience.earth.Place;
 import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.TimePoint;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
@@ -80,7 +80,7 @@ public class Artwork extends Artifact {
      */
     public Artwork(String name, String description, TimeCoordinate productionDate, Place productionPlace, ArtForm category) {
         this(name, description, Quantities.create(1, Units.ONE), null, productionPlace, 
-             productionDate != null ? productionDate.toInstant() : Instant.now(),
+             productionDate != null ? productionDate : TimePoint.now(),
              new UUIDIdentification(UUID.randomUUID().toString()), Money.usd(0), category);
     }
 
@@ -88,7 +88,7 @@ public class Artwork extends Artifact {
      * Full constructor for Artwork as a resource.
      */
     public Artwork(String name, String description, Quantity<?> amount,
-            Community producer, Place productionPlace, Instant productionDate,
+            Community producer, Place productionPlace, TimeCoordinate productionDate,
             Identification identification, Money value, ArtForm category) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.category = Objects.requireNonNull(category, "Category cannot be null");

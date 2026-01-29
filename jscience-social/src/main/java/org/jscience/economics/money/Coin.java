@@ -29,9 +29,12 @@ import org.jscience.util.identity.Identification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
+import org.jscience.history.time.TimeCoordinate;
 
-import java.time.Instant;
 import java.time.Year;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -57,10 +60,10 @@ public final class Coin implements ComprehensiveIdentification {
     private final Identification id;
 
     @Attribute
-    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
+    private final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
-    private final Instant emission;
+    private final TimeCoordinate emission;
 
     @Attribute
     private final Money value;
@@ -76,7 +79,7 @@ public final class Coin implements ComprehensiveIdentification {
      * @param value          the face value
      * @throws NullPointerException if any argument is null
      */
-    public Coin(Identification identification, Instant emission, Money value) {
+    public Coin(Identification identification, TimeCoordinate emission, Money value) {
         this(identification, emission, value, null);
     }
 
@@ -88,7 +91,7 @@ public final class Coin implements ComprehensiveIdentification {
      * @param value          the face value
      * @param mintMark       the mint mark (e.g., "D" for Denver)
      */
-    public Coin(Identification id, Instant emission, Money value, String mintMark) {
+    public Coin(Identification id, TimeCoordinate emission, Money value, String mintMark) {
         this.id = Objects.requireNonNull(id, "Identification cannot be null");
         this.emission = Objects.requireNonNull(emission, "Emission cannot be null");
         this.value = Objects.requireNonNull(value, "Value cannot be null");
@@ -104,7 +107,7 @@ public final class Coin implements ComprehensiveIdentification {
      * @param emission       the date of minting
      * @param currency       the currency
      */
-    public Coin(double value, Identification identification, Instant emission, Currency currency) {
+    public Coin(double value, Identification identification, TimeCoordinate emission, Currency currency) {
         this(identification, emission, Money.valueOf(Real.of(value), currency));
     }
 
@@ -114,7 +117,7 @@ public final class Coin implements ComprehensiveIdentification {
     }
 
     @Override
-    public java.util.Map<String, Object> getTraits() {
+    public Map<String, Object> getTraits() {
         return traits;
     }
 
@@ -130,7 +133,7 @@ public final class Coin implements ComprehensiveIdentification {
      * Returns the emission date.
      * @return the emission instant
      */
-    public Instant getEmission() {
+    public TimeCoordinate getEmission() {
         return emission;
     }
 
@@ -139,7 +142,7 @@ public final class Coin implements ComprehensiveIdentification {
      * @return the year
      */
     public Year getEmissionYear() {
-        return Year.from(emission.atZone(java.time.ZoneOffset.UTC));
+        return Year.from(emission.toInstant().atZone(ZoneOffset.UTC));
     }
 
     /**
@@ -190,21 +193,21 @@ public final class Coin implements ComprehensiveIdentification {
     /**
      * Creates a US penny.
      */
-    public static Coin usPenny(Identification id, Instant emission) {
+    public static Coin usPenny(Identification id, TimeCoordinate emission) {
         return new Coin(id, emission, Money.valueOf(0.01, Currency.USD));
     }
 
     /**
      * Creates a US quarter.
      */
-    public static Coin usQuarter(Identification id, Instant emission) {
+    public static Coin usQuarter(Identification id, TimeCoordinate emission) {
         return new Coin(id, emission, Money.valueOf(0.25, Currency.USD));
     }
 
     /**
      * Creates a Euro coin.
      */
-    public static Coin euro(Identification id, Instant emission, double value) {
+    public static Coin euro(Identification id, TimeCoordinate emission, double value) {
         return new Coin(id, emission, Money.valueOf(value, Currency.EUR));
     }
 }

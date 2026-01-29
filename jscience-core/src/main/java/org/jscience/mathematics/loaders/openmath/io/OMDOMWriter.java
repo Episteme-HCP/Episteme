@@ -146,10 +146,10 @@ public class OMDOMWriter {
                 node = document.createElement("OMA");
 
                 OMApplication application = (OMApplication) object;
-                Enumeration enumeration = application.getElements().elements();
+                Enumeration<OMObject> enumeration = application.getElements().elements();
 
                 for (; enumeration.hasMoreElements();) {
-                    child = writeNode((OMObject) enumeration.nextElement());
+                    child = writeNode(enumeration.nextElement());
                     node.appendChild(child);
                 }
             }
@@ -158,14 +158,14 @@ public class OMDOMWriter {
                 node = document.createElement("OMATTR");
 
                 OMAttribution attribution = new OMAttribution();
-                Hashtable attributions = attribution.getAttributions();
-                Enumeration keys = attributions.keys();
-                Enumeration values = attributions.elements();
+                Hashtable<OMObject, OMObject> attributions = attribution.getAttributions();
+                Enumeration<OMObject> keys = attributions.keys();
+                Enumeration<OMObject> values = attributions.elements();
                 Element pairs = document.createElement("OMATP");
 
                 for (; keys.hasMoreElements();) {
-                    OMObject key = (OMObject) keys.nextElement();
-                    OMObject value = (OMObject) values.nextElement();
+                    OMObject key = keys.nextElement();
+                    OMObject value = values.nextElement();
 
                     pairs.appendChild(writeNode(key));
                     pairs.appendChild(writeNode(value));
@@ -189,12 +189,12 @@ public class OMDOMWriter {
 
                 OMBinding binding = new OMBinding();
                 Element variables = document.createElement("OMBVAR");
-                Enumeration enumeration = binding.getVariables().elements();
+                Enumeration<OMObject> enumeration = binding.getVariables().elements();
 
                 node.appendChild(writeNode(binding.getBinder()));
 
                 for (; enumeration.hasMoreElements();) {
-                    OMObject element = (OMObject) enumeration.nextElement();
+                    OMObject element = enumeration.nextElement();
                     variables.appendChild(writeNode(element));
                 }
 
@@ -206,12 +206,12 @@ public class OMDOMWriter {
                 node = document.createElement("OME");
 
                 OMError error = (OMError) object;
-                Enumeration enumeration = error.getElements().elements();
+                Enumeration<OMObject> enumeration = error.getElements().elements();
 
                 node.appendChild(writeNode(error.getSymbol()));
 
                 for (; enumeration.hasMoreElements();) {
-                    child = writeNode((OMObject) enumeration.nextElement());
+                    child = writeNode(enumeration.nextElement());
                     node.appendChild(child);
                 }
             }
@@ -222,8 +222,7 @@ public class OMDOMWriter {
 
             if (object instanceof OMForeign) {
                 node = document.createElement("OMFOREIGN");
-
-                OMForeign foreign = (OMForeign) object;
+                // OMObject foreign = (OMForeign) object; // Removed unused variable
             }
 
             if (object instanceof OMInteger) {
@@ -260,6 +259,10 @@ public class OMDOMWriter {
                 node = document.createElement("OMV");
             }
 
+            if (node == null) {
+                return null;
+            }
+
             if (prefix != null) {
                 node.setPrefix(prefix);
             }
@@ -270,12 +273,15 @@ public class OMDOMWriter {
             Hashtable<String, Object> attributes = object.getAttributes();
             Enumeration<String> keys = attributes.keys();
             Enumeration<Object> values = attributes.elements();
-            Element element = (Element) node;
+            
+            if (node instanceof Element) {
+                Element element = (Element) node;
 
-            for (; keys.hasMoreElements();) {
-                String key = keys.nextElement();
-                String value = (String) values.nextElement();
-                element.setAttribute(key, value);
+                for (; keys.hasMoreElements();) {
+                    String key = keys.nextElement();
+                    String value = (String) values.nextElement();
+                    element.setAttribute(key, value);
+                }
             }
 
             return node;
