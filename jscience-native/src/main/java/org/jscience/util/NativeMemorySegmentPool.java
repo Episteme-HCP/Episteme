@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.foreign.util;
+package org.jscience.util;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;

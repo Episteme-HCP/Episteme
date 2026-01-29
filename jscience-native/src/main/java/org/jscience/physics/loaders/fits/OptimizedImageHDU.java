@@ -3,13 +3,13 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.foreign.io.fits;
+package org.jscience.physics.loaders.fits;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import org.jscience.physics.loaders.fits.ImageHDU;
 import org.jscience.physics.loaders.fits.FITSConstants;
-import org.jscience.foreign.matrix.NativeMatrix;
+import org.jscience.mathematics.linearalgebra.matrices.NativeMatrix;
 import java.lang.foreign.Arena;
 
 /**

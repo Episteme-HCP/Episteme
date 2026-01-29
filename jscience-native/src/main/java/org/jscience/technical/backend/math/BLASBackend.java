@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.foreign.blas;
+package org.jscience.technical.backend.math;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
@@ -12,8 +12,7 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
-import org.jscience.technical.backend.math.MatrixBackend;
-import org.jscience.foreign.matrix.NativeMatrix;
+import org.jscience.mathematics.linearalgebra.matrices.NativeMatrix;
 
 /**
  * Implementation of {@link MatrixBackend} using OpenBLAS or Intel MKL via Panama.

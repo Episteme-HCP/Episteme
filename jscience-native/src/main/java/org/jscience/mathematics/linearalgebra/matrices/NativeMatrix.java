@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.foreign.matrix;
+package org.jscience.mathematics.linearalgebra.matrices;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;

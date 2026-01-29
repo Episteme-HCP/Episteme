@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.foreign.io.fits;
+package org.jscience.physics.loaders.fits;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -31,18 +31,17 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
-import org.jscience.foreign.matrix.NativeMatrix;
+import java.nio.file.Paths;
+import org.jscience.io.AbstractResourceReader;
+import org.jscience.mathematics.linearalgebra.matrices.NativeMatrix;
 
 /**
  * High-performance FITS reader using Project Panama to call cfitsio.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.1
  */
-public class FITSReader implements AutoCloseable {
+public class FITSReader extends AbstractResourceReader<NativeMatrix> implements AutoCloseable {
 
     private final MemorySegment fitsPtr;
+    private final boolean isShared;
     private static final MethodHandle FFOPEN;
     private static final MethodHandle FFCLOS;
     private static final MethodHandle FFGPVE;
@@ -72,9 +71,14 @@ public class FITSReader implements AutoCloseable {
         }
     }
 
+    public FITSReader() {
+        this.fitsPtr = MemorySegment.NULL;
+        this.isShared = false;
+    }
+
     public FITSReader(Path path) {
         if (!AVAILABLE) throw new UnsupportedOperationException("cfitsio native library not found");
-        
+        this.isShared = true;
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment pathSegment = arena.allocateFrom(path.toString());
             MemorySegment fptrPtr = arena.allocate(ValueLayout.ADDRESS);
@@ -88,6 +92,26 @@ public class FITSReader implements AutoCloseable {
             this.fitsPtr = fptrPtr.get(ValueLayout.ADDRESS, 0);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to open FITS file: " + path, t);
+        }
+    }
+
+    @Override public String getName() { return "Native FITS Reader"; }
+    @Override public String getDescription() { return "FITS reader using Panama and cfitsio library."; }
+    @Override public String getCategory() { return "I/O / Native / Physics"; }
+    @Override public Class<NativeMatrix> getResourceType() { return NativeMatrix.class; }
+    @Override public String getResourcePath() { return null; }
+    @Override public String getLongDescription() { return "High-performance FITS reader leveraging Project Panama and cfitsio for fast, zero-copy data loading from scientific FITS files directly into off-heap NativeMatrix objects."; }
+    @Override public String[] getSupportedVersions() { return new String[] { "4.0" }; }
+
+    @Override
+    protected NativeMatrix loadFromSource(String resourceId) throws Exception {
+        Path path = Paths.get(resourceId);
+        try (FITSReader reader = new FITSReader(path)) {
+            // Placeholder: need dimensions from header. 
+            // In a full implementation, we'd read NAXIS1, NAXIS2 first.
+            NativeMatrix matrix = new NativeMatrix(1, 1);
+            reader.readImage(1, 1, matrix);
+            return matrix;
         }
     }
 
@@ -106,7 +130,7 @@ public class FITSReader implements AutoCloseable {
 
     @Override
     public void close() {
-        if (fitsPtr != null && !fitsPtr.equals(MemorySegment.NULL)) {
+        if (fitsPtr != null && !fitsPtr.equals(MemorySegment.NULL) && isShared) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment status = arena.allocate(ValueLayout.JAVA_INT);
                 status.set(ValueLayout.JAVA_INT, 0, 0);

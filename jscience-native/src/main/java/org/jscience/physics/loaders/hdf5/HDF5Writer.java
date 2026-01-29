@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.foreign.io.hdf5;
+package org.jscience.physics.loaders.hdf5;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -31,18 +31,17 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
-import org.jscience.foreign.matrix.NativeMatrix;
+import java.nio.file.Paths;
+import org.jscience.io.AbstractResourceWriter;
+import org.jscience.mathematics.linearalgebra.matrices.NativeMatrix;
 
 /**
  * High-performance HDF5 writer using Panama.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.1
  */
-public class HDF5Writer implements AutoCloseable {
+public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements AutoCloseable {
 
     private final long fileId;
+    private final boolean isShared;
     private static final MethodHandle H5F_CREATE;
     private static final MethodHandle H5F_CLOSE;
     private static final MethodHandle H5D_WRITE;
@@ -66,14 +65,28 @@ public class HDF5Writer implements AutoCloseable {
         }
     }
 
+    public HDF5Writer() {
+        this.fileId = 0;
+        this.isShared = false;
+    }
+
     public HDF5Writer(Path path) {
         if (!AVAILABLE) throw new UnsupportedOperationException("HDF5 native library not found");
+        this.isShared = true;
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment pathSegment = arena.allocateFrom(path.toString());
             // H5F_ACC_TRUNC = 0x0002u
             this.fileId = (long) H5F_CREATE.invokeExact(pathSegment, 2, 0L, 0L);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to create HDF5 file: " + path, t);
+        }
+    }
+
+    @Override
+    public void save(NativeMatrix resource, String destinationId) throws Exception {
+        Path path = Paths.get(destinationId);
+        try (HDF5Writer writer = new HDF5Writer(path)) {
+            writer.writeMatrix("data", resource);
         }
     }
 
@@ -84,7 +97,7 @@ public class HDF5Writer implements AutoCloseable {
 
     @Override
     public void close() {
-        if (fileId != 0) {
+        if (fileId != 0 && isShared) {
             try {
                 H5F_CLOSE.invokeExact(fileId);
             } catch (Throwable t) {

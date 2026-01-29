@@ -11,7 +11,7 @@ import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider;
 import org.jscience.technical.backend.math.MatrixBackend;
-import org.jscience.foreign.blas.BLASBackend;
+import org.jscience.technical.backend.math.BLASBackend;
 
 /**
  * Native implementation of LinearAlgebraProvider using BLASBackend.

@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.foreign.fft;
+package org.jscience.mathematics.analysis.transform;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
