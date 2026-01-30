@@ -43,9 +43,15 @@ import org.jscience.technical.backend.BackendDiscovery;
  */
 public interface LinearAlgebraProvider<E> extends ComputeBackend {
 
-    @Override
     default String getType() {
         return BackendDiscovery.TYPE_LINEAR_ALGEBRA;
+    }
+
+    /**
+     * Checks if this provider is compatible with the given ring.
+     */
+    default boolean isCompatible(org.jscience.mathematics.structures.rings.Ring<?> ring) {
+        return true; // Assume compatible by default or if generic
     }
 
     // --- Vector Operations ---

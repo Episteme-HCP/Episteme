@@ -27,7 +27,8 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the <code>vector</code> element in MathML Content.
+ * A vector is a mathematical object that has a direction and a magnitude.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,55 +36,55 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLVectorElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+     * Returns the number of components in this vector.
      *
-     * @return DOCUMENT ME!
+     * @return the number of components.
      */
     public int getNcomponents();
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>index</code>-th component of this vector.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param index the index of the component to retrieve.
+     * @return the component at the specified index.
      */
     public MathMLContentElement getComponent(int index);
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new component into the vector at the specified <code>index</code>.
      *
-     * @param newComponent DOCUMENT ME!
-     * @param index        DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param newComponent the new component to insert.
+     * @param index        the index at which the new component is to be inserted.
+     * @return the newly inserted component.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public MathMLContentElement insertComponent(
             MathMLContentElement newComponent, int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Replaces the component at the specified <code>index</code> with a new component.
      *
-     * @param newComponent DOCUMENT ME!
-     * @param index        DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param newComponent the new component to set.
+     * @param index        the index of the component to replace.
+     * @return the newly set component.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public MathMLContentElement setComponent(
             MathMLContentElement newComponent, int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Deletes the component at the specified <code>index</code>.
      *
-     * @param index DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the component to delete.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public void deleteComponent(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Removes and returns the component at the specified <code>index</code>.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param index the index of the component to remove.
+     * @return the removed component.
      */
     public MathMLContentElement removeComponent(int index);
 }

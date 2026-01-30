@@ -24,7 +24,8 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface is the base interface for all MathML presentation elements.
+ * Presentation elements are used to represent the visual layout of mathematical notation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

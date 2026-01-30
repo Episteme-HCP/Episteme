@@ -106,9 +106,15 @@ public final class LinearAlgebraRegistry {
      */
     public static <E> LinearAlgebraProvider<E> getMatrixProvider(
             org.jscience.mathematics.structures.rings.Field<E> field) {
-        // Simple strategy: return the default CPU provider for now.
-        // In a real implementation, we would check if a specific provider (like GPU)
-        // supports this field.
+        
+        for (LinearAlgebraProvider<?> provider : MATRIX_PROVIDERS) {
+            if (provider.isAvailable() && provider.isCompatible(field)) {
+                @SuppressWarnings("unchecked")
+                LinearAlgebraProvider<E> p = (LinearAlgebraProvider<E>) provider;
+                return p;
+            }
+        }
+
         return new CPUDenseLinearAlgebraProvider<>(field);
     }
 

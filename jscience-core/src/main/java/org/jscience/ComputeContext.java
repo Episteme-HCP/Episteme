@@ -66,6 +66,8 @@ import org.jscience.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider
 import org.jscience.mathematics.structures.rings.Ring;
 import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.vectors.storage.VectorStorage;
+import org.jscience.distributed.DistributedContext;
+import org.jscience.distributed.LocalDistributedContext;
 import java.util.List;
 
 /**
@@ -137,6 +139,7 @@ public class ComputeContext {
     private volatile FloatPrecision floatPrecision = FloatPrecision.DOUBLE;
     private volatile IntPrecision intPrecision = IntPrecision.LONG;
     private volatile Backend backend = Backend.JAVA_CPU;
+    private volatile DistributedContext distributedContext = new LocalDistributedContext();
 
     private volatile RealPrecision realPrecision = RealPrecision.NORMAL;
     private volatile OverflowMode overflowMode = OverflowMode.SAFE;
@@ -241,6 +244,21 @@ public class ComputeContext {
      */
     public ComputeContext setBackend(Backend backend) {
         this.backend = backend;
+        return this;
+    }
+
+    /**
+     * Gets the current distributed context.
+     */
+    public DistributedContext getDistributedContext() {
+        return distributedContext;
+    }
+
+    /**
+     * Sets the distributed context.
+     */
+    public ComputeContext setDistributedContext(DistributedContext distributedContext) {
+        this.distributedContext = distributedContext;
         return this;
     }
 

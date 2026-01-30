@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.nio.DoubleBuffer;
 
 /**
  * Local implementation of DistributedContext using ForkJoinPool.
@@ -107,7 +108,28 @@ public class LocalDistributedContext implements DistributedContext {
 
     @Override
     public void shutdown() {
-        // Common pool doesn't need explicit shutdown usually, but we can if needed
+        // Common pool doesn't need explicit shutdown usually
+    }
+
+    private final DoubleBuffer localMemory = DoubleBuffer.allocate(1000000);
+
+    @Override
+    public void put(DoubleBuffer source, int targetRank, long offset) {
+        int pos = source.position();
+        localMemory.put((int) offset, source, pos, source.remaining());
+    }
+
+    @Override
+    public void get(DoubleBuffer target, int sourceRank, long offset) {
+        int limit = target.remaining();
+        for (int i = 0; i < limit; i++) {
+            target.put(localMemory.get((int) offset + i));
+        }
+    }
+
+    @Override
+    public void fence() {
+        // No-op for local memory
     }
 }
 

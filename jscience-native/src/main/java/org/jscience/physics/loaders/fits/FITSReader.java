@@ -100,6 +100,13 @@ public class FITSReader extends AbstractResourceReader<NativeMatrix> implements 
         }
     }
 
+    /**
+     * Opens a FITS file and reads the image data.
+     */
+    public static NativeMatrix open(String path) throws Exception {
+        return new FITSReader().load(path);
+    }
+
     @Override public String getName() { return "Native FITS Reader"; }
     @Override public String getDescription() { return "FITS reader using Panama and cfitsio library."; }
     @Override public String getCategory() { return "I/O / Native / Physics"; }
@@ -107,6 +114,7 @@ public class FITSReader extends AbstractResourceReader<NativeMatrix> implements 
     @Override public String getResourcePath() { return null; }
     @Override public String getLongDescription() { return "High-performance FITS reader leveraging Project Panama and cfitsio for fast, zero-copy data loading from scientific FITS files directly into off-heap NativeMatrix objects."; }
     @Override public String[] getSupportedVersions() { return new String[] { "4.0" }; }
+    @Override public String[] getSupportedExtensions() { return new String[] { ".fits", ".fit" }; }
 
     @Override
     protected NativeMatrix loadFromSource(String resourceId) throws Exception {

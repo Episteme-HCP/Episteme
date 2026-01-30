@@ -57,6 +57,22 @@ public final class ComputeManager {
                 }
             }
         }
+
+        @Override
+        public void dgemv(int rowsA, int colsA,
+                         DoubleBuffer A, int lda,
+                         DoubleBuffer x, int incx,
+                         DoubleBuffer y, int incy,
+                         double alpha, double beta) {
+            for (int i = 0; i < rowsA; i++) {
+                double sum = 0;
+                for (int j = 0; j < colsA; j++) {
+                    sum += A.get(i * lda + j) * x.get(j * incx);
+                }
+                int idxY = i * incy;
+                y.put(idxY, alpha * sum + beta * y.get(idxY));
+            }
+        }
     }
 
     /** Fallback Pure Java FFT Backend. */

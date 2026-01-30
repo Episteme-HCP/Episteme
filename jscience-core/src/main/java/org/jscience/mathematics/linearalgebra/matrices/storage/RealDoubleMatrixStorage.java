@@ -33,6 +33,11 @@ package org.jscience.mathematics.linearalgebra.matrices.storage;
 public interface RealDoubleMatrixStorage extends MatrixStorage<org.jscience.mathematics.numbers.real.Real> {
 
     /**
+     * Returns a DoubleBuffer view of the storage data.
+     */
+    java.nio.DoubleBuffer getBuffer();
+
+    /**
      * Gets the value at the specified position as a primitive double.
      */
     double getDouble(int row, int col);
@@ -46,6 +51,12 @@ public interface RealDoubleMatrixStorage extends MatrixStorage<org.jscience.math
      * Copies the underlying data to a new double array.
      */
     double[] toDoubleArray();
+    /**
+     * Closes the storage and releases any native resources if applicable.
+     */
+    default void close() {
+        // No-op by default
+    }
 }
 
 

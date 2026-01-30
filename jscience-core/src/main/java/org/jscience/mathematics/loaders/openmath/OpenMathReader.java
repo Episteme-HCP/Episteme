@@ -116,6 +116,11 @@ public class OpenMathReader extends AbstractResourceReader<Object> {
     }
 
     @Override
+    public String[] getSupportedExtensions() {
+        return new String[] {".om", ".xml"};
+    }
+
+    @Override
     protected Object loadFromSource(String resourceId) throws Exception {
         File file = new File(resourceId);
         if (file.exists()) {

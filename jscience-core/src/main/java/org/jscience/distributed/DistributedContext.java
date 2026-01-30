@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.nio.DoubleBuffer;
 
 /**
  * Defines the contract for distributed computing contexts.
@@ -87,5 +88,34 @@ public interface DistributedContext {
      * Shuts down the context.
      */
     void shutdown();
+
+    /**
+     * Initiates a one-sided data transfer to a remote node (RDMA Put).
+     *
+     * @param source     Data to send
+     * @param targetRank Target node ID
+     * @param offset     Remote offset
+     */
+    default void put(DoubleBuffer source, int targetRank, long offset) {
+        throw new UnsupportedOperationException("RDMA Put not supported by this context");
+    }
+
+    /**
+     * Initiates a one-sided data transfer from a remote node (RDMA Get).
+     *
+     * @param target     Buffer to receive data
+     * @param sourceRank Source node ID
+     * @param offset     Remote offset
+     */
+    default void get(DoubleBuffer target, int sourceRank, long offset) {
+        throw new UnsupportedOperationException("RDMA Get not supported by this context");
+    }
+
+    /**
+     * Synchronizes RDMA operations.
+     */
+    default void fence() {
+        // No-op by default
+    }
 }
 

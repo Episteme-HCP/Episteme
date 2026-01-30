@@ -121,4 +121,11 @@ public interface ResourceIO<T> {
      * @return array of supported version strings, never null (empty array if version-agnostic)
      */
     String[] getSupportedVersions();
+
+    /**
+     * Returns the supported file extensions (e.g., ".h5", ".fits").
+     */
+    default String[] getSupportedExtensions() {
+        return new String[0];
+    }
 }

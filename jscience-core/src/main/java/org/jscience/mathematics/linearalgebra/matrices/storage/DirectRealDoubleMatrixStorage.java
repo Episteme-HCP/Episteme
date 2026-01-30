@@ -76,6 +76,7 @@ public class DirectRealDoubleMatrixStorage implements RealDoubleMatrixStorage {
         return array;
     }
 
+    @Override
     public DoubleBuffer getBuffer() {
         return buffer;
     }

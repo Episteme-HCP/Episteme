@@ -23,6 +23,15 @@ public interface MatrixBackend extends ComputeBackend {
                DoubleBuffer C, int ldc,
                double alpha, double beta);
 
+    /**
+     * Matrix-Vector Multiplication: y = alpha * A * x + beta * y
+     */
+    void dgemv(int rowsA, int colsA,
+               DoubleBuffer A, int lda,
+               DoubleBuffer x, int incx,
+               DoubleBuffer y, int incy,
+               double alpha, double beta);
+
     @Override
     default ExecutionContext createContext() {
         return null;

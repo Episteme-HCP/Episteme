@@ -63,6 +63,50 @@ public interface FFTProvider {
     double[][] inverseTransform(double[] real, double[] imag);
 
     /**
+     * Computes 2D forward FFT.
+     */
+    default double[][][] transform2D(double[][] real, double[][] imag) {
+        // Default implementation: Successive 1D rows/cols
+        int rows = real.length;
+        int cols = real[0].length;
+        double[][] resReal = new double[rows][cols];
+        double[][] resImag = new double[rows][cols];
+        
+        // Transform rows
+        for (int i = 0; i < rows; i++) {
+            double[][] res = transform(real[i], imag[i]);
+            resReal[i] = res[0];
+            resImag[i] = res[1];
+        }
+        
+        // Transform columns
+        for (int j = 0; j < cols; j++) {
+            double[] colReal = new double[rows];
+            double[] colImag = new double[rows];
+            for (int i = 0; i < rows; i++) {
+                colReal[i] = resReal[i][j];
+                colImag[i] = resImag[i][j];
+            }
+            double[][] res = transform(colReal, colImag);
+            for (int i = 0; i < rows; i++) {
+                resReal[i][j] = res[0][i];
+                resImag[i][j] = res[1][i];
+            }
+        }
+        return new double[][][] { resReal, resImag };
+    }
+
+    /**
+     * Checks if this provider is available on the current system.
+     */
+    default boolean isAvailable() { return true; }
+
+    /**
+     * Returns the priority of this provider (higher = preferred).
+     */
+    default int getPriority() { return 0; }
+
+    /**
      * Returns the name of this provider.
      * 
      * @return provider name

@@ -113,6 +113,11 @@ public class MathMLReader extends AbstractResourceReader<MathMLDocument> {
     }
 
     @Override
+    public String[] getSupportedExtensions() {
+        return new String[] {".xml", ".mml", ".mathml"};
+    }
+
+    @Override
     protected MathMLDocument loadFromSource(String resourceId) throws Exception {
         File file = new File(resourceId);
         if (file.exists()) {

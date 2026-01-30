@@ -24,7 +24,8 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface is the base interface for all MathML content elements.
+ * Content elements are used to represent mathematical meaning.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

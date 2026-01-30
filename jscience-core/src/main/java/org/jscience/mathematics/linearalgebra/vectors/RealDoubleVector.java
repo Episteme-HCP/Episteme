@@ -36,7 +36,7 @@ import org.jscience.mathematics.sets.Reals;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class RealDoubleVector extends DenseVector<Real> {
+public class RealDoubleVector extends DenseVector<Real> implements AutoCloseable {
 
     // Factory methods
 
@@ -48,6 +48,10 @@ public class RealDoubleVector extends DenseVector<Real> {
         return new RealDoubleVector(new DirectRealDoubleVectorStorage(dimension));
     }
 
+    public static RealDoubleVector of(RealDoubleVectorStorage storage) {
+        return new RealDoubleVector(storage);
+    }
+
     // Constructors
 
     protected RealDoubleVector(RealDoubleVectorStorage storage) {
@@ -56,6 +60,15 @@ public class RealDoubleVector extends DenseVector<Real> {
 
     public RealDoubleVectorStorage getRealStorage() {
         return (RealDoubleVectorStorage) storage;
+    }
+
+    public java.nio.DoubleBuffer getBuffer() {
+        return getRealStorage().getBuffer();
+    }
+
+    @Override
+    public void close() {
+        getRealStorage().close();
     }
 
     // Optimized Operations

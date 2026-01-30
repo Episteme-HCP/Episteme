@@ -27,7 +27,8 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the <code>matrix</code> element in MathML Content.
+ * A matrix is a rectangular array of elements.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,80 +36,71 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLMatrixElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+     * Returns the number of rows in this matrix.
      *
-     * @return DOCUMENT ME!
+     * @return the number of rows.
      */
     public int getNrows();
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of columns in this matrix.
      *
-     * @return DOCUMENT ME!
+     * @return the number of columns.
      */
     public int getNcols();
 
     /**
-     * DOCUMENT ME!
+     * Returns a list of the rows in this matrix.
      *
-     * @return DOCUMENT ME!
+     * @return the list of rows.
      */
     public MathMLNodeList getRows();
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>index</code>-th row of this matrix.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the row to retrieve (1-based index).
+     * @return the row at the specified index.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public MathMLMatrixrowElement getRow(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new row into the matrix at the specified <code>index</code>.
      *
-     * @param newRow DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newRow the new row to insert.
+     * @param index  the index at which the new row is to be inserted.
+     * @return the newly inserted row.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public MathMLMatrixrowElement insertRow(MathMLMatrixrowElement newRow,
         int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Replaces the row at the specified <code>index</code> with a new row.
      *
-     * @param newRow DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newRow the new row to set.
+     * @param index  the index of the row to replace.
+     * @return the newly set row.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public MathMLMatrixrowElement setRow(MathMLMatrixrowElement newRow,
         int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Deletes the row at the specified <code>index</code>.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the row to delete.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public void deleteRow(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Removes and returns the row at the specified <code>index</code>.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the row to remove.
+     * @return the removed row.
+     * @throws DOMException INDEX_SIZE_ERR if the index is out of bounds.
      */
     public MathMLMatrixrowElement removeRow(int index)
         throws DOMException;

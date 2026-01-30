@@ -84,6 +84,11 @@ public class DirectRealDoubleVectorStorage implements RealDoubleVectorStorage {
     }
 
     @Override
+    public DoubleBuffer getBuffer() {
+        return buffer;
+    }
+
+    @Override
     public VectorStorage<Real> copy() {
         DoubleBuffer newBuf = java.nio.ByteBuffer.allocateDirect(dimension * 8).asDoubleBuffer();
         DoubleBuffer dup = buffer.duplicate();

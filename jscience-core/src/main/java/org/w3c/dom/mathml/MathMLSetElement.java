@@ -24,7 +24,8 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the <code>set</code> element in MathML Content.
+ * A set is a collection of distinct elements.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,23 +33,23 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLSetElement extends MathMLContentContainer {
     /**
-     * DOCUMENT ME!
+     * Returns <code>true</code> if the set is defined by the explicit listing of its elements.
      *
-     * @return DOCUMENT ME!
+     * @return <code>true</code> if explicit, <code>false</code> otherwise (e.g., defined by properties).
      */
     public boolean getIsExplicit();
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>type</code> attribute of this element.
      *
-     * @return DOCUMENT ME!
+     * @return the type (e.g., "set" or "multiset").
      */
     public String getType();
 
     /**
-     * DOCUMENT ME!
+     * Sets the <code>type</code> attribute of this element.
      *
-     * @param type DOCUMENT ME!
+     * @param type the type to set.
      */
     public void setType(String type);
 }

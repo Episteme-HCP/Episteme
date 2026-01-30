@@ -24,6 +24,7 @@
 package org.jscience.mathematics.linearalgebra.matrices;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage;
 import org.jscience.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.jscience.mathematics.linearalgebra.matrices.storage.DirectRealDoubleMatrixStorage;
@@ -42,7 +43,7 @@ import org.jscience.mathematics.linearalgebra.LinearAlgebraRegistry;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class RealDoubleMatrix extends GenericMatrix<Real> {
+public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseable {
 
     private final RealDoubleMatrixStorage doubleStorage;
 
@@ -88,6 +89,13 @@ public class RealDoubleMatrix extends GenericMatrix<Real> {
         return new RealDoubleMatrix(new DirectRealDoubleMatrixStorage(rows, cols));
     }
 
+    /**
+     * Creates a RealDoubleMatrix from a specialized storage.
+     */
+    public static RealDoubleMatrix of(RealDoubleMatrixStorage storage) {
+        return new RealDoubleMatrix(storage);
+    }
+
     public Field<Real> getField() {
         return org.jscience.mathematics.sets.Reals.getInstance();
     }
@@ -105,11 +113,7 @@ public class RealDoubleMatrix extends GenericMatrix<Real> {
     }
 
     public java.nio.DoubleBuffer getBuffer() {
-        if (doubleStorage instanceof DirectRealDoubleMatrixStorage) {
-            return ((DirectRealDoubleMatrixStorage) doubleStorage).getBuffer();
-        } else {
-            return java.nio.DoubleBuffer.wrap(doubleStorage.toDoubleArray());
-        }
+        return doubleStorage.getBuffer();
     }
 
     /**
@@ -138,65 +142,14 @@ public class RealDoubleMatrix extends GenericMatrix<Real> {
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> other) {
-        if (other instanceof RealDoubleMatrix) {
-            return multiply((RealDoubleMatrix) other);
-        }
-        // Fallback to generic (slow)
-        return super.multiply(other);
+        return provider.multiply(this, other);
     }
 
     /**
      * Optimized matrix multiplication (GEMM).
-     * 
-     * @param other the other RealDoubleMatrix
-     * @return result as RealDoubleMatrix
      */
     public RealDoubleMatrix multiply(RealDoubleMatrix other) {
-        if (this.cols() != other.rows()) {
-            throw new IllegalArgumentException("Matrix dimensions mismatch for multiplication");
-        }
-
-        int m = this.rows();
-        int n = other.cols();
-        int p = this.cols();
-
-        RealDoubleMatrix result = RealDoubleMatrix.direct(m, n);
-        
-        java.util.ServiceLoader<org.jscience.technical.backend.math.MatrixBackend> loader = 
-            java.util.ServiceLoader.load(org.jscience.technical.backend.math.MatrixBackend.class);
-        
-        // Find first available backend or fallback
-        org.jscience.technical.backend.math.MatrixBackend backend = null;
-        for (org.jscience.technical.backend.math.MatrixBackend b : loader) {
-            if (b.isAvailable()) {
-                backend = b;
-                break;
-            }
-        }
-        
-        if (backend != null) {
-            backend.dgemm(
-                m, p, n,
-                this.getBuffer(), p,
-                other.getBuffer(), n,
-                result.getBuffer(), n,
-                1.0, 0.0
-            );
-        } else {
-             // Fallback to naive implementation if no backend found
-             for (int i = 0; i < m; i++) {
-                for (int k = 0; k < p; k++) {
-                    double valA = this.doubleStorage.getDouble(i, k);
-                    for (int j = 0; j < n; j++) {
-                        double valB = other.doubleStorage.getDouble(k, j);
-                        double current = result.doubleStorage.getDouble(i, j);
-                        result.set(i, j, current + valA * valB);
-                    }
-                }
-             }
-        }
-
-        return result;
+        return (RealDoubleMatrix) provider.multiply(this, other);
     }
 
     @Override
@@ -222,6 +175,20 @@ public class RealDoubleMatrix extends GenericMatrix<Real> {
             return new RealDoubleMatrix(resStorage);
         }
         return super.add(other);
+    }
+    @Override
+    public Matrix<Real> inverse() {
+        return provider.inverse(this);
+    }
+    
+    @Override
+    public Vector<Real> multiply(Vector<Real> vector) {
+        return provider.multiply(this, vector);
+    }
+
+    @Override
+    public void close() {
+        doubleStorage.close();
     }
 }
 

@@ -24,7 +24,8 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the top-level <code>math</code> element in MathML.
+ * It serves as a container for all MathML expressions.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,30 +33,30 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLMathElement extends MathMLElement, MathMLContainer {
     /**
-     * DOCUMENT ME!
+     * Returns the <code>macros</code> attribute of this element.
      *
-     * @return DOCUMENT ME!
+     * @return the macros.
      */
     public String getMacros();
 
     /**
-     * DOCUMENT ME!
+     * Sets the <code>macros</code> attribute of this element.
      *
-     * @param macros DOCUMENT ME!
+     * @param macros the macros to set.
      */
     public void setMacros(String macros);
 
     /**
-     * DOCUMENT ME!
+     * Returns the <code>display</code> attribute of this element.
      *
-     * @return DOCUMENT ME!
+     * @return the display mode (e.g., "block" or "inline").
      */
     public String getDisplay();
 
     /**
-     * DOCUMENT ME!
+     * Sets the <code>display</code> attribute of this element.
      *
-     * @param display DOCUMENT ME!
+     * @param display the display mode to set.
      */
     public void setDisplay(String display);
 }

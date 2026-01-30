@@ -6,12 +6,19 @@
 package org.jscience.mathematics.linearalgebra.backends;
 
 import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider;
 import org.jscience.technical.backend.math.MatrixBackend;
-import org.jscience.technical.backend.math.BLASBackend;
+import org.jscience.technical.backend.math.PanamaBlasBackend;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.jscience.mathematics.linearalgebra.matrices.NativeMatrix;
+import org.jscience.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.jscience.mathematics.linearalgebra.vectors.NativeVector;
+import org.jscience.mathematics.sets.Reals;
 
 /**
  * Native implementation of LinearAlgebraProvider using BLASBackend.
@@ -20,12 +27,13 @@ import org.jscience.technical.backend.math.BLASBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider {
+public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider<Real> {
 
     private final MatrixBackend blas;
 
     public NativeLinearAlgebraProvider() {
-        this.blas = new BLASBackend(); // Direct instantiation or discovery
+        super(Reals.getInstance());
+        this.blas = new PanamaBlasBackend();
     }
 
     @Override
@@ -44,20 +52,137 @@ public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider {
     }
 
     @Override
-    public Matrix<Double> multiply(Matrix<Double> a, Matrix<Double> b) {
-        // Implement matrix multiplication using BLAS dgemm
-        // Check if both are RealDoubleMatrix or effectively double matrices
-        // Convert/Get buffer and call blas.dgemm
-        
-        // Simplified Logic:
-        // 1. Get dimensions
-        // 2. Wrap/Copy data to DoubleBuffer (if not already direct)
-        // 3. Call dgemm
-        // 4. Wrap result in Matrix
-        
-        // Note: For now, we fallback to super if complexity is low or data types mismatch
-        // But for demonstration, we assume we can cast or extract double[]
-        
-        return super.multiply(a, b); // Placeholder until full Matrix refactor
+    public boolean isCompatible(org.jscience.mathematics.structures.rings.Ring<?> ring) {
+        return ring instanceof org.jscience.mathematics.sets.Reals;
+    }
+
+    @Override
+    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+        if (blas.isAvailable() && a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
+            RealDoubleMatrix ma = (RealDoubleMatrix) a;
+            RealDoubleMatrix mb = (RealDoubleMatrix) b;
+            
+            if (ma.cols() != mb.rows()) {
+                throw new IllegalArgumentException("Matrix dimensions mismatch");
+            }
+
+            // Create result matrix (Direct/Native)
+            NativeMatrix res = new NativeMatrix(ma.rows(), mb.cols());
+            
+            // Call BLAS
+            // We need to bridge RealDoubleMatrix buffers to NativeMatrix/BLAS
+            blas.dgemm(
+                ma.rows(), ma.cols(), mb.cols(),
+                ma.getBuffer(), ma.cols(),
+                mb.getBuffer(), mb.cols(),
+                res.getBuffer(), mb.cols(),
+                1.0, 0.0
+            );
+            
+            // Wrap in RealDoubleMatrix
+            // We need a constructor or method in RealDoubleMatrix to take NativeMatrix
+            // and we should probably manage its closing.
+            // For now, let's assume RealDoubleMatrix can wrap it.
+            // Wait, I should add a constructor to RealDoubleMatrix for this.
+            return RealDoubleMatrix.of(res);
+        }
+        return super.multiply(a, b);
+    }
+
+    @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        if (blas.isAvailable() && a instanceof RealDoubleMatrix && b instanceof RealDoubleVector) {
+            RealDoubleMatrix ma = (RealDoubleMatrix) a;
+            RealDoubleVector vb = (RealDoubleVector) b;
+
+            if (ma.cols() != vb.dimension()) {
+                throw new IllegalArgumentException("Matrix-Vector dimension mismatch");
+            }
+
+            NativeVector res = new NativeVector(ma.rows());
+            
+            blas.dgemv(
+                ma.rows(), ma.cols(),
+                ma.getBuffer(), ma.cols(),
+                vb.getBuffer(), 1,
+                res.getBuffer(), 1,
+                1.0, 0.0
+            );
+
+            return RealDoubleVector.of(res);
+        }
+        return super.multiply(a, b);
+    }
+
+    @Override
+    public Real norm(Vector<Real> a) {
+        if (blas.isAvailable() && a instanceof RealDoubleVector) {
+            RealDoubleVector v = (RealDoubleVector) a;
+            return Real.of(((PanamaBlasBackend) blas).dnrm2(v.dimension(), v.getBuffer(), 1));
+        }
+        return super.norm(a);
+    }
+
+    @Override
+    public Real dot(Vector<Real> a, Vector<Real> b) {
+        if (blas.isAvailable() && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
+            RealDoubleVector va = (RealDoubleVector) a;
+            RealDoubleVector vb = (RealDoubleVector) b;
+            return Real.of(((PanamaBlasBackend) blas).ddot(va.dimension(), va.getBuffer(), 1, vb.getBuffer(), 1));
+        }
+        return super.dot(a, b);
+    }
+
+    @Override
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
+        if (blas.isAvailable() && vector instanceof RealDoubleVector) {
+            RealDoubleVector v = (RealDoubleVector) vector;
+            RealDoubleVector res = RealDoubleVector.of(v.getRealStorage().copy()); // Copy first
+            ((PanamaBlasBackend) blas).dscal(res.dimension(), scalar.doubleValue(), res.getBuffer(), 1);
+            return res;
+        }
+        return super.multiply(vector, scalar);
+    }
+
+    @Override
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
+        if (blas.isAvailable() && a instanceof RealDoubleMatrix && b instanceof RealDoubleVector) {
+            RealDoubleMatrix ma = (RealDoubleMatrix) a;
+            RealDoubleVector vb = (RealDoubleVector) b;
+            int n = ma.rows();
+            
+            // LAPACK dgesv modifies A and B. We must copy.
+            RealDoubleMatrix targetA = RealDoubleMatrix.of(ma.getDoubleStorage().clone());
+            RealDoubleVector targetB = RealDoubleVector.of(vb.getRealStorage().copy());
+            
+            IntBuffer ipiv = IntBuffer.allocate(n);
+            
+            int info = ((PanamaBlasBackend) blas).dgesv(n, 1, targetA.getBuffer(), n, ipiv, targetB.getBuffer(), 1);
+            if (info != 0) throw new RuntimeException("LAPACK dgesv failed with info=" + info);
+            
+            return targetB;
+        }
+        return super.solve(a, b);
+    }
+
+    @Override
+    public Matrix<Real> inverse(Matrix<Real> a) {
+        if (blas.isAvailable() && a instanceof RealDoubleMatrix) {
+            RealDoubleMatrix ma = (RealDoubleMatrix) a;
+            int n = ma.rows();
+            
+            RealDoubleMatrix targetA = RealDoubleMatrix.of(ma.getDoubleStorage().clone());
+            IntBuffer ipiv = IntBuffer.allocate(n);
+            
+            PanamaBlasBackend b = (PanamaBlasBackend) blas;
+            int info = b.dgetrf(n, n, targetA.getBuffer(), n, ipiv);
+            if (info != 0) throw new RuntimeException("LAPACK dgetrf failed with info=" + info);
+            
+            info = b.dgetri(n, targetA.getBuffer(), n, ipiv);
+            if (info != 0) throw new RuntimeException("LAPACK dgetri failed with info=" + info);
+            
+            return targetA;
+        }
+        return super.inverse(a);
     }
 }

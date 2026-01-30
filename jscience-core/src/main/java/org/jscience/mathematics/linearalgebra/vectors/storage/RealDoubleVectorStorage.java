@@ -47,6 +47,18 @@ public interface RealDoubleVectorStorage extends VectorStorage<Real> {
      * Returns the underlying double array if available (optional operation).
      */
     double[] toDoubleArray();
+
+    /**
+     * Returns a DoubleBuffer view of the data.
+     */
+    java.nio.DoubleBuffer getBuffer();
+
+    /**
+     * Closes the storage and releases any native resources.
+     */
+    default void close() {
+        // No-op by default
+    }
 }
 
 

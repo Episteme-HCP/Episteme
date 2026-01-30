@@ -56,6 +56,11 @@ public class HeapRealDoubleMatrixStorage implements RealDoubleMatrixStorage {
     }
 
     @Override
+    public java.nio.DoubleBuffer getBuffer() {
+        return java.nio.DoubleBuffer.wrap(data);
+    }
+
+    @Override
     public void setDouble(int row, int col, double value) {
         data[row * cols + col] = value;
     }

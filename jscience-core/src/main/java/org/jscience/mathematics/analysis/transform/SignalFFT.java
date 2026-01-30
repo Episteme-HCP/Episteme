@@ -25,6 +25,7 @@ package org.jscience.mathematics.analysis.transform;
 
 import org.jscience.technical.backend.algorithms.FFTProvider;
 import org.jscience.technical.backend.algorithms.MulticoreFFTProvider;
+import java.util.ServiceLoader;
 
 /**
  * Signal Processing FFT (Fast Fourier Transform).
@@ -48,7 +49,16 @@ public class SignalFFT {
      * @param real Real part (modified in place)
      * @param imag Imaginary part (modified in place)
      */
-    private static FFTProvider provider = new MulticoreFFTProvider();
+    private static FFTProvider provider;
+
+    static {
+        ServiceLoader<FFTProvider> loader = ServiceLoader.load(FFTProvider.class);
+        provider = java.util.stream.StreamSupport.stream(loader.spliterator(), false)
+            .filter(FFTProvider::isAvailable)
+            .sorted(java.util.Comparator.comparingInt(FFTProvider::getPriority).reversed())
+            .findFirst()
+            .orElse(new MulticoreFFTProvider());
+    }
 
     public static void setProvider(FFTProvider p) {
         provider = p;
@@ -81,6 +91,34 @@ public class SignalFFT {
             org.jscience.mathematics.numbers.real.Real[][] res = provider.inverseTransform(real, imag);
             System.arraycopy(res[0], 0, real, 0, real.length);
             System.arraycopy(res[1], 0, imag, 0, imag.length);
+        }
+    }
+
+    /** Primitive versions */
+    public static void fft(double[] real, double[] imag) {
+        if (provider != null) {
+            double[][] res = provider.transform(real, imag);
+            System.arraycopy(res[0], 0, real, 0, real.length);
+            System.arraycopy(res[1], 0, imag, 0, imag.length);
+        }
+    }
+
+    public static void ifft(double[] real, double[] imag) {
+        if (provider != null) {
+            double[][] res = provider.inverseTransform(real, imag);
+            System.arraycopy(res[0], 0, real, 0, real.length);
+            System.arraycopy(res[1], 0, imag, 0, imag.length);
+        }
+    }
+
+    /** 2D Transforms */
+    public static void fft2D(double[][] real, double[][] imag) {
+        if (provider != null) {
+            double[][][] res = provider.transform2D(real, imag);
+            for (int i = 0; i < real.length; i++) {
+                System.arraycopy(res[0][i], 0, real[i], 0, real[i].length);
+                System.arraycopy(res[1][i], 0, imag[i], 0, imag[i].length);
+            }
         }
     }
 

@@ -80,6 +80,11 @@ public class HeapRealDoubleVectorStorage implements RealDoubleVectorStorage {
     }
 
     @Override
+    public java.nio.DoubleBuffer getBuffer() {
+        return java.nio.DoubleBuffer.wrap(data);
+    }
+
+    @Override
     public VectorStorage<Real> copy() {
         return new HeapRealDoubleVectorStorage(data.clone());
     }

@@ -26,6 +26,9 @@ package org.jscience.mathematics.linearalgebra.matrices;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import org.jscience.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.numbers.real.RealDouble;
 
 /**
  * A dense matrix backed by off-heap native memory.
@@ -57,7 +60,7 @@ import java.lang.foreign.ValueLayout;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeMatrix implements AutoCloseable {
+public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
 
     private final MemorySegment data;
     private final int rows;
@@ -156,6 +159,33 @@ public class NativeMatrix implements AutoCloseable {
         return cols;
     }
 
+    @Override
+    public Real get(int row, int col) {
+        return RealDouble.create(getDouble(row, col));
+    }
+
+    @Override
+    public void set(int row, int col, Real value) {
+        setDouble(row, col, value.doubleValue());
+    }
+
+    @Override
+    public java.nio.DoubleBuffer getBuffer() {
+        return data.asByteBuffer().asDoubleBuffer();
+    }
+
+    @Override
+    public double[] toDoubleArray() {
+        return toArray();
+    }
+
+    @Override
+    public NativeMatrix clone() {
+        NativeMatrix copy = new NativeMatrix(rows, cols);
+        MemorySegment.copy(this.data, 0, copy.data, 0, sizeBytes());
+        return copy;
+    }
+
     /**
      * Returns the total size in bytes.
      *
@@ -165,27 +195,15 @@ public class NativeMatrix implements AutoCloseable {
         return (long) rows * cols * Double.BYTES;
     }
 
-    /**
-     * Gets a value at the specified position.
-     *
-     * @param row the row index (0-based)
-     * @param col the column index (0-based)
-     * @return the value
-     */
-    public double get(int row, int col) {
+    @Override
+    public double getDouble(int row, int col) {
         checkBounds(row, col);
         long offset = ((long) row * cols + col) * Double.BYTES;
         return data.get(ValueLayout.JAVA_DOUBLE, offset);
     }
 
-    /**
-     * Sets a value at the specified position.
-     *
-     * @param row   the row index (0-based)
-     * @param col   the column index (0-based)
-     * @param value the value to set
-     */
-    public void set(int row, int col, double value) {
+    @Override
+    public void setDouble(int row, int col, double value) {
         checkBounds(row, col);
         long offset = ((long) row * cols + col) * Double.BYTES;
         data.set(ValueLayout.JAVA_DOUBLE, offset, value);
@@ -224,6 +242,30 @@ public class NativeMatrix implements AutoCloseable {
      */
     public int leadingDimension() {
         return cols;
+    }
+
+    /**
+     * Reshapes the matrix to new dimensions.
+     * The total number of elements must remain the same.
+     */
+    public NativeMatrix reshape(int newRows, int newCols) {
+        if ((long) newRows * newCols != (long) rows * cols) {
+            throw new IllegalArgumentException("Total number of elements must remain the same");
+        }
+        return new NativeMatrix(data, newRows, newCols, arena);
+    }
+
+    /**
+     * Creates a new transposed matrix.
+     */
+    public NativeMatrix transpose() {
+        NativeMatrix result = new NativeMatrix(cols, rows);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                result.setDouble(j, i, this.getDouble(i, j));
+            }
+        }
+        return result;
     }
 
     private void checkBounds(int row, int col) {

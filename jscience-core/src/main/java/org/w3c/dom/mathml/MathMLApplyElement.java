@@ -27,7 +27,8 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the <code>apply</code> element in MathML Content.
+ * It is used to apply a function or operator to its arguments.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,46 +36,46 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLApplyElement extends MathMLContentContainer {
     /**
-     * DOCUMENT ME!
+     * Returns the operator applied by this element.
      *
-     * @return DOCUMENT ME!
+     * @return the operator.
      */
     public MathMLElement getOperator();
 
     /**
-     * DOCUMENT ME!
+     * Sets the operator to be applied by this element.
      *
-     * @param operator DOCUMENT ME!
+     * @param operator the operator to set.
      */
     public void setOperator(MathMLElement operator);
 
     /**
-     * DOCUMENT ME!
+     * Returns the lower limit for the operator (e.g., for summation or integration).
      *
-     * @return DOCUMENT ME!
+     * @return the lower limit.
      */
     public MathMLElement getLowLimit();
 
     /**
-     * DOCUMENT ME!
+     * Sets the lower limit for the operator.
      *
-     * @param lowLimit DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param lowLimit the lower limit to set.
+     * @throws DOMException HIERARCHY_REQUEST_ERR if the element is not allowed as a lower limit.
      */
     public void setLowLimit(MathMLElement lowLimit) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Returns the upper limit for the operator.
      *
-     * @return DOCUMENT ME!
+     * @return the upper limit.
      */
     public MathMLElement getUpLimit();
 
     /**
-     * DOCUMENT ME!
+     * Sets the upper limit for the operator.
      *
-     * @param upLimit DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param upLimit the upper limit to set.
+     * @throws DOMException HIERARCHY_REQUEST_ERR if the element is not allowed as an upper limit.
      */
     public void setUpLimit(MathMLElement upLimit) throws DOMException;
 }

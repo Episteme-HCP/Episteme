@@ -49,6 +49,7 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
     private static final MethodHandle H5D_WRITE;
     private static final MethodHandle H5D_CLOSE;
     private static final MethodHandle H5S_CLOSE;
+    private static final long H5T_NATIVE_DOUBLE;
     private static final boolean AVAILABLE;
 
     static {
@@ -70,9 +71,18 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             H5S_CLOSE = linker.downcallHandle(lookup.find("H5Sclose").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
+            
+            if (lookup.find("H5T_NATIVE_DOUBLE_g").isPresent()) {
+                MemorySegment seg = lookup.find("H5T_NATIVE_DOUBLE_g").get();
+                H5T_NATIVE_DOUBLE = seg.get(ValueLayout.JAVA_LONG, 0);
+            } else {
+                H5T_NATIVE_DOUBLE = 0L;
+            }
+            
             AVAILABLE = true;
         } else {
             H5F_CREATE = H5F_CLOSE = H5S_CREATE_SIMPLE = H5D_CREATE2 = H5D_WRITE = H5D_CLOSE = H5S_CLOSE = null;
+            H5T_NATIVE_DOUBLE = 0L;
             AVAILABLE = false;
         }
     }
@@ -94,6 +104,15 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
         }
     }
 
+    @Override public String getName() { return "Native HDF5 Writer"; }
+    @Override public String getDescription() { return "HDF5 writer using Panama and native HDF5 library."; }
+    @Override public String getCategory() { return "I/O / Native"; }
+    @Override public Class<NativeMatrix> getResourceType() { return NativeMatrix.class; }
+    @Override public String getResourcePath() { return null; }
+    @Override public String getLongDescription() { return "High-performance HDF5 writer leveraging Project Panama for zero-copy data persistence from NativeMatrix objects into HDF5 files."; }
+    @Override public String[] getSupportedVersions() { return new String[] { "1.10", "1.12" }; }
+    @Override public String[] getSupportedExtensions() { return new String[] { ".h5", ".hdf5" }; }
+
     @Override
     public void save(NativeMatrix resource, String destinationId) throws Exception {
         Path path = Paths.get(destinationId);
@@ -112,10 +131,9 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
             try {
                 MemorySegment nameSegment = arena.allocateFrom(datasetName);
                 // H5T_NATIVE_DOUBLE (Using 0L as placeholder, need actual handle in real case)
-                long doubleType = 0L; 
-                long datasetId = (long) H5D_CREATE2.invokeExact(fileId, nameSegment, doubleType, spaceId, 0L, 0L, 0L);
+                long datasetId = (long) H5D_CREATE2.invokeExact(fileId, nameSegment, H5T_NATIVE_DOUBLE, spaceId, 0L, 0L, 0L);
                 try {
-                    H5D_WRITE.invokeExact(datasetId, doubleType, 0L, 0L, 0L, matrix.segment());
+                    H5D_WRITE.invokeExact(datasetId, H5T_NATIVE_DOUBLE, 0L, 0L, 0L, matrix.segment());
                 } finally {
                     H5D_CLOSE.invokeExact(datasetId);
                 }
