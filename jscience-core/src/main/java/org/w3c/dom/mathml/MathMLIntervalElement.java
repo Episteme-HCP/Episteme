@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLIntervalElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,44 +32,44 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLIntervalElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLIntervalElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getClosure();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLIntervalElement element.
      *
-     * @param closure DOCUMENT ME!
+     * @param closure the value to set
      */
     public void setClosure(String closure);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLIntervalElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLCnElement getStart();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLIntervalElement element.
      *
-     * @param start DOCUMENT ME!
+     * @param start the value to set
      */
     public void setStart(MathMLCnElement start);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLIntervalElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLCnElement getEnd();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLIntervalElement element.
      *
-     * @param end DOCUMENT ME!
+     * @param end the value to set
      */
     public void setEnd(MathMLCnElement end);
 }

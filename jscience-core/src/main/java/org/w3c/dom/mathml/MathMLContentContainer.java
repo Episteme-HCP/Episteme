@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -36,127 +36,127 @@ import org.w3c.dom.DOMException;
 public interface MathMLContentContainer extends MathMLContentElement,
     MathMLContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public int getNBoundVariables();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLConditionElement getCondition();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param condition DOCUMENT ME!
+     * @param condition the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void setCondition(MathMLConditionElement condition)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getOpDegree();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param opDegree DOCUMENT ME!
+     * @param opDegree the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void setOpDegree(MathMLElement opDegree) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getDomainOfApplication();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param domainOfApplication DOCUMENT ME!
+     * @param domainOfApplication the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void setDomainOfApplication(MathMLElement domainOfApplication)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getMomentAbout();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param momentAbout DOCUMENT ME!
+     * @param momentAbout the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void setMomentAbout(MathMLElement momentAbout)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLBvarElement getBoundVariable(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param newBVar DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newBVar the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLBvarElement insertBoundVariable(MathMLBvarElement newBVar,
         int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param newBVar DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newBVar the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLBvarElement setBoundVariable(MathMLBvarElement newBVar,
         int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      */
     public void deleteBoundVariable(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentContainer element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLBvarElement removeBoundVariable(int index);
 }

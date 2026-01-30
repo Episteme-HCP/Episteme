@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLCnElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,37 +32,37 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLCnElement extends MathMLContentToken {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCnElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getType();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCnElement element.
      *
-     * @param type DOCUMENT ME!
+     * @param type the value to set
      */
     public void setType(String type);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCnElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getBase();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCnElement element.
      *
-     * @param base DOCUMENT ME!
+     * @param base the value to set
      */
     public void setBase(String base);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCnElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public int getNargs();
 }

@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationContainer element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

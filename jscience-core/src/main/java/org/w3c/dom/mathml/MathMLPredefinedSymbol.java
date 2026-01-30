@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLPredefinedSymbol element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,44 +32,44 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLPredefinedSymbol extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPredefinedSymbol element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getDefinitionURL();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPredefinedSymbol element.
      *
-     * @param definitionURL DOCUMENT ME!
+     * @param definitionURL the value to set
      */
     public void setDefinitionURL(String definitionURL);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPredefinedSymbol element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getEncoding();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPredefinedSymbol element.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the value to set
      */
     public void setEncoding(String encoding);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPredefinedSymbol element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getArity();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPredefinedSymbol element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSymbolName();
 }

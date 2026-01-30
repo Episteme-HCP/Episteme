@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLEncloseElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,16 +32,16 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLEncloseElement extends MathMLPresentationContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLEncloseElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getNotation();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLEncloseElement element.
      *
-     * @param notation DOCUMENT ME!
+     * @param notation the value to set
      */
     public void setNotation(String notation);
 }

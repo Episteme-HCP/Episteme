@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLAlignGroupElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,16 +32,16 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLAlignGroupElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAlignGroupElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getGroupalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAlignGroupElement element.
      *
-     * @param groupalign DOCUMENT ME!
+     * @param groupalign the value to set
      */
     public void setGroupalign(String groupalign);
 }

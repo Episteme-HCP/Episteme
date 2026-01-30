@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLRadicalElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,30 +32,30 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLRadicalElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLRadicalElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getRadicand();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLRadicalElement element.
      *
-     * @param radicand DOCUMENT ME!
+     * @param radicand the value to set
      */
     public void setRadicand(MathMLElement radicand);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLRadicalElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getIndex();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLRadicalElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      */
     public void setIndex(MathMLElement index);
 }

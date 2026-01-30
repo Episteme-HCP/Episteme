@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,94 +35,94 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLTableRowElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRowalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @param rowalign DOCUMENT ME!
+     * @param rowalign the value to set
      */
     public void setRowalign(String rowalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColumnalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @param columnalign DOCUMENT ME!
+     * @param columnalign the value to set
      */
     public void setColumnalign(String columnalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getGroupalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @param groupalign DOCUMENT ME!
+     * @param groupalign the value to set
      */
     public void setGroupalign(String groupalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLNodeList getCells();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLTableCellElement insertEmptyCell(int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @param newCell DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newCell the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLTableCellElement insertCell(MathMLTableCellElement newCell,
         int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @param newCell DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newCell the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLTableCellElement setCell(MathMLTableCellElement newCell,
         int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableRowElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      */
     public void deleteCell(int index);
 }

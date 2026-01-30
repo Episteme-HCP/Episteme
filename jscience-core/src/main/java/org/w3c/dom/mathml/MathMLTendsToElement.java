@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLTendsToElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,16 +32,16 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLTendsToElement extends MathMLPredefinedSymbol {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTendsToElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getType();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTendsToElement element.
      *
-     * @param type DOCUMENT ME!
+     * @param type the value to set
      */
     public void setType(String type);
 }

@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLAlignMarkElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,16 +32,16 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLAlignMarkElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAlignMarkElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getEdge();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAlignMarkElement element.
      *
-     * @param edge DOCUMENT ME!
+     * @param edge the value to set
      */
     public void setEdge(String edge);
 }

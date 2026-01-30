@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,86 +32,86 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLTableCellElement extends MathMLPresentationContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRowspan();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @param rowspan DOCUMENT ME!
+     * @param rowspan the value to set
      */
     public void setRowspan(String rowspan);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColumnspan();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @param columnspan DOCUMENT ME!
+     * @param columnspan the value to set
      */
     public void setColumnspan(String columnspan);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRowalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @param rowalign DOCUMENT ME!
+     * @param rowalign the value to set
      */
     public void setRowalign(String rowalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColumnalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @param columnalign DOCUMENT ME!
+     * @param columnalign the value to set
      */
     public void setColumnalign(String columnalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getGroupalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @param groupalign DOCUMENT ME!
+     * @param groupalign the value to set
      */
     public void setGroupalign(String groupalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public boolean getHasaligngroups();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableCellElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getCellindex();
 }

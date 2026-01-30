@@ -68,6 +68,8 @@ import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.jscience.distributed.DistributedContext;
 import org.jscience.distributed.LocalDistributedContext;
+import org.jscience.technical.backend.gpu.GPUBackend;
+import org.jscience.quantum.QuantumBackend;
 import java.util.List;
 
 /**
@@ -130,7 +132,9 @@ public class ComputeContext {
         /** Colt Library */
         COLT,
         /** EJML Library */
-        EJML
+        EJML,
+        /** Quantum Computing Simulator or Hardware */
+        QUANTUM
     }
 
     private static final ThreadLocal<ComputeContext> CURRENT = ThreadLocal.withInitial(ComputeContext::new);
@@ -140,6 +144,8 @@ public class ComputeContext {
     private volatile IntPrecision intPrecision = IntPrecision.LONG;
     private volatile Backend backend = Backend.JAVA_CPU;
     private volatile DistributedContext distributedContext = new LocalDistributedContext();
+    private volatile GPUBackend gpuBackend;
+    private volatile QuantumBackend quantumBackend;
 
     private volatile RealPrecision realPrecision = RealPrecision.NORMAL;
     private volatile OverflowMode overflowMode = OverflowMode.SAFE;
@@ -259,6 +265,36 @@ public class ComputeContext {
      */
     public ComputeContext setDistributedContext(DistributedContext distributedContext) {
         this.distributedContext = distributedContext;
+        return this;
+    }
+
+    /**
+     * Gets the current GPU backend.
+     */
+    public GPUBackend getGPUBackend() {
+        return gpuBackend;
+    }
+
+    /**
+     * Sets the GPU backend.
+     */
+    public ComputeContext setGPUBackend(GPUBackend gpuBackend) {
+        this.gpuBackend = gpuBackend;
+        return this;
+    }
+
+    /**
+     * Gets the current Quantum backend.
+     */
+    public QuantumBackend getQuantumBackend() {
+        return quantumBackend;
+    }
+
+    /**
+     * Sets the Quantum backend.
+     */
+    public ComputeContext setQuantumBackend(QuantumBackend quantumBackend) {
+        this.quantumBackend = quantumBackend;
         return this;
     }
 
@@ -435,6 +471,9 @@ public class ComputeContext {
             case CUDA_GPU:
                 // Native BLAS tensor support pending
                 // ND4J provider removed due to corruption.
+                break;
+            case QUANTUM:
+                // Quantum simulation support via QuantumBackend
                 break;
         }
         // Default

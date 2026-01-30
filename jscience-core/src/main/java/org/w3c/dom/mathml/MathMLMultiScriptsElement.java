@@ -27,7 +27,8 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the mmultiscripts element, which is used to 
+ * attach multiple subscripts and superscripts to a base element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,211 +36,191 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLMultiScriptsElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+     * Returns the shift amount for subscripts.
      *
-     * @return DOCUMENT ME!
+     * @return the subscriptshift attribute value.
      */
     public String getSubscriptshift();
 
     /**
-     * DOCUMENT ME!
+     * Sets the shift amount for subscripts.
      *
-     * @param subscriptshift DOCUMENT ME!
+     * @param subscriptshift the shift amount string.
      */
     public void setSubscriptshift(String subscriptshift);
 
     /**
-     * DOCUMENT ME!
+     * Returns the shift amount for superscripts.
      *
-     * @return DOCUMENT ME!
+     * @return the superscriptshift attribute value.
      */
     public String getSuperscriptshift();
 
     /**
-     * DOCUMENT ME!
+     * Sets the shift amount for superscripts.
      *
-     * @param superscriptshift DOCUMENT ME!
+     * @param superscriptshift the shift amount string.
      */
     public void setSuperscriptshift(String superscriptshift);
 
     /**
-     * DOCUMENT ME!
+     * Returns the base element to which scripts are attached.
      *
-     * @return DOCUMENT ME!
+     * @return the base MathMLElement.
      */
     public MathMLElement getBase();
 
     /**
-     * DOCUMENT ME!
+     * Sets the base element to which scripts are attached.
      *
-     * @param base DOCUMENT ME!
+     * @param base the base MathMLElement to set.
      */
     public void setBase(MathMLElement base);
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of prescripts attached to the base.
      *
-     * @return DOCUMENT ME!
+     * @return a MathMLNodeList of prescripts.
      */
     public MathMLNodeList getPrescripts();
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of postscripts (scripts) attached to the base.
      *
-     * @return DOCUMENT ME!
+     * @return a MathMLNodeList of postscripts.
      */
     public MathMLNodeList getScripts();
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of columns of prescripts.
      *
-     * @return DOCUMENT ME!
+     * @return the number of prescript columns.
      */
     public int getNumprescriptcolumns();
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of columns of postscripts (scripts).
      *
-     * @return DOCUMENT ME!
+     * @return the number of script columns.
      */
     public int getNumscriptcolumns();
 
     /**
-     * DOCUMENT ME!
+     * Retrieves the prescript subscript at the specified column index.
      *
-     * @param colIndex DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param colIndex the column index (1-based).
+     * @return the requested prescript subscript.
      */
     public MathMLElement getPreSubScript(int colIndex);
 
     /**
-     * DOCUMENT ME!
+     * Retrieves the postscript subscript at the specified column index.
      *
-     * @param colIndex DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param colIndex the column index (1-based).
+     * @return the requested postscript subscript.
      */
     public MathMLElement getSubScript(int colIndex);
 
     /**
-     * DOCUMENT ME!
+     * Retrieves the prescript superscript at the specified column index.
      *
-     * @param colIndex DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param colIndex the column index (1-based).
+     * @return the requested prescript superscript.
      */
     public MathMLElement getPreSuperScript(int colIndex);
 
     /**
-     * DOCUMENT ME!
+     * Retrieves the postscript superscript at the specified column index.
      *
-     * @param colIndex DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param colIndex the column index (1-based).
+     * @return the requested postscript superscript.
      */
     public MathMLElement getSuperScript(int colIndex);
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new prescript subscript before the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index before which to insert.
+     * @param newScript the new subscript element.
+     * @return the newly inserted element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement insertPreSubScriptBefore(int colIndex,
         MathMLElement newScript) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Sets the prescript subscript at the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index.
+     * @param newScript the replacement subscript element.
+     * @return the newly set element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement setPreSubScriptAt(int colIndex, MathMLElement newScript)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new postscript subscript before the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index before which to insert.
+     * @param newScript the new subscript element.
+     * @return the newly inserted element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement insertSubScriptBefore(int colIndex,
         MathMLElement newScript) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Sets the postscript subscript at the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index.
+     * @param newScript the replacement subscript element.
+     * @return the newly set element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement setSubScriptAt(int colIndex, MathMLElement newScript)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new prescript superscript before the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index before which to insert.
+     * @param newScript the new superscript element.
+     * @return the newly inserted element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement insertPreSuperScriptBefore(int colIndex,
         MathMLElement newScript) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Sets the prescript superscript at the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index.
+     * @param newScript the replacement superscript element.
+     * @return the newly set element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement setPreSuperScriptAt(int colIndex,
         MathMLElement newScript) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Inserts a new postscript superscript before the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index before which to insert.
+     * @param newScript the new superscript element.
+     * @return the newly inserted element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement insertSuperScriptBefore(int colIndex,
         MathMLElement newScript) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Sets the postscript superscript at the specified column.
      *
-     * @param colIndex DOCUMENT ME!
-     * @param newScript DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param colIndex the column index.
+     * @param newScript the replacement superscript element.
+     * @return the newly set element.
+     * @throws DOMException INDEX_SIZE_ERR: if the column index is out of range.
      */
     public MathMLElement setSuperScriptAt(int colIndex, MathMLElement newScript)
         throws DOMException;

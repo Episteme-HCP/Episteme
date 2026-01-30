@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLLambdaElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,16 +32,16 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLLambdaElement extends MathMLContentContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLLambdaElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getExpression();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLLambdaElement element.
      *
-     * @param expression DOCUMENT ME!
+     * @param expression the value to set
      */
     public void setExpression(MathMLElement expression);
 }

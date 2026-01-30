@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,65 +32,65 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLPresentationToken extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMathvariant();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @param mathvariant DOCUMENT ME!
+     * @param mathvariant the value to set
      */
     public void setMathvariant(String mathvariant);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMathsize();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @param mathsize DOCUMENT ME!
+     * @param mathsize the value to set
      */
     public void setMathsize(String mathsize);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMathcolor();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @param mathcolor DOCUMENT ME!
+     * @param mathcolor the value to set
      */
     public void setMathcolor(String mathcolor);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMathbackground();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @param mathbackground DOCUMENT ME!
+     * @param mathbackground the value to set
      */
     public void setMathbackground(String mathbackground);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPresentationToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLNodeList getContents();
 }

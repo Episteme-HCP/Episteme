@@ -6,9 +6,7 @@
 package org.jscience.mathematics.linearalgebra.matrices;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
-import org.jscience.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.distributed.DistributedContext;
 import org.jscience.ComputeContext;
 
 /**

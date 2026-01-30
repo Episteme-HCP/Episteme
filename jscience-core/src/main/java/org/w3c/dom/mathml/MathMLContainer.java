@@ -27,7 +27,8 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface is used by MathML elements that can contain other elements.
+ * It provides methods for managing arguments and declarations.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,141 +36,123 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLContainer {
     /**
-     * DOCUMENT ME!
+     * Returns the number of arguments (children) of this container.
      *
-     * @return DOCUMENT ME!
+     * @return the number of arguments.
      */
     public int getNArguments();
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of all arguments (children) of this container.
      *
-     * @return DOCUMENT ME!
+     * @return a MathMLNodeList containing the arguments.
      */
     public MathMLNodeList getArguments();
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of all declarations within this container.
      *
-     * @return DOCUMENT ME!
+     * @return a MathMLNodeList containing the declarations.
      */
     public MathMLNodeList getDeclarations();
 
     /**
-     * DOCUMENT ME!
+     * Retrieves an argument at the specified index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the argument to retrieve.
+     * @return the argument at the given index.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than or equal to the number of arguments.
      */
     public MathMLElement getArgument(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Sets or replaces an argument at the specified index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newArgument the new MathMLElement to set.
+     * @param index the index at which to set the argument.
+     * @return the newly set argument.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than the number of arguments.
      */
     public MathMLElement setArgument(MathMLElement newArgument, int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Inserts an argument at the specified index.
      *
-     * @param newArgument DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newArgument the MathMLElement to insert.
+     * @param index the index at which to insert the argument.
+     * @return the newly inserted argument.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than the number of arguments.
      */
     public MathMLElement insertArgument(MathMLElement newArgument, int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Deletes the argument at the specified index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the argument to delete.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than or equal to the number of arguments.
      */
     public void deleteArgument(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Removes the argument at the specified index and returns it.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the argument to remove.
+     * @return the removed argument.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than or equal to the number of arguments.
      */
     public MathMLElement removeArgument(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Retrieves a declaration at the specified index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the declaration to retrieve.
+     * @return the declaration at the given index.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than or equal to the number of declarations.
      */
     public MathMLDeclareElement getDeclaration(int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Sets or replaces a declaration at the specified index.
      *
-     * @param newDeclaration DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newDeclaration the new MathMLDeclareElement to set.
+     * @param index the index at which to set the declaration.
+     * @return the newly set declaration.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than the number of declarations.
      */
     public MathMLDeclareElement setDeclaration(
         MathMLDeclareElement newDeclaration, int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Inserts a declaration at the specified index.
      *
-     * @param newDeclaration DOCUMENT ME!
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param newDeclaration the MathMLDeclareElement to insert.
+     * @param index the index at which to insert the declaration.
+     * @return the newly inserted declaration.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than the number of declarations.
      */
     public MathMLDeclareElement insertDeclaration(
         MathMLDeclareElement newDeclaration, int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Removes the declaration at the specified index and returns it.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the declaration to remove.
+     * @return the removed declaration.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than or equal to the number of declarations.
      */
     public MathMLDeclareElement removeDeclaration(int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+     * Deletes the declaration at the specified index.
      *
-     * @param index DOCUMENT ME!
-     *
-     * @throws DOMException DOCUMENT ME!
+     * @param index the index of the declaration to delete.
+     * @throws DOMException INDEX_SIZE_ERR: if index is greater than or equal to the number of declarations.
      */
     public void deleteDeclaration(int index) throws DOMException;
 }

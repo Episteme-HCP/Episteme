@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLListElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,23 +32,23 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLListElement extends MathMLContentContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLListElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public boolean getIsExplicit();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLListElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getOrdering();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLListElement element.
      *
-     * @param ordering DOCUMENT ME!
+     * @param ordering the value to set
      */
     public void setOrdering(String ordering);
 }

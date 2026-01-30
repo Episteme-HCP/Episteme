@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,78 +35,78 @@ import org.w3c.dom.Node;
  */
 public interface MathMLContentToken extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLNodeList getArguments();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getDefinitionURL();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @param definitionURL DOCUMENT ME!
+     * @param definitionURL the value to set
      */
     public void setDefinitionURL(String definitionURL);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getEncoding();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the value to set
      */
     public void setEncoding(String encoding);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param index the value to set
+     * @return the requested attribute or element
      */
     public Node getArgument(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @param newArgument DOCUMENT ME!
+     * @param newArgument the value to set
      * @param index       DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public Node insertArgument(Node newArgument, int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @param newArgument DOCUMENT ME!
+     * @param newArgument the value to set
      * @param index       DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public Node setArgument(Node newArgument, int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      */
     public void deleteArgument(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLContentToken element.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param index the value to set
+     * @return the requested attribute or element
      */
     public Node removeArgument(int index);
 }

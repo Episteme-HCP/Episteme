@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLMatrixrowElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,66 +35,66 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLMatrixrowElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLMatrixrowElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public int getNEntries();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLMatrixrowElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement getEntry(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLMatrixrowElement element.
      *
-     * @param newEntry DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newEntry the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement insertEntry(MathMLContentElement newEntry,
         int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLMatrixrowElement element.
      *
-     * @param newEntry DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newEntry the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement setEntry(MathMLContentElement newEntry,
         int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLMatrixrowElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void deleteEntry(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLMatrixrowElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement removeEntry(int index)
         throws DOMException;

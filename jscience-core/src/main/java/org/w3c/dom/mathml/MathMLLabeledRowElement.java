@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLLabeledRowElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,18 +35,18 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLLabeledRowElement extends MathMLTableRowElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLLabeledRowElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getLabel();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLLabeledRowElement element.
      *
-     * @param label DOCUMENT ME!
+     * @param label the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void setLabel(MathMLElement label) throws DOMException;
 }

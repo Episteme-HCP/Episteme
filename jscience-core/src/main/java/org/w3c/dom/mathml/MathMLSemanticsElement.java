@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,74 +35,74 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLSemanticsElement extends MathMLElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getBody();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @param body DOCUMENT ME!
+     * @param body the value to set
      */
     public void setBody(MathMLElement body);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public int getNAnnotations();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getAnnotation(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @param newAnnotation DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newAnnotation the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLElement insertAnnotation(MathMLElement newAnnotation, int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @param newAnnotation DOCUMENT ME!
-     * @param index DOCUMENT ME!
+     * @param newAnnotation the value to set
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLElement setAnnotation(MathMLElement newAnnotation, int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      */
     public void deleteAnnotation(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLSemanticsElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement removeAnnotation(int index);
 }

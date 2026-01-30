@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLNodeList element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

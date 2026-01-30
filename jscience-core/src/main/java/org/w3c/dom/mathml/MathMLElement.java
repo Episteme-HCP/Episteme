@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,79 +35,79 @@ import org.w3c.dom.Element;
  */
 public interface MathMLElement extends Element {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getClassName();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @param className DOCUMENT ME!
+     * @param className the value to set
      */
     public void setClassName(String className);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMathElementStyle();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @param mathElementStyle DOCUMENT ME!
+     * @param mathElementStyle the value to set
      */
     public void setMathElementStyle(String mathElementStyle);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getId();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @param id DOCUMENT ME!
+     * @param id the value to set
      */
     public void setId(String id);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getXref();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @param xref DOCUMENT ME!
+     * @param xref the value to set
      */
     public void setXref(String xref);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getHref();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @param href DOCUMENT ME!
+     * @param href the value to set
      */
     public void setHref(String href);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLMathElement getOwnerMathElement();
 }

@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,74 +35,74 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLScriptElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSubscriptshift();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @param subscriptshift DOCUMENT ME!
+     * @param subscriptshift the value to set
      */
     public void setSubscriptshift(String subscriptshift);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSuperscriptshift();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @param superscriptshift DOCUMENT ME!
+     * @param superscriptshift the value to set
      */
     public void setSuperscriptshift(String superscriptshift);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getBase();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @param base DOCUMENT ME!
+     * @param base the value to set
      */
     public void setBase(MathMLElement base);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getSubscript();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @param subscript DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param subscript the value to set
+     * @throws DOMException if an error occurs
      */
     public void setSubscript(MathMLElement subscript) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getSuperscript();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLScriptElement element.
      *
-     * @param superscript DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param superscript the value to set
+     * @throws DOMException if an error occurs
      */
     public void setSuperscript(MathMLElement superscript)
             throws DOMException;

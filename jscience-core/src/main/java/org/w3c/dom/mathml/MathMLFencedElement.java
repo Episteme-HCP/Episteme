@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLFencedElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,44 +32,44 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLFencedElement extends MathMLPresentationContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFencedElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getOpen();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFencedElement element.
      *
-     * @param open DOCUMENT ME!
+     * @param open the value to set
      */
     public void setOpen(String open);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFencedElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getClose();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFencedElement element.
      *
-     * @param close DOCUMENT ME!
+     * @param close the value to set
      */
     public void setClose(String close);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFencedElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSeparators();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFencedElement element.
      *
-     * @param separators DOCUMENT ME!
+     * @param separators the value to set
      */
     public void setSeparators(String separators);
 }

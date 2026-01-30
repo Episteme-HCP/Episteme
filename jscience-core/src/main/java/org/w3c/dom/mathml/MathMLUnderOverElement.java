@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,77 +35,77 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLUnderOverElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getAccentunder();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @param accentunder DOCUMENT ME!
+     * @param accentunder the value to set
      */
     public void setAccentunder(String accentunder);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getAccent();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @param accent DOCUMENT ME!
+     * @param accent the value to set
      */
     public void setAccent(String accent);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getBase();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @param base DOCUMENT ME!
+     * @param base the value to set
      */
     public void setBase(MathMLElement base);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getUnderscript();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @param underscript DOCUMENT ME!
+     * @param underscript the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void setUnderscript(MathMLElement underscript)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getOverscript();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLUnderOverElement element.
      *
-     * @param overscript DOCUMENT ME!
+     * @param overscript the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void setOverscript(MathMLElement overscript)
         throws DOMException;

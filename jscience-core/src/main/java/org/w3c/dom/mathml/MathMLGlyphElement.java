@@ -24,7 +24,8 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface provides support for the mglyph element, used to display 
+ * non-standard symbols.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,44 +33,44 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLGlyphElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+     * Returns the alternative text for the glyph.
      *
-     * @return DOCUMENT ME!
+     * @return the alternative text string.
      */
     public String getAlt();
 
     /**
-     * DOCUMENT ME!
+     * Sets the alternative text for the glyph.
      *
-     * @param alt DOCUMENT ME!
+     * @param alt the alternative text string to set.
      */
     public void setAlt(String alt);
 
     /**
-     * DOCUMENT ME!
+     * Returns the font family from which the glyph should be taken.
      *
-     * @return DOCUMENT ME!
+     * @return the font family string.
      */
     public String getFontfamily();
 
     /**
-     * DOCUMENT ME!
+     * Sets the font family from which the glyph should be taken.
      *
-     * @param fontfamily DOCUMENT ME!
+     * @param fontfamily the font family string to set.
      */
     public void setFontfamily(String fontfamily);
 
     /**
-     * DOCUMENT ME!
+     * Returns the index of the glyph within the specified font.
      *
-     * @return DOCUMENT ME!
+     * @return the integer index of the glyph.
      */
     public int getIndex();
 
     /**
-     * DOCUMENT ME!
+     * Sets the index of the glyph within the specified font.
      *
-     * @param index DOCUMENT ME!
+     * @param index the integer index to set.
      */
     public void setIndex(int index);
 }

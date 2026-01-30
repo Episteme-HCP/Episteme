@@ -35,6 +35,8 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import org.jblas.DoubleMatrix;
+import org.jscience.ComputeContext;
+import org.jscience.ComputeContext.Backend;
 
 /**
  * Matrix multiplication benchmark comparing JScience with other libraries.
@@ -139,6 +141,18 @@ public class MatrixBenchmark {
     @Benchmark
     public DoubleMatrix multiplyJBlas() {
         return jblasA.mmul(jblasB);
+    }
+
+    @Benchmark
+    public Matrix<Real> multiplyJSciencePanama() {
+        // Switch to Panama/Native backend for this benchmark
+        Backend old = ComputeContext.current().getBackend();
+        ComputeContext.current().setBackend(Backend.NATIVE_BLAS);
+        try {
+            return A.multiply(B);
+        } finally {
+            ComputeContext.current().setBackend(old);
+        }
     }
 
     private double[][] generateRandomData(int n) {

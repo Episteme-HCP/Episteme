@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,111 +35,111 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLPiecewiseElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLNodeList getPieces();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLContentElement getOtherwise();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param otherwise DOCUMENT ME!
+     * @param otherwise the value to set
      */
     public void setOtherwise(MathMLContentElement otherwise);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param index the value to set
+     * @return the requested attribute or element
      */
     public MathMLCaseElement getCase(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
      * @param index   DOCUMENT ME!
-     * @param newCase DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param newCase the value to set
+     * @return the requested attribute or element
+     * @throws DOMException if an error occurs
      */
     public MathMLCaseElement setCase(int index, MathMLCaseElement newCase)
             throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param index the value to set
+     * @throws DOMException if an error occurs
      */
     public void deleteCase(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param index the value to set
+     * @return the requested attribute or element
+     * @throws DOMException if an error occurs
      */
     public MathMLCaseElement removeCase(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
      * @param index   DOCUMENT ME!
-     * @param newCase DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param newCase the value to set
+     * @return the requested attribute or element
+     * @throws DOMException if an error occurs
      */
     public MathMLCaseElement insertCase(int index, MathMLCaseElement newCase)
             throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param index the value to set
+     * @return the requested attribute or element
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement getCaseValue(int index)
             throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index DOCUMENT ME!
-     * @param value DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param index the value to set
+     * @param value the value to set
+     * @return the requested attribute or element
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement setCaseValue(int index,
                                              MathMLContentElement value) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param index the value to set
+     * @return the requested attribute or element
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement getCaseCondition(int index)
             throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPiecewiseElement element.
      *
      * @param index     DOCUMENT ME!
-     * @param condition DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws DOMException DOCUMENT ME!
+     * @param condition the value to set
+     * @return the requested attribute or element
+     * @throws DOMException if an error occurs
      */
     public MathMLContentElement setCaseCondition(int index,
                                                  MathMLContentElement condition) throws DOMException;

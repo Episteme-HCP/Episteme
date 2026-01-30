@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLActionElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,30 +32,30 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLActionElement extends MathMLPresentationContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLActionElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getActiontype();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLActionElement element.
      *
-     * @param actiontype DOCUMENT ME!
+     * @param actiontype the value to set
      */
     public void setActiontype(String actiontype);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLActionElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSelection();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLActionElement element.
      *
-     * @param selection DOCUMENT ME!
+     * @param selection the value to set
      */
     public void setSelection(String selection);
 }

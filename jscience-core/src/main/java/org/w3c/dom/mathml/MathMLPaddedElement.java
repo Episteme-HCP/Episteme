@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,58 +32,58 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLPaddedElement extends MathMLPresentationContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getWidth();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @param width DOCUMENT ME!
+     * @param width the value to set
      */
     public void setWidth(String width);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getLspace();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @param lspace DOCUMENT ME!
+     * @param lspace the value to set
      */
     public void setLspace(String lspace);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getHeight();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @param height DOCUMENT ME!
+     * @param height the value to set
      */
     public void setHeight(String height);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getDepth();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLPaddedElement element.
      *
-     * @param depth DOCUMENT ME!
+     * @param depth the value to set
      */
     public void setDepth(String depth);
 }

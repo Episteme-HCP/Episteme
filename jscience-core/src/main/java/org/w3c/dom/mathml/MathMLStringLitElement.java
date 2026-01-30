@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLStringLitElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,30 +32,30 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLStringLitElement extends MathMLPresentationToken {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStringLitElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getLquote();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStringLitElement element.
      *
-     * @param lquote DOCUMENT ME!
+     * @param lquote the value to set
      */
     public void setLquote(String lquote);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStringLitElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRquote();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStringLitElement element.
      *
-     * @param rquote DOCUMENT ME!
+     * @param rquote the value to set
      */
     public void setRquote(String rquote);
 }

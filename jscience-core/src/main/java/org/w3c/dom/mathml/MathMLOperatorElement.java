@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,170 +32,170 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLOperatorElement extends MathMLPresentationToken {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getForm();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param form DOCUMENT ME!
+     * @param form the value to set
      */
     public void setForm(String form);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getFence();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param fence DOCUMENT ME!
+     * @param fence the value to set
      */
     public void setFence(String fence);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSeparator();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param separator DOCUMENT ME!
+     * @param separator the value to set
      */
     public void setSeparator(String separator);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getLspace();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param lspace DOCUMENT ME!
+     * @param lspace the value to set
      */
     public void setLspace(String lspace);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRspace();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param rspace DOCUMENT ME!
+     * @param rspace the value to set
      */
     public void setRspace(String rspace);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getStretchy();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param stretchy DOCUMENT ME!
+     * @param stretchy the value to set
      */
     public void setStretchy(String stretchy);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSymmetric();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param symmetric DOCUMENT ME!
+     * @param symmetric the value to set
      */
     public void setSymmetric(String symmetric);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMaxsize();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param maxsize DOCUMENT ME!
+     * @param maxsize the value to set
      */
     public void setMaxsize(String maxsize);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMinsize();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param minsize DOCUMENT ME!
+     * @param minsize the value to set
      */
     public void setMinsize(String minsize);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getLargeop();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param largeop DOCUMENT ME!
+     * @param largeop the value to set
      */
     public void setLargeop(String largeop);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMovablelimits();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param movablelimits DOCUMENT ME!
+     * @param movablelimits the value to set
      */
     public void setMovablelimits(String movablelimits);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getAccent();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLOperatorElement element.
      *
-     * @param accent DOCUMENT ME!
+     * @param accent the value to set
      */
     public void setAccent(String accent);
 }

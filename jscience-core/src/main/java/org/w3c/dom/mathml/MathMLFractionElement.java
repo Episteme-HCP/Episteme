@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLFractionElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,44 +32,44 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLFractionElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFractionElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getLinethickness();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFractionElement element.
      *
-     * @param linethickness DOCUMENT ME!
+     * @param linethickness the value to set
      */
     public void setLinethickness(String linethickness);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFractionElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getNumerator();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFractionElement element.
      *
-     * @param numerator DOCUMENT ME!
+     * @param numerator the value to set
      */
     public void setNumerator(MathMLElement numerator);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFractionElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getDenominator();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLFractionElement element.
      *
-     * @param denominator DOCUMENT ME!
+     * @param denominator the value to set
      */
     public void setDenominator(MathMLElement denominator);
 }

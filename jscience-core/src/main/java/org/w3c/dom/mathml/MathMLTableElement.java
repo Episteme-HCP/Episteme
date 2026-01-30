@@ -27,7 +27,7 @@ import org.w3c.dom.DOMException;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,340 +35,340 @@ import org.w3c.dom.DOMException;
  */
 public interface MathMLTableElement extends MathMLPresentationElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getAlign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param align DOCUMENT ME!
+     * @param align the value to set
      */
     public void setAlign(String align);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRowalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param rowalign DOCUMENT ME!
+     * @param rowalign the value to set
      */
     public void setRowalign(String rowalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColumnalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param columnalign DOCUMENT ME!
+     * @param columnalign the value to set
      */
     public void setColumnalign(String columnalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getGroupalign();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param groupalign DOCUMENT ME!
+     * @param groupalign the value to set
      */
     public void setGroupalign(String groupalign);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getAlignmentscope();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param alignmentscope DOCUMENT ME!
+     * @param alignmentscope the value to set
      */
     public void setAlignmentscope(String alignmentscope);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColumnwidth();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param columnwidth DOCUMENT ME!
+     * @param columnwidth the value to set
      */
     public void setColumnwidth(String columnwidth);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getWidth();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param width DOCUMENT ME!
+     * @param width the value to set
      */
     public void setWidth(String width);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRowspacing();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param rowspacing DOCUMENT ME!
+     * @param rowspacing the value to set
      */
     public void setRowspacing(String rowspacing);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColumnspacing();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param columnspacing DOCUMENT ME!
+     * @param columnspacing the value to set
      */
     public void setColumnspacing(String columnspacing);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getRowlines();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param rowlines DOCUMENT ME!
+     * @param rowlines the value to set
      */
     public void setRowlines(String rowlines);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColumnlines();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param columnlines DOCUMENT ME!
+     * @param columnlines the value to set
      */
     public void setColumnlines(String columnlines);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getFrame();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param frame DOCUMENT ME!
+     * @param frame the value to set
      */
     public void setFrame(String frame);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getFramespacing();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param framespacing DOCUMENT ME!
+     * @param framespacing the value to set
      */
     public void setFramespacing(String framespacing);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getEqualrows();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param equalrows DOCUMENT ME!
+     * @param equalrows the value to set
      */
     public void setEqualrows(String equalrows);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getEqualcolumns();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param equalcolumns DOCUMENT ME!
+     * @param equalcolumns the value to set
      */
     public void setEqualcolumns(String equalcolumns);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getDisplaystyle();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param displaystyle DOCUMENT ME!
+     * @param displaystyle the value to set
      */
     public void setDisplaystyle(String displaystyle);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getSide();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param side DOCUMENT ME!
+     * @param side the value to set
      */
     public void setSide(String side);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getMinlabelspacing();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param minlabelspacing DOCUMENT ME!
+     * @param minlabelspacing the value to set
      */
     public void setMinlabelspacing(String minlabelspacing);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLNodeList getRows();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLTableRowElement insertEmptyRow(int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLLabeledRowElement insertEmptyLabeledRow(int index)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLTableRowElement getRow(int index);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param index DOCUMENT ME!
-     * @param newRow DOCUMENT ME!
+     * @param index the value to set
+     * @param newRow the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLTableRowElement insertRow(int index,
         MathMLTableRowElement newRow) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param index DOCUMENT ME!
-     * @param newRow DOCUMENT ME!
+     * @param index the value to set
+     * @param newRow the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLTableRowElement setRow(int index, MathMLTableRowElement newRow)
         throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public void deleteRow(int index) throws DOMException;
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLTableElement element.
      *
-     * @param index DOCUMENT ME!
+     * @param index the value to set
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      *
-     * @throws DOMException DOCUMENT ME!
+     * @throws DOMException if an error occurs
      */
     public MathMLTableRowElement removeRow(int index) throws DOMException;
 }

@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLCaseElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,30 +32,30 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLCaseElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCaseElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLContentElement getCaseCondition();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCaseElement element.
      *
-     * @param caseCondition DOCUMENT ME!
+     * @param caseCondition the value to set
      */
     public void setCaseCondition(MathMLContentElement caseCondition);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCaseElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLContentElement getCaseValue();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLCaseElement element.
      *
-     * @param caseValue DOCUMENT ME!
+     * @param caseValue the value to set
      */
     public void setCaseValue(MathMLContentElement caseValue);
 }

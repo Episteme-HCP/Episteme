@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,86 +32,86 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLStyleElement extends MathMLPresentationContainer {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getScriptlevel();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @param scriptlevel DOCUMENT ME!
+     * @param scriptlevel the value to set
      */
     public void setScriptlevel(String scriptlevel);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getDisplaystyle();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @param displaystyle DOCUMENT ME!
+     * @param displaystyle the value to set
      */
     public void setDisplaystyle(String displaystyle);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getScriptsizemultiplier();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @param scriptsizemultiplier DOCUMENT ME!
+     * @param scriptsizemultiplier the value to set
      */
     public void setScriptsizemultiplier(String scriptsizemultiplier);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getScriptminsize();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @param scriptminsize DOCUMENT ME!
+     * @param scriptminsize the value to set
      */
     public void setScriptminsize(String scriptminsize);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getColor();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @param color DOCUMENT ME!
+     * @param color the value to set
      */
     public void setColor(String color);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getBackground();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLStyleElement element.
      *
-     * @param background DOCUMENT ME!
+     * @param background the value to set
      */
     public void setBackground(String background);
 }

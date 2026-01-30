@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLAnnotationElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,30 +32,30 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLAnnotationElement extends MathMLElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAnnotationElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getBody();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAnnotationElement element.
      *
-     * @param body DOCUMENT ME!
+     * @param body the value to set
      */
     public void setBody(String body);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAnnotationElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getEncoding();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLAnnotationElement element.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the value to set
      */
     public void setEncoding(String encoding);
 }

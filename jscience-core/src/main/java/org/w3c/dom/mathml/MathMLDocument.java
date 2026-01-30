@@ -27,7 +27,7 @@ import org.w3c.dom.Document;
 
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLDocument element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,23 +35,23 @@ import org.w3c.dom.Document;
  */
 public interface MathMLDocument extends Document {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDocument element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getReferrer();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDocument element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getDomain();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDocument element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getURI();
 }

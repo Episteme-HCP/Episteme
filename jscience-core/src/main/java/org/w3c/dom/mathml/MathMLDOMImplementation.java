@@ -27,7 +27,8 @@ import org.w3c.dom.DOMImplementation;
 
 
 /**
- * DOCUMENT ME!
+ * This interface extends DOMImplementation with a method to create
+ * a MathMLDocument.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,9 +36,9 @@ import org.w3c.dom.DOMImplementation;
  */
 public interface MathMLDOMImplementation extends DOMImplementation {
     /**
-     * DOCUMENT ME!
+     * Creates a new MathMLDocument.
      *
-     * @return DOCUMENT ME!
+     * @return a new MathMLDocument object.
      */
     public MathMLDocument createMathMLDocument();
 }

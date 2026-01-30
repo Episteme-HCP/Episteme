@@ -24,7 +24,7 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,100 +32,100 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLDeclareElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getType();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @param type DOCUMENT ME!
+     * @param type the value to set
      */
     public void setType(String type);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public int getNargs();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @param nargs DOCUMENT ME!
+     * @param nargs the value to set
      */
     public void setNargs(int nargs);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getOccurrence();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @param occurrence DOCUMENT ME!
+     * @param occurrence the value to set
      */
     public void setOccurrence(String occurrence);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getDefinitionURL();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @param definitionURL DOCUMENT ME!
+     * @param definitionURL the value to set
      */
     public void setDefinitionURL(String definitionURL);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public String getEncoding();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @param encoding DOCUMENT ME!
+     * @param encoding the value to set
      */
     public void setEncoding(String encoding);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLCiElement getIdentifier();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @param identifier DOCUMENT ME!
+     * @param identifier the value to set
      */
     public void setIdentifier(MathMLCiElement identifier);
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @return DOCUMENT ME!
+     * @return the requested attribute or element
      */
     public MathMLElement getConstructor();
 
     /**
-     * DOCUMENT ME!
+ * This interface represents the MathML MathMLDeclareElement element.
      *
-     * @param constructor DOCUMENT ME!
+     * @param constructor the value to set
      */
     public void setConstructor(MathMLElement constructor);
 }

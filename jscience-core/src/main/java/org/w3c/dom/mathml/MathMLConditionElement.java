@@ -24,7 +24,8 @@
 package org.w3c.dom.mathml;
 
 /**
- * DOCUMENT ME!
+ * The condition element is the container element for the condition in a 
+ * MathML content element (like forall, exists, etc.).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -32,16 +33,16 @@ package org.w3c.dom.mathml;
  */
 public interface MathMLConditionElement extends MathMLContentElement {
     /**
-     * DOCUMENT ME!
+     * Returns the child condition element.
      *
-     * @return DOCUMENT ME!
+     * @return the MathMLApplyElement that represents the condition.
      */
     public MathMLApplyElement getCondition();
 
     /**
-     * DOCUMENT ME!
+     * Sets the child condition element.
      *
-     * @param condition DOCUMENT ME!
+     * @param condition the MathMLApplyElement to set as the condition.
      */
     public void setCondition(MathMLApplyElement condition);
 }
