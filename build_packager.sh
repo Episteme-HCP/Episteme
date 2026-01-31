@@ -6,7 +6,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR"
 LAUNCHERS_DIR="$PROJECT_ROOT/launchers"
 TARGET_DIR="$LAUNCHERS_DIR/packaged"
-LIB_DIR="$TARGET_DIR/lib"
 
 echo "Building project from $PROJECT_ROOT ..."
 cd "$PROJECT_ROOT"
@@ -14,45 +13,53 @@ mvn clean install -DskipTests
 
 echo "Cleaning target directory: $TARGET_DIR"
 rm -rf "$TARGET_DIR"
-mkdir -p "$LIB_DIR"
+mkdir -p "$TARGET_DIR"
 
-echo "Copying dependencies..."
-mvn dependency:copy-dependencies -DoutputDirectory="$LIB_DIR" -DincludeScope=runtime -DskipTests
+echo "Copying artifacts (Thin Jars only)..."
 
-echo "Copying project artifacts..."
-# Find jars in submodules target/ (excluding sources/javadoc)
-# We search in likely submodules or just depth 2
-find . -maxdepth 3 -name "jscience-*.jar" -path "*/target/*" ! -name "*-sources.jar" ! -name "*-javadoc.jar" -exec cp {} "$TARGET_DIR" \;
+MODULES=(
+    "jscience-core" 
+    "jscience-natural" 
+    "jscience-social" 
+    "jscience-native" 
+    "jscience-featured-apps" 
+    "jscience-server"
+    "jscience-client"
+    "jscience-database"
+    "jscience-worker"
+    "jscience-benchmarks"
+    "jscience-jni"
+)
 
-echo "Generating launchers (Unix)..."
-if [ -d "$LAUNCHERS_DIR" ]; then
-    for SCRIPT in "$LAUNCHERS_DIR"/run-*.sh; do
-        if [ -f "$SCRIPT" ]; then
-            FILENAME=$(basename "$SCRIPT")
-            APP_CLASS=$(grep "APP_CLASS=" "$SCRIPT" | head -n 1 | cut -d= -f2)
+for MOD in "${MODULES[@]}"; do
+    MOD_TARGET="$PROJECT_ROOT/$MOD/target"
+    if [ -d "$MOD_TARGET" ]; then
+        # Search for original-X.jar (thin) or X.jar (excluding shaded/sources/javadoc)
+        
+        # 1. Try original-
+        ORIGINAL_JAR=$(find "$MOD_TARGET" -maxdepth 1 -name "original-$MOD-*.jar" | head -n 1)
+        
+        if [ -n "$ORIGINAL_JAR" ]; then
+            FILENAME=$(basename "$ORIGINAL_JAR")
+            DEST_NAME=${FILENAME#"original-"}
+            echo "Copying $FILENAME as $DEST_NAME (Thin)"
+            cp "$ORIGINAL_JAR" "$TARGET_DIR/$DEST_NAME"
+        else
+            # 2. Try the normal jar, excluding suffixes
+            # We look for the jar that doesn't have -shaded, -sources, -javadoc
+            NORMAL_JAR=$(find "$MOD_TARGET" -maxdepth 1 -name "$MOD-*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" ! -name "*-shaded.jar" | head -n 1)
             
-            if [ -n "$APP_CLASS" ]; then
-                echo "Processing $FILENAME -> $APP_CLASS"
-                NEW_SCRIPT="$TARGET_DIR/$FILENAME"
-                
-                cat > "$NEW_SCRIPT" <<EOF
-#!/bin/bash
-APP_CLASS=$APP_CLASS
-LIB_DIR=lib
-NATIVE_ARGS="--enable-native-access=ALL-UNNAMED --enable-preview"
-CLASSPATH=".:*:lib/*"
-
-echo "Starting \$APP_CLASS ..."
-exec java \$NATIVE_ARGS -cp "\$CLASSPATH" \$APP_CLASS
-EOF
-                chmod +x "$NEW_SCRIPT"
+            if [ -n "$NORMAL_JAR" ]; then
+                echo "Copying $(basename "$NORMAL_JAR") (Thin)"
+                cp "$NORMAL_JAR" "$TARGET_DIR/"
             else
-                echo "Skipping $FILENAME: APP_CLASS not found"
+                echo "No valid thin jar found for $MOD"
             fi
         fi
-    done
-else
-    echo "Launchers directory not found: $LAUNCHERS_DIR"
-fi
+    else
+        echo "Module target not found: $MOD"
+    fi
+done
 
-echo "Done. Packages available in $TARGET_DIR"
+echo "Packaging complete. Handled thin versions for featured-apps and worker."
+echo "Target: $TARGET_DIR"

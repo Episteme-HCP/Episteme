@@ -16,7 +16,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>org.jscience.apps.Launcher</mainClass>
+          <mainClass>org.jscience.apps.apps.Launcher</mainClass>
         </configuration>
       </plugin>
       <plugin>
@@ -31,7 +31,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>org.jscience.apps.Launcher</mainClass>
+                  <mainClass>org.jscience.apps.apps.Launcher</mainClass>
                 </transformer>
                 <transformer />
               </transformers>

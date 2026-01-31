@@ -5,72 +5,68 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = $scriptDir
 $launchersDir = Join-Path $projectRoot "launchers"
 $targetDir = Join-Path $launchersDir "packaged"
-$libDir = Join-Path $targetDir "lib"
 
 Write-Host "Building project from $projectRoot ..."
 Set-Location $projectRoot
-# Ensure jars are built
+# Build all modules
 mvn clean install -DskipTests
 
 Write-Host "Cleaning target directory: $targetDir"
 if (Test-Path $targetDir) { Remove-Item -Recurse -Force $targetDir }
 New-Item -ItemType Directory -Force $targetDir | Out-Null
-New-Item -ItemType Directory -Force $libDir | Out-Null
 
-Write-Host "Copying dependencies..."
-mvn dependency:copy-dependencies -DoutputDirectory="$libDir" -DincludeScope=runtime -DskipTests
+Write-Host "Copying artifacts (Thin Jars only)..."
+# All project modules
+$modules = @(
+    "jscience-core", 
+    "jscience-natural", 
+    "jscience-social", 
+    "jscience-native", 
+    "jscience-featured-apps", 
+    "jscience-server",
+    "jscience-client",
+    "jscience-database",
+    "jscience-worker",
+    "jscience-benchmarks",
+    "jscience-jni"
+)
 
-Write-Host "Copying project artifacts..."
-$modules = @("jscience-core", "jscience-natural", "jscience-social", "jscience-native", "jscience-featured-apps", "jscience-server")
 foreach ($mod in $modules) {
-    $jarPath = Join-Path $projectRoot "$mod\target"
-    if (Test-Path $jarPath) {
-        Get-ChildItem $jarPath -Filter "$mod-*.jar" | Where-Object { $_.Name -notmatch "sources" -and $_.Name -notmatch "javadoc" } | ForEach-Object {
-            Write-Host "Copying $($_.Name)"
-            Copy-Item $_.FullName -Destination $targetDir
+    $modTarget = Join-Path $projectRoot "$mod\target"
+    if (Test-Path $modTarget) {
+        # Find jars. 
+        # Strategy: 
+        # 1. Search for original-X.jar (the thin jar created by shade plugin)
+        # 2. If not found, search for X.jar (making sure it's not a shaded/sources/javadoc version)
+        
+        $allJars = Get-ChildItem $modTarget -Filter "*.jar" | Where-Object { 
+            ($_.Name -match "^original-$mod-.*\.jar$") -or ($_.Name -match "^$mod-.*\.jar$") 
+        } | Where-Object { 
+            $_.Name -notmatch "-sources" -and $_.Name -notmatch "-javadoc" -and $_.Name -notmatch "-shaded" 
         }
+
+        # Priority to 'original-'
+        $original = $allJars | Where-Object { $_.Name -match "^original-" } | Select-Object -First 1
+        
+        if ($original) {
+            $destName = $original.Name -replace "^original-", ""
+            Write-Host "Copying $($original.Name) as $destName (Thin)"
+            Copy-Item $original.FullName -Destination (Join-Path $targetDir $destName)
+        } else {
+            # Find the true thin jar (usually the shortest name or exactly $mod-version.jar)
+            $thin = $allJars | Sort-Object { $_.Name.Length } | Select-Object -First 1
+            if ($thin) {
+                 Write-Host "Copying $($thin.Name) (Thin)"
+                 Copy-Item $thin.FullName -Destination $targetDir
+            } else {
+                Write-Warning "No valid thin jar found for $mod"
+            }
+        }
+    } else {
+        Write-Warning "Module target not found: $mod"
     }
 }
 
-Write-Host "Generating launchers (Windows)..."
-if (Test-Path $launchersDir) {
-    $sourceLaunchers = Get-ChildItem $launchersDir -Filter "run-*.bat"
-
-    foreach ($launcher in $sourceLaunchers) {
-        $content = Get-Content $launcher.FullName
-        $appClassLine = $content | Where-Object { $_ -match "set APP_CLASS=" }
-        $appClass = $null
-        if ($appClassLine) {
-            $appClass = $appClassLine -replace "set APP_CLASS=", ""
-        }
-    
-        if (-not $appClass) {
-            Write-Warning "Skipping $($launcher.Name): APP_CLASS not found"
-            continue
-        }
-
-        Write-Host "Processing $($launcher.Name) -> $appClass"
-
-        $newContent = @"
-@echo off
-setlocal
-
-set APP_CLASS=$appClass
-set LIB_DIR=lib
-set NATIVE_ARGS=--enable-native-access=ALL-UNNAMED --enable-preview
-set CLASSPATH=.;*;lib\*
-
-echo Starting $appClass ...
-java %NATIVE_ARGS% -cp "%CLASSPATH%" %APP_CLASS%
-
-endlocal
-"@
-
-        $newFile = Join-Path $targetDir $launcher.Name
-        Set-Content -Path $newFile -Value $newContent
-    }
-} else {
-    Write-Warning "Launchers directory not found: $launchersDir"
-}
-
-Write-Host "Done. Packages available in $targetDir"
+Write-Host "Packaging complete. Handled thin versions for featured-apps and worker."
+Write-Host "Launchers and side-libs are assumed to be in $launchersDir."
+Write-Host "Files in $targetDir"
