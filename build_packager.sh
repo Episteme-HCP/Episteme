@@ -1,66 +1,58 @@
 #!/bin/bash
+set -e
 
-# Define paths
-PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
-TARGET_DIR="$PROJECT_ROOT/launchers/packaged"
+# Determine script location (ROOT)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$SCRIPT_DIR"
+LAUNCHERS_DIR="$PROJECT_ROOT/launchers"
+TARGET_DIR="$LAUNCHERS_DIR/packaged"
 LIB_DIR="$TARGET_DIR/lib"
 
-echo "==========================================="
-echo "JScience Project Packager"
-echo "==========================================="
+echo "Building project from $PROJECT_ROOT ..."
+cd "$PROJECT_ROOT"
+mvn clean install -DskipTests
 
-# 1. Build the project
-echo "[1/4] Building project..."
-mvn clean install -DskipTests -f "$PROJECT_ROOT/pom.xml"
-if [ $? -ne 0 ]; then
-    echo "Build failed."
-    exit 1
-fi
-
-# 2. Prepare directories
-echo "[2/4] Preparing directories..."
-if [ -d "$TARGET_DIR" ]; then
-    rm -rf "$TARGET_DIR"
-fi
+echo "Cleaning target directory: $TARGET_DIR"
+rm -rf "$TARGET_DIR"
 mkdir -p "$LIB_DIR"
 
-# 3. Copy dependencies
-echo "[3/4] Copying dependencies..."
-mvn dependency:copy-dependencies -DoutputDirectory="$LIB_DIR" -DincludeScope=runtime -DskipTests -f "$PROJECT_ROOT/pom.xml"
-if [ $? -ne 0 ]; then
-    echo "Copying dependencies failed."
-    exit 1
+echo "Copying dependencies..."
+mvn dependency:copy-dependencies -DoutputDirectory="$LIB_DIR" -DincludeScope=runtime -DskipTests
+
+echo "Copying project artifacts..."
+# Find jars in submodules target/ (excluding sources/javadoc)
+# We search in likely submodules or just depth 2
+find . -maxdepth 3 -name "jscience-*.jar" -path "*/target/*" ! -name "*-sources.jar" ! -name "*-javadoc.jar" -exec cp {} "$TARGET_DIR" \;
+
+echo "Generating launchers (Unix)..."
+if [ -d "$LAUNCHERS_DIR" ]; then
+    for SCRIPT in "$LAUNCHERS_DIR"/run-*.sh; do
+        if [ -f "$SCRIPT" ]; then
+            FILENAME=$(basename "$SCRIPT")
+            APP_CLASS=$(grep "APP_CLASS=" "$SCRIPT" | head -n 1 | cut -d= -f2)
+            
+            if [ -n "$APP_CLASS" ]; then
+                echo "Processing $FILENAME -> $APP_CLASS"
+                NEW_SCRIPT="$TARGET_DIR/$FILENAME"
+                
+                cat > "$NEW_SCRIPT" <<EOF
+#!/bin/bash
+APP_CLASS=$APP_CLASS
+LIB_DIR=lib
+NATIVE_ARGS="--enable-native-access=ALL-UNNAMED --enable-preview"
+CLASSPATH=".:*:lib/*"
+
+echo "Starting \$APP_CLASS ..."
+exec java \$NATIVE_ARGS -cp "\$CLASSPATH" \$APP_CLASS
+EOF
+                chmod +x "$NEW_SCRIPT"
+            else
+                echo "Skipping $FILENAME: APP_CLASS not found"
+            fi
+        fi
+    done
+else
+    echo "Launchers directory not found: $LAUNCHERS_DIR"
 fi
 
-# 4. Copy project jars
-echo "[4/4] Copying project jars..."
-modules=("jscience-core" "jscience-natural" "jscience-social" "jscience-benchmarks" "jscience-featured-apps" "jscience-jni" "jscience-server" "jscience-worker" "jscience-client")
-for mod in "${modules[@]}"; do
-    if ls "$PROJECT_ROOT/$mod/target/"*.jar 1> /dev/null 2>&1; then
-        cp "$PROJECT_ROOT/$mod/target/"*.jar "$LIB_DIR/"
-    fi
-done
-
-# 5. Create Launch Scripts
-echo "[5/4] Creating launch scripts..."
-MAIN_CLASS="org.jscience.ui.JScienceMasterControl"
-
-# run.bat
-cat <<EOF > "$TARGET_DIR/run.bat"
-@echo off
-setlocal
-set "CP=lib\*"
-java -cp "%CP%" $MAIN_CLASS
-endlocal
-EOF
-
-# run.sh
-cat <<EOF > "$TARGET_DIR/run.sh"
-#!/bin/bash
-CP="lib/*"
-java -cp "\$CP" $MAIN_CLASS
-EOF
-chmod +x "$TARGET_DIR/run.sh"
-
-echo "Packaging complete at $TARGET_DIR"
-echo "==========================================="
+echo "Done. Packages available in $TARGET_DIR"
