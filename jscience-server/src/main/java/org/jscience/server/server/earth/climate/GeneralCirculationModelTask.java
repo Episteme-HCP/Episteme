@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.earth.climate;
+package org.jscience.server.server.earth.climate;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
@@ -56,8 +56,8 @@ public class GeneralCirculationModelTask
 
 
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
-    private org.jscience.mathematics.numbers.real.Real[][][] temperatureReal;
-    private org.jscience.mathematics.numbers.real.Real[][] humidityReal;
+    private org.jscience.core.mathematics.numbers.real.Real[][][] temperatureReal;
+    private org.jscience.core.mathematics.numbers.real.Real[][] humidityReal;
 
     public GeneralCirculationModelTask(int latBins, int longBins) {
         this.latBins = latBins;
@@ -128,18 +128,18 @@ public class GeneralCirculationModelTask
     }
 
     private void syncToReal() {
-        temperatureReal = new org.jscience.mathematics.numbers.real.Real[3][latBins][longBins];
-        humidityReal = new org.jscience.mathematics.numbers.real.Real[latBins][longBins];
+        temperatureReal = new org.jscience.core.mathematics.numbers.real.Real[3][latBins][longBins];
+        humidityReal = new org.jscience.core.mathematics.numbers.real.Real[latBins][longBins];
         for (int k = 0; k < 3; k++) {
             for (int i = 0; i < latBins; i++) {
                 for (int j = 0; j < longBins; j++) {
-                    temperatureReal[k][i][j] = org.jscience.mathematics.numbers.real.Real.of(temperature[k][i][j]);
+                    temperatureReal[k][i][j] = org.jscience.core.mathematics.numbers.real.Real.of(temperature[k][i][j]);
                 }
             }
         }
         for (int i = 0; i < latBins; i++) {
             for (int j = 0; j < longBins; j++) {
-                humidityReal[i][j] = org.jscience.mathematics.numbers.real.Real.of(specificHumidity[i][j]);
+                humidityReal[i][j] = org.jscience.core.mathematics.numbers.real.Real.of(specificHumidity[i][j]);
             }
         }
     }
@@ -162,31 +162,31 @@ public class GeneralCirculationModelTask
     public void step(double dt) {
         if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Providers (LBM/NS)
-            org.jscience.technical.backend.algorithms.NavierStokesProvider nsProvider = new org.jscience.technical.backend.algorithms.MulticoreNavierStokesProvider();
+            org.jscience.core.technical.backend.algorithms.NavierStokesProvider nsProvider = new org.jscience.core.technical.backend.algorithms.MulticoreNavierStokesProvider();
 
             // Flatten state for NavierStokesProvider (Real[])
             int size = 3 * latBins * longBins;
-            org.jscience.mathematics.numbers.real.Real[] flatDensity = new org.jscience.mathematics.numbers.real.Real[size];
-            org.jscience.mathematics.numbers.real.Real[] flatU = new org.jscience.mathematics.numbers.real.Real[size];
-            org.jscience.mathematics.numbers.real.Real[] flatV = new org.jscience.mathematics.numbers.real.Real[size];
-            org.jscience.mathematics.numbers.real.Real[] flatW = new org.jscience.mathematics.numbers.real.Real[size];
+            org.jscience.core.mathematics.numbers.real.Real[] flatDensity = new org.jscience.core.mathematics.numbers.real.Real[size];
+            org.jscience.core.mathematics.numbers.real.Real[] flatU = new org.jscience.core.mathematics.numbers.real.Real[size];
+            org.jscience.core.mathematics.numbers.real.Real[] flatV = new org.jscience.core.mathematics.numbers.real.Real[size];
+            org.jscience.core.mathematics.numbers.real.Real[] flatW = new org.jscience.core.mathematics.numbers.real.Real[size];
 
             int idx = 0;
             for (int k = 0; k < 3; k++) {
                 for (int i = 0; i < latBins; i++) {
                     for (int j = 0; j < longBins; j++) {
                         flatDensity[idx] = temperatureReal[k][i][j];
-                        flatU[idx] = org.jscience.mathematics.numbers.real.Real.of(u[k][i][j]);
-                        flatV[idx] = org.jscience.mathematics.numbers.real.Real.of(v[k][i][j]);
-                        flatW[idx] = org.jscience.mathematics.numbers.real.Real.of(w[k][i][j]);
+                        flatU[idx] = org.jscience.core.mathematics.numbers.real.Real.of(u[k][i][j]);
+                        flatV[idx] = org.jscience.core.mathematics.numbers.real.Real.of(v[k][i][j]);
+                        flatW[idx] = org.jscience.core.mathematics.numbers.real.Real.of(w[k][i][j]);
                         idx++;
                     }
                 }
             }
 
             nsProvider.solve(flatDensity, flatU, flatV, flatW,
-                    org.jscience.mathematics.numbers.real.Real.of(dt),
-                    org.jscience.mathematics.numbers.real.Real.of(0.0001),
+                    org.jscience.core.mathematics.numbers.real.Real.of(dt),
+                    org.jscience.core.mathematics.numbers.real.Real.of(0.0001),
                     longBins, latBins, 3);
 
             // Unpack

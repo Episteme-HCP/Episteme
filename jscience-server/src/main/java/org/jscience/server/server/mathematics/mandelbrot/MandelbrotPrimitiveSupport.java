@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.mandelbrot;
+package org.jscience.server.server.mathematics.mandelbrot;
 
 import java.util.stream.IntStream;
 

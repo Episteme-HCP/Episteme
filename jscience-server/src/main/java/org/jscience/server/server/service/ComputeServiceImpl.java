@@ -100,7 +100,7 @@ public class ComputeServiceImpl extends ComputeServiceGrpc.ComputeServiceImplBas
         // Persist Job
         try {
             // Get authenticated user from gRPC context (set by RbacInterceptor)
-            String userId = org.jscience.server.auth.RbacInterceptor.getCurrentUserId();
+            String userId = org.jscience.server.server.auth.RbacInterceptor.getCurrentUserId();
             if (userId == null || userId.isEmpty()) {
                 userId = "anonymous";
             }

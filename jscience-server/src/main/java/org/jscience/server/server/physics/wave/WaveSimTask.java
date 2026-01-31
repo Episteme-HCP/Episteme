@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.physics.wave;
+package org.jscience.server.server.physics.wave;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
@@ -45,8 +45,8 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     private double damping = 0.99;
 
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
-    private org.jscience.mathematics.numbers.real.Real[][] uReal;
-    private org.jscience.mathematics.numbers.real.Real[][] uRealPrev;
+    private org.jscience.core.mathematics.numbers.real.Real[][] uReal;
+    private org.jscience.core.mathematics.numbers.real.Real[][] uRealPrev;
 
     public WaveSimTask(int width, int height) {
         this.width = width;
@@ -68,12 +68,12 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     }
 
     private void syncToReal() {
-        uReal = new org.jscience.mathematics.numbers.real.Real[width][height];
-        uRealPrev = new org.jscience.mathematics.numbers.real.Real[width][height];
+        uReal = new org.jscience.core.mathematics.numbers.real.Real[width][height];
+        uRealPrev = new org.jscience.core.mathematics.numbers.real.Real[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                uReal[x][y] = org.jscience.mathematics.numbers.real.Real.of(u[x][y]);
-                uRealPrev[x][y] = org.jscience.mathematics.numbers.real.Real.of(uPrev[x][y]);
+                uReal[x][y] = org.jscience.core.mathematics.numbers.real.Real.of(u[x][y]);
+                uRealPrev[x][y] = org.jscience.core.mathematics.numbers.real.Real.of(uPrev[x][y]);
             }
         }
     }
@@ -118,10 +118,10 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     public void step() {
         if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Provider
-            org.jscience.technical.backend.algorithms.WaveProvider provider = new org.jscience.technical.backend.algorithms.MulticoreWaveProvider();
+            org.jscience.core.technical.backend.algorithms.WaveProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreWaveProvider();
             provider.solve(uReal, uRealPrev, width, height,
-                    org.jscience.mathematics.numbers.real.Real.of(c),
-                    org.jscience.mathematics.numbers.real.Real.of(damping));
+                    org.jscience.core.mathematics.numbers.real.Real.of(c),
+                    org.jscience.core.mathematics.numbers.real.Real.of(damping));
             syncFromReal();
         } else {
             // Primitive Mode: Use side-by-side Support

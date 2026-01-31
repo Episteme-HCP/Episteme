@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.physics.fluid;
+package org.jscience.server.server.physics.fluid;
 
 /**
  * Native (double-based) implementation of Lattice Boltzmann Method for

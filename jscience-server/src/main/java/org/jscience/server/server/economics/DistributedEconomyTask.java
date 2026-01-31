@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.economics;
+package org.jscience.server.server.economics;
 
 import java.io.Serializable;
 import org.jscience.core.mathematics.numbers.real.Real;

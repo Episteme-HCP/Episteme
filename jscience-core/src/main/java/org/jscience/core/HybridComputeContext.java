@@ -6,7 +6,6 @@
 package org.jscience.core;
 
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import java.util.concurrent.ForkJoinPool;
 import java.nio.DoubleBuffer;
 
 /**

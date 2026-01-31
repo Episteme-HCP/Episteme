@@ -23,12 +23,12 @@
 
 package org.jscience.server;
 
-import org.jscience.server.service.AuthServiceImpl;
+import org.jscience.server.server.service.AuthServiceImpl;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -57,8 +57,8 @@ class AuthServiceIT {
         @BeforeAll
         static void startServer() throws IOException {
                 // Start gRPC server
-                org.jscience.server.repository.UserRepository mockRepo = org.mockito.Mockito
-                                .mock(org.jscience.server.repository.UserRepository.class);
+                org.jscience.server.server.repository.UserRepository mockRepo = org.mockito.Mockito
+                                .mock(org.jscience.server.server.repository.UserRepository.class);
 
                 // Simple stubbing for happy path to avoid runtime NPEs during basic health
                 // checks if any
@@ -260,3 +260,4 @@ class AuthServiceIT {
                 assertFalse(second.getSuccess());
         }
 }
+

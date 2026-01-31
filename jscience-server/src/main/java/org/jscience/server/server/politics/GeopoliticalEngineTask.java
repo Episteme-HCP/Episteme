@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.politics;
+package org.jscience.server.server.politics;
 
 import java.io.Serializable;
 import java.util.ArrayList;

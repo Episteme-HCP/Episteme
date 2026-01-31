@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.physics.nbody;
+package org.jscience.server.server.physics.nbody;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.technical.backend.algorithms.NBodyProvider;
-import org.jscience.technical.backend.algorithms.MulticoreNBodyProvider;
+import org.jscience.core.technical.backend.algorithms.NBodyProvider;
+import org.jscience.core.technical.backend.algorithms.MulticoreNBodyProvider;
 
 public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
 

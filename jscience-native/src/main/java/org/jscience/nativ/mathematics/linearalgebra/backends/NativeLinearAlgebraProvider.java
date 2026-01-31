@@ -5,7 +5,6 @@
 
 package org.jscience.nativ.mathematics.linearalgebra.backends;
 
-import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;

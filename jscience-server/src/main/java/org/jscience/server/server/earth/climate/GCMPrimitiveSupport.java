@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.earth.climate;
+package org.jscience.server.server.earth.climate;
 
 /**
  * Primitive-based support for General Circulation Model (GCM) simulation.

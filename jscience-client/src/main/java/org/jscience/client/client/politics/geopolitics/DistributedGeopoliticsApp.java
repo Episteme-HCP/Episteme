@@ -38,7 +38,7 @@ import org.jscience.server.server.economics.DistributedEconomyTask;
 import org.jscience.social.politics.loaders.WorldBankReader;
 import org.jscience.server.server.politics.GeopoliticalEngineTask;
 import org.jscience.social.politics.loaders.FactbookReader;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 

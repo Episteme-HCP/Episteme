@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.physics.fluid;
+package org.jscience.server.server.physics.fluid;
 
 import java.io.Serializable;
 
@@ -60,24 +60,24 @@ public class LatticeBoltzmann implements Serializable {
     // private static final int[] OPP = { 0, 3, 4, 1, 2, 7, 8, 5, 6 }; // Opposite
     // directions
 
-    private org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider provider;
-    private final org.jscience.mathematics.numbers.real.Real[][][] fReal;
-    private final org.jscience.mathematics.numbers.real.Real omega;
-    private final org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+    private org.jscience.core.technical.backend.algorithms.LatticeBoltzmannProvider provider;
+    private final org.jscience.core.mathematics.numbers.real.Real[][][] fReal;
+    private final org.jscience.core.mathematics.numbers.real.Real omega;
+    private final org.jscience.core.mathematics.numbers.real.Real zero = org.jscience.core.mathematics.numbers.real.Real.ZERO;
 
     public LatticeBoltzmann(int nx, int ny, double viscosity) {
         this.nx = nx;
         this.ny = ny;
         this.tau = 3.0 * viscosity + 0.5;
         this.f = new double[nx][ny][9];
-        this.fReal = new org.jscience.mathematics.numbers.real.Real[nx][ny][9];
+        this.fReal = new org.jscience.core.mathematics.numbers.real.Real[nx][ny][9];
         this.obstacle = new boolean[nx][ny];
-        this.provider = new org.jscience.technical.backend.algorithms.MulticoreLatticeBoltzmannProvider();
-        this.omega = org.jscience.mathematics.numbers.real.Real.of(1.0 / tau);
+        this.provider = new org.jscience.core.technical.backend.algorithms.MulticoreLatticeBoltzmannProvider();
+        this.omega = org.jscience.core.mathematics.numbers.real.Real.of(1.0 / tau);
         initialize();
     }
 
-    public void setProvider(org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider provider) {
+    public void setProvider(org.jscience.core.technical.backend.algorithms.LatticeBoltzmannProvider provider) {
         this.provider = provider;
     }
 
@@ -86,7 +86,7 @@ public class LatticeBoltzmann implements Serializable {
             for (int y = 0; y < ny; y++) {
                 for (int i = 0; i < 9; i++) {
                     f[x][y][i] = W[i];
-                    fReal[x][y][i] = org.jscience.mathematics.numbers.real.Real.of(W[i]);
+                    fReal[x][y][i] = org.jscience.core.mathematics.numbers.real.Real.of(W[i]);
                 }
             }
         }
@@ -119,7 +119,7 @@ public class LatticeBoltzmann implements Serializable {
         double[][] rho = new double[nx][ny];
         for (int x = 0; x < nx; x++) {
             for (int y = 0; y < ny; y++) {
-                org.jscience.mathematics.numbers.real.Real sum = zero;
+                org.jscience.core.mathematics.numbers.real.Real sum = zero;
                 for (int i = 0; i < 9; i++) {
                     sum = sum.add(fReal[x][y][i]);
                 }

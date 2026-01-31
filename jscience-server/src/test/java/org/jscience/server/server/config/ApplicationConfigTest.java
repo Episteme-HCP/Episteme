@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.config;
+package org.jscience.server.server.config;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -264,3 +264,4 @@ class ApplicationConfigTest {
         assertEquals(-1, value, "Should return negative default correctly");
     }
 }
+

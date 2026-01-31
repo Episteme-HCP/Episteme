@@ -39,9 +39,9 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
-import org.jscience.core.physics.classical.mechanics.Particle;
+import org.jscience.natural.physics.classical.mechanics.Particle;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.biology.loaders.PDBReader;
 import org.jscience.natural.biology.loaders.PDBWriter;
@@ -330,7 +330,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
                 TaskRequest request = TaskRequest.newBuilder()
                         .setTaskId("MD-" + stepCount)
                         .setSerializedTask(ByteString.copyFrom(taskData))
-                        .setPriority(org.jscience.server.proto.Priority.HIGH)
+                        .setPriority(org.jscience.server.server.proto.Priority.HIGH)
                         .build();
 
                 TaskResponse response = blockingStub.submitTask(request);
@@ -511,6 +511,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
         return new java.util.ArrayList<>();
     }
 }
+
 
 
 

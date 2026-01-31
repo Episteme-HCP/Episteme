@@ -34,7 +34,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 

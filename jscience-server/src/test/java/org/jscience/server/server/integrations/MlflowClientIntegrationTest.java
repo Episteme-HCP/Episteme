@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.integrations;
+package org.jscience.server.server.integrations;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -177,3 +177,4 @@ class MlflowClientIntegrationTest {
                 });
         }
 }
+

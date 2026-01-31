@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.earth.climate;
+package org.jscience.server.server.earth.climate;

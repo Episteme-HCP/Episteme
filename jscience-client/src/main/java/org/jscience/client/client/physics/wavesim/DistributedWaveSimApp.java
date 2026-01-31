@@ -23,7 +23,7 @@
 
 package org.jscience.client.client.physics.wavesim;
 
-import org.jscience.core.physics.wave.WaveSimTask;
+import org.jscience.server.server.physics.wave.WaveSimTask;
 
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
@@ -40,7 +40,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 
@@ -167,7 +167,7 @@ public class DistributedWaveSimApp extends Application implements org.jscience.c
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("wave-" + stepCount)
                     .setSerializedTask(ByteString.copyFrom(waveData))
-                    .setPriority(org.jscience.server.proto.Priority.HIGH)
+                    .setPriority(org.jscience.server.server.proto.Priority.HIGH)
                     .build();
 
             TaskResponse response = blockingStub.withDeadlineAfter(1, TimeUnit.SECONDS).submitTask(request);
@@ -290,5 +290,6 @@ public class DistributedWaveSimApp extends Application implements org.jscience.c
         return new java.util.ArrayList<>();
     }
 }
+
 
 

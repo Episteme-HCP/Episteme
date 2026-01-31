@@ -40,8 +40,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.core.physics.fluid.LatticeBoltzmann;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.physics.fluid.LatticeBoltzmann;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 import java.io.*;
@@ -146,7 +146,7 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("lbm-" + stepCount)
                     .setSerializedTask(ByteString.copyFrom(fluidData))
-                    .setPriority(org.jscience.server.proto.Priority.CRITICAL)
+                    .setPriority(org.jscience.server.server.proto.Priority.CRITICAL)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
@@ -340,5 +340,6 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
         return new java.util.ArrayList<>();
     }
 }
+
 
 

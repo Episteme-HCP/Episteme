@@ -37,7 +37,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.server.server.biology.genome.CrisprTask;
 import org.jscience.natural.biology.loaders.FASTAReader;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -194,7 +194,7 @@ public class DistributedCrisprApp extends Application implements org.jscience.co
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("CRISPR-" + System.currentTimeMillis())
                     .setSerializedTask(com.google.protobuf.ByteString.copyFrom(serialize(new CrisprTask(sequence))))
-                    .setPriority(org.jscience.server.proto.Priority.HIGH)
+                    .setPriority(org.jscience.server.server.proto.Priority.HIGH)
                     .build();
 
             asyncStub.submitTask(request, new StreamObserver<TaskResponse>() {
@@ -300,6 +300,7 @@ public class DistributedCrisprApp extends Application implements org.jscience.co
         return new java.util.ArrayList<>();
     }
 }
+
 
 
 

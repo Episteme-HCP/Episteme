@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.integrations;
+package org.jscience.server.server.integrations;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,3 +58,4 @@ class MlflowClientTest {
         }
     }
 }
+

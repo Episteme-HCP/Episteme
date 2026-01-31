@@ -9,7 +9,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.distributed.DistributedContext;
-import java.nio.DoubleBuffer;
 
 /**
  * Implementation of Cannon's Algorithm for distributed matrix multiplication.

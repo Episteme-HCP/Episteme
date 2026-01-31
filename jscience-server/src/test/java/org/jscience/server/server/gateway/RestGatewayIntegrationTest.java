@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.gateway;
+package org.jscience.server.server.gateway;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -179,3 +179,4 @@ class RestGatewayIntegrationTest {
         });
     }
 }
+

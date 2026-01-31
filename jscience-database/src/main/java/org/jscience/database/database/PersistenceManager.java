@@ -26,7 +26,6 @@ package org.jscience.database.database;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Id;
 import org.jscience.core.util.persistence.Attribute;
-import org.jscience.core.util.persistence.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

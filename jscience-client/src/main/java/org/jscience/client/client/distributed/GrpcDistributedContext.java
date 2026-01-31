@@ -27,9 +27,9 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.jscience.core.distributed.DistributedContext;
-import org.jscience.server.proto.ComputeServiceGrpc;
-import org.jscience.server.proto.TaskRequest;
-import org.jscience.server.proto.ServerStatus;
+import org.jscience.server.server.proto.ComputeServiceGrpc;
+import org.jscience.server.server.proto.TaskRequest;
+import org.jscience.server.server.proto.ServerStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
@@ -68,19 +68,19 @@ public class GrpcDistributedContext implements DistributedContext {
     @Override
     public <T extends Serializable> Future<T> submit(Callable<T> task, DistributedContext.Priority priority) {
         // Map Priority
-        org.jscience.server.proto.Priority protoPriority;
+        org.jscience.server.server.proto.Priority protoPriority;
         switch (priority) {
             case HIGH:
-                protoPriority = org.jscience.server.proto.Priority.HIGH;
+                protoPriority = org.jscience.server.server.proto.Priority.HIGH;
                 break;
             case CRITICAL:
-                protoPriority = org.jscience.server.proto.Priority.CRITICAL;
+                protoPriority = org.jscience.server.server.proto.Priority.CRITICAL;
                 break;
             case LOW:
-                protoPriority = org.jscience.server.proto.Priority.LOW;
+                protoPriority = org.jscience.server.server.proto.Priority.LOW;
                 break;
             default:
-                protoPriority = org.jscience.server.proto.Priority.NORMAL;
+                protoPriority = org.jscience.server.server.proto.Priority.NORMAL;
         }
 
         // Serialize Task
@@ -153,18 +153,18 @@ public class GrpcDistributedContext implements DistributedContext {
         @SuppressWarnings("unchecked")
         public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             try {
-                org.jscience.server.proto.TaskIdentifier request = org.jscience.server.proto.TaskIdentifier.newBuilder()
+                org.jscience.server.server.proto.TaskIdentifier request = org.jscience.server.server.proto.TaskIdentifier.newBuilder()
                         .setTaskId(taskId)
                         .build();
 
                 // This call might block if the server implementation blocks
-                java.util.Iterator<org.jscience.server.proto.TaskResult> responses = blockingStub
+                java.util.Iterator<org.jscience.server.server.proto.TaskResult> responses = blockingStub
                         .streamResults(request);
 
                 if (responses.hasNext()) {
-                    org.jscience.server.proto.TaskResult resultProto = responses.next();
+                    org.jscience.server.server.proto.TaskResult resultProto = responses.next();
 
-                    if (resultProto.getStatus() == org.jscience.server.proto.Status.FAILED) {
+                    if (resultProto.getStatus() == org.jscience.server.server.proto.Status.FAILED) {
                         throw new ExecutionException(new RuntimeException(resultProto.getErrorMessage()));
                     }
 
@@ -194,7 +194,7 @@ public class GrpcDistributedContext implements DistributedContext {
     @Override
     public int getParallelism() {
         try {
-            ServerStatus status = blockingStub.getStatus(org.jscience.server.proto.Empty.newBuilder().build());
+            ServerStatus status = blockingStub.getStatus(org.jscience.server.server.proto.Empty.newBuilder().build());
             return status.getActiveWorkers();
         } catch (Exception e) {
             return 1; // Fallback
@@ -206,4 +206,5 @@ public class GrpcDistributedContext implements DistributedContext {
         channel.shutdown();
     }
 }
+
 

@@ -42,7 +42,7 @@ import javafx.stage.Stage;
 import org.jscience.server.server.earth.climate.GeneralCirculationModelTask;
 
 import org.jscience.core.mathematics.loaders.VTKWriter;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 import java.io.*;
@@ -149,7 +149,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("gcm-step-" + stepCount)
                     .setSerializedTask(ByteString.copyFrom(serialize(task)))
-                    .setPriority(org.jscience.server.proto.Priority.HIGH)
+                    .setPriority(org.jscience.server.server.proto.Priority.HIGH)
                     .build();
 
             TaskResponse response = blockingStub.withDeadlineAfter(3, TimeUnit.SECONDS).submitTask(request);
@@ -306,6 +306,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
         return new java.util.ArrayList<>();
     }
 }
+
 
 
 

@@ -73,7 +73,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     // Simulation State
     private Timeline simulationTimeline;
-    private org.jscience.mathematics.linearalgebra.Matrix<Real> simulationResults;
+    private org.jscience.core.mathematics.linearalgebra.Matrix<Real> simulationResults;
     private int currentDay = 0;
     private boolean isRunning = false;
 
@@ -380,7 +380,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
         try {
             Real[][] rawResults = PopulationDynamics.seirdModel(initial, beta, sigma, gamma, mu, dt, days);
-            simulationResults = org.jscience.mathematics.linearalgebra.matrices.GenericMatrix.of(rawResults, org.jscience.mathematics.numbers.real.Real.ZERO);
+            simulationResults = org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix.of(rawResults, org.jscience.core.mathematics.numbers.real.Real.ZERO);
             startAnimation(days);
             isRunning = true;
             setStatus(i18n.get("status.running", "Running..."));

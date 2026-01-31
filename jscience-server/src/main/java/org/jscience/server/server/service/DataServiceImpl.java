@@ -26,7 +26,7 @@ package org.jscience.server.server.service;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.jscience.natural.biology.loaders.FASTAReader;
-import org.jscience.core.physics.loaders.VizieRReader;
+import org.jscience.natural.physics.loaders.VizieRReader;
 import org.jscience.server.server.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 /**
  * gRPC Service for Data Lake.
@@ -128,28 +127,44 @@ public class DataServiceImpl extends DataServiceGrpc.DataServiceImplBase {
                     Math.abs(maxDec - minDec) * 60 / 2.0);
 
             // Query VizieR with Hipparcos catalog
-            Map<String, String> result = VizieRReader.queryByCoordinates(
+            List<Map<String, String>> results = VizieRReader.queryByCoordinates(
                     centerRa, centerDec, radiusArcmin, VizieRReader.HIPPARCOS);
 
-            List<StarObject> stars = new ArrayList<>();
-
-            if (result != null && result.containsKey("raw_votable")) {
-                stars = parseVOTableStars(result.get("raw_votable"), minRa, maxRa, minDec, maxDec);
-            }
-
-            if (stars.isEmpty()) {
+            if (results == null || results.isEmpty()) {
                 LOG.warn("No results from VizieR, using fallback star data");
                 streamFallbackStarData(minRa, maxRa, minDec, maxDec, responseObserver);
                 return;
             }
 
-            for (StarObject star : stars) {
-                responseObserver.onNext(star);
-                Thread.sleep(50); // Small delay for streaming
+            for (Map<String, String> row : results) {
+                 try {
+                    // Extract fields. Keys depend on VizieR output but usually contain these substrings.
+                    String starId = row.getOrDefault("HIP", "Star-" + UUID.randomUUID().toString());
+                    
+                    // Helper to parse potential keys
+                    double ra = parseDoubleFromMap(row, "RA", (minRa+maxRa)/2);
+                    double dec = parseDoubleFromMap(row, "DE", (minDec+maxDec)/2);
+                    double mag = parseDoubleFromMap(row, "mag", 5.0);
+
+                    // Filter to requested region (VizieR might return stars slightly outside due to cone search)
+                    if (ra >= minRa && ra <= maxRa && dec >= minDec && dec <= maxDec) {
+                         StarObject star = StarObject.newBuilder()
+                                .setStarId(starId)
+                                .setRa(ra)
+                                .setDec(dec)
+                                .setMagnitude(mag)
+                                .setType("G2V") // Placeholder or extract "SpType"
+                                .build();
+                        responseObserver.onNext(star);
+                        Thread.sleep(10); // Small delay
+                    }
+                } catch (Exception e) {
+                    // Skip malformed row
+                }
             }
 
             responseObserver.onCompleted();
-            LOG.info("Star catalog query completed, returned {} stars", stars.size());
+            LOG.info("Star catalog query completed, returned {} stars", results.size());
 
         } catch (Exception e) {
             LOG.error("Error querying star catalog, falling back to simulated data", e);
@@ -221,65 +236,20 @@ public class DataServiceImpl extends DataServiceGrpc.DataServiceImplBase {
     /**
      * Parses VOTable XML to extract star objects.
      */
-    private List<StarObject> parseVOTableStars(String votable, double minRa, double maxRa,
-            double minDec, double maxDec) {
-        List<StarObject> stars = new ArrayList<>();
-
-        // Simple parsing - look for TABLEDATA entries
-        // Format varies but typically has RA, DEC, Vmag columns
-        Pattern rowPattern = Pattern.compile("<TR>(.*?)</TR>", Pattern.DOTALL);
-        Pattern cellPattern = Pattern.compile("<TD>(.*?)</TD>");
-
-        Matcher rowMatcher = rowPattern.matcher(votable);
-        int count = 0;
-
-        while (rowMatcher.find() && count < 50) {
-            String row = rowMatcher.group(1);
-            Matcher cellMatcher = cellPattern.matcher(row);
-
-            List<String> cells = new ArrayList<>();
-            while (cellMatcher.find()) {
-                cells.add(cellMatcher.group(1).trim());
-            }
-
-            if (cells.size() >= 3) {
+    private double parseDoubleFromMap(Map<String, String> row, String keyPart, double defaultValue) {
+        for (Map.Entry<String, String> entry : row.entrySet()) {
+            if (entry.getKey().toLowerCase().contains(keyPart.toLowerCase())) {
                 try {
-                    // Typically: HIP, RA, DEC, Vmag, ...
-                    String starId = cells.size() > 0 ? "HIP " + cells.get(0) : "Star-" + count;
-                    double ra = parseDouble(cells.get(1), (minRa + maxRa) / 2);
-                    double dec = parseDouble(cells.get(2), (minDec + maxDec) / 2);
-                    double mag = cells.size() > 3 ? parseDouble(cells.get(3), 5.0) : 5.0;
-
-                    // Filter to requested region
-                    if (ra >= minRa && ra <= maxRa && dec >= minDec && dec <= maxDec) {
-                        String spectralType = cells.size() > 4 ? cells.get(4) : "G2V";
-
-                        StarObject star = StarObject.newBuilder()
-                                .setStarId(starId)
-                                .setRa(ra)
-                                .setDec(dec)
-                                .setMagnitude(mag)
-                                .setType(spectralType)
-                                .build();
-                        stars.add(star);
-                        count++;
-                    }
-                } catch (Exception e) {
-                    // Skip malformed row
+                    return Double.parseDouble(entry.getValue());
+                } catch (NumberFormatException e) {
+                    // Continue to next key
                 }
             }
         }
-
-        return stars;
+        return defaultValue;
     }
 
-    private double parseDouble(String s, double defaultValue) {
-        try {
-            return Double.parseDouble(s);
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
+
 
     /**
      * Streams fallback genome data when real data is unavailable.

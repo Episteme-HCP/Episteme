@@ -29,7 +29,7 @@ import io.grpc.ManagedChannelBuilder;
 import org.jscience.core.distributed.ComputationException;
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
 import java.io.*;
 import java.util.Optional;

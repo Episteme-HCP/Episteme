@@ -26,7 +26,7 @@ package org.jscience.client.client.technical.backend.math;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;

@@ -47,7 +47,7 @@ import javafx.stage.Stage;
 import org.jscience.core.ui.ThemeManager;
 import org.jscience.server.server.biology.structure.ProteinFoldingTask;
 import org.jscience.server.server.biology.structure.ProteinFoldingTask.Monomer;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
 import java.io.*;
 import java.util.List;

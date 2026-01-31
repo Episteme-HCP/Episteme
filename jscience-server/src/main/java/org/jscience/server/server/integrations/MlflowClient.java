@@ -60,7 +60,7 @@ public class MlflowClient {
      * Creates a new MLflow client using configuration from ApplicationConfig.
      */
     public MlflowClient() {
-        org.jscience.server.config.ApplicationConfig config = org.jscience.server.config.ApplicationConfig
+        org.jscience.server.server.config.ApplicationConfig config = org.jscience.server.server.config.ApplicationConfig
                 .getInstance();
         String uri = config.getMlflowUri();
         this.trackingUri = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;

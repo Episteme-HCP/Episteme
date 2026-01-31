@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.montecarlo;
+package org.jscience.server.server.mathematics.montecarlo;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
@@ -84,7 +84,7 @@ public class MonteCarloPiTask implements DistributedTask<Long, Long> {
 
         if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Provider
-            org.jscience.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
+            org.jscience.core.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
             return provider.countPointsInside(samples);
         } else {
             // Primitive Mode: Use side-by-side Support

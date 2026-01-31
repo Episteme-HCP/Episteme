@@ -23,8 +23,8 @@
 
 package org.jscience.client.client.mathematics.mandelbrot;
 
-import org.jscience.core.mathematics.mandelbrot.MandelbrotTask;
-import org.jscience.core.mathematics.mandelbrot.RealMandelbrotTask;
+import org.jscience.server.server.mathematics.mandelbrot.MandelbrotTask;
+import org.jscience.server.server.mathematics.mandelbrot.RealMandelbrotTask;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 import com.google.protobuf.ByteString;
@@ -45,7 +45,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 import java.io.*;
@@ -205,7 +205,7 @@ public class DistributedMandelbrotApp extends Application implements org.jscienc
                     .setTaskId(taskId)
                     .setTaskType(type)
                     .setSerializedTask(ByteString.copyFrom(taskData))
-                    .setPriority(org.jscience.server.proto.Priority.CRITICAL)
+                    .setPriority(org.jscience.server.server.proto.Priority.CRITICAL)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
@@ -527,5 +527,6 @@ public class DistributedMandelbrotApp extends Application implements org.jscienc
         return new java.util.ArrayList<>();
     }
 }
+
 
 

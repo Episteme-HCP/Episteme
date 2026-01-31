@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.politics;
+package org.jscience.server.server.politics;

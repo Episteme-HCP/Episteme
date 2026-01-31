@@ -37,7 +37,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.core.ui.ThemeManager;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -136,7 +136,7 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         footer.getStyleClass().add("status-bar");
         statusLabel = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.status.connecting", "Connecting..."));
         statusLabel.setTextFill(
-                org.jscience.server.proto.Status.UNKNOWN.name().equals("UNKNOWN") ? Color.valueOf("#4ecca3")
+                org.jscience.server.server.proto.Status.UNKNOWN.name().equals("UNKNOWN") ? Color.valueOf("#4ecca3")
                         : Color.valueOf("#e94560"));
         footer.getChildren().add(statusLabel);
         return footer;
@@ -233,5 +233,6 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
         return new java.util.ArrayList<>();
     }
 }
+
 
 

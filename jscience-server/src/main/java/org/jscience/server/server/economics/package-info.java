@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.economics;
+package org.jscience.server.server.economics;

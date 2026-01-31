@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.physics.nbody;
+package org.jscience.server.server.physics.nbody;

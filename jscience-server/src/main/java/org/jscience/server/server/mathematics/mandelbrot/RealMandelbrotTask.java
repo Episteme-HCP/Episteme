@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.mandelbrot;
+package org.jscience.server.server.mathematics.mandelbrot;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.context.MathContext;
@@ -93,7 +93,7 @@ public class RealMandelbrotTask extends MandelbrotTask {
         MathContext mc = MathContext.exact().withJavaMathContext(jmc);
 
         mc.compute(() -> {
-            org.jscience.technical.backend.algorithms.MandelbrotProvider provider = new org.jscience.technical.backend.algorithms.MulticoreMandelbrotProvider();
+            org.jscience.core.technical.backend.algorithms.MandelbrotProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreMandelbrotProvider();
 
             this.result = provider.computeReal(rXMin, rXMax, rYMin, rYMax, width, height, maxIterations);
             return null;

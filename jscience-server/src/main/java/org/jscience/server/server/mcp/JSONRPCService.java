@@ -175,7 +175,6 @@ public class JSONRPCService {
     }
 
     private String executeGetConstant(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
-        String category = args.has("category") ? args.get("category").asText() : "UNKNOWN";
         String name = args.get("name").asText().toUpperCase();
         
         String value = "Unknown constant";

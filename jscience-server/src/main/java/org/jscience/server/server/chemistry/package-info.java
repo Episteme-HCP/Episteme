@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.chemistry;
+package org.jscience.server.server.chemistry;

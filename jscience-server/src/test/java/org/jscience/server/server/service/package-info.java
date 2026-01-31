@@ -22,10 +22,11 @@
  */
 
 /**
- * Core functionality for the org package in the JScience library.
+ * Core functionality for the org.jscience.server.server.service package in the JScience library.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-package org;
+package org.jscience.server.server.service;
+

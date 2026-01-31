@@ -23,7 +23,7 @@
 
 package org.jscience.jni.jni.devices;
 
-import org.jscience.core.device.sensors.Spectrometer;
+import org.jscience.natural.device.sensors.Spectrometer;
 
 import org.jscience.jni.jni.NativeDeviceBridge;
 import org.jscience.core.mathematics.numbers.real.Real;

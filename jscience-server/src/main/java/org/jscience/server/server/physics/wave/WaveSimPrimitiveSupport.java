@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.physics.wave;
+package org.jscience.server.server.physics.wave;
 
 import java.util.stream.IntStream;
 

@@ -37,7 +37,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 /**
@@ -287,9 +287,9 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
                     .setPayload(data)
                     .build();
 
-            asyncStub.publishEvent(event, new StreamObserver<org.jscience.server.proto.PublishAck>() {
+            asyncStub.publishEvent(event, new StreamObserver<org.jscience.server.server.proto.PublishAck>() {
                 @Override
-                public void onNext(org.jscience.server.proto.PublishAck value) {
+                public void onNext(org.jscience.server.server.proto.PublishAck value) {
                 }
 
                 @Override
@@ -359,5 +359,6 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
         return new java.util.ArrayList<>();
     }
 }
+
 
 

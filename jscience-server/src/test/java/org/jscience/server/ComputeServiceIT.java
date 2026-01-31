@@ -24,12 +24,12 @@
 package org.jscience.server;
 
 import com.google.protobuf.ByteString;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
-import org.jscience.server.proto.Status;
-import org.jscience.server.proto.Priority;
-import org.jscience.server.proto.TaskRequest;
-import org.jscience.server.proto.TaskResponse;
+import org.jscience.server.server.proto.Status;
+import org.jscience.server.server.proto.Priority;
+import org.jscience.server.server.proto.TaskRequest;
+import org.jscience.server.server.proto.TaskResponse;
 
 import org.junit.jupiter.api.*;
 
@@ -49,17 +49,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ComputeServiceIT {
     private static io.grpc.Server grpcServer;
     private static io.grpc.ManagedChannel channel;
-    private static org.jscience.server.proto.ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
+    private static org.jscience.server.server.proto.ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
     private static final int TEST_PORT = 50099;
 
     @BeforeAll
     static void startServer() throws IOException {
         // Mock Repository
-        org.jscience.server.repository.JobRepository mockRepo = org.mockito.Mockito
-                .mock(org.jscience.server.repository.JobRepository.class);
+        org.jscience.server.server.repository.JobRepository mockRepo = org.mockito.Mockito
+                .mock(org.jscience.server.server.repository.JobRepository.class);
 
         // Start gRPC server with service instance
-        org.jscience.server.service.ComputeServiceImpl service = new org.jscience.server.service.ComputeServiceImpl(
+        org.jscience.server.server.service.ComputeServiceImpl service = new org.jscience.server.server.service.ComputeServiceImpl(
                 mockRepo);
 
         grpcServer = io.grpc.ServerBuilder.forPort(TEST_PORT)
@@ -72,7 +72,7 @@ public class ComputeServiceIT {
                 .usePlaintext()
                 .build();
 
-        blockingStub = org.jscience.server.proto.ComputeServiceGrpc.newBlockingStub(channel);
+        blockingStub = org.jscience.server.server.proto.ComputeServiceGrpc.newBlockingStub(channel);
     }
 
     @AfterAll
@@ -201,7 +201,7 @@ public class ComputeServiceIT {
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("concurrent-task-" + i + "-" + System.currentTimeMillis())
                     .setSerializedTask(ByteString.copyFromUtf8("BATCH_TASK_" + i))
-                    .setPriority(org.jscience.server.proto.Priority.NORMAL)
+                    .setPriority(org.jscience.server.server.proto.Priority.NORMAL)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
@@ -211,3 +211,4 @@ public class ComputeServiceIT {
         }
     }
 }
+

@@ -42,11 +42,11 @@ import javafx.scene.paint.Stop;
 import javafx.scene.paint.CycleMethod;
 import javafx.stage.Stage;
 
-import org.jscience.core.physics.classical.mechanics.NBodySimulation;
-import org.jscience.core.physics.classical.mechanics.Particle;
+import org.jscience.natural.physics.classical.mechanics.NBodySimulation;
+import org.jscience.natural.physics.classical.mechanics.Particle;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.physics.PhysicalConstants;
-import org.jscience.server.proto.*;
+import org.jscience.natural.physics.PhysicalConstants;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 import java.io.*;
@@ -179,7 +179,7 @@ public class DistributedNBodyApp extends Application implements org.jscience.cor
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("nbody-step-" + stepCount)
                     .setSerializedTask(ByteString.copyFrom(particleData))
-                    .setPriority(org.jscience.server.proto.Priority.HIGH)
+                    .setPriority(org.jscience.server.server.proto.Priority.HIGH)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
@@ -461,5 +461,6 @@ public class DistributedNBodyApp extends Application implements org.jscience.cor
         return new java.util.ArrayList<>();
     }
 }
+
 
 

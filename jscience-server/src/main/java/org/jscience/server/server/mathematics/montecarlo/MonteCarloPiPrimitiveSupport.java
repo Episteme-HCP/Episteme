@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.montecarlo;
+package org.jscience.server.server.mathematics.montecarlo;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.LongStream;

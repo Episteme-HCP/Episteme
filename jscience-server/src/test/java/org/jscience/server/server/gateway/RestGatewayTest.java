@@ -21,16 +21,16 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.gateway;
+package org.jscience.server.server.gateway;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.jscience.server.proto.Empty;
-import org.jscience.server.proto.ServerStatus;
+import org.jscience.server.server.proto.Empty;
+import org.jscience.server.server.proto.ServerStatus;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.jscience.server.proto.ComputeServiceGrpc;
+import org.jscience.server.server.proto.ComputeServiceGrpc;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,3 +73,5 @@ class RestGatewayTest {
         assertEquals(10, body.get("queuedTasks").asInt());
     }
 }
+
+

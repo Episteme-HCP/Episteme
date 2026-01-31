@@ -37,7 +37,7 @@ import javafx.stage.Stage;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import com.google.protobuf.ByteString;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
 import java.io.*;
@@ -214,7 +214,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
                 TaskRequest request = TaskRequest.newBuilder()
                         .setTaskId(taskId)
                         .setSerializedTask(ByteString.copyFrom(taskData))
-                        .setPriority(org.jscience.server.proto.Priority.HIGH)
+                        .setPriority(org.jscience.server.server.proto.Priority.HIGH)
                         .setTimestamp(System.currentTimeMillis())
                         .build();
 
@@ -245,7 +245,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
     private byte[] serializeSamplingTask(long numSamples) throws IOException {
         // Use proper object serialization of the Task
-        org.jscience.core.mathematics.montecarlo.MonteCarloPiTask task = new org.jscience.core.mathematics.montecarlo.MonteCarloPiTask(
+        org.jscience.server.server.mathematics.montecarlo.MonteCarloPiTask task = new org.jscience.server.server.mathematics.montecarlo.MonteCarloPiTask(
                 numSamples);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -402,5 +402,6 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
         return new java.util.ArrayList<>();
     }
 }
+
 
 

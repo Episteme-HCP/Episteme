@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.mandelbrot;
+package org.jscience.server.server.mathematics.mandelbrot;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskProvider;

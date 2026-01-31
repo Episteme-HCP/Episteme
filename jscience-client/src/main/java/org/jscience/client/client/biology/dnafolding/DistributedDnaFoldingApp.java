@@ -50,7 +50,7 @@ import org.jscience.natural.chemistry.PeriodicTable;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -186,7 +186,7 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("dna-fold-" + stepCount)
                     .setSerializedTask(ByteString.copyFrom(foldingData))
-                    .setPriority(org.jscience.server.proto.Priority.HIGH)
+                    .setPriority(org.jscience.server.server.proto.Priority.HIGH)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
@@ -332,6 +332,7 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
         return new java.util.ArrayList<>();
     }
 }
+
 
 
 

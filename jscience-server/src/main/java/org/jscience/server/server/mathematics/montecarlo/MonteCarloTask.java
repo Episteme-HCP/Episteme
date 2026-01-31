@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.montecarlo;
+package org.jscience.server.server.mathematics.montecarlo;
 
 import org.jscience.core.distributed.DistributedTask;
 

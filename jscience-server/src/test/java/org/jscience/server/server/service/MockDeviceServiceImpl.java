@@ -21,10 +21,10 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.service;
+package org.jscience.server.server.service;
 
 import io.grpc.stub.StreamObserver;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 
 import java.util.UUID;
 
@@ -100,3 +100,4 @@ public class MockDeviceServiceImpl extends DeviceServiceGrpc.DeviceServiceImplBa
         }).start();
     }
 }
+
