@@ -25,7 +25,7 @@ package org.jscience.economics;
 
 import java.io.Serializable;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.distributed.TaskRegistry;
+import org.jscience.core.distributed.TaskRegistry;
 
 
 /**

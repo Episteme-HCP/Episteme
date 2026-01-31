@@ -23,8 +23,8 @@
 
 package org.jscience.mathematics.mandelbrot;
 
-import org.jscience.distributed.DistributedTask;
-import org.jscience.distributed.TaskRegistry;
+import org.jscience.core.distributed.DistributedTask;
+import org.jscience.core.distributed.TaskRegistry;
 
 public class MandelbrotTask implements DistributedTask<MandelbrotTask, MandelbrotTask> {
 

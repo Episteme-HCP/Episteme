@@ -23,8 +23,8 @@
 
 package org.jscience.earth.climate;
 
-import org.jscience.distributed.DistributedTask;
-import org.jscience.distributed.TaskRegistry;
+import org.jscience.core.distributed.DistributedTask;
+import org.jscience.core.distributed.TaskRegistry;
 
 /**
  * Advanced General Circulation Model (GCM) Task.

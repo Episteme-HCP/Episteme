@@ -23,7 +23,7 @@
 
 package org.jscience.mathematics.montecarlo;
 
-import org.jscience.distributed.DistributedTask;
+import org.jscience.core.distributed.DistributedTask;
 
 import java.util.Random;
 

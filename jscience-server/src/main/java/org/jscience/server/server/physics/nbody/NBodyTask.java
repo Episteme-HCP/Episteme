@@ -23,8 +23,8 @@
 
 package org.jscience.physics.nbody;
 
-import org.jscience.distributed.DistributedTask;
-import org.jscience.distributed.TaskRegistry;
+import org.jscience.core.distributed.DistributedTask;
+import org.jscience.core.distributed.TaskRegistry;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

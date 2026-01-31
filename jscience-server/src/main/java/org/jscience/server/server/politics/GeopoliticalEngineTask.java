@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.distributed.TaskRegistry;
+import org.jscience.core.distributed.TaskRegistry;
 
 
 /**
