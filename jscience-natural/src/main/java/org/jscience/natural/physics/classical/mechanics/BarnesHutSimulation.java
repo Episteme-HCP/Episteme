@@ -1,0 +1,194 @@
+﻿/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.jscience.natural.physics.classical.mechanics;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.natural.physics.PhysicalConstants;
+import org.jscience.core.mathematics.structures.SpatialOctree;
+
+/**
+ * Barnes-Hut N-body gravitational simulation (O(N log N)).
+ * 
+ * <p>
+ * References:
+ * <ul>
+ * <li>Barnes, J., & Hut, P. (1986). A hierarchical O(N log N) force-calculation
+ * algorithm. Nature, 324(6096), 446-449.</li>
+ * </ul>
+ * </p>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class BarnesHutSimulation {
+
+    private final List<Particle> particles = new ArrayList<>();
+    private Real G = PhysicalConstants.G;
+    private Real theta = Real.of(0.5);
+    private Real softening = Real.of(0.01);
+    private SpatialOctree<Particle> tree;
+
+    public BarnesHutSimulation() {
+    }
+
+    public BarnesHutSimulation(Real G, Real theta) {
+        this.G = G;
+        this.theta = theta;
+    }
+
+    public void addParticle(Particle p) {
+        particles.add(p);
+    }
+
+    public List<Particle> getParticles() {
+        return particles;
+    }
+
+    public void setTheta(Real t) {
+        theta = t;
+    }
+
+    public void setSoftening(Real s) {
+        softening = s;
+    }
+
+    public void buildTree() {
+        if (particles.isEmpty())
+            return;
+
+        // Find bounds
+        Particle p0 = particles.get(0);
+        Real minX = Real.of(p0.getX()), minY = Real.of(p0.getY()), minZ = Real.of(p0.getZ());
+        Real maxX = minX, maxY = minY, maxZ = minZ;
+
+        for (Particle p : particles) {
+
+            Real x = Real.of(p.getX());
+            Real y = Real.of(p.getY());
+            Real z = Real.of(p.getZ());
+            if (x.compareTo(minX) < 0)
+                minX = x;
+            if (y.compareTo(minY) < 0)
+                minY = y;
+            if (z.compareTo(minZ) < 0)
+                minZ = z;
+            if (x.compareTo(maxX) > 0)
+                maxX = x;
+            if (y.compareTo(maxY) > 0)
+                maxY = y;
+            if (z.compareTo(maxZ) > 0)
+                maxZ = z;
+        }
+
+        Real size = Real.ZERO;
+        size = size.max(maxX.subtract(minX));
+        size = size.max(maxY.subtract(minY));
+        size = size.max(maxZ.subtract(minZ));
+
+        Real cx = maxX.add(minX).divide(Real.TWO);
+        Real cy = maxY.add(minY).divide(Real.TWO);
+        Real cz = maxZ.add(minZ).divide(Real.TWO);
+
+        tree = new SpatialOctree<>(cx, cy, cz, size.multiply(Real.of(1.1)));
+        for (Particle p : particles)
+            tree.insert(p);
+        tree.computeCenterOfMass();
+    }
+
+    public void computeForces() {
+        buildTree();
+        for (Particle p : particles) {
+            p.setAcceleration(Real.ZERO, Real.ZERO, Real.ZERO);
+            if (tree != null)
+                computeForce(p, tree.getRoot());
+        }
+    }
+
+    private void computeForce(Particle p, SpatialOctree.Node<Particle> node) {
+        if (node.mass.equals(Real.ZERO) || node.object == p)
+            return;
+
+        Real dx = node.comX.subtract(Real.of(p.getX()));
+        Real dy = node.comY.subtract(Real.of(p.getY()));
+        Real dz = node.comZ.subtract(Real.of(p.getZ()));
+
+        Real r2 = dx.pow(2).add(dy.pow(2)).add(dz.pow(2)).add(softening.pow(2));
+        Real r = r2.sqrt();
+
+        // theta check: s / r < theta
+        if (node.isLeaf() || (node.size.divide(r).compareTo(theta) < 0)) {
+            Real r3 = r2.multiply(r);
+            Real factor = G.multiply(node.mass).divide(r3);
+
+            // acc += factor * d
+            // But Vector is likely immutable or we need helper.
+            // Let's create vector from d
+            // Or use getAcceleration().add(...)
+            // However, p.getAcceleration is already a Vector.
+            // We need to construct vector (factor*dx, factor*dy, factor*dz)
+
+            // Assuming we use setAcceleration:
+            Real ax = p.getAcceleration().get(0).add(factor.multiply(dx));
+            Real ay = p.getAcceleration().get(1).add(factor.multiply(dy));
+            Real az = (p.getAcceleration().dimension() > 2 ? p.getAcceleration().get(2) : Real.ZERO)
+                    .add(factor.multiply(dz));
+
+            p.setAcceleration(ax, ay, az);
+        } else {
+            for (SpatialOctree.Node<Particle> c : node.children)
+                if (c != null)
+                    computeForce(p, c);
+        }
+    }
+
+    public void step(Real dt) {
+        for (Particle p : particles) {
+            Vector<Real> v = p.getVelocity();
+            Vector<Real> a = p.getAcceleration();
+            p.setVelocity(v.add(a.multiply(dt.multiply(Real.of(0.5)))));
+        }
+        for (Particle p : particles)
+            p.updatePosition(dt);
+        computeForces();
+        for (Particle p : particles) {
+            Vector<Real> v = p.getVelocity();
+            Vector<Real> a = p.getAcceleration();
+            p.setVelocity(v.add(a.multiply(dt.multiply(Real.of(0.5)))));
+        }
+    }
+
+    public void run(Real dt, int steps) {
+        computeForces();
+        for (int i = 0; i < steps; i++)
+            step(dt);
+    }
+
+}
+
+

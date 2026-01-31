@@ -1,5 +1,5 @@
 /*
- * �R���� : ��?��̈ʒu��\���C���^�[�t�F�[�X
+ * �R���� : ��?��̈ʒu��\���C���^�[�t�F�[�X
  *
  * Copyright 2000 by Information-technology Promotion Agency, Japan
  * Copyright 2000 by Precision Modeling Laboratory, Inc., Tokyo, Japan
@@ -11,7 +11,7 @@ package org.jscience.mathematics.geometry;
 
 /**
  * �R���� :
- * ��?��̈ʒu��\���C���^�[�t�F�[�X�B
+ * ��?��̈ʒu��\���C���^�[�t�F�[�X�B
  *
  * @author Information-technology Promotion Agency, Japan
  * @version $Revision: 1.2 $, $Date: 2007-10-23 18:19:44 $

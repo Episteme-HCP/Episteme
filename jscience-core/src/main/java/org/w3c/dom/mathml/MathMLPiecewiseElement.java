@@ -66,7 +66,7 @@ public interface MathMLPiecewiseElement extends MathMLContentElement {
     /**
  * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index   DOCUMENT ME!
+     * @param index   the index of the case to set.
      * @param newCase the value to set
      * @return the requested attribute or element
      * @throws DOMException if an error occurs
@@ -94,7 +94,7 @@ public interface MathMLPiecewiseElement extends MathMLContentElement {
     /**
  * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index   DOCUMENT ME!
+     * @param index   the index of the case to insert before.
      * @param newCase the value to set
      * @return the requested attribute or element
      * @throws DOMException if an error occurs
@@ -136,7 +136,7 @@ public interface MathMLPiecewiseElement extends MathMLContentElement {
     /**
  * This interface represents the MathML MathMLPiecewiseElement element.
      *
-     * @param index     DOCUMENT ME!
+     * @param index     the index of the case condition to set.
      * @param condition the value to set
      * @return the requested attribute or element
      * @throws DOMException if an error occurs

@@ -25,15 +25,15 @@ package org.jscience.social;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.jscience.history.CounterfactualHistoryRunner;
-import org.jscience.history.CounterfactualSimulator;
-import org.jscience.history.time.FuzzyTimePoint;
-import org.jscience.politics.VotingMethod;
-import org.jscience.sociology.Group;
-import org.jscience.sociology.GroupKind;
-import org.jscience.sociology.Person;
-import org.jscience.sociology.Society;
-import org.jscience.biology.BiologicalSex;
+import org.jscience.social.history.CounterfactualHistoryRunner;
+import org.jscience.social.history.CounterfactualSimulator;
+import org.jscience.social.history.time.FuzzyTimePoint;
+import org.jscience.social.politics.VotingMethod;
+import org.jscience.social.sociology.Group;
+import org.jscience.social.sociology.GroupKind;
+import org.jscience.social.sociology.Person;
+import org.jscience.social.sociology.Society;
+import org.jscience.natural.biology.BiologicalSex;
 import java.util.Arrays;
 import java.util.List;
 

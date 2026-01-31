@@ -28,15 +28,15 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import org.jscience.server.proto.*;
 
-import org.jscience.mathematics.linearalgebra.Matrix;
-import org.jscience.mathematics.linearalgebra.Vector;
-import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.structures.rings.Field;
-import org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider;
-import org.jscience.technical.backend.ExecutionContext;
-import org.jscience.technical.backend.Operation;
+import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.structures.rings.Field;
+import org.jscience.core.mathematics.linearalgebra.backends.LinearAlgebraProvider;
+import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.Operation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -418,3 +418,4 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         }
     }
 }
+

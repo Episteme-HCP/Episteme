@@ -34,12 +34,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.economics.DistributedEconomyTask;
-import org.jscience.politics.loaders.WorldBankReader;
-import org.jscience.politics.GeopoliticalEngineTask;
-import org.jscience.politics.loaders.FactbookReader;
+import org.jscience.social.economics.DistributedEconomyTask;
+import org.jscience.social.politics.loaders.WorldBankReader;
+import org.jscience.social.politics.GeopoliticalEngineTask;
+import org.jscience.social.politics.loaders.FactbookReader;
 import org.jscience.server.proto.*;
-import org.jscience.ui.ThemeManager;
+import org.jscience.core.ui.ThemeManager;
 
 
 import java.io.*;
@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
  * Distributed Social Simulation App (Economics & Politics).
@@ -56,7 +56,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributedGeopoliticsApp extends Application implements org.jscience.ui.App {
+public class DistributedGeopoliticsApp extends Application implements org.jscience.core.ui.App {
 
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
@@ -71,7 +71,7 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.title", "📉 JScience Social Grid - Global Economics & Politics"));
+        stage.setTitle(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.title", "ðŸ“‰ JScience Social Grid - Global Economics & Politics"));
 
         // Fetch real data (blocking for simplicity in start)
         double gdp = 23000000000000.0; // Fallback
@@ -97,9 +97,9 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
         List<GeopoliticalEngineTask.NationState> nations = new ArrayList<>();
         // Load nations from FactbookReader
         FactbookReader loader = new FactbookReader();
-        List<org.jscience.politics.Country> countries = loader.getMiniCatalog().getAll().get(0);
+        List<org.jscience.social.politics.Country> countries = loader.getMiniCatalog().getAll().get(0);
 
-        for (org.jscience.politics.Country c : countries) {
+        for (org.jscience.social.politics.Country c : countries) {
             double stability = 0.5;
             if (c.getGovernmentType() != null && c.getGovernmentType().toLowerCase().contains("republic")) {
                 stability = 0.8;
@@ -113,10 +113,10 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
         politicsTask = new GeopoliticalEngineTask(nations);
 
         console = new ListView<>();
-        economyLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.economy_label", "GDP: -- | Inflation: --"));
+        economyLabel = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.economy_label", "GDP: -- | Inflation: --"));
         economyLabel.getStyleClass().add("header-label");
 
-        Button exportBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.btn.export", "📄 Export Report"));
+        Button exportBtn = new Button(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.btn.export", "ðŸ“„ Export Report"));
         exportBtn.setOnAction(e -> exportReport(stage));
 
         VBox root = new VBox(10, economyLabel, console, exportBtn);
@@ -187,18 +187,18 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
 
                 Platform.runLater(this::updateUI);
             } catch (Exception e) {
-                Platform.runLater(() -> console.getItems().add(0, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.grid_error", "Grid Error: {0}", e.getMessage())));
+                Platform.runLater(() -> console.getItems().add(0, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.grid_error", "Grid Error: {0}", e.getMessage())));
             }
         }).start();
     }
 
     private void updateUI() {
-        economyLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.format", "GDP: $%.2fT | Inflation: %.2f%%"),
+        economyLabel.setText(String.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.format", "GDP: $%.2fT | Inflation: %.2f%%"),
                 economyTask.getGDP().doubleValue() / 1e12,
                 economyTask.getInflation().doubleValue() * 100));
 
         for (GeopoliticalEngineTask.NationState n : politicsTask.getNations()) {
-            console.getItems().add(0, String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.nation_format", "[%d] %s: Stability=%.2f, Military=%.0f"),
+            console.getItems().add(0, String.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.nation_format", "[%d] %s: Stability=%.2f, Military=%.0f"),
                     step, n.name, n.stability, n.militaryPower));
         }
         if (console.getItems().size() > 50)
@@ -206,16 +206,16 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
     }
 
     private void exportReport(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.export_report", "Export Report"), org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.csv", "CSV Files"), "*.csv");
+        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.export_report", "Export Report"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.csv", "CSV Files"), "*.csv");
         if (file != null) {
             try (PrintWriter pw = new PrintWriter(file)) {
                 pw.println("Step,Metric,Value");
                 pw.println(step + ",GDP," + economyTask.getGDP());
                 pw.println(step + ",Inflation," + economyTask.getInflation());
                 pw.println(step + ",ActiveNations," + politicsTask.getNations().size());
-                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.alert.report_saved", "Report saved")).show();
+                new Alert(Alert.AlertType.INFORMATION, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.alert.report_saved", "Report saved")).show();
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.alert.export_failed", "Export failed")).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.alert.export_failed", "Export failed")).show();
             }
         }
     }
@@ -248,16 +248,16 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.politics", "Politics"); }
+    public String getCategory() { return org.jscience.core.ui.i18n.I18N.getInstance().get("category.politics", "Politics"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.name", "Distributed Geopolitics App"); }
+    public String getName() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.name", "Distributed Geopolitics App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.desc", "Distributed social simulation for global economics and geopolitics."); }
+    public String getDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.desc", "Distributed social simulation for global economics and geopolitics."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.longdesc", "Simulate complex world systems by coupling economic indicators (GDP, Inflation) with geopolitical stability and military power across nations. Uses the JScience cluster for intensive social dynamics forecasting."); }
+    public String getLongDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.longdesc", "Simulate complex world systems by coupling economic indicators (GDP, Inflation) with geopolitical stability and military power across nations. Uses the JScience cluster for intensive social dynamics forecasting."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {
@@ -269,8 +269,10 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
     }
 
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+    public java.util.List<org.jscience.core.ui.Parameter<?>> getViewerParameters() {
         return new java.util.ArrayList<>();
     }
 }
+
+
 

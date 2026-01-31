@@ -26,13 +26,13 @@ package org.jscience.social;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.jscience.economics.money.Money;
-import org.jscience.economics.money.Currency;
-import org.jscience.arts.*;
-import org.jscience.sports.*;
-import org.jscience.bibliography.*;
-import org.jscience.sociology.Person;
-import org.jscience.biology.BiologicalSex;
+import org.jscience.social.economics.money.Money;
+import org.jscience.social.economics.money.Currency;
+import org.jscience.social.arts.*;
+import org.jscience.social.sports.*;
+import org.jscience.core.bibliography.*;
+import org.jscience.social.sociology.Person;
+import org.jscience.natural.biology.BiologicalSex;
 
 public class Phase3DomainTest {
 

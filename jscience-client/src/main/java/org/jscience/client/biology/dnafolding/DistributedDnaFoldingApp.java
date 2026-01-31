@@ -41,15 +41,15 @@ import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
-import org.jscience.biology.Protein;
+import org.jscience.natural.biology.Protein;
 
-import org.jscience.biology.loaders.PDBWriter;
-import org.jscience.biology.structure.DnaFoldingTask;
-import org.jscience.chemistry.Atom;
-import org.jscience.chemistry.PeriodicTable;
-import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.mathematics.sets.Reals;
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.natural.biology.loaders.PDBWriter;
+import org.jscience.natural.biology.structure.DnaFoldingTask;
+import org.jscience.natural.chemistry.Atom;
+import org.jscience.natural.chemistry.PeriodicTable;
+import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.core.mathematics.sets.Reals;
+import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.server.proto.*;
 
 import java.io.*;
@@ -57,7 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javafx.stage.FileChooser;
-import org.jscience.ui.ThemeManager;
+import org.jscience.core.ui.ThemeManager;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert;
 import javafx.geometry.Pos;
@@ -69,7 +69,7 @@ import javafx.geometry.Insets;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributedDnaFoldingApp extends Application implements org.jscience.ui.App {
+public class DistributedDnaFoldingApp extends Application implements org.jscience.core.ui.App {
 
     private final Group moleculeGroup = new Group();
     private DnaFoldingTask task;
@@ -84,7 +84,7 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.title", "🧬 DNA Folding - Distributed JScience"));
+        stage.setTitle(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.title", "ðŸ§¬ DNA Folding - Distributed JScience"));
 
         EnergyView energyView = new EnergyView();
         energyLabel = energyView.label;
@@ -136,7 +136,7 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
                 else {
                     task.run();
                     renderMolecule();
-                    statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.local", "Status: Local Performance"));
+                    statusLabel.setText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.local", "Status: Local Performance"));
                 }
             }
         }.start();
@@ -144,8 +144,8 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
 
     private void exportToPdb() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.file.save.title", "Save PDB Export"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.file.pdb", "PDB Files"), "*.pdb"));
+        fileChooser.setTitle(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.file.save.title", "Save PDB Export"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.file.pdb", "PDB Files"), "*.pdb"));
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -163,9 +163,9 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
                 }
                 p.addChain(chain);
                 new PDBWriter().save(p, file.getAbsolutePath());
-                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.alert.export.success", "PDB Export successful")).show();
+                new Alert(Alert.AlertType.INFORMATION, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.alert.export.success", "PDB Export successful")).show();
             } catch (Exception ex) {
-                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.alert.export.error", "Export failed: {0}", ex.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.alert.export.error", "Export failed: {0}", ex.getMessage())).show();
             }
         }
     }
@@ -199,7 +199,7 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
                     if (result.getStatus() == Status.COMPLETED) {
                         applyFoldingResults(result.getSerializedData().toByteArray());
                         renderMolecule();
-                        statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.grid_complete", "Status: Grid Computed ✅"));
+                        statusLabel.setText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.grid_complete", "Status: Grid Computed âœ…"));
                         return;
                     }
                 } catch (Exception e) {
@@ -207,11 +207,11 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
             }
             task.run();
             renderMolecule();
-            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.grid_pending", "Status: Grid Pending ⏳"));
+            statusLabel.setText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.grid_pending", "Status: Grid Pending â³"));
         } catch (Exception e) {
             task.run();
             renderMolecule();
-            statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.grid_error", "Status: Grid Error ❌"));
+            statusLabel.setText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.status.grid_error", "Status: Grid Error âŒ"));
         }
     }
 
@@ -258,7 +258,7 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
                 moleculeGroup.getChildren().add(createBond(points.get(i - 1), p));
             }
         }
-        energyLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.energy", "Energy: %.2f kcal/mol"), task.getFinalEnergy()));
+        energyLabel.setText(String.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.energy", "Energy: %.2f kcal/mol"), task.getFinalEnergy()));
     }
 
     private Node createBond(DnaFoldingTask.Point3D p1, DnaFoldingTask.Point3D p2) {
@@ -274,8 +274,8 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
         VBox pane = new VBox(15);
         Label label = new Label();
         Label status = new Label();
-        CheckBox checkbox = new CheckBox(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.chk.distributed", "Distributed Mode"));
-        Button exportBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.btn.export", "💾 Export PDB"));
+        CheckBox checkbox = new CheckBox(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.chk.distributed", "Distributed Mode"));
+        Button exportBtn = new Button(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.btn.export", "ðŸ’¾ Export PDB"));
 
         EnergyView() {
             pane.setPadding(new Insets(20));
@@ -307,16 +307,16 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology"); }
+    public String getCategory() { return org.jscience.core.ui.i18n.I18N.getInstance().get("category.biology", "Biology"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.name", "Distributed Dna Folding App"); }
+    public String getName() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.name", "Distributed Dna Folding App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.desc", "Distributed 3D DNA structure prediction and folding simulation."); }
+    public String getDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.desc", "Distributed 3D DNA structure prediction and folding simulation."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.longdesc", "Analyze the thermodynamic stability and 3D folding pathways of DNA sequences. This application utilizes the JScience grid to accelerate conformational sampling and energy minimization, supporting large-scale nucleic acid structural studies."); }
+    public String getLongDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributeddnafoldingapp.longdesc", "Analyze the thermodynamic stability and 3D folding pathways of DNA sequences. This application utilizes the JScience grid to accelerate conformational sampling and energy minimization, supporting large-scale nucleic acid structural studies."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {
@@ -328,8 +328,10 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
     }
 
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+    public java.util.List<org.jscience.core.ui.Parameter<?>> getViewerParameters() {
         return new java.util.ArrayList<>();
     }
 }
+
+
 

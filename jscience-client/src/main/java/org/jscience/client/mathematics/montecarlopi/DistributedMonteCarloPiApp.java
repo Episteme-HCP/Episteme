@@ -38,7 +38,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import com.google.protobuf.ByteString;
 import org.jscience.server.proto.*;
-import org.jscience.ui.ThemeManager;
+import org.jscience.core.ui.ThemeManager;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Monte Carlo Pi Estimation with distributed sampling.
  * 
  * Uses the JScience Grid to distribute sampling across multiple workers
- * for faster convergence to π.
+ * for faster convergence to Ï€.
  
  * <p>
  * <b>Reference:</b><br>
@@ -59,7 +59,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributedMonteCarloPiApp extends Application implements org.jscience.ui.App {
+public class DistributedMonteCarloPiApp extends Application implements org.jscience.core.ui.App {
 
     private static final int NUM_WORKERS = 4; // Distribute across 4 tasks
     private static final long SAMPLES_PER_BATCH = 1_000_000;
@@ -96,7 +96,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
         checkServerAvailability();
 
-        stage.setTitle(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.title", "🎯 Monte Carlo π Estimation - JScience"));
+        stage.setTitle(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.title", "ðŸŽ¯ Monte Carlo Ï€ Estimation - JScience"));
 
         canvas = new Canvas(600, 600);
         gc = canvas.getGraphicsContext2D();
@@ -107,28 +107,28 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
         controls.getStyleClass().add("viewer-sidebar");
         controls.setPrefWidth(250);
 
-        Label title = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.header", "Monte Carlo π"));
+        Label title = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.header", "Monte Carlo Ï€"));
         title.getStyleClass().add("header-label-white");
 
-        piLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
+        piLabel = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_label", "Ï€ â‰ˆ ?"));
         piLabel.getStyleClass().add("title-label-white");
 
-        samplesLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_label", "Samples: 0"));
+        samplesLabel = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_label", "Samples: 0"));
         samplesLabel.getStyleClass().add("label-muted");
 
-        modeLabel = new Label(serverAvailable ? org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
+        modeLabel = new Label(serverAvailable ? org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.dist", "ðŸŒ Distributed Mode") : org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.local", "ðŸ’» Local Mode"));
         modeLabel.getStyleClass().add("label-green");
 
         progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(200);
 
-        Label accuracyLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.accuracy_label", "Accuracy: ±?"));
+        Label accuracyLabel = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.accuracy_label", "Accuracy: Â±?"));
         accuracyLabel.getStyleClass().add("label-muted");
 
         Separator sep = new Separator();
         sep.setStyle("-fx-background-color: #333;");
 
-        ToggleButton distributedBtn = new ToggleButton(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.dist", "🌐 Distributed"));
+        ToggleButton distributedBtn = new ToggleButton(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.dist", "ðŸŒ Distributed"));
         distributedBtn.setSelected(serverAvailable);
         distributedBtn.getStyleClass().add("accent-button-green");
         distributedBtn.setOnAction(e -> {
@@ -136,20 +136,20 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
             if (useDistributed && !serverAvailable) {
                 checkServerAvailability();
             }
-            modeLabel.setText(useDistributed && serverAvailable ? org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
+            modeLabel.setText(useDistributed && serverAvailable ? org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.dist", "ðŸŒ Distributed Mode") : org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.local", "ðŸ’» Local Mode"));
         });
 
-        Button startBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.start", "▶ Start Sampling"));
+        Button startBtn = new Button(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.start", "â–¶ Start Sampling"));
         startBtn.getStyleClass().add("accent-button-red");
         startBtn.setOnAction(e -> {
             running = !running;
-            startBtn.setText(running ? org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.pause", "⏸ Pause") : org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.resume", "▶ Resume"));
+            startBtn.setText(running ? org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.pause", "â¸ Pause") : org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.resume", "â–¶ Resume"));
             if (running && useDistributed && serverAvailable) {
                 startDistributedSampling();
             }
         });
 
-        Button resetBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.reset", "↺ Reset"));
+        Button resetBtn = new Button(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.reset", "â†º Reset"));
         resetBtn.getStyleClass().add("accent-button-gray");
         resetBtn.setOnAction(e -> reset());
 
@@ -159,7 +159,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
                 1. Random points in unit square
                 2. Count points inside circle
-                3. π ≈ 4 × (inside / total)
+                3. Ï€ â‰ˆ 4 Ã— (inside / total)
 
                 Distributed mode sends batches
                 to multiple workers for parallel
@@ -245,7 +245,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
     private byte[] serializeSamplingTask(long numSamples) throws IOException {
         // Use proper object serialization of the Task
-        org.jscience.mathematics.montecarlo.MonteCarloPiTask task = new org.jscience.mathematics.montecarlo.MonteCarloPiTask(
+        org.jscience.core.mathematics.montecarlo.MonteCarloPiTask task = new org.jscience.core.mathematics.montecarlo.MonteCarloPiTask(
                 numSamples);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -275,7 +275,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
     private void performLocalBatch(long batchSize) {
         // Use Provider for local fallback too
-        org.jscience.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
+        org.jscience.core.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
 
         long inside = provider.countPointsInside(batchSize);
 
@@ -305,8 +305,8 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
         running = false;
         drawBackground();
         drawBackground();
-        piLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
-        samplesLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_label", "Samples: 0"));
+        piLabel.setText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_label", "Ï€ â‰ˆ ?"));
+        samplesLabel.setText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_label", "Samples: 0"));
         progressBar.setProgress(0);
     }
 
@@ -344,10 +344,10 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
                     double pi = 4.0 * inside / total;
                     double error = Math.abs(pi - Math.PI);
 
-                    piLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_format", "π ≈ %.8f"), pi));
-                    samplesLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_format", "Samples: %,d"), total));
+                    piLabel.setText(String.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_format", "Ï€ â‰ˆ %.8f"), pi));
+                    samplesLabel.setText(String.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_format", "Samples: %,d"), total));
                     progressBar.setProgress((double) total / targetSamples);
-                    accuracyLabel.setText(String.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.error_format", "Error: %.6f"), error));
+                    accuracyLabel.setText(String.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.error_format", "Error: %.6f"), error));
                 }
 
                 if (total >= targetSamples) {
@@ -377,16 +377,16 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.mathematics", "Mathematics"); }
+    public String getCategory() { return org.jscience.core.ui.i18n.I18N.getInstance().get("category.mathematics", "Mathematics"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.name", "Distributed Monte Carlo Pi App"); }
+    public String getName() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.name", "Distributed Monte Carlo Pi App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.desc", "Statistical estimation of π using distributed random sampling on the JScience grid."); }
+    public String getDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.desc", "Statistical estimation of Ï€ using distributed random sampling on the JScience grid."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.longdesc", "The Monte Carlo method uses random numbers to approximate mathematical constants. This application distributes billions of samples across the JScience cluster, allowing for rapid convergence and high-accuracy estimation of π through massive parallel execution."); }
+    public String getLongDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmontecarlopiapp.longdesc", "The Monte Carlo method uses random numbers to approximate mathematical constants. This application distributes billions of samples across the JScience cluster, allowing for rapid convergence and high-accuracy estimation of Ï€ through massive parallel execution."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {
@@ -398,8 +398,9 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
     }
 
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+    public java.util.List<org.jscience.core.ui.Parameter<?>> getViewerParameters() {
         return new java.util.ArrayList<>();
     }
 }
+
 

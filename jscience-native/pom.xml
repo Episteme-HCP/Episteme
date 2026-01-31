@@ -48,6 +48,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <release>25</release>
+                    <includes>
+                        <include>**/*.java</include>
+                        <include>module-info.java</include>
+                    </includes>
                     <compilerArgs>
                         <!-- FFM is standard in 22+, no preview needed unless verifying -->
                     </compilerArgs>

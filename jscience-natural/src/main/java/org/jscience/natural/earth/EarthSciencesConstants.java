@@ -1,0 +1,153 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.jscience.natural.earth;
+
+import org.jscience.core.measure.Quantity;
+import org.jscience.core.measure.Quantities;
+import org.jscience.core.measure.Units;
+import org.jscience.core.measure.quantity.Length;
+import org.jscience.core.measure.quantity.Mass;
+import org.jscience.core.measure.quantity.Dimensionless;
+
+
+/**
+ * Constants and enumerations for earth sciences (geology, meteorology, climatology).
+ * <p>
+ * Provides classifications for planetary layers, rock types, grain sizes, 
+ * volcanic structures, climates, biomes, and cloud types.
+ */
+public final class EarthSciencesConstants {
+
+    private EarthSciencesConstants() {}
+
+    /** WGS84 Earth equatorial radius (meters) */
+    public static final Quantity<Length> EARTH_RADIUS_EQUATORIAL = Quantities.create(6378137.0, Units.METER);
+
+    /** WGS84 Earth polar radius (meters) */
+    public static final Quantity<Length> EARTH_RADIUS_POLAR = Quantities.create(6356752.314245, Units.METER);
+
+    /** WGS84 flattening */
+    public static final Quantity<Dimensionless> FLATTENING = Quantities.create(1.0 / 298.257223563, Units.ONE);
+
+    /** Mean Earth radius (meters) */
+    public static final Quantity<Length> EARTH_RADIUS_MEAN = Quantities.create(6371000.0, Units.METER);
+
+    /** Earth mass (kg) */
+    public static final Quantity<Mass> EARTH_MASS = Quantities.create(5.9722e24, Units.KILOGRAM);
+
+
+
+    /**
+     * Internal layers of terrestrial planets.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+    public enum PlanetaryLayer {
+        INNER_CORE, OUTER_CORE, LOWER_MANTLE, UPPER_MANTLE, 
+        ASTHENOSPHERE, LITHOSPHERE, CRUST, HYDROSPHERE, ATMOSPHERE, UNKNOWN
+    }
+
+    /**
+     * Atmospheric layers.
+     */
+    public enum AtmosphereLayer {
+        TROPOSPHERE, STRATOSPHERE, MESOSPHERE, THERMOSPHERE, EXOSPHERE, IONOSPHERE
+    }
+
+    /**
+     * Major rock classifications.
+     */
+    public enum RockType {
+        SEDIMENTARY_CLASTIC, SEDIMENTARY_BIOGENIC, SEDIMENTARY_CHEMICAL,
+        METAMORPHIC_FOLIATED, METAMORPHIC_NON_FOLIATED,
+        IGNEOUS_PLUTONIC, IGNEOUS_VOLCANIC, UNKNOWN
+    }
+
+    /**
+     * Wentworth scale for sediment grain size.
+     */
+    public enum GrainSize {
+        BOULDER, COBBLE, PEBBLE, GRANULE, SAND, SILT, CLAY
+    }
+
+    /**
+     * Igneous rock texture/grain size.
+     */
+    public enum IgneousTexture {
+        PEGMATITIC, PHANERITIC, PORPHYRITIC, APHANITIC, GLASSY
+    }
+
+    /**
+     * Crystal development.
+     */
+    public enum CrystalForm {
+        EUHEDRAL, SUBEUHEDRAL, ANHEDRAL
+    }
+
+    /**
+     * Volcanic structures.
+     */
+    public enum VolcanoType {
+        CINDER_CONE, ASH_CONE, SPATTER_CONE, SHIELD_VOLCANO, 
+        STRATOVOLCANO, CALDERA, SUPERVOLCANO, MUD_VOLCANO, FISSURE_VENT
+    }
+
+    /**
+     * Volcanic eruption types.
+     */
+    public enum EruptionType {
+        PHREATIC, EXPLOSIVE, EFFUSIVE, HAWAIIAN, STROMBOLIAN, 
+        VULCANIAN, PELEAN, PLINIAN, SURTSEYAN
+    }
+
+    /**
+     * Climate classifications (KÃ¶ppen-like).
+     */
+    public enum ClimateType {
+        TROPICAL, DRY, TEMPERATE, CONTINENTAL, POLAR, 
+        MEDITERRANEAN, SUBTROPICAL, SUBARCTIC, ALPINE
+    }
+
+    /**
+     * Terrestrial biomes.
+     */
+    public enum Biome {
+        TUNDRA, TAIGA, TEMPERATE_CONIFEROUS_FOREST, TEMPERATE_BROADLEAF_FOREST, 
+        TEMPERATE_GRASSLAND, MEDITERRANEAN_FOREST, TROPICAL_CONIFEROUS_FOREST, 
+        TROPICAL_MOIST_FOREST, TROPICAL_DRY_FOREST, TROPICAL_GRASSLAND, 
+        DESERT, MANGROVE, FLOODED_GRASSLAND, MONTANE_GRASSLAND
+    }
+
+    /**
+     * Basic cloud genera.
+     */
+    public enum CloudType {
+        CIRRUS, CIRROCUMULUS, CIRROSTRATUS, 
+        ALTOCUMULUS, ALTOSTRATUS, 
+        STRATUS, STRATOCUMULUS, CUMULUS, 
+        NIMBOSTRATUS, CUMULONIMBUS
+    }
+}
+

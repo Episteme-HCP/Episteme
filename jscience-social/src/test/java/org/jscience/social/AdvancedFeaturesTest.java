@@ -23,14 +23,14 @@
 
 package org.jscience.social;
 
-import org.jscience.economics.*;
-import org.jscience.sociology.*;
-import org.jscience.biology.BiologicalSex;
-import org.jscience.geography.*;
-import org.jscience.linguistics.*;
-import org.jscience.economics.money.Money;
-import org.jscience.earth.coordinates.GeodeticCoordinate;
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.social.economics.*;
+import org.jscience.social.sociology.*;
+import org.jscience.natural.biology.BiologicalSex;
+import org.jscience.social.geography.*;
+import org.jscience.social.linguistics.*;
+import org.jscience.social.economics.money.Money;
+import org.jscience.natural.earth.coordinates.GeodeticCoordinate;
+import org.jscience.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,7 +78,7 @@ public class AdvancedFeaturesTest {
         assertEquals(343000, distance, 5000); // 5km tolerance
 
         GISProfile gp = new GISProfile(GISProfile.Projection.MERCATOR);
-        org.jscience.mathematics.linearalgebra.Vector<Real> proj = gp.project(paris);
+        org.jscience.core.mathematics.linearalgebra.Vector<Real> proj = gp.project(paris);
         assertNotNull(proj);
         assertEquals(2, proj.dimension());
     }

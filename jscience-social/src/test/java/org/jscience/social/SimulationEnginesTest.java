@@ -23,13 +23,13 @@
 
 package org.jscience.social;
 
-import org.jscience.economics.*;
-import org.jscience.economics.models.MacroModel;
-import org.jscience.sociology.*;
-import org.jscience.biology.BiologicalSex;
-import org.jscience.politics.*;
-import org.jscience.geography.*;
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.social.economics.*;
+import org.jscience.social.economics.models.MacroModel;
+import org.jscience.social.sociology.*;
+import org.jscience.natural.biology.BiologicalSex;
+import org.jscience.social.politics.*;
+import org.jscience.social.geography.*;
+import org.jscience.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

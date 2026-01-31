@@ -1,0 +1,146 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.jscience.natural.physics.loaders;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jscience.core.ui.i18n.I18N;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.io.AbstractResourceReader;
+
+/**
+ * Loads Star Catalog Data (CSV).
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
+
+    @Override
+    protected List<Star> loadFromSource(String id) throws Exception {
+        // StarReader typically loads a full catalog from resource
+        return loadResource(id);
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/org/jscience/physics/astronomy/";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<Star>> getResourceType() {
+        return (Class<List<Star>>) (Class<?>) List.class;
+    }
+
+    @Override
+    public String getCategory() {
+        return I18N.getInstance().get("category.astronomy", "Astronomy");
+    }
+
+    @Override
+    public String getName() {
+        return I18N.getInstance().get("reader.starreader.name", "Star Reader");
+    }
+
+    @Override
+    public String getDescription() {
+        return I18N.getInstance().get("reader.starreader.desc", "Generic Star Catalog Reader (CSV).");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return I18N.getInstance().get("reader.starreader.longdesc", "Loads star catalog data from CSV resources, including position, distance, and spectral type.");
+    }
+
+    public List<Star> loadResource(String path) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            if (is == null)
+                throw new java.io.IOException("Star catalog not found: " + path);
+            return loadCSV(is);
+        }
+    }
+
+    public static class Star {
+        public String name;
+        public Real ra; // Right Ascension (degrees)
+        public Real dec; // Declination (degrees)
+        public Real dist; // Distance (light years)
+        public Real mag; // Apparent Magnitude
+        public String spectralType; // O, B, A, F, G, K, M
+
+        public Star(String name, Real ra, Real dec, Real dist, Real mag, String spectralType) {
+            this.name = name;
+            this.ra = ra;
+            this.dec = dec;
+            this.dist = dist;
+            this.mag = mag;
+            this.spectralType = spectralType;
+        }
+    }
+
+    public static List<Star> loadCSV(InputStream is) {
+        List<Star> stars = new ArrayList<>();
+        if (is == null)
+            return stars;
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+            boolean header = true;
+            while ((line = br.readLine()) != null) {
+                if (header) {
+                    header = false;
+                    continue;
+                }
+                String[] parts = line.split(",");
+                if (parts.length >= 6) {
+                    // Name,RA(deg),Dec(deg),Dist(ly),Mag,Type
+                    String name = parts[0].trim();
+                    Real ra = Real.of(parts[1].trim());
+                    Real dec = Real.of(parts[2].trim());
+                    Real dist = Real.of(parts[3].trim());
+                    Real mag = Real.of(parts[4].trim());
+                    String type = parts[5].trim();
+
+                    stars.add(new Star(name, ra, dec, dist, mag, type));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stars;
+    }
+}
+
+

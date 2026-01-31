@@ -1,0 +1,348 @@
+/*
+ * $Id: OMAttribution.java,v 1.2 2007-10-21 17:46:56 virtualcall Exp $
+ *
+ * Copyright (c) 2001-2004, RIACA, Technische Universiteit Eindhoven (TU/e).
+ * All Rights Reserved.
+ *
+ * ---------------------------------------------------------------------------
+ *
+ *  The contents of this file are subject to the RIACA Public License
+ *  Version 1.0 (the "License"). You may not use this file except in
+ *  compliance with the License. A copy of the License is available at
+ *  http://www.riaca.win.tue.nl/
+ *
+ *  Alternatively, the contents of this file may be used under the terms
+ *  of the GNU Lesser General Public license (the "LGPL license"), in which 
+ *  case the provisions of the LGPL license are applicable instead of those 
+ *  above. A copy of the LGPL license is available at http://www.gnu.org/
+ *
+ *  The Original Code is ROML -- the RIACA OpenMath Library. The Initial
+ *  Developer of the Original Code is Manfred N. Riem.  Portions created
+ *  by Manfred N. Riem are Copyright (c) 2001. All Rights Reserved.
+ *
+ *  Contributor(s):
+ *
+ *      Ernesto Reinaldo Barreiro, Arjeh M. Cohen, Hans Cuypers, Hans Sterk,
+ *      Olga Caprotti
+ *
+ * ---------------------------------------------------------------------------
+ */
+package org.jscience.core.mathematics.loaders.openmath;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+/**
+ * Models an OpenMath attribution object. <p>
+ *
+ * @author Manfred N. Riem (mriem@manorrock.org)
+ * @version $Revision: 1.2 $
+ * @see "The OpenMath standard 2.0, 2.1.3"
+ */
+public class OMAttribution extends OMObject {
+    /**
+     * Stores the constructor. <p>
+     */
+    protected OMObject constructor;
+
+    /**
+     * Stores the attributions. <p>
+     */
+    protected Hashtable<OMObject, OMObject> attributions = new Hashtable<>();
+
+    /**
+     * Constructor. <p>
+     */
+    public OMAttribution() {
+        super();
+    }
+
+    /**
+     * Constructor. <p>
+     *
+     * @param newAttributions the table of attributions.
+     * @param newConstructor  the attribution constructor.
+     */
+    public OMAttribution(Hashtable<OMObject, OMObject> newAttributions, OMObject newConstructor) {
+        super();
+
+        attributions = newAttributions;
+        constructor = newConstructor;
+    }
+
+    /**
+     * Gets the type. <p>
+     */
+    public String getType() {
+        return "OMATTR";
+    }
+
+    /**
+     * Get the attributions. <p>
+     *
+     * @return the hashtable of attributions.
+     */
+    public Hashtable<OMObject, OMObject> getAttributions() {
+        return attributions;
+    }
+
+    /**
+     * Set the attributions. <p>
+     *
+     * @param newAttributions the hashtable of attributions
+     */
+    public void setAttributions(Hashtable<OMObject, OMObject> newAttributions) {
+        attributions = newAttributions;
+    }
+
+    /**
+     * Get the attribution constructor. <p>
+     *
+     * @return the attribution constructor.
+     */
+    public OMObject getConstructor() {
+        return constructor;
+    }
+
+    /**
+     * Set the attribution constructor. <p>
+     *
+     * @param newConstructor the attribution constructor.
+     */
+    public void setConstructor(OMObject newConstructor) {
+        constructor = newConstructor;
+    }
+
+    /**
+     * Puts an attribution. <p>
+     *
+     * @param key   the key of the attribution.
+     * @param value the value of the attribution.
+     */
+    public void put(OMObject key, OMObject value) {
+        attributions.put(key, value);
+    }
+
+    /**
+     * Removes an attribution. <p>
+     *
+     * @param key the attribution to remove by key.
+     */
+    public void remove(OMObject key) {
+        attributions.remove(key);
+    }
+
+    /**
+     * Gets the value of the attribution. <p>
+     *
+     * @param key the attribution to look for by key.
+     * @return the attribution value found, or <b>null</b> if not found.
+     */
+    public OMObject get(OMObject key) {
+        return attributions.get(key);
+    }
+
+    /**
+     * Has symbol. <p>
+     * <p/>
+     * <p/>
+     * <i>Note: this method does NOT do a (cd, name)-pair match. It does
+     * the comparison on object level. So an OMSymbol with the same
+     * CD and same Name is not necessarily the same object. This
+     * is done, because the standard allows multiple attribute-pairs
+     * with the same symbol. </i>
+     * </p>
+     *
+     * @param key the key to look for.
+     * @return <b>true</b> if it contains the given key, <b>false</b> if not.
+     */
+    public boolean hasKey(OMObject key) {
+        return attributions.containsKey(key);
+    }
+
+    /**
+     * Has value. <p>
+     *
+     * @param value the value to look for.
+     * @return <b>true</b> if it contains the given value,
+     *         <b>false</b> otherwise.
+     */
+    public boolean hasValue(OMObject value) {
+        return attributions.containsValue(value);
+    }
+
+    /**
+     * Get the symbol (keys). <p>
+     *
+     * @return an enumeration of the keys.
+     */
+    public Enumeration<OMObject> getKeys() {
+        return attributions.keys();
+    }
+
+    /**
+     * Get the values. <p>
+     *
+     * @return an enumeration of the values.
+     */
+    public Enumeration<OMObject> getValues() {
+        return attributions.elements();
+    }
+
+    /**
+     * Returns a string representation of the object. <p>
+     */
+    public String toString() {
+        StringBuffer result = new StringBuffer();
+        Enumeration<OMObject> enumeration = attributions.keys();
+        result.append("<OMATTR><OMATP>");
+
+        for (; enumeration.hasMoreElements();) {
+            OMObject key = enumeration.nextElement();
+            OMObject value = attributions.get(key);
+
+            result.append(key.toString());
+            result.append(value.toString());
+        }
+
+        result.append("</OMATP>");
+        result.append(constructor.toString());
+        result.append("</OMATTR>");
+
+        return result.toString();
+    }
+
+    /**
+     * Flatten the attribution. <p>
+     *
+     * @return the flattened attribution.
+     */
+    public OMAttribution flatten() {
+        if (constructor instanceof OMAttribution) {
+            OMAttribution newConstructor = ((OMAttribution) constructor).flatten();
+            OMAttribution newAttribution = new OMAttribution();
+
+            newAttribution.setConstructor(newConstructor.getConstructor());
+
+            Enumeration<OMObject> enumeration = newConstructor.getKeys();
+
+            for (; enumeration.hasMoreElements();) {
+                OMObject key = enumeration.nextElement();
+                OMObject value = newConstructor.get(key);
+                newAttribution.put(key, value);
+            }
+
+            enumeration = getKeys();
+
+            for (; enumeration.hasMoreElements();) {
+                OMObject key = enumeration.nextElement();
+                OMObject value = get(key);
+                newAttribution.put(key, value);
+            }
+
+            return newAttribution;
+        } else {
+            return (OMAttribution) clone();
+        }
+    }
+
+    /**
+     * Strip the attribution. <p>
+     *
+     * @return the stripped OpenMath object.
+     */
+    public OMObject strip() {
+        return (OMObject) constructor.copy();
+    }
+
+    /**
+     * Clones the object (shallow copy).
+     */
+    @SuppressWarnings("unchecked")
+    public Object clone() {
+        OMAttribution attribution = new OMAttribution();
+        attribution.constructor = constructor;
+        attribution.attributions = (Hashtable<OMObject, OMObject>) attributions.clone();
+        return attribution;
+    }
+
+    /**
+     * Copies the object (full copy).
+     */
+    @SuppressWarnings("unchecked")
+    public Object copy() {
+        OMAttribution attribution = new OMAttribution();
+        attribution.constructor = (OMObject) constructor.copy();
+        attribution.attributions = (Hashtable<OMObject, OMObject>) attributions.clone();
+        return attribution;
+    }
+
+    /**
+     * Are we a composite object.
+     */
+    public boolean isComposite() {
+        return true;
+    }
+
+    /**
+     * Are we an atom object.
+     */
+    public boolean isAtom() {
+        return false;
+    }
+
+    /**
+     * Determines if this is the same object. <p>
+     */
+    public boolean isSame(OMObject object) {
+        if (object instanceof OMAttribution) {
+            OMAttribution attribution = (OMAttribution) object;
+            if (attribution.constructor.isSame(constructor))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Determines if this is a valid object. <p>
+     */
+    public boolean isValid() {
+        if (constructor != null) {
+            if (attributions.size() >= 1)
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Replace any occurrence of source to destination. <p>
+     *
+     * @param source the source object.
+     * @param dest   the destination object.
+     * @return the application with the replacing.
+     */
+    public OMObject replace(OMObject source, OMObject dest) {
+        if (!constructor.isSame(source)) {
+            if (constructor instanceof OMApplication) {
+                OMApplication application = (OMApplication) constructor;
+                constructor = application.replace(source, dest);
+            }
+            if (constructor instanceof OMAttribution) {
+                OMAttribution attribution = (OMAttribution) constructor;
+                constructor = attribution.replace(source, dest);
+            }
+            if (constructor instanceof OMBinding) {
+                OMBinding binding = (OMBinding) constructor;
+                constructor = binding.replace(source, dest);
+            }
+            if (constructor instanceof OMError) {
+                OMError error = (OMError) constructor;
+                constructor = error.replace(source, dest);
+            }
+        } else {
+            constructor = dest;
+        }
+        return this;
+    }
+}
+

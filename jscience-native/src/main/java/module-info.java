@@ -23,23 +23,22 @@
 
 /**
  * JScience Native module for high-performance computing via Project Panama.
- * <p>
- * This module provides zero-copy integration with native libraries:
- * <ul>
- *   <li>BLAS/LAPACK for linear algebra</li>
- *   <li>HDF5 for scientific data I/O</li>
- *   <li>FFTW for signal processing</li>
- * </ul>
- * <p>
- * Requires Java 22+ with {@code --enable-preview} for stable FFM API.
- *
- * @since 1.1
  */
-module org.jscience.native {
-    requires org.jscience.core;
+module org.jscience.nativ {
+    requires transitive org.jscience.core;
+    requires transitive org.jscience.natural;
     
-    exports org.jscience.native.memory;
-    exports org.jscience.native.matrix;
-    exports org.jscience.native.blas;
-    exports org.jscience.native.hdf5;
+    exports org.jscience.nativ.mathematics.analysis.transform;
+    exports org.jscience.nativ.mathematics.linearalgebra.backends;
+    exports org.jscience.nativ.mathematics.linearalgebra.matrices;
+    exports org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
+    exports org.jscience.nativ.mathematics.linearalgebra.vectors;
+    exports org.jscience.nativ.mathematics.linearalgebra.vectors.storage;
+    exports org.jscience.nativ.physics.loaders.fits;
+    exports org.jscience.nativ.physics.loaders.hdf5;
+    exports org.jscience.nativ.technical.backend.algorithms;
+    exports org.jscience.nativ.technical.backend.gpu;
+    exports org.jscience.nativ.technical.backend.math;
+    exports org.jscience.nativ.technical.backend.physics;
+    exports org.jscience.nativ.util;
 }

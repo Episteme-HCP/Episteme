@@ -25,13 +25,13 @@ package org.jscience.social;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import org.jscience.law.*;
-import org.jscience.linguistics.*;
-import org.jscience.philosophy.*;
-import org.jscience.sociology.*;
-import org.jscience.sociology.Religion;
-import org.jscience.psychology.*;
-import org.jscience.biology.BiologicalSex;
+import org.jscience.social.law.*;
+import org.jscience.social.linguistics.*;
+import org.jscience.social.philosophy.*;
+import org.jscience.social.sociology.*;
+import org.jscience.social.sociology.Religion;
+import org.jscience.social.psychology.*;
+import org.jscience.natural.biology.BiologicalSex;
 import java.time.LocalDate;
 
 public class Phase2DomainTest {

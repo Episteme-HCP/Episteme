@@ -1,0 +1,287 @@
+﻿/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.jscience.social.geography.loaders;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.jscience.natural.earth.coordinates.GeodeticCoordinate;
+import org.jscience.social.geography.Region;
+import org.jscience.core.io.AbstractResourceReader;
+import org.jscience.core.io.MiniCatalog;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Loads geographic data from GeoJSON format.
+ * Supports loading regions/features with coordinates (including altitude) and properties.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
+
+    private final ObjectMapper mapper;
+
+    public GeoJSONReader() {
+        this.mapper = new ObjectMapper();
+    }
+
+    @Override
+    public String getCategory() {
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("category.geography", "Geography");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("reader.geojson.desc", "GeoJSON Geographic Data Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("reader.geojson.longdesc", "Reads geographic features and regions from GeoJSON format files.");
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<Region>> getResourceType() {
+        return (Class<List<Region>>) (Class<?>) List.class;
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "RFC 7946", "1.0" };
+    }
+
+    @Override
+    protected List<Region> loadFromSource(String id) {
+        try (InputStream is = getClass().getResourceAsStream(id)) {
+            if (is != null) {
+                return loadRegions(is);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    protected MiniCatalog<List<Region>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<Region>> getAll() {
+                return List.of();
+            }
+
+            @Override
+            public Optional<List<Region>> findByName(String name) {
+                return Optional.empty();
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
+    }
+
+    /**
+     * Loads regions from a GeoJSON FeatureCollection.
+     *
+     * @param is Input stream containing GeoJSON data
+     * @return List of Region objects
+     * @throws IOException on parse error
+     */
+    public List<Region> loadRegions(InputStream is) throws IOException {
+        List<Region> regions = new ArrayList<>();
+        if (is == null)
+            return regions;
+
+        JsonNode root = mapper.readTree(is);
+        
+        // Handle FeatureCollection
+        JsonNode features = root.path("features");
+        if (features.isArray()) {
+            for (JsonNode feature : features) {
+                Region region = parseFeature(feature);
+                if (region != null) {
+                    regions.add(region);
+                }
+            }
+        } 
+        // Handle single Feature
+        else if ("Feature".equals(root.path("type").asText())) {
+             Region region = parseFeature(root);
+             if (region != null) regions.add(region);
+        }
+
+        return regions;
+    }
+
+    /**
+     * Parses a single GeoJSON Feature into a Region.
+     */
+    private Region parseFeature(JsonNode feature) {
+        JsonNode properties = feature.path("properties");
+        JsonNode geometry = feature.path("geometry");
+
+        String name = properties.path("name").asText(null);
+        if (name == null) {
+            name = properties.path("NAME").asText(null);
+        }
+        if (name == null) {
+            name = "Unknown";
+        }
+
+        Region.SubType type = Region.SubType.COUNTRY;
+        String typeStr = properties.path("type").asText("");
+        if (!typeStr.isEmpty()) {
+            try {
+                type = Region.SubType.valueOf(typeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Use default
+            }
+        }
+
+        Region region = new Region(name, type);
+
+        if (properties.has("population")) {
+            region.setPopulation(properties.path("population").asLong(0));
+        }
+
+        String geometryType = geometry.path("type").asText("");
+        JsonNode coordinates = geometry.path("coordinates");
+
+        if ("Point".equals(geometryType) && coordinates.isArray() && coordinates.size() >= 2) {
+            double lon = coordinates.get(0).asDouble();
+            double lat = coordinates.get(1).asDouble();
+            double alt = (coordinates.size() > 2) ? coordinates.get(2).asDouble() : 0.0;
+            region.setCenter(new GeodeticCoordinate(lat, lon, alt));
+        } else if ("Polygon".equals(geometryType) || "MultiPolygon".equals(geometryType)) {
+            GeodeticCoordinate centroid = computeCentroid(coordinates, geometryType);
+            if (centroid != null) {
+                region.setCenter(centroid);
+            }
+        }
+
+        return region;
+    }
+
+    /**
+     * Computes approximate centroid of a polygon.
+     */
+    private GeodeticCoordinate computeCentroid(JsonNode coordinates, String type) {
+        try {
+            JsonNode ring;
+            if ("MultiPolygon".equals(type)) {
+                // MultiPolygon -> [Polygon, Polygon] -> [[[x,y]...]]
+                // Take first polygon's first ring for now
+                if (coordinates.size() > 0 && coordinates.get(0).size() > 0)
+                    ring = coordinates.get(0).get(0);
+                else return null;
+            } else {
+                // Polygon -> [[x,y]...]
+                 if (coordinates.size() > 0)
+                    ring = coordinates.get(0);
+                 else return null;
+            }
+
+            if (ring == null || !ring.isArray() || ring.isEmpty()) {
+                return null;
+            }
+
+            double sumLat = 0, sumLon = 0;
+            double sumAlt = 0;
+            int count = 0;
+            for (JsonNode point : ring) {
+                if (point.isArray() && point.size() >= 2) {
+                    sumLon += point.get(0).asDouble();
+                    sumLat += point.get(1).asDouble();
+                    if (point.size() > 2) {
+                        sumAlt += point.get(2).asDouble();
+                    }
+                    count++;
+                }
+            }
+
+            if (count > 0) {
+                return new GeodeticCoordinate(sumLat / count, sumLon / count, sumAlt / count);
+            }
+        } catch (Exception e) {
+            // Ignore and return null
+        }
+        return null;
+    }
+
+    /**
+     * Loads raw coordinate pairs from a GeoJSON geometry.
+     *
+     * @param is Input stream containing GeoJSON data
+     * @return List of GeodeticCoordinate objects
+     * @throws IOException on parse error
+     */
+    public List<GeodeticCoordinate> loadCoordinates(InputStream is) throws IOException {
+        List<GeodeticCoordinate> coords = new ArrayList<>();
+        if (is == null)
+            return coords;
+
+        JsonNode root = mapper.readTree(is);
+        extractCoordinates(root, coords);
+        return coords;
+    }
+
+    private void extractCoordinates(JsonNode node, List<GeodeticCoordinate> coords) {
+        if (node.isArray()) {
+            if (node.size() >= 2 && node.get(0).isNumber() && node.get(1).isNumber()) {
+                double lon = node.get(0).asDouble();
+                double lat = node.get(1).asDouble();
+                double alt = (node.size() > 2) ? node.get(2).asDouble() : 0.0;
+                coords.add(new GeodeticCoordinate(lat, lon, alt));
+            } else {
+                for (JsonNode child : node) {
+                    extractCoordinates(child, coords);
+                }
+            }
+        } else if (node.has("coordinates")) {
+            extractCoordinates(node.path("coordinates"), coords);
+        } else if (node.has("features")) {
+            for (JsonNode feature : node.path("features")) {
+                extractCoordinates(feature.path("geometry"), coords);
+            }
+        }
+    }
+
+    @Override public String getName() { return org.jscience.core.ui.i18n.I18N.getInstance().get("reader.geojson.name", "GeoJSON Reader"); }
+}
+

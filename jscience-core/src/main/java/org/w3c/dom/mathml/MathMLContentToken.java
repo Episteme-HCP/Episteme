@@ -81,7 +81,7 @@ public interface MathMLContentToken extends MathMLContentElement {
  * This interface represents the MathML MathMLContentToken element.
      *
      * @param newArgument the value to set
-     * @param index       DOCUMENT ME!
+     * @param index       the index at which to insert the argument.
      * @return the requested attribute or element
      */
     public Node insertArgument(Node newArgument, int index);
@@ -90,7 +90,7 @@ public interface MathMLContentToken extends MathMLContentElement {
  * This interface represents the MathML MathMLContentToken element.
      *
      * @param newArgument the value to set
-     * @param index       DOCUMENT ME!
+     * @param index       the index of the argument to set.
      * @return the requested attribute or element
      */
     public Node setArgument(Node newArgument, int index);

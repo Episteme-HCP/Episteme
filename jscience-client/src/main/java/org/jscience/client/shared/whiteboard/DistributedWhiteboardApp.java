@@ -38,7 +38,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.server.proto.*;
-import org.jscience.ui.ThemeManager;
+import org.jscience.core.ui.ThemeManager;
 
 /**
  * Collaborative Whiteboard - Real-time shared canvas using
@@ -48,7 +48,7 @@ import org.jscience.ui.ThemeManager;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributedWhiteboardApp extends Application implements org.jscience.ui.App {
+public class DistributedWhiteboardApp extends Application implements org.jscience.core.ui.App {
 
     private ManagedChannel channel;
     private CollaborationServiceGrpc.CollaborationServiceStub asyncStub;
@@ -102,7 +102,7 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
 
         Scene scene = new Scene(root, 1100, 750);
         ThemeManager.getInstance().applyTheme(scene);
-        primaryStage.setTitle(java.text.MessageFormat.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.title", "JScience Collaborative Whiteboard - {0}"), userId));
+        primaryStage.setTitle(java.text.MessageFormat.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.title", "JScience Collaborative Whiteboard - {0}"), userId));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -112,19 +112,19 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
         toolbar.setPadding(new Insets(10, 20, 10, 20));
         toolbar.getStyleClass().add("header-box");
 
-        Label title = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.header", "🎨 Collaborative Whiteboard"));
+        Label title = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.header", "ðŸŽ¨ Collaborative Whiteboard"));
         title.getStyleClass().add("header-label-white");
 
         // Session controls
         TextField sessionField = new TextField("default-session");
         sessionField.setPrefWidth(150);
-        sessionField.setPromptText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.prompt.session", "Session ID"));
+        sessionField.setPromptText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.prompt.session", "Session ID"));
 
-        Button joinBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.btn.join", "Join Session"));
+        Button joinBtn = new Button(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.btn.join", "Join Session"));
         joinBtn.getStyleClass().add("accent-button-green");
         joinBtn.setOnAction(e -> joinSession(sessionField.getText()));
 
-        Button createBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.btn.create", "Create Session"));
+        Button createBtn = new Button(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.btn.create", "Create Session"));
         createBtn.getStyleClass().add("accent-button-red");
         createBtn.setOnAction(e -> createSession(sessionField.getText()));
 
@@ -136,10 +136,10 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
         brushSizeSlider.setShowTickMarks(true);
         brushSizeSlider.setPrefWidth(100);
 
-        Label brushLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.label.brush", "Brush:"));
+        Label brushLabel = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.label.brush", "Brush:"));
         brushLabel.getStyleClass().add("label-white");
 
-        Button clearBtn = new Button(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.btn.clear", "Clear"));
+        Button clearBtn = new Button(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.btn.clear", "Clear"));
         clearBtn.getStyleClass().add("accent-button-red");
         clearBtn.setOnAction(e -> clearCanvas());
 
@@ -158,7 +158,7 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
         footer.setPadding(new Insets(8, 20, 8, 20));
         footer.getStyleClass().add("status-bar");
 
-        statusLabel = new Label(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.not_connected", "⚪ Not connected to any session"));
+        statusLabel = new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.not_connected", "âšª Not connected to any session"));
         statusLabel.getStyleClass().add("label-muted");
 
         footer.getChildren().add(statusLabel);
@@ -177,13 +177,13 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
             SessionResponse response = blockingStub.createSession(request);
             sessionId = response.getSessionId();
             Platform.runLater(() -> {
-                statusLabel.setText(java.text.MessageFormat.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.created", "🟢 Created session: {0}"), sessionId));
+                statusLabel.setText(java.text.MessageFormat.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.created", "ðŸŸ¢ Created session: {0}"), sessionId));
                 statusLabel.getStyleClass().setAll("label", "accent-button-green");
             });
             joinSession(sessionId);
         } catch (Exception e) {
             Platform.runLater(() -> {
-                statusLabel.setText(java.text.MessageFormat.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.create_failed", "🔴 Failed to create session: {0}"), e.getMessage()));
+                statusLabel.setText(java.text.MessageFormat.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.create_failed", "ðŸ”´ Failed to create session: {0}"), e.getMessage()));
                 statusLabel.getStyleClass().setAll("label", "accent-button-red");
             });
         }
@@ -206,7 +206,7 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
             @Override
             public void onError(Throwable t) {
                 Platform.runLater(() -> {
-                    statusLabel.setText(java.text.MessageFormat.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.conn_error", "🔴 Connection error: {0}"), t.getMessage()));
+                    statusLabel.setText(java.text.MessageFormat.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.conn_error", "ðŸ”´ Connection error: {0}"), t.getMessage()));
                     statusLabel.getStyleClass().setAll("label", "accent-button-red");
                     isConnected = false;
                 });
@@ -215,7 +215,7 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
             @Override
             public void onCompleted() {
                 Platform.runLater(() -> {
-                    statusLabel.setText(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.ended", "⚪ Session ended"));
+                    statusLabel.setText(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.ended", "âšª Session ended"));
                     statusLabel.getStyleClass().setAll("label", "label-muted");
                     isConnected = false;
                 });
@@ -224,7 +224,7 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
 
         isConnected = true;
         Platform.runLater(() -> {
-            statusLabel.setText(java.text.MessageFormat.format(org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.connected", "🟢 Connected to session: {0} as {1}"), sessionId, userId));
+            statusLabel.setText(java.text.MessageFormat.format(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.status.connected", "ðŸŸ¢ Connected to session: {0} as {1}"), sessionId, userId));
             statusLabel.getStyleClass().setAll("label", "accent-button-green");
         });
     }
@@ -333,16 +333,16 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18N.getInstance().get("category.general", "General"); }
+    public String getCategory() { return org.jscience.core.ui.i18n.I18N.getInstance().get("category.general", "General"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.name", "Distributed Whiteboard App"); }
+    public String getName() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.name", "Distributed Whiteboard App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.desc", "Real-time collaborative whiteboard for shared scientific visualization and brainstorming."); }
+    public String getDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.desc", "Real-time collaborative whiteboard for shared scientific visualization and brainstorming."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.longdesc", "The Collaborative Whiteboard enables multiple researchers to draw on a shared digital canvas in real-time. It leverages JScience collaboration services to provide low-latency synchronization of strokes, colors, and brush sizes across the network."); }
+    public String getLongDescription() { return org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedwhiteboardapp.longdesc", "The Collaborative Whiteboard enables multiple researchers to draw on a shared digital canvas in real-time. It leverages JScience collaboration services to provide low-latency synchronization of strokes, colors, and brush sizes across the network."); }
 
 
     @Override
@@ -355,8 +355,9 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
     }
 
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+    public java.util.List<org.jscience.core.ui.Parameter<?>> getViewerParameters() {
         return new java.util.ArrayList<>();
     }
 }
+
 

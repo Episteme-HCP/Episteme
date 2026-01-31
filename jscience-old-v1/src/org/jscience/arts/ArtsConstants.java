@@ -60,7 +60,7 @@ public final class ArtsConstants extends Object {
     /** DOCUMENT ME! */
     public final static int INTERNET = 25; //candidate for egelian art ten
 
-//commercials (publicité) is also considered by some as an art
+//commercials (publicitï¿½) is also considered by some as an art
 
     /** DOCUMENT ME! */
     public final static int COOKING = 26;

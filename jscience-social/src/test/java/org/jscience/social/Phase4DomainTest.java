@@ -28,17 +28,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.jscience.earth.Place;
-import org.jscience.earth.PlaceType;
+import org.jscience.natural.earth.Place;
+import org.jscience.natural.earth.PlaceType;
 
-import org.jscience.sociology.*;
+import org.jscience.social.sociology.*;
 
-import org.jscience.politics.*;
+import org.jscience.social.politics.*;
 
-import org.jscience.politics.military.Conflict;
+import org.jscience.social.politics.military.Conflict;
 
-import org.jscience.geography.Address;
-import org.jscience.linguistics.Language;
+import org.jscience.social.geography.Address;
+import org.jscience.social.linguistics.Language;
 
 public class Phase4DomainTest {
 
