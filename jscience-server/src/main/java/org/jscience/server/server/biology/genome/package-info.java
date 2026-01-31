@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.biology.genome;
+package org.jscience.natural.biology.genome;

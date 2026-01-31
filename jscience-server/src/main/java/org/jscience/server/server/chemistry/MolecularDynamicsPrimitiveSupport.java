@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.chemistry;
+package org.jscience.natural.chemistry;
 
 /**
  * Primitive-based support for Molecular Dynamics simulation.

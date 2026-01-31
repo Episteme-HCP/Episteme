@@ -45,8 +45,8 @@ import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.core.ui.ThemeManager;
-import org.jscience.natural.biology.structure.ProteinFoldingTask;
-import org.jscience.natural.biology.structure.ProteinFoldingTask.Monomer;
+import org.jscience.server.server.biology.structure.ProteinFoldingTask;
+import org.jscience.server.server.biology.structure.ProteinFoldingTask.Monomer;
 import org.jscience.server.proto.*;
 
 import java.io.*;

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.earth.climate;
+package org.jscience.natural.earth.climate;
 
 import java.io.Serializable;
 import org.jscience.core.mathematics.numbers.real.Real;

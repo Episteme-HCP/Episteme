@@ -35,7 +35,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import org.jscience.natural.biology.genome.CrisprTask;
+import org.jscience.server.server.biology.genome.CrisprTask;
 import org.jscience.natural.biology.loaders.FASTAReader;
 import org.jscience.server.proto.*;
 
@@ -132,7 +132,7 @@ public class DistributedCrisprApp extends Application implements org.jscience.co
     }
 
     private void loadFasta(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.file.load.title", "Load FASTA"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.file.fasta", "FASTA Files"), "*.fasta",
+        File file = org.jscience.client.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.file.load.title", "Load FASTA"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.file.fasta", "FASTA Files"), "*.fasta",
                 "*.fa");
         if (file != null) {
             try {

@@ -261,7 +261,7 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
     }
 
     private void loadObstacleMap(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedfluidsimapp.file.load_map", "Load Obstacle Map"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedfluidsimapp.file.images", "Images"), "*.png",
+        File file = org.jscience.client.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedfluidsimapp.file.load_map", "Load Obstacle Map"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedfluidsimapp.file.images", "Images"), "*.png",
                 "*.jpg", "*.bmp");
         if (file != null) {
             try {

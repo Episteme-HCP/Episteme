@@ -440,7 +440,7 @@ public class DistributedMandelbrotApp extends Application implements org.jscienc
     }
 
     private void saveImage(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.save_img", "Save Image"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.png", "PNG Images"), "*.png");
+        File file = org.jscience.client.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.save_img", "Save Image"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.png", "PNG Images"), "*.png");
         if (file != null) {
             try {
                 ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
@@ -451,7 +451,7 @@ public class DistributedMandelbrotApp extends Application implements org.jscienc
     }
 
     private void saveConfig(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.save_cfg", "Save Config"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.json", "JSON Config"), "*.json");
+        File file = org.jscience.client.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.save_cfg", "Save Config"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.json", "JSON Config"), "*.json");
         if (file != null) {
             try (PrintWriter pw = new PrintWriter(file)) {
                 pw.printf("{\"minRe\": %f, \"maxRe\": %f, \"minIm\": %f, \"maxIm\": %f}", minRe, maxRe, minIm, maxIm);
@@ -462,7 +462,7 @@ public class DistributedMandelbrotApp extends Application implements org.jscienc
     }
 
     private void loadConfig(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.load_cfg", "Load Config"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.json", "JSON Config"), "*.json");
+        File file = org.jscience.client.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.load_cfg", "Load Config"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmandelbrotapp.file.json", "JSON Config"), "*.json");
         if (file != null) {
             try (java.util.Scanner s = new java.util.Scanner(file).useDelimiter("\\A")) {
                 String content = s.hasNext() ? s.next() : "";

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.biology.structure;
+package org.jscience.natural.biology.structure;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -44,7 +44,7 @@ import javafx.stage.Stage;
 import org.jscience.natural.biology.Protein;
 
 import org.jscience.natural.biology.loaders.PDBWriter;
-import org.jscience.natural.biology.structure.DnaFoldingTask;
+import org.jscience.server.server.biology.structure.DnaFoldingTask;
 import org.jscience.natural.chemistry.Atom;
 import org.jscience.natural.chemistry.PeriodicTable;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;

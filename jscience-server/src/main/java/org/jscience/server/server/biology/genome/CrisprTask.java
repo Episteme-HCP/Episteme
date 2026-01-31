@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.biology.genome;
+package org.jscience.natural.biology.genome;
 
 import java.io.Serializable;
 import java.util.ArrayList;

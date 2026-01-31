@@ -34,9 +34,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.social.economics.DistributedEconomyTask;
+import org.jscience.server.server.economics.DistributedEconomyTask;
 import org.jscience.social.politics.loaders.WorldBankReader;
-import org.jscience.social.politics.GeopoliticalEngineTask;
+import org.jscience.server.server.politics.GeopoliticalEngineTask;
 import org.jscience.social.politics.loaders.FactbookReader;
 import org.jscience.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
@@ -206,7 +206,7 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
     }
 
     private void exportReport(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.export_report", "Export Report"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.csv", "CSV Files"), "*.csv");
+        File file = org.jscience.client.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.export_report", "Export Report"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.csv", "CSV Files"), "*.csv");
         if (file != null) {
             try (PrintWriter pw = new PrintWriter(file)) {
                 pw.println("Step,Metric,Value");

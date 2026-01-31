@@ -48,7 +48,7 @@ import org.jscience.natural.biology.loaders.PDBWriter;
 import org.jscience.natural.biology.Protein;
 import org.jscience.natural.chemistry.Atom;
 import org.jscience.natural.chemistry.PeriodicTable;
-import org.jscience.natural.chemistry.MolecularDynamicsTask;
+import org.jscience.server.server.chemistry.MolecularDynamicsTask;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.sets.Reals;
 
@@ -412,7 +412,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
     }
 
     private void loadPdb(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.open.title", "Load Protein PDB"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb",
+        File file = org.jscience.client.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.open.title", "Load Protein PDB"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb",
                 "*.ent");
         if (file != null) {
             try {

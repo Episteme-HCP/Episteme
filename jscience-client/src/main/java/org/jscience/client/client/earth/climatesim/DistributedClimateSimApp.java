@@ -39,7 +39,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.natural.earth.climate.GeneralCirculationModelTask;
+import org.jscience.server.server.earth.climate.GeneralCirculationModelTask;
 
 import org.jscience.core.mathematics.loaders.VTKWriter;
 import org.jscience.server.proto.*;
@@ -183,7 +183,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
     }
 
     private void exportToVtk(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.save.vtk", "Save VTK Export"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.vtk", "VTK Files"), "*.vtk");
+        File file = org.jscience.client.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.save.vtk", "Save VTK Export"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.vtk", "VTK Files"), "*.vtk");
         if (file != null) {
             try {
                 new VTKWriter().save(task.getSurfaceTemperature(), file.getAbsolutePath());
@@ -195,7 +195,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
     }
 
     private void exportToJSON(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.save.json", "Save JSON State"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
+        File file = org.jscience.client.client.util.FileHelper.showSaveDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.save.json", "Save JSON State"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
                 "*.json");
         if (file != null) {
             try {
@@ -215,7 +215,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
     }
 
     private void loadFromJSON(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.load.json", "Load JSON State"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
+        File file = org.jscience.client.client.util.FileHelper.showOpenDialog(stage, org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.load.json", "Load JSON State"), org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.file.json", "JSON Files"),
                 "*.json");
         if (file != null) {
             try {

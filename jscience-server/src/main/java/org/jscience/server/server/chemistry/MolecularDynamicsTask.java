@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.chemistry;
+package org.jscience.natural.chemistry;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
