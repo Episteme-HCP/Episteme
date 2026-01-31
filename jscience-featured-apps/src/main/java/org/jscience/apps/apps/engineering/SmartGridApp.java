@@ -25,7 +25,7 @@ package org.jscience.apps.apps.engineering;
 
 import java.util.Random;
 import javafx.animation.KeyFrame;
-import org.jscience.social.history.Timeline;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
@@ -37,7 +37,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import org.jscience.social.arts.music.Duration;
+import javafx.util.Duration;
 
 import org.jscience.apps.apps.framework.ChartFactory;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
@@ -97,7 +97,7 @@ public class SmartGridApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.name", "Smart Grid Simulator");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.name", "Smart Grid Simulator");
     }
 
     @Override
@@ -107,12 +107,12 @@ public class SmartGridApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.desc", "Real-time power grid frequency balance simulation.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.desc", "Real-time power grid frequency balance simulation.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.longdesc", "Advanced engineering simulator for smart power grids. Features real-time frequency balancing, intermittent renewable energy sources (Wind/Solar), and battery storage management to prevent blackouts and ensure grid stability.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.smartgridapp.longdesc", "Advanced engineering simulator for smart power grids. Features real-time frequency balancing, intermittent renewable energy sources (Wind/Solar), and battery storage management to prevent blackouts and ensure grid stability.");
     }
 
     @Override
@@ -475,7 +475,7 @@ public class SmartGridApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppHelpTopics(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Engineering", "Smart Grid Concepts",
                 "Understand the power grid:\n\n" +
                         "- **Supply vs Demand**: Grid frequency deviates when supply != demand.\n" +
@@ -486,7 +486,7 @@ public class SmartGridApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppTutorials(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Tutorial", "Balancing the Grid",
                 "1. **Monitor Frequency**: Keep the frequency gauge near 50Hz (Green Zone).\n" +
                         "2. **Adjust Supply**: Use sliders to increase Coal, Wind, or Solar output to match Demand.\n" +
@@ -582,6 +582,6 @@ public class SmartGridApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("category.engineering", "Engineering");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("category.engineering", "Engineering");
     }
 }

@@ -23,14 +23,14 @@
 
 package org.jscience.apps.apps.physics.spintronics;
 
-import org.jscience.social.sociology.Group;
+import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import org.jscience.core.mathematics.geometry.surfaces.Cylinder;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.apps.apps.framework.JScienceTheme;

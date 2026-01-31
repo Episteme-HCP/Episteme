@@ -24,7 +24,7 @@
 package org.jscience.apps.apps.biology;
 
 import javafx.animation.KeyFrame;
-import org.jscience.social.history.Timeline;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -36,7 +36,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import org.jscience.social.arts.music.Duration;
+import javafx.util.Duration;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -96,7 +96,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.name", "Pandemic Forecaster");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.name", "Pandemic Forecaster");
     }
 
     @Override
@@ -106,12 +106,12 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.desc", "Simulate disease spread using SEIR models.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.desc", "Simulate disease spread using SEIR models.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.longdesc", "Advanced biological simulator for modeling the propagation of infectious diseases. Implements the SEIR (Susceptible-Exposed-Infectious-Recovered-Deceased) compartmental model with support for real-world demographic data from the World Bank and adjustable parameters for transmission, incubation, recovery, and mortality rates.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.pandemicforecasterapp.longdesc", "Advanced biological simulator for modeling the propagation of infectious diseases. Implements the SEIR (Susceptible-Exposed-Infectious-Recovered-Deceased) compartmental model with support for real-world demographic data from the World Bank and adjustable parameters for transmission, incubation, recovery, and mortality rates.");
     }
 
     @Override
@@ -584,7 +584,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppHelpTopics(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Scientific Model", "SEIR Model",
                 "This application uses the **SEIR** compartmental model:\n\n" +
                         "- **S**usceptible: Individuals who can catch the disease.\n" +
@@ -601,7 +601,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppTutorials(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Tutorial", "Running a Simulation",
                 "1. Select a **Country** from the dropdown.\n" +
                         "2. Adjust the parameters (Transmission, Incubation, etc.) to match the disease characteristics.\n"
@@ -669,6 +669,6 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("category.biology", "Biology");
     }
 }

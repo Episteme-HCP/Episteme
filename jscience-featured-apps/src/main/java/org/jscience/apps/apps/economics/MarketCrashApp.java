@@ -24,7 +24,7 @@
 package org.jscience.apps.apps.economics;
 
 import javafx.animation.KeyFrame;
-import org.jscience.social.history.Timeline;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.chart.*;
@@ -32,7 +32,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import org.jscience.social.arts.music.Duration;
+import javafx.util.Duration;
 
 import org.jscience.apps.apps.framework.ChartFactory;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
@@ -82,7 +82,7 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.name", "Market Crash Analysis");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.name", "Market Crash Analysis");
     }
 
     @Override
@@ -92,12 +92,12 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.desc", "Financial market simulation and technical analysis.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.desc", "Financial market simulation and technical analysis.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.longdesc", "Sophisticated financial simulator designed to analyze market trends and predict potential crashes. Includes technical indicators like Simple Moving Average (SMA), Relative Strength Index (RSI), and Bollinger Bands, with real-time risk assessment and historical data playback.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.marketcrashapp.longdesc", "Sophisticated financial simulator designed to analyze market trends and predict potential crashes. Includes technical indicators like Simple Moving Average (SMA), Relative Strength Index (RSI), and Bollinger Bands, with real-time risk assessment and historical data playback.");
     }
 
     @Override
@@ -540,7 +540,7 @@ public class MarketCrashApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppHelpTopics(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Economics", "Market Analysis",
                 "Technical analysis tools included:\n\n" +
                         "- **SMA (Simple Moving Average)**: Average price over a specific period (trend).\n" +
@@ -552,7 +552,7 @@ public class MarketCrashApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppTutorials(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Tutorial", "Predicting Crashes",
                 "1. **Load Data**: The app loads S&P 500 data automatically.\n" +
                         "2. **Run Simulation**: Click **Run** to replay historical market data.\n" +
@@ -613,6 +613,6 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("category.economics", "Economics");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("category.economics", "Economics");
     }
 }

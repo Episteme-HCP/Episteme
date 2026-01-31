@@ -142,7 +142,7 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.titrationapp.name", "Acid-Base Titration");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.titrationapp.name", "Acid-Base Titration");
     }
 
     @Override
@@ -152,12 +152,12 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.titrationapp.desc", "Simulate titration experiments with various acids and indicators.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.titrationapp.desc", "Simulate titration experiments with various acids and indicators.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("viewer.titrationapp.longdesc", "Virtual chemistry laboratory for performing acid-base titrations. Supports monoprotic and multi-protic acids (HCl, H2SO4, H3PO4, etc.) with a range of indicators including Phenolphthalein and Methyl Orange. Features real-time pH curve plotting and laboratory equipment visualization.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.titrationapp.longdesc", "Virtual chemistry laboratory for performing acid-base titrations. Supports monoprotic and multi-protic acids (HCl, H2SO4, H3PO4, etc.) with a range of indicators including Phenolphthalein and Methyl Orange. Features real-time pH curve plotting and laboratory equipment visualization.");
     }
 
     @Override
@@ -498,7 +498,7 @@ public class TitrationApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppHelpTopics(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Chemistry", "Acid-Base Titration",
                 "Simulate titration experiments:\n\n" +
                         "\u2022 **Titration**: Determining concentration of an acid by neutralizing it with a base of known concentration.\n"
@@ -512,7 +512,7 @@ public class TitrationApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppTutorials(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Tutorial", "Performing a Titration",
                 "1. **Select Acid**: Choose the acid type (e.g., HCl, H2SO4).\n" +
                         "2. **Select Indicator**: Choose an appropriate indicator for the expected pH change.\n" +
@@ -578,6 +578,6 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 }

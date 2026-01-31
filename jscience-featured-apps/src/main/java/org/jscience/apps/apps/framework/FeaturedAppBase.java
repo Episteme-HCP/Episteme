@@ -27,7 +27,8 @@ import org.jscience.core.ui.i18n.I18NManager;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import org.jscience.social.arts.theater.Scene;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
@@ -174,23 +175,23 @@ public abstract class FeaturedAppBase extends Application implements App {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("category.featured_apps", "Featured Apps");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("category.featured_apps", "Featured Apps");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("app." + getClass().getSimpleName().toLowerCase() + ".name", getAppTitle().replace(" - JScience", ""));
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("app." + getClass().getSimpleName().toLowerCase() + ".name", getAppTitle().replace(" - JScience", ""));
     }
 
     @Override
     public String getDescription() {
         // Standardized key based on class name, e.g., "CrystalStructureApp.desc"
-        return org.jscience.ui.i18n.I18N.getInstance().get(getClass().getSimpleName() + ".desc", "Featured Scientific Application");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get(getClass().getSimpleName() + ".desc", "Featured Scientific Application");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18N.getInstance().get(getClass().getSimpleName() + ".longdesc", "A comprehensive scientific simulation and visualization application part of the JScience suite.");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get(getClass().getSimpleName() + ".longdesc", "A comprehensive scientific simulation and visualization application part of the JScience suite.");
     }
 
     @Override

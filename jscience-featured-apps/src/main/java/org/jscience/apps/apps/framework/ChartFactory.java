@@ -24,10 +24,11 @@
 package org.jscience.apps.apps.framework;
 
 import javafx.animation.KeyFrame;
-import org.jscience.social.history.Timeline;
+import javafx.animation.Timeline;
 
 import javafx.scene.chart.*;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;

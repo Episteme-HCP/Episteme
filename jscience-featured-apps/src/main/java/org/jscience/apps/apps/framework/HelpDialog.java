@@ -29,6 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.jscience.core.ui.i18n.I18NManager;
 
@@ -106,7 +107,7 @@ public class HelpDialog extends Dialog<Void> {
     private void showTopic(String title) {
         HelpTopic topic = topics.get(title);
         if (topic == null) {
-            detailPane.setContent(new Label(org.jscience.ui.i18n.I18N.getInstance().get("auto.helpdialog.select_a_topic_to_view_details", "Select a topic to view details.")));
+            detailPane.setContent(new Label(org.jscience.core.ui.i18n.I18N.getInstance().get("auto.helpdialog.select_a_topic_to_view_details", "Select a topic to view details.")));
             return;
         }
 

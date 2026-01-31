@@ -23,7 +23,7 @@
 
 package org.jscience.apps.apps.physics;
 
-import org.jscience.social.geography.Region;
+import javafx.scene.layout.Region;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
 import org.jscience.core.ui.i18n.I18N;
 import org.jscience.natural.ui.viewers.physics.quantum.QuantumCircuitViewer;

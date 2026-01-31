@@ -32,7 +32,7 @@ import org.jscience.social.ui.viewers.sociology.DemographicProfileViewer;
 import org.jscience.social.economics.loaders.EconomicScenarioReader;
 import org.jscience.social.sociology.loaders.DemographicResourceReader;
 import java.util.logging.Level;
-import org.jscience.core.util.Logger;
+import java.util.logging.Logger;
 
 /**
  * Global Stability Studio: A professional tool for analyzing world risks.

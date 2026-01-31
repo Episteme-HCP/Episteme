@@ -22,7 +22,7 @@
  */
 
 /**
- * Core functionality for the org.jscience.apps.shared package in the JScience library.
+ * Core functionality for the org.jscience.apps.apps.shared package in the JScience library.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

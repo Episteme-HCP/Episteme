@@ -137,7 +137,7 @@ public class CivilizationApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppHelpTopics(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Dynamics", "Population Growth",
                 "Population grows based on birth rate minus death rate.\n\nDeath rate is influenced by pollution and scarcity.",
                 null);
@@ -147,7 +147,7 @@ public class CivilizationApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppTutorials(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Tutorials", "Avoiding Collapse",
                 "To avoid collapse:\n1. Keep consumption moderate.\n2. Invest in innovation.\n3. Control birth rate if resources dwindle.",
                 null);
@@ -254,7 +254,7 @@ public class CivilizationApp extends FeaturedAppBase {
             } else {
                 double newValue = s.getValue();
                 if (Math.abs(newValue - oldValue[0]) > 0.0001) {
-                    undoManager.push(new org.jscience.apps.framework.UndoManager.Action() {
+                    undoManager.push(new org.jscience.apps.apps.framework.UndoManager.Action() {
                         @Override
                         public void undo() {
                             s.setValue(oldValue[0]);

@@ -27,8 +27,8 @@ import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import org.jscience.core.mathematics.geometry.surfaces.Cylinder;
-import org.jscience.core.mathematics.geometry.surfaces.Sphere;
+import javafx.scene.shape.Cylinder;
+import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import org.jscience.core.mathematics.numbers.real.Real;
 

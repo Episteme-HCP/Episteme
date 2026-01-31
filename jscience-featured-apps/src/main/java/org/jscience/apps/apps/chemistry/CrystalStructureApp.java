@@ -23,8 +23,8 @@
 
 package org.jscience.apps.apps.chemistry;
 
-import org.jscience.natural.biology.loaders.neuroml.Point3D;
-import org.jscience.social.sociology.Group;
+import javafx.geometry.Point3D;
+import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
@@ -33,8 +33,8 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import org.jscience.core.mathematics.geometry.surfaces.Cylinder;
-import org.jscience.core.mathematics.geometry.surfaces.Sphere;
+import javafx.scene.shape.Cylinder;
+import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
@@ -625,7 +625,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppHelpTopics(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Structures", "Lattice Types",
                 "Explore various crystal lattice structures:\n\n" +
                         "Ã¢â‚¬Â¢ **Simple Cubic (SC)**: Simplest repeating unit (e.g. Polonium).\n" +
@@ -638,7 +638,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
     }
 
     @Override
-    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+    protected void addAppTutorials(org.jscience.apps.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Tutorial", "Navigating 3D Space",
                 "1. **Rotate**: Drag with the mouse to rotate the crystal structure.\n" +
                         "2. **Zoom**: Use the scroll wheel to zoom in and out.\n" +
@@ -698,6 +698,6 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
+        return org.jscience.core.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 }

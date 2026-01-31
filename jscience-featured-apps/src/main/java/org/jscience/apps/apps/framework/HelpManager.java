@@ -26,6 +26,7 @@ package org.jscience.apps.apps.framework;
 import org.jscience.core.ui.i18n.I18NManager;
 
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

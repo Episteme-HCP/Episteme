@@ -32,7 +32,7 @@ import org.jscience.social.ui.viewers.geography.SpatialFluxViewer;
 import org.jscience.natural.biology.loaders.BiologicalResourceReader;
 import org.jscience.natural.biology.ProteinFolding;
 import java.util.logging.Level;
-import org.jscience.core.util.Logger;
+import java.util.logging.Logger;
 
 
 /**
