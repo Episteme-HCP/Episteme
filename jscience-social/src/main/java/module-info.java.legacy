@@ -1,0 +1,30 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+/**
+ * JScience Social module providing social sciences (Economics, Sociology, etc.) infrastructure.
+ */
+module org.jscience.social {
+    requires transitive org.jscience.core;
+    requires transitive org.jscience.natural;
+    
+    requires com.fasterxml.jackson.databind;
+    requires io.github.resilience4j.ratelimiter;
+
+    exports org.jscience.social.architecture;
+    exports org.jscience.social.arts;
+    exports org.jscience.social.economics;
+    exports org.jscience.social.geography;
+    exports org.jscience.social.history;
+    exports org.jscience.social.law;
+    exports org.jscience.social.linguistics;
+    exports org.jscience.social.medicine;
+    exports org.jscience.social.philosophy;
+    exports org.jscience.social.politics;
+    exports org.jscience.social.psychology;
+    exports org.jscience.social.sociology;
+    exports org.jscience.social.sports;
+    exports org.jscience.social.ui;
+}

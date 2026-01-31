@@ -1,0 +1,14 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+/**
+ * JScience Worker module providing distributed computation nodes.
+ */
+module org.jscience.worker {
+    requires transitive org.jscience.core;
+    requires transitive org.jscience.natural;
+    
+    exports org.jscience.worker;
+}
