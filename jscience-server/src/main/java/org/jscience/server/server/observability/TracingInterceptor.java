@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.observability;
+package org.jscience.server.server.observability;
 
 import io.grpc.*;
 import org.slf4j.Logger;

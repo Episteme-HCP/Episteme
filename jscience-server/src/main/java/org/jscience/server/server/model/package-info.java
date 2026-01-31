@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.model;
+package org.jscience.server.server.model;

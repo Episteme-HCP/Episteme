@@ -21,11 +21,11 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.service;
+package org.jscience.server.server.service;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-﻿package org.jscience.social.geography.loaders.gml;
+package org.jscience.social.geography.loaders.gml;
 
 import org.jscience.natural.earth.Place;
 import org.jscience.natural.earth.PlaceType;

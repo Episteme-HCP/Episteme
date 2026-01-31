@@ -21,11 +21,11 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.config;
+package org.jscience.server.server.config;
 
-import org.jscience.server.auth.Roles;
-import org.jscience.server.model.User;
-import org.jscience.server.repository.UserRepository;
+import org.jscience.server.server.auth.Roles;
+import org.jscience.server.server.model.User;
+import org.jscience.server.server.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

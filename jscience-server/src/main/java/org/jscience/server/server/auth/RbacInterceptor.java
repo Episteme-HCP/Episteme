@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.auth;
+package org.jscience.server.server.auth;
 
 import io.grpc.*;
 import org.slf4j.Logger;

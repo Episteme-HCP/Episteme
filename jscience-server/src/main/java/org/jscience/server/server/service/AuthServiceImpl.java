@@ -21,15 +21,15 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.service;
+package org.jscience.server.server.service;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.jscience.server.auth.JWTUtil;
-import org.jscience.server.auth.OIDCProvider;
-import org.jscience.server.model.User;
-import org.jscience.server.proto.*;
-import org.jscience.server.repository.UserRepository;
+import org.jscience.server.server.auth.JWTUtil;
+import org.jscience.server.server.auth.OIDCProvider;
+import org.jscience.server.server.model.User;
+import org.jscience.server.server.proto.*;
+import org.jscience.server.server.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

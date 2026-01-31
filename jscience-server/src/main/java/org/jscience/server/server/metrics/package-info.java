@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.metrics.
  */
-package org.jscience.server.metrics;
+package org.jscience.server.server.metrics;

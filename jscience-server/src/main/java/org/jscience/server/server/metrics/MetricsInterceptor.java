@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.metrics;
+package org.jscience.server.server.metrics;
 
 import io.grpc.*;
 import org.slf4j.Logger;

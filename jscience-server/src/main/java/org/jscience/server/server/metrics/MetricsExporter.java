@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.metrics;
+package org.jscience.server.server.metrics;
 
 import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;

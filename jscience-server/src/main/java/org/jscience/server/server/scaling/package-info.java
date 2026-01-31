@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.scaling.
  */
-package org.jscience.server.scaling;
+package org.jscience.server.server.scaling;

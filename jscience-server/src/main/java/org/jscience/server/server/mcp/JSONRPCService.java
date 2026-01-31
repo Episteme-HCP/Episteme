@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.mcp;
+package org.jscience.server.server.mcp;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

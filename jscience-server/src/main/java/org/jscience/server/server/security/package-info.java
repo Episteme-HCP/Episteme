@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.security.
  */
-package org.jscience.server.security;
+package org.jscience.server.server.security;

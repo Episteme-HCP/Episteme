@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.scheduling;
+package org.jscience.server.server.scheduling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

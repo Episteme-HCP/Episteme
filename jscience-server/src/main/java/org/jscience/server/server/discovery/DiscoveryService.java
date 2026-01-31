@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.discovery;
+package org.jscience.server.server.discovery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

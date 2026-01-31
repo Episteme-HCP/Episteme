@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.auth;
+package org.jscience.server.server.auth;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

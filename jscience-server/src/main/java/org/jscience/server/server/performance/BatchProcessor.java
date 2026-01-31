@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.performance;
+package org.jscience.server.server.performance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

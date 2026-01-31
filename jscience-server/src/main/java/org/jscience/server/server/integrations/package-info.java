@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.integrations.
  */
-package org.jscience.server.integrations;
+package org.jscience.server.server.integrations;

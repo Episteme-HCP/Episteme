@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.scheduling.
  */
-package org.jscience.server.scheduling;
+package org.jscience.server.server.scheduling;

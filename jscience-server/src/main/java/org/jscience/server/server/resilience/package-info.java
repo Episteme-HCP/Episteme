@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.resilience.
  */
-package org.jscience.server.resilience;
+package org.jscience.server.server.resilience;

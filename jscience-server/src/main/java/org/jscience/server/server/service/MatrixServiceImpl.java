@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.service;
+package org.jscience.server.server.service;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.jscience.server.proto.MatrixData;
-import org.jscience.server.proto.MatrixRequest;
-import org.jscience.server.proto.MatrixResponse;
-import org.jscience.server.proto.MatrixServiceGrpc;
+import org.jscience.server.server.proto.MatrixData;
+import org.jscience.server.server.proto.MatrixRequest;
+import org.jscience.server.server.proto.MatrixResponse;
+import org.jscience.server.server.proto.MatrixServiceGrpc;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 
 import org.slf4j.Logger;

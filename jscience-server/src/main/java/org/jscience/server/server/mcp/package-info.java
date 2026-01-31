@@ -28,4 +28,4 @@
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-package org.jscience.server.mcp;
+package org.jscience.server.server.mcp;

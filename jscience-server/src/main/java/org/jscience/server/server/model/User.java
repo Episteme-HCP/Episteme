@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.model;
+package org.jscience.server.server.model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;

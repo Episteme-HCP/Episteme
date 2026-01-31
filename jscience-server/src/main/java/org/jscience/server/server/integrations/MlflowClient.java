@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.integrations;
+package org.jscience.server.server.integrations;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

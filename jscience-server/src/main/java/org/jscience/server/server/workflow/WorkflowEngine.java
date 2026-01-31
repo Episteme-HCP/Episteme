@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.workflow;
+package org.jscience.server.server.workflow;
 
-import org.jscience.server.scheduling.TaskDependencyGraph;
+import org.jscience.server.server.scheduling.TaskDependencyGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

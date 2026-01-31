@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.mcp;
+package org.jscience.server.server.mcp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.scaling;
+package org.jscience.server.server.scaling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

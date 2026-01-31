@@ -1,4 +1,4 @@
-﻿package org.jscience.social.earth.loaders.gml;
+package org.jscience.social.earth.loaders.gml;
 
 import org.jscience.social.geography.loaders.gml.GMLReader;
 import org.junit.jupiter.api.Test;

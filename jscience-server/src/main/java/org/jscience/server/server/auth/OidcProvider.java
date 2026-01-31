@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.auth;
+package org.jscience.server.server.auth;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

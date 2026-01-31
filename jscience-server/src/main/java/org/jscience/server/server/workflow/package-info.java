@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.workflow.
  */
-package org.jscience.server.workflow;
+package org.jscience.server.server.workflow;

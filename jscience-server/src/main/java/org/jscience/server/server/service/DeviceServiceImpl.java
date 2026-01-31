@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.service;
+package org.jscience.server.server.service;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.jscience.core.device.Device;
-import org.jscience.server.integrations.DeviceRegistry;
-import org.jscience.server.proto.*;
+import org.jscience.server.server.integrations.DeviceRegistry;
+import org.jscience.server.server.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

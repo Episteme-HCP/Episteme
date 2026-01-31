@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.auth;
+package org.jscience.server.server.auth;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

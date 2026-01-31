@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.repository;
+package org.jscience.server.server.repository;
 
-import org.jscience.server.model.User;
+import org.jscience.server.server.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;

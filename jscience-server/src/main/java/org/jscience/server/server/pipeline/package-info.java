@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.pipeline.
  */
-package org.jscience.server.pipeline;
+package org.jscience.server.server.pipeline;

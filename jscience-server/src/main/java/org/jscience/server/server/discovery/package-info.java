@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.discovery.
  */
-package org.jscience.server.discovery;
+package org.jscience.server.server.discovery;

@@ -1,0 +1,183 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.jscience.physics.nbody;
+
+import org.jscience.distributed.DistributedTask;
+import org.jscience.distributed.TaskRegistry;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.technical.backend.algorithms.NBodyProvider;
+import org.jscience.technical.backend.algorithms.MulticoreNBodyProvider;
+
+public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
+
+    public static class Body implements Serializable {
+        public double x, y, z;
+        public double vx, vy, vz;
+        public double mass;
+
+        public Body(double x, double y, double z, double vx, double vy, double vz, double mass) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.vx = vx;
+            this.vy = vy;
+            this.vz = vz;
+            this.mass = mass;
+        }
+    }
+
+    private List<Body> bodies;
+    private double dt = 0.01;
+    private double softening = 0.1;
+    private static final double G = 1.0;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+
+    public NBodyTask(List<Body> bodies) {
+        this.bodies = new ArrayList<>(bodies);
+    }
+
+    public void setMode(TaskRegistry.PrecisionMode mode) {
+        this.mode = mode;
+    }
+
+    public NBodyTask() {
+        this.bodies = new ArrayList<>();
+    }
+
+    @Override
+    public Class<NBodyTask> getInputType() {
+        return NBodyTask.class;
+    }
+
+    @Override
+    public Class<NBodyTask> getOutputType() {
+        return NBodyTask.class;
+    }
+
+    @Override
+    public NBodyTask execute(NBodyTask input) {
+        if (input != null && input.bodies != null) {
+            input.step();
+            return input;
+        }
+        if (this.bodies != null && !this.bodies.isEmpty()) {
+            this.step();
+            return this;
+        }
+        return null;
+    }
+
+    @Override
+    public String getTaskType() {
+        return "N_BODY";
+    }
+
+    public void step() {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
+            stepReal();
+        } else {
+            stepPrimitive();
+        }
+    }
+
+    private void stepReal() {
+        int n = bodies.size();
+        Real[] positions = new Real[n * 3];
+        Real[] masses = new Real[n];
+        Real[] forces = new Real[n * 3];
+
+        for (int i = 0; i < n; i++) {
+            Body b = bodies.get(i);
+            positions[i * 3] = Real.of(b.x);
+            positions[i * 3 + 1] = Real.of(b.y);
+            positions[i * 3 + 2] = Real.of(b.z);
+            masses[i] = Real.of(b.mass);
+        }
+
+        NBodyProvider provider = new MulticoreNBodyProvider();
+        provider.computeForces(positions, masses, forces, Real.of(G), Real.of(softening));
+
+        for (int i = 0; i < n; i++) {
+            Body b = bodies.get(i);
+            double ax = forces[i * 3].doubleValue() / b.mass;
+            double ay = forces[i * 3 + 1].doubleValue() / b.mass;
+            double az = forces[i * 3 + 2].doubleValue() / b.mass;
+
+            b.vx += ax * dt;
+            b.vy += ay * dt;
+            b.vz += az * dt;
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+            b.z += b.vz * dt;
+        }
+    }
+
+    private void stepPrimitive() {
+        int n = bodies.size();
+        double[] positions = new double[n * 3];
+        double[] masses = new double[n];
+        double[] forces = new double[n * 3];
+
+        for (int i = 0; i < n; i++) {
+            Body b = bodies.get(i);
+            positions[i * 3] = b.x;
+            positions[i * 3 + 1] = b.y;
+            positions[i * 3 + 2] = b.z;
+            masses[i] = b.mass;
+        }
+
+        NBodyProvider provider = new MulticoreNBodyProvider();
+        provider.computeForces(positions, masses, forces, G, softening);
+
+        for (int i = 0; i < n; i++) {
+            Body b = bodies.get(i);
+            double ax = forces[i * 3] / b.mass;
+            double ay = forces[i * 3 + 1] / b.mass;
+            double az = forces[i * 3 + 2] / b.mass;
+
+            b.vx += ax * dt;
+            b.vy += ay * dt;
+            b.vz += az * dt;
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+            b.z += b.vz * dt;
+        }
+    }
+
+    public List<Body> getBodies() {
+        return bodies;
+    }
+
+    public void setDt(double dt) {
+        this.dt = dt;
+    }
+
+    public void setSoftening(double s) {
+        this.softening = s;
+    }
+}

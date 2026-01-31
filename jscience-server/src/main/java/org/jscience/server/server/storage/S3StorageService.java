@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.storage;
+package org.jscience.server.server.storage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

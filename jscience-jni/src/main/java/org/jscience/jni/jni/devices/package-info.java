@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.jscience.jni.devices;
+package org.jscience.jni.jni.devices;

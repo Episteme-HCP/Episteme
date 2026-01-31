@@ -16,14 +16,12 @@
     <module>jscience-social</module>
     <module>jscience-native</module>
     <module>jscience-benchmarks</module>
-    <!--
     <module>jscience-featured-apps</module>
     <module>jscience-server</module>
+    <module>jscience-worker</module>
     <module>jscience-client</module>
-    -->
     <module>jscience-database</module>
     <module>jscience-jni</module>
-    <module>jscience-worker</module>
   </modules>
   <licenses>
     <license>

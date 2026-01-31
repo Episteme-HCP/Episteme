@@ -33,4 +33,4 @@
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-package org.jscience.server.auth;
+package org.jscience.server.server.auth;

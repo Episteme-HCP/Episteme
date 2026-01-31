@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.performance;
+package org.jscience.server.server.performance;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

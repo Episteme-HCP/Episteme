@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.auth;
+package org.jscience.server.server.auth;
 
 /**
  * Standard roles for JScience Grid role-based access control.

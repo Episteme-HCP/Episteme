@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.constants;
+package org.jscience.server.server.constants;
 
 /**
  * Service-related constants for JScience Server.

@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.storage.
  */
-package org.jscience.server.storage;
+package org.jscience.server.server.storage;

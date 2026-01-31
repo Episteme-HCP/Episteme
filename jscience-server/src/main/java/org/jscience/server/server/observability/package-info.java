@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.observability.
  */
-package org.jscience.server.observability;
+package org.jscience.server.server.observability;

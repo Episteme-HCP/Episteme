@@ -24,4 +24,4 @@
 /**
  * Provides classes and interfaces for org.jscience.server.performance.
  */
-package org.jscience.server.performance;
+package org.jscience.server.server.performance;

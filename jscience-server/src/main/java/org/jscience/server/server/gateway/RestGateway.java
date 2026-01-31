@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.server.gateway;
+package org.jscience.server.server.gateway;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,9 +31,9 @@ import com.google.protobuf.ByteString;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.jscience.server.metrics.MetricsRegistry; // We might need to migrate this later
-import org.jscience.server.proto.*;
-import org.jscience.server.auth.Roles;
+import org.jscience.server.server.metrics.MetricsRegistry; // We might need to migrate this later
+import org.jscience.server.server.proto.*;
+import org.jscience.server.server.auth.Roles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
