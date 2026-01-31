@@ -94,7 +94,7 @@ public class DataExporter {
             writer.println("Cell,X_nm,Mx,My,Mz");
             for (int i = 0; i < sim.getNumCells(); i++) {
                 double x = i * sim.getCellSize().doubleValue() * 1e9;
-                org.jscience.mathematics.numbers.real.Real[] m = sim.getMagnetization(i);
+                org.jscience.core.mathematics.numbers.real.Real[] m = sim.getMagnetization(i);
                 writer.printf("%d,%.2f,%.6f,%.6f,%.6f%n", i, x, m[0].doubleValue(), m[1].doubleValue(), m[2].doubleValue());
             }
         }
@@ -103,7 +103,7 @@ public class DataExporter {
     /**
      * Exports power spectrum to CSV.
      */
-    public static void exportSpectrum(String filename, double[] frequencies, org.jscience.mathematics.numbers.real.Real[] psd) throws IOException {
+    public static void exportSpectrum(String filename, double[] frequencies, org.jscience.core.mathematics.numbers.real.Real[] psd) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             writer.println("Frequency_GHz,Power");
             int len = Math.min(frequencies.length, psd.length);
@@ -113,3 +113,4 @@ public class DataExporter {
         }
     }
 }
+

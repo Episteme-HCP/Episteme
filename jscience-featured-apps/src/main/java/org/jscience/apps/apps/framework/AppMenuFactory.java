@@ -71,15 +71,15 @@ public class AppMenuFactory {
     private Menu createFileMenu() {
         Menu menu = new Menu(i18n.get("framework.menu.file"));
 
-        MenuItem newItem = new MenuItem(i18n.get("framework.menu.file.new"), org.jscience.ui.IconLoader.getIcon("file-plus"));
+        MenuItem newItem = new MenuItem(i18n.get("framework.menu.file.new"), org.jscience.core.ui.IconLoader.getIcon("file-plus"));
         newItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         newItem.setOnAction(e -> app.onNew());
 
-        MenuItem openItem = new MenuItem(i18n.get("framework.menu.file.open"), org.jscience.ui.IconLoader.getIcon("folder-open"));
+        MenuItem openItem = new MenuItem(i18n.get("framework.menu.file.open"), org.jscience.core.ui.IconLoader.getIcon("folder-open"));
         openItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
         openItem.setOnAction(e -> app.onOpen());
 
-        MenuItem saveItem = new MenuItem(i18n.get("framework.menu.file.save"), org.jscience.ui.IconLoader.getIcon("save"));
+        MenuItem saveItem = new MenuItem(i18n.get("framework.menu.file.save"), org.jscience.core.ui.IconLoader.getIcon("save"));
         saveItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         saveItem.setOnAction(e -> app.onSave());
 
@@ -98,7 +98,7 @@ public class AppMenuFactory {
         exportPdf.setOnAction(e -> app.onExport("pdf"));
         exportMenu.getItems().addAll(exportPng, exportCsv, exportPdf);
 
-        MenuItem exitItem = new MenuItem(i18n.get("framework.menu.file.exit"), org.jscience.ui.IconLoader.getIcon("log-out"));
+        MenuItem exitItem = new MenuItem(i18n.get("framework.menu.file.exit"), org.jscience.core.ui.IconLoader.getIcon("log-out"));
         exitItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
         exitItem.setOnAction(e -> app.onExit());
 
@@ -111,21 +111,21 @@ public class AppMenuFactory {
     private Menu createEditMenu() {
         Menu menu = new Menu(i18n.get("framework.menu.edit"));
 
-        MenuItem undoItem = new MenuItem(i18n.get("framework.menu.edit.undo"), org.jscience.ui.IconLoader.getIcon("undo"));
+        MenuItem undoItem = new MenuItem(i18n.get("framework.menu.edit.undo"), org.jscience.core.ui.IconLoader.getIcon("undo"));
         undoItem.setAccelerator(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN));
         undoItem.setOnAction(e -> app.onUndo());
 
-        MenuItem redoItem = new MenuItem(i18n.get("framework.menu.edit.redo"), org.jscience.ui.IconLoader.getIcon("redo"));
+        MenuItem redoItem = new MenuItem(i18n.get("framework.menu.edit.redo"), org.jscience.core.ui.IconLoader.getIcon("redo"));
         redoItem.setAccelerator(new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN));
         redoItem.setOnAction(e -> app.onRedo());
 
-        MenuItem cutItem = new MenuItem(i18n.get("framework.menu.edit.cut"), org.jscience.ui.IconLoader.getIcon("scissors"));
+        MenuItem cutItem = new MenuItem(i18n.get("framework.menu.edit.cut"), org.jscience.core.ui.IconLoader.getIcon("scissors"));
         cutItem.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN));
 
-        MenuItem copyItem = new MenuItem(i18n.get("framework.menu.edit.copy"), org.jscience.ui.IconLoader.getIcon("copy"));
+        MenuItem copyItem = new MenuItem(i18n.get("framework.menu.edit.copy"), org.jscience.core.ui.IconLoader.getIcon("copy"));
         copyItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
 
-        MenuItem pasteItem = new MenuItem(i18n.get("framework.menu.edit.paste"), org.jscience.ui.IconLoader.getIcon("clipboard"));
+        MenuItem pasteItem = new MenuItem(i18n.get("framework.menu.edit.paste"), org.jscience.core.ui.IconLoader.getIcon("clipboard"));
         pasteItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN));
 
         MenuItem findItem = new MenuItem(i18n.get("framework.menu.edit.find"));
@@ -148,11 +148,11 @@ public class AppMenuFactory {
     private Menu createViewMenu() {
         Menu menu = new Menu(i18n.get("framework.menu.view"));
 
-        MenuItem zoomIn = new MenuItem(i18n.get("framework.menu.view.zoomIn"), org.jscience.ui.IconLoader.getIcon("zoom-in"));
+        MenuItem zoomIn = new MenuItem(i18n.get("framework.menu.view.zoomIn"), org.jscience.core.ui.IconLoader.getIcon("zoom-in"));
         zoomIn.setAccelerator(new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN));
         zoomIn.setOnAction(e -> app.onZoomIn());
 
-        MenuItem zoomOut = new MenuItem(i18n.get("framework.menu.view.zoomOut"), org.jscience.ui.IconLoader.getIcon("zoom-out"));
+        MenuItem zoomOut = new MenuItem(i18n.get("framework.menu.view.zoomOut"), org.jscience.core.ui.IconLoader.getIcon("zoom-out"));
         zoomOut.setAccelerator(new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN));
         zoomOut.setOnAction(e -> app.onZoomOut());
 
@@ -160,16 +160,16 @@ public class AppMenuFactory {
         fitWindow.setOnAction(e -> app.onFitToWindow());
 
         MenuItem fullScreen = new MenuItem(i18n.get("framework.menu.view.fullScreen"),
-                org.jscience.ui.IconLoader.getIcon("maximize"));
+                org.jscience.core.ui.IconLoader.getIcon("maximize"));
         fullScreen.setAccelerator(new KeyCodeCombination(KeyCode.F11));
         fullScreen.setOnAction(e -> app.onFullScreen());
 
         // Theme submenu
         Menu themeMenu = new Menu(i18n.get("framework.menu.view.theme"));
         RadioMenuItem lightTheme = new RadioMenuItem(i18n.get("framework.menu.view.theme.light"),
-                org.jscience.ui.IconLoader.getIcon("sun"));
+                org.jscience.core.ui.IconLoader.getIcon("sun"));
         RadioMenuItem darkTheme = new RadioMenuItem(i18n.get("framework.menu.view.theme.dark"),
-                org.jscience.ui.IconLoader.getIcon("moon"));
+                org.jscience.core.ui.IconLoader.getIcon("moon"));
         ToggleGroup themeGroup = new ToggleGroup();
         lightTheme.setToggleGroup(themeGroup);
         darkTheme.setToggleGroup(themeGroup);
@@ -186,26 +186,26 @@ public class AppMenuFactory {
     private Menu createToolsMenu() {
         Menu menu = new Menu(i18n.get("framework.menu.tools"));
 
-        MenuItem runItem = new MenuItem(i18n.get("framework.menu.tools.run"), org.jscience.ui.IconLoader.getIcon("play"));
+        MenuItem runItem = new MenuItem(i18n.get("framework.menu.tools.run"), org.jscience.core.ui.IconLoader.getIcon("play"));
         runItem.setAccelerator(new KeyCodeCombination(KeyCode.F5));
         runItem.setOnAction(e -> app.onRun());
 
-        MenuItem pauseItem = new MenuItem(i18n.get("framework.menu.tools.pause"), org.jscience.ui.IconLoader.getIcon("pause"));
+        MenuItem pauseItem = new MenuItem(i18n.get("framework.menu.tools.pause"), org.jscience.core.ui.IconLoader.getIcon("pause"));
         pauseItem.setOnAction(e -> app.onPause());
 
-        MenuItem stopItem = new MenuItem(i18n.get("framework.menu.tools.stop"), org.jscience.ui.IconLoader.getIcon("square"));
+        MenuItem stopItem = new MenuItem(i18n.get("framework.menu.tools.stop"), org.jscience.core.ui.IconLoader.getIcon("square"));
         stopItem.setOnAction(e -> app.onStop());
 
         MenuItem resetItem = new MenuItem(i18n.get("framework.menu.tools.reset"),
-                org.jscience.ui.IconLoader.getIcon("rotate-ccw"));
+                org.jscience.core.ui.IconLoader.getIcon("rotate-ccw"));
         resetItem.setOnAction(e -> app.onReset());
 
         MenuItem paramsItem = new MenuItem(i18n.get("framework.menu.tools.parameters"),
-                org.jscience.ui.IconLoader.getIcon("settings"));
+                org.jscience.core.ui.IconLoader.getIcon("settings"));
         paramsItem.setOnAction(e -> app.onShowParameters());
 
         MenuItem consoleItem = new MenuItem(i18n.get("framework.menu.tools.console"),
-                org.jscience.ui.IconLoader.getIcon("terminal"));
+                org.jscience.core.ui.IconLoader.getIcon("terminal"));
         consoleItem.setOnAction(e -> app.onShowConsole());
 
         menu.getItems().addAll(runItem, pauseItem, stopItem, new SeparatorMenuItem(),
@@ -217,7 +217,7 @@ public class AppMenuFactory {
         Menu menu = new Menu(i18n.get("framework.menu.preferences"));
 
         // Language submenu
-        Menu langMenu = new Menu(i18n.get("framework.menu.preferences.language"), org.jscience.ui.IconLoader.getIcon("globe"));
+        Menu langMenu = new Menu(i18n.get("framework.menu.preferences.language"), org.jscience.core.ui.IconLoader.getIcon("globe"));
         ToggleGroup langGroup = new ToggleGroup();
         for (Locale locale : I18NManager.getSupportedLocales()) {
             String name = locale.getDisplayLanguage(locale);
@@ -254,10 +254,11 @@ public class AppMenuFactory {
         MenuItem tutorialItem = new MenuItem(i18n.get("framework.menu.help.tutorials"));
         tutorialItem.setOnAction(e -> app.onShowTutorials());
 
-        MenuItem aboutItem = new MenuItem(i18n.get("framework.menu.help.about"), org.jscience.ui.IconLoader.getIcon("info"));
+        MenuItem aboutItem = new MenuItem(i18n.get("framework.menu.help.about"), org.jscience.core.ui.IconLoader.getIcon("info"));
         aboutItem.setOnAction(e -> app.onShowAbout());
 
         menu.getItems().addAll(docsItem, tutorialItem, new SeparatorMenuItem(), aboutItem);
         return menu;
     }
 }
+

@@ -225,12 +225,12 @@ public class SpintronicCircuitSimulator {
     private Vector<Real> solveDCOperatingPoint() {
         int size = augmentedSize;
         if (size == 0) {
-            return new DenseVector<Real>(java.util.Collections.emptyList(), org.jscience.mathematics.sets.Reals.INSTANCE);
+            return new DenseVector<Real>(java.util.Collections.emptyList(), org.jscience.core.mathematics.sets.Reals.INSTANCE);
         }
         
         Real[] zeroArr = new Real[size];
         Arrays.fill(zeroArr, Real.ZERO);
-        Vector<Real> v_guess = new DenseVector<Real>(Arrays.asList(zeroArr), org.jscience.mathematics.sets.Reals.INSTANCE);
+        Vector<Real> v_guess = new DenseVector<Real>(Arrays.asList(zeroArr), org.jscience.core.mathematics.sets.Reals.INSTANCE);
         
         for (int iter = 0; iter < MAX_NEWTON_ITER; iter++) {
             Real[][] gData = new Real[size][size];
@@ -261,8 +261,8 @@ public class SpintronicCircuitSimulator {
                 gData[i][i] = gData[i][i].add(epsilon);
             }
             
-            Matrix<Real> J = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
-            Vector<Real> rhs = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.mathematics.sets.Reals.INSTANCE);
+            Matrix<Real> J = new DenseMatrix<>(gData, org.jscience.core.mathematics.sets.Reals.INSTANCE);
+            Vector<Real> rhs = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.core.mathematics.sets.Reals.INSTANCE);
             Vector<Real> F = J.multiply(v_guess).subtract(rhs);
             
             if (F.dimension() == 0) return v_guess;
@@ -277,7 +277,7 @@ public class SpintronicCircuitSimulator {
             } catch (ArithmeticException e) {
                 // Matrix is still singular despite regularization, return current guess
                 System.err.println("Warning: Matrix singular in DC operating point, using zero initial state");
-                return new DenseVector<Real>(Arrays.asList(zeroArr), org.jscience.mathematics.sets.Reals.INSTANCE);
+                return new DenseVector<Real>(Arrays.asList(zeroArr), org.jscience.core.mathematics.sets.Reals.INSTANCE);
             }
         }
         return v_guess;
@@ -311,7 +311,7 @@ public class SpintronicCircuitSimulator {
                  stampMatrix(cData, n1, n2, val);
              }
         }
-        C_matrix = new DenseMatrix<>(cData, org.jscience.mathematics.sets.Reals.INSTANCE);
+        C_matrix = new DenseMatrix<>(cData, org.jscience.core.mathematics.sets.Reals.INSTANCE);
     }
 
     private void stampMatrix(Real[][] matrix, int n1, int n2, Real val) {
@@ -346,7 +346,7 @@ public class SpintronicCircuitSimulator {
     private Vector<Real> getInitialState() {
         Real[] state = new Real[augmentedSize];
         Arrays.fill(state, Real.ZERO);
-        return new DenseVector<Real>(Arrays.asList(state), org.jscience.mathematics.sets.Reals.INSTANCE);
+        return new DenseVector<Real>(Arrays.asList(state), org.jscience.core.mathematics.sets.Reals.INSTANCE);
     }
 
     private Vector<Real> solveStep(Vector<Real> prevSol, Real dt, double time) {
@@ -396,8 +396,8 @@ public class SpintronicCircuitSimulator {
                 }
             }
             
-            DenseMatrix<Real> G = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
-            DenseVector<Real> I_source = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.mathematics.sets.Reals.INSTANCE);
+            DenseMatrix<Real> G = new DenseMatrix<>(gData, org.jscience.core.mathematics.sets.Reals.INSTANCE);
+            DenseVector<Real> I_source = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.core.mathematics.sets.Reals.INSTANCE);
             
             // Add regularization to avoid singular matrix (same as in DC solver)
             Real epsilon = Real.of(1e-12);
@@ -405,7 +405,7 @@ public class SpintronicCircuitSimulator {
                 gData[i][i] = gData[i][i].add(epsilon);
             }
             // Re-create G with regularization
-            G = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
+            G = new DenseMatrix<>(gData, org.jscience.core.mathematics.sets.Reals.INSTANCE);
             
             // F = G * v_new + C/dt * v_new - (C/dt*v_old + I_source)
             // Jacobian J = G + C/dt (Approximate G_tan ~ G for simple bias dep)
@@ -513,3 +513,4 @@ public class SpintronicCircuitSimulator {
          return timePoints;
     }
 }
+

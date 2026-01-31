@@ -36,7 +36,7 @@ import org.jscience.apps.apps.framework.FeaturedAppBase;
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.Quantities;
 import org.jscience.core.measure.Units;
-import org.jscience.measure.quantity.*;
+import org.jscience.core.measure.quantity.*;
 import org.jscience.core.ui.i18n.I18N;
 
 /**
@@ -544,3 +544,4 @@ public class CivilizationApp extends FeaturedAppBase {
 
 
 }
+

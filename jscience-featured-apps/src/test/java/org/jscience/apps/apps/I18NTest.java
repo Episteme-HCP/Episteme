@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps;
+package org.jscience.apps.apps;
 
-import org.jscience.ui.i18n.I18NManager;
+import org.jscience.core.ui.i18n.I18NManager;
 import org.junit.jupiter.api.Test;
 import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,3 +58,5 @@ public class I18NTest {
         System.out.println("SUCCESS: Localization keys resolved.");
     }
 }
+
+

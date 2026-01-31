@@ -160,7 +160,7 @@ public class SpinValveApp extends FeaturedAppBase {
         // Tab 4: Magnetic Field Vector View
         Tab magTab = new Tab(i18n.get("spintronics.tab.visualization", "3D Visualization") + " (Field)");
         magTab.setClosable(false);
-        magTab.setContent(new org.jscience.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer());
+        magTab.setContent(new org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer());
         tabPane.getTabs().add(magTab);
 
         centerPanel.getChildren().add(tabPane);
@@ -594,3 +594,5 @@ public class SpinValveApp extends FeaturedAppBase {
         return org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.spinvalveapp.longdesc", "Advanced 3D spintronics simulation laboratory. Includes modules for Giant Magnetoresistance (GMR) effect, Spin-Orbit Torque (SOT), Spin Transfer Torque (STT) oscillators, and interactive magnetic field visualization.");
     }
 }
+
+

@@ -76,7 +76,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
         String type; // "Na", "Cl", "C", "Si"
 
         AtomRecord(double x, double y, double z, String t) {
-            this.position = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, Real.of(x), Real.of(y), Real.of(z));
+            this.position = org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, Real.of(x), Real.of(y), Real.of(z));
             this.type = t;
         }
     }
@@ -316,7 +316,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     private void loadCifStructure(java.io.InputStream is) {
         try {
-            org.jscience.chemistry.loaders.CIFReader.CrystalStructure cif = org.jscience.chemistry.loaders.CIFReader
+            org.jscience.natural.chemistry.loaders.CIFReader.CrystalStructure cif = org.jscience.natural.chemistry.loaders.CIFReader
                     .load(is);
 
             if (cif == null)
@@ -341,7 +341,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
             for (int i = 0; i < repeat; i++) {
                 for (int j = 0; j < repeat; j++) {
                     for (int k = 0; k < repeat; k++) {
-                        for (org.jscience.chemistry.loaders.CIFReader.AtomSite site : cif.atoms) {
+                        for (org.jscience.natural.chemistry.loaders.CIFReader.AtomSite site : cif.atoms) {
                             double x = (site.x + i);
                             double y = (site.y + j);
                             double z = (site.z + k);
@@ -429,7 +429,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
     }
 
     private void loadSample() {
-        try (java.io.InputStream is = getClass().getResourceAsStream("/org/jscience/chemistry/diamond.cif")) {
+        try (java.io.InputStream is = getClass().getResourceAsStream("/org.jscience.natural.chemistry/diamond.cif")) {
             if (is != null) {
                 loadCifStructure(is);
             } else {
@@ -701,3 +701,4 @@ public class CrystalStructureApp extends FeaturedAppBase {
         return org.jscience.core.ui.i18n.I18N.getInstance().get("category.chemistry", "Chemistry");
     }
 }
+

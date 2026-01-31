@@ -22,10 +22,11 @@
  */
 
 /**
- * Core functionality for the org.jscience.apps.anatomy package in the JScience library.
+ * Core functionality for the org.jscience.apps.sociology package in the JScience library.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-package org.jscience.apps.anatomy;
+package org.jscience.apps.apps.sociology;
+

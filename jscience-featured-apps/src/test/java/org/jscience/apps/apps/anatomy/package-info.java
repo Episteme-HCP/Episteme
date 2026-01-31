@@ -21,25 +21,12 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps.ui;
+/**
+ * Core functionality for the org.jscience.apps.anatomy package in the JScience library.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+package org.jscience.apps.apps.anatomy;
 
-import javafx.scene.Node;
-import javafx.stage.Stage;
-import org.jscience.apps.biology.PandemicForecasterApp;
-import org.junit.jupiter.api.Test;
-import org.testfx.framework.junit5.ApplicationTest;
-
-import static org.testfx.api.FxAssert.verifyThat;
-
-public class UiSmokeTest extends ApplicationTest {
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        new PandemicForecasterApp().start(stage);
-    }
-
-    @Test
-    public void testAppLaunch() {
-        verifyThat(".button", (Node n) -> n.isVisible());
-    }
-}

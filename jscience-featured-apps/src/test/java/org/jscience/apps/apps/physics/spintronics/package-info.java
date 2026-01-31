@@ -22,10 +22,11 @@
  */
 
 /**
- * Core functionality for the org.jscience.apps package in the JScience library.
+ * Physical laws, constants, and simulation models for classical and modern physics.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-package org.jscience.apps;
+package org.jscience.apps.apps.physics.spintronics;
+

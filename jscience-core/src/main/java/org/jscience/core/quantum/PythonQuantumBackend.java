@@ -130,10 +130,10 @@ public class PythonQuantumBackend implements QuantumBackend {
 
     private static class AdvancedQuantumCircuit implements QuantumCircuit {
         private final StringBuilder qasm = new StringBuilder("OPENQASM 2.0;\ninclude \"qelib1.inc\";\n");
-        private final int q, c;
+        private final int q;
         public AdvancedQuantumCircuit(int q, int c) {
             this.q = q;
-            this.c = c;
+            
             qasm.append("qreg q[").append(q).append("];\ncreg c[").append(c).append("];\n");
         }
         @Override public void hadamard(int i) { qasm.append("h q[").append(i).append("];\n"); }
@@ -155,4 +155,5 @@ public class PythonQuantumBackend implements QuantumBackend {
         @Override public long getExecutionTimeMs() { return time; }
     }
 }
+
 

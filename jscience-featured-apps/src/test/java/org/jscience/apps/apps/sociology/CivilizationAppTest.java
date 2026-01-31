@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps.sociology;
+package org.jscience.apps.apps.sociology;
 
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.control.LabeledMatchers.hasText;
@@ -35,7 +35,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import javafx.stage.Stage;
-import org.jscience.ui.i18n.I18NManager;
+import org.jscience.core.ui.i18n.I18NManager;
 
 @ExtendWith(ApplicationExtension.class)
 public class CivilizationAppTest {
@@ -116,3 +116,5 @@ public class CivilizationAppTest {
         verifyThat(".toggle-button", hasText("Run"));
     }
 }
+
+

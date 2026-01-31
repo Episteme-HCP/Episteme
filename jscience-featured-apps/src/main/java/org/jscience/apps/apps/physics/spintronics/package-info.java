@@ -39,20 +39,20 @@
  * 
  * <h2>Device Structures</h2>
  * <ul>
- *   <li>{@link org.jscience.apps.physics.spintronics.SpinValve} - GMR/TMR stacks with SAF support</li>
- *   <li>{@link org.jscience.apps.physics.spintronics.FerrimagneticLayer} - Two-sublattice dynamics (GdFeCo)</li>
- *   <li>{@link org.jscience.apps.physics.spintronics.StochasticMTJ} - p-bits for probabilistic computing</li>
+ *   <li>{@link org.jscience.apps.apps.physics.spintronics.SpinValve} - GMR/TMR stacks with SAF support</li>
+ *   <li>{@link org.jscience.apps.apps.physics.spintronics.FerrimagneticLayer} - Two-sublattice dynamics (GdFeCo)</li>
+ *   <li>{@link org.jscience.apps.apps.physics.spintronics.StochasticMTJ} - p-bits for probabilistic computing</li>
  * </ul>
  * 
  * <h2>Micromagnetics</h2>
  * <ul>
- *   <li>{@link org.jscience.apps.physics.spintronics.Micromagnetics1D} - Domain wall dynamics</li>
- *   <li>{@link org.jscience.apps.physics.spintronics.Micromagnetics2D} - Skyrmions with DMI</li>
+ *   <li>{@link org.jscience.apps.apps.physics.spintronics.Micromagnetics1D} - Domain wall dynamics</li>
+ *   <li>{@link org.jscience.apps.apps.physics.spintronics.Micromagnetics2D} - Skyrmions with DMI</li>
  * </ul>
  * 
  * <h2>Neuromorphic Computing</h2>
  * <ul>
- *   <li>{@link org.jscience.apps.physics.spintronics.PBitNetwork} - Boltzmann machines, simulated annealing</li>
+ *   <li>{@link org.jscience.apps.apps.physics.spintronics.PBitNetwork} - Boltzmann machines, simulated annealing</li>
  * </ul>
  * 
  * <h2>Example Usage</h2>
@@ -89,3 +89,4 @@
  * @since 1.0
  */
 package org.jscience.apps.apps.physics.spintronics;
+

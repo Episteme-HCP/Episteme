@@ -27,6 +27,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
 import org.jscience.natural.ui.viewers.chemistry.MolecularViewer;
+import org.jscience.natural.ui.viewers.chemistry.ReactionKineticsViewer;
 
 /**
  * Chemical Intelligence Studio.

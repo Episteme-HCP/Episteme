@@ -142,7 +142,7 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
      * @param sim Micromagnetics2D simulation
      * @param scale Arrow length scaling factor
      */
-    public void addSpinField2D(org.jscience.apps.physics.spintronics.Micromagnetics2D sim, float scale) {
+    public void addSpinField2D(org.jscience.apps.apps.physics.spintronics.Micromagnetics2D sim, float scale) {
         int nx = sim.getNx();
         int ny = sim.getNy();
         float cellSize = (float)(sim.getCellSize().doubleValue() * 1e9); // nm
@@ -158,7 +158,7 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
                 float z = j * cellSize;
                 
                 Real[] mData = sim.getMagnetization(i, j);
-                Vector<Real> m = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, mData[0], mData[1], mData[2]);
+                Vector<Real> m = org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, mData[0], mData[1], mData[2]);
                 float mx = (float) m.get(0).doubleValue();
                 float my = (float) m.get(1).doubleValue();
                 float mz = (float) m.get(2).doubleValue();
@@ -187,7 +187,7 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
      * Highlights skyrmion regions with topological density coloring.
      * @param sim Micromagnetics2D simulation
      */
-    public void addSkyrmionTopology(org.jscience.apps.physics.spintronics.Micromagnetics2D sim) {
+    public void addSkyrmionTopology(org.jscience.apps.apps.physics.spintronics.Micromagnetics2D sim) {
         int nx = sim.getNx();
         int ny = sim.getNy();
         float cellSize = (float)(sim.getCellSize().doubleValue() * 1e9);
@@ -197,8 +197,8 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
         for (int i = 1; i < nx - 1; i++) {
             for (int j = 1; j < ny - 1; j++) {
                 Real[] mData = sim.getMagnetization(i, j);
-                org.jscience.mathematics.linearalgebra.Vector<Real> m = 
-                    org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, 
+                org.jscience.core.mathematics.linearalgebra.Vector<Real> m = 
+                    org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, 
                         mData[0], mData[1], mData[2]);
                 
                 // Simple skyrmion detection: m_core pointing down
@@ -218,8 +218,10 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
     /**
      * Updates spin field visualization in real-time.
      */
-    public void updateSpinField2D(org.jscience.apps.physics.spintronics.Micromagnetics2D sim, float scale) {
+    public void updateSpinField2D(org.jscience.apps.apps.physics.spintronics.Micromagnetics2D sim, float scale) {
         clear();
         addSpinField2D(sim, scale);
     }
 }
+
+

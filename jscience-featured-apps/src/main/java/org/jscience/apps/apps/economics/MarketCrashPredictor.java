@@ -260,7 +260,7 @@ public class MarketCrashPredictor {
                 volume *= 3;
             }
 
-            TimePoint time = TimePoint.of(date);
+            TimePoint time = TimePoint.of(date.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant());
             Candle candle = new Candle(
                     time,
                     Money.usd(open),
@@ -280,3 +280,4 @@ public class MarketCrashPredictor {
         return candles;
     }
 }
+

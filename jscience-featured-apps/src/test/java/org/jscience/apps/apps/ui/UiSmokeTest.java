@@ -21,11 +21,27 @@
  * SOFTWARE.
  */
 
-/**
- * Physical laws, constants, and simulation models for classical and modern physics.
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-package org.jscience.apps.physics.spintronics;
+package org.jscience.apps.apps.ui;
+
+import javafx.scene.Node;
+import javafx.stage.Stage;
+import org.jscience.apps.apps.biology.PandemicForecasterApp;
+import org.junit.jupiter.api.Test;
+import org.testfx.framework.junit5.ApplicationTest;
+
+import static org.testfx.api.FxAssert.verifyThat;
+
+public class UiSmokeTest extends ApplicationTest {
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        new PandemicForecasterApp().start(stage);
+    }
+
+    @Test
+    public void testAppLaunch() {
+        verifyThat(".button", (Node n) -> n.isVisible());
+    }
+}
+
+

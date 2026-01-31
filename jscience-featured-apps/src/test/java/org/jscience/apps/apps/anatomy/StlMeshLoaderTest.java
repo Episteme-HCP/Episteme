@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps.anatomy;
+package org.jscience.apps.apps.anatomy;
 
-import org.jscience.biology.loaders.StlMeshReader;
+import org.jscience.natural.biology.loaders.StlMeshReader;
 
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
@@ -96,3 +96,5 @@ public class StlMeshLoaderTest {
         assertEquals(1, mesh.getFaces().size() / 6); // 1 face * 6 indices
     }
 }
+
+

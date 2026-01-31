@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps.apps.apps.apps;
+package org.jscience.apps.apps;
+
 
 

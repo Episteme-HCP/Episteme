@@ -285,13 +285,13 @@ public class MarketCrashApp extends FeaturedAppBase {
             // I will use a helper if possible or just use what I know.
             // Let's add the import for Money just in case.
 
-            // To avoid compilation error, I'll assume usage of org.jscience.economics.Money
-            marketData.add(new Candle(org.jscience.history.TimePoint.of(time),
-                    org.jscience.economics.Money.usd(open),
-                    org.jscience.economics.Money.usd(high),
-                    org.jscience.economics.Money.usd(low),
-                    org.jscience.economics.Money.usd(close),
-                    org.jscience.mathematics.numbers.real.Real.of((double) ((long) (Math.random() * 1000000)))));
+            // To avoid compilation error, I'll assume usage of org.jscience.social.economics.money.Money
+            marketData.add(new Candle(org.jscience.social.history.time.TimePoint.of(time),
+                    org.jscience.social.economics.money.Money.usd(open),
+                    org.jscience.social.economics.money.Money.usd(high),
+                    org.jscience.social.economics.money.Money.usd(low),
+                    org.jscience.social.economics.money.Money.usd(close),
+                    org.jscience.core.mathematics.numbers.real.Real.of((double) ((long) (Math.random() * 1000000)))));
 
             price = close;
             time = time.plus(java.time.Duration.ofDays(1));
@@ -616,3 +616,5 @@ public class MarketCrashApp extends FeaturedAppBase {
         return org.jscience.core.ui.i18n.I18N.getInstance().get("category.economics", "Economics");
     }
 }
+
+

@@ -56,7 +56,7 @@ public class ResourceAuditTest {
             new LoaderResourceMapping("PeriodicTableReader", "/org/jscience/chemistry/elements.json"),
 
             // Astronomy
-            new LoaderResourceMapping("SolarSystemReader", "/org/jscience/ui/astronomy/solar_system.json"),
+            new LoaderResourceMapping("SolarSystemReader", "/org.jscience.core.ui/astronomy/solar_system.json"),
 
             // Physics
             new LoaderResourceMapping("ParticleLoader", "/org/jscience/physics/particles.json"),
@@ -125,7 +125,7 @@ public class ResourceAuditTest {
     @Test
     @DisplayName("Solar system demo JSON should exist")
     void testSolarSystemResource() {
-        InputStream is = getClass().getResourceAsStream("/org/jscience/ui/astronomy/solar_system.json");
+        InputStream is = getClass().getResourceAsStream("/org.jscience.core.ui/astronomy/solar_system.json");
         assertNotNull(is, "solar_system.json should exist");
         try {
             is.close();
@@ -139,5 +139,6 @@ public class ResourceAuditTest {
     private record LoaderResourceMapping(String loaderName, String resourcePath) {
     }
 }
+
 
 

@@ -22,10 +22,11 @@
  */
 
 /**
- * Core functionality for the org.jscience.apps.sociology package in the JScience library.
+ * User interface components and internationalization support for JScience applications.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-package org.jscience.apps.sociology;
+package org.jscience.apps.apps.ui;
+

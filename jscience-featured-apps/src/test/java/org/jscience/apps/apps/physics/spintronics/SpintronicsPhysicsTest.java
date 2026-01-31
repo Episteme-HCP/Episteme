@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps.physics.spintronics;
+package org.jscience.apps.apps.physics.spintronics;
 
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
@@ -225,3 +225,5 @@ class SpintronicsPhysicsTest {
             "Larger temperature gradient should give larger voltage");
     }
 }
+
+

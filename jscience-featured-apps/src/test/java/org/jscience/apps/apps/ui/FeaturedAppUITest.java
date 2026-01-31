@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps.ui;
+package org.jscience.apps.apps.ui;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -181,3 +181,4 @@ class FeaturedAppUITest {
         assertTrue(stage.isResizable(), "Window should be resizable");
     }
 }
+

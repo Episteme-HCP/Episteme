@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps;
+package org.jscience.apps.apps;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -29,8 +29,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import org.jscience.ui.JScienceDemosApp;
-import org.jscience.ui.i18n.I18N;
+import org.jscience.core.ui.JScienceDemosApp;
+import org.jscience.core.ui.i18n.I18N;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -80,7 +80,7 @@ public class DemosAppCrawlerTest {
         new File(SCREENSHOT_DIR).mkdirs();
         // Force English for stable lookups
         Locale.setDefault(Locale.ENGLISH);
-        org.jscience.ui.i18n.I18N.getInstance().setLocale(Locale.ENGLISH);
+        org.jscience.core.ui.i18n.I18N.getInstance().setLocale(Locale.ENGLISH);
     }
 
     @Start
@@ -212,5 +212,7 @@ public class DemosAppCrawlerTest {
         }
     }
 }
+
+
 
 

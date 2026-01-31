@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps.apps.apps.apps;
+package org.jscience.apps.apps;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -62,3 +62,4 @@ public class Launcher extends Application {
         launch(args);
     }
 }
+

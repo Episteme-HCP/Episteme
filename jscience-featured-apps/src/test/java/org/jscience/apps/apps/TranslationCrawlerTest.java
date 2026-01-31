@@ -21,15 +21,15 @@
  * SOFTWARE.
  */
 
-package org.jscience.apps;
+package org.jscience.apps.apps;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 
 import javafx.stage.Stage;
-import org.jscience.ui.JScienceMasterControl;
-import org.jscience.ui.i18n.I18N;
+import org.jscience.core.ui.JScienceMasterControl;
+import org.jscience.core.ui.i18n.I18N;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -222,3 +222,5 @@ public class TranslationCrawlerTest {
         }
     }
 }
+
+
