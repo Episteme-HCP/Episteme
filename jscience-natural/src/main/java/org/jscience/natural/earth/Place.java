@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.io.Serializable;
 
 /**
  * Base class for all geographical features and named locations.
@@ -59,9 +58,9 @@ import java.io.Serializable;
  * @since 1.0
  */
 @Persistent
-public class Place implements ComprehensiveIdentification, Positioned<EarthCoordinate> {
+public class Place implements ComprehensiveIdentification, Positioned<EarthCoordinate>, Temporal<Temporal<?>> {
 
-    private static final long serialVersionUID = 5L;
+    private static final long serialVersionUID = 6L;
 
     @Id
     protected final Identification id;
@@ -90,10 +89,10 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
     @Attribute
     private final List<Boundary<EarthCoordinate>> boundaries = new ArrayList<>();
 
-    @Attribute
-    private final List<TimedBoundary> timedBoundaries = new ArrayList<>();
-
     private final java.util.Set<org.jscience.natural.biology.Individual> inhabitants = new java.util.HashSet<>();
+
+    @Attribute
+    private Temporal<?> existenceTime;
 
     public Place(String name) {
         this(name, PlaceType.UNKNOWN);
@@ -174,6 +173,10 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
         this.region = region;
     }
 
+    /**
+     * Returns the boundaries of this place.
+     * Enclaves and exclaves should be modeled using CompositeBoundary2D if supported.
+     */
     public List<Boundary<EarthCoordinate>> getBoundaries() {
         return Collections.unmodifiableList(boundaries);
     }
@@ -183,19 +186,18 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
             boundaries.add(boundary);
         }
     }
-
-    public List<TimedBoundary> getTimedBoundaries() {
-        return Collections.unmodifiableList(timedBoundaries);
-    }
-
-    public void addTimedBoundary(TimedBoundary boundary) {
-        if (boundary != null) {
-            timedBoundaries.add(boundary);
-        }
-    }
     
     public void clearBoundaries() {
         boundaries.clear();
+    }
+
+    @Override
+    public Temporal<?> getWhen() {
+        return existenceTime;
+    }
+
+    public void setExistenceTime(Temporal<?> existenceTime) {
+        this.existenceTime = existenceTime;
     }
 
     public void addInhabitant(org.jscience.natural.biology.Individual individual) {
@@ -239,82 +241,6 @@ public class Place implements ComprehensiveIdentification, Positioned<EarthCoord
 
     public static Place greenwich() {
         return of("Greenwich Observatory", 51.4772, 0.0, PlaceType.BUILDING);
-    }
-
-    /**
-     * A boundary that changes over time, integrated into Place.
-     */
-    @Persistent
-    public static class TimedBoundary implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public static class BoundaryState implements Serializable, Comparable<BoundaryState>, Temporal<Temporal<?>> {
-            private static final long serialVersionUID = 1L;
-            
-            @Attribute
-            private final Temporal<?> timestamp;
-            @Attribute
-            private final Boundary<EarthCoordinate> boundary;
-
-            public BoundaryState(Temporal<?> timestamp, Boundary<EarthCoordinate> boundary) {
-                this.timestamp = Objects.requireNonNull(timestamp);
-                this.boundary = Objects.requireNonNull(boundary);
-            }
-
-            public Temporal<?> getTimestamp() { return timestamp; }
-            public Boundary<EarthCoordinate> getBoundary() { return boundary; }
-            @Override public Temporal<?> getWhen() { return timestamp; }
-            
-            @Override 
-            @SuppressWarnings("unchecked")
-            public int compareTo(BoundaryState other) { 
-                return ((Comparable<Object>)this.timestamp).compareTo(other.timestamp); 
-            }
-        }
-
-        @Attribute
-        private final String name;
-        @Attribute
-        private final List<BoundaryState> states;
-
-        public TimedBoundary(String name, Boundary<EarthCoordinate> initial) {
-            this.name = Objects.requireNonNull(name);
-            this.states = new ArrayList<>();
-            // Use a simple mock temporal or wait for integration. 
-            // Since we can't depend on TimePoint from here, we rely on the user passing correct Temporal objects.
-            // For initial state, we might need a generic or constructor without time if we don't have a time class.
-            // But we can accept it if passed.
-            // this.states.add(new BoundaryState(..., initial)); 
-            // For now, empty list or user must provide states.
-        }
-        
-        // Constructor that accepts an initial state with a timestamp would be better, 
-        // but we don't have a concrete timestamp class visible here easily without cycle.
-        // So we just take the list for now.
-        public TimedBoundary(String name, List<BoundaryState> states) {
-            this.name = Objects.requireNonNull(name);
-            this.states = new ArrayList<>(states);
-            Collections.sort(this.states);
-        }
-
-        public void addState(Temporal<?> timestamp, Boundary<EarthCoordinate> boundary) {
-            states.add(new BoundaryState(timestamp, boundary));
-            Collections.sort(states);
-        }
-
-        @SuppressWarnings("unchecked")
-        public Boundary<EarthCoordinate> getAt(Temporal<?> time) {
-            Boundary<EarthCoordinate> result = null;
-            for (BoundaryState state : states) {
-                if (((Comparable<Object>)state.getTimestamp()).compareTo(time) <= 0) {
-                    result = state.getBoundary();
-                } else {
-                    break;
-                }
-            }
-
-            return result != null ? result : (states.isEmpty() ? null : states.get(0).getBoundary());
-        }
     }
 }
 

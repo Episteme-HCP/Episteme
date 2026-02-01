@@ -23,6 +23,7 @@
 
 package org.jscience.natural.earth.coordinates;
 
+import org.jscience.core.mathematics.geometry.GeometricObject;
 import org.jscience.core.util.Positioned;
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Length;
@@ -31,14 +32,15 @@ import org.jscience.core.measure.quantity.Length;
  * Base interface for all Earth coordinate systems.
  * <p>
  * This interface unifies all coordinate representations (Geodetic, UTM, MGRS, ECEF, etc.)
- * under a common contract while implementing {@link Positioned} for spatial operations.
+ * under a common contract while implementing {@link Positioned} and {@link GeometricObject} 
+ * for spatial operations and geometry engine integration.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface EarthCoordinate extends Positioned<EarthCoordinate> {
+public interface EarthCoordinate extends Positioned<EarthCoordinate>, GeometricObject<EarthCoordinate> {
 
     /**
      * Returns the coordinate system name (e.g., "WGS84", "UTM", "MGRS").
@@ -79,6 +81,21 @@ public interface EarthCoordinate extends Positioned<EarthCoordinate> {
     @Override
     default EarthCoordinate getPosition() {
         return this;
+    }
+
+    @Override
+    default int dimension() {
+        return 0; // Coordinates are points (0D)
+    }
+
+    @Override
+    default int ambientDimension() {
+        return 3; // Earth coordinates exist in 3D space
+    }
+
+    @Override
+    default String description() {
+        return getCoordinateSystem() + " Coordinate: " + toString();
     }
 }
 

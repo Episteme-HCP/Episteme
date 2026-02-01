@@ -142,5 +142,24 @@ public class BonneCoordinate implements EarthCoordinate, Serializable {
                 Quantities.create(0, Units.METER),
                 el);
     }
+    @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "Bonne Coordinate: " + toString();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Bonne[E=%.2f, N=%.2f]", easting.doubleValue(), northing.doubleValue());
+    }
 }
 

@@ -154,5 +154,23 @@ public class PolyconicCoordinate implements EarthCoordinate, Serializable {
                 Quantities.create(0, Units.METER),
                 el);
     }
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "Polyconic Coordinate: " + toString();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Polyconic[E=%.2f, N=%.2f]", easting.doubleValue(), northing.doubleValue());
+    }
 }
 

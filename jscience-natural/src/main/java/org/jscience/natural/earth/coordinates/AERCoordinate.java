@@ -113,6 +113,21 @@ public final class AERCoordinate implements EarthCoordinate, Serializable {
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "AER Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("AER[Az=%.2fÂ°, El=%.2fÂ°, Range=%.2fm]", azimuth, elevation, slantRange);
     }

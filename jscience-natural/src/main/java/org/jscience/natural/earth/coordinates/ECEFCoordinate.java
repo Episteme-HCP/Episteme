@@ -128,6 +128,29 @@ public final class ECEFCoordinate implements EarthCoordinate, Serializable {
         );
     }
 
+    /**
+     * Converts this ECEF coordinate to a standard 3D point.
+     * @return the Point3D representation
+     */
+    public org.jscience.core.mathematics.geometry.Point3D toPoint3D() {
+        return org.jscience.core.mathematics.geometry.Point3D.of(x, y, z);
+    }
+
+    @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "ECEF Coordinate: " + toString();
+    }
+
     @Override
     public String toString() {
         return String.format("ECEF[X=%.2f, Y=%.2f, Z=%.2f]", x.doubleValue(), y.doubleValue(), z.doubleValue());

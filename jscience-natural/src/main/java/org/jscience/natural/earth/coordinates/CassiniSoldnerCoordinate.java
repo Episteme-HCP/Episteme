@@ -138,5 +138,24 @@ public class CassiniSoldnerCoordinate implements EarthCoordinate, Serializable {
                 Quantities.create(0, Units.METER),
                 el);
     }
+    @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "Cassini-Soldner Coordinate: " + toString();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Cassini[E=%.2f, N=%.2f]", easting.doubleValue(), northing.doubleValue());
+    }
 }
 

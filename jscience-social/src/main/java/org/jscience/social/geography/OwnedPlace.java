@@ -27,7 +27,6 @@ import org.jscience.social.economics.money.Money;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.jscience.natural.earth.Place;
 import org.jscience.natural.earth.PlaceType;
 import org.jscience.social.economics.EconomicAgent;
 import org.jscience.social.economics.Property;
@@ -43,7 +42,7 @@ import org.jscience.core.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class OwnedPlace extends Place implements Property {
+public class OwnedPlace extends TimedPlace implements Property {
 
     private static final long serialVersionUID = 1L;
 

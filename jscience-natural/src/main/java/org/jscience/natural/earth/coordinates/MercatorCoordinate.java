@@ -103,6 +103,21 @@ public final class MercatorCoordinate implements EarthCoordinate, Serializable {
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "Mercator Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("%sMercator[X=%.2f, Y=%.2f]", webMercator ? "Web" : "", x.doubleValue(), y.doubleValue());
     }

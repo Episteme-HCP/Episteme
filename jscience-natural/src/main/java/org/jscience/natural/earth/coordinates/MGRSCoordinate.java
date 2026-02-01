@@ -143,6 +143,21 @@ public final class MGRSCoordinate implements EarthCoordinate, Serializable {
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "MGRS Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         String format = "%0" + precision + "d";
         return zone + gridSquare + String.format(format, easting) + String.format(format, northing);

@@ -182,6 +182,21 @@ public final class UTMCoordinate implements EarthCoordinate, Serializable {
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "UTM Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("%d%c %s %s", zoneNumber, zoneLetter, easting, northing);
     }

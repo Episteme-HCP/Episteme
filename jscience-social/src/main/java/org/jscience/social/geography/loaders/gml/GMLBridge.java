@@ -2,6 +2,7 @@ package org.jscience.social.geography.loaders.gml;
 
 import org.jscience.natural.earth.Place;
 import org.jscience.natural.earth.PlaceType;
+import org.jscience.social.geography.TimedPlace;
 import org.jscience.natural.earth.coordinates.EarthCoordinate;
 import org.jscience.natural.earth.coordinates.GeodeticCoordinate;
 import org.jscience.social.geography.GeoMap;
@@ -65,7 +66,13 @@ public class GMLBridge {
         if (name == null) name = id != null ? id : "feature";
 
         if (gmlGeom instanceof GMLPoint || gmlGeom instanceof GMLPolygon || gmlGeom instanceof GMLMultiPoint || gmlGeom instanceof GMLMultiPolygon) {
-            Place place = new Place(name, PlaceType.UNKNOWN);
+            // Check if it should be a TimedPlace
+            boolean isTimed = gmlFeature.getProperty("time") != null || 
+                             gmlFeature.getProperty("validTime") != null ||
+                             gmlFeature.getProperty("timestamp") != null;
+            
+            Place place = isTimed ? new TimedPlace(name, PlaceType.UNKNOWN) : new Place(name, PlaceType.UNKNOWN);
+            
             if (id != null) place.setTrait("gml.id", id);
             place.setTrait("gml.type", gmlFeature.getTypeName());
             
@@ -89,17 +96,34 @@ public class GMLBridge {
                     place.addBoundary(new PointBoundary<EarthCoordinate>(new GeodeticCoordinate(pt.getY(), pt.getX(), pt.getZ())));
                 }
             } else if (gmlGeom instanceof GMLMultiPolygon) {
+                GeoPolygon multiPoly = new GeoPolygon();
                 for (GMLPolygon poly : ((GMLMultiPolygon) gmlGeom).getPolygons()) {
-                    place.addBoundary(convertPolygon(poly));
+                    GeoPolygon.SimpleGeoPolygon simple = new GeoPolygon.SimpleGeoPolygon();
+                    if (poly.getExteriorRing() != null) {
+                        simple.setExterior(convertToGeodetic(poly.getExteriorRing()));
+                    }
+                    if (poly.getInteriorRings() != null) {
+                        for (List<double[]> ring : poly.getInteriorRings()) {
+                            simple.addInterior(convertToGeodetic(ring));
+                        }
+                    }
+                    multiPoly.addInclusion(simple);
                 }
+                place.addBoundary(multiPoly);
             }
             results.add(place);
         } else if (gmlGeom instanceof GMLLineString) {
             results.add(convertLineString((GMLLineString) gmlGeom, name));
         } else if (gmlGeom instanceof GMLMultiLineString) {
+            GeoPath multiPath = new GeoPath(name);
             for (GMLLineString line : ((GMLMultiLineString) gmlGeom).getLineStrings()) {
-                results.add(convertLineString(line, name));
+                GeoPath.SimpleGeoPath simple = new GeoPath.SimpleGeoPath();
+                for (GeodeticCoordinate c : convertToGeodetic(line.getPoints())) {
+                    simple.addPoint(c);
+                }
+                multiPath.addInclusion(simple);
             }
+            results.add(multiPath);
         }
         
         return results;

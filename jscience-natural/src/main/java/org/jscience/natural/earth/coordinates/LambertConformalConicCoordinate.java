@@ -149,6 +149,21 @@ public final class LambertConformalConicCoordinate implements EarthCoordinate, S
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "LCC Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("LCC[E=%.2f, N=%.2f]", easting.doubleValue(), northing.doubleValue());
     }

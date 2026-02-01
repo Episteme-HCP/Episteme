@@ -107,6 +107,21 @@ public final class UPSCoordinate implements EarthCoordinate, Serializable {
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "UPS Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("UPS-%c[E=%.2f, N=%.2f]", hemisphere, easting.doubleValue(), northing.doubleValue());
     }

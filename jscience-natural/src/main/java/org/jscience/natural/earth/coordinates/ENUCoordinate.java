@@ -125,6 +125,21 @@ public final class ENUCoordinate implements EarthCoordinate, Serializable {
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "ENU Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("ENU[E=%.2fm, N=%.2fm, U=%.2fm]", east.doubleValue(), north.doubleValue(), up.doubleValue());
     }

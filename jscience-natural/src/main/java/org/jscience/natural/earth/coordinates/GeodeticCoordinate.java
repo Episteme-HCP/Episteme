@@ -145,6 +145,21 @@ public class GeodeticCoordinate implements EarthCoordinate {
     }
 
     @Override
+    public int dimension() {
+        return 0;
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return "Geodetic Coordinate: " + toString();
+    }
+
+    @Override
     public String toString() {
         return String.format("Geodetic[Lat=%.6fÂ°, Lon=%.6fÂ°, H=%.2f, %s]", 
             latitude.to(Units.DEGREE_ANGLE).getValue().doubleValue(),
