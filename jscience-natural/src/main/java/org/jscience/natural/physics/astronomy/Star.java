@@ -42,14 +42,40 @@ import org.jscience.core.measure.quantity.Power;
  */
 public class Star extends CelestialBody {
 
+    private String catalogId;
     private String spectralType;
     private Quantity<Power> luminosity;
     private Quantity<Temperature> temperature;
+    private double distanceLightYears;
 
-    public Star(String name, Quantity<Mass> mass, Quantity<Length> radius, Vector<Real> position,
+    public Star(String name, String catalogId, Quantity<Mass> mass, Quantity<Length> radius, Vector<Real> position,
             Vector<Real> velocity) {
         super(name, mass, radius, position, velocity);
+        this.catalogId = catalogId;
     }
+
+    // Constructor without ID for backward compatibility or when ID is unknown
+    public Star(String name, Quantity<Mass> mass, Quantity<Length> radius, Vector<Real> position,
+            Vector<Real> velocity) {
+        this(name, null, mass, radius, position, velocity);
+    }
+
+    public String getCatalogId() {
+        return catalogId;
+    }
+
+    public void setCatalogId(String catalogId) {
+        this.catalogId = catalogId;
+    }
+
+    public double getDistanceLightYears() {
+        return distanceLightYears;
+    }
+
+    public void setDistanceLightYears(double distanceLightYears) {
+        this.distanceLightYears = distanceLightYears;
+    }
+
 
     public String getSpectralType() {
         return spectralType;

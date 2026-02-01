@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Orion",
+    "color": "#FFD700",
+    "lines": [
+      ["Betelgeuse", "Bellatrix"],
+      ["Bellatrix", "Rigel"],
+      ["Rigel", "Saiph"],
+      ["Saiph", "Betelgeuse"],
+      ["Betelgeuse", "Alnitak"],
+      ["Bellatrix", "Mintaka"],
+      ["Mintaka", "Alnilam"],
+      ["Alnilam", "Alnitak"]
+    ]
+  }
+]

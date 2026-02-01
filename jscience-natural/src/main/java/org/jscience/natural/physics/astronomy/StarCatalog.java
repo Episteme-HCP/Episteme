@@ -29,6 +29,8 @@ import org.jscience.core.measure.Quantities;
 import org.jscience.core.measure.quantity.*;
 import org.jscience.core.measure.Units;
 import org.jscience.core.io.MiniCatalog;
+import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.core.mathematics.sets.Reals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,7 +47,7 @@ import java.util.stream.Collectors;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
+public class StarCatalog implements MiniCatalog<Star> {
 
     private static final StarCatalog INSTANCE = new StarCatalog();
     private final List<Star> stars = new ArrayList<>();
@@ -78,6 +80,7 @@ public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
             for (JsonNode node : root) {
                 String name = node.get("name").asText();
                 String spectralType = node.get("spectralType").asText();
+                String catalogId = node.has("catalogId") ? node.get("catalogId").asText() : null;
 
                 // Create Quantities using Real and Units
                 Quantity<Mass> mass = Quantities.create(
@@ -93,8 +96,20 @@ public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
                         Real.of(node.get("radius").asDouble()), Units.METER);
 
                 double distance = node.get("distance").asDouble(); // light years
-
-                stars.add(new Star(name, spectralType, mass, temperature, luminosity, radius, distance));
+                // We don't have position/velocity in JSON yet, so use placeholder or calculate?
+                // The top-level Star expects position/velocity vectors.
+                // We'll use Dummy vectors for now as we don't have 3D coordinates in stars.json
+                
+                Star star = new Star(name, catalogId, mass, radius, 
+                     DenseVector.of(List.of(Real.ZERO, Real.ZERO, Real.ZERO), Reals.getInstance()), 
+                     DenseVector.of(List.of(Real.ZERO, Real.ZERO, Real.ZERO), Reals.getInstance()));
+                
+                star.setSpectralType(spectralType);
+                star.setLuminosity(luminosity);
+                star.setTemperature(temperature);
+                star.setDistanceLightYears(distance);
+                
+                stars.add(star);
             }
 
         } catch (IOException e) {
@@ -163,71 +178,6 @@ public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
                     return t >= minKelvin && t <= maxKelvin;
                 })
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Star data class using JScience Quantities.
-     */
-    public static class Star {
-        private final String name;
-        private final String spectralType;
-        private final Quantity<Mass> mass;
-        private final Quantity<Temperature> temperature;
-        private final Quantity<Power> luminosity;
-        private final Quantity<Length> radius;
-        private final double distanceLightYears;
-
-        public Star(String name, String spectralType,
-                Quantity<Mass> mass, Quantity<Temperature> temperature,
-                Quantity<Power> luminosity, Quantity<Length> radius,
-                double distanceLightYears) {
-            this.name = name;
-            this.spectralType = spectralType;
-            this.mass = mass;
-            this.temperature = temperature;
-            this.luminosity = luminosity;
-            this.radius = radius;
-            this.distanceLightYears = distanceLightYears;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getSpectralType() {
-            return spectralType;
-        }
-
-        public Quantity<Mass> getMass() {
-            return mass;
-        }
-
-        public Quantity<Temperature> getTemperature() {
-            return temperature;
-        }
-
-        public Quantity<Power> getLuminosity() {
-            return luminosity;
-        }
-
-        public Quantity<Length> getRadius() {
-            return radius;
-        }
-
-        public double getDistanceLightYears() {
-            return distanceLightYears;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s (%s): T=%s K, M=%s kg, L=%s W, R=%s m, d=%.1f ly",
-                    name, spectralType,
-                    temperature.getValue(),
-                    mass.getValue(),
-                    luminosity.getValue(),
-                    radius.getValue(),
-                    distanceLightYears);
-        }
     }
 }
 
