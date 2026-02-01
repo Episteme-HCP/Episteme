@@ -28,8 +28,17 @@ public class ZarrReader extends AbstractResourceReader<byte[]> {
     @Override
     public byte[] loadFromSource(String resourceId) throws Exception {
         logger.info("Loading Zarr dataset: {}", resourceId);
-        // Implementation for reading .zarr stores
-        return new byte[0];
+        // Basic validation of Zarr structure
+        java.io.File file = new java.io.File(resourceId);
+        if (!file.exists()) throw new java.io.IOException("File not found: " + resourceId);
+        
+        java.io.File zarray = new java.io.File(file, ".zarray");
+        if (!zarray.exists()) {
+            throw new java.io.IOException("Not a valid Zarr root (missing .zarray): " + file);
+        }
+        
+        // Return metadata as the "loaded resource" for now
+        return java.nio.file.Files.readAllBytes(zarray.toPath());
     }
 
     @Override

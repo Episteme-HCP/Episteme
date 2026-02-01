@@ -24,6 +24,7 @@
 package org.jscience.natural.physics.loaders.fits;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
@@ -61,9 +62,15 @@ public class FITSFile extends AbstractDataFile {
      * @throws IOException if no image found or read error
      */
     public RealDoubleMatrix asMatrix() throws IOException {
-        // Need to parse HDUs sequentially until we find an image
+        // Handle GZIP Compression
         ReadableByteChannel channel = getChannel();
-        if (channel instanceof java.nio.channels.SeekableByteChannel) {
+        InputStream is = null;
+        
+        if (getPath() != null && getPath().toString().endsWith(".gz")) {
+             // Create a GZIP input stream wrapper
+             is = new java.util.zip.GZIPInputStream(java.nio.file.Files.newInputStream(getPath()));
+             channel = java.nio.channels.Channels.newChannel(is);
+        } else if (channel instanceof java.nio.channels.SeekableByteChannel) {
             ((java.nio.channels.SeekableByteChannel) channel).position(0);
         }
 

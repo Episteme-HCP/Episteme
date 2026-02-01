@@ -12,7 +12,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.algorithms.SUMMAAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.CannonAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.FoxAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.TwoAndHalfDAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.Algorithm25D;
 import org.jscience.core.mathematics.linearalgebra.algorithms.CARMAAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
@@ -111,7 +111,7 @@ public class DistributedMatrixBenchmark {
             int pLayer = parallelism / c;
             int pSqrt = (int) Math.sqrt(pLayer);
             if (pSqrt * pSqrt == pLayer) {
-                return TwoAndHalfDAlgorithm.multiply(tiledA, tiledB, c);
+                return Algorithm25D.multiply(tiledA, tiledB, c);
             }
         }
         return null;
