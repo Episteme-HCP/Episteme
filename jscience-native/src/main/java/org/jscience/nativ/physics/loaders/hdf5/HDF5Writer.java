@@ -49,7 +49,14 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
     private static final MethodHandle H5D_WRITE;
     private static final MethodHandle H5D_CLOSE;
     private static final MethodHandle H5S_CLOSE;
+    private static final MethodHandle H5P_CREATE;
+    private static final MethodHandle H5P_SET_CHUNK;
+    private static final MethodHandle H5P_SET_DEFLATE;
+    private static final MethodHandle H5P_SET_SZIP;
+    private static final MethodHandle H5P_SET_FILTER;
+    private static final MethodHandle H5P_CLOSE;
     private static final long H5T_NATIVE_DOUBLE;
+    private static final long H5P_DATASET_CREATE;
     private static final boolean AVAILABLE;
 
     static {
@@ -71,6 +78,18 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             H5S_CLOSE = linker.downcallHandle(lookup.find("H5Sclose").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
+            H5P_CREATE = linker.downcallHandle(lookup.find("H5Pcreate").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
+            H5P_SET_CHUNK = linker.downcallHandle(lookup.find("H5Pset_chunk").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            H5P_SET_DEFLATE = linker.downcallHandle(lookup.find("H5Pset_deflate").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
+            H5P_SET_SZIP = linker.downcallHandle(lookup.find("H5Pset_szip").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            H5P_SET_FILTER = linker.downcallHandle(lookup.find("H5Pset_filter").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
+            H5P_CLOSE = linker.downcallHandle(lookup.find("H5Pclose").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             
             if (lookup.find("H5T_NATIVE_DOUBLE_g").isPresent()) {
                 MemorySegment seg = lookup.find("H5T_NATIVE_DOUBLE_g").get();
@@ -78,11 +97,20 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
             } else {
                 H5T_NATIVE_DOUBLE = 0L;
             }
+
+            if (lookup.find("H5P_CLS_DATASET_CREATE_ID_g").isPresent()) {
+                 MemorySegment seg = lookup.find("H5P_CLS_DATASET_CREATE_ID_g").get();
+                 H5P_DATASET_CREATE = seg.get(ValueLayout.JAVA_LONG, 0);
+            } else {
+                 H5P_DATASET_CREATE = 0L;
+            }
             
             AVAILABLE = true;
         } else {
             H5F_CREATE = H5F_CLOSE = H5S_CREATE_SIMPLE = H5D_CREATE2 = H5D_WRITE = H5D_CLOSE = H5S_CLOSE = null;
+            H5P_CREATE = H5P_SET_CHUNK = H5P_SET_DEFLATE = H5P_SET_SZIP = H5P_SET_FILTER = H5P_CLOSE = null;
             H5T_NATIVE_DOUBLE = 0L;
+            H5P_DATASET_CREATE = 0L;
             AVAILABLE = false;
         }
     }
@@ -121,7 +149,7 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
         }
     }
 
-    public void writeMatrix(String datasetName, NativeMatrix matrix) {
+    public void writeMatrix(String datasetName, NativeMatrix matrix, String compression, int level) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment dims = arena.allocate(ValueLayout.JAVA_LONG, 2);
             dims.set(ValueLayout.JAVA_LONG, 0, matrix.rows());
@@ -129,20 +157,53 @@ public class HDF5Writer extends AbstractResourceWriter<NativeMatrix> implements 
             
             long spaceId = (long) H5S_CREATE_SIMPLE.invokeExact(2, dims, MemorySegment.NULL);
             try {
+                long dcpl = 0L;
+                if (compression != null && !compression.equalsIgnoreCase("none")) {
+                    dcpl = (long) H5P_CREATE.invokeExact(H5P_DATASET_CREATE);
+                    // Standard HDF5 chunking (e.g. 128x128)
+                    MemorySegment chunks = arena.allocate(ValueLayout.JAVA_LONG, 2);
+                    chunks.set(ValueLayout.JAVA_LONG, 0, Math.min(128L, matrix.rows()));
+                    chunks.set(ValueLayout.JAVA_LONG, 1, Math.min(128L, matrix.cols()));
+                    H5P_SET_CHUNK.invokeExact(dcpl, 2, chunks);
+
+                    if (compression.equalsIgnoreCase("gzip")) {
+                        H5P_SET_DEFLATE.invokeExact(dcpl, level);
+                    } else if (compression.equalsIgnoreCase("szip")) {
+                        // H5_SZIP_NN_OPTION_MASK = 32
+                        H5P_SET_SZIP.invokeExact(dcpl, 32, level);
+                    } else if (compression.equalsIgnoreCase("blosc")) {
+                        // H5Z_FILTER_BLOSC = 32001
+                        // cd_values: [0, 0, 0, level, 1 (shuffle), 1 (blosclz)]
+                        MemorySegment cdValues = arena.allocate(ValueLayout.JAVA_INT, 7);
+                        cdValues.set(ValueLayout.JAVA_INT, 0, 0); // Reserved
+                        cdValues.set(ValueLayout.JAVA_INT, 4, 0); // Reserved
+                        cdValues.set(ValueLayout.JAVA_INT, 8, 0); // Reserved
+                        cdValues.set(ValueLayout.JAVA_INT, 12, level);
+                        cdValues.set(ValueLayout.JAVA_INT, 16, 1); // Shuffle
+                        cdValues.set(ValueLayout.JAVA_INT, 20, 1); // Compressor (blosclz)
+                        H5P_SET_FILTER.invokeExact(dcpl, 32001, 1, 6L, cdValues);
+                    }
+                }
+
                 MemorySegment nameSegment = arena.allocateFrom(datasetName);
-                // H5T_NATIVE_DOUBLE (Using 0L as placeholder, need actual handle in real case)
-                long datasetId = (long) H5D_CREATE2.invokeExact(fileId, nameSegment, H5T_NATIVE_DOUBLE, spaceId, 0L, 0L, 0L);
+                long datasetId = (long) H5D_CREATE2.invokeExact(fileId, nameSegment, H5T_NATIVE_DOUBLE, spaceId, 0L, dcpl, 0L);
                 try {
                     H5D_WRITE.invokeExact(datasetId, H5T_NATIVE_DOUBLE, 0L, 0L, 0L, matrix.segment());
                 } finally {
                     H5D_CLOSE.invokeExact(datasetId);
                 }
+                
+                if (dcpl != 0) H5P_CLOSE.invokeExact(dcpl);
             } finally {
                 H5S_CLOSE.invokeExact(spaceId);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("Failed to write matrix: " + datasetName, t);
+            throw new RuntimeException("Failed to write matrix with compression: " + datasetName, t);
         }
+    }
+
+    public void writeMatrix(String datasetName, NativeMatrix matrix) {
+        writeMatrix(datasetName, matrix, null, 0);
     }
 
     @Override

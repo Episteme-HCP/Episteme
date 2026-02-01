@@ -33,6 +33,16 @@ Ce plan consolide les actions requises pour aligner JScience sur les standards H
 - [x] **Benchmarking** :
   - Comparaison possible entre `NativeBLAS`, `SIMD` et `Pur Java`.
 
+## 📦 4. I/O & Persistence (HDF5)
+
+*Objectif : Stockage haute performance et compression.*
+
+- [x] **Compression HDF5** :
+  - [x] **GZIP (Deflate)** : Supporté via `H5Pset_deflate`.
+  - [x] **SZIP** : Supporté via `H5Pset_szip`.
+  - [x] **Blosc** : Supporté via `H5Pset_filter` (ID 32001).
+- [x] **Zero-Copy I/O** : Utilisation de Panama pour le mapping direct des NativeMatrix.
+
 ## 🌐 4. MPI Binding & Algos Avancés
 
 *Objectif : Vrai distribué et évitement de communication.*
