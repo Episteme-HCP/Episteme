@@ -76,6 +76,10 @@ public class GenericMatrix<E> implements Matrix<E> {
         this.ring = ring;
     }
 
+    public void set(int row, int col, E value) {
+        storage.set(row, col, value);
+    }
+
     // ================= Factory Methods (Replacing MatrixFactory) =================
 
     /**

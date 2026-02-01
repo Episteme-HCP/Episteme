@@ -114,6 +114,24 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
         return tiles[tileI][tileJ].get(localI, localJ);
     }
 
+    public void set(int row, int col, Real value) {
+        int tileI = row / tileRows;
+        int tileJ = col / tileCols;
+        int localI = row % tileRows;
+        int localJ = col % tileCols;
+        // GenericMatrix usually doesn't expose set? We need to cast or assume implementation.
+        // Assuming tiles are GenericMatrix or MutableMatrix.
+        // But Matrix interface doesn't have set() in JScience 5? 
+        // Wait, MMapMatrix implemented it but it wasn't in interface (no @Override).
+        // Let's implement it here properly.
+        Matrix<Real> tile = tiles[tileI][tileJ];
+        if (tile instanceof GenericMatrix) {
+             ((GenericMatrix<Real>) tile).set(localI, localJ, value);
+        } else {
+             throw new UnsupportedOperationException("Tile is immutable or does not support set.");
+        }
+    }
+
     public Matrix<Real> getTile(int i, int j) {
         return tiles[i][j];
     }

@@ -44,6 +44,13 @@ Statistics stats = dna.computeAlignmentStats();   // Mathematics layer
 - ✅ **Internationalization**: EN, FR (100% translated)
 - ✅ **59 Interactive Demos**: Physics, Chemistry, Biology, Social Sciences
 
+## 🚀 High Performance & Distributed Computing (HPC)
+
+JScience now includes native optimizations for heavy workloads:
+- **SIMD Acceleration**: Vector API (Incubator) utilization for AVX-512/NEON instructions in Matrix operations.
+- **Native BLAS**: Automatic bonding with OpenBLAS / MKL via Project Panama (Foreign Function & Memory API) for maximum CPU throughput.
+- **MPI Integration**: Distributed context capable of scaling from local simulation to true MPI clusters (OpenMPI/MPICH) without code changes.
+
 ## Quick Start
 
 ```bash

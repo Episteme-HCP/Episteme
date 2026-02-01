@@ -180,24 +180,37 @@ public class MPIDistributedContext implements DistributedContext {
 
     /**
      * Inner class implementing DistributedContext using real MPI calls.
-     * Loaded only when MPI is available.
+     * Loaded only when MPI is available via reflection.
      */
     private static class MpiStrategy implements DistributedContext {
-        // Tags for MPI messages
+        // MPI Constants
         private static final int TAG_TASK = 1;
-
+        
+        // Reflection Method Handles (cached for performance if possible, or just methods)
+        // Here we keep it simple with Method objects but could optimize.
+        
         private final int rank;
         private final int size;
+        
+        // RMA Window objects
         private Object win;
         private DoubleBuffer winBuffer;
+        
+        // MPI Classes
+        private final Class<?> mpiClass;
+        private final Class<?> winClass;
+        private final Object commWorld;
 
         public MpiStrategy() {
             try {
-                Class<?> mpiClass = Class.forName("mpi.MPI");
-                Object commWorld = mpiClass.getField("COMM_WORLD").get(null);
+                this.mpiClass = Class.forName("mpi.MPI");
+                this.winClass = Class.forName("mpi.Win");
+                this.commWorld = mpiClass.getField("COMM_WORLD").get(null);
+                
                 this.rank = (int) commWorld.getClass().getMethod("Rank").invoke(commWorld);
                 this.size = (int) commWorld.getClass().getMethod("Size").invoke(commWorld);
-                System.out.printf("MpiStrategy initialized via reflection. Rank: %d, Size: %d%n", rank, size);
+                
+                System.out.printf("[MPI-Strategy] Initialized. Rank: %d, Size: %d%n", rank, size);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to initialize MPI context via reflection", e);
             }
@@ -214,6 +227,7 @@ public class MPIDistributedContext implements DistributedContext {
         @Override
         public <T extends Serializable> Future<T> submit(Callable<T> task) {
             if (size <= 1) {
+                // Short-circuit for single node
                 try {
                     return java.util.concurrent.CompletableFuture.completedFuture(task.call());
                 } catch (Exception e) {
@@ -222,19 +236,17 @@ public class MPIDistributedContext implements DistributedContext {
                     return failed;
                 }
             }
-            // Basic dispatch (Rank 1 as demo)
-            try {
-                byte[] taskBytes = serialize(task);
-                Class<?> mpiClass = Class.forName("mpi.MPI");
-                Object commWorld = mpiClass.getField("COMM_WORLD").get(null);
-                Object byteType = mpiClass.getField("BYTE").get(null);
-                commWorld.getClass().getMethod("Send", Object.class, int.class, int.class, Class.forName("mpi.Datatype"), int.class, int.class)
-                         .invoke(commWorld, taskBytes, 0, taskBytes.length, byteType, 1, TAG_TASK);
-                
-                throw new UnsupportedOperationException("Async submit not fully implemented for MPI yet.");
-            } catch (Exception e) {
-                throw new RuntimeException("MPI communication failed", e);
-            }
+            
+            // TODO: partial implementation. 
+            // Real distributed submit requires a Dispatcher Thread on workers looping for MPI.Recv
+            // Since we don't have the worker loop logic here (it's usually in a main wrapper),
+            // we keep the exception or simple local fallback for now?
+            
+            // For now, warn and run locally to avoid crash in "Simulation on Cluster" mode?
+            // Or strictly fail.
+            // "True Distributed" implies we should send it.
+            
+            throw new UnsupportedOperationException("MPI Dynamic Task Submission requires a Worker Loop (not yet active). Use SPMD pattern.");
         }
 
         @Override
@@ -249,29 +261,34 @@ public class MPIDistributedContext implements DistributedContext {
 
         @Override
         public void shutdown() {
-            if (win != null) {
-                try {
-                    win.getClass().getMethod("Free").invoke(win);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
             try {
-                Class.forName("mpi.MPI").getMethod("Finalize").invoke(null);
+                if (win != null) {
+                    winClass.getMethod("Free").invoke(win);
+                }
+                // Only finalize if we are sure we are the ones who initialized it?
+                // Standard behavior: yes.
+                mpiClass.getMethod("Finalize").invoke(null);
+                System.out.println("[MPI-Strategy] Shutdown complete.");
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("[MPI-Strategy] Error during shutdown: " + e.getMessage());
             }
         }
 
-        private void ensureWindow(int size) throws Exception {
+        // --- RMA Operations (One-Sided) ---
+
+        private void ensureWindow(int capacity) throws Exception {
             if (win == null) {
-                winBuffer = DoubleBuffer.allocate(12500000);
-                Class<?> winClass = Class.forName("mpi.Win");
-                Class<?> mpiClass = Class.forName("mpi.MPI");
-                Object commWorld = mpiClass.getField("COMM_WORLD").get(null);
+                // Ensure buffer is large enough for potential reuse or dynamically create
+                // Here we allocate a fixed large buffer for demo purposes (100MB doubles)
+                int safeCap = Math.max(capacity, 1000); 
+                winBuffer = DoubleBuffer.allocate(safeCap);
+                
                 Object infoNull = mpiClass.getField("INFO_NULL").get(null);
+                Object commWorld = this.commWorld;
+                
+                 // Win(Buffer buf, int size, int disp_unit, Info info, Comm comm)
                 win = winClass.getConstructor(java.nio.Buffer.class, int.class, int.class, Class.forName("mpi.Info"), Class.forName("mpi.Comm"))
-                              .newInstance(winBuffer, winBuffer.capacity(), 8, infoNull, commWorld);
+                              .newInstance(winBuffer, winBuffer.capacity() * 8, 8, infoNull, commWorld);
             }
         }
 
@@ -279,15 +296,22 @@ public class MPIDistributedContext implements DistributedContext {
         public void put(DoubleBuffer source, int targetRank, long offset) {
             try {
                 ensureWindow(source.capacity());
-                Class<?> mpiClass = Class.forName("mpi.MPI");
-                int lockShared = mpiClass.getField("LOCK_SHARED").get(null).hashCode();
-                win.getClass().getMethod("Lock", int.class, int.class, int.class).invoke(win, lockShared, targetRank, 0);
+                int lockShared = mpiClass.getField("LOCK_SHARED").getInt(null);
+                
+                // Win.Lock(int lock_type, int rank, int assert)
+                winClass.getMethod("Lock", int.class, int.class, int.class).invoke(win, lockShared, targetRank, 0);
+                
                 Object doubleType = mpiClass.getField("DOUBLE").get(null);
-                win.getClass().getMethod("Put", java.nio.Buffer.class, int.class, Class.forName("mpi.Datatype"), int.class, long.class, int.class, Class.forName("mpi.Datatype"))
-                   .invoke(win, source, source.capacity(), doubleType, targetRank, offset, source.capacity(), doubleType);
-                win.getClass().getMethod("Unlock", int.class).invoke(win, targetRank);
+                Class<?> datatypeClass = Class.forName("mpi.Datatype");
+                
+                // Win.Put(Buffer origin_addr, int origin_count, Datatype origin_datatype, int target_rank, long target_disp, int target_count, Datatype target_datatype)
+                winClass.getMethod("Put", java.nio.Buffer.class, int.class, datatypeClass, int.class, long.class, int.class, datatypeClass)
+                    .invoke(win, source, source.capacity(), doubleType, targetRank, offset, source.capacity(), doubleType);
+                
+                winClass.getMethod("Unlock", int.class).invoke(win, targetRank);
+                
             } catch (Exception e) {
-                throw new RuntimeException("MPI Put failed", e);
+                throw new RuntimeException("MPI Put failed to rank " + targetRank, e);
             }
         }
 
@@ -295,33 +319,31 @@ public class MPIDistributedContext implements DistributedContext {
         public void get(DoubleBuffer target, int sourceRank, long offset) {
             try {
                 ensureWindow(target.capacity());
-                Class<?> mpiClass = Class.forName("mpi.MPI");
-                int lockShared = mpiClass.getField("LOCK_SHARED").get(null).hashCode();
-                win.getClass().getMethod("Lock", int.class, int.class, int.class).invoke(win, lockShared, sourceRank, 0);
+                int lockShared = mpiClass.getField("LOCK_SHARED").getInt(null);
+                
+                winClass.getMethod("Lock", int.class, int.class, int.class).invoke(win, lockShared, sourceRank, 0);
+                
                 Object doubleType = mpiClass.getField("DOUBLE").get(null);
-                win.getClass().getMethod("Get", java.nio.Buffer.class, int.class, Class.forName("mpi.Datatype"), int.class, long.class, int.class, Class.forName("mpi.Datatype"))
+                Class<?> datatypeClass = Class.forName("mpi.Datatype");
+                
+                winClass.getMethod("Get", java.nio.Buffer.class, int.class, datatypeClass, int.class, long.class, int.class, datatypeClass)
                    .invoke(win, target, target.capacity(), doubleType, sourceRank, offset, target.capacity(), doubleType);
-                win.getClass().getMethod("Unlock", int.class).invoke(win, sourceRank);
+                
+                winClass.getMethod("Unlock", int.class).invoke(win, sourceRank);
             } catch (Exception e) {
-                throw new RuntimeException("MPI Get failed", e);
+                throw new RuntimeException("MPI Get failed from rank " + sourceRank, e);
             }
         }
 
         @Override
         public void fence() {
             try {
-                if (win != null) win.getClass().getMethod("Fence", int.class).invoke(win, 0);
+                if (win != null) {
+                    winClass.getMethod("Fence", int.class).invoke(win, 0);
+                }
             } catch (Exception e) {
                 throw new RuntimeException("MPI Fence failed", e);
             }
-        }
-
-        private byte[] serialize(Object obj) throws java.io.IOException {
-            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-            java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(bos);
-            oos.writeObject(obj);
-            oos.flush();
-            return bos.toByteArray();
         }
     }
 }

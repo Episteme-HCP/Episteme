@@ -337,6 +337,7 @@
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
+              <arg>-Xpkginfo:always</arg>
             </compilerArgs>
           </configuration>
         </plugin>

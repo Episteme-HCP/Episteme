@@ -153,19 +153,16 @@ public final class MatrixFactory {
                 }
 
                 if (isReal) {
-                    // Convert to double[][] for RealDoubleMatrix
-                    double[][] dData = new double[rows][cols];
-                    for (int i = 0; i < rows; i++) {
-                        for (int j = 0; j < cols; j++) {
-                            dData[i][j] = ((org.jscience.core.mathematics.numbers.real.Real) data[i][j]).doubleValue();
-                        }
-                    }
+                    // Convert to double[][] for SIMD matrix (or Generic optimization)
                     double[] flatData = new double[rows * cols];
                     for (int i = 0; i < rows; i++) {
-                        System.arraycopy(dData[i], 0, flatData, i * cols, cols);
+                        for (int j = 0; j < cols; j++) {
+                            flatData[i * cols + j] = ((org.jscience.core.mathematics.numbers.real.Real) data[i][j]).doubleValue();
+                        }
                     }
+                    // Use SIMDDoubleMatrix directly if applicable
                     @SuppressWarnings("unchecked")
-                    Matrix<E> m = (Matrix<E>) RealDoubleMatrix.of(flatData, rows, cols);
+                    Matrix<E> m = (Matrix<E>) new SIMDDoubleMatrix(rows, cols, flatData);
                     return m;
                 }
                 // Flatten for DenseMatrix constructor
@@ -334,19 +331,15 @@ public final class MatrixFactory {
                 }
 
                 if (isRealList) {
-                    double[][] dData = new double[rows][cols];
+                    double[] flatData = new double[rows * cols];
                     for (int i = 0; i < rows; i++) {
                         List<E> row = data.get(i);
                         for (int j = 0; j < cols; j++) {
-                            dData[i][j] = ((org.jscience.core.mathematics.numbers.real.Real) row.get(j)).doubleValue();
+                            flatData[i * cols + j] = ((org.jscience.core.mathematics.numbers.real.Real) row.get(j)).doubleValue();
                         }
                     }
-                    double[] flatData = new double[rows * cols];
-                    for (int i = 0; i < rows; i++) {
-                        System.arraycopy(dData[i], 0, flatData, i * cols, cols);
-                    }
                     @SuppressWarnings("unchecked")
-                    Matrix<E> m = (Matrix<E>) RealDoubleMatrix.of(flatData, rows, cols);
+                    Matrix<E> m = (Matrix<E>) new SIMDDoubleMatrix(rows, cols, flatData);
                     return m;
                 }
                 return new DenseMatrix<E>(data, ring);
