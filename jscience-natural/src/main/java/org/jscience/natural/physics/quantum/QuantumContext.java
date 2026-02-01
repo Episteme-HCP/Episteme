@@ -57,6 +57,14 @@ public class QuantumContext implements QuantumBackend.QuantumCircuit {
     @Override public int getNumQubits() { return totalQubits; }
 
     @Override
+    public void append(QuantumBackend.QuantumCircuit other) {
+        if (other instanceof QuantumContext) {
+            QuantumContext otherContext = (QuantumContext) other;
+            this.gates.addAll(otherContext.getGates());
+        }
+    }
+
+    @Override
     public String toQASM() {
         StringBuilder sb = new StringBuilder("OPENQASM 2.0;\ninclude \"qelib1.inc\";\n");
         for (QuantumRegister reg : registers) {

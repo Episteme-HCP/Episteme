@@ -85,8 +85,16 @@ public class QiskitQuantumProvider implements QuantumBackend {
     @Override public double vqe(Matrix<Complex> h, QuantumBackend.QuantumCircuit a, String o) { return 0.0; }
     @Override public QuantumBackend.QuantumResult qaoa(Matrix<Complex> h, int l) { return null; }
     @Override public double quantumPhaseEstimation(Matrix<Complex> u, Vector<Complex> e, int p) { return 0.0; }
-    @Override public QuantumBackend.QuantumResult groverSearch(QuantumBackend.QuantumCircuit o, int q) { return null; }
-    @Override public int[] shorFactor(int N) { return new int[0]; }
+    @Override
+    public QuantumBackend.QuantumResult groverSearch(QuantumBackend.QuantumCircuit oracle, int numQubits) {
+        QuantumBackend.QuantumCircuit groverCircuit = org.jscience.natural.physics.quantum.QuantumAlgorithms.createGroverCircuit(this, oracle, numQubits);
+        return executeSimulator(groverCircuit, 1024);
+    }
+
+    @Override
+    public int[] shorFactor(int N) {
+        return org.jscience.natural.physics.quantum.QuantumAlgorithms.shor(N);
+    }
     @Override public QuantumBackend.QuantumCircuit matrixToUnitary(Matrix<Complex> m) { return null; }
     @Override public Matrix<Complex> stateTomography(QuantumBackend.QuantumCircuit c, int s) { return null; }
     @Override public String[] getAvailableBackends() { return new String[]{"qiskit_sim"}; }

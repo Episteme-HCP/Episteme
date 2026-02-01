@@ -75,7 +75,15 @@ public interface QuantumBackend extends ComputeBackend {
         /**
          * Returns a string representation of the circuit (e.g., QASM).
          */
+        /**
+         * Returns a string representation of the circuit (e.g., QASM).
+         */
         String toQASM();
+
+        /**
+         * Appends another circuit to this circuit.
+         */
+        void append(QuantumCircuit other);
     }
 
     /**
