@@ -295,6 +295,23 @@ public class SIMDDoubleMatrix implements Matrix<Real> {
     public double[] getInternalData() {
         return data;
     }
+
+    /**
+     * Efficiently copies a row into a double array.
+     */
+    public double[] getRowData(int row) {
+        double[] rowData = new double[cols];
+        System.arraycopy(data, row * cols, rowData, 0, cols);
+        return rowData;
+    }
+
+    /**
+     * Efficiently sets a row from a double array.
+     */
+    public void setRowData(int row, double[] rowData) {
+        if (rowData.length != cols) throw new IllegalArgumentException("Length mismatch");
+        System.arraycopy(rowData, 0, data, row * cols, cols);
+    }
     
     @Override public Vector<Real> getRow(int row) { throw new UnsupportedOperationException(); }
     @Override public Vector<Real> getColumn(int col) { throw new UnsupportedOperationException(); }

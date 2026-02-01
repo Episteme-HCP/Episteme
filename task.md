@@ -39,17 +39,24 @@ Ce plan consolide les actions requises pour aligner JScience sur les standards H
 
 - [x] **Refactor `MPIDistributedContext`** :
     - Nettoyage de `MpiStrategy` et documentation des limitations du `submit` dynamique (SPMD vs MPMD).
-    - [x] **Algorithmes HPC** :
-    - [x] **2.5D Algorithm** (`Algorithm25D`) pour limiter les communications réseau.
-    - [x] **CARMA Algorithm** :
-        - [x] `RealAlgorithmCARMA` : Version haute précision (Arbitrary precision).
-        - [x] `RealDoubleAlgorithmCARMA` : Version haute performance (SIMD/double primitive).
+- [x] **Algorithmes HPC Distribués** (TiledMatrix) :
+    - [x] **DistributedCARMAAlgorithm** : Version CARMA pour grilles distribuées.
+    - [x] **DistributedSUMMAAlgorithm** : SUMMA avec support RDMA pour SIMD tiles.
+    - [x] **DistributedCannonAlgorithm** : Multiplication pour maillages carrés.
+    - [x] **DistributedFoxAlgorithm** : Diffusion par lignes/colonnes.
+    - [x] **Distributed25DAlgorithm** : Algorithme à faible communication (réplication).
+- [x] **Algorithmes Spécialisés Locaux** (Matrix<Real>) :
+    - [x] **RealCARMAAlgorithm** / **RealDoubleCARMAAlgorithm** (SIMD).
+    - [x] **RealStrassenAlgorithm** / **RealDoubleStrassenAlgorithm** (SIMD).
 - [x] **Support LAPACK Natif** :
     - [x] Inversion de matrice via `DGETRF` et `DGETRI`.
-    - [x] Résolution de systèmes linéaires via `DGESV`.
+    - [x] Résolution de systèmes linéaires via `DGESV` et `solve(Matrix, Vector)`.
 
 ## 🧹 5. Audit et Packaging
 
-- [x] **Audit Qualité** : Nettoyage de la dette technique dans `HDF5Reader` et `MMapMatrix` (champs/classes inutilisés).
+- [x] **Audit Qualité** : 
+    - [x] Nettoyage de la dette technique.
+    - [x] Harmonisation du nommage (préfixes `Distributed`, `Real`, `RealDouble`).
+    - [x] Consolidation des imports et suppression des algorithmes obsolètes.
 - [ ] **Fat Jars & Modules** : S'assurer que les connecteurs natifs (Panama) fonctionnent une fois packagés.
 - [x] **Documentation** : README mis à jour avec les prérequis système (OpenBLAS/MPI).

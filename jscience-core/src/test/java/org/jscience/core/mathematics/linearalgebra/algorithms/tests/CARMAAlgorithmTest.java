@@ -6,7 +6,7 @@
 package org.jscience.core.mathematics.linearalgebra.algorithms.tests;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
-import org.jscience.core.mathematics.linearalgebra.algorithms.CARMAAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.distributed.LocalDistributedContext;
 import org.jscience.core.ComputeContext;
@@ -28,7 +28,7 @@ public class CARMAAlgorithmTest {
         TiledMatrix B = createIdentity(4, 2);
         
         // C = I * I = I
-        TiledMatrix C = CARMAAlgorithm.multiply(A, B);
+        TiledMatrix C = DistributedCARMAAlgorithm.multiply(A, B);
         
         // Verify C is Identity
         for(int i=0; i<4; i++) {
