@@ -23,8 +23,8 @@
 
 package org.jscience.core.mathematics.analysis.transform;
 
-import org.jscience.core.technical.backend.algorithms.FFTProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreFFTProvider;
+import org.jscience.core.mathematics.analysis.transform.algorithms.FFTProvider;
+import org.jscience.core.mathematics.analysis.transform.algorithms.MulticoreFFTProvider;
 import java.util.ServiceLoader;
 
 /**

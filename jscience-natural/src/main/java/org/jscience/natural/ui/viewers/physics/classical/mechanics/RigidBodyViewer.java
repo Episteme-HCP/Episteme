@@ -32,7 +32,7 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.natural.physics.classical.mechanics.PhysicsEngine;
+import org.jscience.natural.physics.classical.mechanics.CollisionSimulation;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 import org.jscience.core.ui.NumericParameter;
 import org.jscience.core.ui.BooleanParameter;
@@ -61,8 +61,8 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         VisualBodyData(Color c) { this.color = c; }
     }
 
-    private final PhysicsEngine engine = new PhysicsEngine();
-    private final java.util.Map<PhysicsEngine.Body, VisualBodyData> visualData = new java.util.HashMap<>();
+    private final CollisionSimulation engine = new CollisionSimulation();
+    private final java.util.Map<CollisionSimulation.Body, VisualBodyData> visualData = new java.util.HashMap<>();
     
     private double gravityVal = 0.5;
     private double bouncinessVal = 0.8;
@@ -128,7 +128,7 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         RigidBody rb = new RigidBody(toVector(px, py, 0), Real.of(radius * radius), inertia, null);
         rb.setVelocity(toVector((r.nextDouble() - 0.5) * 10, 0, 0));
 
-        PhysicsEngine.Body body = new PhysicsEngine.Body(rb, radius);
+        CollisionSimulation.Body body = new CollisionSimulation.Body(rb, radius);
         body.bounciness = bouncinessVal;
         engine.addBody(body);
         visualData.put(body, new VisualBodyData(Color.hsb(r.nextDouble() * 360, 0.7, 0.9)));
@@ -150,7 +150,7 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         gc.setStroke(Color.GRAY);
         gc.strokeLine(0, canvas.getHeight() - 1, canvas.getWidth(), canvas.getHeight() - 1);
 
-        for (PhysicsEngine.Body vb : engine.getBodies()) {
+        for (CollisionSimulation.Body vb : engine.getBodies()) {
             RigidBody b = vb.physicsBody;
             double x = b.getPosition().get(0).doubleValue();
             double y = b.getPosition().get(1).doubleValue();

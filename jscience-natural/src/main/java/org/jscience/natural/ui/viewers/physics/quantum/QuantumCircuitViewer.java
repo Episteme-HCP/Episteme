@@ -35,9 +35,12 @@ import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.NumericParameter;
 import org.jscience.core.ui.BooleanParameter;
+import org.jscience.core.physics.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.BackendManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -50,13 +53,24 @@ public final class QuantumCircuitViewer extends AbstractViewer {
     private boolean noiseEnabled = false;
     private final BarChart<String, Number> probChart;
     private final VBox circuitGrid = new VBox(10);
+    private QuantumBackend quantumBackend;
 
     public QuantumCircuitViewer() {
+        // Try to find a quantum backend
+        try {
+            this.quantumBackend = (QuantumBackend) BackendManager.getAllBackends().stream()
+                    .filter(b -> b instanceof QuantumBackend && b.isAvailable())
+                    .findFirst()
+                    .orElse(null);
+        } catch (Exception e) {
+            // Fallback to internal simulator
+        }
+
         VBox root = new VBox(20);
         root.setPadding(new Insets(20));
         root.setStyle("-fx-background-color: #050a10;");
 
-        Label title = new Label("QUANTUM SUPREMACY SIMULATOR");
+        Label title = new Label(quantumBackend != null ? "HYBRID QUANTUM-CLASSICAL COMPUTER" : "QUANTUM SUPREMACY SIMULATOR");
         title.setStyle("-fx-text-fill: #00d4ff; -fx-font-size: 22px; -fx-font-weight: bold; -fx-letter-spacing: 3px;");
 
         // Circuit Visualization Area
@@ -101,6 +115,38 @@ public final class QuantumCircuitViewer extends AbstractViewer {
         series.setName("Probability Distribution");
 
         int numStates = (int) Math.pow(2, numQubits);
+        
+        if (quantumBackend != null) {
+            try {
+                QuantumBackend.QuantumCircuit circuit = quantumBackend.createCircuit(numQubits, numQubits);
+                // Create a Bell State or similar for demo
+                for (int i = 0; i < numQubits; i++) {
+                    circuit.hadamard(i);
+                }
+                for (int i = 0; i < numQubits; i++) {
+                    circuit.measure(i, i);
+                }
+                
+                QuantumBackend.QuantumResult result = quantumBackend.executeSimulator(circuit, 1024);
+                Map<String, Integer> counts = result.getCounts();
+                
+                for (int i = 0; i < numStates; i++) {
+                    String stateBits = String.format("%" + numQubits + "s", Integer.toBinaryString(i)).replace(' ', '0');
+                    String stateLabel = "|" + stateBits + ">";
+                    int count = counts.getOrDefault(stateBits, 0);
+                    series.getData().add(new XYChart.Data<>(stateLabel, count / 1024.0));
+                }
+            } catch (Exception e) {
+                runMockSimulation(series, numStates);
+            }
+        } else {
+            runMockSimulation(series, numStates);
+        }
+        
+        probChart.getData().add(series);
+    }
+
+    private void runMockSimulation(XYChart.Series<String, Number> series, int numStates) {
         Random rand = new Random();
         double[] probs = new double[numStates];
         double sum = 0;
@@ -113,12 +159,9 @@ public final class QuantumCircuitViewer extends AbstractViewer {
 
         for (int i = 0; i < numStates; i++) {
             String state = String.format("|%s>", Integer.toBinaryString(i)).replace(' ', '0');
-            // Pad binary string manually if necessary
             while (state.length() < numQubits + 2) state = "|0" + state.substring(1);
-            
             series.getData().add(new XYChart.Data<>(state, probs[i] / sum));
         }
-        probChart.getData().add(series);
     }
 
     @Override

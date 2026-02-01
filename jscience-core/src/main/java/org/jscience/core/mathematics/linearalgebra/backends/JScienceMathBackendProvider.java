@@ -23,3 +23,50 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
+import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.BackendDiscovery;
+
+/**
+ * BackendProvider for JScience Core Math engine.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class JScienceMathBackendProvider implements BackendProvider {
+    @Override
+    public String getType() {
+        return BackendDiscovery.TYPE_MATH;
+    }
+
+    @Override
+    public String getId() {
+        return "jsci_core";
+    }
+
+    @Override
+    public String getName() {
+        return "JScience Core";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Native JScience mathematical framework.";
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public int getPriority() {
+        return 100;
+    }
+
+    @Override
+    public Object createBackend() {
+        return null;
+    }
+}
+
+

@@ -23,10 +23,9 @@
 
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.backends.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.tensors.backends.TensorProvider;
 import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider;
 
 import java.util.Collections;
 import java.util.List;

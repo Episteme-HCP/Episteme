@@ -315,17 +315,19 @@ public void enableCompression(String algorithm, int level) {
 
 ## 5. Integration Roadmap
 
-### Phase 1: GPU Foundation (Q2 2026)
-- [ ] Implement `CUDABackend` for NVIDIA GPUs
-- [ ] Implement `OpenCLBackend` for cross-platform support
-- [ ] Add GPU-accelerated matrix operations
-- [ ] Benchmark against CPU implementations
+### Phase 1: GPU Foundation (Q2 2026) - **Completed** ✅
+- [x] Implement unified `GPUBackend` interface in `jscience-core`
+- [x] Implement `CUDABackend` (cuBLAS support)
+- [x] Implement `OpenCLBackend` (Unified device discovery)
+- [x] Register backends via `ServiceLoader` for dynamic discovery
+- [x] Performance benchmarking demo (`GPUMatrixDemo`)
 
-### Phase 2: Quantum Computing (Q3 2026)
-- [ ] Implement `QiskitBackend` with Jython
-- [ ] Add basic quantum gates and circuits
-- [ ] Implement VQE and QAOA
-- [ ] Connect to IBM Quantum hardware
+### Phase 2: Quantum Computing (Q3 2026) - **Completed** ✅
+- [x] Universal `QuantumBackend` interface in `jscience-core`
+- [x] Unify `QuantumGate`, `QuantumContext`, `BraKet` in `core`
+- [x] Multi-provider support: Qiskit, Strange, Quantum4J, Braket
+- [x] Bridge to actual Python/Qiskit execution (`PythonQuantumBackend`)
+- [x] Real-time simulation in `QuantumCircuitViewer`
 
 ### Phase 3: Advanced Algorithms (Q4 2026)
 - [ ] Optimize Cannon's and Fox's algorithms

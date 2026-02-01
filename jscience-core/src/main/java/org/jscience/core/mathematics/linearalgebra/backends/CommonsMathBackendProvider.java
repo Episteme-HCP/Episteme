@@ -23,3 +23,58 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
+import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.BackendDiscovery;
+
+/**
+ * BackendProvider for Apache Commons Math.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class CommonsMathBackendProvider implements BackendProvider {
+    @Override
+    public String getType() {
+        return BackendDiscovery.TYPE_MATH;
+    }
+
+    @Override
+    public String getId() {
+        return "commonsmath";
+    }
+
+    @Override
+    public String getName() {
+        return "Apache Commons Math";
+    }
+
+    @Override
+    public String getDescription() {
+        return "General purpose mathematics and statistics library.";
+    }
+
+    @Override
+    public boolean isAvailable() {
+        try {
+            Class.forName("org.apache.commons.math3.util.Precision");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public int getPriority() {
+        return 50;
+    }
+
+    @Override
+    public Object createBackend() {
+        if (isAvailable()) {
+            return new org.jscience.core.mathematics.linearalgebra.backends.CommonsMathLinearAlgebraProvider<>();
+        }
+        return null;
+    }
+}
+
+

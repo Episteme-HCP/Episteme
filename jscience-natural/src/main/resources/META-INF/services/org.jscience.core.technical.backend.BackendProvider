@@ -1,0 +1,11 @@
+# Molecular Backend Providers
+org.jscience.natural.physics.chemistry.backends.JavaFXMolecularBackendProvider
+org.jscience.natural.physics.chemistry.backends.JmolMolecularBackendProvider
+org.jscience.natural.physics.chemistry.backends.PyMOLMolecularBackendProvider
+org.jscience.natural.physics.chemistry.backends.VMDMolecularBackendProvider
+
+# Quantum Backend Providers
+org.jscience.natural.physics.quantum.backends.StrangeQuantumProvider
+org.jscience.natural.physics.quantum.backends.Quantum4JQuantumProvider
+org.jscience.natural.physics.quantum.backends.QiskitQuantumProvider
+org.jscience.natural.physics.quantum.backends.AmazonBraketQuantumProvider

@@ -21,5 +21,6 @@
  * SOFTWARE.
  */
 
-package org.jscience.core.mathematics.linearalgebra.backends;
+package org.jscience.core.technical.backend.gpu.cuda;
+
 

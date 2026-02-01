@@ -54,22 +54,22 @@ import org.jscience.core.mathematics.context.MathContext.OverflowMode;
 import org.jscience.core.mathematics.linearalgebra.tensors.backends.TensorProvider;
 import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorProvider;
 
-import org.jscience.core.mathematics.linearalgebra.backends.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.CPUSparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.CUDADenseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.CUDASparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.OpenCLDenseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.OpenCLSparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.ColtLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CUDADenseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CUDASparseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.OpenCLDenseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.OpenCLSparseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.ColtLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.EJMLLinearAlgebraProvider;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.quantum.QuantumBackend;
+import org.jscience.core.physics.quantum.QuantumBackend;
 import java.util.List;
 
 /**

@@ -23,3 +23,58 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
+import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.BackendDiscovery;
+
+/**
+ * BackendProvider for EJML (Efficient Java Matrix Library).
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class EJMLBackendProvider implements BackendProvider {
+    @Override
+    public String getType() {
+        return BackendDiscovery.TYPE_MATH;
+    }
+
+    @Override
+    public String getId() {
+        return "ejml";
+    }
+
+    @Override
+    public String getName() {
+        return "EJML";
+    }
+
+    @Override
+    public String getDescription() {
+        return "High-performance linear algebra library.";
+    }
+
+    @Override
+    public boolean isAvailable() {
+        try {
+            Class.forName("org.ejml.EjmlParameters");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public int getPriority() {
+        return 80;
+    }
+
+    @Override
+    public Object createBackend() {
+        if (isAvailable()) {
+            return new org.jscience.core.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider<>();
+        }
+        return null;
+    }
+}
+
+
