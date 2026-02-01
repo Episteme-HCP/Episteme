@@ -23,7 +23,7 @@
 
 package org.jscience.natural.physics.quantum;
 
-import org.jscience.core.physics.quantum.BraKet;
+// BraKet is in the same package, no import needed.
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;

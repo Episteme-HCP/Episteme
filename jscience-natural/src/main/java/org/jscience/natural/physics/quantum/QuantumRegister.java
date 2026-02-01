@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.physics.quantum;
+package org.jscience.natural.physics.quantum;
 
 /**
  * Represents a Register of Qubits.

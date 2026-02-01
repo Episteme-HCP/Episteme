@@ -3,15 +3,16 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.physics.quantum;
+package org.jscience.natural.physics.quantum;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jscience.core.technical.backend.quantum.QuantumBackend;
 
 /**
  * Represents a Quantum Circuit / Context.
  * Holds registers and the sequence of gates.
- * Re-located to core for unified backend access.
+ * Located in natural for physics domain logic.
  */
 public class QuantumContext implements QuantumBackend.QuantumCircuit {
     private final List<QuantumRegister> registers = new ArrayList<>();

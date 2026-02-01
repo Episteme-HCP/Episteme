@@ -1,15 +1,11 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- */
-
 package org.jscience.core.io;
-
+ 
 import org.junit.jupiter.api.Test;
+import org.jscience.core.methodology.loaders.SciencesDatabaseReader;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for SciencesDatabase.
+ * Automated baseline test for SciencesDatabaseReader.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -20,7 +16,7 @@ public class SciencesDatabaseTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(SciencesDatabase.class);
+        assertNotNull(SciencesDatabaseReader.class);
     }
 }
 

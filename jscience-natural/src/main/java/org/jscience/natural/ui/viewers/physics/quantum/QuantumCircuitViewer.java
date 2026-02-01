@@ -35,7 +35,7 @@ import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.NumericParameter;
 import org.jscience.core.ui.BooleanParameter;
-import org.jscience.core.physics.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.quantum.QuantumBackend;
 import org.jscience.core.technical.backend.BackendManager;
 
 import java.util.ArrayList;

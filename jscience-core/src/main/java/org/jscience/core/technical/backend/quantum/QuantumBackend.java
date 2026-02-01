@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.physics.quantum;
+package org.jscience.core.technical.backend.quantum;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
@@ -119,12 +119,12 @@ public interface QuantumBackend extends ComputeBackend {
     QuantumResult executeSimulator(QuantumCircuit circuit, int shots);
 
     /**
-     * Executes a quantum context (circuit).
-     * @param context The quantum context containing registers and gates.
+     * Executes a quantum circuit.
+     * @param circuit The quantum circuit to execute.
      * @return A map of measurement results (e.g., bitstring -> count).
      */
-    default java.util.Map<String, Integer> execute(QuantumContext context) {
-        return executeSimulator(context, 1024).getCounts();
+    default java.util.Map<String, Integer> execute(QuantumCircuit circuit) {
+        return executeSimulator(circuit, 1024).getCounts();
     }
 
     /**

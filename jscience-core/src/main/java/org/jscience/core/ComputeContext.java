@@ -69,7 +69,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.physics.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.quantum.QuantumBackend;
 import java.util.List;
 
 /**

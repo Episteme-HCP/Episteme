@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.nativ;
+package org.jscience.nativ.technical.backend.nativ;
 
 import java.lang.foreign.*;
 import java.nio.file.Paths;
@@ -62,5 +62,3 @@ public class NativeLibraryLoader {
         return LINKER;
     }
 }
-
-

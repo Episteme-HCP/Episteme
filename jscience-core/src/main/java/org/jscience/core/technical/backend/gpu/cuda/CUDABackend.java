@@ -49,7 +49,7 @@ import static jcuda.runtime.cudaMemcpyKind.*;
 public class CUDABackend implements GPUBackend {
 
     private static boolean available;
-    private int selectedDeviceId = 0;
+
 
 
     static {
@@ -133,7 +133,7 @@ public class CUDABackend implements GPUBackend {
 
     @Override
     public void selectDevice(int deviceId) {
-        this.selectedDeviceId = deviceId;
+
         cudaSetDevice(deviceId);
     }
 

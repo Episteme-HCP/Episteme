@@ -10,8 +10,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.ComputeContext;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.concurrent.Future;
 
 /**

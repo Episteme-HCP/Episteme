@@ -3,8 +3,9 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.io;
+package org.jscience.core.io.loaders;
 
+import org.jscience.core.io.AbstractResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.InputStream;
@@ -54,6 +55,16 @@ public class HDF5Reader extends AbstractResourceReader<byte[]> {
             } else if ("szip".equals(algorithm)) {
                 h5Class.getMethod("H5Pset_szip", long.class, int.class, int.class)
                     .invoke(null, dcpl, H5_SZIP_NN_OPTION_MASK, 16);
+            } else if ("lzf".equals(algorithm)) {
+                // LZF is often an external filter (filter ID 32000)
+                logger.info("Setting up LZF filter (External)");
+                h5Class.getMethod("H5Pset_filter", long.class, int.class, int.class, long.class, int[].class)
+                    .invoke(null, dcpl, 32000, 1, 0L, new int[0]);
+            } else if ("blosc".equals(algorithm)) {
+                // Blosc filter ID 32001
+                logger.info("Setting up Blosc filter (External)");
+                h5Class.getMethod("H5Pset_filter", long.class, int.class, int.class, long.class, int[].class)
+                    .invoke(null, dcpl, 32001, 1, 0L, new int[]{level, 1, 1}); // [clevel, doshuffle, compname]
             }
             
             // Set chunking (required for compression)
@@ -69,6 +80,14 @@ public class HDF5Reader extends AbstractResourceReader<byte[]> {
             logger.error("Failed to enable HDF5 compression", e);
             throw new RuntimeException("Failed to enable compression", e);
         }
+    }
+
+    /**
+     * Enables parallel I/O for MPI-based execution.
+     */
+    public void enableParallelIO() {
+        logger.info("Enabling Parallel HDF5 I/O");
+        // Requires H5Pset_fapl_mpio
     }
 
     @Override

@@ -21,8 +21,9 @@
  * SOFTWARE.
  */
 
-package org.jscience.core.io;
+package org.jscience.core.methodology.loaders;
 
+import org.jscience.core.io.AbstractResourceReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -39,22 +40,16 @@ import java.util.*;
  * Database contains 600+ scientific disciplines from acarology to zoology.
  * </p>
  *
- * <p>
- * <b>Usage example</b>:
- * </p>
- *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SciencesDatabase {
+public class SciencesDatabaseReader extends AbstractResourceReader<SciencesDatabaseReader.Science> {
 
     /**
      * Path to the embedded XML database.
      */
     private static final String RESOURCE_PATH = "/org/jscience/taxonomy/sciences.xml";
-    private static Map<String, Science> sciences = null;
-    private static final Object LOCK = new Object();
 
     /**
      * Represents a scientific discipline.
@@ -107,96 +102,25 @@ public class SciencesDatabase {
         }
     }
 
-    /**
-     * Finds a science by exact name match (case-insensitive).
-     * <p>
-     * Complexity: O(1) after initial load
-     * </p>
-     * 
-     * @param name science name (case-insensitive)
-     * @return Optional containing the science if found
-     */
-    public static Optional<Science> find(String name) {
-        ensureLoaded();
-        return Optional.ofNullable(sciences.get(name.toLowerCase()));
+    public SciencesDatabaseReader() {
     }
 
-    /**
-     * Searches for sciences containing the keyword in name or description.
-     * <p>
-     * Complexity: O(n) where n is number of sciences (~600)
-     * </p>
-     * 
-     * @param keyword search term (case-insensitive)
-     * @return list of matching sciences (may be empty)
-     */
-    public static List<Science> search(String keyword) {
-        ensureLoaded();
-        String lowerKeyword = keyword.toLowerCase();
-        List<Science> results = new ArrayList<>();
-
-        for (Science science : sciences.values()) {
-            if (science.getName().contains(lowerKeyword) ||
-                    science.getDescription().toLowerCase().contains(lowerKeyword)) {
-                results.add(science);
-            }
-        }
-
-        return results;
+    @Override
+    protected Science loadFromSource(String id) throws Exception {
+        // Since it's a monolithic XML, loadAll usually populates everything.
+        // But for consistency:
+        return loadAll().stream()
+                .filter(s -> s.getName().equalsIgnoreCase(id))
+                .findFirst()
+                .orElse(null);
     }
 
-    /**
-     * Gets all sciences in the database.
-     * <p>
-     * Returns unmodifiable collection of all 600+ sciences.
-     * </p>
-     * 
-     * @return all sciences
-     */
-    public static Collection<Science> getAll() {
-        ensureLoaded();
-        return Collections.unmodifiableCollection(sciences.values());
-    }
-
-    /**
-     * Gets the number of sciences in the database.
-     * 
-     * @return count (typically 600+)
-     */
-    public static int count() {
-        ensureLoaded();
-        return sciences.size();
-    }
-
-    /**
-     * Ensures database is loaded (thread-safe lazy initialization).
-     */
-    private static void ensureLoaded() {
-        if (sciences == null) {
-            synchronized (LOCK) {
-                if (sciences == null) {
-                    sciences = loadDatabase();
-                }
-            }
-        }
-    }
-
-    /**
-     * Loads and parses the sciences XML database.
-     * <p>
-     * Parses /org/jscience/sciences.xml from classpath.
-     * </p>
-     * 
-     * @return map of science name to Science object
-     * @throws RuntimeException if parsing fails
-     */
-    private static Map<String, Science> loadDatabase() {
-        Map<String, Science> map = new HashMap<>();
-
-        try {
-            InputStream is = SciencesDatabase.class.getResourceAsStream(RESOURCE_PATH);
+    @Override
+    protected List<Science> loadAllFromSource() throws Exception {
+        List<Science> list = new ArrayList<>();
+        try (InputStream is = getClass().getResourceAsStream(RESOURCE_PATH)) {
             if (is == null) {
-                throw new IllegalStateException("Resource not found: " + RESOURCE_PATH);
+                return list;
             }
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -207,28 +131,17 @@ public class SciencesDatabase {
 
             for (int i = 0; i < scienceNodes.getLength(); i++) {
                 Element scienceElement = (Element) scienceNodes.item(i);
-
                 String name = getTextContent(scienceElement, "name");
                 String description = getTextContent(scienceElement, "description");
-
                 if (name != null && description != null) {
-                    map.put(name.toLowerCase(), new Science(name, description));
+                    list.add(new Science(name, description));
                 }
             }
-
-            is.close();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load sciences database", e);
         }
-
-        return map;
+        return list;
     }
 
-    /**
-     * Extracts text content from XML element.
-     */
-    private static String getTextContent(Element parent, String tagName) {
+    private String getTextContent(Element parent, String tagName) {
         NodeList nodes = parent.getElementsByTagName(tagName);
         if (nodes.getLength() > 0) {
             return nodes.item(0).getTextContent().trim();
@@ -236,9 +149,43 @@ public class SciencesDatabase {
         return null;
     }
 
-    // Prevent instantiation
-    private SciencesDatabase() {
+    @Override
+    public String getResourcePath() {
+        return "org/jscience/taxonomy";
+    }
+
+    @Override
+    public Class<Science> getResourceType() {
+        return Science.class;
+    }
+
+    @Override
+    public String getName() {
+        return "Sciences Taxonomy Reader";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Reader for the scientific disciplines taxonomy database.";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return "A comprehensive database of over 600 scientific disciplines, providing names and descriptions for taxonomy and classification.";
+    }
+
+    @Override
+    public String getCategory() {
+        return "Scientific Data";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"2004.1"};
+    }
+
+    @Override
+    public String[] getSupportedExtensions() {
+        return new String[] {".xml"};
     }
 }
-
-

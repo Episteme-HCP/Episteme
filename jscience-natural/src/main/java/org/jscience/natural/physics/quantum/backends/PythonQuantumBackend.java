@@ -5,7 +5,7 @@
 
 package org.jscience.natural.physics.quantum.backends;
 
-import org.jscience.core.physics.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.quantum.QuantumBackend;
 
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -54,21 +54,21 @@ public class PythonQuantumBackend implements QuantumBackend {
     }
 
     @Override
-    public QuantumCircuit createCircuit(int qubits, int clbits) {
+    public QuantumBackend.QuantumCircuit createCircuit(int qubits, int clbits) {
         return new AdvancedQuantumCircuit(qubits, clbits);
     }
 
     @Override
-    public QuantumResult executeSimulator(QuantumCircuit circuit, int shots) {
+    public QuantumBackend.QuantumResult executeSimulator(QuantumBackend.QuantumCircuit circuit, int shots) {
         return runExecution(circuit, shots, "qasm_simulator");
     }
-
+ 
     @Override
-    public QuantumResult executeHardware(QuantumCircuit circuit, int shots, String backend) {
+    public QuantumBackend.QuantumResult executeHardware(QuantumBackend.QuantumCircuit circuit, int shots, String backend) {
         return runExecution(circuit, shots, backend);
     }
 
-    private QuantumResult runExecution(QuantumCircuit circuit, int shots, String backendName) {
+    private QuantumBackend.QuantumResult runExecution(QuantumBackend.QuantumCircuit circuit, int shots, String backendName) {
         try {
             File script = createExtendedScript(circuit.toQASM(), shots, backendName);
             Process p = new ProcessBuilder(pythonExecutable, script.getAbsolutePath()).start();
@@ -97,7 +97,7 @@ public class PythonQuantumBackend implements QuantumBackend {
         return f;
     }
 
-    private QuantumResult parseRobustResult(String json) {
+    private QuantumBackend.QuantumResult parseRobustResult(String json) {
         // Robust regex-based parsing to avoid external JSON dependency in core
         Map<String, Integer> counts = new HashMap<>();
         long time = 0;
@@ -111,7 +111,7 @@ public class PythonQuantumBackend implements QuantumBackend {
     }
 
     @Override
-    public double vqe(Matrix<Complex> hamiltonian, QuantumCircuit ansatz, String optimizer) {
+    public double vqe(Matrix<Complex> hamiltonian, QuantumBackend.QuantumCircuit ansatz, String optimizer) {
         System.out.println("[Quantum] Running VQE Hybrid Optimization for Hamiltonian of size " + hamiltonian.rows());
         return -1.165; // Mock ground state energy for Hydrogen molecule
     }
@@ -123,15 +123,15 @@ public class PythonQuantumBackend implements QuantumBackend {
     }
 
     // Standard QuantumBackend overrides
-    @Override public QuantumResult qaoa(Matrix<Complex> h, int l) { return executeSimulator(createCircuit(2,2), 1024); }
+    @Override public QuantumBackend.QuantumResult qaoa(Matrix<Complex> h, int l) { return executeSimulator(createCircuit(2,2), 1024); }
     @Override public double quantumPhaseEstimation(Matrix<Complex> u, Vector<Complex> e, int p) { return 0.0; }
-    @Override public QuantumResult groverSearch(QuantumCircuit o, int q) { return executeSimulator(o, 1024); }
-    @Override public QuantumCircuit matrixToUnitary(Matrix<Complex> m) { return createCircuit(2,2); }
-    @Override public Matrix<Complex> stateTomography(QuantumCircuit c, int s) { return null; }
+    @Override public QuantumBackend.QuantumResult groverSearch(QuantumBackend.QuantumCircuit o, int q) { return executeSimulator(o, 1024); }
+    @Override public QuantumBackend.QuantumCircuit matrixToUnitary(Matrix<Complex> m) { return createCircuit(2,2); }
+    @Override public Matrix<Complex> stateTomography(QuantumBackend.QuantumCircuit c, int s) { return null; }
     @Override public String[] getAvailableBackends() { return new String[]{"qasm_simulator", "ibmq_manila"}; }
     @Override public Map<String, Object> getBackendInfo(String b) { return Map.of("qubits", 5); }
 
-    private static class AdvancedQuantumCircuit implements QuantumCircuit {
+    private static class AdvancedQuantumCircuit implements QuantumBackend.QuantumCircuit {
         private final StringBuilder qasm = new StringBuilder("OPENQASM 2.0;\ninclude \"qelib1.inc\";\n");
         private final int q;
         public AdvancedQuantumCircuit(int q, int c) {
@@ -149,7 +149,7 @@ public class PythonQuantumBackend implements QuantumBackend {
         @Override public String toQASM() { return qasm.toString(); }
     }
 
-    private static class AdvancedQuantumResult implements QuantumResult {
+    private static class AdvancedQuantumResult implements QuantumBackend.QuantumResult {
         private final Map<String, Integer> counts;
         private final long time;
         public AdvancedQuantumResult(Map<String, Integer> c, long t) { this.counts = c; this.time = t; }

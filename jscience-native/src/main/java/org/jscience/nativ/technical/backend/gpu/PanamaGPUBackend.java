@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 
-import org.jscience.nativ.technical.nativ.NativeLibraryLoader;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
  * Robust GPU acceleration backend using Project Panama to interface with CUDA and CUBLAS.
