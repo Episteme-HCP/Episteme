@@ -37,6 +37,12 @@ public class QuantumGate {
         this.qubits = (int) (Math.log(matrix.rows()) / Math.log(2));
     }
 
+    public static QuantumGate hadamard() { return new QuantumGate(hadamardMatrix()); }
+    public static QuantumGate pauliX() { return new QuantumGate(pauliXMatrix()); }
+    public static QuantumGate pauliY() { return new QuantumGate(pauliYMatrix()); }
+    public static QuantumGate pauliZ() { return new QuantumGate(pauliZMatrix()); }
+    public static QuantumGate cnot() { return new QuantumGate(cnotMatrix()); }
+
     public QuantumGateType getType() { return type; }
     public int[] getTargetQubits() { return targetQubits; }
     public int getQubits() { return qubits; }

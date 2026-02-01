@@ -12,6 +12,8 @@ import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.algorithms.SUMMAAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.CannonAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.FoxAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.TwoAndHalfDAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.CARMAAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.distributed.DistributedContext;
@@ -99,6 +101,25 @@ public class DistributedMatrixBenchmark {
             return FoxAlgorithm.multiply(tiledA, tiledB);
         }
         return null; // Skip if not square grid
+    }
+
+    @Benchmark
+    public TiledMatrix twoAndHalfDMultiply() {
+        // Use 2 layers if parallelism allows
+        int c = (parallelism >= 8) ? 2 : 1;
+        if (parallelism % c == 0) {
+            int pLayer = parallelism / c;
+            int pSqrt = (int) Math.sqrt(pLayer);
+            if (pSqrt * pSqrt == pLayer) {
+                return TwoAndHalfDAlgorithm.multiply(tiledA, tiledB, c);
+            }
+        }
+        return null;
+    }
+
+    @Benchmark
+    public TiledMatrix carmaMultiply() {
+        return CARMAAlgorithm.multiply(tiledA, tiledB);
     }
 
     private Real[][] toReal(double[][] data) {

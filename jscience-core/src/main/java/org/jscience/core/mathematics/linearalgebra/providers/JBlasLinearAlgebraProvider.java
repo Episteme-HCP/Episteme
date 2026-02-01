@@ -21,15 +21,27 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
+
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
 
 import java.lang.reflect.Constructor;
 
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.mathematics.numbers.real.Real;
+
 import org.jscience.core.technical.backend.ExecutionContext;
+
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 /**
@@ -55,7 +67,7 @@ public class JBlasLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         try {
             Class.forName("org.jblas.DoubleMatrix");
             Class.forName("org.jblas.Solve");
-            Class.forName("org.jscience.core.mathematics.linearalgebra.backends.JBlasSupport");
+            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.JBlasSupport");
             jblasAvailable = true;
         } catch (ClassNotFoundException e) {
             jblasAvailable = false;
@@ -76,7 +88,7 @@ public class JBlasLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         
         if (jblasAvailable && field != null) {
             try {
-                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.backends.JBlasSupport");
+                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.JBlasSupport");
                 @SuppressWarnings("unchecked")
                 Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
                 this.jblasImpl = ctor.newInstance(field);
@@ -198,4 +210,3 @@ public class JBlasLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         return jblasImpl.norm(a);
     }
 }
-

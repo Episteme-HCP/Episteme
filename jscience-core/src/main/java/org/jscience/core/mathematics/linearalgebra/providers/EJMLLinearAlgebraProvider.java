@@ -21,15 +21,27 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
+
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
 
 import java.lang.reflect.Constructor;
 
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.mathematics.numbers.real.Real;
+
 import org.jscience.core.technical.backend.ExecutionContext;
+
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 /**
@@ -55,7 +67,7 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         try {
             Class.forName("org.ejml.simple.SimpleMatrix");
             Class.forName("org.ejml.dense.row.CommonOps_DDRM");
-            Class.forName("org.jscience.core.mathematics.linearalgebra.backends.EJMLSupport");
+            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.EJMLSupport");
             ejmlAvailable = true;
         } catch (ClassNotFoundException e) {
             ejmlAvailable = false;
@@ -72,7 +84,7 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         
         if (ejmlAvailable && field != null) {
             try {
-                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.backends.EJMLSupport");
+                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.EJMLSupport");
                 @SuppressWarnings("unchecked")
                 Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
                 this.ejmlImpl = ctor.newInstance(field);
@@ -193,4 +205,3 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         return ejmlImpl.norm(a);
     }
 }
-

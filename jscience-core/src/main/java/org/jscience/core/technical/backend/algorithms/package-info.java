@@ -33,7 +33,7 @@
  * N-body gravitational simulation</li>
  * <li>{@link org.jscience.core.technical.backend.algorithms.OpenCLLatticeBoltzmannProvider}
  * - Fluid dynamics</li>
- * <li>{@link org.jscience.core.technical.backend.algorithms.OpenCLFFTProvider} -
+ * <li>{@link org.jscience.core.mathematics.analysis.transform.algorithms.OpenCLFFTProvider} -
  * Fast Fourier Transform</li>
  * <li>{@link org.jscience.core.technical.backend.algorithms.ParallelMonteCarloProvider}
  * - Monte Carlo integration</li>

@@ -24,7 +24,7 @@
 package org.jscience.core.technical.backend.algorithms;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.cuda.CUDABackend;
+import org.jscience.core.technical.backend.gpu.cuda.CUDABackend;
 
 import java.util.logging.Logger;
 

@@ -21,15 +21,27 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
+
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
 
 import java.lang.reflect.Constructor;
 
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.mathematics.numbers.real.Real;
+
 import org.jscience.core.technical.backend.ExecutionContext;
+
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 /**
@@ -55,7 +67,7 @@ public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvide
         try {
             Class.forName("org.apache.commons.math3.linear.RealMatrix");
             Class.forName("org.apache.commons.math3.linear.LUDecomposition");
-            Class.forName("org.jscience.core.mathematics.linearalgebra.backends.CommonsMathSupport");
+            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.CommonsMathSupport");
             commonsMathAvailable = true;
         } catch (ClassNotFoundException e) {
             commonsMathAvailable = false;
@@ -72,7 +84,7 @@ public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvide
         
         if (commonsMathAvailable && field != null) {
             try {
-                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.backends.CommonsMathSupport");
+                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.CommonsMathSupport");
                 @SuppressWarnings("unchecked")
                 Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
                 this.cmImpl = ctor.newInstance(field);
@@ -192,4 +204,3 @@ public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvide
         return cmImpl.norm(a);
     }
 }
-

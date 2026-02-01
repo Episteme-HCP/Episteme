@@ -21,20 +21,36 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
+
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
 
 
 
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
+
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
+
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
+
 import org.jscience.core.mathematics.numbers.real.Real;
+
 import org.jscience.core.technical.backend.ExecutionContext;
+
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
+
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -208,4 +224,3 @@ public class EJMLSupport<E> implements LinearAlgebraProvider<E> {
         return (E) Real.of(ea.normF());
     }
 }
-

@@ -21,14 +21,25 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
 
+
+
 import java.util.ArrayList;
+
 import java.util.List;
+
 import java.util.Map;
+
 import java.util.TreeMap;
+
 import java.util.stream.IntStream;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.SparseMatrix;
 
 /**
@@ -250,4 +261,3 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         return new SparseMatrix<E>(storage, ring);
     }
 }
-

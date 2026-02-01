@@ -274,13 +274,13 @@ public final class MatrixFactory {
      * @param storageType the desired storage layout
      * @return a new Matrix instance
      */
-    private static <E> org.jscience.core.mathematics.linearalgebra.backends.LinearAlgebraProvider<E> getProvider(
+    private static <E> org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<E> getProvider(
             Ring<E> ring) {
         // Simple implementation picking the default/first available provider
         // Ideally we would query Registry for a provider compatible with 'field'
         // But for now we just use the default provider from Registry or create one
         // Note: CPUDenseLinearAlgebraProvider needs field
-        return new org.jscience.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider<>(ring);
+        return new org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<>(ring);
     }
 
     /**
@@ -526,7 +526,7 @@ public final class MatrixFactory {
         return storage;
     }
 
-    public static <E> org.jscience.core.mathematics.linearalgebra.backends.LinearAlgebraProvider<E> getStandardProvider(
+    public static <E> org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<E> getStandardProvider(
             Ring<E> ring) {
         return getProvider(ring);
     }

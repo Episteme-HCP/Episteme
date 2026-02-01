@@ -21,20 +21,36 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
 
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
+
 import java.util.ArrayList;
+
 import java.util.List;
+
 import java.util.stream.Collectors;
+
 import java.util.stream.IntStream;
 
+
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.technical.backend.ExecutionContext;
+
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
+
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 
 /**
@@ -650,7 +666,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return "CPUDenseLinearAlgebraProvider";
     }
 }
-
 
 
 

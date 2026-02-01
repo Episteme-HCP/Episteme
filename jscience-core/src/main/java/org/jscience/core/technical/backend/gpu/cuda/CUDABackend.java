@@ -33,6 +33,8 @@ import java.nio.DoubleBuffer;
 
 import static jcuda.driver.JCudaDriver.*;
 import static jcuda.runtime.JCuda.*;
+import static jcuda.driver.CUdevice_attribute.*;
+import static jcuda.runtime.cudaMemcpyKind.*;
 
 /**
  * CUDA implementation of GPUBackend for NVIDIA GPU acceleration.
@@ -48,6 +50,7 @@ public class CUDABackend implements GPUBackend {
 
     private static boolean available;
     private int selectedDeviceId = 0;
+
 
     static {
         try {

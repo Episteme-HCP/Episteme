@@ -7,8 +7,8 @@ package org.jscience.core.technical.backend;
 
 import java.util.ServiceLoader;
 import java.nio.DoubleBuffer;
-import org.jscience.core.technical.backend.math.MatrixBackend;
-import org.jscience.core.technical.backend.math.FFTBackend;
+import org.jscience.core.mathematics.linearalgebra.MatrixBackend;
+import org.jscience.core.mathematics.analysis.transform.backends.FFTBackend;
 
 /**
  * Manager for high-performance compute backends.

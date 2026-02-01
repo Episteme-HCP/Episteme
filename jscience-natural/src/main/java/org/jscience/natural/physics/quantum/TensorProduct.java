@@ -23,6 +23,10 @@
 
 package org.jscience.natural.physics.quantum;
 
+import org.jscience.core.physics.quantum.BraKet;
+
+import org.jscience.core.physics.quantum.QuantumGate;
+
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import java.util.List;

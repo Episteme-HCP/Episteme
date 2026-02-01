@@ -24,8 +24,8 @@
 package org.jscience.core.media.backends;
 
 import org.jscience.core.media.AudioBackend;
-import org.jscience.core.technical.backend.algorithms.FFTProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreFFTProvider;
+import org.jscience.core.mathematics.analysis.transform.algorithms.FFTProvider;
+import org.jscience.core.mathematics.analysis.transform.algorithms.MulticoreFFTProvider;
 import javax.sound.sampled.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

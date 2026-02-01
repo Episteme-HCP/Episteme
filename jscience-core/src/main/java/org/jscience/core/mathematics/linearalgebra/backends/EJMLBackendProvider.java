@@ -71,7 +71,7 @@ public class EJMLBackendProvider implements BackendProvider {
     @Override
     public Object createBackend() {
         if (isAvailable()) {
-            return new org.jscience.core.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider<>();
+            return new org.jscience.core.mathematics.linearalgebra.providers.EJMLLinearAlgebraProvider<>();
         }
         return null;
     }

@@ -5,6 +5,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
+import org.jscience.core.mathematics.linearalgebra.providers.CommonsMathSupport;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

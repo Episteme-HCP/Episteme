@@ -21,11 +21,20 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
 
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 
 import org.jscience.core.technical.backend.ExecutionContext;
 
@@ -261,7 +270,6 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         return "CUDADenseLinearAlgebraProvider";
     }
 }
-
 
 
 

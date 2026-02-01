@@ -21,13 +21,23 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
 
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.opencl.OpenCLBackend;
+
+import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
 
 /**
  * OpenCL Linear Algebra Provider (Sparse).
@@ -154,7 +164,6 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
         return "OpenCLSparseLinearAlgebraProvider";
     }
 }
-
 
 
 

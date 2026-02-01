@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.matrices;
 
-import org.jscience.core.mathematics.linearalgebra.backends.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;

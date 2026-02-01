@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.analysis.transform.algorithms;
 
-import org.jscience.core.technical.backend.cuda.CUDABackend;
+import org.jscience.core.technical.backend.gpu.cuda.CUDABackend;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 import java.util.logging.Logger;

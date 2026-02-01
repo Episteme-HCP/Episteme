@@ -71,7 +71,7 @@ public class ColtBackendProvider implements BackendProvider {
     @Override
     public Object createBackend() {
         if (isAvailable()) {
-            return new org.jscience.core.mathematics.linearalgebra.backends.ColtLinearAlgebraProvider<>();
+            return new org.jscience.core.mathematics.linearalgebra.providers.ColtLinearAlgebraProvider<>();
         }
         return null;
     }

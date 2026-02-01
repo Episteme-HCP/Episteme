@@ -12,7 +12,7 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
-import org.jscience.core.mathematics.linearalgebra.matrices.backends.MatrixBackend;
+import org.jscience.core.mathematics.linearalgebra.MatrixBackend;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
 
 /**
@@ -22,7 +22,7 @@ import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class PanamaBlasBackend implements MatrixBackend {
+public class PanamaBLASBackend implements MatrixBackend {
 
     private static final MethodHandle DGEMM_HANDLE;
     private static final MethodHandle DGEMV_HANDLE;

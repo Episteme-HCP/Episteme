@@ -5,6 +5,8 @@
 
 package org.jscience.core.technical.backend.cuda;
 
+import org.jscience.core.technical.backend.gpu.cuda.CUDAExecutionContext;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

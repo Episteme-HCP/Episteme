@@ -134,6 +134,48 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
         tiles[i][j] = tile;
     }
 
+    /**
+     * Internal constructor for sub-matrices.
+     */
+    private TiledMatrix(Matrix<Real>[][] tiles, int rows, int cols, int tileRows, int tileCols) {
+        super(new TiledMatrixStorage(tiles, rows, cols, tileRows, tileCols),
+                LinearAlgebraRegistry.getMatrixProvider(Reals.getInstance()),
+                Reals.getInstance());
+        this.tiles = tiles;
+        this.rows = rows;
+        this.cols = cols;
+        this.tileRows = tileRows;
+        this.tileCols = tileCols;
+        this.tileSize = tileRows;
+    }
+
+    /**
+     * Returns a sub-tiled matrix representing a portion of this tiled matrix.
+     * Dimensions are in terms of tiles.
+     */
+    @SuppressWarnings("unchecked")
+    public TiledMatrix getSubTiledMatrix(int startTileRow, int endTileRow, int startTileCol, int endTileCol) {
+        int numRows = endTileRow - startTileRow;
+        int numCols = endTileCol - startTileCol;
+        Matrix<Real>[][] subTiles = new Matrix[numRows][numCols];
+        
+        int totalRows = 0;
+        int totalCols = 0;
+        
+        for (int i = 0; i < numRows; i++) {
+            subTiles[i] = new Matrix[numCols];
+            int currentRowRows = 0;
+            for (int j = 0; j < numCols; j++) {
+                subTiles[i][j] = tiles[startTileRow + i][startTileCol + j];
+                if (i == 0) totalCols += subTiles[i][j].cols();
+                currentRowRows = subTiles[i][j].rows();
+            }
+            totalRows += currentRowRows;
+        }
+        
+        return new TiledMatrix(subTiles, totalRows, totalCols, tileRows, tileCols);
+    }
+
     @Override
     public void close() {
         for (Matrix<Real>[] row : tiles) {

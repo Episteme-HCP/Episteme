@@ -21,6 +21,8 @@
  * SOFTWARE.
  */
 
-package org.jscience.core.mathematics.linearalgebra.providers;
 
+
+
+package org.jscience.core.mathematics.linearalgebra.providers;
 

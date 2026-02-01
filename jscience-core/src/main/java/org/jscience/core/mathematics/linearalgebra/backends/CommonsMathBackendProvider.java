@@ -71,7 +71,7 @@ public class CommonsMathBackendProvider implements BackendProvider {
     @Override
     public Object createBackend() {
         if (isAvailable()) {
-            return new org.jscience.core.mathematics.linearalgebra.backends.CommonsMathLinearAlgebraProvider<>();
+            return new org.jscience.core.mathematics.linearalgebra.providers.CommonsMathLinearAlgebraProvider<>();
         }
         return null;
     }

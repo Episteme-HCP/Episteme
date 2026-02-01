@@ -5,7 +5,8 @@
 
 package org.jscience.natural.physics.quantum.backends;
 
-import org.jscience.natural.physics.quantum.*;
+import org.jscience.core.physics.quantum.QuantumBackend;
+
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
@@ -157,5 +158,4 @@ public class PythonQuantumBackend implements QuantumBackend {
         @Override public long getExecutionTimeMs() { return time; }
     }
 }
-
 

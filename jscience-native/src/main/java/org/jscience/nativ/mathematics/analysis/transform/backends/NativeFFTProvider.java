@@ -3,13 +3,13 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.algorithms;
+package org.jscience.nativ.mathematics.analysis.transform.backends;
 
 import java.nio.DoubleBuffer;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.real.RealDouble;
-import org.jscience.core.technical.backend.algorithms.FFTProvider;
-import org.jscience.nativ.mathematics.analysis.transform.PanamaFFTBackend;
+import org.jscience.core.mathematics.analysis.transform.algorithms.FFTProvider;
+
 
 /**
  * Native FFT provider using FFTW3 via FFTWBackend.

@@ -5,6 +5,8 @@
 
 package org.jscience.core.technical.backend.algorithms;
 
+import org.jscience.core.mathematics.analysis.transform.algorithms.CUDAFFTProvider;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

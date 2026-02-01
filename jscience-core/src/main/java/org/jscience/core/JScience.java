@@ -440,7 +440,7 @@ public final class JScience {
      */
     public static boolean isCudaAvailable() {
         try {
-            return new org.jscience.core.technical.backend.cuda.CUDABackend().isAvailable();
+            return new org.jscience.core.technical.backend.gpu.cuda.CUDABackend().isAvailable();
         } catch (Throwable t) {
             return false;
         }
@@ -451,7 +451,7 @@ public final class JScience {
      */
     public static boolean isOpenCLAvailable() {
         try {
-            return new org.jscience.core.technical.backend.opencl.OpenCLBackend().isAvailable();
+            return new org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend().isAvailable();
         } catch (Throwable t) {
             return false;
         }

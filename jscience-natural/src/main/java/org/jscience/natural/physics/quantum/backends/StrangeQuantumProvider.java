@@ -3,9 +3,9 @@ package org.jscience.natural.physics.quantum.backends;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jscience.natural.physics.quantum.QuantumBackend;
-import org.jscience.natural.physics.quantum.QuantumContext;
-import org.jscience.natural.physics.quantum.QuantumGate;
+import org.jscience.core.physics.quantum.QuantumBackend;
+import org.jscience.core.physics.quantum.QuantumContext;
+import org.jscience.core.physics.quantum.QuantumGate;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;

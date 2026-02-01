@@ -71,7 +71,7 @@ public class JBlasBackendProvider implements BackendProvider {
     @Override
     public Object createBackend() {
         if (isAvailable()) {
-            return new org.jscience.core.mathematics.linearalgebra.backends.JBlasLinearAlgebraProvider<>();
+            return new org.jscience.core.mathematics.linearalgebra.providers.JBlasLinearAlgebraProvider<>();
         }
         return null;
     }

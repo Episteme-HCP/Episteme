@@ -21,13 +21,24 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
 
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.opencl.OpenCLBackend;
+
+import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
+
 import org.jocl.*;
 
 /**
@@ -162,7 +173,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
     }
 
     private void executeVectorAdd(double[] a, double[] b, double[] c, int n) {
-        org.jscience.core.technical.backend.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.opencl.OpenCLExecutionContext) createContext();
+        org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext) createContext();
 
         cl_context clContext = ctx.getContext();
         cl_command_queue commandQueue = ctx.getCommandQueue();
@@ -338,7 +349,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
     private void executeMatrixMultiply(org.jocl.Pointer ptrA, org.jocl.Pointer ptrB, org.jocl.Pointer ptrC, int m,
             int n, int k) {
-        org.jscience.core.technical.backend.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.opencl.OpenCLExecutionContext) createContext();
+        org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext) createContext();
         cl_context clContext = ctx.getContext();
         cl_command_queue commandQueue = ctx.getCommandQueue();
 
@@ -439,7 +450,6 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
         return "OpenCLDenseLinearAlgebraProvider";
     }
 }
-
 
 
 

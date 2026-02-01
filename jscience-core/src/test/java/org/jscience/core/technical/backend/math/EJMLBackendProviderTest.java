@@ -5,6 +5,8 @@
 
 package org.jscience.core.technical.backend.math;
 
+import org.jscience.core.mathematics.linearalgebra.backends.EJMLBackendProvider;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

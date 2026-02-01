@@ -27,7 +27,7 @@ import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.cuda.CUDAExecutionContext;
+import org.jscience.core.technical.backend.gpu.cuda.CUDAExecutionContext;
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 /**

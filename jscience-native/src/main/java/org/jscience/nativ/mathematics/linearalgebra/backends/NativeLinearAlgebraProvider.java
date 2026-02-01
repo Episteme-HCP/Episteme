@@ -9,9 +9,9 @@ import java.nio.IntBuffer;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider;
-import org.jscience.core.technical.backend.math.MatrixBackend;
-import org.jscience.nativ.technical.backend.math.PanamaBlasBackend;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.MatrixBackend;
+import org.jscience.nativ.mathematics.linearalgebra.matrices.backends.PanamaBLASBackend;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
@@ -34,7 +34,7 @@ public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider<R
 
     public NativeLinearAlgebraProvider() {
         super(Reals.getInstance());
-        this.blas = new PanamaBlasBackend();
+        this.blas = new PanamaBLASBackend();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider<R
     public Real norm(Vector<Real> a) {
         if (blas.isAvailable() && a instanceof RealDoubleVector) {
             RealDoubleVector v = (RealDoubleVector) a;
-            return Real.of(((PanamaBlasBackend) blas).dnrm2(v.dimension(), v.getBuffer(), 1));
+            return Real.of(((PanamaBLASBackend) blas).dnrm2(v.dimension(), v.getBuffer(), 1));
         }
         return super.norm(a);
     }
@@ -125,7 +125,7 @@ public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider<R
         if (blas.isAvailable() && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
             RealDoubleVector va = (RealDoubleVector) a;
             RealDoubleVector vb = (RealDoubleVector) b;
-            return Real.of(((PanamaBlasBackend) blas).ddot(va.dimension(), va.getBuffer(), 1, vb.getBuffer(), 1));
+            return Real.of(((PanamaBLASBackend) blas).ddot(va.dimension(), va.getBuffer(), 1, vb.getBuffer(), 1));
         }
         return super.dot(a, b);
     }
@@ -135,7 +135,7 @@ public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider<R
         if (blas.isAvailable() && vector instanceof RealDoubleVector) {
             RealDoubleVector v = (RealDoubleVector) vector;
             RealDoubleVector res = RealDoubleVector.of((RealDoubleVectorStorage) v.getRealStorage().copy()); // Copy first
-            ((PanamaBlasBackend) blas).dscal(res.dimension(), scalar.doubleValue(), res.getBuffer(), 1);
+            ((PanamaBLASBackend) blas).dscal(res.dimension(), scalar.doubleValue(), res.getBuffer(), 1);
             return res;
         }
         return super.multiply(vector, scalar);
@@ -154,7 +154,7 @@ public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider<R
             
             IntBuffer ipiv = IntBuffer.allocate(n);
             
-            int info = ((PanamaBlasBackend) blas).dgesv(n, 1, targetA.getBuffer(), n, ipiv, targetB.getBuffer(), 1);
+            int info = ((PanamaBLASBackend) blas).dgesv(n, 1, targetA.getBuffer(), n, ipiv, targetB.getBuffer(), 1);
             if (info != 0) throw new RuntimeException("LAPACK dgesv failed with info=" + info);
             
             return targetB;
@@ -171,7 +171,7 @@ public class NativeLinearAlgebraProvider extends CPUDenseLinearAlgebraProvider<R
             RealDoubleMatrix targetA = RealDoubleMatrix.of((RealDoubleMatrixStorage) ma.getDoubleStorage().clone());
             IntBuffer ipiv = IntBuffer.allocate(n);
             
-            PanamaBlasBackend b = (PanamaBlasBackend) blas;
+            PanamaBLASBackend b = (PanamaBLASBackend) blas;
             int info = b.dgetrf(n, n, targetA.getBuffer(), n, ipiv);
             if (info != 0) throw new RuntimeException("LAPACK dgetrf failed with info=" + info);
             

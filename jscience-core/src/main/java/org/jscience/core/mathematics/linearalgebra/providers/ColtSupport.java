@@ -21,26 +21,48 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
 
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
+
 import java.util.ArrayList;
+
 import java.util.List;
 
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
+
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
+
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
+
 import org.jscience.core.mathematics.numbers.real.Real;
+
 import org.jscience.core.technical.backend.ExecutionContext;
+
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
+
 import cern.colt.matrix.DoubleMatrix1D;
+
 import cern.colt.matrix.DoubleMatrix2D;
+
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+
 import cern.colt.matrix.linalg.Algebra;
 
 /**
@@ -239,4 +261,3 @@ public class ColtSupport<E> implements LinearAlgebraProvider<E> {
         return (E) Real.of(Math.sqrt(ca.zDotProduct(ca)));
     }
 }
-

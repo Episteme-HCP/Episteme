@@ -21,15 +21,27 @@
  * SOFTWARE.
  */
 
+
+
+
 package org.jscience.core.mathematics.linearalgebra.providers;
+
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+
 
 import java.lang.reflect.Constructor;
 
+
 import org.jscience.core.mathematics.structures.rings.Field;
+
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+
 import org.jscience.core.mathematics.linearalgebra.Vector;
+
 import org.jscience.core.mathematics.numbers.real.Real;
+
 import org.jscience.core.technical.backend.ExecutionContext;
+
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 /**
@@ -57,7 +69,7 @@ public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         try {
             Class.forName("cern.colt.matrix.DoubleMatrix2D");
             Class.forName("cern.colt.matrix.linalg.Algebra");
-            Class.forName("org.jscience.core.mathematics.linearalgebra.backends.ColtSupport");
+            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.ColtSupport");
             coltAvailable = true;
         } catch (ClassNotFoundException e) {
             coltAvailable = false;
@@ -77,7 +89,7 @@ public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         
         if (coltAvailable && field != null) {
             try {
-                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.backends.ColtSupport");
+                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.ColtSupport");
                 @SuppressWarnings("unchecked")
                 Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
                 this.coltImpl = ctor.newInstance(field);
@@ -200,4 +212,3 @@ public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         return coltImpl.norm(a);
     }
 }
-

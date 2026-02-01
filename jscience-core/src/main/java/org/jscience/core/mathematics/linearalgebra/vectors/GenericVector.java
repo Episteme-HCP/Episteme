@@ -24,7 +24,7 @@
 package org.jscience.core.mathematics.linearalgebra.vectors;
 
 import org.jscience.core.ComputeContext;
-import org.jscience.core.mathematics.linearalgebra.backends.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
