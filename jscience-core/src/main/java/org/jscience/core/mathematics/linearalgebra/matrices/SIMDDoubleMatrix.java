@@ -115,7 +115,7 @@ public class SIMDDoubleMatrix implements Matrix<Real> {
         final jdk.incubator.vector.VectorSpecies<Double> species = SPECIES;
         for (; i < species.loopBound(data.length); i += species.length()) {
             var v = jdk.incubator.vector.DoubleVector.fromArray(species, this.data, i);
-            v.mul(scalar).intoArray(res, i);
+            v.mul(jdk.incubator.vector.DoubleVector.broadcast(species, scalar)).intoArray(res, i);
         }
         for (; i < data.length; i++) {
             res[i] = data[i] * scalar;
@@ -213,8 +213,8 @@ public class SIMDDoubleMatrix implements Matrix<Real> {
                         var cVec = DoubleVector.fromArray(SPECIES, C.data, cIdx);
                         
                         // FMA: c = c + a * b
-                        cVec = bVec.fma(aik, cVec); // Fused Multiply Add if supported
-                        // Or: cVec = cVec.add(bVec.mul(aik));
+                        cVec = bVec.fma(jdk.incubator.vector.DoubleVector.broadcast(SPECIES, aik), cVec); 
+                        // Or: cVec = cVec.add(bVec.mul(DoubleVector.broadcast(SPECIES, aik)));
                         
                         cVec.intoArray(C.data, cIdx);
                     }

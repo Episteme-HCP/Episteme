@@ -1,7 +1,5 @@
 package org.jscience.core.mathematics.linearalgebra.algorithms;
 
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.matrices.SIMDDoubleMatrix;
 
 /**

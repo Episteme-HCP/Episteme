@@ -177,7 +177,7 @@ public class DistributedFoxAlgorithm {
         long timeFox = System.nanoTime() - startFox;
 
         long startSUMMA = System.nanoTime();
-        SUMMAAlgorithm.multiply(A, B);  // Don't store result, just measure time
+        DistributedSUMMAAlgorithm.multiply(A, B);  // Don't store result, just measure time
         long timeSUMMA = System.nanoTime() - startSUMMA;
 
         return String.format(

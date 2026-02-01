@@ -9,11 +9,11 @@ import org.openjdk.jmh.annotations.*;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.jscience.core.mathematics.linearalgebra.algorithms.SUMMAAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.CannonAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.FoxAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.Algorithm25D;
-import org.jscience.core.mathematics.linearalgebra.algorithms.CARMAAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCannonAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedFoxAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.Distributed25DAlgorithm;
+import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.distributed.DistributedContext;
@@ -80,7 +80,7 @@ public class DistributedMatrixBenchmark {
 
     @Benchmark
     public TiledMatrix summaMultiply() {
-        return SUMMAAlgorithm.multiply(tiledA, tiledB);
+        return DistributedSUMMAAlgorithm.multiply(tiledA, tiledB);
     }
 
     @Benchmark
@@ -88,7 +88,7 @@ public class DistributedMatrixBenchmark {
         // Only run if grid is square
         int gridSize = (int) Math.sqrt(parallelism);
         if (gridSize * gridSize == parallelism) {
-            return CannonAlgorithm.multiply(tiledA, tiledB);
+            return DistributedCannonAlgorithm.multiply(tiledA, tiledB);
         }
         return null; // Skip if not square grid
     }
@@ -98,7 +98,7 @@ public class DistributedMatrixBenchmark {
         // Only run if grid is square
         int gridSize = (int) Math.sqrt(parallelism);
         if (gridSize * gridSize == parallelism) {
-            return FoxAlgorithm.multiply(tiledA, tiledB);
+            return DistributedFoxAlgorithm.multiply(tiledA, tiledB);
         }
         return null; // Skip if not square grid
     }
@@ -111,7 +111,7 @@ public class DistributedMatrixBenchmark {
             int pLayer = parallelism / c;
             int pSqrt = (int) Math.sqrt(pLayer);
             if (pSqrt * pSqrt == pLayer) {
-                return Algorithm25D.multiply(tiledA, tiledB, c);
+                return Distributed25DAlgorithm.multiply(tiledA, tiledB, c);
             }
         }
         return null;
@@ -119,7 +119,7 @@ public class DistributedMatrixBenchmark {
 
     @Benchmark
     public TiledMatrix carmaMultiply() {
-        return CARMAAlgorithm.multiply(tiledA, tiledB);
+        return DistributedCARMAAlgorithm.multiply(tiledA, tiledB);
     }
 
     private Real[][] toReal(double[][] data) {
