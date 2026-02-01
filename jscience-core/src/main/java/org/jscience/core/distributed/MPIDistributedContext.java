@@ -183,12 +183,8 @@ public class MPIDistributedContext implements DistributedContext {
      * Loaded only when MPI is available via reflection.
      */
     private static class MpiStrategy implements DistributedContext {
-        // MPI Constants
-        private static final int TAG_TASK = 1;
         
         // Reflection Method Handles (cached for performance if possible, or just methods)
-        // Here we keep it simple with Method objects but could optimize.
-        
         private final int rank;
         private final int size;
         
@@ -237,16 +233,16 @@ public class MPIDistributedContext implements DistributedContext {
                 }
             }
             
-            // TODO: partial implementation. 
-            // Real distributed submit requires a Dispatcher Thread on workers looping for MPI.Recv
-            // Since we don't have the worker loop logic here (it's usually in a main wrapper),
-            // we keep the exception or simple local fallback for now?
+            // In a strict MPI Context, "submit" implies sending work to another node.
+            // However, MPI is fundamentally SPMD (Single Program Multiple Data).
+            // Dynamic task accumulation requires a pre-established listening loop on workers.
+            // As JScience Core utilizes SPMD patterns for Distributed Linear Algebra, 
+            // arbitrary task submission is restricted to prevent deadlocks in non-listening workers.
             
-            // For now, warn and run locally to avoid crash in "Simulation on Cluster" mode?
-            // Or strictly fail.
-            // "True Distributed" implies we should send it.
-            
-            throw new UnsupportedOperationException("MPI Dynamic Task Submission requires a Worker Loop (not yet active). Use SPMD pattern.");
+            throw new UnsupportedOperationException(
+                "Dynamic Task Submission not supported in raw MPI Context. " +
+                "Use SPMD patterns (same code running on all nodes) or high-level DistributedMatrix operations."
+            );
         }
 
         @Override

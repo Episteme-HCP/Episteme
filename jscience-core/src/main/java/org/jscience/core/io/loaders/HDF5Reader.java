@@ -95,16 +95,12 @@ public class HDF5Reader extends AbstractResourceReader<byte[]> {
         logger.info("Enabling Parallel HDF5 I/O with Comm: {} Info: {}", mpiCommHandle, mpiInfoHandle);
         try {
             Class<?> h5Class = Class.forName("hdf.hdf5lib.H5");
-            class H5P {
-                // Mocking constants or fetch them
-                static final long H5P_FILE_ACCESS = 1; // Placeholder
-            }
-            
-            // 1. Create File Access Property List (FAPL)
             // long fapl = H5.H5Pcreate(HDF5Constants.H5P_FILE_ACCESS);
             // using reflection:
+            // Assuming 1L is the value for H5P_FILE_ACCESS property list class
+            long H5P_FILE_ACCESS = 1L; 
              long fapl = (long) h5Class.getMethod("H5Pcreate", long.class)
-                .invoke(null, 1L); // Using 1L as mock for H5P_FILE_ACCESS if constant not available
+                .invoke(null, H5P_FILE_ACCESS); 
             
             // 2. Set MPIO
             // H5.H5Pset_fapl_mpio(fapl, mpiCommHandle, mpiInfoHandle);

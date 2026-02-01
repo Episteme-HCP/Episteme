@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class CARMAAlgorithm {
+public class DistributedCARMAAlgorithm {
 
     /**
      * Performs CARMA distributed matrix multiplication C = A × B.

@@ -30,12 +30,9 @@ public class MMapMatrix implements Matrix<Real> {
     private final MappedByteBuffer buffer;
     private final int rows;
     private final int cols;
-    private final Path filePath; // Kept for potential re-mapping or resizing logic
-
     public MMapMatrix(Path path, int rows, int cols) throws IOException {
         this.rows = rows;
         this.cols = cols;
-        this.filePath = path;
 
         long sizeBytes = (long) rows * cols * 8; // 8 bytes per double
         if (sizeBytes > Integer.MAX_VALUE) {

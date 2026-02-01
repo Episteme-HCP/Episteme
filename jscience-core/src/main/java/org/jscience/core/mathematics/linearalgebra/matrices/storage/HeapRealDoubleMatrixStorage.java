@@ -94,6 +94,16 @@ public class HeapRealDoubleMatrixStorage implements RealDoubleMatrixStorage {
     public MatrixStorage<Real> clone() {
         return new HeapRealDoubleMatrixStorage(data.clone(), rows, cols);
     }
+
+    /**
+     * Returns the underlying data array without cloning.
+     * Exercise caution as modifications to this array will affect the storage.
+     * 
+     * @return the raw double data array
+     */
+    public double[] getData() {
+        return data;
+    }
 }
 
 

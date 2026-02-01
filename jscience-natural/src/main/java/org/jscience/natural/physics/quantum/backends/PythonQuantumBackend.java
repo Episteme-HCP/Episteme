@@ -147,6 +147,15 @@ public class PythonQuantumBackend implements QuantumBackend {
         @Override public void measure(int i, int j) { qasm.append("measure q[").append(i).append("] -> c[").append(j).append("];\n"); }
         @Override public int getNumQubits() { return q; }
         @Override public String toQASM() { return qasm.toString(); }
+        @Override
+        public void append(QuantumBackend.QuantumCircuit other) {
+            String otherQasm = other.toQASM();
+            // Naive copy, ideally checks registers
+            // Removing headers if present
+            otherQasm = otherQasm.replace("OPENQASM 2.0;\ninclude \"qelib1.inc\";\n", "");
+            // Ideally re-index qubits if appending to a specific register, but here assuming sequential composition
+            qasm.append(otherQasm);
+        }
     }
 
     private static class AdvancedQuantumResult implements QuantumBackend.QuantumResult {

@@ -44,7 +44,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class FoxAlgorithm {
+public class DistributedFoxAlgorithm {
 
     /**
      * Performs distributed matrix multiplication C = A × B using Fox's algorithm.

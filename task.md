@@ -8,43 +8,48 @@ Ce plan consolide les actions requises pour aligner JScience sur les standards H
 
 ## ✅ 1. État des Lieux et Prérequis
 
--   [ ] **Vérification Java Version** : Le projet doit être compilé avec Java 21+.
--   [ ] **Flag Incubator** : Ajouter `--add-modules jdk.incubator.vector` aux configurations de build (Maven) et de run, car la Vector API est toujours en incubation en Java 21+.
+- [x] **Vérification Java Version** : Le projet doit être compilé avec Java 21+.
+- [x] **Flag Incubator** : Ajouter `--add-modules jdk.incubator.vector` aux configurations de build (Maven) et de run.
 
 ## ⚡ 2. Accélération SIMD (Vector API)
 
 *Objectif : Exploiter AVX-512 / NEON pour les boucles critiques.*
 
--   [ ] **Créer `VectorSimdMatrix` (jscience-core)** :
-    -   Une implémentation de `Matrix<Real>` (ou `RealDoubleMatrix`) optimisée.
-    -   Utiliser `DoubleVector.fromArray(...)` pour charger des blocs de données.
-    -   Implémenter `add`, `sub`, `mul` (pointwise) avec les opérations vectorielles.
--   [ ] **Intégrer dans le Planner** :
-    -   Modifier les factories de matrices pour privilégier cette implémentation si le module `jdk.incubator.vector` est disponible.
+- [x] **Créer `SIMDDoubleMatrix` (jscience-core)** :
+    - Une implémentation de `Matrix<Real>` optimisée.
+    - [x] **Opérations Élémentaires** : `add`, `sub`, `mul`, `div`.
+    - [x] **Opérations Transcendantes** : `sqrt`, `exp`, `log`, `sin`, `cos`, `abs` vectorisés via `VectorOperators`.
+- [x] **Intégrer dans le Planner** :
+    - Les factories privilégient désormais cette implémentation pour les matrices réelles.
 
-##  3. Native BLAS Provider
+## 💎 3. Native BLAS Provider
 
 *Objectif : Performance maximale sur CPU via OpenBLAS / Intel MKL.*
 
--   [x] **Créer `NativeLinearAlgebraProvider` (jscience-native)** :
-    -   Détecter la présence de bibliothèques partagées (`libopenblas.so`, `mkl_rt.dll`).
-    -   Utiliser **Project Panama (FFM API)** pour charger dynamiquement les symboles (`dgemm_`, `dgesv_`, etc.).
-    -   *Architecture* : Ne pas créer de dépendance forte. Si la lib est absente, le constructeur lève une exception (ou retourne false) et JScience continue avec ses algos Java.
--   [x] **Benchmarking** :
-    -   Comparer `NativeLinearAlgebraProvider` vs `VectorSimdMatrix` vs `Standard Java`.
--   [x] **Scripts de Lancement** :
-    -   Mise à jour de `start_cpu.bat` et `run_benchmarks.bat` pour injecter OpenBLAS dans le PATH.
+- [x] **Créer `NativeLinearAlgebraProvider` (jscience-native)** :
+  - Détecter la présence de bibliothèques partagées.
+  - [x] **Routines Supportées** : `DGEMM` (Multiplication), `DSCAL` (Échelle), `DAXPY` (Addition pondérée).
+  - Utiliser **Project Panama (FFM API)** pour charger dynamiquement les symboles sans dépendance forte.
+- [x] **Benchmarking** :
+  - Comparaison possible entre `NativeBLAS`, `SIMD` et `Pur Java`.
 
-## 🌐 4. MPI Binding (Vrai Distribué)
+## 🌐 4. MPI Binding & Algos Avancés
 
-*Objectif : Passer de la simulation locale au cluster physique.*
+*Objectif : Vrai distribué et évitement de communication.*
 
--   [ ] **Refactor `MPIDistributedContext`** :
-    -   Il existe déjà une détection MPI par réflexion dans `org.jscience.core.distributed.MPIDistributedContext`.
-    -   **Audit** : Vérifier que l'implémentation actuelle (`MpiStrategy`) est fonctionnelle et couvre les besoins des nouveaux algos (2.5D, CARMA).
-    -   Déplacer si nécessaire la logique purement native dans `jscience-native` pour isoler les dépendances JNI/MPI.
+- [x] **Refactor `MPIDistributedContext`** :
+    - Nettoyage de `MpiStrategy` et documentation des limitations du `submit` dynamique (SPMD vs MPMD).
+    - [x] **Algorithmes HPC** :
+    - [x] **2.5D Algorithm** (`Algorithm25D`) pour limiter les communications réseau.
+    - [x] **CARMA Algorithm** :
+        - [x] `RealAlgorithmCARMA` : Version haute précision (Arbitrary precision).
+        - [x] `RealDoubleAlgorithmCARMA` : Version haute performance (SIMD/double primitive).
+- [x] **Support LAPACK Natif** :
+    - [x] Inversion de matrice via `DGETRF` et `DGETRI`.
+    - [x] Résolution de systèmes linéaires via `DGESV`.
 
-## 📦 5. Packaging et CI
+## 🧹 5. Audit et Packaging
 
--   [ ] **Fat Jars & Modules** : S'assurer que les connecteurs natifs (Panama) fonctionnent une fois packagés.
--   [ ] **Documentation** : Mettre à jour le README avec les prérequis système (Installer OpenBLAS/MPI) pour activer ces fonctionnalités "Turbo".
+- [x] **Audit Qualité** : Nettoyage de la dette technique dans `HDF5Reader` et `MMapMatrix` (champs/classes inutilisés).
+- [ ] **Fat Jars & Modules** : S'assurer que les connecteurs natifs (Panama) fonctionnent une fois packagés.
+- [x] **Documentation** : README mis à jour avec les prérequis système (OpenBLAS/MPI).

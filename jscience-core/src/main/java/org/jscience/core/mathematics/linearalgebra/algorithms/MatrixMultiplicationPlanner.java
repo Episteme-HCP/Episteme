@@ -5,6 +5,9 @@
 
 package org.jscience.core.mathematics.linearalgebra.algorithms;
 
+import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.linearalgebra.matrices.SIMDDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.ComputeContext;
@@ -32,12 +35,30 @@ public class MatrixMultiplicationPlanner {
         CARMA
     }
 
+    private static final int STRASSEN_THRESHOLD = 1024;
+
+    public static Matrix<Real> multiply(Matrix<Real> A, Matrix<Real> B) {
+        int n = Math.max(A.rows(), A.cols());
+        
+        if (A instanceof SIMDDoubleMatrix && B instanceof SIMDDoubleMatrix) {
+            if (n >= STRASSEN_THRESHOLD && isPowerOfTwo(n)) {
+                return RealDoubleStrassenAlgorithm.multiply((SIMDDoubleMatrix) A, (SIMDDoubleMatrix) B);
+            }
+            return RealDoubleCARMAAlgorithm.multiply((SIMDDoubleMatrix) A, (SIMDDoubleMatrix) B);
+        }
+        
+        if (n >= STRASSEN_THRESHOLD && isPowerOfTwo(n)) {
+            return RealStrassenAlgorithm.multiply(A, B);
+        }
+        return RealCARMAAlgorithm.multiply(A, B);
+    }
+
+    private static boolean isPowerOfTwo(int n) {
+        return n > 0 && (n & (n - 1)) == 0;
+    }
+
     /**
      * Selects and executes the best distributed multiplication algorithm.
-     *
-     * @param A Left Matrix
-     * @param B Right Matrix
-     * @return Result Matrix
      */
     public static TiledMatrix multiply(TiledMatrix A, TiledMatrix B) {
         DistributedContext ctx = ComputeContext.current().getDistributedContext();
@@ -48,22 +69,20 @@ public class MatrixMultiplicationPlanner {
         
         switch (algo) {
             case CANNON:
-                return CannonAlgorithm.multiply(A, B);
+                return DistributedCannonAlgorithm.multiply(A, B);
             case FOX:
                  // Ensure Fox is valid (square grid)
-                if (isSquareGrid(p)) return FoxAlgorithm.multiply(A, B);
-                return SUMMAAlgorithm.multiply(A, B); // Fallback
+                if (isSquareGrid(p)) return DistributedFoxAlgorithm.multiply(A, B);
+                return DistributedSUMMAAlgorithm.multiply(A, B);
             case ALGORITHM_25D:
-                // Estimate best c (replication)
-                // Heuristic: if memory allows, use c=p^(1/3)
                 int c = (int) Math.pow(p, 0.33);
                 if (c < 1) c = 1;
-                return Algorithm25D.multiply(A, B, c);
+                return Distributed25DAlgorithm.multiply(A, B, c);
             case CARMA:
-                return CARMAAlgorithm.multiply(A, B);
+                return DistributedCARMAAlgorithm.multiply(A, B);
             case SUMMA:
             default:
-                return SUMMAAlgorithm.multiply(A, B);
+                return DistributedSUMMAAlgorithm.multiply(A, B);
         }
     }
 
@@ -84,14 +103,13 @@ public class MatrixMultiplicationPlanner {
         }
         
         // 2. 2.5D if we have 3D-like topology or high communication cost
-        // Simplified check: if p is large (e.g. > 64) and cube-root-able
         if (p >= 64) {
              return Algorithm.ALGORITHM_25D;
         }
 
         // 3. Cannon/Fox for square grids
         if (isSquareGrid) {
-            return Algorithm.CANNON; // Cannon usually slightly better than Fox for square
+            return Algorithm.CANNON; 
         }
         
         // 4. Fallback
@@ -103,3 +121,4 @@ public class MatrixMultiplicationPlanner {
         return sqrt * sqrt == p;
     }
 }
+

@@ -1,0 +1,80 @@
+package org.jscience.core.mathematics.linearalgebra.algorithms;
+
+import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.linearalgebra.matrices.SIMDDoubleMatrix;
+
+/**
+ * Implementation of the CARMA Algorithm specialized for the double primitive type.
+ * <p>
+ * This version uses SIMDDoubleMatrix and direct double[] manipulations
+ * to achieve maximum performance on hardware supporting vector instructions.
+ * </p>
+ */
+public class RealDoubleCARMAAlgorithm {
+
+    private static final int RECURSION_THRESHOLD = 256; // Higher threshold for SIMD
+
+    public static SIMDDoubleMatrix multiply(SIMDDoubleMatrix A, SIMDDoubleMatrix B) {
+        int m = A.rows();
+        int k = A.cols();
+        int n = B.cols();
+
+        if (k != B.rows()) {
+            throw new IllegalArgumentException("Matrix dimensions incompatible for multiplication");
+        }
+
+        // Base case: Use the SIMD-optimized multiply of SIMDDoubleMatrix
+        if (m <= RECURSION_THRESHOLD && n <= RECURSION_THRESHOLD && k <= RECURSION_THRESHOLD) {
+            return (SIMDDoubleMatrix) A.multiply(B);
+        }
+
+        if (m >= n && m >= k) {
+            SIMDDoubleMatrix A1 = (SIMDDoubleMatrix) A.getSubMatrix(0, m / 2, 0, k);
+            SIMDDoubleMatrix A2 = (SIMDDoubleMatrix) A.getSubMatrix(m / 2, m, 0, k);
+            return combineVertical(multiply(A1, B), multiply(A2, B));
+        } else if (n >= m && n >= k) {
+            SIMDDoubleMatrix B1 = (SIMDDoubleMatrix) B.getSubMatrix(0, k, 0, n / 2);
+            SIMDDoubleMatrix B2 = (SIMDDoubleMatrix) B.getSubMatrix(0, k, n / 2, n);
+            return combineHorizontal(multiply(A, B1), multiply(A, B2));
+        } else {
+            SIMDDoubleMatrix A1 = (SIMDDoubleMatrix) A.getSubMatrix(0, m, 0, k / 2);
+            SIMDDoubleMatrix A2 = (SIMDDoubleMatrix) A.getSubMatrix(0, m, k / 2, k);
+            SIMDDoubleMatrix B1 = (SIMDDoubleMatrix) B.getSubMatrix(0, k / 2, 0, n);
+            SIMDDoubleMatrix B2 = (SIMDDoubleMatrix) B.getSubMatrix(k / 2, k, 0, n);
+            
+            SIMDDoubleMatrix C1 = multiply(A1, B1);
+            SIMDDoubleMatrix C2 = multiply(A2, B2);
+            return (SIMDDoubleMatrix) C1.add(C2);
+        }
+    }
+
+    private static SIMDDoubleMatrix combineVertical(SIMDDoubleMatrix top, SIMDDoubleMatrix bottom) {
+        int rows = top.rows() + bottom.rows();
+        int cols = top.cols();
+        double[] combinedData = new double[rows * cols];
+        
+        System.arraycopy(top.getInternalData(), 0, combinedData, 0, top.getInternalData().length);
+        System.arraycopy(bottom.getInternalData(), 0, combinedData, top.getInternalData().length, bottom.getInternalData().length);
+        
+        return new SIMDDoubleMatrix(rows, cols, combinedData);
+    }
+
+    private static SIMDDoubleMatrix combineHorizontal(SIMDDoubleMatrix left, SIMDDoubleMatrix right) {
+        int rows = left.rows();
+        int leftCols = left.cols();
+        int rightCols = right.cols();
+        int totalCols = leftCols + rightCols;
+        double[] combinedData = new double[rows * totalCols];
+        
+        double[] lData = left.getInternalData();
+        double[] rData = right.getInternalData();
+        
+        for (int i = 0; i < rows; i++) {
+            System.arraycopy(lData, i * leftCols, combinedData, i * totalCols, leftCols);
+            System.arraycopy(rData, i * rightCols, combinedData, i * totalCols + leftCols, rightCols);
+        }
+        
+        return new SIMDDoubleMatrix(rows, totalCols, combinedData);
+    }
+}

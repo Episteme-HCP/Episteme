@@ -21,7 +21,7 @@ import org.jscience.core.distributed.DistributedContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class CannonAlgorithm {
+public class DistributedCannonAlgorithm {
 
     /**
      * Performs distributed matrix multiplication C = A × B using Cannon's algorithm.
