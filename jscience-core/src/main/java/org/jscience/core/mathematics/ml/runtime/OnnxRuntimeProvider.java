@@ -47,8 +47,21 @@ public class OnnxRuntimeProvider implements AlgorithmProvider {
      * @return a runnable Model session.
      */
     public OnnxSession loadModel(Path modelPath) {
-        // Placeholder: would init OrtEnvironment and OrtSession
-        return new OnnxSession(modelPath);
+        try {
+            // Attempt to load standard ONNX Runtime classes via reflection
+            // to allow pluggable support without strict compile-time dependency
+            Class<?> envClass = Class.forName("ai.onnxruntime.OrtEnvironment");
+            Object env = envClass.getMethod("getEnvironment").invoke(null);
+            
+            // In a real implementation we would create the session here
+            // Object session = env.createSession(modelPath.toString());
+            
+            return new OnnxSession(modelPath, env);
+        } catch (Exception e) {
+            System.err.println("ONNX Runtime library not found in classpath.");
+            // Fallback or rethrow
+            return new OnnxSession(modelPath, null);
+        }
     }
     
     @Override
@@ -62,9 +75,11 @@ public class OnnxRuntimeProvider implements AlgorithmProvider {
     public static class OnnxSession {
         @SuppressWarnings("unused")
         private final Path path;
+        private final Object nativeSession; // OrtSession handle
         
-        public OnnxSession(Path path) {
+        public OnnxSession(Path path, Object nativeSession) {
             this.path = path;
+            this.nativeSession = nativeSession;
         }
         
         /**
@@ -74,9 +89,11 @@ public class OnnxRuntimeProvider implements AlgorithmProvider {
          * @return map of output name to Tensor.
          */
         public Map<String, Tensor<?>> run(Map<String, Tensor<?>> inputs) {
-             // Wrapper around ONNX Runtime execute
-             // return ...
-             throw new UnsupportedOperationException("ONNX Runtime bindings not present.");
+             if (nativeSession != null) {
+                 // Implement native execution via reflection or adapter
+                 throw new UnsupportedOperationException("Native execution pending complete bindings.");
+             }
+             throw new UnsupportedOperationException("ONNX Runtime library was not loaded successfully.");
         }
     }
 }

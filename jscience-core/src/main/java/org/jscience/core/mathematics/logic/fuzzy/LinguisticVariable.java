@@ -26,7 +26,7 @@ public class LinguisticVariable {
     /**
      * DOCUMENT ME!
      */
-    private Hashtable<String, MembershipFunction> mFunctions;
+    private Hashtable<String, MembershipFunction<?>> mFunctions;
 
     // Input value for this LV used in fuzzification.
 
@@ -50,7 +50,7 @@ public class LinguisticVariable {
      *
      * @param function DOCUMENT ME!
      */
-    public void addMembershipFunction(MembershipFunction function) {
+    public void addMembershipFunction(MembershipFunction<?> function) {
         mFunctions.put(function.getName(), function);
     }
 
@@ -60,7 +60,7 @@ public class LinguisticVariable {
      * @param name DOCUMENT ME!
      * @return DOCUMENT ME!
      */
-    public MembershipFunction getMembershipFuncion(String name) {
+    public MembershipFunction<?> getMembershipFuncion(String name) {
         return mFunctions.get(name);
     }
 
@@ -91,9 +91,9 @@ public class LinguisticVariable {
     public double defuzzify() throws NoRulesFiredException {
         double total = 0;
         double divider = 0;
-        MembershipFunction mf;
+        MembershipFunction<?> mf;
 
-        for (Enumeration<MembershipFunction> _enum = mFunctions.elements();
+        for (Enumeration<MembershipFunction<?>> _enum = mFunctions.elements();
              _enum.hasMoreElements();) {
             mf = _enum.nextElement();
             total = total +

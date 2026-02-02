@@ -29,7 +29,7 @@ public class FuzzyExpression<T> {
     /**
      * DOCUMENT ME!
      */
-    private MembershipFunction mMembershipFunction = null; // Membership Function
+    private MembershipFunction<T> mMembershipFunction = null; // Membership Function
 
     /**
      * Creates a new FuzzyExpression object.
@@ -37,9 +37,18 @@ public class FuzzyExpression<T> {
      * @param lv DOCUMENT ME!
      * @param mf DOCUMENT ME!
      */
-    public FuzzyExpression(LinguisticVariable lv, MembershipFunction mf) {
+    public FuzzyExpression(LinguisticVariable lv, MembershipFunction<T> mf) {
         mLinguisticVariable = lv;
         mMembershipFunction = mf;
+    }
+
+    /**
+     * Evaluates the expression against a specific input.
+     * @param input the input value.
+     * @return result of fuzzification.
+     */
+    public double evaluate(T input) {
+        return mMembershipFunction.fuzzify(input);
     }
 
     /**
@@ -47,8 +56,9 @@ public class FuzzyExpression<T> {
      *
      * @return DOCUMENT ME!
      */
+    @SuppressWarnings("unchecked")
     public double evaluateExpression() {
-        return mMembershipFunction.fuzzify(mLinguisticVariable.getFuzzificationInputValue());
+        return mMembershipFunction.fuzzify((T) Double.valueOf(mLinguisticVariable.getFuzzificationInputValue()));
     }
 
     /**
@@ -74,7 +84,7 @@ public class FuzzyExpression<T> {
      *
      * @return DOCUMENT ME!
      */
-    public MembershipFunction getMembershipFunction() {
+    public MembershipFunction<T> getMembershipFunction() {
         return mMembershipFunction;
     }
 }

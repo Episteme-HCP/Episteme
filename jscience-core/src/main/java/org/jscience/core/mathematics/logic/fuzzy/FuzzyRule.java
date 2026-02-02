@@ -32,12 +32,12 @@ public class FuzzyRule {
     /**
      * DOCUMENT ME!
      */
-    private FuzzyExpression[] mLeftFuzzyExpressions;
+    private FuzzyExpression<?>[] mLeftFuzzyExpressions;
 
     /**
      * DOCUMENT ME!
      */
-    private FuzzyExpression[] mRightFuzzyExpressions;
+    private FuzzyExpression<?>[] mRightFuzzyExpressions;
 
     /**
      * DOCUMENT ME!
@@ -198,7 +198,7 @@ public class FuzzyRule {
             index = input.length();
         }
 
-        MembershipFunction mf = lv.getMembershipFuncion(input.substring(0, index));
+        MembershipFunction<?> mf = lv.getMembershipFuncion(input.substring(0, index));
 
         if (mf == null) {
             throw new RuleParsingException("\"" + input.substring(0, index) +
@@ -238,13 +238,13 @@ public class FuzzyRule {
      * @param exp      DOCUMENT ME!
      * @param isLeftFE DOCUMENT ME!
      */
-    private void addFE(FuzzyExpression exp, boolean isLeftFE) {
+    private void addFE(FuzzyExpression<?> exp, boolean isLeftFE) {
         if (isLeftFE) {
             if (mLeftFuzzyExpressions == null) {
                 mLeftFuzzyExpressions = new FuzzyExpression[1];
                 mLeftFuzzyExpressions[0] = exp;
             } else {
-                FuzzyExpression[] tmp = new FuzzyExpression[mLeftFuzzyExpressions.length +
+                FuzzyExpression<?>[] tmp = new FuzzyExpression[mLeftFuzzyExpressions.length +
                         1];
 
                 for (int i = 0; i < mLeftFuzzyExpressions.length; i++) {
@@ -259,7 +259,7 @@ public class FuzzyRule {
                 mRightFuzzyExpressions = new FuzzyExpression[1];
                 mRightFuzzyExpressions[0] = exp;
             } else {
-                FuzzyExpression[] tmp = new FuzzyExpression[mRightFuzzyExpressions.length +
+                FuzzyExpression<?>[] tmp = new FuzzyExpression[mRightFuzzyExpressions.length +
                         1];
 
                 for (int i = 0; i < mRightFuzzyExpressions.length; i++) {
@@ -315,7 +315,7 @@ public class FuzzyRule {
      *
      * @return DOCUMENT ME!
      */
-    public FuzzyExpression[] getRightFuzzyExpressions() {
+    public FuzzyExpression<?>[] getRightFuzzyExpressions() {
         return mRightFuzzyExpressions;
     }
 
@@ -324,7 +324,7 @@ public class FuzzyRule {
      *
      * @return DOCUMENT ME!
      */
-    public FuzzyExpression[] getLeftFuzzyExpressions() {
+    public FuzzyExpression<?>[] getLeftFuzzyExpressions() {
         return mLeftFuzzyExpressions;
     }
 
