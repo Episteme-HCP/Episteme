@@ -65,7 +65,7 @@ public class FuzzySet<T> {
      * @return the complement set
      */
     public FuzzySet<T> complement() {
-        return new FuzzySet<>(e -> 1.0 - this.membership(e));
+        return new FuzzySet<>((MembershipFunction<T>) e -> 1.0 - this.membership(e));
     }
 
     /**
@@ -75,7 +75,7 @@ public class FuzzySet<T> {
      * @return the union set
      */
     public FuzzySet<T> union(FuzzySet<T> other) {
-        return new FuzzySet<>(e -> Math.max(this.membership(e), other.membership(e)));
+        return new FuzzySet<>((MembershipFunction<T>) e -> Math.max(this.membership(e), other.membership(e)));
     }
 
     /**
@@ -85,7 +85,7 @@ public class FuzzySet<T> {
      * @return the intersection set
      */
     public FuzzySet<T> intersection(FuzzySet<T> other) {
-        return new FuzzySet<>(e -> Math.min(this.membership(e), other.membership(e)));
+        return new FuzzySet<>((MembershipFunction<T>) e -> Math.min(this.membership(e), other.membership(e)));
     }
 }
 

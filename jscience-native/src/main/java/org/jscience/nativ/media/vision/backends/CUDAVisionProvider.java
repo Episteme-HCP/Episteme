@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+package org.jscience.nativ.media.vision.backends;
+
+import org.jscience.core.media.vision.ImageOp;
+import org.jscience.core.media.vision.VisionProvider;
+
 /**
- * Provides the {@link org.jscience.core.mathematics.logic.fuzzy} module.
+ * CUDA-accelerated vision provider.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
-package org.jscience.core.mathematics.logic.fuzzy;
+public class CUDAVisionProvider implements VisionProvider<Object> {
+
+    @Override
+    public Object apply(Object image, ImageOp<Object> op) {
+        throw new UnsupportedOperationException("CUDA bindings not yet integrated.");
+    }
+
+    @Override
+    public Object CreateImage(Object data, int width, int height) {
+        throw new UnsupportedOperationException("CUDA bindings not yet integrated.");
+    }
+}

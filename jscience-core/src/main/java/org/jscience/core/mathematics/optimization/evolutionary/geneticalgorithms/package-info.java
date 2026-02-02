@@ -21,6 +21,6 @@
  * SOFTWARE.
  */
 /**
- * Provides the {@link org.jscience.core.mathematics.logic.fuzzy} module.
+ * Provides the {@link org.jscience.core.mathematics.optimization.evolutionary.geneticalgorithms} module.
  */
-package org.jscience.core.mathematics.logic.fuzzy;
+package org.jscience.core.mathematics.optimization.evolutionary.geneticalgorithms;

@@ -21,6 +21,6 @@
  * SOFTWARE.
  */
 /**
- * Provides the {@link org.jscience.core.mathematics.logic.fuzzy} module.
+ * Provides the {@link org.jscience.core.computing.ai.simulation} module.
  */
-package org.jscience.core.mathematics.logic.fuzzy;
+package org.jscience.core.computing.ai.simulation;

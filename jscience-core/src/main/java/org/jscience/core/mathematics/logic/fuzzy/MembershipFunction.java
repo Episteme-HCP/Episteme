@@ -1,48 +1,48 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.core.mathematics.logic.fuzzy;
 
 /**
- * Functional interface for fuzzy membership functions.
- * <p>
- * Maps an element to a degree of membership in [0, 1].
+ * <p/>
+ * Abstraction for fuzzy membership functions.
  * </p>
  *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @author Levent Bayindir
+ * @version 0.0.1
  */
-@FunctionalInterface
-public interface MembershipFunction<T> {
+public interface MembershipFunction<T> extends java.util.function.Function<T, Double> {
+    /** Triangular shape type */
+    public static int TYPE_TRIANGULAR = 0;
 
     /**
-     * Calculates the degree of membership for the given element.
-     * 
-     * @param element the element to test
-     * @return membership degree between 0.0 and 1.0
+     * Returns the membership value (0.0 to 1.0) for the given input.
+     *
+     * @param input the element to test.
+     * @return the membership degree.
      */
-    double apply(T element);
+    public double fuzzify(T input);
+
+    @Override
+    default Double apply(T input) {
+        return fuzzify(input);
+    }
+
+    /**
+     * Returns the name of this membership function.
+     * @return name
+     */
+    default String getName() { return "Unknown"; }
+
+    /**
+     * Returns the type constant.
+     * @return type id
+     */
+    default int getType() { return -1; }
+
+    /**
+     * Returns the typical value (center) of the set.
+     */
+    default double getTypicalValue() { return 0.0; }
+
+    // Legacy support methods can be deprecated or kept as default helpers
+    default void setDeFuzzificationInputValue(double inputValue) {}
+    default double getDeFuzzificationInputValue() { return 0.0; }
 }
-
-
