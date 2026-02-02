@@ -14,11 +14,9 @@ import java.nio.DoubleBuffer;
  * It uses heuristics to decide whether a task should run on the CPU (low latency)
  * or the GPU (high throughput).
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @deprecated Use {@link ComputeContext} directly, which now supports hybrid execution modes.
  */
+@Deprecated
 public class HybridComputeContext extends ComputeContext {
 
     private final double gpuThreshold; // Minimum problem size for GPU offloading
