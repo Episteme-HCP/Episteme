@@ -40,6 +40,7 @@ import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 import org.jscience.core.util.identity.Identification;
 import org.jscience.core.util.identity.UUIDIdentification;
+import org.jscience.natural.engineering.eventdriven.EventDrivenEngine;
 
 /**
  * Represents a human individual as a social agent.
@@ -76,7 +77,11 @@ public class Person extends Human {
     // Constructors
 
     public Person(Identification id, String name, BiologicalSex sex, LocalDate birthDate, String nationality) {
-        super(id, sex, birthDate); // Initialize Human
+        this(id, name, sex, birthDate, nationality, null);
+    }
+
+    public Person(Identification id, String name, BiologicalSex sex, LocalDate birthDate, String nationality, EventDrivenEngine engine) {
+        super(id, sex, birthDate, engine); // Initialize Human with engine
         setName(name); // Set Name in Human/Individual
         this.nationality = (nationality != null) ? nationality : "Unknown";
         this.wealth = Money.usd(0);

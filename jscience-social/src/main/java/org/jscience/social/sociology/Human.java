@@ -42,6 +42,7 @@ import org.jscience.natural.biology.Individual;
 import org.jscience.natural.biology.BiologicalSex;
 import org.jscience.natural.biology.BloodType;
 import org.jscience.natural.biology.HomoSapiens;
+import org.jscience.natural.engineering.eventdriven.EventDrivenEngine;
 
 /**
  * Represents a human individual.
@@ -100,7 +101,14 @@ public class Human extends Individual {
      * Creates a new human with a specific ID.
      */
     public Human(org.jscience.core.util.identity.Identification id, BiologicalSex sex, LocalDate birthDate) {
-        super(id, HomoSapiens.SPECIES, sex, birthDate);
+        this(id, sex, birthDate, null);
+    }
+
+    /**
+     * Creates a new human with a specific ID and simulation engine.
+     */
+    public Human(org.jscience.core.util.identity.Identification id, BiologicalSex sex, LocalDate birthDate, EventDrivenEngine engine) {
+        super(id, HomoSapiens.SPECIES, sex, birthDate, engine);
         this.height = org.jscience.core.measure.Quantities.create(Real.ZERO, Units.METER);
         this.weight = org.jscience.core.measure.Quantities.create(Real.ZERO, Units.KILOGRAM);
     }

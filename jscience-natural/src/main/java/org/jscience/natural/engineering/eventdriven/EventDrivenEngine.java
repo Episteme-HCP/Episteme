@@ -37,7 +37,7 @@ public class EventDrivenEngine implements Runnable {
     
     private final String id;
     private final EventQueue eventQueue;
-    private final Map<String, SimulationEntity> entities;
+    private final Map<String, SimulationAgent> entities;
     private volatile double currentTime = 0.0;
     
     private volatile boolean running = false;
@@ -49,13 +49,17 @@ public class EventDrivenEngine implements Runnable {
         this.entities = new ConcurrentHashMap<>();
         this.running = false;
     }
+
+    public SimulationAgent getEntity(String id) {
+        return entities.get(id);
+    }
     
     public double getCurrentTime() {
         return currentTime;
     }
 
-    public void registerEntity(SimulationEntity entity) {
-        entities.put(entity.getId(), entity);
+    public void registerEntity(SimulationAgent entity) {
+        entities.put(entity.getSimId(), entity);
     }
     
     public void unregisterEntity(String entityId) {
@@ -87,7 +91,7 @@ public class EventDrivenEngine implements Runnable {
      * @param delay time from now to schedule
      */
     public void scheduleEvent(String targetId, EventSpec spec, double delay, Object... args) {
-        SimulationEntity target = entities.get(targetId);
+        SimulationAgent target = entities.get(targetId);
         if (target != null) {
             double scheduledTime = currentTime + delay;
             Event event = new Event(target, spec, scheduledTime, args);
@@ -102,7 +106,7 @@ public class EventDrivenEngine implements Runnable {
         scheduleEvent(targetId, spec, 0.0, args);
     }
     
-    public void sendInternalEvent(SimulationEntity target, EventSpec spec, Object... args) {
+    public void sendInternalEvent(SimulationAgent target, EventSpec spec, Object... args) {
         // Internal events are immediate/priority, assume same time or ASAP
         Event event = new Event(target, spec, currentTime, args);
         eventQueue.queueInternal(event);
@@ -181,10 +185,8 @@ public class EventDrivenEngine implements Runnable {
         // Integrator acquisition from registry/context
         org.jscience.core.technical.backend.algorithms.ODEProvider integrator = new org.jscience.core.technical.backend.algorithms.RungeKuttaODEProvider();
         
-        for (SimulationEntity entity : entities.values()) {
-            if (entity instanceof org.jscience.natural.engineering.continuum.Continuum) {
-                org.jscience.natural.engineering.continuum.Continuum cont = (org.jscience.natural.engineering.continuum.Continuum) entity;
-                
+        for (SimulationAgent entity : entities.values()) {
+            if (entity instanceof org.jscience.natural.engineering.continuum.Continuum continuum) {
                 // Create adapter function
                 org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]> f = 
                     new org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]>() {
@@ -193,30 +195,30 @@ public class EventDrivenEngine implements Runnable {
                             org.jscience.core.mathematics.numbers.real.Real time = input[0];
                             org.jscience.core.mathematics.numbers.real.Real[] state = new org.jscience.core.mathematics.numbers.real.Real[input.length - 1];
                             System.arraycopy(input, 1, state, 0, state.length);
-                            return cont.computeDerivatives(time, state);
+                            return continuum.computeDerivatives(time, state);
                         }
                         
                         @Override
-                        public String getDomain() { return "Real^" + (cont.getDimension() + 1); }
+                        public String getDomain() { return "Real^" + (continuum.getDimension() + 1); }
                         
                         @Override
-                        public String getCodomain() { return "Real^" + cont.getDimension(); }
+                        public String getCodomain() { return "Real^" + continuum.getDimension(); }
                     };
 
-                org.jscience.core.mathematics.numbers.real.Real[] y0 = cont.getState();
+                org.jscience.core.mathematics.numbers.real.Real[] y0 = continuum.getState();
                 org.jscience.core.mathematics.numbers.real.Real[] yNew = integrator.solve(f, t, y0, tEnd, h);
-                cont.setState(yNew);
+                continuum.setState(yNew);
             }
         }
     }
     
     private void processEvent(Event event) {
-        SimulationEntity target = event.getTarget();
+        SimulationAgent target = event.getTarget();
         if (target != null) {
             try {
                 target.processEvent(event);
             } catch (Exception e) {
-                System.err.println("Error in entity " + target.getId() + ": " + e.getMessage());
+                System.err.println("Error in agent " + target.getSimId() + ": " + e.getMessage());
             }
         }
     }

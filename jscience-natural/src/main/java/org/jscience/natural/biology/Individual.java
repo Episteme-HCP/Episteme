@@ -30,7 +30,6 @@ import java.util.*;
 import org.jscience.natural.biology.taxonomy.Species;
 import org.jscience.natural.earth.Place;
 import org.jscience.core.util.Positioned;
-import org.jscience.core.util.identity.ComprehensiveIdentification;
 import org.jscience.core.util.identity.Identification;
 import org.jscience.core.util.identity.SimpleIdentification;
 import org.jscience.core.util.persistence.Attribute;
@@ -38,31 +37,17 @@ import org.jscience.core.util.persistence.Id;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.natural.engineering.eventdriven.EventDrivenEngine;
+import org.jscience.natural.engineering.eventdriven.Event;
+import org.jscience.natural.engineering.eventdriven.EventSpec;
 
 /**
  * Represents an individual organism - a single instance of a species.
- * <p>
- * Connects biological taxonomy with social science modeling by providing
- * a base class that can be extended for specific organisms (e.g., Human).
- * Supports multiple reproduction modes including sexual and asexual.
- * </p>
- * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
- * Modernized to use Extensible Enums for Sex, LifeStage, and ReproductionMode.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 @Persistent
-public class Individual implements ComprehensiveIdentification, Positioned<Place> {
+public class Individual extends SocialEntity implements Positioned<Place> {
 
     private static final long serialVersionUID = 2L;
-
-    @Id
-    protected final Identification id;
-
-    @Attribute
-    protected final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private final Species species;
@@ -98,10 +83,10 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
     private final Set<Behavior> availableBehaviors = new HashSet<>();
 
     /**
-     * Creates a new individual organism.
+     * Creates a new individual organism with an associated simulation engine.
      */
-    public Individual(Identification id, Species species, BiologicalSex sex, LocalDate birthDate) {
-        this.id = Objects.requireNonNull(id, "ID cannot be null");
+    public Individual(Identification id, Species species, BiologicalSex sex, LocalDate birthDate, EventDrivenEngine engine) {
+        super(id, engine);
         this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.sex = sex != null ? sex : BiologicalSex.UNKNOWN;
         this.birthDate = birthDate;
@@ -112,25 +97,15 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
      * Helper constructor for String IDs.
      */
     public Individual(String id, Species species, BiologicalSex sex, LocalDate birthDate) {
-        this(new SimpleIdentification(id), species, sex, birthDate);
+        this(new SimpleIdentification(id), species, sex, birthDate, null);
     }
 
     public Individual(Identification id, Species species, BiologicalSex sex) {
-        this(id, species, sex, null);
+        this(id, species, sex, null, null);
     }
 
     public Individual(String id, Species species, BiologicalSex sex) {
-        this(new SimpleIdentification(id), species, sex, null);
-    }
-
-    @Override
-    public Identification getId() {
-        return id;
-    }
-
-    @Override
-    public Map<String, Object> getTraits() {
-        return traits;
+        this(new SimpleIdentification(id), species, sex, null, null);
     }
 
     public Set<Individual> getDescendants() {
@@ -480,6 +455,9 @@ public class Individual implements ComprehensiveIdentification, Positioned<Place
     public String toString() {
         return String.format("%s of %s", getName(), species.getScientificName());
     }
+
+    @Override
+    public void processEvent(Event event) {
+        // Default: no-op or basic logging
+    }
 }
-
-

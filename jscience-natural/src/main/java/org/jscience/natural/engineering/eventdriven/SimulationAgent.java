@@ -24,44 +24,20 @@
 package org.jscience.natural.engineering.eventdriven;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Interface for any object that can receive and process simulation events.
+ * Allows both inheritance (SimulationEntity) and composition (Population/Individual) 
+ * patterns to be used in the engine.
  */
-public class Event implements Comparable<Event> {
+public interface SimulationAgent {
     
-    private final SimulationAgent target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
+    /**
+     * Returns the unique identifier of the agent in the simulation.
+     */
+    String getSimId();
     
-    public Event(SimulationAgent target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationAgent getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
-    }
-
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
-    }
+    /**
+     * Process an event delivered to this agent.
+     * @param event The event to process
+     */
+    void processEvent(Event event);
 }

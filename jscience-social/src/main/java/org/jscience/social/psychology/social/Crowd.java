@@ -25,18 +25,15 @@ package org.jscience.social.psychology.social;
 
 
 import java.util.Objects;
+import org.jscience.natural.biology.Individual;
 import org.jscience.natural.biology.ecology.Population;
 import org.jscience.natural.biology.taxonomy.Species;
 
 /**
  * Represents a transient gathering of individuals (a crowd) sharing a common physical proximity 
  * and motive, but lacking the structured relations found in a {@link Group}.
- * * @version 1.1
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
-public class Crowd extends Population {
+public class Crowd extends Population<Individual> {
 
     private static final long serialVersionUID = 1L;
 

@@ -30,7 +30,7 @@ package org.jscience.natural.engineering.eventdriven;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class SimulationEntity {
+public abstract class SimulationEntity implements SimulationAgent {
     
     protected final String id;
     protected final EventDrivenEngine engine;
@@ -41,6 +41,11 @@ public abstract class SimulationEntity {
     }
     
     public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getSimId() {
         return id;
     }
     

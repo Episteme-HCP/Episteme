@@ -29,48 +29,31 @@ import java.util.function.Predicate;
 import org.jscience.natural.biology.Individual;
 import org.jscience.natural.biology.BiologicalSex;
 import org.jscience.natural.biology.LifeStage;
+import org.jscience.natural.biology.SocialCollective;
 import org.jscience.natural.biology.taxonomy.Species;
 import org.jscience.natural.earth.Place;
 import org.jscience.core.util.Positioned;
-import org.jscience.core.util.identity.ComprehensiveIdentification;
 import org.jscience.core.util.identity.Identification;
 import org.jscience.core.util.identity.UUIDIdentification;
 import org.jscience.core.util.persistence.Attribute;
-import org.jscience.core.util.persistence.Id;
 import org.jscience.core.util.persistence.Persistent;
-import org.jscience.core.util.persistence.Relation;
+import org.jscience.natural.engineering.eventdriven.EventDrivenEngine;
+import org.jscience.natural.engineering.eventdriven.Event;
 
 /**
  * Represents a population of individuals of the same species.
  * Provides population-level analysis: demographics, statistics, growth modeling.
- * Modernized to use extensible biometric traits and standardized persistence.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 @Persistent
-public class Population implements ComprehensiveIdentification, Positioned<Place> {
+public class Population<T extends Individual> extends SocialCollective<T> implements Positioned<Place> {
 
     private static final long serialVersionUID = 2L;
-
-    @Id
-    protected final Identification id;
-
-    @Attribute
-    protected final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private final Species species;
     
-    @Relation(type = Relation.Type.ONE_TO_MANY)
-    private final List<Individual> members = new ArrayList<>();
-    
     @Attribute
     private Place territory;
-
-    /** The simulation engine driving this population's temporal evolution. */
-    protected org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine;
 
     public Population(String name, Species species, Place territory) {
         this(new UUIDIdentification(UUID.randomUUID().toString()), name, species, territory);
@@ -80,26 +63,15 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
         this(id, name, species, territory, null);
     }
 
-    public Population(Identification id, String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
-        this.id = Objects.requireNonNull(id, "ID cannot be null");
-        setName(name);
+    public Population(Identification id, String name, Species species, Place territory, EventDrivenEngine engine) {
+        super(id, engine);
+        setName(name); // setName is inherited or expected from ComprehensiveIdentification
         this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.territory = territory;
-        this.engine = engine;
     }
 
     public Population(Species species) {
         this("Unnamed Population", species, null);
-    }
-
-    @Override
-    public Identification getId() {
-        return id;
-    }
-
-    @Override
-    public Map<String, Object> getTraits() {
-        return traits;
     }
 
     public Species getSpecies() {
@@ -123,30 +95,23 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
         return territory != null ? territory.getName() : "Unknown";
     }
 
-    public void addMember(Individual individual) {
+    @Override
+    public void addMember(T individual) {
         if (!individual.getSpecies().equals(species)) {
             throw new IllegalArgumentException("Individual must be of species " + species);
         }
-        members.add(individual);
+        super.addMember(individual);
     }
 
-    public void removeMember(Individual individual) {
-        members.remove(individual);
-    }
-
-    public Set<Individual> getIndividuals() {
+    public Set<T> getIndividuals() {
         return new HashSet<>(members);
     }
 
-    public void setIndividuals(Set<Individual> individuals) {
+    public void setIndividuals(Set<T> individuals) {
         members.clear();
         if (individuals != null) {
             members.addAll(individuals);
         }
-    }
-
-    public List<Individual> getMembers() {
-        return Collections.unmodifiableList(members);
     }
 
     public int size() {
@@ -206,7 +171,7 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
         return dist;
     }
 
-    public List<Individual> getFounders() {
+    public List<T> getFounders() {
         return members.stream()
                 .filter(i -> i.getParents().isEmpty())
                 .toList();
@@ -220,14 +185,14 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
                 .orElse(0);
     }
 
-    public List<Individual> filter(Predicate<Individual> predicate) {
+    public List<T> filter(Predicate<T> predicate) {
         return members.stream().filter(predicate).toList();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Population population)) return false;
+        if (!(o instanceof Population<?> population)) return false;
         return Objects.equals(id, population.id);
     }
 
@@ -236,17 +201,9 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
         return Objects.hash(id);
     }
 
-    public org.jscience.natural.engineering.eventdriven.EventDrivenEngine getEngine() {
-        return engine;
-    }
-
-    public void setEngine(org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
-        this.engine = engine;
-    }
-
-    // Event processing method
-    public void processEvent(org.jscience.natural.engineering.eventdriven.Event event) {
-        // Default implementation: delegate or ignore, can be overridden by subclasses
+    @Override
+    public void processEvent(Event event) {
+        // Default implementation: handle population events
     }
     
     @Override
@@ -255,5 +212,3 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
                 getName(), species.getScientificName(), getLocation(), size(), countAlive());
     }
 }
-
-

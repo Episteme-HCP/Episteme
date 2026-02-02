@@ -53,8 +53,8 @@ public class IntegrationTest {
     @Test
     public void testPopulationDynamics() {
         Species human = new Species("Homo sapiens", "Human");
-        Population pop = new Population("City", human, null);
-        Individual adam = new Individual("1", human, BiologicalSex.MALE);
+        Population<Individual> pop = new Population<>("City", human, null);
+        Individual adam = new Individual(new org.jscience.core.util.identity.SimpleIdentification("1"), human, BiologicalSex.MALE);
         pop.addMember(adam);
 
         assertEquals(1, pop.size());
