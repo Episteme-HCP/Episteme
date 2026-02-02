@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;

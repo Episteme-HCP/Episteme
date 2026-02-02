@@ -24,7 +24,7 @@
 package org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field;
 
 import javafx.scene.Node;
-import org.jscience.core.technical.backend.algorithms.MaxwellSource;
+import org.jscience.core.technical.algorithm.MaxwellSource;
 
 /**
  * Interface for visualizing field sources in the MagneticFieldViewer.

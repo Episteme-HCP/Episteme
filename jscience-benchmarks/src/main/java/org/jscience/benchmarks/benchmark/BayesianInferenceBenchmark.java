@@ -2,9 +2,6 @@ package org.jscience.benchmarks.benchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.jscience.core.mathematics.ml.BayesianBeliefNetwork;
-import org.jscience.core.technical.backend.algorithms.BayesianInferenceProvider;
-import org.jscience.core.technical.backend.algorithms.VariableEliminationProvider;
-import org.jscience.nativ.mathematics.ml.backends.NativeBayesianInferenceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,14 +13,11 @@ import java.util.concurrent.TimeUnit;
 public class BayesianInferenceBenchmark {
 
     // Simple network structure hardcoded for benchmark reuse
-    private BayesianInferenceProvider javaProvider;
-    private BayesianInferenceProvider nativeProvider;
     private BayesianBeliefNetwork network; 
     private Map<String, String> evidence;
 
     @Setup(Level.Trial)
     public void doSetup() {
-        javaProvider = new VariableEliminationProvider();
         
         network = new BayesianBeliefNetwork();
         // Add variables

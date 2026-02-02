@@ -25,8 +25,8 @@ package org.jscience.core.mathematics.ml;
 
 import org.jscience.core.mathematics.discrete.DirectedWeightedGraph;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.algorithms.BayesianInferenceProvider;
-import org.jscience.core.technical.backend.algorithms.VariableEliminationProvider;
+import org.jscience.core.technical.algorithm.BayesianInferenceProvider;
+import org.jscience.core.technical.algorithm.inference.VariableEliminationProvider;
 import java.util.*;
 
 /**
@@ -120,9 +120,6 @@ public class BayesianBeliefNetwork extends DirectedWeightedGraph<String, Real> {
         return new VariableEliminationProvider();
     }
 
-    private static class Factor {
-        // Factor class removed as it is now in VariableEliminationProvider
-    }
 
     private static class BayesianNode implements BayesianInferenceProvider.BayesNodeData {
         private final List<String> states;

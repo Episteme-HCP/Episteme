@@ -81,7 +81,7 @@ public class HartreeFockSCFMethod extends SCFMethod {
         densityMatrix = createZeroMatrix(n);
         
         // 5. Find Provider
-        org.jscience.core.technical.backend.algorithms.SCFProvider provider = findProvider();
+        org.jscience.core.technical.algorithm.SCFProvider provider = findProvider();
         
         // DIIS
         DIISSubspace diis = new DIISSubspace(6);
@@ -164,13 +164,13 @@ public class HartreeFockSCFMethod extends SCFMethod {
     
     // --- Helper Methods ---
 
-    private org.jscience.core.technical.backend.algorithms.SCFProvider findProvider() {
-        ServiceLoader<org.jscience.core.technical.backend.algorithms.SCFProvider> loader = 
-            ServiceLoader.load(org.jscience.core.technical.backend.algorithms.SCFProvider.class);
-        for (org.jscience.core.technical.backend.algorithms.SCFProvider p : loader) {
+    private org.jscience.core.technical.algorithm.SCFProvider findProvider() {
+        ServiceLoader<org.jscience.core.technical.algorithm.SCFProvider> loader = 
+            ServiceLoader.load(org.jscience.core.technical.algorithm.SCFProvider.class);
+        for (org.jscience.core.technical.algorithm.SCFProvider p : loader) {
             return p;
         }
-        return new org.jscience.core.technical.backend.algorithms.MulticoreSCFProvider();
+        return new org.jscience.core.technical.algorithm.numerical.MulticoreSCFProvider();
     }
 
     private void generateMinimalBasis() {

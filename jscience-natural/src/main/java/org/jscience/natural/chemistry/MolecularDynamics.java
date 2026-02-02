@@ -27,8 +27,8 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.measure.Units;
-import org.jscience.core.technical.backend.algorithms.MolecularDynamicsProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreMolecularDynamicsProvider;
+import org.jscience.core.technical.algorithm.MolecularDynamicsProvider;
+import org.jscience.core.technical.algorithm.physics.MulticoreMolecularDynamicsProvider;
 import java.util.Arrays;
 
 /**

@@ -26,8 +26,8 @@ package org.jscience.core.mathematics.analysis.fem;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.analysis.Function;
-import org.jscience.core.technical.backend.algorithms.FEMProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreFEMProvider;
+import org.jscience.core.technical.algorithm.FEMProvider;
+import org.jscience.core.technical.algorithm.numerical.MulticoreFEMProvider;
 
 /**
  * A simple Finite Element Method solver.

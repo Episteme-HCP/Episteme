@@ -1,0 +1,2 @@
+org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider
+org.jscience.core.technical.algorithm.linearalgebra.CPUSparseLinearAlgebraProvider

@@ -2,8 +2,8 @@ package org.jscience.benchmarks.benchmark;
 
 import org.openjdk.jmh.annotations.*;
 
-import org.jscience.core.technical.backend.algorithms.NBodyProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreNBodyProvider;
+import org.jscience.core.technical.algorithm.NBodyProvider;
+import org.jscience.core.technical.algorithm.nbody.MulticoreNBodyProvider;
 
 import java.util.concurrent.TimeUnit;
 import java.util.Random;

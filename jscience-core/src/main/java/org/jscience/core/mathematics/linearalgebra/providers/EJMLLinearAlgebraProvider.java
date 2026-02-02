@@ -26,11 +26,12 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 
 import java.lang.reflect.Constructor;
 
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 
 import org.jscience.core.mathematics.structures.rings.Field;
 
@@ -40,9 +41,7 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
-import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 /**
  * EJML Linear Algebra Provider.
@@ -105,10 +104,7 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         return ejmlAvailable;
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return new CPUExecutionContext();
-    }
+
 
     @Override
     public int getPriority() {

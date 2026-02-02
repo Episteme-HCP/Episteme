@@ -4,8 +4,8 @@ import org.openjdk.jmh.annotations.*;
 import org.jscience.core.mathematics.discrete.Graph;
 import org.jscience.core.mathematics.discrete.generators.ScaleFreeGenerator;
 import org.jscience.core.mathematics.numbers.integers.Natural;
-import org.jscience.core.technical.backend.algorithms.GraphAlgorithmProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreGraphAlgorithmProvider;
+import org.jscience.core.technical.algorithm.GraphAlgorithmProvider;
+import org.jscience.core.technical.algorithm.graph.MulticoreGraphAlgorithmProvider;
 import org.jscience.nativ.mathematics.discrete.backends.NativeGraphAlgorithmProvider;
 
 import java.util.Map;

@@ -26,7 +26,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 
 import org.jscience.core.mathematics.structures.rings.Field;
@@ -35,7 +35,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
 
@@ -78,10 +77,6 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
         return "OpenCL (Sparse)";
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return backend.createContext();
-    }
 
     @Override
     public int getPriority() {
@@ -154,14 +149,10 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
         return cpuProvider.scale(scalar, a);
     }
 
-    @Override
-    public String getId() {
-        return "openclsparse";
-    }
 
     @Override
-    public String getDescription() {
-        return "OpenCLSparseLinearAlgebraProvider";
+    public E norm(Vector<E> a) {
+        return cpuProvider.norm(a);
     }
 }
 

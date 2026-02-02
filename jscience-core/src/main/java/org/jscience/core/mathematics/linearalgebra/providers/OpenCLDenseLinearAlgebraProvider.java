@@ -26,7 +26,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 
 import org.jscience.core.mathematics.structures.rings.Field;
@@ -35,9 +35,10 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
+
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 
 import org.jocl.*;
 
@@ -83,10 +84,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
         return "OpenCL (Dense)";
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return backend.createContext();
-    }
+
 
     @Override
     public int getPriority() {
@@ -173,7 +171,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
     }
 
     private void executeVectorAdd(double[] a, double[] b, double[] c, int n) {
-        org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext) createContext();
+        org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext) backend.createContext();
 
         cl_context clContext = ctx.getContext();
         cl_command_queue commandQueue = ctx.getCommandQueue();
@@ -349,7 +347,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
     private void executeMatrixMultiply(org.jocl.Pointer ptrA, org.jocl.Pointer ptrB, org.jocl.Pointer ptrC, int m,
             int n, int k) {
-        org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext) createContext();
+        org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext ctx = (org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext) backend.createContext();
         cl_context clContext = ctx.getContext();
         cl_command_queue commandQueue = ctx.getCommandQueue();
 
@@ -440,14 +438,10 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
         return cpuProvider.scale(scalar, a);
     }
 
-    @Override
-    public String getId() {
-        return "opencldense";
-    }
 
     @Override
-    public String getDescription() {
-        return "OpenCLDenseLinearAlgebraProvider";
+    public E norm(Vector<E> a) {
+        return cpuProvider.norm(a);
     }
 }
 

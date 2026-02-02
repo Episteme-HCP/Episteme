@@ -1,9 +1,8 @@
 package org.jscience.benchmarks.benchmark;
 
 import org.openjdk.jmh.annotations.*;
-import org.jscience.core.technical.backend.algorithms.GeneticAlgorithmProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreGeneticAlgorithmProvider;
-import org.jscience.nativ.mathematics.optimization.backends.NativeGeneticAlgorithmProvider;
+import org.jscience.core.technical.algorithm.GeneticAlgorithmProvider;
+import org.jscience.core.technical.algorithm.genetic.MulticoreGeneticAlgorithmProvider;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -22,13 +21,12 @@ public class GeneticAlgorithmBenchmark {
     public int generations;
 
     private GeneticAlgorithmProvider multicoreProvider;
-    private GeneticAlgorithmProvider nativeProvider;
     private Function<double[], Double> sphereFunction;
 
     @Setup(Level.Trial)
     public void doSetup() {
         multicoreProvider = new MulticoreGeneticAlgorithmProvider();
-        nativeProvider = new NativeGeneticAlgorithmProvider();
+        // nativeProvider = new NativeGeneticAlgorithmProvider();
 
         // Sphere function: sum(x_i^2)
         sphereFunction = (args) -> {
@@ -45,8 +43,10 @@ public class GeneticAlgorithmBenchmark {
         return multicoreProvider.solve(sphereFunction, dimensions, populationSize, generations, 0.01);
     }
 
+    /*
     @Benchmark
     public double[] benchmarkNative() {
         return nativeProvider.solve(sphereFunction, dimensions, populationSize, generations, 0.01);
     }
+    */
 }

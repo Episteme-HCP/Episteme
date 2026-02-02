@@ -1,40 +1,20 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.core.mathematics.analysis.transform;
 
-import org.jscience.core.mathematics.analysis.transform.algorithms.FFTProvider;
-import org.jscience.core.mathematics.analysis.transform.algorithms.MulticoreFFTProvider;
-import java.util.ServiceLoader;
+import org.jscience.core.technical.algorithm.FFTProvider;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
+import org.jscience.core.technical.algorithm.fft.MulticoreFFTProvider;
+import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
  * Signal Processing FFT (Fast Fourier Transform).
  * <p>
  * Optimized for signal processing, operating on primitive arrays or Real arrays.
- * Uses provider pattern for hardware acceleration.
- * </p>
- * <p>
- * Formerly known as FFT.
+ * Uses AlgorithmManager for hardware acceleration.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -43,25 +23,9 @@ import java.util.ServiceLoader;
  */
 public class SignalFFT {
 
-    /**
-     * Compute forward FFT of complex data.
-     * 
-     * @param real Real part (modified in place)
-     * @param imag Imaginary part (modified in place)
-     */
-    private static FFTProvider provider;
-
-    static {
-        ServiceLoader<FFTProvider> loader = ServiceLoader.load(FFTProvider.class);
-        provider = java.util.stream.StreamSupport.stream(loader.spliterator(), false)
-            .filter(FFTProvider::isAvailable)
-            .sorted(java.util.Comparator.comparingInt(FFTProvider::getPriority).reversed())
-            .findFirst()
-            .orElse(new MulticoreFFTProvider());
-    }
-
-    public static void setProvider(FFTProvider p) {
-        provider = p;
+    private static FFTProvider getProvider() {
+        FFTProvider provider = AlgorithmManager.getProvider(FFTProvider.class);
+        return provider != null ? provider : new MulticoreFFTProvider();
     }
 
     /**
@@ -70,55 +34,45 @@ public class SignalFFT {
      * @param real Real part (modified in place)
      * @param imag Imaginary part (modified in place)
      */
-    public static void fft(org.jscience.core.mathematics.numbers.real.Real[] real,
-            org.jscience.core.mathematics.numbers.real.Real[] imag) {
-        if (provider != null) {
-            org.jscience.core.mathematics.numbers.real.Real[][] res = provider.transform(real, imag);
-            // API expects in-place modification, so copy back.
-            System.arraycopy(res[0], 0, real, 0, real.length);
-            System.arraycopy(res[1], 0, imag, 0, imag.length);
-        } else {
-            new MulticoreFFTProvider().transform(real, imag);
-        }
+    public static void fft(Real[] real, Real[] imag) {
+        FFTProvider provider = getProvider();
+        Real[][] res = provider.transform(real, imag);
+        System.arraycopy(res[0], 0, real, 0, real.length);
+        System.arraycopy(res[1], 0, imag, 0, imag.length);
     }
 
     /**
      * Compute inverse FFT.
      */
-    public static void ifft(org.jscience.core.mathematics.numbers.real.Real[] real,
-            org.jscience.core.mathematics.numbers.real.Real[] imag) {
-        if (provider != null) {
-            org.jscience.core.mathematics.numbers.real.Real[][] res = provider.inverseTransform(real, imag);
-            System.arraycopy(res[0], 0, real, 0, real.length);
-            System.arraycopy(res[1], 0, imag, 0, imag.length);
-        }
+    public static void ifft(Real[] real, Real[] imag) {
+        FFTProvider provider = getProvider();
+        Real[][] res = provider.inverseTransform(real, imag);
+        System.arraycopy(res[0], 0, real, 0, real.length);
+        System.arraycopy(res[1], 0, imag, 0, imag.length);
     }
 
     /** Primitive versions */
     public static void fft(double[] real, double[] imag) {
-        if (provider != null) {
-            double[][] res = provider.transform(real, imag);
-            System.arraycopy(res[0], 0, real, 0, real.length);
-            System.arraycopy(res[1], 0, imag, 0, imag.length);
-        }
+        FFTProvider provider = getProvider();
+        double[][] res = provider.transform(real, imag);
+        System.arraycopy(res[0], 0, real, 0, real.length);
+        System.arraycopy(res[1], 0, imag, 0, imag.length);
     }
 
     public static void ifft(double[] real, double[] imag) {
-        if (provider != null) {
-            double[][] res = provider.inverseTransform(real, imag);
-            System.arraycopy(res[0], 0, real, 0, real.length);
-            System.arraycopy(res[1], 0, imag, 0, imag.length);
-        }
+        FFTProvider provider = getProvider();
+        double[][] res = provider.inverseTransform(real, imag);
+        System.arraycopy(res[0], 0, real, 0, real.length);
+        System.arraycopy(res[1], 0, imag, 0, imag.length);
     }
 
     /** 2D Transforms */
     public static void fft2D(double[][] real, double[][] imag) {
-        if (provider != null) {
-            double[][][] res = provider.transform2D(real, imag);
-            for (int i = 0; i < real.length; i++) {
-                System.arraycopy(res[0][i], 0, real[i], 0, real[i].length);
-                System.arraycopy(res[1][i], 0, imag[i], 0, imag[i].length);
-            }
+        FFTProvider provider = getProvider();
+        double[][][] res = provider.transform2D(real, imag);
+        for (int i = 0; i < real.length; i++) {
+            System.arraycopy(res[0][i], 0, real[i], 0, real[i].length);
+            System.arraycopy(res[1][i], 0, imag[i], 0, imag[i].length);
         }
     }
 
@@ -128,28 +82,23 @@ public class SignalFFT {
      * @param data Real input (must be power of 2 length)
      * @return [real_part, imag_part]
      */
-    public static org.jscience.core.mathematics.numbers.real.Real[][] fftReal(
-            org.jscience.core.mathematics.numbers.real.Real[] data) {
+    public static Real[][] fftReal(Real[] data) {
         int n = data.length;
-        org.jscience.core.mathematics.numbers.real.Real[] real = data.clone();
-        org.jscience.core.mathematics.numbers.real.Real[] imag = new org.jscience.core.mathematics.numbers.real.Real[n];
-        org.jscience.core.mathematics.numbers.real.Real zero = org.jscience.core.mathematics.numbers.real.Real.ZERO;
-        for (int i = 0; i < n; i++)
-            imag[i] = zero;
-
+        Real[] real = data.clone();
+        Real[] imag = new Real[n];
+        Real zero = Real.ZERO;
+        for (int i = 0; i < n; i++) imag[i] = zero;
         fft(real, imag);
-        return new org.jscience.core.mathematics.numbers.real.Real[][] { real, imag };
+        return new Real[][] { real, imag };
     }
 
     /**
      * Compute magnitude spectrum.
      */
-    public static org.jscience.core.mathematics.numbers.real.Real[] magnitude(
-            org.jscience.core.mathematics.numbers.real.Real[] real, org.jscience.core.mathematics.numbers.real.Real[] imag) {
+    public static Real[] magnitude(Real[] real, Real[] imag) {
         int n = real.length;
-        org.jscience.core.mathematics.numbers.real.Real[] mag = new org.jscience.core.mathematics.numbers.real.Real[n];
+        Real[] mag = new Real[n];
         for (int i = 0; i < n; i++) {
-            // mag[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
             mag[i] = real[i].multiply(real[i]).add(imag[i].multiply(imag[i])).sqrt();
         }
         return mag;
@@ -158,12 +107,10 @@ public class SignalFFT {
     /**
      * Compute phase spectrum.
      */
-    public static org.jscience.core.mathematics.numbers.real.Real[] phase(org.jscience.core.mathematics.numbers.real.Real[] real,
-            org.jscience.core.mathematics.numbers.real.Real[] imag) {
+    public static Real[] phase(Real[] real, Real[] imag) {
         int n = real.length;
-        org.jscience.core.mathematics.numbers.real.Real[] ph = new org.jscience.core.mathematics.numbers.real.Real[n];
+        Real[] ph = new Real[n];
         for (int i = 0; i < n; i++) {
-            // ph[i] = Math.atan2(imag[i], real[i]);
             ph[i] = imag[i].atan2(real[i]);
         }
         return ph;
@@ -172,17 +119,15 @@ public class SignalFFT {
     /**
      * Power spectral density.
      */
-    public static org.jscience.core.mathematics.numbers.real.Real[] powerSpectrum(
-            org.jscience.core.mathematics.numbers.real.Real[] data) {
-        org.jscience.core.mathematics.numbers.real.Real[][] result = fftReal(data);
+    public static Real[] powerSpectrum(Real[] data) {
+        Real[][] result = fftReal(data);
         int n = data.length;
-        org.jscience.core.mathematics.numbers.real.Real[] power = new org.jscience.core.mathematics.numbers.real.Real[n / 2 + 1];
-        org.jscience.core.mathematics.numbers.real.Real nReal = org.jscience.core.mathematics.numbers.real.Real.of(n);
+        Real[] power = new Real[n / 2 + 1];
+        Real nReal = Real.of(n);
 
         for (int i = 0; i <= n / 2; i++) {
-            org.jscience.core.mathematics.numbers.real.Real r = result[0][i];
-            org.jscience.core.mathematics.numbers.real.Real im = result[1][i];
-            // power[i] = (result[0][i] * result[0][i] + result[1][i] * result[1][i]) / n;
+            Real r = result[0][i];
+            Real im = result[1][i];
             power[i] = r.multiply(r).add(im.multiply(im)).divide(nReal);
         }
         return power;
@@ -191,18 +136,16 @@ public class SignalFFT {
     /**
      * Compute convolution using FFT.
      */
-    public static org.jscience.core.mathematics.numbers.real.Real[] convolve(org.jscience.core.mathematics.numbers.real.Real[] a,
-            org.jscience.core.mathematics.numbers.real.Real[] b) {
+    public static Real[] convolve(Real[] a, Real[] b) {
         int n = 1;
-        while (n < a.length + b.length - 1)
-            n *= 2;
+        while (n < a.length + b.length - 1) n *= 2;
 
-        org.jscience.core.mathematics.numbers.real.Real[] aReal = new org.jscience.core.mathematics.numbers.real.Real[n];
-        org.jscience.core.mathematics.numbers.real.Real[] aImag = new org.jscience.core.mathematics.numbers.real.Real[n];
-        org.jscience.core.mathematics.numbers.real.Real[] bReal = new org.jscience.core.mathematics.numbers.real.Real[n];
-        org.jscience.core.mathematics.numbers.real.Real[] bImag = new org.jscience.core.mathematics.numbers.real.Real[n];
+        Real[] aReal = new Real[n];
+        Real[] aImag = new Real[n];
+        Real[] bReal = new Real[n];
+        Real[] bImag = new Real[n];
 
-        org.jscience.core.mathematics.numbers.real.Real zero = org.jscience.core.mathematics.numbers.real.Real.ZERO;
+        Real zero = Real.ZERO;
         for (int i = 0; i < n; i++) {
             aReal[i] = (i < a.length) ? a[i] : zero;
             aImag[i] = zero;
@@ -213,20 +156,16 @@ public class SignalFFT {
         fft(aReal, aImag);
         fft(bReal, bImag);
 
-        // Complex multiplication
-        org.jscience.core.mathematics.numbers.real.Real[] cReal = new org.jscience.core.mathematics.numbers.real.Real[n];
-        org.jscience.core.mathematics.numbers.real.Real[] cImag = new org.jscience.core.mathematics.numbers.real.Real[n];
+        Real[] cReal = new Real[n];
+        Real[] cImag = new Real[n];
         for (int i = 0; i < n; i++) {
-            // cReal[i] = aReal[i] * bReal[i] - aImag[i] * bImag[i];
             cReal[i] = aReal[i].multiply(bReal[i]).subtract(aImag[i].multiply(bImag[i]));
-            // cImag[i] = aReal[i] * bImag[i] + aImag[i] * bReal[i];
             cImag[i] = aReal[i].multiply(bImag[i]).add(aImag[i].multiply(bReal[i]));
         }
 
         ifft(cReal, cImag);
 
-        org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[a.length
-                + b.length - 1];
+        Real[] result = new Real[a.length + b.length - 1];
         System.arraycopy(cReal, 0, result, 0, result.length);
         return result;
     }
@@ -234,14 +173,11 @@ public class SignalFFT {
     /**
      * Compute correlation using FFT.
      */
-    public static org.jscience.core.mathematics.numbers.real.Real[] correlate(org.jscience.core.mathematics.numbers.real.Real[] a,
-            org.jscience.core.mathematics.numbers.real.Real[] b) {
-        // Reverse b for correlation
-        org.jscience.core.mathematics.numbers.real.Real[] bRev = new org.jscience.core.mathematics.numbers.real.Real[b.length];
+    public static Real[] correlate(Real[] a, Real[] b) {
+        Real[] bRev = new Real[b.length];
         for (int i = 0; i < b.length; i++) {
             bRev[i] = b[b.length - 1 - i];
         }
         return convolve(a, bRev);
     }
 }
-

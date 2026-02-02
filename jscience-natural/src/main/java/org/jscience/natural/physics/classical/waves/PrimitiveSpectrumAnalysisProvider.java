@@ -23,8 +23,8 @@
 
 package org.jscience.natural.physics.classical.waves;
 
-import org.jscience.core.mathematics.analysis.transform.algorithms.FFTProvider;
-import org.jscience.core.mathematics.analysis.transform.algorithms.MulticoreFFTProvider;
+import org.jscience.core.technical.algorithm.FFTProvider;
+import org.jscience.core.technical.algorithm.fft.MulticoreFFTProvider;
 
 /**
  * Primitive implementation of spectrum analysis using double arrays.

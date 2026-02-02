@@ -1,9 +1,8 @@
 package org.jscience.benchmarks.benchmark;
 
 import org.openjdk.jmh.annotations.*;
-import org.jscience.core.technical.backend.algorithms.SimulationProvider;
-import org.jscience.core.technical.backend.algorithms.ParallelSimulationProvider;
-import org.jscience.nativ.engineering.eventdriven.backends.NativeSimulationProvider;
+import org.jscience.core.technical.algorithm.SimulationProvider;
+import org.jscience.core.technical.algorithm.simulation.MulticoreSimulationProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +23,8 @@ public class SimulationBenchmark {
 
     @Setup(Level.Trial)
     public void doSetup() {
-        parallelProvider = new ParallelSimulationProvider();
-        nativeProvider = new NativeSimulationProvider();
+        parallelProvider = new MulticoreSimulationProvider();
+        nativeProvider = new MulticoreSimulationProvider(); // Native provider not available
 
         tasks = new ArrayList<>(numTasks);
         for (int i = 0; i < numTasks; i++) {

@@ -30,7 +30,7 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 /**
  * A headless circuit simulator using Modified Nodal Analysis (MNA).
@@ -600,7 +600,7 @@ public class Circuit {
 
         // 3. Solve using Provider
         try {
-            LinearAlgebraProvider<Real> provider = new org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<>(
+            LinearAlgebraProvider<Real> provider = new org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider<Real>(
                     org.jscience.core.mathematics.sets.Reals.getInstance());
             Vector<Real> x = provider.solve(A, b);
 

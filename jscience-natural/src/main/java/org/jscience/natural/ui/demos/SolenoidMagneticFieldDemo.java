@@ -30,8 +30,8 @@ import javafx.scene.shape.Cylinder;
 import org.jscience.core.ui.AbstractDemo;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer;
-import org.jscience.core.technical.backend.algorithms.MulticoreMaxwellProvider;
-import org.jscience.core.technical.backend.algorithms.MaxwellSource;
+import org.jscience.core.technical.algorithm.physics.MulticoreMaxwellProvider;
+import org.jscience.core.technical.algorithm.MaxwellSource;
 
 /**
  * Demo for a Magnetic solenoid or rod using the generic viewer.

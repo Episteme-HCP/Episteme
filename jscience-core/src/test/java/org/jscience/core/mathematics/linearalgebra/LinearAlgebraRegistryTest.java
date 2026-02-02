@@ -6,6 +6,7 @@
 package org.jscience.core.mathematics.linearalgebra;
 
 import org.junit.jupiter.api.Test;
+import org.jscience.core.ComputeContext;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -19,8 +20,8 @@ public class LinearAlgebraRegistryTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(LinearAlgebraRegistry.class);
+        // Ensure class is reachable (using ComputeContext instead of deprecated LinearAlgebraRegistry)
+        assertNotNull(ComputeContext.class);
     }
 }
 

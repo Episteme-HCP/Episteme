@@ -5,7 +5,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

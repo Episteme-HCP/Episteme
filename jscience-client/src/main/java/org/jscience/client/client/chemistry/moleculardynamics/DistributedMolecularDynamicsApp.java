@@ -40,6 +40,8 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.server.server.proto.*;
+import org.jscience.core.technical.algorithm.MolecularDynamicsProvider;
+import org.jscience.core.technical.algorithm.physics.MulticoreMolecularDynamicsProvider;
 
 import org.jscience.natural.physics.classical.mechanics.Particle;
 import org.jscience.core.mathematics.numbers.real.Real;
@@ -214,7 +216,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
         }
     }
 
-    private org.jscience.core.technical.backend.algorithms.MolecularDynamicsProvider localProvider;
+    private MolecularDynamicsProvider localProvider;
     private List<Particle> localParticles = new ArrayList<>();
 
     private void runLocalStep() {
@@ -226,7 +228,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
         }
 
         if (localProvider == null) {
-            localProvider = new org.jscience.core.technical.backend.algorithms.MulticoreMolecularDynamicsProvider();
+            localProvider = new MulticoreMolecularDynamicsProvider();
         }
 
         // Pack data for Provider

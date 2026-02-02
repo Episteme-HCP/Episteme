@@ -6,7 +6,7 @@
 package org.jscience.nativ.technical.backend.gpu;
 
 import java.lang.foreign.*;
-import java.lang.invoke.MethodHandle;
+
 import java.nio.DoubleBuffer;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
@@ -24,6 +24,7 @@ import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
  */
 public class PanamaOpenCLBackend implements GPUBackend {
 
+    @SuppressWarnings("unused") // Reserved for future OpenCL implementation
     private final SymbolLookup opencl;
     private boolean available = false;
     

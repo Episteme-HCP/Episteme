@@ -26,8 +26,8 @@ package org.jscience.natural.physics.classical.waves.electromagnetism.field;
 import org.jscience.core.mathematics.geometry.Vector4D;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.algorithms.MaxwellProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreMaxwellProvider;
+import org.jscience.core.technical.algorithm.MaxwellProvider;
+import org.jscience.core.technical.algorithm.physics.MulticoreMaxwellProvider;
 
 /**
  * Solver for Maxwell's equations.

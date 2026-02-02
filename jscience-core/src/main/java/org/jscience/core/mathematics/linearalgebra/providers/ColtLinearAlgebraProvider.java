@@ -26,7 +26,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 
 
 import java.lang.reflect.Constructor;
@@ -40,9 +41,7 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
-import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 /**
  * Colt Linear Algebra Provider.
@@ -110,10 +109,7 @@ public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         return coltAvailable;
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return new CPUExecutionContext();
-    }
+
 
     @Override
     public int getPriority() {

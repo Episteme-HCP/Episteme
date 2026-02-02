@@ -31,18 +31,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import org.jscience.natural.biology.Individual;
-import org.jscience.natural.biology.SocialCollective;
 import org.jscience.natural.biology.ecology.Population;
-import org.jscience.natural.biology.taxonomy.Species;
 import org.jscience.natural.biology.HomoSapiens;
-import org.jscience.natural.earth.Place;
 import org.jscience.social.linguistics.Language;
 import org.jscience.core.util.identity.UUIDIdentification;
 import org.jscience.core.util.persistence.Attribute;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
-import org.jscience.core.util.Positioned;
 import org.jscience.natural.engineering.eventdriven.EventDrivenEngine;
 import org.jscience.natural.engineering.eventdriven.Event;
 

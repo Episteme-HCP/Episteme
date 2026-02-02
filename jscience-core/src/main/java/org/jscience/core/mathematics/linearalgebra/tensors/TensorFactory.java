@@ -23,7 +23,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.backends.TensorProvider;
+import org.jscience.core.technical.algorithm.TensorProvider;
+import org.jscience.core.ComputeContext;
 
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class TensorFactory {
      * @return the provider
      */
     public static TensorProvider getProvider() {
-        return org.jscience.core.mathematics.linearalgebra.LinearAlgebraRegistry.getTensorProvider();
+        return ComputeContext.current().getTensorProvider();
     }
 
     /**
@@ -94,7 +95,8 @@ public class TensorFactory {
      * @return list of providers
      */
     public static List<TensorProvider> getAllProviders() {
-        return org.jscience.core.mathematics.linearalgebra.LinearAlgebraRegistry.getTensorProviders();
+        // Return a singleton list for now, as ComputeContext handles provider selection
+        return java.util.Collections.singletonList(getProvider());
     }
 
     // ========== Convenience factory methods ==========

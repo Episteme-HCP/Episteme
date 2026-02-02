@@ -44,7 +44,6 @@ public class ND4JCUDATensorProvider extends ND4JBaseTensorProvider {
         }
     }
 
-    @Override
     public String getId() {
         return "nd4j-cuda";
     }
@@ -54,7 +53,6 @@ public class ND4JCUDATensorProvider extends ND4JBaseTensorProvider {
         return "ND4J CUDA (GPU)";
     }
 
-    @Override
     public String getDescription() {
         return "ND4J Tensor Provider using CUDA GPU Backend";
     }

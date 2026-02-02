@@ -91,7 +91,7 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
             // conversion internal or special Real provider)
             // Implementation note: existing provider uses doubles but we wrap for
             // architecture consistency.
-            org.jscience.core.technical.backend.algorithms.MandelbrotProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreMandelbrotProvider();
+            org.jscience.core.technical.algorithm.MandelbrotProvider provider = new org.jscience.core.technical.algorithm.fractals.MulticoreMandelbrotProvider();
             this.result = provider.compute(xMin, xMax, yMin, yMax, width, height, maxIterations);
         } else {
             // Primitive Mode: Use side-by-side Support

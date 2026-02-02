@@ -50,7 +50,7 @@ import org.jscience.core.util.persistence.Relation;
  */
 
 @Persistent
-public class Group extends Population {
+public class Group extends Population<Individual> {
 
     private static final long serialVersionUID = 2L;
 

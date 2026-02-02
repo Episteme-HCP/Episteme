@@ -32,7 +32,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.storage.DirectRealDo
 import org.jscience.core.mathematics.numbers.real.Real;
 
 import org.jscience.core.mathematics.structures.rings.Field;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraRegistry;
+import org.jscience.core.ComputeContext;
 
 /**
  * A specialized Matrix implementation for Doubles with SIMD and Native
@@ -52,7 +52,7 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
      */
     protected RealDoubleMatrix(RealDoubleMatrixStorage storage) {
         super(storage,
-                LinearAlgebraRegistry.getMatrixProvider(org.jscience.core.mathematics.sets.Reals.getInstance()),
+                ComputeContext.current().getLinearAlgebraProvider(org.jscience.core.mathematics.sets.Reals.getInstance()),
                 org.jscience.core.mathematics.sets.Reals.getInstance());
         this.doubleStorage = storage;
     }

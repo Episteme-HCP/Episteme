@@ -23,6 +23,10 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
 
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorProvider;
+import org.jscience.core.technical.algorithm.TensorProvider;
+
+
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
@@ -54,12 +58,16 @@ public abstract class ND4JBaseTensorProvider implements TensorProvider {
      */
     protected abstract boolean checkAvailability();
 
+    /**
+     * Checks if GPU is supported.
+     */
+    public abstract boolean supportsGPU();
+
     @Override
     public boolean isAvailable() {
         return isAvailable;
     }
 
-    @Override
     public boolean supportsParallelOps() {
         return true;
     }
@@ -77,7 +85,6 @@ public abstract class ND4JBaseTensorProvider implements TensorProvider {
         }
     }
     
-    @Override
     public ExecutionContext createContext() {
         if (!isAvailable) {
             throw new IllegalStateException("ND4J backend not available");

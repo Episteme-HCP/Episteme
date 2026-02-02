@@ -34,9 +34,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.structures.rings.Field;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.Operation;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,10 +90,7 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         return channel != null && !channel.isShutdown() && !channel.isTerminated();
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return new GRPCExecutionContext();
-    }
+
 
     /**
      * Shuts down the gRPC channel gracefully.
@@ -404,18 +399,5 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     // ==================== Execution Context ====================
 
-    private class GRPCExecutionContext implements ExecutionContext {
-        @Override
-        public <T> T execute(Operation<T> operation) {
-            // Remote execution context - operations are executed on the server
-            return operation.compute(this);
-        }
-
-
-        @Override
-        public void close() {
-            // Context cleanup - nothing to do for gRPC
-        }
-    }
 }
 

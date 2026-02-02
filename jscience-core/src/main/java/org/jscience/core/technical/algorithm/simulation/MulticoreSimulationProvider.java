@@ -1,0 +1,69 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+package org.jscience.core.technical.algorithm.simulation;
+
+import org.jscience.core.technical.algorithm.SimulationProvider;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Multicore implementation of SimulationProvider using a thread pool.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.2
+ */
+public class MulticoreSimulationProvider implements SimulationProvider {
+
+    @Override
+    public int getPriority() {
+        return 40;
+    }
+
+    @Override
+    public void parallelExecute(List<Runnable> tasks, int parallelism) {
+        if (tasks.isEmpty()) return;
+        
+        ExecutorService executor = Executors.newFixedThreadPool(parallelism, r -> {
+            Thread t = new Thread(r, "JScience-Simulation-Worker");
+            t.setDaemon(true);
+            return t;
+        });
+        
+        try {
+            Phaser phaser = new Phaser(1);
+            for (Runnable task : tasks) {
+                phaser.register();
+                executor.submit(() -> {
+                    try {
+                        task.run();
+                    } finally {
+                        phaser.arriveAndDeregister();
+                    }
+                });
+            }
+            phaser.arriveAndAwaitAdvance();
+        } finally {
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "Java Multicore Simulation (CPU)";
+    }
+}

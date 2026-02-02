@@ -46,7 +46,6 @@ public class ND4JNativeTensorProvider extends ND4JBaseTensorProvider {
         }
     }
 
-    @Override
     public String getId() {
         return "nd4j-native";
     }
@@ -56,7 +55,6 @@ public class ND4JNativeTensorProvider extends ND4JBaseTensorProvider {
         return "ND4J Native (CPU)";
     }
 
-    @Override
     public String getDescription() {
         return "ND4J Tensor Provider using Native CPU Backend (AVX/AVX2/AVX512)";
     }

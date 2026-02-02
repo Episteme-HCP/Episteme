@@ -40,6 +40,9 @@ import com.google.protobuf.ByteString;
 import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
+import org.jscience.core.technical.algorithm.MonteCarloProvider;
+import org.jscience.core.technical.algorithm.montecarlo.MulticoreMonteCarloProvider;
+
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -275,9 +278,11 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
     private void performLocalBatch(long batchSize) {
         // Use Provider for local fallback too
-        org.jscience.core.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
+        MonteCarloProvider provider = new MulticoreMonteCarloProvider();
 
-        long inside = provider.countPointsInside(batchSize);
+        // Reverse calculate count from Pi estimate
+        double piEst = provider.estimatePi((int) batchSize);
+        long inside = Math.round((piEst / 4.0) * batchSize);
 
         insideCircle.addAndGet(inside);
         totalSamples.addAndGet(batchSize);

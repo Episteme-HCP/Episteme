@@ -73,37 +73,47 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
     @Override
     public Vector<Complex> evaluate(Vector<Complex> input) {
         int n = input.dimension();
-        // Check if n is power of 2 for Radix-2 FFT
         if ((n & (n - 1)) != 0) {
             throw new IllegalArgumentException("Input dimension must be power of 2 for FFT");
         }
 
         Complex[] x = new Complex[n];
-        for (int i = 0; i < n; i++)
-            x[i] = input.get(i);
+        for (int i = 0; i < n; i++) x[i] = input.get(i);
 
         Complex[] y = fft(x, inverse);
 
-        // Convert back to Vector
-        // Using DenseVector if available, or custom list wrapper
         List<Complex> list = new ArrayList<>();
-        for (Complex c : y)
-            list.add(c);
-
-        // Assuming DenseVector.valueOf(List) or similar exists.
-        // If not, we'll need to instantiate DenseVector directly or use a factory.
-        // For now, let's try to use DenseVector constructor if public, or static
-        // factory.
-        // We'll assume DenseVector.valueOf(List) for now, or fix later.
+        for (Complex c : y) list.add(c);
         return DenseVector.valueOf(list);
     }
 
     private Complex[] fft(Complex[] x, boolean inv) {
         int n = x.length;
-        if (n == 1)
-            return new Complex[] { x[0] };
+        
+        // Try to use optimized FFT if available
+        org.jscience.core.technical.algorithm.FFTProvider provider = 
+            org.jscience.core.technical.algorithm.AlgorithmManager.getProvider(org.jscience.core.technical.algorithm.FFTProvider.class);
+            
+        if (provider != null) {
+            double[] real = new double[n];
+            double[] imag = new double[n];
+            for (int i = 0; i < n; i++) {
+                real[i] = x[i].real();
+                imag[i] = x[i].imaginary();
+            }
+            
+            double[][] result = inv ? provider.inverseTransform(real, imag) : provider.transform(real, imag);
+            
+            Complex[] res = new Complex[n];
+            for (int i = 0; i < n; i++) {
+                res[i] = Complex.of(result[0][i], result[1][i]);
+            }
+            return res;
+        }
 
-        // Divide
+        // Fallback to recursive implementation
+        if (n == 1) return new Complex[] { x[0] };
+
         Complex[] even = new Complex[n / 2];
         Complex[] odd = new Complex[n / 2];
         for (int i = 0; i < n / 2; i++) {
@@ -111,11 +121,9 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
             odd[i] = x[2 * i + 1];
         }
 
-        // Conquer
         Complex[] q = fft(even, inv);
         Complex[] r = fft(odd, inv);
 
-        // Combine
         Complex[] y = new Complex[n];
         double angle = (inv ? 2 : -2) * Math.PI / n;
         Complex wn = Complex.of(Math.cos(angle), Math.sin(angle));
@@ -127,15 +135,11 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
             y[k + n / 2] = q[k].subtract(wr);
             w = w.multiply(wn);
         }
-
         return y;
     }
 
     /**
      * Static convenience method for FFT.
-     * 
-     * @param data the input data
-     * @return the transformed data
      */
     public static Complex[] transform(Complex[] data) {
         DiscreteFourierTransform dft = new DiscreteFourierTransform();

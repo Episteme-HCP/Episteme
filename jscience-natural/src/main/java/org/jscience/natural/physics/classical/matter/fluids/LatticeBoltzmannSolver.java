@@ -23,8 +23,8 @@
 
 package org.jscience.natural.physics.classical.matter.fluids;
 
-import org.jscience.core.technical.backend.algorithms.LatticeBoltzmannProvider;
-import org.jscience.core.technical.backend.algorithms.OpenCLLatticeBoltzmannProvider;
+import org.jscience.core.technical.algorithm.LatticeBoltzmannProvider;
+import java.util.ServiceLoader;
 
 /**
  * 2D Lattice Boltzmann Method (LBM) solver for incompressible fluid flow.
@@ -142,7 +142,11 @@ public class LatticeBoltzmannSolver {
      */
     public void step() {
         if (provider == null) {
-            provider = new OpenCLLatticeBoltzmannProvider();
+            provider = ServiceLoader.load(LatticeBoltzmannProvider.class).findFirst().orElse(null);
+        }
+        
+        if (provider == null) {
+            throw new IllegalStateException("No LatticeBoltzmannProvider found!");
         }
 
         // Evolve using provider (Collision + Streaming + BCs)

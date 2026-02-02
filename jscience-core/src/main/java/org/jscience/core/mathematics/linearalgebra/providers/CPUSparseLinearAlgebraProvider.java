@@ -41,6 +41,7 @@ import java.util.stream.IntStream;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.SparseMatrix;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 
 /**
  * Linear Algebra Provider for Sparse Matrices (CPU).

@@ -26,7 +26,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 
 
@@ -47,9 +47,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorSt
 
 import org.jscience.core.mathematics.numbers.real.Real;
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
-import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 
 import org.apache.commons.math3.linear.RealMatrix;
@@ -86,10 +84,7 @@ public class CommonsMathSupport<E> implements LinearAlgebraProvider<E> {
         return true;
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return new CPUExecutionContext();
-    }
+
 
     // Conversion helpers
     private RealMatrix toCommonsMatrix(Matrix<E> m) {

@@ -26,6 +26,8 @@ package org.jscience.core.mathematics.linearalgebra.matrices;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.*;
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -72,6 +74,10 @@ public final class MatrixFactory {
         }
         DiagonalMatrixStorage<E> storage = new DiagonalMatrixStorage<E>(diag, ring);
         return new GenericMatrix<E>(storage, getProvider(ring), ring);
+    }
+
+    public static <E> GenericMatrix<E> create(DiagonalMatrixStorage<E> storage, LinearAlgebraProvider<E> provider, Ring<E> ring) {
+        return new GenericMatrix<E>(storage, provider, ring);
     }
 
     /**
@@ -271,13 +277,8 @@ public final class MatrixFactory {
      * @param storageType the desired storage layout
      * @return a new Matrix instance
      */
-    private static <E> org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<E> getProvider(
-            Ring<E> ring) {
-        // Simple implementation picking the default/first available provider
-        // Ideally we would query Registry for a provider compatible with 'field'
-        // But for now we just use the default provider from Registry or create one
-        // Note: CPUDenseLinearAlgebraProvider needs field
-        return new org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<>(ring);
+    private static <E> LinearAlgebraProvider<E> getProvider(Ring<E> ring) {
+        return new CPUDenseLinearAlgebraProvider<>(ring);
     }
 
     /**
@@ -519,8 +520,7 @@ public final class MatrixFactory {
         return storage;
     }
 
-    public static <E> org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<E> getStandardProvider(
-            Ring<E> ring) {
+    public static <E> LinearAlgebraProvider<E> getStandardProvider(Ring<E> ring) {
         return getProvider(ring);
     }
 

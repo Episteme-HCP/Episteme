@@ -93,7 +93,7 @@ public class RealMandelbrotTask extends MandelbrotTask {
         MathContext mc = MathContext.exact().withJavaMathContext(jmc);
 
         mc.compute(() -> {
-            org.jscience.core.technical.backend.algorithms.MandelbrotProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreMandelbrotProvider();
+            org.jscience.core.technical.algorithm.MandelbrotProvider provider = new org.jscience.core.technical.algorithm.fractals.MulticoreMandelbrotProvider();
 
             this.result = provider.computeReal(rXMin, rXMax, rYMin, rYMax, width, height, maxIterations);
             return null;

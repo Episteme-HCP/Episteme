@@ -26,7 +26,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 
 
 import org.jscience.core.mathematics.structures.rings.Field;
@@ -36,7 +37,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
 /**
  * CUDA Linear Algebra Provider (Dense).
@@ -83,10 +83,6 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         return "CUDA (Dense)";
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return null;
-    }
 
     @Override
     public int getPriority() {
@@ -260,14 +256,10 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         return cpuProvider.scale(scalar, a);
     }
 
-    @Override
-    public String getId() {
-        return "cudadense";
-    }
 
     @Override
-    public String getDescription() {
-        return "CUDADenseLinearAlgebraProvider";
+    public E norm(Vector<E> a) {
+        return cpuProvider.norm(a);
     }
 }
 

@@ -51,11 +51,11 @@ import java.util.Map;
 import org.jscience.core.mathematics.context.ComputeMode;
 import org.jscience.core.mathematics.context.MathContext.RealPrecision;
 import org.jscience.core.mathematics.context.MathContext.OverflowMode;
-import org.jscience.core.mathematics.linearalgebra.tensors.backends.TensorProvider;
-import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorProvider;
+import org.jscience.core.technical.algorithm.TensorProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorProvider;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.providers.CUDADenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.providers.CUDASparseLinearAlgebraProvider;
@@ -378,7 +378,7 @@ public class ComputeContext {
             case CUDA_GPU:
                 if (canUseGpu) {
                     try {
-                        return new CUDASparseLinearAlgebraProvider<>((Field<E>) ring);
+                        return new CUDASparseLinearAlgebraProvider<E>((Field<E>) ring);
                     } catch (Throwable t) {
                         return new CPUSparseLinearAlgebraProvider<>(ring);
                     }
@@ -387,7 +387,7 @@ public class ComputeContext {
             case OPENCL_GPU:
                 if (canUseGpu) {
                     try {
-                        return new OpenCLSparseLinearAlgebraProvider<>((Field<E>) ring);
+                        return new OpenCLSparseLinearAlgebraProvider<E>((Field<E>) ring);
                     } catch (Throwable t) {
                         // Fallback to CPU
                         return new CPUSparseLinearAlgebraProvider<>(ring);
@@ -399,6 +399,7 @@ public class ComputeContext {
                 return new CPUSparseLinearAlgebraProvider<>(ring);
         }
     }
+
 
     /**
      * Gets a dense linear algebra provider.
@@ -416,7 +417,7 @@ public class ComputeContext {
             case CUDA_GPU:
                 if (canUseGpu) {
                     try {
-                        return new CUDADenseLinearAlgebraProvider<>((Field<E>) ring);
+                        return new CUDADenseLinearAlgebraProvider<E>((Field<E>) ring);
                     } catch (Throwable t) {
                         // Fallback
                         return new CPUDenseLinearAlgebraProvider<>(ring);
@@ -426,7 +427,7 @@ public class ComputeContext {
             case OPENCL_GPU:
                 if (canUseGpu) {
                     try {
-                        return new OpenCLDenseLinearAlgebraProvider<>((Field<E>) ring);
+                        return new OpenCLDenseLinearAlgebraProvider<E>((Field<E>) ring);
                     } catch (Throwable t) {
                         // Fallback to CPU
                         return new CPUDenseLinearAlgebraProvider<>(ring);
@@ -443,7 +444,7 @@ public class ComputeContext {
 
             case EJML:
                 try {
-                    return new EJMLLinearAlgebraProvider<>((Field<E>) ring);
+                    return new EJMLLinearAlgebraProvider<E>((Field<E>) ring);
                 } catch (Throwable t) {
                     return new CPUDenseLinearAlgebraProvider<>(ring);
                 }

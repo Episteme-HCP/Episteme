@@ -12,8 +12,9 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 
 /**
  * SIMD-accelerated Matrix implementation using JDK Vector API.

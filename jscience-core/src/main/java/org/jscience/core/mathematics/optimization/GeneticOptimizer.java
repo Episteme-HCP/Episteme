@@ -24,8 +24,8 @@
 package org.jscience.core.mathematics.optimization;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.algorithms.GeneticAlgorithmProvider;
-import org.jscience.core.technical.backend.algorithms.MulticoreGeneticAlgorithmProvider;
+import org.jscience.core.technical.algorithm.GeneticAlgorithmProvider;
+import org.jscience.core.technical.algorithm.genetic.MulticoreGeneticAlgorithmProvider;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 

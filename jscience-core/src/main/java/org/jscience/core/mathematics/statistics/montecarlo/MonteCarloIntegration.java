@@ -25,7 +25,8 @@ package org.jscience.core.mathematics.statistics.montecarlo;
 
 import java.util.Random;
 import java.util.function.Function;
-import org.jscience.core.technical.backend.algorithms.MonteCarloProvider;
+import java.util.function.ToDoubleFunction;
+import org.jscience.core.technical.algorithm.MonteCarloProvider;
 
 /**
  * Monte Carlo integration methods.
@@ -92,32 +93,20 @@ public class MonteCarloIntegration {
     public double integrateND(Function<double[], Double> f, double[] lower, double[] upper, int samples) {
         if (provider == null) {
             // Default to multicore provider
-            provider = new org.jscience.core.technical.backend.algorithms.MulticoreMonteCarloProvider();
+            provider = new org.jscience.core.technical.algorithm.montecarlo.MulticoreMonteCarloProvider();
         }
 
-        int dim = lower.length;
-        double volume = 1.0;
-        for (int i = 0; i < dim; i++) {
-            volume *= (upper[i] - lower[i]);
-        }
-        final double finalVolume = volume;
 
         // Scale bounds from [0,1] back to [lower, upper] required by provider ?
         // Actually, MonteCarloProvider interface doc says: "Estimates the integral of a
         // function over a hypercube [0,1]^d."
         // So we must wrap 'f' to accept [0,1] inputs and map them to [lower, upper].
 
-        Function<double[], Double> scaledF = (point01) -> {
-            double[] point = new double[dim];
-            for (int i = 0; i < dim; i++) {
-                point[i] = lower[i] + point01[i] * (upper[i] - lower[i]);
-            }
-            return f.apply(point);
-        };
+        // Use ToDoubleFunction to avoid boxing
+        ToDoubleFunction<double[]> primitiveF = (point) -> f.apply(point);
 
-        double integral01 = provider.integrate(scaledF, dim, samples);
-        // Integral over [a,b] is Vol * Integral over [0,1] of transformed function
-        return integral01 * finalVolume;
+        double integral = provider.integrate(primitiveF, lower, upper, samples);
+        return integral;
     }
 
     /**

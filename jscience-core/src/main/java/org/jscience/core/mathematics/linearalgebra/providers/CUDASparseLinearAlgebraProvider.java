@@ -26,7 +26,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 
 import org.jscience.core.mathematics.structures.rings.Field;
@@ -36,7 +36,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
 /**
  *
@@ -86,10 +85,6 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
         return "CUDA (Sparse)";
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return null;
-    }
 
     @Override
     public int getPriority() {
@@ -161,14 +156,10 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
         return cpuProvider.scale(scalar, a);
     }
 
-    @Override
-    public String getId() {
-        return "cudasparse";
-    }
 
     @Override
-    public String getDescription() {
-        return "CUDASparseLinearAlgebraProvider";
+    public E norm(Vector<E> a) {
+        return cpuProvider.norm(a);
     }
 }
 

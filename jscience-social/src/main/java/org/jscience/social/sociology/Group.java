@@ -49,8 +49,9 @@ public class Group extends Population<Person> {
     private static final long serialVersionUID = 2L;
 
     @Deprecated
+    @SuppressWarnings("deprecation")
     public enum Type {
-        FAMILY, COMMUNITY, ORGANIZATION, NATION, TRIBE, TEAM, CLASS, NETWORK;
+        @Deprecated FAMILY, @Deprecated COMMUNITY, @Deprecated ORGANIZATION, @Deprecated NATION, @Deprecated TRIBE, @Deprecated TEAM, @Deprecated CLASS, @Deprecated NETWORK;
 
         public GroupKind toGroupKind() {
             try {

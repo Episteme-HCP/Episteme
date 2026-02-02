@@ -5,6 +5,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
 
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorProvider;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -61,6 +61,8 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
     // Internal constructor
     protected DenseMatrix(MatrixStorage<E> storage, Ring<E> ring) {
         super(storage, ComputeContext.current().getDenseLinearAlgebraProvider(ring), ring);
+        this.storage = storage;
+        this.ring = ring;
         // Explicit validation: Ensure storage is intended for Dense usage
         // We accept DenseMatrixStorage OR RealDoubleMatrixStorage (which is Dense
         // optimized)

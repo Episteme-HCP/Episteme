@@ -118,7 +118,7 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     public void step() {
         if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Provider
-            org.jscience.core.technical.backend.algorithms.WaveProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreWaveProvider();
+            org.jscience.core.technical.algorithm.WaveProvider provider = new org.jscience.core.technical.algorithm.physics.MulticoreWaveProvider();
             provider.solve(uReal, uRealPrev, width, height,
                     org.jscience.core.mathematics.numbers.real.Real.of(c),
                     org.jscience.core.mathematics.numbers.real.Real.of(damping));

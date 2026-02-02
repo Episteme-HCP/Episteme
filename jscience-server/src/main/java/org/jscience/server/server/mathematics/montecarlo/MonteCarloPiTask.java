@@ -84,7 +84,7 @@ public class MonteCarloPiTask implements DistributedTask<Long, Long> {
 
         if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Provider
-            org.jscience.core.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.core.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
+            org.jscience.core.technical.algorithm.MonteCarloProvider provider = new org.jscience.core.technical.algorithm.montecarlo.MulticoreMonteCarloProvider();
             return provider.countPointsInside(samples);
         } else {
             // Primitive Mode: Use side-by-side Support

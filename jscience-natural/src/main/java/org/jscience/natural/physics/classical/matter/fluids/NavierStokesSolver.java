@@ -24,8 +24,8 @@
 package org.jscience.natural.physics.classical.matter.fluids;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.algorithms.MulticoreNavierStokesProvider;
-import org.jscience.core.technical.backend.algorithms.NavierStokesProvider;
+import org.jscience.core.technical.algorithm.physics.MulticoreNavierStokesProvider;
+import org.jscience.core.technical.algorithm.NavierStokesProvider;
 
 /**
  * Solves the incompressible Navier-Stokes equations using a backend provider.

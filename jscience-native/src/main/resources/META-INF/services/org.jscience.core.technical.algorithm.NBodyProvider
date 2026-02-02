@@ -1,0 +1,3 @@
+org.jscience.nativ.physics.classical.mechanics.providers.NativeMulticoreNBodyProvider
+org.jscience.nativ.physics.classical.mechanics.providers.CUDANBodyProvider
+org.jscience.nativ.physics.classical.mechanics.providers.OpenCLNBodyProvider

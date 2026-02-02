@@ -26,7 +26,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 
 
 import java.util.ArrayList;
@@ -50,9 +50,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorSt
 
 import org.jscience.core.mathematics.numbers.real.Real;
 
-import org.jscience.core.technical.backend.ExecutionContext;
 
-import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 
 
 import cern.colt.matrix.DoubleMatrix1D;
@@ -91,10 +89,7 @@ public class ColtSupport<E> implements LinearAlgebraProvider<E> {
         return true;
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return new CPUExecutionContext();
-    }
+
 
     // Conversion helpers
     private DoubleMatrix2D toColtMatrix(Matrix<E> m) {
