@@ -1,4 +1,4 @@
-package org.jscience.benchmarks.linearalgebra;
+package org.jscience.benchmarks.benchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.jscience.core.mathematics.linearalgebra.Matrix;

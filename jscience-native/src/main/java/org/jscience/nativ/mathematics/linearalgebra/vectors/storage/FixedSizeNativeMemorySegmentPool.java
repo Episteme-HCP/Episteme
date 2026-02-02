@@ -20,9 +20,9 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeMemorySegmentPool implements AutoCloseable {
+public class FixedSizeNativeMemorySegmentPool implements org.jscience.nativ.util.MemorySegmentPool {
 
-    private static final Logger LOGGER = Logger.getLogger(NativeMemorySegmentPool.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FixedSizeNativeMemorySegmentPool.class.getName());
     
     private final long segmentSize;
     private final Arena arena;
@@ -35,10 +35,24 @@ public class NativeMemorySegmentPool implements AutoCloseable {
      * @param segmentSize size in bytes
      * @param maxPoolSize maximum number of segments to keep in pool
      */
-    public NativeMemorySegmentPool(long segmentSize, int maxPoolSize) {
+    public FixedSizeNativeMemorySegmentPool(long segmentSize, int maxPoolSize) {
         this.segmentSize = segmentSize;
         this.maxPoolSize = maxPoolSize;
         this.arena = Arena.ofShared();
+    }
+
+    /**
+     * Acquires a segment from the pool or allocates a new one.
+     * Ignores the sizeBytes parameter and always returns segments of the configured size.
+     */
+    @Override
+    public MemorySegment acquire(long sizeBytes) {
+        if (sizeBytes != segmentSize) {
+            LOGGER.warning(() -> String.format(
+                "Requested size %d does not match pool size %d. Returning pool-sized segment.",
+                sizeBytes, segmentSize));
+        }
+        return acquire();
     }
 
     /**
@@ -58,6 +72,7 @@ public class NativeMemorySegmentPool implements AutoCloseable {
     /**
      * Returns a segment to the pool for reuse.
      */
+    @Override
     public void release(MemorySegment segment) {
         if (segment.byteSize() != segmentSize) {
             throw new IllegalArgumentException("Segment size mismatch");
@@ -73,6 +88,7 @@ public class NativeMemorySegmentPool implements AutoCloseable {
         return allocatedCount.get();
     }
 
+    @Override
     public int getPoolSize() {
         return pool.size();
     }

@@ -33,13 +33,13 @@ import org.jscience.core.util.Positioned;
 import org.jscience.core.util.identity.Identification;
 import org.jscience.core.util.identity.SimpleIdentification;
 import org.jscience.core.util.persistence.Attribute;
-import org.jscience.core.util.persistence.Id;
+
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.engineering.eventdriven.EventDrivenEngine;
 import org.jscience.natural.engineering.eventdriven.Event;
-import org.jscience.natural.engineering.eventdriven.EventSpec;
+
 
 /**
  * Represents an individual organism - a single instance of a species.

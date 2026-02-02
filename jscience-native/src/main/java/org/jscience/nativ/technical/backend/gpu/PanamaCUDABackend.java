@@ -13,13 +13,13 @@ import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
- * Robust GPU acceleration backend using Project Panama to interface with CUDA and CUBLAS.
+ * Robust CUDA acceleration backend using Project Panama to interface with CUDA and CUBLAS.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class PanamaGPUBackend implements GPUBackend {
+public class PanamaCUDABackend implements GPUBackend {
 
     private final SymbolLookup cuda;
     private final SymbolLookup cublas;
@@ -27,7 +27,7 @@ public class PanamaGPUBackend implements GPUBackend {
     private MethodHandle cuDeviceGetCount;
     private MethodHandle cublasDgemm;
 
-    public PanamaGPUBackend() {
+    public PanamaCUDABackend() {
         SymbolLookup cudaLookup = null;
         SymbolLookup cublasLookup = null;
         try {
@@ -63,7 +63,7 @@ public class PanamaGPUBackend implements GPUBackend {
             );
             
         } catch (Exception e) {
-            System.err.println("GPU Backend initialization failed: " + e.getMessage());
+            System.err.println("CUDA Backend initialization failed: " + e.getMessage());
         }
         this.cuda = cudaLookup;
         this.cublas = cublasLookup;
@@ -98,10 +98,10 @@ public class PanamaGPUBackend implements GPUBackend {
             // 3. cublasDgemm
             // 4. cudaMemcpy (D2H)
             
-            System.out.println("[GPU] Dispatched " + m + "x" + n + " matrix multiplication to CUBLAS.");
+            System.out.println("[CUDA] Dispatched " + m + "x" + n + " matrix multiplication to CUBLAS.");
             // cublasDgemm.invoke(...);
         } catch (Throwable t) {
-            throw new RuntimeException("GPU execution error", t);
+            throw new RuntimeException("CUDA execution error", t);
         }
     }
 
@@ -153,9 +153,3 @@ public class PanamaGPUBackend implements GPUBackend {
         };
     }
 }
-
-
-
-
-
-

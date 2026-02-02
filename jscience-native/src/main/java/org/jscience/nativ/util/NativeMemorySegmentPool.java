@@ -40,7 +40,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeMemorySegmentPool implements AutoCloseable {
+public class NativeMemorySegmentPool implements MemorySegmentPool {
 
     private final Arena arena;
     private final Map<Long, Deque<MemorySegment>> pools;
@@ -56,12 +56,13 @@ public class NativeMemorySegmentPool implements AutoCloseable {
     }
 
     /**
-     * Borrow a segment of at least the requested size.
+     * Acquires a segment of at least the requested size.
      *
      * @param sizeBytes requested size
      * @return a memory segment
      */
-    public MemorySegment borrow(long sizeBytes) {
+    @Override
+    public MemorySegment acquire(long sizeBytes) {
         // Find pool for this size or slightly larger (simplification for now: exact size)
         Deque<MemorySegment> pool = pools.computeIfAbsent(sizeBytes, k -> new ArrayDeque<>());
         if (pool.isEmpty()) {
@@ -75,10 +76,16 @@ public class NativeMemorySegmentPool implements AutoCloseable {
      *
      * @param segment the segment to return
      */
+    @Override
     public void release(MemorySegment segment) {
         long size = segment.byteSize();
         Deque<MemorySegment> pool = pools.computeIfAbsent(size, k -> new ArrayDeque<>());
         pool.push(segment);
+    }
+
+    @Override
+    public int getPoolSize() {
+        return pools.values().stream().mapToInt(Deque::size).sum();
     }
 
     @Override
