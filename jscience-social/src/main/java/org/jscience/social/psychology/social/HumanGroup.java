@@ -41,11 +41,11 @@ import java.util.Objects;
  */
 @Persistent
 public class HumanGroup extends Group {
-/**
+    /**
      * Creates a new HumanGroup object.
      */
     public HumanGroup() {
-        super(HomoSapiens.SPECIES);
+        super("HumanGroup", HomoSapiens.SPECIES, null, null);
     }
 
     /**
@@ -55,7 +55,14 @@ public class HumanGroup extends Group {
      * @throws NullPointerException if formalTerritory is null
      */
     public HumanGroup(Place formalTerritory) {
-        super(HomoSapiens.SPECIES, Objects.requireNonNull(formalTerritory, "Territory cannot be null"));
+        super("HumanGroup", HomoSapiens.SPECIES, Objects.requireNonNull(formalTerritory, "Territory cannot be null"), null);
+    }
+    
+    /**
+     * Full constructor.
+     */
+    public HumanGroup(String name, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
+        super(name, HomoSapiens.SPECIES, territory, engine);
     }
 }
 

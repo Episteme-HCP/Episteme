@@ -21,47 +21,17 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.engineering.eventdriven;
+package org.jscience.core.technical.backend;
+
+import org.jscience.core.util.Named;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
+ * Common interface for all algorithm providers (backends).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Event implements Comparable<Event> {
-    
-    private final SimulationEntity target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
-    
-    public Event(SimulationEntity target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationEntity getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
-    }
-
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
-    }
+public interface AlgorithmProvider extends Named {
+    // getName() inherited from Named
 }

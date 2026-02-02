@@ -46,8 +46,6 @@ import java.util.Objects;
 @Persistent
 public class Tribe extends HumanGroup {
     /** The name of the tribe. */
-    @Attribute
-    private String name;
 
     /** The distinct culture associated with the tribe. */
     @Relation(type = Relation.Type.MANY_TO_ONE)
@@ -62,10 +60,11 @@ public class Tribe extends HumanGroup {
      * @throws IllegalArgumentException if name is empty
      */
     public Tribe(String name, Culture culture) {
+        super(name, null, null);
         if (Objects.requireNonNull(name, "Name cannot be null").isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
-        this.name = name;
+        // name is set in super
         this.culture = Objects.requireNonNull(culture, "Culture cannot be null");
     }
 
@@ -79,12 +78,17 @@ public class Tribe extends HumanGroup {
      * @throws IllegalArgumentException if name is empty
      */
     public Tribe(String name, Place formalTerritory, Culture culture) {
-        super(Objects.requireNonNull(formalTerritory, "Territory cannot be null"));
+        super(name, Objects.requireNonNull(formalTerritory, "Territory cannot be null"), null);
         if (Objects.requireNonNull(name, "Name cannot be null").isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
-        this.name = name;
+        // name set in super
         this.culture = Objects.requireNonNull(culture, "Culture cannot be null");
+    }
+    
+    public Tribe(String name, Place formalTerritory, Culture culture, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
+        super(name, formalTerritory, engine);
+        this.culture = culture;
     }
 
     /**

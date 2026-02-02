@@ -83,9 +83,14 @@ public class Nation extends Tribe {
      * @throws NullPointerException if any argument is null
      */
     public Nation(String name, Place formalTerritory, Culture culture) {
+        this(name, formalTerritory, culture, null);
+    }
+
+    public Nation(String name, Place formalTerritory, Culture culture, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
         super(Objects.requireNonNull(name, "Name cannot be null"), 
               Objects.requireNonNull(formalTerritory, "Territory cannot be null"), 
-              Objects.requireNonNull(culture, "Culture cannot be null"));
+              Objects.requireNonNull(culture, "Culture cannot be null"),
+              engine);
 
         this.kind = PoliticsConstants.UNKNOWN;
         this.parliment = new HashSet<>();

@@ -82,6 +82,9 @@ public class HartreeFockSCFMethod extends SCFMethod {
         
         // 5. Find Provider
         org.jscience.core.technical.backend.algorithms.SCFProvider provider = findProvider();
+        
+        // DIIS
+        DIISSubspace diis = new DIISSubspace(6);
 
         // 6. SCF Loop
         scfIteration = 0;
@@ -115,7 +118,24 @@ public class HartreeFockSCFMethod extends SCFMethod {
             }
             previousEnergy = totalEnergy;
 
+            // DIIS Extrapolation
+            // Error e = FDS - SDF (Commutator)
+            Matrix<Real> S = oneEI.getOverlap();
+            Matrix<Real> P = densityMatrix;
+            Matrix<Real> F = fockMatrix;
+            
+            Matrix<Real> FPS = F.multiply(P).multiply(S);
+            Matrix<Real> SPF = S.multiply(P).multiply(F);
+            Matrix<Real> error = FPS.subtract(SPF);
+            
+            // Limit max error for DIIS activation (optional, but good for stability)
+             // if (maxError < 0.5) {
+                 diis.add(F, error);
+                 fockMatrix = diis.extrapolate();
+             // }
+
             // 6.3 Diagonalize F' = X^T F X
+            // Use extrapolate F (which is 'fockMatrix' now)
             Matrix<Real> F_prime = X.transpose().multiply(fockMatrix).multiply(X);
             EigenDecomposition eig = EigenDecomposition.decompose(F_prime);
             
@@ -206,8 +226,8 @@ public class HartreeFockSCFMethod extends SCFMethod {
             }
         }
         
-        overlapMatrix = DenseMatrix.of(S);
-        Matrix<Real> coreH = DenseMatrix.of(H);
+        overlapMatrix = DenseMatrix.of(S, Reals.getInstance());
+        Matrix<Real> coreH = DenseMatrix.of(H, Reals.getInstance());
         
         this.oneEI = new OneElectronIntegrals(coreH, overlapMatrix);
         this.twoEI = new TwoElectronIntegrals(eris, n);
@@ -246,7 +266,7 @@ public class HartreeFockSCFMethod extends SCFMethod {
                 P[u][v] = Real.of(sum);
             }
         }
-        return DenseMatrix.of(P);
+        return DenseMatrix.of(P, Reals.getInstance());
     }
     
     private double calculateElectronicEnergy(Matrix<Real> P, Matrix<Real> H, Matrix<Real> F, int n) {
@@ -280,13 +300,13 @@ public class HartreeFockSCFMethod extends SCFMethod {
                 M[i][j] = Real.of(data[i*n + j]);
             }
         }
-        return DenseMatrix.of(M);
+        return DenseMatrix.of(M, Reals.getInstance());
     }
     
     private Matrix<Real> createZeroMatrix(int n) {
         Real[][] M = new Real[n][n];
         for (int i=0; i<n; i++) ArraysFill(M[i], Real.ZERO);
-        return DenseMatrix.of(M);
+        return DenseMatrix.of(M, Reals.getInstance());
     }
     
     private Matrix<Real> createIdentityMatrix(int n) {
@@ -295,7 +315,7 @@ public class HartreeFockSCFMethod extends SCFMethod {
              ArraysFill(M[i], Real.ZERO);
              M[i][i] = Real.ONE;
         }
-        return DenseMatrix.of(M);
+        return DenseMatrix.of(M, Reals.getInstance());
     }
     
     private void ArraysFill(Real[] arr, Real val) {

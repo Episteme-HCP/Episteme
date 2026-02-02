@@ -21,47 +21,35 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.engineering.eventdriven;
+package org.jscience.social.psychology.ai;
+
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.natural.engineering.eventdriven.Event;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
+ * Defines an agent capable of learning from environment interactions using 
+ * Reinforcement Learning (RL).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Event implements Comparable<Event> {
-    
-    private final SimulationEntity target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
-    
-    public Event(SimulationEntity target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationEntity getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
-    }
+public interface ReinforcementLearningAgent {
 
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
-    }
+    /**
+     * Receives a reward signal from the environment.
+     * @param reward The scalar reward value.
+     */
+    void observeReward(Real reward);
+
+    /**
+     * Updates the agent's internal state/policy based on the last action and reward.
+     */
+    void learn();
+
+    /**
+     * Selects the next action based on the current policy (e.g., Epsilon-Greedy).
+     * @return The selected action mechanism (or Event to emit).
+     */
+    Event decideAction();
 }

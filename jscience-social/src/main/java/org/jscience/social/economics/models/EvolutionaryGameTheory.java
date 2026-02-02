@@ -21,47 +21,31 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.engineering.eventdriven;
+package org.jscience.social.economics.models;
+
+import java.util.Map;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
+ * Models population dynamics under evolutionary game theory (Replicator Dynamics).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Event implements Comparable<Event> {
-    
-    private final SimulationEntity target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
-    
-    public Event(SimulationEntity target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationEntity getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
-    }
+public class EvolutionaryGameTheory {
 
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
+    private EvolutionaryGameTheory() {}
+
+    /**
+     * Calculates the change in frequency of a strategy using the Replicator Equation.
+     * dx_i/dt = x_i * (f_i(x) - phi(x))
+     * 
+     * @param frequency Current frequency of strategy i (x_i).
+     * @param fitness Fitness of strategy i (f_i).
+     * @param averageFitness Average fitness of the population (phi).
+     * @return The rate of change.
+     */
+    public static double replicatorDynamics(double frequency, double fitness, double averageFitness) {
+        return frequency * (fitness - averageFitness);
     }
 }

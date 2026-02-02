@@ -21,47 +21,62 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.engineering.eventdriven;
+package org.jscience.social.geography.urban;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
+ * A generalized Cellular Automata model for simulating urban growth, land use change,
+ * or traffic flow.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Event implements Comparable<Event> {
-    
-    private final SimulationEntity target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
-    
-    public Event(SimulationEntity target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationEntity getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
-    }
+public class CellularAutomata {
 
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
+    private final int width;
+    private final int height;
+    private int[][] grid;
+
+    public CellularAutomata(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.grid = new int[width][height];
+    }
+    
+    public void setState(int x, int y, int state) {
+        if (isValid(x, y)) {
+            grid[x][y] = state;
+        }
+    }
+    
+    public int getState(int x, int y) {
+        if (isValid(x, y)) {
+            return grid[x][y];
+        }
+        return 0; // Default boundary condition
+    }
+    
+    public void step(Rule rule) {
+        int[][] newGrid = new int[width][height];
+        
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                newGrid[x][y] = rule.apply(x, y, this);
+            }
+        }
+        
+        this.grid = newGrid;
+    }
+    
+    private boolean isValid(int x, int y) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+    
+    /**
+     * Functional interface for CA transition rules.
+     */
+    @FunctionalInterface
+    public interface Rule {
+        int apply(int x, int y, CellularAutomata ca);
     }
 }

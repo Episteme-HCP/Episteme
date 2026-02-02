@@ -21,47 +21,30 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.engineering.eventdriven;
+package org.jscience.core.technical.backend.algorithms;
+
+import org.jscience.core.mathematics.analysis.Function;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.technical.backend.AlgorithmProvider;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
- *
+ * Service provider interface for Ordinary Differential Equation (ODE) solvers.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Event implements Comparable<Event> {
+public interface ODEProvider extends AlgorithmProvider {
     
-    private final SimulationEntity target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
-    
-    public Event(SimulationEntity target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationEntity getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
-    }
-
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
-    }
+    /**
+     * Solves an initial value problem dy/dt = f(t, y).
+     * 
+     * @param f The derivative function f(t, y). Input is {t, y...}, Output is {dy/dt...}.
+     * @param t0 Initial time.
+     * @param y0 Initial state vector.
+     * @param tEnd Target time.
+     * @param h Step size (suggested).
+     * @return The state vector at tEnd.
+     */
+    Real[] solve(Function<Real[], Real[]> f, Real t0, Real[] y0, Real tEnd, Real h);
 }

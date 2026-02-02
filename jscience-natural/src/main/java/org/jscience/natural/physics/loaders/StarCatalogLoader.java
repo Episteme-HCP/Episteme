@@ -21,12 +21,12 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.physics.astronomy.loaders;
+package org.jscience.natural.physics.loaders;
 
 import org.jscience.core.io.AbstractResourceReader;
 import org.jscience.core.mathematics.linearalgebra.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.numbers.real.Reals;
+import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.measure.Quantities;
 import org.jscience.core.measure.Units;
 import org.jscience.natural.physics.astronomy.Star;

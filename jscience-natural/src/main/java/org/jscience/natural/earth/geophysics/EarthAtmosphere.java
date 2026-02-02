@@ -21,47 +21,42 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.engineering.eventdriven;
+package org.jscience.natural.earth.geophysics;
+
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.measure.Quantities;
+import org.jscience.core.measure.quantity.Length;
+import org.jscience.core.measure.Units;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
+ * Represents Earth's atmosphere.
+ * Delegates to static methods in {@link Atmosphere} for standard atmosphere calculations.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Event implements Comparable<Event> {
-    
-    private final SimulationEntity target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
-    
-    public Event(SimulationEntity target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationEntity getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
+public class EarthAtmosphere extends Atmosphere {
+
+    public EarthAtmosphere() {
+        super(Quantities.create(100, Units.KILOMETER), "Nitrogen 78%, Oxygen 21%, Argon 0.9%");
     }
 
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
+    /**
+     * Calculates pressure at a given altitude in Earth's atmosphere.
+     * @param altitude altitude (m)
+     * @return Pressure (Pa)
+     */
+    public Real getPressure(Real altitude) {
+        return Atmosphere.pressure(altitude);
+    }
+
+    /**
+     * Calculates temperature at a given altitude in Earth's atmosphere.
+     * @param altitude altitude (m)
+     * @return Temperature (K)
+     */
+    public Real getTemperature(Real altitude) {
+        return Atmosphere.temperature(altitude);
     }
 }

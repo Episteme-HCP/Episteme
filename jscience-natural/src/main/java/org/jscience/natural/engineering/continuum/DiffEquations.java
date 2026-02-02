@@ -21,47 +21,31 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.engineering.eventdriven;
+package org.jscience.natural.engineering.continuum;
+
+import org.jscience.core.util.Named;
 
 /**
- * Represents an event occurring in the system targeting a specific entity.
+ * Interface defining a system of first-order differential equations.
+ * dy/dt = f(t, y)
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Event implements Comparable<Event> {
+public interface DiffEquations extends Named {
     
-    private final SimulationEntity target;
-    private final EventSpec spec;
-    private final double time;
-    private final Object[] args;
+    /**
+     * Calculates the derivatives dy/dt at a given state.
+     * 
+     * @param t The current time (independent variable).
+     * @param y The current state vector (dependent variables).
+     * @return The derivatives dy/dt.
+     */
+    org.jscience.core.mathematics.numbers.real.Real[] computeDerivatives(org.jscience.core.mathematics.numbers.real.Real t, org.jscience.core.mathematics.numbers.real.Real[] y);
     
-    public Event(SimulationEntity target, EventSpec spec, double time, Object[] args) {
-        this.target = target;
-        this.spec = spec;
-        this.time = time;
-        this.args = args;
-    }
-    
-    public SimulationEntity getTarget() {
-        return target;
-    }
-    
-    public EventSpec getSpec() {
-        return spec;
-    }
-    
-    public double getTime() {
-        return time;
-    }
-    
-    public Object[] getArgs() {
-        return args;
-    }
-
-    @Override
-    public int compareTo(Event other) {
-        return Double.compare(this.time, other.time);
-    }
+    /**
+     * Returns the dimension of the state vector.
+     */
+    int getDimension();
 }

@@ -70,14 +70,6 @@ public class EconomicAgent extends Role {
         this.wallet = new Wallet();
     }
 
-    @Deprecated
-    protected EconomicAgent(Individual individual, String name,
-            EconomicSituation situation, int kind) {
-        super(individual, name, situation, kind);
-        this.belongings = new HashSet<>();
-        this.wallet = new Wallet();
-    }
-
     /**
      * Returns the set of resources currently owned by this agent.
      * @return unmodifiable set of owned resources
@@ -142,4 +134,3 @@ public class EconomicAgent extends Role {
             getIndividual().getPosition());
     }
 }
-

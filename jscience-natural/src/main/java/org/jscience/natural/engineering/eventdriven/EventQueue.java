@@ -23,7 +23,7 @@
 
 package org.jscience.natural.engineering.eventdriven;
 
-import java.util.LinkedList;
+
 
 /**
  * A synchronized priority queue for events.
@@ -35,13 +35,19 @@ import java.util.LinkedList;
  */
 public class EventQueue {
     
-    private final LinkedList<Event> internalQueue = new LinkedList<>();
-    private final LinkedList<Event> normalQueue = new LinkedList<>();
+    private final java.util.LinkedList<Event> internalQueue = new java.util.LinkedList<>();
+    private final java.util.PriorityQueue<Event> normalQueue = new java.util.PriorityQueue<>();
     
     /**
-     * Dequeues the next event, blocking if empty.
-     * Internal events take precedence.
+     * Peeks at the next event time without removing it.
+     * Returns Double.NaN if queues are empty.
      */
+    public synchronized double peekNextTime() {
+        if (!internalQueue.isEmpty()) return Double.NEGATIVE_INFINITY; // Immediate
+        if (!normalQueue.isEmpty()) return normalQueue.peek().getTime();
+        return Double.NaN;
+    }
+
     public synchronized Event dequeue() throws InterruptedException {
         while (internalQueue.isEmpty() && normalQueue.isEmpty()) {
             wait();
@@ -50,12 +56,12 @@ public class EventQueue {
         if (!internalQueue.isEmpty()) {
             return internalQueue.removeFirst();
         } else {
-            return normalQueue.removeFirst();
+            return normalQueue.poll();
         }
     }
     
     public synchronized void queueNormal(Event event) {
-        normalQueue.addLast(event);
+        normalQueue.add(event);
         notifyAll();
     }
     

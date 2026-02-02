@@ -38,8 +38,7 @@ public class EventDrivenEngine implements Runnable {
     private final String id;
     private final EventQueue eventQueue;
     private final Map<String, SimulationEntity> entities;
-    private volatile boolean running;
-    private Thread engineThread;
+    private volatile double currentTime = 0.0;
     
     public EventDrivenEngine(String id) {
         this.id = id;
@@ -48,6 +47,10 @@ public class EventDrivenEngine implements Runnable {
         this.running = false;
     }
     
+    public double getCurrentTime() {
+        return currentTime;
+    }
+
     public void registerEntity(SimulationEntity entity) {
         entities.put(entity.getId(), entity);
     }
@@ -76,40 +79,132 @@ public class EventDrivenEngine implements Runnable {
         }
     }
     
-    public void sendEvent(String targetId, EventSpec spec, Object... args) {
+    /**
+     * Schedules an event to occur after a delay.
+     * @param delay time from now to schedule
+     */
+    public void scheduleEvent(String targetId, EventSpec spec, double delay, Object... args) {
         SimulationEntity target = entities.get(targetId);
         if (target != null) {
-            Event event = new Event(target, spec, args);
+            double scheduledTime = currentTime + delay;
+            Event event = new Event(target, spec, scheduledTime, args);
             eventQueue.queueNormal(event);
         } else {
-            System.err.println("Engine Warning: Target entity not found: " + targetId);
+            System.err.println("Engine Warning: Target not found: " + targetId);
         }
     }
     
+    // Legacy support (immediate/next step)
+    public void sendEvent(String targetId, EventSpec spec, Object... args) {
+        scheduleEvent(targetId, spec, 0.0, args);
+    }
+    
     public void sendInternalEvent(SimulationEntity target, EventSpec spec, Object... args) {
-        Event event = new Event(target, spec, args);
+        // Internal events are immediate/priority, assume same time or ASAP
+        Event event = new Event(target, spec, currentTime, args);
         eventQueue.queueInternal(event);
     }
 
     @Override
     public void run() {
-        System.out.println("Engine " + id + " started.");
+        System.out.println("Engine " + id + " started at t=" + currentTime);
+        
+        // Cache integrators for continuum entities
+        // Simple strategy: Create RK4 on demand or cache?
+        // Reuse RK4 instance per entity if possible.
+        
         while (running) {
             try {
-                Event event = eventQueue.dequeue();
-                processEvent(event);
-            } catch (InterruptedException e) {
-                if (running) {
-                    System.out.println("Engine interrupted, stopping.");
+                // Hybrid Loop:
+                // 1. Determine next event time
+                double nextEventTime = eventQueue.peekNextTime();
+                
+                // If internal queue has events, nextEventTime is -Infinity (immediate)
+                // If normal queue has events, nextEventTime is T
+                // If both empty, NaN
+                
+                if (Double.isNaN(nextEventTime)) {
+                    // No events. Wait or step forward continuously?
+                    // Strategy: Step forward by dt_max? Or wait for input?
+                    // For now, simple wait (via dequeue blocking)
+                    // But if we have continuous entities, they should evolve!
+                    // Assuming simulation ends if no events? Or evolves until maxTime?
+                    // Let's assume we wait for events.
+                    Event event = eventQueue.dequeue(); // Block
+                    processEvent(event);
+                    continue; // Re-evaluate loop
                 }
+                
+                if (nextEventTime == Double.NEGATIVE_INFINITY) {
+                    // Immediate processing
+                    Event event = eventQueue.dequeue();
+                    processEvent(event);
+                    continue;
+                }
+                
+                // Normal event at T > currentTime?
+                if (nextEventTime > currentTime) {
+                    // Integrate from currentTime to nextEventTime
+                    double dt = nextEventTime - currentTime;
+                    integrateContinuum(dt);
+                    currentTime = nextEventTime;
+                }
+                
+                // Process the event
+                Event event = eventQueue.dequeue();
+                // Ensure we update time if logic differs
+                currentTime = Math.max(currentTime, event.getTime());
+                processEvent(event);
+
+            } catch (InterruptedException e) {
+                if (running) System.out.println("Engine interrupted.");
                 Thread.currentThread().interrupt();
                 break;
             } catch (Exception e) {
-                System.err.println("Error processing event: " + e.getMessage());
+                System.err.println("Engine Loop Error: " + e.getMessage());
                 e.printStackTrace();
             }
         }
         System.out.println("Engine " + id + " stopped.");
+    }
+    
+    private void integrateContinuum(double duration) {
+        if (duration <= 1e-9) return;
+        
+        org.jscience.core.mathematics.numbers.real.Real h = org.jscience.core.mathematics.numbers.real.Real.of(0.01);
+        org.jscience.core.mathematics.numbers.real.Real t = org.jscience.core.mathematics.numbers.real.Real.of(currentTime);
+        org.jscience.core.mathematics.numbers.real.Real tEnd = t.add(org.jscience.core.mathematics.numbers.real.Real.of(duration));
+        
+        // TODO: Get from ComputeContext or AlgorithmProvider registry
+        org.jscience.core.technical.backend.algorithms.ODEProvider integrator = new org.jscience.core.technical.backend.algorithms.RungeKuttaODEProvider();
+        
+        for (SimulationEntity entity : entities.values()) {
+            if (entity instanceof org.jscience.natural.engineering.continuum.Continuum) {
+                org.jscience.natural.engineering.continuum.Continuum cont = (org.jscience.natural.engineering.continuum.Continuum) entity;
+                
+                // Create adapter function
+                org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]> f = 
+                    new org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]>() {
+                        @Override
+                        public org.jscience.core.mathematics.numbers.real.Real[] evaluate(org.jscience.core.mathematics.numbers.real.Real[] input) {
+                            org.jscience.core.mathematics.numbers.real.Real time = input[0];
+                            org.jscience.core.mathematics.numbers.real.Real[] state = new org.jscience.core.mathematics.numbers.real.Real[input.length - 1];
+                            System.arraycopy(input, 1, state, 0, state.length);
+                            return cont.computeDerivatives(time, state);
+                        }
+                        
+                        @Override
+                        public String getDomain() { return "Real^" + (cont.getDimension() + 1); }
+                        
+                        @Override
+                        public String getCodomain() { return "Real^" + cont.getDimension(); }
+                    };
+
+                org.jscience.core.mathematics.numbers.real.Real[] y0 = cont.getState();
+                org.jscience.core.mathematics.numbers.real.Real[] yNew = integrator.solve(f, t, y0, tEnd, h);
+                cont.setState(yNew);
+            }
+        }
     }
     
     private void processEvent(Event event) {

@@ -23,7 +23,6 @@
 
 package org.jscience.social.sociology;
 
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,26 +32,30 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+
 import org.jscience.natural.biology.BiologicalSex;
+import org.jscience.natural.biology.Human;
 import org.jscience.social.economics.money.Money;
 import org.jscience.natural.earth.Place;
 import org.jscience.core.util.persistence.Attribute;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
+import org.jscience.core.util.identity.Identification;
+import org.jscience.core.util.identity.UUIDIdentification;
 
 /**
- * Represents a human being with demographic and social attributes.
- * Extends the biological {@link Human} to incorporate societal concepts.
- * Modernized to use extensible Gender and standardized Individual types.
- * * @version 1.2
+ * Represents a human individual as a social agent.
+ * Extends Human directly.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+
 @Persistent
 public class Person extends Human {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     @Attribute
     private String nationality;
@@ -74,22 +77,29 @@ public class Person extends Human {
 
     @Attribute
     private Gender gender;
+    
+    // Constructors
 
-    public Person(org.jscience.core.util.identity.Identification id, String name, BiologicalSex sex, LocalDate birthDate, String nationality) {
-        super(id, sex, birthDate);
-        setName(name);
+    public Person(Identification id, String name, BiologicalSex sex, LocalDate birthDate, String nationality) {
+        super(id, sex, birthDate); // Initialize Human
+        setName(name); // Set Name in Human/Individual
         this.nationality = (nationality != null) ? nationality : "Unknown";
         this.wealth = Money.usd(0);
         this.gender = Gender.fromSex(sex);
     }
 
     public Person(String id, String name, BiologicalSex sex, LocalDate birthDate, String nationality) {
-        this(new org.jscience.core.util.identity.UUIDIdentification(UUID.fromString(id)), name, sex, birthDate, nationality);
+        this(new UUIDIdentification(UUID.fromString(id)), name, sex, birthDate, nationality);
     }
     
+    /**
+     * Convenience constructor.
+     */
     public Person(String name, BiologicalSex sex) {
-        this(new org.jscience.core.util.identity.UUIDIdentification(UUID.randomUUID()), name, sex, LocalDate.now().minusYears(20), "Unknown");
+        this(new UUIDIdentification(UUID.randomUUID()), name, sex, LocalDate.now().minusYears(20), "Unknown");
     }
+
+    // Social Attributes
 
     public Gender getGender() {
         return gender;
@@ -147,18 +157,7 @@ public class Person extends Human {
     public void removeSpouse(Person spouse) {
         spouses.remove(spouse);
     }
-
-    public void move(Place newLocation) {
-        Place oldLocation = getPosition();
-        if (oldLocation != null) {
-            oldLocation.removeInhabitant(this);
-        }
-        setPosition(newLocation);
-        if (newLocation != null) {
-            newLocation.addInhabitant(this);
-        }
-    }
-
+    
     public Person addSocialRole(String role) {
         if (role != null) {
             socialRoles.add(role);
@@ -166,17 +165,17 @@ public class Person extends Human {
         return this;
     }
 
-    public void addStructuralRole(org.jscience.social.sociology.Role role) {
+    public void addStructuralRole(Role role) {
         if (role != null && !structuralRoles.contains(role)) {
             structuralRoles.add(role);
         }
     }
 
-    public void removeStructuralRole(org.jscience.social.sociology.Role role) {
+    public void removeStructuralRole(Role role) {
         structuralRoles.remove(role);
     }
 
-    public List<org.jscience.social.sociology.Role> getStructuralRoles() {
+    public List<Role> getStructuralRoles() {
         return Collections.unmodifiableList(structuralRoles);
     }
 
@@ -194,3 +193,202 @@ public class Person extends Human {
     }
 }
 
+    private static final long serialVersionUID = 3L;
+
+    /** The biological component of this person. */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private final Human human;
+
+    @Attribute
+    private String nationality;
+    
+    @Attribute
+    private final List<String> socialRoles = new ArrayList<>();
+    
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<org.jscience.social.sociology.Role> structuralRoles = new ArrayList<>();
+    
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Person> spouses = new HashSet<>();
+    
+    @Attribute
+    private Money wealth;
+    
+    @Attribute
+    private String address;
+
+    // EconomicAgent fields
+    private final Wallet wallet = new Wallet();
+    private final Set<Resource> belongings = new HashSet<>();
+
+    @Attribute
+    private Gender gender;
+    
+    // Constructors
+
+    public Person(Identification id, String name, BiologicalSex sex, LocalDate birthDate, String nationality, EventDrivenEngine engine) {
+        super(id.toString(), name, engine);
+        this.human = new Human(id, sex, birthDate);
+        this.human.setName(name); // Sync name
+        this.nationality = (nationality != null) ? nationality : "Unknown";
+        this.wealth = Money.usd(0);
+        this.gender = Gender.fromSex(sex);
+    }
+
+    public Person(String id, String name, BiologicalSex sex, LocalDate birthDate, String nationality, EventDrivenEngine engine) {
+        this(new UUIDIdentification(UUID.fromString(id)), name, sex, birthDate, nationality, engine);
+    }
+    
+    /**
+     * Convenience constructor with null engine (for pure data usage).
+     */
+    public Person(String name, BiologicalSex sex) {
+        this(new UUIDIdentification(UUID.randomUUID()), name, sex, LocalDate.now().minusYears(20), "Unknown", null);
+    }
+
+    // Delegation to Human (Biology)
+    
+    public Human getHuman() { return human; }
+    
+    public BiologicalSex getSex() { return human.getSex(); }
+    
+    public int getAge() { return human.getAge(); }
+    public void setBirthDate(LocalDate birthDate) { human.setBirthDate(birthDate); }
+    public LocalDate getBirthDate() { return human.getBirthDate(); }
+
+    // Social Attributes
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getNationality() {
+        return nationality;
+    }
+
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
+    }
+
+    public List<String> getSocialRoles() {
+        return Collections.unmodifiableList(socialRoles);
+    }
+
+    public Money getWealth() {
+        return wealth;
+    }
+
+    public void setWealth(Money wealth) {
+        this.wealth = wealth;
+        // Sync to wallet?
+        if (wealth != null) this.wallet.add(wealth);
+    }
+
+    // EconomicAgent Implementation
+
+    @Override
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    @Override
+    public Set<Resource> getBelongings() {
+        return Collections.unmodifiableSet(belongings);
+    }
+
+    @Override
+    public void addBelonging(Resource belonging) {
+        if (belonging != null) belongings.add(belonging);
+    }
+
+    @Override
+    public void removeBelonging(Resource belonging) {
+        belongings.remove(belonging);
+    }
+
+    public void earn(Money amount) {
+        Objects.requireNonNull(amount, "Amount cannot be null");
+        if (this.wealth == null) this.wealth = amount;
+        else if (this.wealth.getCurrency().equals(amount.getCurrency())) {
+            this.wealth = this.wealth.add(amount);
+        }
+    }
+
+    public void spend(Money amount) {
+        Objects.requireNonNull(amount, "Amount cannot be null");
+        if (this.wealth != null && this.wealth.getCurrency().equals(amount.getCurrency())) {
+            this.wealth = this.wealth.subtract(amount);
+        }
+    }
+
+    public Set<Person> getSpouses() {
+        return Collections.unmodifiableSet(spouses);
+    }
+
+    public void addSpouse(Person spouse) {
+        if (spouse != null) {
+            spouses.add(spouse);
+        }
+    }
+
+    public void removeSpouse(Person spouse) {
+        spouses.remove(spouse);
+    }
+
+    public void move(Place newLocation) {
+        // Delegate position to Human if Human handles location
+        Place oldInternal = human.getPosition();
+        if (oldInternal != null) oldInternal.removeInhabitant(human); 
+        
+        human.setPosition(newLocation);
+        if (newLocation != null) newLocation.addInhabitant(human);
+    }
+    
+    public Place getPosition() {
+        return human.getPosition();
+    }
+
+    public Person addSocialRole(String role) {
+        if (role != null) {
+            socialRoles.add(role);
+        }
+        return this;
+    }
+
+    public void addStructuralRole(Role role) {
+        if (role != null && !structuralRoles.contains(role)) {
+            structuralRoles.add(role);
+        }
+    }
+
+    public void removeStructuralRole(Role role) {
+        structuralRoles.remove(role);
+    }
+
+    public List<Role> getStructuralRoles() {
+        return Collections.unmodifiableList(structuralRoles);
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Override
+    public void processEvent(Event event) {
+        // Handle social events: e.g., "ReceiveSalary", "GetMarried"
+        super.processEvent(event);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s/%s, %d years, %s)", getName(), getSex(), gender, getAge(), nationality);
+    }
+}
