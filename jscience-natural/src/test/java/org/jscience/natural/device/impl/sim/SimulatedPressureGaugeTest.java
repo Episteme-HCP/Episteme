@@ -55,7 +55,7 @@ public class SimulatedPressureGaugeTest {
     @Test
     public void testCapabilities() throws Exception {
         try (SimulatedPressureGauge gauge = new SimulatedPressureGauge()) {
-            Map<String, Boolean> caps = gauge.getCapabilities();
+            java.util.Map<String, Boolean> caps = gauge.getCapabilities();
             assertTrue(caps.getOrDefault("Data Logging", false));
             assertTrue(caps.getOrDefault("Remote Control", false));
             assertFalse(caps.getOrDefault("High Voltage Protection", true));

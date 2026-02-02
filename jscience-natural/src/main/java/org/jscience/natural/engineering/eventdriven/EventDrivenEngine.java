@@ -24,7 +24,12 @@
 package org.jscience.natural.engineering.eventdriven;
 
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+import org.jscience.core.technical.backend.algorithms.SimulationProvider;
+import org.jscience.core.technical.backend.algorithms.ParallelSimulationProvider;
 
 /**
  * Run-time core of the event driven simulation engine.
@@ -42,11 +47,17 @@ public class EventDrivenEngine implements Runnable {
     
     private volatile boolean running = false;
     private Thread engineThread;
+    private final int numThreads;
 
     public EventDrivenEngine(String id) {
+        this(id, Runtime.getRuntime().availableProcessors());
+    }
+
+    public EventDrivenEngine(String id, int numThreads) {
         this.id = id;
         this.eventQueue = new EventQueue();
         this.entities = new ConcurrentHashMap<>();
+        this.numThreads = numThreads;
         this.running = false;
     }
 
@@ -54,6 +65,10 @@ public class EventDrivenEngine implements Runnable {
         return entities.get(id);
     }
     
+    public int getNumThreads() {
+        return numThreads;
+    }
+
     public double getCurrentTime() {
         return currentTime;
     }
@@ -182,34 +197,41 @@ public class EventDrivenEngine implements Runnable {
         org.jscience.core.mathematics.numbers.real.Real t = org.jscience.core.mathematics.numbers.real.Real.of(currentTime);
         org.jscience.core.mathematics.numbers.real.Real tEnd = t.add(org.jscience.core.mathematics.numbers.real.Real.of(duration));
         
-        // Integrator acquisition from registry/context
         org.jscience.core.technical.backend.algorithms.ODEProvider integrator = new org.jscience.core.technical.backend.algorithms.RungeKuttaODEProvider();
         
+        List<Runnable> tasks = new ArrayList<>();
         for (SimulationAgent entity : entities.values()) {
             if (entity instanceof org.jscience.natural.engineering.continuum.Continuum continuum) {
-                // Create adapter function
-                org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]> f = 
-                    new org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]>() {
-                        @Override
-                        public org.jscience.core.mathematics.numbers.real.Real[] evaluate(org.jscience.core.mathematics.numbers.real.Real[] input) {
-                            org.jscience.core.mathematics.numbers.real.Real time = input[0];
-                            org.jscience.core.mathematics.numbers.real.Real[] state = new org.jscience.core.mathematics.numbers.real.Real[input.length - 1];
-                            System.arraycopy(input, 1, state, 0, state.length);
-                            return continuum.computeDerivatives(time, state);
-                        }
-                        
-                        @Override
-                        public String getDomain() { return "Real^" + (continuum.getDimension() + 1); }
-                        
-                        @Override
-                        public String getCodomain() { return "Real^" + continuum.getDimension(); }
-                    };
+                tasks.add(() -> {
+                    org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]> f = 
+                        new org.jscience.core.mathematics.analysis.Function<org.jscience.core.mathematics.numbers.real.Real[], org.jscience.core.mathematics.numbers.real.Real[]>() {
+                            @Override
+                            public org.jscience.core.mathematics.numbers.real.Real[] evaluate(org.jscience.core.mathematics.numbers.real.Real[] input) {
+                                org.jscience.core.mathematics.numbers.real.Real time = input[0];
+                                org.jscience.core.mathematics.numbers.real.Real[] state = new org.jscience.core.mathematics.numbers.real.Real[input.length - 1];
+                                System.arraycopy(input, 1, state, 0, state.length);
+                                return continuum.computeDerivatives(time, state);
+                            }
+                            
+                            @Override public String getDomain() { return "Real^" + (continuum.getDimension() + 1); }
+                            @Override public String getCodomain() { return "Real^" + continuum.getDimension(); }
+                        };
 
-                org.jscience.core.mathematics.numbers.real.Real[] y0 = continuum.getState();
-                org.jscience.core.mathematics.numbers.real.Real[] yNew = integrator.solve(f, t, y0, tEnd, h);
-                continuum.setState(yNew);
+                    org.jscience.core.mathematics.numbers.real.Real[] y0 = continuum.getState();
+                    org.jscience.core.mathematics.numbers.real.Real[] yNew = integrator.solve(f, t, y0, tEnd, h);
+                    continuum.setState(yNew);
+                });
             }
         }
+        
+        SimulationProvider provider = findSimulationProvider();
+        provider.parallelExecute(tasks, numThreads);
+    }
+
+    private SimulationProvider findSimulationProvider() {
+        ServiceLoader<SimulationProvider> loader = ServiceLoader.load(SimulationProvider.class);
+        for (SimulationProvider p : loader) return p;
+        return new ParallelSimulationProvider();
     }
     
     private void processEvent(Event event) {
