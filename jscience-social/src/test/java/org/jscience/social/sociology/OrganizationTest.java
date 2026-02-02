@@ -19,8 +19,8 @@ public class OrganizationTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(Organization.class);
+        // Ensure class is reachable - Organization is in economics package
+        assertNotNull(org.jscience.social.economics.Organization.class);
     }
 }
 

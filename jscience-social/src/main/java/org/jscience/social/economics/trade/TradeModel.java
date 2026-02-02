@@ -24,8 +24,8 @@
 package org.jscience.social.economics.trade;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.natural.earth.Place;
-import org.jscience.social.economics.Organization;
+
+
 import org.jscience.social.politics.Nation;
 
 /**
@@ -60,11 +60,11 @@ public class TradeModel {
     public static Real gravity(Nation nationA, Real gdpA, Nation nationB, Real gdpB, Real distance, Real constantG) {
         if (distance.equals(Real.ZERO)) {
             // Avoid division by zero; treat as intra-national trade or extremely high
-             return constantG.times(gdpA).times(gdpB); // Simplified fallback
+             return constantG.multiply(gdpA).multiply(gdpB); // Simplified fallback
         }
         
         // F = G * (GDP_A * GDP_B) / Distance
-        return constantG.times(gdpA).times(gdpB).divide(distance);
+        return constantG.multiply(gdpA).multiply(gdpB).divide(distance);
     }
     
     /**
@@ -83,7 +83,7 @@ public class TradeModel {
     public static Real gravityExtended(Real gdpA, Real gdpB, Real distance, Real constantG, double alpha, double beta, double gamma) {
          if (distance.equals(Real.ZERO))  return Real.ZERO; // or simplify
          
-         Real num = constantG.times(gdpA.pow(alpha)).times(gdpB.pow(beta));
+         Real num = constantG.multiply(gdpA.pow(alpha)).multiply(gdpB.pow(beta));
          Real den = distance.pow(gamma);
          
          return num.divide(den);

@@ -93,20 +93,6 @@ public class Role implements ComprehensiveIdentification, Temporal<TimeCoordinat
         this.individual.addRole(this);
     }
 
-    @Deprecated
-    public Role(Individual individual, String name, Situation situation, int kind) {
-        this(individual, name, situation, mapLegacyKind(kind));
-    }
-
-    private static RoleKind mapLegacyKind(int legacyKind) {
-        return switch (legacyKind) {
-            case 1 -> RoleKind.CLIENT;
-            case 2 -> RoleKind.SERVER;
-            case 4 -> RoleKind.SUPERVISOR;
-            case 8 -> RoleKind.OBSERVER;
-            default -> RoleKind.OTHER;
-        };
-    }
 
     /**
      * Creates a standalone Role template.
@@ -122,9 +108,13 @@ public class Role implements ComprehensiveIdentification, Temporal<TimeCoordinat
         this.timestamp = org.jscience.social.history.time.TimePoint.now();
     }
 
+    /**
+     * Deprecated constructor for backward compatibility with integer-based role kinds.
+     * @deprecated Use {@link #Role(Individual, String, Situation, RoleKind)} instead
+     */
     @Deprecated
-    public Role(String name, int kind) {
-        this(name, mapLegacyKind(kind));
+    public Role(Individual individual, String name, Situation situation, int kind) {
+        this(individual, name, situation, org.jscience.social.sociology.RoleKind.fromInt(kind));
     }
 
     @Override

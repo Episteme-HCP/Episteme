@@ -46,6 +46,8 @@ import java.util.Objects;
 @Persistent
 public class Tribe extends HumanGroup {
     /** The name of the tribe. */
+    @Attribute
+    private String name;
 
     /** The distinct culture associated with the tribe. */
     @Relation(type = Relation.Type.MANY_TO_ONE)
@@ -64,7 +66,7 @@ public class Tribe extends HumanGroup {
         if (Objects.requireNonNull(name, "Name cannot be null").isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
-        // name is set in super
+        this.name = name; // Initialize the name field
         this.culture = Objects.requireNonNull(culture, "Culture cannot be null");
     }
 

@@ -8,19 +8,13 @@ package org.jscience.nativelib.linearalgebra;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.ComputeContext;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
-import java.util.Collections;
-import java.util.Set;
-
 /**
  * Native BLAS implementation of Linear Algebra Provider.
  * <p>
@@ -116,10 +110,17 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
     }
 
     @Override
-    public ComputeContext createContext() {
-        // Return a context with Native capabilities
-        // Simplified for now
-        return ComputeContext.current(); 
+    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+        return new org.jscience.core.technical.backend.ExecutionContext() {
+            @Override
+            public <T> T execute(org.jscience.core.technical.backend.Operation<T> operation) {
+                return operation.compute(this);
+            }
+            @Override
+            public void close() {
+                // No resources to close for now
+            }
+        };
     }
 
     // --- Matrix Operations ---
@@ -282,8 +283,8 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
             MemorySegment.copy(matSeg, 0, MemorySegment.ofArray(resultData), 0, data.length * 8L);
 
             return new GenericMatrix<Real>(
-                (MatrixStorage<Real>) new HeapRealDoubleMatrixStorage(resultData, n, n),
-                (org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>) this,
+                new HeapRealDoubleMatrixStorage(resultData, n, n),
+                this,
                 org.jscience.core.mathematics.sets.Reals.getInstance()
             );
         } catch (Throwable t) {
@@ -296,6 +297,8 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
         throw new UnsupportedOperationException("Native Determinant not yet implemented");
     }
 
+    @Override
+    public Vector<Real> solve(Matrix<Real> A, Vector<Real> B) {
         // Wrap vector B into a matrix with 1 column
         double[] dataB = new double[B.dimension()];
         for(int i=0; i<dataB.length; i++) dataB[i] = B.get(i).doubleValue();
@@ -314,8 +317,9 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
         double[] rawSol = ((HeapRealDoubleMatrixStorage) solStorage).getData();
         System.arraycopy(rawSol, 0, solData, 0, solData.length);
         
-        return new org.jscience.core.mathematics.linearalgebra.vectors.DenseVector<Real>(
+        return new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<Real>(
             new org.jscience.core.mathematics.linearalgebra.vectors.storage.HeapRealDoubleVectorStorage(solData),
+            this,
             org.jscience.core.mathematics.sets.Reals.getInstance()
         );
     }
@@ -361,8 +365,8 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
             MemorySegment.copy(segB, 0, MemorySegment.ofArray(resultData), 0, dataB.length * 8L);
 
             return new GenericMatrix<Real>(
-                (org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real>) new HeapRealDoubleMatrixStorage(resultData, n, nrhs),
-                (org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>) this,
+                new HeapRealDoubleMatrixStorage(resultData, n, nrhs),
+                this,
                 org.jscience.core.mathematics.sets.Reals.getInstance()
             );
         } catch (Throwable t) {
@@ -395,8 +399,8 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
         // DGEMV could be used here
         // fallback
         return new GenericMatrix<Real>(
-            (org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real>) getAsDefaultStorage(matrix), 
-            (org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>) this, 
+            getAsDefaultStorage(matrix), 
+            this, 
             org.jscience.core.mathematics.sets.Reals.getInstance()
         ).multiply(vector);
     }
@@ -417,12 +421,28 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
 
     @Override
     public Vector<Real> add(Vector<Real> v1, Vector<Real> v2) {
-        throw new UnsupportedOperationException("Native Vector Add not implemented");
+        int n = v1.dimension();
+        if (v2.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
+        double[] data = new double[n];
+        for(int i=0; i<n; i++) data[i] = v1.get(i).doubleValue() + v2.get(i).doubleValue();
+        return new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<Real>(
+            new org.jscience.core.mathematics.linearalgebra.vectors.storage.HeapRealDoubleVectorStorage(data),
+            this,
+            org.jscience.core.mathematics.sets.Reals.getInstance()
+        );
     }
 
     @Override
     public Vector<Real> subtract(Vector<Real> v1, Vector<Real> v2) {
-        throw new UnsupportedOperationException("Native Vector Sub not implemented");
+        int n = v1.dimension();
+        if (v2.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
+        double[] data = new double[n];
+        for(int i=0; i<n; i++) data[i] = v1.get(i).doubleValue() - v2.get(i).doubleValue();
+        return new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<Real>(
+            new org.jscience.core.mathematics.linearalgebra.vectors.storage.HeapRealDoubleVectorStorage(data),
+            this,
+            org.jscience.core.mathematics.sets.Reals.getInstance()
+        );
     }
 
     public Matrix<Real> scale(Real scalar, GenericMatrix<Real> element) {
@@ -445,8 +465,8 @@ public class NativeLinearAlgebraProvider implements LinearAlgebraProvider<Real> 
                     MemorySegment.copy(seg, 0, MemorySegment.ofArray(resultData), 0, data.length * 8L);
                     
                     return new GenericMatrix<Real>(
-                        (org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real>) new HeapRealDoubleMatrixStorage(resultData, storage.rows(), storage.cols()),
-                        (org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>) this,
+                        new HeapRealDoubleMatrixStorage(resultData, storage.rows(), storage.cols()),
+                        this,
                         org.jscience.core.mathematics.sets.Reals.getInstance()
                     );
                 }

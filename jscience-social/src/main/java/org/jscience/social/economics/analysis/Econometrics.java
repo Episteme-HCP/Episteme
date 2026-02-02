@@ -24,7 +24,6 @@
 package org.jscience.social.economics.analysis;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.vectors.Float64Vector;
 
 import java.util.List;
 
@@ -102,7 +101,7 @@ public class Econometrics {
         if (data.size() < 2) return data;
         java.util.ArrayList<Real> diff = new java.util.ArrayList<>();
         for (int i = 1; i < data.size(); i++) {
-            diff.add(data.get(i).minus(data.get(i - 1)));
+            diff.add(data.get(i).subtract(data.get(i - 1)));
         }
         return diff;
     }

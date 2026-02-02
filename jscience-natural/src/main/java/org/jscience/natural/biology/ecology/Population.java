@@ -69,15 +69,23 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
     @Attribute
     private Place territory;
 
+    /** The simulation engine driving this population's temporal evolution. */
+    protected org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine;
+
     public Population(String name, Species species, Place territory) {
         this(new UUIDIdentification(UUID.randomUUID().toString()), name, species, territory);
     }
 
     public Population(Identification id, String name, Species species, Place territory) {
+        this(id, name, species, territory, null);
+    }
+
+    public Population(Identification id, String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
         this.id = Objects.requireNonNull(id, "ID cannot be null");
         setName(name);
         this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.territory = territory;
+        this.engine = engine;
     }
 
     public Population(Species species) {
@@ -228,6 +236,19 @@ public class Population implements ComprehensiveIdentification, Positioned<Place
         return Objects.hash(id);
     }
 
+    public org.jscience.natural.engineering.eventdriven.EventDrivenEngine getEngine() {
+        return engine;
+    }
+
+    public void setEngine(org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
+        this.engine = engine;
+    }
+
+    // Event processing method
+    public void processEvent(org.jscience.natural.engineering.eventdriven.Event event) {
+        // Default implementation: delegate or ignore, can be overridden by subclasses
+    }
+    
     @Override
     public String toString() {
         return String.format("Population '%s' of %s at %s: %d members (%d alive)",

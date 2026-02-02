@@ -88,5 +88,20 @@ public final class RoleKind extends ExtensibleEnum {
     public static RoleKind[] values() {
         return EnumRegistry.getRegistry(RoleKind.class).values().toArray(new RoleKind[0]);
     }
+
+    /**
+     * Converts an integer to a RoleKind for backward compatibility.
+     * @deprecated Use RoleKind constants directly
+     */
+    @Deprecated
+    public static RoleKind fromInt(int kind) {
+        return switch (kind) {
+            case 0 -> CLIENT;
+            case 1 -> SERVER;
+            case 2 -> SUPERVISOR;
+            case 3 -> OBSERVER;
+            default -> OTHER;
+        };
+    }
 }
 

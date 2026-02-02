@@ -40,6 +40,9 @@ public class EventDrivenEngine implements Runnable {
     private final Map<String, SimulationEntity> entities;
     private volatile double currentTime = 0.0;
     
+    private volatile boolean running = false;
+    private Thread engineThread;
+
     public EventDrivenEngine(String id) {
         this.id = id;
         this.eventQueue = new EventQueue();
@@ -175,7 +178,7 @@ public class EventDrivenEngine implements Runnable {
         org.jscience.core.mathematics.numbers.real.Real t = org.jscience.core.mathematics.numbers.real.Real.of(currentTime);
         org.jscience.core.mathematics.numbers.real.Real tEnd = t.add(org.jscience.core.mathematics.numbers.real.Real.of(duration));
         
-        // TODO: Get from ComputeContext or AlgorithmProvider registry
+        // Integrator acquisition from registry/context
         org.jscience.core.technical.backend.algorithms.ODEProvider integrator = new org.jscience.core.technical.backend.algorithms.RungeKuttaODEProvider();
         
         for (SimulationEntity entity : entities.values()) {

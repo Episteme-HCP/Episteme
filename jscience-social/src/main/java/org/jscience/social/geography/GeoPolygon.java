@@ -5,7 +5,6 @@ import org.jscience.natural.earth.coordinates.GeodeticCoordinate;
 import org.jscience.core.mathematics.geometry.boundaries.Boundary;
 import org.jscience.core.mathematics.geometry.boundaries.BoundingBox;
 import org.jscience.core.mathematics.geometry.boundaries.CompositeBoundary;
-import org.jscience.core.mathematics.geometry.boundaries.PointBoundary;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.measure.Units;
 import org.jscience.core.util.persistence.Attribute;

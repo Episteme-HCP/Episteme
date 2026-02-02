@@ -24,7 +24,6 @@
 package org.jscience.social.economics.models;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import java.util.List;
 
 /**
  * Solves for Nash Equilibria in non-cooperative games.
@@ -44,9 +43,9 @@ public class NashEquilibriumSolver {
      * @param payoffMatrixB Payoffs for Player B (column player).
      * @return Array of indices {row, col} representing the strategy profile, or null if none found.
      */
-    public static int[] findPureStrategyNE(double[][] payoffMatrixA, double[][] payoffMatrixB) {
-        int rows = payoffMatrixA.length;
-        int cols = payoffMatrixA[0].length;
+    public static int[] findPureStrategyNE(org.jscience.core.mathematics.linearalgebra.Matrix<Real> payoffMatrixA, org.jscience.core.mathematics.linearalgebra.Matrix<Real> payoffMatrixB) {
+        int rows = payoffMatrixA.rows();
+        int cols = payoffMatrixA.cols();
         
         // Brute force check: A cell (r, c) is a NE if:
         // A[r][c] >= A[i][c] for all i (Best response for A)
@@ -55,8 +54,9 @@ public class NashEquilibriumSolver {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 boolean bestForA = true;
+                Real currentA = payoffMatrixA.get(r, c);
                 for (int i = 0; i < rows; i++) {
-                    if (payoffMatrixA[i][c] > payoffMatrixA[r][c]) {
+                    if (payoffMatrixA.get(i, c).compareTo(currentA) > 0) {
                         bestForA = false;
                         break;
                     }
@@ -65,8 +65,9 @@ public class NashEquilibriumSolver {
                 if (!bestForA) continue;
                 
                 boolean bestForB = true;
+                Real currentB = payoffMatrixB.get(r, c);
                 for (int j = 0; j < cols; j++) {
-                    if (payoffMatrixB[r][j] > payoffMatrixB[r][c]) {
+                    if (payoffMatrixB.get(r, j).compareTo(currentB) > 0) {
                         bestForB = false;
                         break;
                     }

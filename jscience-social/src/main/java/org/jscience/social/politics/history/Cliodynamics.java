@@ -49,7 +49,7 @@ public class Cliodynamics {
      * @return The Political Stress Index
      */
     public static Real calculatePoliticalStressIndex(Real mmp, Real emp, Real sfd) {
-        return mmp.times(emp).times(sfd);
+        return mmp.multiply(emp).multiply(sfd);
     }
     
     /**
@@ -65,6 +65,6 @@ public class Cliodynamics {
         if (realWage.equals(Real.ZERO)) return Real.of(100.0); // High stress
         
         // (Expected / Real) * Urbanization
-        return expectedWage.divide(realWage).times(urbanizationRate);
+        return expectedWage.divide(realWage).multiply(urbanizationRate);
     }
 }

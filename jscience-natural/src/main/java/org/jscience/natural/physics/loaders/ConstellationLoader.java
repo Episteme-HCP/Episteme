@@ -26,8 +26,6 @@ package org.jscience.natural.physics.loaders;
 import org.jscience.natural.physics.astronomy.Constellation;
 import org.jscience.natural.physics.astronomy.StarCatalog;
 import org.jscience.natural.physics.astronomy.Star;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.core.mathematics.sets.Reals;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

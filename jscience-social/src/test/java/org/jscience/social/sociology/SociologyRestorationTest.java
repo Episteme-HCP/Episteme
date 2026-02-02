@@ -53,8 +53,8 @@ public class SociologyRestorationTest {
         assertTrue(dinnerParty.getRoles().contains(guestRole));
 
         // Verify Persons have roles
-        assertTrue(alice.getStructuralRoles().contains(hostRole));
-        assertTrue(bob.getStructuralRoles().contains(guestRole));
+        assertTrue(alice.getRoles().contains(hostRole));
+        assertTrue(bob.getRoles().contains(guestRole));
 
         // Verify Linkage
         assertEquals(dinnerParty, hostRole.getSituation());

@@ -26,7 +26,7 @@ package org.jscience.natural.chemistry.computational.quantum;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.chemistry.Atom;
-import java.util.List;
+
 
 /**
  * Utility for calculating analytic molecular integrals over Gaussian basis functions.
@@ -94,7 +94,7 @@ public class AnalyticIntegrals {
 
     private static double distanceSquared(Vector<Real> v1, Vector<Real> v2) {
         double d2 = 0.0;
-        int dim = Math.min(v1.getDimension(), v2.getDimension());
+        int dim = Math.min(v1.dimension(), v2.dimension());
         for (int i=0; i<dim; i++) {
              double d = v1.get(i).doubleValue() - v2.get(i).doubleValue();
              d2 += d*d;

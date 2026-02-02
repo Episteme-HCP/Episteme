@@ -52,9 +52,9 @@ public class TokenomicsModel {
     public static Real calculateSwapOutput(Real reserveX, Real reserveY, Real dx, Real fee) {
         // dy = (y * dx * (1 - fee)) / (x + dx * (1 - fee))
         
-        Real amountInWithFee = dx.times(Real.of(1.0).minus(fee));
-        Real numerator = amountInWithFee.times(reserveY);
-        Real denominator = reserveX.plus(amountInWithFee);
+        Real amountInWithFee = dx.multiply(Real.of(1.0).subtract(fee));
+        Real numerator = amountInWithFee.multiply(reserveY);
+        Real denominator = reserveX.add(amountInWithFee);
         
         return numerator.divide(denominator);
     }
@@ -73,6 +73,6 @@ public class TokenomicsModel {
         // New price = y_new / x_new
         // Simplified approximation logic usually used.
         // For now, returning placeholder.
-        return dx.divide(reserveX.plus(dx));
+        return dx.divide(reserveX.add(dx));
     }
 }

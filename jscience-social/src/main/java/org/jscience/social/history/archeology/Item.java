@@ -33,6 +33,7 @@ import org.jscience.social.arts.Analysis;
 import org.jscience.social.arts.Restoration;
 import org.jscience.core.bibliography.Citation;
 import org.jscience.social.sociology.Human;
+import org.jscience.social.economics.Community;
 import org.jscience.social.economics.Organization;
 import org.jscience.social.economics.money.Money;
 import org.jscience.social.economics.resources.PhysicalObject;
@@ -90,7 +91,9 @@ public class Item extends PhysicalObject {
     public Item(String name, String description, Organization organization,
                 TimeCoordinate dating, Identification identification, Set<Human> discoverers,
                 TimeCoordinate discoveryDate, Place originalPosition) {
-        super(name, description, org.jscience.core.measure.Quantities.create(1, org.jscience.core.measure.Units.ONE), organization, Places.EARTH,
+        // PhysicalObject expects Community, so we cast Organization (which extends Community)
+        super(name, description, org.jscience.core.measure.Quantities.create(1, org.jscience.core.measure.Units.ONE), 
+            (Community) organization, Places.EARTH,
             dating != null ? dating : TimePoint.now(), identification, Money.usd(0));
 
         this.dating = Objects.requireNonNull(dating, "Dating cannot be null");

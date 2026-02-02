@@ -100,11 +100,11 @@ public abstract class SCFMethod {
         return totalEnergy;
     }
     
-    public Matrix getDensityMatrix() {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> getDensityMatrix() {
         return densityMatrix;
     }
     
-    public Matrix getFockMatrix() {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> getFockMatrix() {
         return fockMatrix;
     }
 }

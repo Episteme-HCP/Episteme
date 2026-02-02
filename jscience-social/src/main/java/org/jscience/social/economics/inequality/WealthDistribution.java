@@ -24,9 +24,8 @@
 package org.jscience.social.economics.inequality;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.social.economics.Money;
+import org.jscience.social.economics.money.Money;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

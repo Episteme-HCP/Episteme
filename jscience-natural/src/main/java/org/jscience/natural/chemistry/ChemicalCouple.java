@@ -23,7 +23,6 @@
 
 package org.jscience.natural.chemistry;
 
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.ElectricPotential;
 

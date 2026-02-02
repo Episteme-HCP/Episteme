@@ -25,7 +25,6 @@ package org.jscience.natural.earth.geophysics;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.measure.Quantities;
-import org.jscience.core.measure.quantity.Length;
 import org.jscience.core.measure.Units;
 
 /**

@@ -24,7 +24,6 @@
 package org.jscience.social.sociology.health;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.social.psychology.social.Group;
 
 /**
  * Implements epidemiological models such as SIR (Susceptible-Infectious-Recovered)
@@ -75,15 +74,15 @@ public class EpidemicModel {
         if (N.equals(Real.ZERO)) return new Real[]{S, I, R};
 
         // dS = -beta * S * I / N * dt
-        Real dS = beta.negate().times(S).times(I).divide(N).times(dt);
+        Real dS = beta.negate().multiply(S).multiply(I).divide(N).multiply(dt);
         
         // dR = gamma * I * dt
-        Real dR = gamma.times(I).times(dt);
+        Real dR = gamma.multiply(I).multiply(dt);
         
         // dI = -dS - dR (Conservation)
         // dI = (beta * S * I / N - gamma * I) * dt
-        Real dI = beta.times(S).times(I).divide(N).minus(gamma.times(I)).times(dt);
+        Real dI = beta.multiply(S).multiply(I).divide(N).subtract(gamma.multiply(I)).multiply(dt);
         
-        return new Real[] { S.plus(dS), I.plus(dI), R.plus(dR) };
+        return new Real[] { S.add(dS), I.add(dI), R.add(dR) };
     }
 }

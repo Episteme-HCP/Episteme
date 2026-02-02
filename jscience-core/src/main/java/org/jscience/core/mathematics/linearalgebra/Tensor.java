@@ -7,7 +7,6 @@ package org.jscience.core.mathematics.linearalgebra;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 /**
  * N-Dimensional Tensor Implementation.
@@ -96,7 +95,6 @@ public class Tensor {
         for (int i=0; i<other.getRank(); i++) if (i != dimB) newDims[p++] = other.indices[i];
         
         Tensor result = new Tensor(newDims);
-        int K = this.indices[dimA];
         
         // This is a naive loop implementation. 
         // Optimized libraries use Reshape + GEMM.

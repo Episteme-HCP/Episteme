@@ -27,7 +27,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.mathematics.linearalgebra.Vector;
 
 import java.util.ArrayList;
 import java.util.List;

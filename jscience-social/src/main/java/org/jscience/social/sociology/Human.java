@@ -81,8 +81,6 @@ public class Human extends Individual {
 
     // Historical & Biographical Data
     @Attribute
-    private final Set<HumanRole> humanRoles = new HashSet<>();
-    @Attribute
     private String title;
     @Attribute
     private String nationality;
@@ -168,9 +166,6 @@ public class Human extends Individual {
 
     public BigFiveProfile getPersonality() { return personality; }
     public void setPersonality(BigFiveProfile personality) { this.personality = personality; }
-
-    public Set<HumanRole> getHumanRoles() { return Collections.unmodifiableSet(humanRoles); }
-    public void addHumanRole(HumanRole role) { humanRoles.add(Objects.requireNonNull(role, "Role cannot be null")); }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

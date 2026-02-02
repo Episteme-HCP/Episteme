@@ -48,7 +48,6 @@ public class CollisionSimulation {
     }
 
     private final List<Body> bodies = new ArrayList<>();
-    private final CollisionBackend backend;
     private double gravity = 0.5;
     private double width = 800;
     private double height = 600;
@@ -58,7 +57,7 @@ public class CollisionSimulation {
     }
 
     public CollisionSimulation(CollisionBackend backend) {
-        this.backend = backend;
+        // backend unused in current implementation
     }
 
     public void addBody(Body body) {

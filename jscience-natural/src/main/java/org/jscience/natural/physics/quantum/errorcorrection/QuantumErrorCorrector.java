@@ -5,8 +5,6 @@
 
 package org.jscience.natural.physics.quantum.errorcorrection;
 
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
  * Quantum Error Correction (QEC) Simulator.
@@ -38,8 +36,16 @@ public class QuantumErrorCorrector {
                 // |1> -> |111>
                 // Uses 2 CNOTs
                 break;
+            case PHASE_FLIP_3:
+                // |+> -> |+++>
+                // |-> -> |--->
+                // Uses 2 CNOTs in Hadamard basis
+                break;
             case SHOR_9:
                 // Concatenates phase flip and bit flip
+                break;
+            case STEANE_7:
+                // CSS code based on [7,4,3] Hamming code
                 break;
         }
     }

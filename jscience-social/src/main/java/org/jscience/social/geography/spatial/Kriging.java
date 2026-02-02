@@ -67,7 +67,7 @@ public class Kriging {
         
         Real sum = Real.ZERO;
         for (Real val : knownValues) {
-            sum = sum.plus(val);
+            sum = sum.add(val);
         }
         
         return sum.divide(Real.of(knownValues.size()));

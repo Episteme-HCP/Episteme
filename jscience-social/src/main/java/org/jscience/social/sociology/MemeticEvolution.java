@@ -26,9 +26,7 @@ package org.jscience.social.sociology;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.social.philosophy.Belief;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,7 +57,7 @@ public class MemeticEvolution {
         Set<Belief> sourceBeliefs = source.getBeliefs();
         // Calculate similarity to scale transmission? keeping it simple for now.
         
-        for (Belief belief : sourceBeliefs) {
+        for (@SuppressWarnings("unused") Belief belief : sourceBeliefs) {
             if (Math.random() < transmissionRate) {
                 // In a real implementation, Culture would have a mutable 'addBelief' method exposed 
                 // or we would return a Mutation object.

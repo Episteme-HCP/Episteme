@@ -24,7 +24,7 @@
 package org.jscience.natural.physics.loaders;
 
 import org.jscience.core.io.AbstractResourceReader;
-import org.jscience.core.mathematics.linearalgebra.DenseVector;
+import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.measure.Quantities;
@@ -49,6 +49,41 @@ import java.util.List;
 public class StarCatalogLoader extends AbstractResourceReader<Star> {
 
     private static final String DEFAULT_CATALOG_PATH = "/org/jscience/physics/astronomy/stars.json";
+
+    @Override
+    public String getName() {
+        return "Star Catalog Loader";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Loads star catalogs (e.g. Hipparcos, Tycho)";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return "Parses standard astronomical star catalog formats to populate a stellar database.";
+    }
+
+    @Override
+    public String getCategory() {
+        return "Astronomy/Stars";
+    }
+    
+    @Override
+    public Class<Star> getResourceType() {
+        return Star.class;
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "Hipparcos Main", "Tycho-2" };
+    }
+
+    @Override
+    public String getResourcePath() {
+        return DEFAULT_CATALOG_PATH;
+    }
 
     @Override
     protected Star loadFromSource(String id) throws Exception {

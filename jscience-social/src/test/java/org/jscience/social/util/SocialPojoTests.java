@@ -35,7 +35,7 @@ import org.jscience.social.economics.money.Money;
 import org.jscience.social.economics.money.Currency;
 import org.jscience.natural.earth.Place;
 import org.jscience.core.mathematics.geometry.boundaries.Boundary;
-import org.jscience.social.sociology.Organization;
+import org.jscience.social.economics.Organization;
 
 public class SocialPojoTests {
 

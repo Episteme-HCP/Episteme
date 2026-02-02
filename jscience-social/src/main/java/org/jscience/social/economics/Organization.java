@@ -23,7 +23,8 @@
 
 package org.jscience.social.economics;
 
-import org.jscience.social.psychology.social.Group;
+import org.jscience.natural.biology.taxonomy.Species;
+import org.jscience.natural.earth.Place;
 import org.jscience.social.economics.money.Account;
 import org.jscience.social.economics.money.Money;
 import org.jscience.social.geography.BusinessPlace;
@@ -36,7 +37,6 @@ import org.jscience.core.util.persistence.Relation;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ import java.util.List;
  * @since 2.0
  */
 @Persistent
-public class Organization extends Group implements Property {
+public class Organization extends Community implements Property {
 
     private static final long serialVersionUID = 2L;
 
@@ -102,12 +102,8 @@ public class Organization extends Group implements Property {
      * Full Constructor.
      */
     public Organization(String id, String name, LocalDate foundedDate, OrganizationSector sector) {
-        super(name, null, null); // Group(name, species=null, place=null) - adjusting as needed based on Group ctor
-        // Or if Group(name) exists?
-        // Note: I need to verify Group constructor. Assuming 'super(name)' or similar.
-        // Let's assume Group requires Species. Organizations usually Human.
-        // super(new HumanSpecies(), null); 
-        // Reverting based on generic Group assumptions, might need fixing if Group ctor is strict.
+        super(new org.jscience.core.util.identity.UUIDIdentification(id), name, new Species("Organization", "Legal Entity"), null); 
+        // Providing default species to satisfy Population contract
         
         this.foundedDate = (foundedDate != null) ? foundedDate : LocalDate.now();
         this.sector = (sector != null) ? sector : OrganizationSector.OTHER;
@@ -126,6 +122,33 @@ public class Organization extends Group implements Property {
     public Organization(String name, OrganizationSector sector) {
         this(UUID.randomUUID().toString(), name, LocalDate.now(), sector);
         // Note: UUID logic might need to be compliant with Group/SimulationEntity if Group uses String ID.
+    }
+
+    /**
+     * Constructor for Bank compatibility (modern API).
+     */
+    public Organization(String name, Place place, Money capital) {
+        this(UUID.randomUUID().toString(), name, LocalDate.now(), OrganizationSector.OTHER);
+        this.place = (BusinessPlace) (place instanceof BusinessPlace ? place : new BusinessPlace(place.getName(), place.getCenter())); 
+        // Cast or wrap place. Ideally BusinessPlace should be used.
+        this.capital = capital != null ? capital : Money.usd(0);
+        this.value = this.capital;
+    }
+
+    /**
+     * Constructor for Bank compatibility (detailed).
+     */
+    public Organization(String name, Identification id, Set<EconomicAgent> owners, Place place, Set<Account> accounts) {
+        super(id, name, new Species("Organization", "Legal Entity"), place);
+        this.foundedDate = LocalDate.now();
+        this.sector = OrganizationSector.FINANCIAL; // Defaulting for Bank usage context
+        this.owners = owners != null ? owners : new HashSet<>();
+        this.place = (place instanceof BusinessPlace) ? (BusinessPlace) place : (place != null ? new BusinessPlace(place.getName(), place.getCenter()) : null);
+        this.accounts = accounts != null ? accounts : new HashSet<>();
+        this.capital = Money.usd(0);
+        this.value = Money.usd(0);
+        this.organigram = new Organigram(name);
+        this.missionStatement = "";
     }
     
     // Legacy/native methods
@@ -152,6 +175,10 @@ public class Organization extends Group implements Property {
 
     public void addDepartment(Organization dept) { departments.add(dept); }
     public List<Organization> getDepartments() { return Collections.unmodifiableList(departments); }
+
+    public Organigram getOrganigram() {
+        return organigram;
+    }
 
     @Override
     public String toString() {

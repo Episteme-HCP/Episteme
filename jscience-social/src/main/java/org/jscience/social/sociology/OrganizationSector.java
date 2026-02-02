@@ -45,6 +45,7 @@ public final class OrganizationSector extends ExtensibleEnum {
     public static final OrganizationSector GOVERNMENT = new OrganizationSector("GOVERNMENT", true);
     public static final OrganizationSector ACADEMIC = new OrganizationSector("ACADEMIC", true);
     public static final OrganizationSector MILITARY = new OrganizationSector("MILITARY", true);
+    public static final OrganizationSector FINANCIAL = new OrganizationSector("FINANCIAL", true);
     
     public static final OrganizationSector OTHER = new OrganizationSector("OTHER", true);
     public static final OrganizationSector UNKNOWN = new OrganizationSector("UNKNOWN", true);
@@ -58,6 +59,7 @@ public final class OrganizationSector extends ExtensibleEnum {
         EnumRegistry.register(OrganizationSector.class, GOVERNMENT);
         EnumRegistry.register(OrganizationSector.class, ACADEMIC);
         EnumRegistry.register(OrganizationSector.class, MILITARY);
+        EnumRegistry.register(OrganizationSector.class, FINANCIAL);
         EnumRegistry.register(OrganizationSector.class, OTHER);
         EnumRegistry.register(OrganizationSector.class, UNKNOWN);
     }

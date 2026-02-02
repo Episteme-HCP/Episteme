@@ -19,8 +19,8 @@ public class HumanRoleTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        assertNotNull(HumanRole.class);
+        // Ensure class is reachable - testing Role class
+        assertNotNull(Role.class);
     }
 }
 

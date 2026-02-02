@@ -30,6 +30,7 @@ import org.jscience.social.economics.Organization;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -56,6 +57,15 @@ public class BusinessPlace extends OwnedPlace {
         this.address = Objects.requireNonNull(address, "Address cannot be null");
         this.setType(PlaceType.BUILDING);
         this.address.setPlace(this);
+    }
+
+    /** Constructor for direct coordinate usage. */
+    public BusinessPlace(String name, org.jscience.natural.earth.coordinates.GeodeticCoordinate coords) {
+        super(name, new HashSet<>());
+        this.address = new Address();
+        this.address.setPlace(this);
+        this.setCenter(coords);
+        this.setType(PlaceType.BUILDING);
     }
 
     public Address getAddress() {

@@ -23,7 +23,7 @@
 
 package org.jscience.social.economics.models;
 
-import java.util.Map;
+import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
  * Models population dynamics under evolutionary game theory (Replicator Dynamics).
@@ -45,7 +45,7 @@ public class EvolutionaryGameTheory {
      * @param averageFitness Average fitness of the population (phi).
      * @return The rate of change.
      */
-    public static double replicatorDynamics(double frequency, double fitness, double averageFitness) {
-        return frequency * (fitness - averageFitness);
+    public static Real replicatorDynamics(Real frequency, Real fitness, Real averageFitness) {
+        return frequency.multiply(fitness.subtract(averageFitness));
     }
 }

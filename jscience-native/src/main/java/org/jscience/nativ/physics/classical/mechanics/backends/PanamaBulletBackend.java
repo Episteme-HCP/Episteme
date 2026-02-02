@@ -62,6 +62,11 @@ public class PanamaBulletBackend implements CollisionBackend {
     }
 
     @Override
+    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+        return null; // Bullet doesn't use contexts in this simple wrapper
+    }
+
+    @Override
     public int detectSphereCollisions(DoubleBuffer positions, DoubleBuffer radii, int n, IntBuffer collisions) {
         if (!AVAILABLE) throw new UnsupportedOperationException("Bullet native library not found");
         try {

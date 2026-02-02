@@ -23,12 +23,8 @@
 
 package org.jscience.natural.physics.astronomy;
 
-import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.measure.Quantities;
-import org.jscience.core.measure.quantity.Length;
-import org.jscience.core.measure.quantity.Mass;
-import org.jscience.core.measure.quantity.Time;
 import org.jscience.core.measure.Units;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.sets.Reals;
@@ -45,26 +41,40 @@ import java.util.List;
 public class ArtificialSatellite extends CelestialBody {
 
     // TLE Data
+    @SuppressWarnings("unused")
     private String line1;
+    @SuppressWarnings("unused")
     private String line2;
+    @SuppressWarnings("unused")
     private int satelliteNumber;
+    @SuppressWarnings("unused")
     private char classification;
+    @SuppressWarnings("unused")
     private int launchYear;
+    @SuppressWarnings("unused")
     private int launchNumber;
+    @SuppressWarnings("unused")
     private String launchPiece;
+    @SuppressWarnings("unused")
     private int epochYear;
+    @SuppressWarnings("unused")
     private double epochDay;
+    @SuppressWarnings("unused")
     private double firstDerivativeMeanMotion;
+    @SuppressWarnings("unused")
     private double secondDerivativeMeanMotion;
     private double bStar;
+    @SuppressWarnings("unused")
     private int ephemerisType;
+    @SuppressWarnings("unused")
     private int elementNumber;
     private double inclination;
-    private double rightAscension;
+    private double raan;
     private double eccentricity;
-    private double perigeeArgument;
+    private double argumentOfPerigee;
     private double meanAnomaly;
     private double meanMotion;
+    @SuppressWarnings("unused")
     private int revolutionNumber;
 
     // SGP4 Constants (WGS-72 / WGS-84)
@@ -86,7 +96,6 @@ public class ArtificialSatellite extends CelestialBody {
     private static final double X3PIO2 = 4.71238898;
 
     // SGP4 Variables
-    private boolean isDeepSpace;
     private int isimp;
     private double c1, c2, c3, c4, c5, d2, d3, d4, t3cof, t4cof, t5cof, eta, delmo;
     private double sinio, cosio, sinmo, omgcof, xmcof, xnodcf, t2cof, xlcof, aycof, x7thm1;
@@ -144,9 +153,9 @@ public class ArtificialSatellite extends CelestialBody {
 
             // Line 2
             inclination = Double.parseDouble(l2.substring(8, 16).trim());
-            rightAscension = Double.parseDouble(l2.substring(17, 25).trim());
+            raan = Double.parseDouble(l2.substring(17, 25).trim());
             eccentricity = Double.parseDouble("0." + l2.substring(26, 33).trim());
-            perigeeArgument = Double.parseDouble(l2.substring(34, 42).trim());
+            argumentOfPerigee = Double.parseDouble(l2.substring(34, 42).trim());
             meanAnomaly = Double.parseDouble(l2.substring(43, 51).trim());
             meanMotion = Double.parseDouble(l2.substring(52, 63).trim());
             
@@ -156,8 +165,8 @@ public class ArtificialSatellite extends CelestialBody {
 
             // Convert units
             inclination *= DE2RA;
-            rightAscension *= DE2RA;
-            perigeeArgument *= DE2RA;
+            raan *= DE2RA;
+            argumentOfPerigee *= DE2RA;
             meanAnomaly *= DE2RA;
             
             // Mean Motion: revs/day -> rad/min
@@ -228,7 +237,7 @@ public class ArtificialSatellite extends CelestialBody {
             (eccentricity * (0.5 + (2.0 * etasq)))) -
             ((2.0 * CK2 * tsi) / (aodp * psisq) * ((-3.0 * x3thm1 * (1.0 -
             (2.0 * eeta) + (etasq * (1.5 - (0.5 * eeta))))) +
-            (0.75 * x1mth2 * ((2.0 * etasq) - (eeta * (1.0 + etasq))) * Math.cos(2.0 * perigeeArgument)))));
+            (0.75 * x1mth2 * ((2.0 * etasq) - (eeta * (1.0 + etasq))) * Math.cos(2.0 * argumentOfPerigee)))));
             
         c5 = 2.0 * coef1 * aodp * beta02 * (1.0 + (2.75 * (etasq + eeta)) + (eeta * etasq));
         
@@ -249,7 +258,7 @@ public class ArtificialSatellite extends CelestialBody {
         xhdot1 = -temp1 * cosio;
         xnodot = xhdot1 + (((0.5 * temp2 * (4.0 - (19.0 * theta2))) + (2.0 * temp3 * (3.0 - (7.0 * theta2)))) * cosio);
         
-        omgcof = bStar * c3 * Math.cos(perigeeArgument);
+        omgcof = bStar * c3 * Math.cos(argumentOfPerigee);
         xmcof = (-TOTHRD * coef * bStar * AE) / eeta;
         xnodcf = 3.5 * beta02 * xhdot1 * c1;
         t2cof = 1.5 * c1;
@@ -283,8 +292,8 @@ public class ArtificialSatellite extends CelestialBody {
 
         // Update for secular gravity and atmospheric drag
         double xmdf = meanAnomaly + (xmdot * tSince);
-        double omgadf = perigeeArgument + (omgdot * tSince);
-        double xnoddf = rightAscension + (xnodot * tSince);
+        double omgadf = argumentOfPerigee + (omgdot * tSince);
+        double xnoddf = raan + (xnodot * tSince);
         double omega = omgadf;
         double xmp = xmdf;
         double tsq = tSince * tSince;
@@ -338,12 +347,8 @@ public class ArtificialSatellite extends CelestialBody {
         }
 
         // Short period preliminary quantities
-        double ecose = temp2 * cosepw + ayn; // approximate? No, wait:
-        // Re-evaluating based on SGP4 logic
-        double epw = temp2;
-        double ecose_val = axn * cosepw + ayn * sinepw; // Not quite, checking generic SGP4
-        // ecose = axn*cos(epw) + ayn*sin(epw) is not standard.
-        // Let's stick to V1 logic:
+        
+        // V1:
         
         // V1:
         // CAPU = MathUtils.FMOD2P(XLT - XNODE);

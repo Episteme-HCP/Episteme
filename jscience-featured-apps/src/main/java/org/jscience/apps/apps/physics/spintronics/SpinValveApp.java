@@ -59,7 +59,6 @@ public class SpinValveApp extends FeaturedAppBase {
     private Label resistanceValueLabel;
     private Label gmrRatioLabel;
     private Label sttLabel;
-    @SuppressWarnings("unused") // Reserved for future status display
     private Label statusLabelInfo;
 
     private Spintronic3DRenderer renderer3D;

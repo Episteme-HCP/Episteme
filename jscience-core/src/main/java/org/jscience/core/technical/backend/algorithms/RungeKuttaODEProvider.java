@@ -25,7 +25,6 @@ package org.jscience.core.technical.backend.algorithms;
 
 import org.jscience.core.mathematics.analysis.Function;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.algorithms.ODEProvider;
 
 /**
  * Default implementation of ODEProvider using classical Runge-Kutta 4.

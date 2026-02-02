@@ -54,9 +54,6 @@ public class Group extends Population {
 
     private static final long serialVersionUID = 2L;
 
-    /** The simulation engine driving this group's temporal evolution. */
-    protected org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine;
-
     /** Individuals designated as leaders or rulers within the group. */
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private Set<Individual> leaders;
@@ -77,8 +74,7 @@ public class Group extends Population {
     }
 
     public Group(String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()), name, species, territory);
-        this.engine = engine;
+        super(new UUIDIdentification(UUID.randomUUID().toString()), name, species, territory, engine);
         this.leaders = new HashSet<>();
         this.relations = new HashMap<>();
     }
@@ -91,8 +87,7 @@ public class Group extends Population {
     }
 
     public Group(Identification id, String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
-        super(id, name, species, territory);
-        this.engine = engine;
+        super(id, name, species, territory, engine);
         this.leaders = new HashSet<>();
         this.relations = new HashMap<>();
     }
@@ -160,18 +155,9 @@ public class Group extends Population {
         return Real.ZERO;
     }
 
-    public org.jscience.natural.engineering.eventdriven.EventDrivenEngine getEngine() {
-        return engine;
-    }
-
-    public void setEngine(org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
-        this.engine = engine;
-    }
     
     // Placeholder for Event processing if Group is treated as event-driven
-    public void processEvent(org.jscience.natural.engineering.eventdriven.Event event) {
-        // Default implementation: delegate or ignore
-    }
+    // Inherited from Population now
 }
 
 

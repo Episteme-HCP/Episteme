@@ -62,7 +62,11 @@ public class Community extends Group implements TaskProcessor {
     }
 
     public Community(Identification id, Species species, Place place) {
-        super(id, species, place);
+        this(id, species.getCommonName() + " Community", species, place);
+    }
+
+    public Community(Identification id, String name, Species species, Place place) {
+        super(id, name, species, place);
         this.resources = new HashSet<>();
     }
 
