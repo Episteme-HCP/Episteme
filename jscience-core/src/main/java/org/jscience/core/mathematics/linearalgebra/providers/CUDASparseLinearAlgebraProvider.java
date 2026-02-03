@@ -43,7 +43,9 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+import org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider;
+
+public class CUDASparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
 
     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
 

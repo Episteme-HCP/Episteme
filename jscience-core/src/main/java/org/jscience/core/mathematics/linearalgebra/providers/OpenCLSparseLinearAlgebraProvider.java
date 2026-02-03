@@ -47,7 +47,9 @@ import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+import org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider;
+
+public class OpenCLSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
 
     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
     private static final OpenCLBackend backend = new OpenCLBackend();

@@ -37,7 +37,14 @@ public final class AlgorithmManager {
         return (P) BEST_PROVIDERS.computeIfAbsent(providerClass, k -> findBestProvider((Class<P>) k));
     }
 
-    private static <P extends AlgorithmProvider> P findBestProvider(Class<P> providerClass) {
+    /**
+     * Finds and returns all available providers for the given interface, sorted by priority.
+     * 
+     * @param <P> the provider type
+     * @param providerClass the interface class of the provider
+     * @return list of available providers (modifiable copy)
+     */
+    public static <P extends AlgorithmProvider> List<P> getProviders(Class<P> providerClass) {
         ServiceLoader<P> loader = ServiceLoader.load(providerClass);
         List<P> available = new ArrayList<>();
         
@@ -46,13 +53,17 @@ public final class AlgorithmManager {
                 available.add(provider);
             }
         }
+        
+        available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
+        return available;
+    }
+
+    private static <P extends AlgorithmProvider> P findBestProvider(Class<P> providerClass) {
+        List<P> available = getProviders(providerClass);
 
         if (available.isEmpty()) {
-            throw new NoSuchElementException("No available provider found for: " + providerClass.getName());
+            throw new NoSuchElementException("No available provider found for: " + providerClass.getSimpleName());
         }
-
-        // Sort by priority descending
-        available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
         
         P best = available.get(0);
         LOGGER.info("Selected best provider " + best.getName() + " for " + providerClass.getSimpleName() + " (Priority: " + best.getPriority() + ")");

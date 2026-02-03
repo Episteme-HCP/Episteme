@@ -42,7 +42,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     @Override
     public int getPriority() {
-        return 40;
+        return 0; // Default baseline priority
     }
 
     @Override

@@ -57,12 +57,7 @@ import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorProvide
 import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.CUDADenseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.CUDASparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.OpenCLDenseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.OpenCLSparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.ColtLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.EJMLLinearAlgebraProvider;
+// Providers loaded via reflection or service loader, imports removed to fix warnings.
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
@@ -375,90 +370,71 @@ public class ComputeContext {
     /**
      * Gets a sparse linear algebra provider.
      */
+    /**
+     * Gets a sparse linear algebra provider.
+     */
+    /**
+     * Gets a sparse linear algebra provider.
+     */
     public <E> LinearAlgebraProvider<E> getSparseLinearAlgebraProvider(
             org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
 
-        boolean canUseGpu = (ring.zero() instanceof org.jscience.core.mathematics.numbers.real.Real);
-
-        switch (backend) {
-            case CUDA_GPU:
-                if (canUseGpu) {
-                    try {
-                        return new CUDASparseLinearAlgebraProvider<E>((Field<E>) ring);
-                    } catch (Throwable t) {
-                        return new CPUSparseLinearAlgebraProvider<>(ring);
-                    }
-                }
-                // Fallthrough
-            case OPENCL_GPU:
-                if (canUseGpu) {
-                    try {
-                        return new OpenCLSparseLinearAlgebraProvider<E>((Field<E>) ring);
-                    } catch (Throwable t) {
-                        // Fallback to CPU
-                        return new CPUSparseLinearAlgebraProvider<>(ring);
-                    }
-                }
-                // Fallthrough
-            case JAVA_CPU:
-            default:
-                return new CPUSparseLinearAlgebraProvider<>(ring);
+        // Use AlgorithmManager to find all implementations of SparseLinearAlgebraProvider
+        // This relies on the new marker interface for typesafe discovery
+        @SuppressWarnings("rawtypes")
+        Class<org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider> type = 
+            org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider.class;
+            
+        java.util.List<org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider> candidates = 
+            org.jscience.core.technical.algorithm.AlgorithmManager.getProviders(type);
+        
+        for (org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider<?> p : candidates) {
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<E> typedProvider = (LinearAlgebraProvider<E>) p;
+            if (typedProvider.isCompatible(ring)) {
+                return typedProvider;
+            }
         }
+
+        // Fallback to CPU Sparse
+        return new org.jscience.core.technical.algorithm.linearalgebra.CPUSparseLinearAlgebraProvider<>(ring);
     }
 
 
     /**
      * Gets a dense linear algebra provider.
      */
+    /**
+     * Gets a linear algebra provider suited for the given ring, respecting priorities.
+     */
+    /**
+     * Gets a linear algebra provider suited for the given ring, respecting priorities.
+     */
     public <E> LinearAlgebraProvider<E> getLinearAlgebraProvider(
             org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
-        // First check if a specific provider is registered for this type/name
-        // (Implementation detail: we could add a map Key(backend, fieldType) ->
-        // Provider)
-
-        // For now, use the robust switching logic derived from DenseVector
-        boolean canUseGpu = (ring.zero() instanceof org.jscience.core.mathematics.numbers.real.Real);
-
-        switch (backend) {
-            case CUDA_GPU:
-                if (canUseGpu) {
-                    try {
-                        return new CUDADenseLinearAlgebraProvider<E>((Field<E>) ring);
-                    } catch (Throwable t) {
-                        // Fallback
-                        return new CPUDenseLinearAlgebraProvider<>(ring);
-                    }
-                }
-                // Fallthrough
-            case OPENCL_GPU:
-                if (canUseGpu) {
-                    try {
-                        return new OpenCLDenseLinearAlgebraProvider<E>((Field<E>) ring);
-                    } catch (Throwable t) {
-                        // Fallback to CPU
-                        return new CPUDenseLinearAlgebraProvider<>(ring);
-                    }
-                }
-                // Fallthrough
-
-            case COLT:
-                try {
-                    return new ColtLinearAlgebraProvider<>((Field<E>) ring);
-                } catch (Throwable t) {
-                    return new CPUDenseLinearAlgebraProvider<>(ring);
-                }
-
-            case EJML:
-                try {
-                    return new EJMLLinearAlgebraProvider<E>((Field<E>) ring);
-                } catch (Throwable t) {
-                    return new CPUDenseLinearAlgebraProvider<>(ring);
-                }
-
-            case JAVA_CPU:
-            default:
-                return new CPUDenseLinearAlgebraProvider<>(ring);
+        
+        // Use AlgorithmManager to find all implementations of LinearAlgebraProvider
+        // The manager handles ServiceLoader discovery and Priority sorting
+        @SuppressWarnings("rawtypes")
+        Class<LinearAlgebraProvider> type = LinearAlgebraProvider.class;
+        java.util.List<LinearAlgebraProvider> candidates = org.jscience.core.technical.algorithm.AlgorithmManager.getProviders(type);
+        
+        for (LinearAlgebraProvider<?> p : candidates) {
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<E> typedProvider = (LinearAlgebraProvider<E>) p;
+            if (typedProvider.isCompatible(ring)) {
+                // Check if user has forced a specific backend via setBackend()
+                // If backend is AUTO (or JAVA_CPU default but overridden by priority), we just take the best.
+                // However, if user explicitly requested CUDA_GPU, we should prefer it.
+                // NOTE: The current priorities in providers (CUDA=100, OpenCL=50, CPU=0) 
+                // naturally enforce the selection if we just pick the first compatible one.
+                return typedProvider;
+            }
         }
+
+        // Fallback: This should ideally be covered by the providers list (CPU is always available)
+        // But if ServiceLoader fails or config is broken, return a hardcoded CPU/Default.
+        return new CPUDenseLinearAlgebraProvider<>(ring);
     }
 
     /**

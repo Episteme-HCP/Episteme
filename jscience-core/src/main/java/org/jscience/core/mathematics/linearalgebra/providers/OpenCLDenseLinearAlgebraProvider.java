@@ -88,7 +88,17 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
     @Override
     public int getPriority() {
-        return 10;
+        // Medium priority: preferred over CPU but less than CUDA
+        return isAvailable() ? 50 : Integer.MIN_VALUE;
+    }
+
+    private java.util.Map<String, Object> config = new java.util.HashMap<>();
+
+    @Override
+    public void configure(java.util.Map<String, Object> properties) {
+        if (properties != null) {
+            this.config.putAll(properties);
+        }
     }
 
     private static final String KERNEL_SRC = "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +

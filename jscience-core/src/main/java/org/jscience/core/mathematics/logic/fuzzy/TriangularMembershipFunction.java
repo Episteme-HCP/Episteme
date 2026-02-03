@@ -128,6 +128,23 @@ public class TriangularMembershipFunction<T extends Number> implements Membershi
      * @param input DOCUMENT ME!
      * @return DOCUMENT ME!
      */
+    /**
+     * DOCUMENT ME!
+     *
+     * @param input DOCUMENT ME!
+     * @return DOCUMENT ME!
+     */
+    public double fuzzify(T input) {
+        if (input == null) return 0.0;
+        return fuzzify(input.doubleValue());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param input DOCUMENT ME!
+     * @return DOCUMENT ME!
+     */
     public double fuzzify(double input) {
         // Check if input value is in range, if not, return 0.
         if ((input < mLeftPoint) || (input > mRightPoint)) {

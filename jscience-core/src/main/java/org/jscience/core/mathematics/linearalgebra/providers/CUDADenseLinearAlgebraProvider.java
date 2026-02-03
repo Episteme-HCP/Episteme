@@ -86,7 +86,17 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
 
     @Override
     public int getPriority() {
-        return isAvailable() ? 100 : 0;
+        // High priority if available, otherwise effectively disabled for selection
+        return isAvailable() ? 100 : Integer.MIN_VALUE;
+    }
+
+    private java.util.Map<String, Object> config = new java.util.HashMap<>();
+
+    @Override
+    public void configure(java.util.Map<String, Object> properties) {
+        if (properties != null) {
+            this.config.putAll(properties);
+        }
     }
 
     // Delegate to CPU for now, as full JCuda implementation requires specific

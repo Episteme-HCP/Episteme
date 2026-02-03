@@ -25,6 +25,22 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
         return true; 
     }
 
+    /**
+     * Priority of this provider (higher means more preferred).
+     * Used for automatic backend selection and fallbacks.
+     */
+    default int getPriority() {
+        return 0;
+    }
+
+    /**
+     * Configure the provider with context parameters.
+     * @param properties configuration map
+     */
+    default void configure(java.util.Map<String, Object> properties) {
+        // No-op by default
+    }
+
     // --- Vector Operations ---
     Vector<E> add(Vector<E> a, Vector<E> b);
     Vector<E> subtract(Vector<E> a, Vector<E> b);

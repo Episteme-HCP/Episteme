@@ -89,5 +89,10 @@ public class AgentVerification {
 
         @Override
         public void setEnvironment(Environment environment) { this.environment = environment; }
+
+        @Override
+        public void interact(Agent other) {
+            // No interaction for simple agent verification
+        }
     }
 }
