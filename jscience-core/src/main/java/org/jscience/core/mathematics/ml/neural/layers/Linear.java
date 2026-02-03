@@ -11,6 +11,7 @@ import java.util.Random;
  * Fully connected (linear) layer.
  */
 public class Linear<T> implements Layer<T> {
+    private static final long serialVersionUID = 1L;
     private final GraphNode<T> weights;
     private final GraphNode<T> bias;
 

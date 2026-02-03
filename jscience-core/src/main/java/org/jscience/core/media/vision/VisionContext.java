@@ -53,7 +53,7 @@ public class VisionContext {
 
     private static final ThreadLocal<VisionContext> CURRENT = ThreadLocal.withInitial(() -> {
         VisionContext ctx = new VisionContext();
-        ctx.registerProvider(Backend.JAVA_AWT, new JavaAWTVisionProvider());
+        ctx.registerProvider(Backend.JAVA_AWT, new org.jscience.core.media.vision.providers.JavaAWTVisionAlgorithmProvider());
         return ctx;
     });
     

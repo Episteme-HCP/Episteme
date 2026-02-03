@@ -23,9 +23,8 @@
 
 package org.jscience.core.media.audio;
 
-import org.jscience.core.mathematics.analysis.transform.SignalFFT;
-import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.*;
+import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
  * Convenience wrapper for frequency analysis using SignalFFT.
@@ -40,11 +39,11 @@ public final class AudioSpectrogram {
 
     /**
      * Calculates the magnitude spectrum of a buffer.
-     * Uses the optimized SignalFFT from jscience-core.
+     * Uses the best available {@link org.jscience.core.technical.algorithm.FFTProvider}.
      */
     public static double[] calculateSpectrum(double[] buffer, WindowFunction window) {
         int n = buffer.length;
-        // SignalFFT requires power of 2
+        // FFT requires power of 2
         if ((n & (n - 1)) != 0) {
             int powerOfTwo = 1 << (31 - Integer.numberOfLeadingZeros(n));
             double[] truncated = new double[powerOfTwo];
@@ -55,26 +54,31 @@ public final class AudioSpectrogram {
         
         double[] real = buffer.clone();
         applyWindow(real, window);
-        
-        // Convert to Real[] for SignalFFT if needed, but we can use double[] if 
-        // SignalFFT had a primitive version. Looking at SignalFFT, it uses Real[].
-        // Let's check for a primitive version or use a helper.
-        Real[] rReal = new Real[n];
-        Real[] rImag = new Real[n];
-        for (int i = 0; i < n; i++) {
-            rReal[i] = Real.of(real[i]);
-            rImag[i] = Real.ZERO;
-        }
+        double[] imag = new double[n]; // Init to 0
 
-        SignalFFT.fft(rReal, rImag);
+        org.jscience.core.technical.algorithm.FFTProvider provider = findProvider();
+        double[][] result = provider.transform(real, imag);
         
+        double[] rReal = result[0];
+        double[] rImag = result[1];
+        
+        // Calculate magnitude
         double[] magnitude = new double[n / 2];
         for (int i = 0; i < n / 2; i++) {
-            magnitude[i] = Math.sqrt(Math.pow(rReal[i].doubleValue(), 2) + 
-                                     Math.pow(rImag[i].doubleValue(), 2));
+             // |z| = sqrt(a^2 + b^2)
+            magnitude[i] = Math.sqrt(rReal[i] * rReal[i] + rImag[i] * rImag[i]);
         }
         
         return magnitude;
+    }
+
+    private static org.jscience.core.technical.algorithm.FFTProvider findProvider() {
+        ServiceLoader<org.jscience.core.technical.algorithm.FFTProvider> loader = ServiceLoader.load(org.jscience.core.technical.algorithm.FFTProvider.class);
+        for (org.jscience.core.technical.algorithm.FFTProvider p : loader) {
+            return p;
+        }
+        // Fallback
+        return new org.jscience.core.technical.algorithm.fft.MulticoreFFTProvider();
     }
 
     private static void applyWindow(double[] data, WindowFunction type) {

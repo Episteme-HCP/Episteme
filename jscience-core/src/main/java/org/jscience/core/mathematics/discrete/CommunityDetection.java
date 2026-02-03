@@ -21,40 +21,41 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.computing.ai.generative;
+package org.jscience.core.mathematics.discrete;
 
-import java.util.concurrent.CompletableFuture;
+import org.jscience.core.mathematics.discrete.Graph;
+import org.jscience.core.technical.algorithm.GraphAlgorithmProvider;
+import org.jscience.core.technical.algorithm.graph.MulticoreGraphAlgorithmProvider;
+import java.util.*;
 
 /**
- * Interface representing a Generative AI model (e.g., Large Language Model).
- * <p>
- * Provides methods for generating text and embeddings.
- * </p>
- *
+ * Provides algorithms for detecting communities in graphs.
+ * Refactored to use the technical backend provider pattern.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
-public interface GenerativeModel {
+public class CommunityDetection {
 
     /**
-     * Generates a response for the given prompt.
+     * Detects communities using the best available provider.
      * 
-     * @param prompt the input text.
-     * @return a future containing the generated text.
+     * @param <V> the vertex type
+     * @param graph the graph to analyze
+     * @param maxIterations maximum number of iterations
+     * @return a map from vertex to community ID
      */
-    CompletableFuture<String> generate(String prompt);
+    public static <V> Map<V, Integer> detectCommunities(Graph<V> graph, int maxIterations) {
+        GraphAlgorithmProvider provider = findProvider();
+        return provider.detectCommunities(graph, maxIterations);
+    }
 
-    /**
-     * Generates vector embeddings for the given text.
-     * 
-     * @param text the input text.
-     * @return a future containing the embedding vector (as float array).
-     */
-    CompletableFuture<float[]> embed(String text);
-    
-    /**
-     * Returns the name of the model being used (e.g., "gpt-4", "llama3").
-     */
-    String getModelName();
+    private static GraphAlgorithmProvider findProvider() {
+        ServiceLoader<GraphAlgorithmProvider> loader = ServiceLoader.load(GraphAlgorithmProvider.class);
+        for (GraphAlgorithmProvider p : loader) {
+            return p;
+        }
+        return new MulticoreGraphAlgorithmProvider();
+    }
 }

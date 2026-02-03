@@ -8,7 +8,7 @@ package org.jscience.social;
 import org.jscience.core.mathematics.ml.BayesianBeliefNetwork;
 import org.jscience.core.mathematics.discrete.Graph;
 import org.jscience.core.mathematics.discrete.generators.SmallWorldGenerator;
-import org.jscience.core.mathematics.discrete.algorithms.CommunityDetection;
+import org.jscience.core.mathematics.discrete.CommunityDetection;
 import org.jscience.core.mathematics.optimization.GeneticOptimizer;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.integers.Natural;

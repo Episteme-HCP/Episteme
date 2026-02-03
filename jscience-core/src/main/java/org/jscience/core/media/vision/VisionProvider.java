@@ -34,7 +34,9 @@ package org.jscience.core.media.vision;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public interface VisionProvider<T> {
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+
+public interface VisionProvider<T> extends AlgorithmProvider {
 
     /**
      * Applies a generic operation to an image.

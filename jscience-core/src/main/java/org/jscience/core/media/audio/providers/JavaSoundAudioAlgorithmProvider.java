@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.core.media.audio.backends;
+package org.jscience.core.media.audio.providers;
 
 import org.jscience.core.media.audio.AudioBuffer;
 import org.jscience.core.media.audio.AudioOp;
@@ -30,7 +30,7 @@ import org.jscience.core.media.audio.AudioProvider;
 /**
  * Standard AudioProvider using JavaSound.
  */
-public class JavaSoundAudioProvider implements AudioProvider<AudioBuffer> {
+public class JavaSoundAudioAlgorithmProvider implements AudioProvider<AudioBuffer> {
 
     @Override
     public AudioBuffer apply(AudioBuffer audio, AudioOp<AudioBuffer> op) {
@@ -42,6 +42,16 @@ public class JavaSoundAudioProvider implements AudioProvider<AudioBuffer> {
         if (data instanceof double[]) {
             return new AudioBuffer((double[]) data, channels, sampleRate);
         }
-        throw new IllegalArgumentException("Unsupported data type for JavaSoundAudioProvider");
+        throw new IllegalArgumentException("Unsupported data type for JavaSoundAudioAlgorithmProvider");
+    }
+
+    @Override
+    public String getName() {
+        return "JavaSound Audio Algorithm Provider";
+    }
+
+    @Override
+    public int getPriority() {
+        return 10;
     }
 }

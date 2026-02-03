@@ -20,21 +20,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jscience.core.mathematics.ml.neural.serialization;
+package org.jscience.core.mathematics.loaders;
 
+import org.jscience.core.io.AbstractResourceReader;
+import org.jscience.core.mathematics.ml.neural.Layer;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.jscience.core.mathematics.ml.neural.Layer;
+import java.nio.file.Paths;
 
 /**
- * Utility for saving and loading Neural Network models.
+ * Loader/Serializer for Neural Network models using Java Binary Serialization.
+ * <p>
+ * Implements {@link AbstractResourceReader} for standardized access.
+ * Formerly ModelSerializer.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class ModelSerializer {
+public class BinaryModelLoader extends AbstractResourceReader<Layer<?>> {
+
+    private static final BinaryModelLoader INSTANCE = new BinaryModelLoader();
+
+    public static BinaryModelLoader getInstance() {
+        return INSTANCE;
+    }
+
+    @Override
+    protected Layer<?> loadFromSource(String id) throws Exception {
+        Path path = Paths.get(id);
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
+            return (Layer<?>) ois.readObject();
+        }
+    }
 
     /**
      * Saves a layer (or model) to a binary file.
@@ -42,22 +62,44 @@ public class ModelSerializer {
      * @param path the destination path.
      * @throws IOException if an I/O error occurs.
      */
-    public static void saveModel(Layer<?> model, Path path) throws IOException {
+    public void save(Layer<?> model, Path path) throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
             oos.writeObject(model);
         }
     }
 
-    /**
-     * Loads a layer (or model) from a binary file.
-     * @param path the source path.
-     * @return the loaded model.
-     * @throws IOException if an I/O error occurs.
-     * @throws ClassNotFoundException if the class of the serialized object cannot be found.
-     */
-    public static Layer<?> loadModel(Path path) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-            return (Layer<?>) ois.readObject();
-        }
+    @Override
+    public String getName() {
+        return "Binary Model Loader";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Loads/Saves usage Java Serialization";
+    }
+
+    @Override
+    public String getCategory() {
+        return "AI/ML";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<Layer<?>> getResourceType() {
+        return (Class<Layer<?>>) (Class<?>) Layer.class;
+    }
+    @Override
+    public String getResourcePath() {
+        return "ml/models";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return "Loads and saves Neural Network models using Java standard serialization.";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
     }
 }

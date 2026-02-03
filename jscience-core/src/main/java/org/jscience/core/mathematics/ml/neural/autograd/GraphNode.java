@@ -15,11 +15,12 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class GraphNode<T> {
+public class GraphNode<T> implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
     private Tensor<T> data;
     private Tensor<T> grad;
-    private final List<GraphNode<T>> parents;
-    private final BackwardFunc<T> backwardFunc;
+    private final transient List<GraphNode<T>> parents;
+    private final transient BackwardFunc<T> backwardFunc;
     private final boolean requiresGrad;
     private final String operation;
 

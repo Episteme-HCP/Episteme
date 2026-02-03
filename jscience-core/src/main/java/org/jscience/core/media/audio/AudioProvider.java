@@ -28,7 +28,9 @@ import org.jscience.core.media.audio.AudioOp;
 /**
  * Service Provider Interface for audio processing backends.
  */
-public interface AudioProvider<T> {
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+
+public interface AudioProvider<T> extends AlgorithmProvider {
 
     /**
      * Applies an operation to audio data.

@@ -39,6 +39,8 @@ import java.util.Arrays;
  */
 public class DenseTensor<T> implements Tensor<T> {
 
+    private static final long serialVersionUID = 1L;
+
     protected final Object data; // Flat array
     protected final int[] shape;
     protected final int[] strides; // For efficient indexing

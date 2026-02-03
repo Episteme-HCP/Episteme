@@ -105,4 +105,13 @@ public class NativeMulticoreVisionProvider implements VisionProvider<BufferedIma
          }
          throw new IllegalArgumentException("Unsupported data type for NativeMulticoreVisionProvider");
     }
+    @Override
+    public String getName() {
+        return "Native Multicore Vision Provider";
+    }
+
+    @Override
+    public int getPriority() {
+        return 5; // Standard priority
+    }
 }

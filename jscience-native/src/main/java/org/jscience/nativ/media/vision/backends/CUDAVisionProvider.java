@@ -70,4 +70,13 @@ public class CUDAVisionProvider implements VisionProvider<Object> {
     private static class Sizeof {
         static final int INT = 4;
     }
+    @Override
+    public String getName() {
+        return "CUDA Vision Provider";
+    }
+
+    @Override
+    public int getPriority() {
+        return 20; // Higher priority than CPU
+    }
 }

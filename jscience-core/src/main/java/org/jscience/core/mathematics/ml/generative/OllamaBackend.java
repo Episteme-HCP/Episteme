@@ -21,36 +21,45 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.computing.ai.generative;
+package org.jscience.core.mathematics.ml.generative;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Backend for interacting with OpenAI-compatible APIs (OpenAI, Gemini via Gateway, LocalAI).
+ * Backend for interacting with Ollama (Local LLM server).
+ * <p>
+ * assumes Ollama is running on localhost:11434 by default.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class OpenAICompatBackend implements GenerativeModel {
+public class OllamaBackend implements GenerativeModel {
 
     private final String modelName;
 
-    public OpenAICompatBackend(String apiKey, String modelName) {
+    public OllamaBackend(String modelName) {
         this.modelName = modelName;
     }
 
     @Override
     public CompletableFuture<String> generate(String prompt) {
+        // Implementation note: Would use HttpClient to POST /api/generate
+        // For current scope without external dependencies, we stub strictly.
+        // Once HttpClient is confirmed available (Java 11+), we can implement.
         return CompletableFuture.supplyAsync(() -> {
-            // Mock response
-             return "OpenAI (" + modelName + ") response to: " + prompt; 
+            // Mock response for now to ensure compilation without specific JSON libs
+            return "Ollama (" + modelName + ") response to: " + prompt; 
         });
     }
 
     @Override
     public CompletableFuture<float[]> embed(String text) {
-        return CompletableFuture.supplyAsync(() -> new float[1536]);
+         return CompletableFuture.supplyAsync(() -> {
+            // Mock embedding
+            return new float[768]; 
+        });
     }
 
     @Override

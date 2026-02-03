@@ -51,6 +51,11 @@ public class NativeMulticoreAudioProvider implements AudioProvider<AudioBuffer> 
     /**
      * Specialized parallel gain application.
      */
+    @Override
+    public String getName() {
+        return "Native Multicore Audio Provider";
+    }
+
     public AudioBuffer parallelGain(AudioBuffer input, double multiplier) {
         double[] samples = input.getSamples();
         double[] result = new double[samples.length];

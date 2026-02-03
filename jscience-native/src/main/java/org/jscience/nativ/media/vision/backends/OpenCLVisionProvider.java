@@ -72,4 +72,13 @@ public class OpenCLVisionProvider implements VisionProvider<Object> {
         }
         throw new UnsupportedOperationException("OpenCL data upload only supported for int arrays for now.");
     }
+    @Override
+    public String getName() {
+        return "OpenCL Vision Provider";
+    }
+
+    @Override
+    public int getPriority() {
+        return 15; // Higher than CPU, potentially lower than pure CUDA
+    }
 }

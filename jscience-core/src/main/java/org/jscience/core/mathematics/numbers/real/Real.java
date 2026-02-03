@@ -38,7 +38,9 @@ import org.jscience.core.mathematics.structures.rings.FieldElement;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class Real extends Number implements Comparable<Real>, Field<Real>, FieldElement<Real> {
+public abstract class Real extends Number implements Comparable<Real>, Field<Real>, FieldElement<Real>, java.io.Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final class Constants {
         private static final Real ZERO = RealDouble.create(0.0);

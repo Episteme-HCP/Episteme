@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Base interface for neural network layers.
  */
-public interface Layer<T> {
+public interface Layer<T> extends java.io.Serializable {
     /**
      * Performs forward pass.
      */

@@ -25,7 +25,7 @@ package org.jscience.core.media.vision.detection;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.core.mathematics.ml.runtime.OnnxRuntimeProvider;
+import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackendProvider;
 
 /**
  * Wrapper for YOLO (You Only Look Once) Object Detection models.
@@ -39,11 +39,14 @@ import org.jscience.core.mathematics.ml.runtime.OnnxRuntimeProvider;
  */
 public class YoloDetector {
     @SuppressWarnings("unused")
-    private OnnxRuntimeProvider.OnnxSession session;
+    private ONNXRuntimeBackendProvider.ONNXSession session;
 
     public YoloDetector(Path modelPath) {
-        OnnxRuntimeProvider provider = new OnnxRuntimeProvider();
-        this.session = provider.loadModel(modelPath);
+        try {
+            this.session = org.jscience.core.mathematics.loaders.ONNXModelReader.getInstance().load(modelPath.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load YOLO model", e);
+        }
     }
 
     /**

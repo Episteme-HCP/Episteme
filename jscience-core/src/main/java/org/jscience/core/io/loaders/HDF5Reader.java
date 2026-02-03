@@ -124,8 +124,11 @@ public class HDF5Reader extends AbstractResourceReader<byte[]> {
 
     @Override
     public byte[] loadFromSource(String resourceId) throws Exception {
-        // Real HDF5 loading would happen here via JNI
-        return new byte[0];
+        java.nio.file.Path path = java.nio.file.Paths.get(resourceId);
+        if (!java.nio.file.Files.exists(path)) {
+            return null;
+        }
+        return java.nio.file.Files.readAllBytes(path);
     }
 
     @Override

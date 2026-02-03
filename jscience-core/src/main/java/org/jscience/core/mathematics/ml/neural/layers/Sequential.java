@@ -8,6 +8,7 @@ import java.util.List;
  * Container for sequential execution of layers.
  */
 public class Sequential<T> implements Layer<T> {
+    private static final long serialVersionUID = 1L;
     private final List<Layer<T>> layers = new ArrayList<>();
 
     public void add(Layer<T> layer) {

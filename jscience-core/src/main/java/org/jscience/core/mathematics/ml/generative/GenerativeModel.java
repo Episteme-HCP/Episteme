@@ -21,27 +21,40 @@
  * SOFTWARE.
  */
 
-package org.jscience.core.media.vision;
+package org.jscience.core.mathematics.ml.generative;
 
-import java.awt.image.BufferedImage;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Basic VisionProvider using standard Java AWT (BufferedImage).
+ * Interface representing a Generative AI model (e.g., Large Language Model).
+ * <p>
+ * Provides methods for generating text and embeddings.
+ * </p>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
-public class JavaAWTVisionProvider implements VisionProvider<BufferedImage> {
+public interface GenerativeModel {
 
-    @Override
-    public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {
-        return op.process(image);
-    }
+    /**
+     * Generates a response for the given prompt.
+     * 
+     * @param prompt the input text.
+     * @return a future containing the generated text.
+     */
+    CompletableFuture<String> generate(String prompt);
 
-    @Override
-    public BufferedImage createImage(Object data, int width, int height) {
-        if (data instanceof int[]) {
-            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            img.setRGB(0, 0, width, height, (int[]) data, 0, width);
-            return img;
-        }
-        throw new IllegalArgumentException("Unsupported data type for JavaAWTVisionProvider");
-    }
+    /**
+     * Generates vector embeddings for the given text.
+     * 
+     * @param text the input text.
+     * @return a future containing the embedding vector (as float array).
+     */
+    CompletableFuture<float[]> embed(String text);
+    
+    /**
+     * Returns the name of the model being used (e.g., "gpt-4", "llama3").
+     */
+    String getModelName();
 }

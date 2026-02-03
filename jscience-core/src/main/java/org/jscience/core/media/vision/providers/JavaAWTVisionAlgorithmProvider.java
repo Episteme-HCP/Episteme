@@ -21,49 +21,39 @@
  * SOFTWARE.
  */
 
-package org.jscience.natural.computing.ai.generative;
+package org.jscience.core.media.vision.providers;
 
-import java.util.concurrent.CompletableFuture;
+import org.jscience.core.media.vision.VisionProvider;
+import org.jscience.core.media.vision.ImageOp;
+import java.awt.image.BufferedImage;
 
 /**
- * Backend for interacting with Ollama (Local LLM server).
- * <p>
- * assumes Ollama is running on localhost:11434 by default.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * Basic VisionProvider using standard Java AWT (BufferedImage).
  */
-public class OllamaBackend implements GenerativeModel {
+public class JavaAWTVisionAlgorithmProvider implements VisionProvider<BufferedImage> {
 
-    private final String modelName;
-
-    public OllamaBackend(String modelName) {
-        this.modelName = modelName;
+    @Override
+    public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {
+        return op.process(image);
     }
 
     @Override
-    public CompletableFuture<String> generate(String prompt) {
-        // Implementation note: Would use HttpClient to POST /api/generate
-        // For current scope without external dependencies, we stub strictly.
-        // Once HttpClient is confirmed available (Java 11+), we can implement.
-        return CompletableFuture.supplyAsync(() -> {
-            // Mock response for now to ensure compilation without specific JSON libs
-            return "Ollama (" + modelName + ") response to: " + prompt; 
-        });
+    public BufferedImage createImage(Object data, int width, int height) {
+        if (data instanceof int[]) {
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            img.setRGB(0, 0, width, height, (int[]) data, 0, width);
+            return img;
+        }
+        throw new IllegalArgumentException("Unsupported data type for JavaAWTVisionAlgorithmProvider");
     }
 
     @Override
-    public CompletableFuture<float[]> embed(String text) {
-         return CompletableFuture.supplyAsync(() -> {
-            // Mock embedding
-            return new float[768]; 
-        });
+    public String getName() {
+        return "Java AWT Vision Algorithm Provider";
     }
 
     @Override
-    public String getModelName() {
-        return modelName;
+    public int getPriority() {
+        return 10;
     }
 }

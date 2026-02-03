@@ -20,11 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package org.jscience.core.mathematics.ml.runtime;
+package org.jscience.core.mathematics.ml.neural.backends;
 
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.backend.BackendProvider;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -32,13 +31,54 @@ import java.util.Map;
  * Provider for running ONNX (Open Neural Network Exchange) models.
  * <p>
  * Allows executing pre-trained models (e.g., from PyTorch/TensorFlow) within JScience.
+ * Implements {@link BackendProvider} for standardized discovery.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class OnnxRuntimeProvider implements AlgorithmProvider {
+public class ONNXRuntimeBackendProvider implements BackendProvider {
+
+    @Override
+    public String getType() {
+        return "neural_runtime";
+    }
+
+    @Override
+    public String getId() {
+        return "onnx_runtime";
+    }
+
+    @Override
+    public String getName() {
+        return "ONNX Runtime Bridge";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Bridge to Microsoft ONNX Runtime for high-performance inference.";
+    }
+
+    @Override
+    public boolean isAvailable() {
+        try {
+            Class.forName("ai.onnxruntime.OrtEnvironment");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public int getPriority() {
+        return 100; // High priority for native execution
+    }
+
+    @Override
+    public Object createBackend() {
+        return this; // This provider acts as the factory/backend itself
+    }
 
     /**
      * Loads an ONNX model from the specified path.
@@ -46,7 +86,7 @@ public class OnnxRuntimeProvider implements AlgorithmProvider {
      * @param modelPath path to .onnx file.
      * @return a runnable Model session.
      */
-    public OnnxSession loadModel(Path modelPath) {
+    public ONNXSession loadModel(Path modelPath) {
         try {
             // Attempt to load standard ONNX Runtime classes via reflection
             // to allow pluggable support without strict compile-time dependency
@@ -56,28 +96,23 @@ public class OnnxRuntimeProvider implements AlgorithmProvider {
             // In a real implementation we would create the session here
             // Object session = env.createSession(modelPath.toString());
             
-            return new OnnxSession(modelPath, env);
+            return new ONNXSession(modelPath, env);
         } catch (Exception e) {
-            System.err.println("ONNX Runtime library not found in classpath.");
+             System.err.println("ONNX Runtime library not found in classpath.");
             // Fallback or rethrow
-            return new OnnxSession(modelPath, null);
+            return new ONNXSession(modelPath, null);
         }
-    }
-    
-    @Override
-    public String getName() {
-        return "ONNX Runtime Bridge";
     }
     
     /**
      * Represents a loaded ONNX model session.
      */
-    public static class OnnxSession {
+    public static class ONNXSession {
         @SuppressWarnings("unused")
         private final Path path;
         private final Object nativeSession; // OrtSession handle
         
-        public OnnxSession(Path path, Object nativeSession) {
+        public ONNXSession(Path path, Object nativeSession) {
             this.path = path;
             this.nativeSession = nativeSession;
         }

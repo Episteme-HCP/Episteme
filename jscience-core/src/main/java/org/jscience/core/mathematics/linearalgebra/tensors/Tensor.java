@@ -55,7 +55,7 @@ package org.jscience.core.mathematics.linearalgebra.tensors;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Tensor<T> {
+public interface Tensor<T> extends java.io.Serializable {
 
     /**
      * Returns the shape of this tensor.
