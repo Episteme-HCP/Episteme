@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A simple in-memory Vector Database for RAG (Retrieval Augmented Generation).
+ * A simple in-memory Embedding Store for RAG (Retrieval Augmented Generation).
  * <p>
  * Stores document embeddings and retrieves nearest neighbors using Cosine Similarity.
  * </p>
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class SimpleVectorDB {
+public class InMemoryEmbeddingStore {
     
     private static class DocumentEntry {
         @SuppressWarnings("unused")
@@ -53,7 +53,7 @@ public class SimpleVectorDB {
     private List<DocumentEntry> entries = new ArrayList<>();
 
     /**
-     * Adds a document with its embedding vector to the database.
+     * Adds a document with its embedding vector to the store.
      * @param id unique identifier.
      * @param content text content.
      * @param embedding float array representing the embedding.

@@ -86,6 +86,11 @@ public class AgentVerification {
         public void setEnvironment(Environment environment) { this.environment = environment; }
 
         @Override
+        public void receive(org.jscience.natural.computing.ai.agents.acl.ACLMessage message) {
+            // No interaction for simple agent verification
+        }
+
+        @Override
         public void interact(Agent other) {
             // No interaction for simple agent verification
         }

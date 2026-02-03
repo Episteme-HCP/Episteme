@@ -541,6 +541,17 @@ public class DenseTensor<T> implements Tensor<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Tensor<T> map(java.util.function.Function<T, T> function) {
+        T[] thisData = (T[]) data;
+        T[] newData = (T[]) java.lang.reflect.Array.newInstance(data.getClass().getComponentType(), thisData.length);
+        for (int i = 0; i < thisData.length; i++) {
+            newData[i] = function.apply(thisData[i]);
+        }
+        return new DenseTensor<>(newData, shape);
+    }
+
+    @Override
     public String toString() {
         return "DenseTensor(shape=" + Arrays.toString(shape) + ", size=" + size + ")";
     }

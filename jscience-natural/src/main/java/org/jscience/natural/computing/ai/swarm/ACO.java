@@ -36,7 +36,9 @@ import java.util.Random;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
+ * @deprecated Use {@link org.jscience.core.mathematics.optimization.swarm.ACO} instead.
  */
+@Deprecated
 public class ACO {
     private int numAnts;
     private int numNodes;

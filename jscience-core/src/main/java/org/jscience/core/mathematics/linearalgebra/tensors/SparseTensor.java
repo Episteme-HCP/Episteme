@@ -494,5 +494,18 @@ public class SparseTensor<T> implements Tensor<T> {
     public T getZero() {
         return zero;
     }
+
+    @Override
+    public Tensor<T> map(java.util.function.Function<T, T> function) {
+        T newZero = function.apply(zero);
+        Map<Integer, T> newData = new HashMap<>();
+        data.forEach((k, v) -> {
+            T newVal = function.apply(v);
+            if (!newVal.equals(newZero)) {
+                newData.put(k, newVal);
+            }
+        });
+        return new SparseTensor<>(newData, shape, newZero);
+    }
 }
 

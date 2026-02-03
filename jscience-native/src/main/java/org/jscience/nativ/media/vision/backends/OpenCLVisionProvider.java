@@ -44,6 +44,9 @@ import org.jscience.core.media.vision.VisionProvider;
 public class OpenCLVisionProvider implements VisionProvider<Object> {
     
     // Placeholder for cl_context, cl_command_queue, etc.
+    private org.jocl.cl_context context;
+    @SuppressWarnings("unused")
+    private org.jocl.cl_command_queue commandQueue;
 
     @Override
     public Object apply(Object image, ImageOp<Object> op) {
@@ -51,12 +54,22 @@ public class OpenCLVisionProvider implements VisionProvider<Object> {
         // 2. Execute Kernel (defined by op)
         // 3. Download result (or keep on GPU)
         
-        // For now, since we lack the bindings in classpath, we return null or throw.
-        throw new UnsupportedOperationException("OpenCL bindings not yet integrated.");
+        if (!(image instanceof org.jocl.cl_mem)) {
+            throw new IllegalArgumentException("Expected cl_mem for OpenCLVisionProvider");
+        }
+        
+        return op.process(image);
     }
 
     @Override
-    public Object CreateImage(Object data, int width, int height) {
-        throw new UnsupportedOperationException("OpenCL bindings not yet integrated.");
+    public Object createImage(Object data, int width, int height) {
+        if (data instanceof int[]) {
+            int[] pixels = (int[]) data;
+            org.jocl.cl_mem mem = org.jocl.CL.clCreateBuffer(context, 
+                org.jocl.CL.CL_MEM_READ_WRITE | org.jocl.CL.CL_MEM_COPY_HOST_PTR, 
+                (long) pixels.length * 4, org.jocl.Pointer.to(pixels), null);
+            return mem;
+        }
+        throw new UnsupportedOperationException("OpenCL data upload only supported for int arrays for now.");
     }
 }

@@ -20,37 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jscience.core.mathematics.ml.neural.autograd;
-
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+package org.jscience.core.mathematics.ml;
 
 /**
- * Represents a variable in the computation graph for Automatic Differentiation.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * Service Provider Interface for high-performance Machine Learning operations.
  */
-public class Variable<T> {
-    private Tensor<T> data;
-    private Tensor<T> grad;
-    
-    public Variable(Tensor<T> data) {
-        this.data = data;
-    }
-    
-    public void backward() {
-        if (grad == null) {
-            // Init grad with ones if scalar, or matching shape
-        }
-        // Propagate gradient to parents (Reverse Mode AD)
-    }
-    
-    public Tensor<T> getData() {
-        return data;
-    }
-    
-    public Tensor<T> getGrad() {
-        return grad;
-    }
+public interface MLProvider {
+
+    /**
+     * Performs K-Means clustering.
+     * @param data double[][] of shape (samples, features)
+     * @param k number of clusters
+     * @param maxIterations maximum iterations
+     * @return int[] of cluster assignments
+     */
+    int[] kMeans(double[][] data, int k, int maxIterations);
+
+    /**
+     * Performs Principal Component Analysis (PCA).
+     * @param data double[][] of shape (samples, features)
+     * @param nComponents number of components to keep
+     * @return double[][] of shape (samples, nComponents) - transformed data
+     */
+    double[][] pca(double[][] data, int nComponents);
 }

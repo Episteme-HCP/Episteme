@@ -74,4 +74,11 @@ public interface Environment {
      * @param message the content.
      */
     void broadcast(Agent sender, Object message);
+
+    /**
+     * Sends a directed ACL message.
+     * 
+     * @param message the ACL message containing sender, receiver, and content.
+     */
+    void send(org.jscience.natural.computing.ai.agents.acl.ACLMessage message);
 }

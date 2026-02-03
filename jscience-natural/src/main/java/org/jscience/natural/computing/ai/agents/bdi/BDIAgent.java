@@ -22,11 +22,16 @@
  */
 package org.jscience.natural.computing.ai.agents.bdi;
 
-import java.util.ArrayList;
+import java.util.Queue;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 import org.jscience.natural.computing.ai.agents.Agent;
+import org.jscience.natural.computing.ai.agents.Behavior;
 import org.jscience.natural.computing.ai.agents.Environment;
+import org.jscience.natural.computing.ai.agents.acl.ACLMessage;
 
 /**
  * A base implementation of a BDI (Belief-Desire-Intention) Agent.
@@ -39,20 +44,62 @@ import org.jscience.natural.computing.ai.agents.Environment;
  */
 public abstract class BDIAgent implements Agent {
     
+    protected UUID id = UUID.randomUUID();
+    protected String name;
     protected ConcurrentHashMap<String, Belief> beliefs = new ConcurrentHashMap<>();
     protected List<Desire> desires = new ArrayList<>();
+    protected List<Behavior> behaviors = new ArrayList<>();
+    protected Queue<BDIEvent> eventQueue = new ConcurrentLinkedQueue<>();
+    
+    /**
+     * The intention stack represents the active commitments of the agent.
+     * Real BDI systems use a stack to allow for sub-goaling.
+     */
     protected List<Intention> intentions = new ArrayList<>();
     protected List<Plan> planLibrary = new ArrayList<>();
     
     protected Environment environment;
+
+    public BDIAgent(String name) {
+        this.name = name;
+    }
+
+    @Override public UUID getId() { return id; }
+    @Override public String getName() { return name; }
     
     @Override
     public void run() {
-        // Main agent loop intended to be called typically in a thread or step
+        // Broad perception
         perceive();
+
+        // Handle events
+        while (!eventQueue.isEmpty()) {
+            handleEvent(eventQueue.poll());
+        }
+
+        // Run behaviors
+        for (Behavior b : new ArrayList<>(behaviors)) {
+            b.action();
+            if (b.done()) {
+                b.onEnd();
+                behaviors.remove(b);
+            }
+        }
+
+        // BDI Deliberation
         deliberate();
         plan();
         act();
+    }
+
+    /**
+     * Handles an internal or external BDI event.
+     */
+    protected void handleEvent(BDIEvent event) {
+        // Extensions should override this
+        if (event.getType() == BDIEvent.Type.MESSAGE_RECEIVED) {
+            System.out.println("Processing message event for " + getName());
+        }
     }
     
     /**
@@ -73,15 +120,16 @@ public abstract class BDIAgent implements Agent {
      * Select intentions (plans) to achieve desires.
      */
     public void plan() {
-        // Simple planner: for each desire, find a plan
+        // simple planner: for each desire, find a plan
         for (Desire desire : desires) {
              boolean intentionExists = intentions.stream().anyMatch(i -> i.getGoal().equals(desire));
              if (!intentionExists) {
                  for (Plan plan : planLibrary) {
                      if (plan.isApplicable(new ArrayList<>(beliefs.values()), desire)) {
                          // Commit to this plan (create Intention)
-                         // For simplicity in this base class, we execute immediately in act() or store as intention object
-                         // Real BDI would create an Intention stack.
+                         Intention intention = new BaseIntention(desire, plan, this);
+                         intentions.add(intention);
+                         break; // Found a plan for this desire
                      }
                  }
              }
@@ -100,19 +148,66 @@ public abstract class BDIAgent implements Agent {
 
     public void addBelief(Belief belief) {
         beliefs.put(belief.getName(), belief);
+        eventQueue.add(new BDIEvent(BDIEvent.Type.BELIEF_ADDED, this, belief));
     }
     
     public Belief getBelief(String name) {
         return beliefs.get(name);
     }
+
+    @Override
+    public void addBehavior(Behavior behavior) {
+        behavior.setAgent(this);
+        behavior.onStart();
+        behaviors.add(behavior);
+    }
+
+    @Override
+    public void removeBehavior(Behavior behavior) {
+        behaviors.remove(behavior);
+    }
     
     public void addPlan(Plan plan) {
         planLibrary.add(plan);
     }
+
+    /**
+     * Internal implementation of a committed plan.
+     */
+    private static class BaseIntention implements Intention {
+        private final Desire target;
+        private final Plan plan;
+        private final BDIAgent agent;
+        private boolean done = false;
+
+        BaseIntention(Desire target, Plan plan, BDIAgent agent) {
+            this.target = target;
+            this.plan = plan;
+            this.agent = agent;
+        }
+
+        @Override public Desire getGoal() { return target; }
+        @Override public void step() { 
+            plan.execute(agent);
+            done = true; // For now, plans execute in one step
+        }
+        @Override public boolean isDone() { return done; }
+    }
     
     @Override
+    public void receive(ACLMessage message) {
+        // Trigger BDI event
+        eventQueue.add(BDIEvent.message(message));
+    }
+
+    @Override
     public void interact(Agent other) {
-        // Agent communications
+        // Basic interaction
+    }
+
+    @Override
+    public Environment getEnvironment() {
+        return environment;
     }
     
     public void setEnvironment(Environment env) {

@@ -31,7 +31,7 @@ import org.jscience.natural.chemistry.Element;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class Metal extends Element {
+public class Metal extends Element {
     public Metal(String name, String symbol) {
         super(name, symbol);
     }

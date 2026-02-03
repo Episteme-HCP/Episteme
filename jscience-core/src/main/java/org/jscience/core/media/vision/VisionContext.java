@@ -46,10 +46,16 @@ public class VisionContext {
         /** OpenCL GPU acceleration */
         OPENCL_GPU,
         /** Java multithreaded array processing */
-        JAVA_MULTICORE
+        JAVA_MULTICORE,
+        /** CUDA GPU acceleration */
+        CUDA_GPU
     }
 
-    private static final ThreadLocal<VisionContext> CURRENT = ThreadLocal.withInitial(VisionContext::new);
+    private static final ThreadLocal<VisionContext> CURRENT = ThreadLocal.withInitial(() -> {
+        VisionContext ctx = new VisionContext();
+        ctx.registerProvider(Backend.JAVA_AWT, new JavaAWTVisionProvider());
+        return ctx;
+    });
     
     private volatile Backend backend = Backend.JAVA_AWT;
     private final Map<Backend, VisionProvider<?>> providers = new ConcurrentHashMap<>();

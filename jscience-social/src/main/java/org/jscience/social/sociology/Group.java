@@ -48,20 +48,6 @@ public class Group extends Population<Person> {
 
     private static final long serialVersionUID = 2L;
 
-    @Deprecated
-    public enum Type {
-        @Deprecated FAMILY, @Deprecated COMMUNITY, @Deprecated ORGANIZATION, @Deprecated NATION, @Deprecated TRIBE, @Deprecated TEAM, @Deprecated CLASS, @Deprecated NETWORK;
-
-        @Deprecated
-        public GroupKind toGroupKind() {
-            try {
-                return GroupKind.valueOf(this.name());
-            } catch (Exception e) {
-                return GroupKind.OTHER;
-            }
-        }
-    }
-
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Map<Individual, String> internalRoles = new HashMap<>();
 
@@ -75,11 +61,6 @@ public class Group extends Population<Person> {
     public Group(String name, GroupKind kind, EventDrivenEngine engine) {
         super(new UUIDIdentification(UUID.randomUUID()), name, HomoSapiens.SPECIES, null, engine);
         this.kind = Objects.requireNonNull(kind, "Kind cannot be null");
-    }
-
-    @Deprecated
-    public Group(String name, Type type) {
-        this(name, type.toGroupKind());
     }
 
     public GroupKind getKind() {

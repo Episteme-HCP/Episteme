@@ -23,9 +23,13 @@
 
 package org.jscience.core.mathematics.optimization;
 
-import org.jscience.core.mathematics.numbers.real.Real;
-
 import org.jscience.core.mathematics.analysis.Function;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.optimization.swarm.PSO;
+import org.jscience.core.mathematics.optimization.swarm.ACO;
+import org.jscience.core.mathematics.optimization.evolutionary.NSGA2;
+import org.jscience.core.mathematics.optimization.evolutionary.MultiobjectiveSolution;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,6 +72,59 @@ public class OptimizationTest {
 
         // Should be close to 0
         assertTrue(result.abs().compareTo(Real.of(0.1)) < 0);
+    }
+
+    @Test
+    public void testPSO() {
+        // Sphere function: minimize sum(x^2)
+        // We maximize, so we use -sum(x^2)
+        PSO pso = new PSO(30, 2, -10, 10, vars -> {
+            double sum = 0;
+            for (double v : vars) sum += v * v;
+            return -sum;
+        });
+
+        pso.solve(100);
+        assertTrue(pso.getBestFitness() > -0.1, "PSO failed to converge on sphere function. Best fitness: " + pso.getBestFitness());
+    }
+
+    @Test
+    public void testACO() {
+        // 4 nodes TSP in a square
+        double[][] distances = {
+            {0, 1, 1.414, 1},
+            {1, 0, 1, 1.414},
+            {1.414, 1, 0, 1},
+            {1, 1.414, 1, 0}
+        };
+
+        ACO aco = new ACO(4, distances, 10);
+        for(int i=0; i<50; i++) aco.step();
+
+        assertEquals(4.0, aco.getBestTourLength(), 0.1, "ACO failed to find optimal TSP tour");
+    }
+
+    @Test
+    public void testNSGA2() {
+        // Schaffer function N.1: minimize f1=x^2, f2=(x-2)^2
+        NSGA2 nsga2 = new NSGA2(50, 1, 2, (vars, objs) -> {
+            double x = vars[0] * 4 - 1; // Map [0,1] to [-1, 3]
+            objs[0] = x * x;
+            objs[1] = (x - 2) * (x - 2);
+        });
+
+        for (int i = 0; i < 50; i++) nsga2.evolve();
+
+        List<MultiobjectiveSolution> pop = nsga2.getPopulation();
+        assertNotNull(pop);
+        // Verify diversity: some solutions should be better in f1, others in f2
+        boolean hasF1Better = false;
+        boolean hasF2Better = false;
+        for (MultiobjectiveSolution sol : pop) {
+            if (sol.getObjectives()[0] < 0.5) hasF1Better = true;
+            if (sol.getObjectives()[1] < 0.5) hasF2Better = true;
+        }
+        assertTrue(hasF1Better && hasF2Better, "NSGA2 failed to find diverse Pareto front");
     }
 }
 

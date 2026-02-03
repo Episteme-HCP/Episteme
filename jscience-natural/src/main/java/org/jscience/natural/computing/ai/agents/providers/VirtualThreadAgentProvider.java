@@ -81,6 +81,22 @@ public class VirtualThreadAgentProvider implements Environment {
     }
 
     @Override
+    public void send(org.jscience.natural.computing.ai.agents.acl.ACLMessage message) {
+        String receiverId = message.getReceiver();
+        if (receiverId == null) return;
+
+        try {
+            UUID id = UUID.fromString(receiverId);
+            Agent receiver = getAgent(id);
+            if (receiver != null) {
+                receiver.receive(message);
+            }
+        } catch (IllegalArgumentException e) {
+            // AID might not be a UUID string, handle or log
+        }
+    }
+
+    @Override
     public void broadcast(Agent sender, Object message) {
         // Broadcasst can be expensive. 
         // For massive systems, we might want a pub/sub or spatial partition.

@@ -11,6 +11,7 @@ public class ReteEngine implements InferenceEngine {
     private final List<Rule> rules = new ArrayList<>();
     private final Set<Object> facts = new HashSet<>();
     private final List<AlphaNode> alphaNodes = new ArrayList<>();
+    private final List<BetaNode> betaNodes = new ArrayList<>();
 
     @Override
     public void addRule(Rule rule) {
@@ -18,26 +19,32 @@ public class ReteEngine implements InferenceEngine {
         // Build Rete network for this rule
         AlphaNode alpha = new AlphaNode(rule);
         alphaNodes.add(alpha);
+        
+        // For complex rules, we would chain BetaNodes here
+        // Currently supporting simple alpha networks, but prepared for Beta joins
     }
 
     @Override
     public void addFact(Object fact) {
-        facts.add(fact);
-        // Propagate fact through Rete network
-        for (AlphaNode node : alphaNodes) {
-            node.processFact(fact, this);
+        if (facts.add(fact)) {
+            // Propagate fact through Rete network
+            for (AlphaNode node : alphaNodes) {
+                node.processFact(fact, this);
+            }
         }
     }
 
     @Override
     public void removeFact(Object fact) {
-        facts.remove(fact);
-        // Withdraw from network
+        if (facts.remove(fact)) {
+             // In a full Rete, we would propagate retract signals
+        }
     }
 
     @Override
     public void fireRules() {
-        // Rete usually fires rules as they match, but we can batch
+        // Rules fire immediately on fact addition in this simple version
+        // In complex Rete, we'd process the agenda here
     }
 
     @Override
@@ -50,13 +57,4 @@ public class ReteEngine implements InferenceEngine {
         facts.clear();
     }
 
-    private static class AlphaNode {
-        private final Rule rule;
-        public AlphaNode(Rule rule) { this.rule = rule; }
-        public void processFact(Object fact, InferenceEngine engine) {
-            if (rule.matches(fact)) {
-                rule.execute(engine);
-            }
-        }
-    }
 }

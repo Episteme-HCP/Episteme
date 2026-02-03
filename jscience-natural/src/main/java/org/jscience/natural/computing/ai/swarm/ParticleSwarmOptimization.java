@@ -42,7 +42,9 @@ import java.util.Random;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @deprecated Use {@link org.jscience.core.mathematics.optimization.swarm.PSO} instead.
  */
+@Deprecated
 public class ParticleSwarmOptimization {
 
     private final Function<Real[], Real> objective;

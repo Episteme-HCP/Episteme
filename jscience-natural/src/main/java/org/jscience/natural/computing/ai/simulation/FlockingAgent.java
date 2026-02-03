@@ -178,6 +178,11 @@ public class FlockingAgent implements Agent {
     public void setEnvironment(Environment environment) { this.environment = environment; }
 
     @Override
+    public void receive(org.jscience.natural.computing.ai.agents.acl.ACLMessage message) {
+        // Flocking agents don't use ACL messages yet.
+    }
+
+    @Override
     public void interact(Agent other) {
         // Flocking agents interact through perception in computeNewHeading
     }

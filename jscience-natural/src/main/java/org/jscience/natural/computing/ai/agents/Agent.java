@@ -89,6 +89,13 @@ public interface Agent extends Runnable {
     void setEnvironment(Environment environment);
 
     /**
+     * Receives a message from the environment.
+     * 
+     * @param message the ACL message to process.
+     */
+    void receive(org.jscience.natural.computing.ai.agents.acl.ACLMessage message);
+
+    /**
      * Interacts with another agent.
      *
      * @param other the agent to interact with.

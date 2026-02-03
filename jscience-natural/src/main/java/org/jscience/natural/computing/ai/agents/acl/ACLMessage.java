@@ -40,6 +40,15 @@ public class ACLMessage implements Serializable {
     private String receiver; // AID
     private String content;
 
+    // FIPA ACL Metadata
+    private String protocol;
+    private String conversationId;
+    private String language;
+    private String ontology;
+    private String replyWith;
+    private String inReplyTo;
+    private Long replyBy; // Timestamp
+
     public ACLMessage(Performative performative) {
         this.performative = performative;
     }
@@ -75,6 +84,79 @@ public class ACLMessage implements Serializable {
     public void setContent(String content) {
         this.content = content;
     }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getOntology() {
+        return ontology;
+    }
+
+    public void setOntology(String ontology) {
+        this.ontology = ontology;
+    }
+
+    public String getReplyWith() {
+        return replyWith;
+    }
+
+    public void setReplyWith(String replyWith) {
+        this.replyWith = replyWith;
+    }
+
+    public String getInReplyTo() {
+        return inReplyTo;
+    }
+
+    public void setInReplyTo(String inReplyTo) {
+        this.inReplyTo = inReplyTo;
+    }
+
+    public Long getReplyBy() {
+        return replyBy;
+    }
+
+    public void setReplyBy(Long replyBy) {
+        this.replyBy = replyBy;
+    }
+
+    /**
+     * Creates a reply to this message.
+     * @param performative the performative of the reply.
+     * @return a new ACLMessage with sender/receiver swapped and correlation IDs set.
+     */
+    public ACLMessage createReply(Performative performative) {
+        ACLMessage reply = new ACLMessage(performative);
+        reply.setSender(this.receiver);
+        reply.setReceiver(this.sender);
+        reply.setConversationId(this.conversationId);
+        reply.setInReplyTo(this.replyWith);
+        reply.setProtocol(this.protocol);
+        reply.setOntology(this.ontology);
+        reply.setLanguage(this.language);
+        return reply;
+    }
     
     // ... Getters and Setters for other fields omitted for brevity but would be present
     
@@ -85,6 +167,8 @@ public class ACLMessage implements Serializable {
                 ", sender='" + sender + '\'' +
                 ", receiver='" + receiver + '\'' +
                 ", content='" + content + '\'' +
+                ", conversationId='" + conversationId + '\'' +
+                ", protocol='" + protocol + '\'' +
                 '}';
     }
 }

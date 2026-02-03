@@ -187,6 +187,14 @@ public interface Tensor<T> {
     Tensor<T> slice(int[] starts, int[] sizes);
 
     /**
+     * Applies a function to each element of the tensor.
+     * 
+     * @param function the function to apply
+     * @return a new tensor with transformed elements
+     */
+    Tensor<T> map(java.util.function.Function<T, T> function);
+
+    /**
      * Sums all elements.
      * 
      * @return ÃŽÂ£ elements

@@ -52,5 +52,5 @@ public interface VisionProvider<T> {
      * @param height image height.
      * @return the created image object.
      */
-    T CreateImage(Object data, int width, int height);
+    T createImage(Object data, int width, int height);
 }
