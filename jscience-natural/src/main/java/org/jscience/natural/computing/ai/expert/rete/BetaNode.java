@@ -32,18 +32,7 @@ import java.util.Map;
  */
 public class BetaNode {
     private final List<Map<String, Object>> memory = new ArrayList<>();
-    private BetaNode leftParent;
-    private AlphaNode rightParent;
-
     public BetaNode() {}
-
-    public void setLeftParent(BetaNode leftParent) {
-        this.leftParent = leftParent;
-    }
-
-    public void setRightParent(AlphaNode rightParent) {
-        this.rightParent = rightParent;
-    }
 
     public void leftActivate(Map<String, Object> token) {
         // Simple join logic (cartesian product for now, needs condition matching)

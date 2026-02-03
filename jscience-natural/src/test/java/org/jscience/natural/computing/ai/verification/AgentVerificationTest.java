@@ -4,6 +4,8 @@ import org.jscience.natural.computing.ai.agents.Agent;
 import org.jscience.natural.computing.ai.agents.Behavior;
 import org.jscience.natural.computing.ai.agents.Environment;
 import org.jscience.natural.computing.ai.agents.providers.VirtualThreadAgentProvider;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,14 +13,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Verification class to test the Virtual Thread Agent Provider.
  */
-public class AgentVerification {
+public class AgentVerificationTest {
 
-    public static void main(String[] args) throws InterruptedException {
+    @Test
+    public void testVirtualThreadAgents() throws InterruptedException {
         System.out.println("Starting Agent Verification...");
         
         VirtualThreadAgentProvider env = new VirtualThreadAgentProvider();
         AtomicInteger counter = new AtomicInteger(0);
-        int agentCount = 10_000;
+        int agentCount = 1000; // Reduced from 10,000 for faster unit testing
         
         System.out.println("Spawning " + agentCount + " agents on Virtual Threads...");
         
@@ -27,19 +30,15 @@ public class AgentVerification {
             env.addAgent(agent);
         }
         
-        // Let them run for a second
-        Thread.sleep(1000);
+        // Let them run for a short period
+        Thread.sleep(500);
         
         env.shutdown();
         
         System.out.println("Verification Complete.");
         System.out.println("Total behaviors executed ~ " + counter.get());
         
-        if (counter.get() > 0) {
-            System.out.println("SUCCESS: Agents ran concurrently.");
-        } else {
-            System.out.println("FAILURE: Agents did not run.");
-        }
+        assertTrue(counter.get() > 0, "Agents should have executed some behaviors");
     }
     
     static class SimpleAgent implements Agent {
@@ -72,7 +71,7 @@ public class AgentVerification {
                 counter.incrementAndGet();
                 try {
                     // Sleep to yield and simulate work
-                    Thread.sleep(100); 
+                    Thread.sleep(10); 
                 } catch (InterruptedException e) {
                     running = false;
                 }

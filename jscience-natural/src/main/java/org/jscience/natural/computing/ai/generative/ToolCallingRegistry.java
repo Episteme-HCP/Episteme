@@ -61,5 +61,7 @@ public class ToolCallingRegistry {
             this.instance = instance;
             this.method = method;
         }
+        
+        public String getName() { return name; }
     }
 }

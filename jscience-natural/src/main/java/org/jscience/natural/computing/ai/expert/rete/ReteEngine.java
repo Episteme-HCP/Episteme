@@ -57,4 +57,8 @@ public class ReteEngine implements InferenceEngine {
         facts.clear();
     }
 
+    public List<BetaNode> getBetaNodes() {
+        return Collections.unmodifiableList(betaNodes);
+    }
+
 }
