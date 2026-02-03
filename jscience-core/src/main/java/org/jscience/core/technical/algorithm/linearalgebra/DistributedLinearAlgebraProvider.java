@@ -1,8 +1,3 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- */
-
 package org.jscience.core.technical.algorithm.linearalgebra;
 
 import org.jscience.core.distributed.DistributedCompute;
@@ -12,9 +7,10 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-// CPUDenseLinearAlgebraProvider is in the same package, no import needed.
 
 /**
  * Linear algebra provider that delegates to distributed algorithms when appropriate.
@@ -43,8 +39,7 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
     @Override
     public boolean isCompatible(Ring<?> ring) {
         // Currently only supports Real numbers due to DistributedSUMMAAlgorithm limitation
-        // In a real implementation we would check ring type compatibility
-        return true; 
+        return ring instanceof Reals || (ring != null && ring.zero() instanceof Real);
     }
 
     @Override
@@ -60,16 +55,18 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
         }
         
         // Only prioritize if explicitly configured or potentially useful
-        // We set a high priority to ensure we are picked if available
         return 200; 
     }
     
     @Override
     public String getName() {
-        return "Distributed Linear Algebra Provider (" + DistributedCompute.getContext().getClass().getSimpleName() + ")";
+        DistributedContext ctx = DistributedCompute.getContext();
+        String contextType = (ctx != null) ? ctx.getClass().getSimpleName() : "None";
+        return "Distributed Linear Algebra Provider (" + contextType + ")";
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         // Check heuristics for distribution
         boolean isLarge = (long)a.rows() * a.cols() * b.cols() > 1_000_000;
@@ -77,11 +74,9 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
         if (isLarge && a instanceof TiledMatrix && b instanceof TiledMatrix) {
             try {
                 // Delegate to DistributedSUMMA
-                // Note: Unchecked cast - assumes matrix content is compatible (Real/Double)
-                // In production code, we would need strict type checking or a generic DistributedSUMMA
-                 @SuppressWarnings("unchecked")
+                // Note: result is TiledMatrix (which extends GenericMatrix<Real>)
                 TiledMatrix result = DistributedSUMMAAlgorithm.multiply((TiledMatrix) a, (TiledMatrix) b);
-                return (Matrix<E>) result;
+                return (Matrix<E>) (Matrix<?>) result;
             } catch (Exception e) {
                // Fallback on error
                System.err.println("Distributed multiplication failed, falling back to local: " + e.getMessage());

@@ -23,7 +23,6 @@
 package org.jscience.natural.computing.ai.agents.bdi;
 
 import java.util.List;
-import org.jscience.natural.computing.ai.agents.Environment;
 
 /**
  * Represents a Plan in the BDI architecture.

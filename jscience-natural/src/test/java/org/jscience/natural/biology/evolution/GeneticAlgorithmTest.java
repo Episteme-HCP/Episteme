@@ -23,9 +23,9 @@
 
 package org.jscience.natural.biology.evolution;
 
-import org.jscience.natural.computing.ai.ga.Chromosome;
-import org.jscience.natural.computing.ai.ga.GeneticAlgorithm;
-import org.jscience.natural.computing.ai.ga.Population;
+import org.jscience.natural.computing.ai.evolutionary.Chromosome;
+import org.jscience.natural.computing.ai.evolutionary.GeneticAlgorithm;
+import org.jscience.natural.computing.ai.evolutionary.Population;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

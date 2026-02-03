@@ -4,12 +4,9 @@
  */
 package org.jscience.core.technical.algorithm.linearalgebra;
 
-import org.jscience.core.ComputeContext;
 import org.jscience.core.distributed.DistributedCompute;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 

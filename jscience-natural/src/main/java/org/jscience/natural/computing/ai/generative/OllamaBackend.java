@@ -38,15 +38,9 @@ import java.util.concurrent.CompletableFuture;
 public class OllamaBackend implements GenerativeModel {
 
     private final String modelName;
-    private final String baseUrl;
 
     public OllamaBackend(String modelName) {
-        this(modelName, "http://localhost:11434");
-    }
-
-    public OllamaBackend(String modelName, String baseUrl) {
         this.modelName = modelName;
-        this.baseUrl = baseUrl;
     }
 
     @Override

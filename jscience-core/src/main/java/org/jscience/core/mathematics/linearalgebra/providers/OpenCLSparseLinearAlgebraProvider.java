@@ -26,8 +26,6 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-
 
 import org.jscience.core.mathematics.structures.rings.Field;
 

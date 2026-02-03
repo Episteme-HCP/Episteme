@@ -51,7 +51,7 @@ public abstract class Terminal extends Program {
         Terminal temp = null;
 
         try {
-            temp = (Terminal) getClass().newInstance();
+            temp = (Terminal) getClass().getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             System.out.println(e);
         }

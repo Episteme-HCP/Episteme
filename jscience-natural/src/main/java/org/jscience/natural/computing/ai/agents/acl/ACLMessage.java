@@ -23,8 +23,6 @@
 package org.jscience.natural.computing.ai.agents.acl;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Represents an Agent Communication Language (ACL) Message.
@@ -41,15 +39,6 @@ public class ACLMessage implements Serializable {
     private String sender; // AID (Agent ID)
     private String receiver; // AID
     private String content;
-    private String language;
-    private String ontology;
-    private String protocol;
-    private String conversationId;
-    private String replyWith;
-    private String inReplyTo;
-    private long replyBy;
-    
-    private Map<String, String> userDefinedParameters = new HashMap<>();
 
     public ACLMessage(Performative performative) {
         this.performative = performative;

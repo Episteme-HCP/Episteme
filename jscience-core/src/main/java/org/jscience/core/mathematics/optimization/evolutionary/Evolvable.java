@@ -28,7 +28,7 @@ package org.jscience.core.mathematics.optimization.evolutionary;
  *
  * @author James Matthews
  */
-public interface Evolvable extends java.lang.Comparable {
+public interface Evolvable extends java.lang.Comparable<Evolvable> {
     /**
      * Initialize the class to random values. This allows for a default
      * constructor or initializor, as well as the random initializor required

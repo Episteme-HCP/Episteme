@@ -42,7 +42,7 @@ public class ModelSerializer {
      * @param path the destination path.
      * @throws IOException if an I/O error occurs.
      */
-    public static void saveModel(Layer model, Path path) throws IOException {
+    public static void saveModel(Layer<?> model, Path path) throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
             oos.writeObject(model);
         }
@@ -55,9 +55,9 @@ public class ModelSerializer {
      * @throws IOException if an I/O error occurs.
      * @throws ClassNotFoundException if the class of the serialized object cannot be found.
      */
-    public static Layer loadModel(Path path) throws IOException, ClassNotFoundException {
+    public static Layer<?> loadModel(Path path) throws IOException, ClassNotFoundException {
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-            return (Layer) ois.readObject();
+            return (Layer<?>) ois.readObject();
         }
     }
 }

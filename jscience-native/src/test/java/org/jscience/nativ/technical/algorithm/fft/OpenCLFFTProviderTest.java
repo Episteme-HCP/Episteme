@@ -20,7 +20,7 @@ public class OpenCLFFTProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        // TODO: Enable whenever OpenCLFFTProvider is available
+        // TODO: Enable once OpenCLFFTProvider is implemented in Phase 10
         // assertNotNull(OpenCLFFTProvider.class);
     }
 }

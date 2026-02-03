@@ -21,6 +21,7 @@ public class HybridComputeContext extends ComputeContext {
 
     private final double gpuThreshold; // Minimum problem size for GPU offloading
 
+    @Deprecated
     public HybridComputeContext(double gpuThreshold) {
         this.gpuThreshold = gpuThreshold;
     }
@@ -28,6 +29,7 @@ public class HybridComputeContext extends ComputeContext {
     /**
      * Executes a matrix multiplication using the most efficient available backend.
      */
+    @Deprecated
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {
         long complexity = (long) m * n * k;
         GPUBackend gpu = getGPUBackend();
@@ -45,6 +47,7 @@ public class HybridComputeContext extends ComputeContext {
     /**
      * Parallelizes an operation across CPU and GPU if possible.
      */
+    @Deprecated
     public void parallelStencil(DoubleBuffer data, int width, int height) {
         // Split data into chunks, process some on GPU, some on CPU for maximum throughput
     }

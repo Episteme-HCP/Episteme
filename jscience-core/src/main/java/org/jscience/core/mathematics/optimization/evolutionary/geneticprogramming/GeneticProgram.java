@@ -129,8 +129,8 @@ public class GeneticProgram {
         Terminal terminal;
 
         try {
-            Class cls = terminalSet[randomNumberGenerator.nextInt(terminalSet.length)].getClass();
-            terminal = (Terminal) cls.newInstance();
+            Class<? extends Terminal> cls = terminalSet[randomNumberGenerator.nextInt(terminalSet.length)].getClass();
+            terminal = cls.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             terminal = null;
             System.out.println(e);
@@ -148,8 +148,8 @@ public class GeneticProgram {
         Function function;
 
         try {
-            Class cls = functionSet[randomNumberGenerator.nextInt(functionSet.length)].getClass();
-            function = (Function) cls.newInstance();
+            Class<? extends Function> cls = functionSet[randomNumberGenerator.nextInt(functionSet.length)].getClass();
+            function = cls.getDeclaredConstructor().newInstance();
         } catch (Exception e1) {
             function = null;
             System.out.println(e1);
@@ -229,7 +229,7 @@ public class GeneticProgram {
         int allowableDepth;
         boolean fullP;
         boolean fullCycleP = false;
-        Hashtable generation0Individuals = new Hashtable();
+        Hashtable<String, Program> generation0Individuals = new Hashtable<>();
 
         population = new Individual[populationSize];
 
@@ -326,7 +326,6 @@ public class GeneticProgram {
         int index;
         Individual individual1;
         Individual individual2;
-        int i;
         double sumOfFractions = crossoverFraction + reproductionFraction +
             mutationFraction;
         double tmpCrossoverFraction = crossoverFraction / sumOfFractions;
@@ -641,19 +640,19 @@ public class GeneticProgram {
         // and returns the best one.
         int tournamentSize = Math.min(populationSize, 7);
 
-        Hashtable table = new Hashtable();
+        Hashtable<Integer, Individual> table = new Hashtable<>();
 
         while (table.size() < tournamentSize) {
             int key = randomNumberGenerator.nextInt(populationSize);
-            table.put(new Integer(key), population[key]);
+            table.put(Integer.valueOf(key), population[key]);
         }
 
-        Enumeration e = table.elements();
-        Individual best = (Individual) e.nextElement();
+        Enumeration<Individual> e = table.elements();
+        Individual best = e.nextElement();
         double bestFitness = best.getStandardizedFitness();
 
         while (e.hasMoreElements()) {
-            Individual individual = (Individual) e.nextElement();
+            Individual individual = e.nextElement();
 
             if (individual.getStandardizedFitness() > bestFitness) {
                 best = individual;

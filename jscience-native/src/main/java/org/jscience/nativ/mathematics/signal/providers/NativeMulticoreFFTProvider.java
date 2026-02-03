@@ -15,7 +15,6 @@ import org.jscience.nativ.technical.backend.fft.PanamaFFTBackend;
  */
 public class NativeMulticoreFFTProvider implements FFTProvider {
 
-    @SuppressWarnings("unused")
     private final PanamaFFTBackend backend = new PanamaFFTBackend();
 
     @Override

@@ -122,6 +122,12 @@
             <artifactId>jocl</artifactId>
         </dependency>
 
+        <!-- ONNX Runtime -->
+        <dependency>
+            <groupId>com.microsoft.onnxruntime</groupId>
+            <artifactId>onnxruntime</artifactId>
+        </dependency>
+
         <!-- JavaFX (UI) -->
         <dependency>
             <groupId>org.openjfx</groupId>

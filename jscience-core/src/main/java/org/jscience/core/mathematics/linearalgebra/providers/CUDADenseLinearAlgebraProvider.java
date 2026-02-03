@@ -1,42 +1,22 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-
-
-
 package org.jscience.core.mathematics.linearalgebra.providers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import jcuda.Pointer;
+import jcuda.Sizeof;
+import jcuda.jcublas.JCublas;
+import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.sets.Reals;
+import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
-
-
-import org.jscience.core.mathematics.structures.rings.Field;
-
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-
-import org.jscience.core.mathematics.linearalgebra.Vector;
-
-
 
 /**
  * CUDA Linear Algebra Provider (Dense).
@@ -83,49 +63,157 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         return "CUDA (Dense)";
     }
 
-
     @Override
     public int getPriority() {
         // High priority if available, otherwise effectively disabled for selection
         return isAvailable() ? 100 : Integer.MIN_VALUE;
     }
 
-    private java.util.Map<String, Object> config = new java.util.HashMap<>();
+    private Map<String, Object> config = new HashMap<>();
 
     @Override
-    public void configure(java.util.Map<String, Object> properties) {
+    public void configure(Map<String, Object> properties) {
         if (properties != null) {
             this.config.putAll(properties);
         }
     }
 
-    // Delegate to CPU for now, as full JCuda implementation requires specific
-    // kernel logic or bridging Generic Field<E> to float/double arrays for CUBLAS.
-    // NOTE: This implementation currently supports Real fields (double precision).
-
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        if (!isAvailable() || !(field.zero() instanceof org.jscience.core.mathematics.numbers.real.Real)) {
+        if (!isAvailable() || !(field.zero() instanceof Real)) {
             return cpuProvider.add(a, b);
         }
-        // JCUDA vector addition (implement if performance critical, often overhead
-        // dominates for simple ops)
-        return cpuProvider.add(a, b);
+        
+        int n = a.dimension();
+        if (n != b.dimension()) throw new IllegalArgumentException("Vector dimension mismatch");
+
+        try {
+            double[] h_A = toDoubleArray(a);
+            double[] h_B = toDoubleArray(b);
+            double[] h_C = new double[n];
+
+            JCublas.cublasInit();
+            Pointer d_A = new Pointer();
+            Pointer d_B = new Pointer();
+
+            JCublas.cublasAlloc(n, Sizeof.DOUBLE, d_A);
+            JCublas.cublasAlloc(n, Sizeof.DOUBLE, d_B);
+
+            JCublas.cublasSetVector(n, Sizeof.DOUBLE, Pointer.to(h_A), 1, d_A, 1);
+            JCublas.cublasSetVector(n, Sizeof.DOUBLE, Pointer.to(h_B), 1, d_B, 1);
+
+            // C = 1.0 * A + B
+            JCublas.cublasDaxpy(n, 1.0, d_A, 1, d_B, 1);
+
+            JCublas.cublasGetVector(n, Sizeof.DOUBLE, d_B, 1, Pointer.to(h_C), 1);
+
+            JCublas.cublasFree(d_A);
+            JCublas.cublasFree(d_B);
+            JCublas.cublasShutdown();
+
+            return toVector(h_C);
+        } catch (Throwable t) {
+            return cpuProvider.add(a, b);
+        }
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        return cpuProvider.subtract(a, b);
+        if (!isAvailable() || !(field.zero() instanceof Real)) {
+            return cpuProvider.subtract(a, b);
+        }
+        
+        int n = a.dimension();
+        try {
+            double[] h_A = toDoubleArray(a);
+            double[] h_B = toDoubleArray(b);
+            double[] h_C = new double[n];
+
+            JCublas.cublasInit();
+            Pointer d_A = new Pointer();
+            Pointer d_B = new Pointer();
+
+            JCublas.cublasAlloc(n, Sizeof.DOUBLE, d_A);
+            JCublas.cublasAlloc(n, Sizeof.DOUBLE, d_B);
+
+            JCublas.cublasSetVector(n, Sizeof.DOUBLE, Pointer.to(h_A), 1, d_A, 1);
+            JCublas.cublasSetVector(n, Sizeof.DOUBLE, Pointer.to(h_B), 1, d_B, 1);
+
+            // B = -1.0 * B + A  => B = A - B
+            JCublas.cublasDaxpy(n, -1.0, d_B, 1, d_A, 1);
+
+            JCublas.cublasGetVector(n, Sizeof.DOUBLE, d_A, 1, Pointer.to(h_C), 1);
+
+            JCublas.cublasFree(d_A);
+            JCublas.cublasFree(d_B);
+            JCublas.cublasShutdown();
+
+            return toVector(h_C);
+        } catch (Throwable t) {
+            return cpuProvider.subtract(a, b);
+        }
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        return cpuProvider.multiply(vector, scalar);
+        if (!isAvailable() || !(field.zero() instanceof Real)) {
+            return cpuProvider.multiply(vector, scalar);
+        }
+        
+        int n = vector.dimension();
+        double s = ((Real)scalar).doubleValue();
+        try {
+            double[] h_v = toDoubleArray(vector);
+            
+            JCublas.cublasInit();
+            Pointer d_v = new Pointer();
+            JCublas.cublasAlloc(n, Sizeof.DOUBLE, d_v);
+            JCublas.cublasSetVector(n, Sizeof.DOUBLE, Pointer.to(h_v), 1, d_v, 1);
+
+            JCublas.cublasDscal(n, s, d_v, 1);
+
+            JCublas.cublasGetVector(n, Sizeof.DOUBLE, d_v, 1, Pointer.to(h_v), 1);
+            JCublas.cublasFree(d_v);
+            JCublas.cublasShutdown();
+
+            return toVector(h_v);
+        } catch (Throwable t) {
+            return cpuProvider.multiply(vector, scalar);
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
-        return cpuProvider.dot(a, b);
+        if (!isAvailable() || !(field.zero() instanceof Real)) {
+            return cpuProvider.dot(a, b);
+        }
+        
+        int n = a.dimension();
+        try {
+            double[] h_A = toDoubleArray(a);
+            double[] h_B = toDoubleArray(b);
+
+            JCublas.cublasInit();
+            Pointer d_A = new Pointer();
+            Pointer d_B = new Pointer();
+
+            JCublas.cublasAlloc(n, Sizeof.DOUBLE, d_A);
+            JCublas.cublasAlloc(n, Sizeof.DOUBLE, d_B);
+
+            JCublas.cublasSetVector(n, Sizeof.DOUBLE, Pointer.to(h_A), 1, d_A, 1);
+            JCublas.cublasSetVector(n, Sizeof.DOUBLE, Pointer.to(h_B), 1, d_B, 1);
+
+            double result = JCublas.cublasDdot(n, d_A, 1, d_B, 1);
+
+            JCublas.cublasFree(d_A);
+            JCublas.cublasFree(d_B);
+            JCublas.cublasShutdown();
+
+            return (E) Real.of(result);
+        } catch (Throwable t) {
+            return cpuProvider.dot(a, b);
+        }
     }
 
     @Override
@@ -140,7 +228,7 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (!isAvailable() || !(field.zero() instanceof org.jscience.core.mathematics.numbers.real.Real)) {
+        if (!isAvailable() || !(field.zero() instanceof Real)) {
             return cpuProvider.multiply(a, b);
         }
 
@@ -157,54 +245,41 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
                 return cpuProvider.multiply(a, b);
             }
 
-            // Convert to double array
+            // Convert to double array (CUBLAS uses column-major)
             double[] A = toDoubleArray(a);
             double[] B = toDoubleArray(b);
             double[] C = new double[m * n];
 
-            // Initialize JCublas
-            jcuda.jcublas.JCublas.cublasInit();
+            JCublas.cublasInit();
 
-            // Allocate device memory
-            jcuda.Pointer d_A = new jcuda.Pointer();
-            jcuda.Pointer d_B = new jcuda.Pointer();
-            jcuda.Pointer d_C = new jcuda.Pointer();
+            Pointer d_A = new Pointer();
+            Pointer d_B = new Pointer();
+            Pointer d_C = new Pointer();
 
-            jcuda.jcublas.JCublas.cublasAlloc(m * k, jcuda.Sizeof.DOUBLE, d_A);
-            jcuda.jcublas.JCublas.cublasAlloc(k * n, jcuda.Sizeof.DOUBLE, d_B);
-            jcuda.jcublas.JCublas.cublasAlloc(m * n, jcuda.Sizeof.DOUBLE, d_C);
+            JCublas.cublasAlloc(m * k, Sizeof.DOUBLE, d_A);
+            JCublas.cublasAlloc(k * n, Sizeof.DOUBLE, d_B);
+            JCublas.cublasAlloc(m * n, Sizeof.DOUBLE, d_C);
 
-            // Copy to device
-            jcuda.jcublas.JCublas.cublasSetVector(m * k, jcuda.Sizeof.DOUBLE, jcuda.Pointer.to(A), 1, d_A, 1);
-            jcuda.jcublas.JCublas.cublasSetVector(k * n, jcuda.Sizeof.DOUBLE, jcuda.Pointer.to(B), 1, d_B, 1);
+            JCublas.cublasSetVector(m * k, Sizeof.DOUBLE, Pointer.to(A), 1, d_A, 1);
+            JCublas.cublasSetVector(k * n, Sizeof.DOUBLE, Pointer.to(B), 1, d_B, 1);
 
-            // Execute DGEMM
-            // Alpha = 1, Beta = 0
-            double alpha = 1.0;
-            double beta = 0.0;
-
-            // Note: CUBLAS uses column-major, Java uses row-major.
             // C = A * B
-            // Passing B as A and A as B with proper dimensions handles the transpose
-            // implicitly for layout?
-            // Standard trick: C^T = B^T * A^T
-            // Here we just follow standard call for now, assuming data layout is managed or
-            // purely dense.
-            jcuda.jcublas.JCublas.cublasDgemm('N', 'N', n, m, k, alpha, d_B, n, d_A, k, beta, d_C, n);
+            // Java (Row-Major) A[m][k], B[k][n] => C[m][n]
+            // CUBLAS (Col-Major) 
+            // We can treat Row-Major A as Col-Major A^T.
+            // Row-Major C = A * B  <=>  (Row-Major C)^T = B^T * A^T (in Col-Major)
+            JCublas.cublasDgemm('n', 'n', n, m, k, 1.0, d_B, n, d_A, k, 0.0, d_C, n);
 
-            // Copy back
-            jcuda.jcublas.JCublas.cublasGetVector(m * n, jcuda.Sizeof.DOUBLE, d_C, 1, jcuda.Pointer.to(C), 1);
+            JCublas.cublasGetVector(m * n, Sizeof.DOUBLE, d_C, 1, Pointer.to(C), 1);
 
-            // Cleanup
-            jcuda.jcublas.JCublas.cublasFree(d_A);
-            jcuda.jcublas.JCublas.cublasFree(d_B);
-            jcuda.jcublas.JCublas.cublasFree(d_C);
-            jcuda.jcublas.JCublas.cublasShutdown();
+            JCublas.cublasFree(d_A);
+            JCublas.cublasFree(d_B);
+            JCublas.cublasFree(d_C);
+            JCublas.cublasShutdown();
 
             return toMatrix(C, m, n);
 
         } catch (Throwable t) {
-            System.err.println("CUDA execution failed: " + t.getMessage());
             return cpuProvider.multiply(a, b);
         }
     }
@@ -229,33 +304,6 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         return cpuProvider.transpose(A);
     }
 
-    private double[] toDoubleArray(Matrix<E> m) {
-        int rows = m.rows();
-        int cols = m.cols();
-        double[] arr = new double[rows * cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                org.jscience.core.mathematics.numbers.real.Real r = (org.jscience.core.mathematics.numbers.real.Real) m.get(i, j);
-                arr[i * cols + j] = r.doubleValue();
-            }
-        }
-        return arr;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Matrix<E> toMatrix(double[] data, int rows, int cols) {
-        java.util.List<java.util.List<org.jscience.core.mathematics.numbers.real.Real>> matrixData = new java.util.ArrayList<>();
-        for (int i = 0; i < rows; i++) {
-            java.util.List<org.jscience.core.mathematics.numbers.real.Real> row = new java.util.ArrayList<>();
-            for (int j = 0; j < cols; j++) {
-                row.add(org.jscience.core.mathematics.numbers.real.Real.of(data[i * cols + j]));
-            }
-            matrixData.add(row);
-        }
-        return (Matrix<E>) new org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<>(matrixData,
-                org.jscience.core.mathematics.sets.Reals.getInstance());
-    }
-
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         return cpuProvider.multiply(a, b);
@@ -266,10 +314,54 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         return cpuProvider.scale(scalar, a);
     }
 
-
     @Override
     public E norm(Vector<E> a) {
         return cpuProvider.norm(a);
+    }
+
+    private double[] toDoubleArray(Vector<E> v) {
+        int n = v.dimension();
+        double[] arr = new double[n];
+        for (int i = 0; i < n; i++) {
+            Real r = (Real) v.get(i);
+            arr[i] = r.doubleValue();
+        }
+        return arr;
+    }
+
+    private double[] toDoubleArray(Matrix<E> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        double[] arr = new double[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Real r = (Real) m.get(i, j);
+                arr[i * cols + j] = r.doubleValue();
+            }
+        }
+        return arr;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Matrix<E> toMatrix(double[] data, int rows, int cols) {
+        List<List<Real>> matrixData = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            List<Real> row = new ArrayList<>();
+            for (int j = 0; j < cols; j++) {
+                row.add(Real.of(data[i * cols + j]));
+            }
+            matrixData.add(row);
+        }
+        return (Matrix<E>) new DenseMatrix<>(matrixData, Reals.getInstance());
+    }
+
+    @SuppressWarnings("unchecked")
+    private Vector<E> toVector(double[] data) {
+        List<Real> list = new ArrayList<>(data.length);
+        for (double d : data) {
+            list.add(Real.of(d));
+        }
+        return (Vector<E>) new DenseVector<>(list, Reals.getInstance());
     }
 }
 

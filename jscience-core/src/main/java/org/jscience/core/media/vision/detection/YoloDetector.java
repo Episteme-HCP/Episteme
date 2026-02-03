@@ -38,6 +38,7 @@ import org.jscience.core.mathematics.ml.runtime.OnnxRuntimeProvider;
  * @since 2.0
  */
 public class YoloDetector {
+    @SuppressWarnings("unused")
     private OnnxRuntimeProvider.OnnxSession session;
 
     public YoloDetector(Path modelPath) {

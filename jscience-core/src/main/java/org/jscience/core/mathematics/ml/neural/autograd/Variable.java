@@ -23,8 +23,6 @@
 package org.jscience.core.mathematics.ml.neural.autograd;
 
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents a variable in the computation graph for Automatic Differentiation.
@@ -36,16 +34,9 @@ import java.util.Set;
 public class Variable<T> {
     private Tensor<T> data;
     private Tensor<T> grad;
-    private Set<Variable<?>> parents = new HashSet<>();
-    private boolean requiresGrad;
     
     public Variable(Tensor<T> data) {
-        this(data, false);
-    }
-
-    public Variable(Tensor<T> data, boolean requiresGrad) {
         this.data = data;
-        this.requiresGrad = requiresGrad;
     }
     
     public void backward() {

@@ -5,7 +5,6 @@
 package org.jscience.nativ.mathematics.logic.fuzzy.backends;
 
 import org.jscience.core.mathematics.logic.fuzzy.FuzzyExpression;
-import org.jscience.core.mathematics.logic.fuzzy.LinguisticVariable;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.Collection;
 import java.util.List;

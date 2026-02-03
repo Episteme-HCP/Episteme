@@ -1,17 +1,12 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- */
-package org.jscience.core.computing.ai.verification;
+package org.jscience.natural.computing.ai.verification;
 
-import org.jscience.core.computing.ai.agents.Agent;
-import org.jscience.core.computing.ai.agents.Behavior;
-import org.jscience.core.computing.ai.agents.Environment;
-import org.jscience.core.computing.ai.agents.providers.VirtualThreadAgentProvider;
+import org.jscience.natural.computing.ai.agents.Agent;
+import org.jscience.natural.computing.ai.agents.Behavior;
+import org.jscience.natural.computing.ai.agents.Environment;
+import org.jscience.natural.computing.ai.agents.providers.VirtualThreadAgentProvider;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.time.Duration;
 
 /**
  * Verification class to test the Virtual Thread Agent Provider.

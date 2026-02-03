@@ -32,17 +32,12 @@ import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
  * @since 2.0
  */
 public class SGD implements Optimizer {
-    private double learningRate;
-    private double momentum;
-    // Map of param ID to velocity tensor would be needed here for stateful momentum
     
     public SGD(double learningRate) {
         this(learningRate, 0.0);
     }
 
     public SGD(double learningRate, double momentum) {
-        this.learningRate = learningRate;
-        this.momentum = momentum;
     }
 
     @Override

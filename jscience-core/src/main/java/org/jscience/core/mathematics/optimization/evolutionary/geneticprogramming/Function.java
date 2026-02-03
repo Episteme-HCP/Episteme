@@ -19,7 +19,7 @@ public abstract class Function extends Program {
         Function temp = null;
 
         try {
-            temp = (Function) getClass().newInstance();
+            temp = (Function) getClass().getDeclaredConstructor().newInstance();
 
             for (int i = 0; i < arg.length; i++) {
                 temp.arg[i] = (Program) arg[i].clone();

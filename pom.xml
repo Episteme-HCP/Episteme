@@ -77,6 +77,7 @@
     <javafx.version>21.0.1</javafx.version>
     <mockito.version>5.11.0</mockito.version>
     <resilience4j.version>2.2.0</resilience4j.version>
+    <onnxruntime.version>1.17.1</onnxruntime.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -316,6 +317,12 @@
         <groupId>io.github.resilience4j</groupId>
         <artifactId>resilience4j-ratelimiter</artifactId>
         <version>${resilience4j.version}</version>
+      </dependency>
+      <!-- ONNX Runtime -->
+      <dependency>
+        <groupId>com.microsoft.onnxruntime</groupId>
+        <artifactId>onnxruntime</artifactId>
+        <version>${onnxruntime.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

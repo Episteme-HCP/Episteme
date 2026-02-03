@@ -95,18 +95,9 @@ public abstract class BinaryCodedGA {
      */
     protected int historyLength = 0;
 
-    // Temporary Variables used in the methods - These are not nice variables
-    // TODO: Remove them if possible!
 
-    /**
-     * TODO: Remove this vriable in the future relases.
-     */
-    protected double tmpSumx;
-
-    /**
-     * TODO: Remove this vriable in the future relases.
-     */
-    protected double tmpSumOfFitnesses;
+    // Total sum of fitnesses for the current population (used for selection)
+    protected double sumOfFitnesses;
 
     /**
      * Creates a binary-coded genetic algorithm with default parameters.
@@ -196,8 +187,7 @@ public abstract class BinaryCodedGA {
             if (i == 0) {
                 maxFitness = currentPopulationFitness[i];
                 minFitness = currentPopulationFitness[i];
-                tmpSumOfFitnesses = 0.0;
-                tmpSumx = 0.0;
+                sumOfFitnesses = 0.0;
             }
 
             if (currentPopulationFitness[i] > maxFitness) {
@@ -208,12 +198,11 @@ public abstract class BinaryCodedGA {
                 minFitness = currentPopulationFitness[i];
             }
 
-            tmpSumOfFitnesses += currentPopulationFitness[i];
-            tmpSumx += currentPopulationFitness[i];
+            sumOfFitnesses += currentPopulationFitness[i];
         }
 
         if (historyLength > 0) {
-            historyAvgFitness[0] = tmpSumx / (double) populationSize;
+            historyAvgFitness[0] = sumOfFitnesses / (double) populationSize;
             historyMaxFitness[0] = maxFitness;
             historyMinFitness[0] = minFitness;
         }
@@ -232,7 +221,7 @@ public abstract class BinaryCodedGA {
     public double evaluateIndividual(int chromosomeNo, boolean[] chromosome) {
         // This method should be overriden by the child classes.
         // InvalidGAConfigurationException is thrown if not overrided.
-        throw new InvalidGAConfigurationException("evaluateIndividual(int chromosomeNo, boolean[] chromosome) method in org.jscience.computing.ai.BinaryCodedGA should be overridden.");
+        throw new InvalidGAConfigurationException("evaluateIndividual(int chromosomeNo, boolean[] chromosome) method in BinaryCodedGA should be overridden.");
     }
 
     /**
@@ -273,8 +262,7 @@ public abstract class BinaryCodedGA {
                 maxFitness = currentPopulationFitness[l];
                 bestChromosomeNo = l;
                 minFitness = currentPopulationFitness[l];
-                tmpSumOfFitnesses = 0.0;
-                tmpSumx = 0.0;
+                sumOfFitnesses = 0.0;
             }
 
             if (currentPopulationFitness[l] > maxFitness) {
@@ -286,12 +274,11 @@ public abstract class BinaryCodedGA {
                 minFitness = currentPopulationFitness[l];
             }
 
-            tmpSumOfFitnesses += currentPopulationFitness[l];
-            tmpSumx += currentPopulationFitness[l];
+            sumOfFitnesses += currentPopulationFitness[l];
         }
 
         if (historyLength > generationNo) {
-            historyAvgFitness[generationNo] = tmpSumx / (double) populationSize;
+            historyAvgFitness[generationNo] = sumOfFitnesses / (double) populationSize;
             historyMaxFitness[generationNo] = maxFitness;
             historyMinFitness[generationNo] = minFitness;
         }
@@ -305,7 +292,7 @@ public abstract class BinaryCodedGA {
      * @return index of the selected chromosome in the current population.
      */
     protected int selectChromosome() {
-        double f = (float) Math.random() * tmpSumOfFitnesses;
+        double f = (float) Math.random() * sumOfFitnesses;
         int i = -1;
 
         for (float f1 = 0.0F; (i < (populationSize - 1)) && (f1 < f);
@@ -371,8 +358,7 @@ public abstract class BinaryCodedGA {
                     "mosomeFitness() - Invalid fitness value: " + newFitness);
         }
 
-        tmpSumOfFitnesses -= currentPopulationFitness[chromosomeNo];
-        tmpSumx -= currentPopulationFitness[chromosomeNo];
+        sumOfFitnesses -= currentPopulationFitness[chromosomeNo];
 
         currentPopulationFitness[chromosomeNo] = newFitness;
 
@@ -384,8 +370,7 @@ public abstract class BinaryCodedGA {
             minFitness = currentPopulationFitness[chromosomeNo];
         }
 
-        tmpSumOfFitnesses += currentPopulationFitness[chromosomeNo];
-        tmpSumx += currentPopulationFitness[chromosomeNo];
+        sumOfFitnesses += currentPopulationFitness[chromosomeNo];
     }
 
     /**

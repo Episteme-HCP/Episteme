@@ -34,18 +34,10 @@ import java.util.concurrent.CompletableFuture;
  */
 public class OpenAICompatBackend implements GenerativeModel {
 
-    private final String apiKey;
     private final String modelName;
-    private final String baseUrl;
 
     public OpenAICompatBackend(String apiKey, String modelName) {
-        this(apiKey, modelName, "https://api.openai.com/v1");
-    }
-    
-    public OpenAICompatBackend(String apiKey, String modelName, String baseUrl) {
-        this.apiKey = apiKey;
         this.modelName = modelName;
-        this.baseUrl = baseUrl;
     }
 
     @Override

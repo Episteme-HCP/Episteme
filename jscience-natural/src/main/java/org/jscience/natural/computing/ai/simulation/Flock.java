@@ -24,7 +24,6 @@ package org.jscience.natural.computing.ai.simulation;
 
 import java.util.Random;
 import java.util.Vector;
-import org.jscience.natural.computing.ai.simulation.FlockingAgent;
 
 /**
  * Craig Reynolds' Boids Algorithm.
@@ -78,19 +77,26 @@ public class Flock {
             boid.positionY = random.nextInt(rows);
             boids.add(boid);
         }
-        
-        // Static initialization for legacy FlockingAgent
-        FlockingAgent.cols = columns;
-        FlockingAgent.rows = rows;
-        FlockingAgent.myFlock = boids.toArray(new FlockingAgent[0]);
+
+        // Initialize the boids with world dimensions and self-reference
+        FlockingAgent[] flockArray = boids.toArray(new FlockingAgent[0]);
+        for (FlockingAgent boid : flockArray) {
+            boid.worldCols = columns;
+            boid.worldRows = rows;
+            boid.myFlock = flockArray;
+        }
     }
 
     /**
      * Perform a step.
      */
     public void doStep() {
-        // Sync the static array just in case
-        FlockingAgent.myFlock = boids.toArray(new FlockingAgent[0]);
+        FlockingAgent[] flockArray = boids.toArray(new FlockingAgent[0]);
+        
+        // Use instance passing if needed, but here we just ensure each agent has the array
+        for (FlockingAgent boid : flockArray) {
+            boid.myFlock = flockArray;
+        }
 
         // First pass: compute headings
         for (int i = 0; i < numBoids; i++) {

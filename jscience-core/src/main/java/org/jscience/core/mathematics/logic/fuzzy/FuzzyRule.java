@@ -209,7 +209,7 @@ public class FuzzyRule {
         input = input.substring(index);
 
         // Add Fuzzy Expression(FE)
-        addFE(new FuzzyExpression(lv, mf), isLeftFE);
+        addFE(new FuzzyExpression<>(lv, mf), isLeftFE);
 
         return input.trim();
     }
@@ -241,10 +241,10 @@ public class FuzzyRule {
     private void addFE(FuzzyExpression<?> exp, boolean isLeftFE) {
         if (isLeftFE) {
             if (mLeftFuzzyExpressions == null) {
-                mLeftFuzzyExpressions = new FuzzyExpression[1];
+                mLeftFuzzyExpressions = new FuzzyExpression<?>[1];
                 mLeftFuzzyExpressions[0] = exp;
             } else {
-                FuzzyExpression<?>[] tmp = new FuzzyExpression[mLeftFuzzyExpressions.length +
+                FuzzyExpression<?>[] tmp = new FuzzyExpression<?>[mLeftFuzzyExpressions.length +
                         1];
 
                 for (int i = 0; i < mLeftFuzzyExpressions.length; i++) {
@@ -256,10 +256,10 @@ public class FuzzyRule {
             }
         } else {
             if (mRightFuzzyExpressions == null) {
-                mRightFuzzyExpressions = new FuzzyExpression[1];
+                mRightFuzzyExpressions = new FuzzyExpression<?>[1];
                 mRightFuzzyExpressions[0] = exp;
             } else {
-                FuzzyExpression<?>[] tmp = new FuzzyExpression[mRightFuzzyExpressions.length +
+                FuzzyExpression<?>[] tmp = new FuzzyExpression<?>[mRightFuzzyExpressions.length +
                         1];
 
                 for (int i = 0; i < mRightFuzzyExpressions.length; i++) {

@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 public class SimpleVectorDB {
     
     private static class DocumentEntry {
+        @SuppressWarnings("unused")
         String id;
         String content;
         float[] embedding; // Embedding vector

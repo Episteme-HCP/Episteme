@@ -55,10 +55,10 @@ public class FlockingAgent implements Agent {
     protected static Random rnd;
 
     /** The width of the flocking agent's world. */
-    protected static int rows;
+    protected int worldRows;
 
     /** The height of the flocking agent's world. */
-    protected static int cols;
+    protected int worldCols;
 
     /** The viewing angle of the agent. */
     protected static double viewA;
@@ -103,13 +103,7 @@ public class FlockingAgent implements Agent {
     protected static double ddt;
 
     /** The flock this agent is in. */
-    protected static FlockingAgent[] myFlock;
-
-    /** DOCUMENT ME! */
-    protected static double nx;
-
-    /** DOCUMENT ME! */
-    protected static double ny;
+    protected FlockingAgent[] myFlock;
 
     /** The x-position of this agent. */
     protected double positionX;
@@ -145,17 +139,17 @@ public class FlockingAgent implements Agent {
      */
     public FlockingAgent() {
         // Set the random position of the FA
-        positionX = Math.abs(rnd.nextInt() % cols);
-        positionY = Math.abs(rnd.nextInt() % rows);
+        positionX = Math.abs(rnd.nextInt() % (worldCols > 0 ? worldCols : 800));
+        positionY = Math.abs(rnd.nextInt() % (worldRows > 0 ? worldRows : 600));
 
         // Set the random velocity
         vx = (2 * rnd.nextDouble()) - 1;
         vy = (2 * rnd.nextDouble()) - 1;
 
         // Normalize the results
-        normalize(vx, vy);
-        vx = nx;
-        vy = ny;
+        double[] n = normalize(vx, vy);
+        vx = n[0];
+        vy = n[1];
         this.name = "Boid-" + id.toString().substring(0, 8);
         Behavior flockBehavior = new FlockingBehavior(this, -1);
         flockBehavior.setAgent(this);
@@ -207,11 +201,14 @@ public class FlockingAgent implements Agent {
      * @param vaa DOCUMENT ME!
      * @param mv DOCUMENT ME!
      */
-    public static void initMisc(Random r, int rr, int cc, /*Viewer v,*/
+    public void setWorldDimensions(int rows, int cols) {
+        this.worldRows = rows;
+        this.worldCols = cols;
+    }
+    
+    public static void initMisc(Random r, int rr, int cc,
         double va, double vaa, double mv) {
         rnd = r;
-        rows = rr;
-        cols = cc;
         viewA = (va * Math.PI) / 180.0;
         vAvoidA = (vaa * Math.PI) / 180.0;
         minV = mv;
@@ -266,10 +263,8 @@ public class FlockingAgent implements Agent {
      *
      * @param flock DOCUMENT ME!
      */
-    public static void setFlock(FlockingAgent[] flock) {
-        // FIXME: Check to see if this is member flock?s
-        // FIXME: This shouldn't be static if we want multiple flocks.
-        myFlock = flock;
+    public void setFlock(FlockingAgent[] flock) {
+        this.myFlock = flock;
     }
 
     /**
@@ -278,39 +273,36 @@ public class FlockingAgent implements Agent {
      * @param x DOCUMENT ME!
      * @param y DOCUMENT ME!
      */
-    protected static void normalize(double x, double y) {
-        // FIXME: Don't like the way this is done, not very OOP. Returning an
-        // FIXME: array might have a performance hit though.
+    protected static double[] normalize(double x, double y) {
         double l = len(x, y);
 
         if (l != 0.0) {
-            nx = x / l;
-            ny = y / l;
+            return new double[] { x / l, y / l };
         }
+        return new double[] { x, y };
     }
 
-    /**
-     * DOCUMENT ME!
+     /**
+     * Calculates the Euclidean length of a 2D vector.
      *
-     * @param x DOCUMENT ME!
-     * @param y DOCUMENT ME!
+     * @param x the x component
+     * @param y the y component
      *
-     * @return DOCUMENT ME!
+     * @return the length
      */
     protected static double len(double x, double y) {
-        // TODO: Is it worth sqrting this?
         return Math.sqrt((x * x) + (y * y));
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the Euclidean distance between two points.
      *
-     * @param x1 DOCUMENT ME!
-     * @param y1 DOCUMENT ME!
-     * @param x2 DOCUMENT ME!
-     * @param y2 DOCUMENT ME!
+     * @param x1 x-coordinate of the first point
+     * @param y1 y-coordinate of the first point
+     * @param x2 x-coordinate of the second point
+     * @param y2 y-coordinate of the second point
      *
-     * @return DOCUMENT ME!
+     * @return the distance
      */
     protected static double dist(double x1, double y1, double x2, double y2) {
         return len(x2 - x1, y2 - y1);
@@ -377,8 +369,8 @@ public class FlockingAgent implements Agent {
 
             mindist = Double.MAX_VALUE;
 
-            for (int j = -cols; j <= cols; j += cols) {
-                for (int k = -rows; k <= rows; k += rows) {
+            for (int j = -worldCols; j <= worldCols; j += worldCols) {
+                for (int k = -worldRows; k <= worldRows; k += worldRows) {
                     d = dist(myFlock[b].positionX + j,
                             myFlock[b].positionY + k, positionX, positionY);
 
@@ -466,27 +458,27 @@ public class FlockingAgent implements Agent {
         }
 
         if (len(xa, ya) > 1.0) {
-            normalize(xa, ya);
-            xa = nx;
-            ya = ny;
+            double[] n = normalize(xa, ya);
+            xa = n[0];
+            ya = n[1];
         }
 
         if (len(xb, yb) > 1.0) {
-            normalize(xb, yb);
-            xb = nx;
-            yb = ny;
+            double[] n = normalize(xb, yb);
+            xb = n[0];
+            yb = n[1];
         }
 
         if (len(xc, yc) > 1.0) {
-            normalize(xc, yc);
-            xc = nx;
-            yc = ny;
+            double[] n = normalize(xc, yc);
+            xc = n[0];
+            yc = n[1];
         }
 
         if (len(xd, yd) > 1.0) {
-            normalize(xd, yd);
-            xd = nx;
-            yd = ny;
+            double[] n = normalize(xd, yd);
+            xd = n[0];
+            yd = n[1];
         }
 
         xt = (centroidW * xa) + (copyW * xb) + (avoidW * xc) + (vAvoidW * xd);
@@ -518,15 +510,15 @@ public class FlockingAgent implements Agent {
 
         // Apply torodial geometry (wrap around)
         if (positionX < 0) {
-            positionX += cols;
-        } else if (positionX >= cols) {
-            positionX -= cols;
+            positionX += worldCols;
+        } else if (positionX >= worldCols) {
+            positionX -= worldCols;
         }
 
         if (positionY < 0) {
-            positionY += rows;
-        } else if (positionY >= rows) {
-            positionY -= rows;
+            positionY += worldRows;
+        } else if (positionY >= worldRows) {
+            positionY -= worldRows;
         }
     }
 
@@ -552,9 +544,9 @@ public class FlockingAgent implements Agent {
         // direction line
         x3 = vx;
         y3 = vy;
-        normalize(x3, y3);
-        x3 = nx;
-        y3 = ny;
+        double[] n = normalize(x3, y3);
+        x3 = n[0];
+        y3 = n[1];
         x1 = positionX;
         y1 = positionY;
         x2 = x1 - (x3 * tailLen);
