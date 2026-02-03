@@ -199,6 +199,11 @@ public final class Units {
         public static final Unit<Dimensionless> ONE = new StandardUnit<>("1", "one", Dimension.DIMENSIONLESS);
 
         /**
+         * Percent unit: % = 1/100.
+         */
+        public static final Unit<Dimensionless> PERCENT = ONE.divide(100);
+
+        /**
          * Square meter: mÃ‚Â² (area).
          */
         @SuppressWarnings("unchecked")
@@ -437,6 +442,8 @@ public final class Units {
                 UNIT_BY_SYMBOL.put("cd", CANDELA);
                 UNIT_BY_SYMBOL.put("rad", RADIAN);
                 UNIT_BY_SYMBOL.put("sr", STERADIAN);
+                UNIT_BY_SYMBOL.put("%", PERCENT);
+                UNIT_BY_SYMBOL.put("percent", PERCENT);
 
                 // Derived units
                 UNIT_BY_SYMBOL.put("km", KILOMETER);

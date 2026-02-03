@@ -33,8 +33,11 @@ import org.jscience.natural.biology.genetics.BioSequence;
 import org.jscience.natural.biology.genetics.SequenceAlignment;
 import org.jscience.natural.earth.coordinates.GeodeticCoordinate;
 import org.jscience.natural.earth.coordinates.ReferenceEllipsoid;
-import org.jscience.natural.computing.ai.neuralnetwork.Layer;
-import org.jscience.natural.computing.ai.neuralnetwork.ActivationFunction;
+import org.jscience.core.mathematics.ml.neural.layers.Layer;
+import org.jscience.core.mathematics.ml.neural.layers.Linear;
+import org.jscience.core.mathematics.ml.neural.layers.ActivationLayer;
+import org.jscience.core.mathematics.ml.neural.layers.Sequential;
+import org.jscience.core.mathematics.ml.neural.ActivationFunction;
 
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Mass;
@@ -109,7 +112,12 @@ public class ScienceVerificationTest {
     @Test
     public void testComputingNeuralNetwork() {
         System.out.println("Verifying Computing AI...");
-        Layer layer = new Layer(3, 2, ActivationFunction.RELU);
+        // Define a simple MLP: 3 inputs -> 2 outputs with ReLU
+        Sequential<Real> sequential = new Sequential<>();
+        sequential.add(new Linear<>(3, 2));
+        sequential.add(new ActivationLayer<>(ActivationFunction.RELU));
+        
+        Layer<Real> layer = sequential;
 
         List<Real> inputList = new ArrayList<>();
         inputList.add(Real.of(1.0));

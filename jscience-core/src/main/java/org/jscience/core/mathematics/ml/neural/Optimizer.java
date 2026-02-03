@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.ml.neural;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import java.util.Map;
 
 /**
@@ -31,17 +31,22 @@ import java.util.Map;
  * Examples: SGD, Adam, RMSProp.
  *
  * @param <T> the data type.
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 2.0
  */
 public interface Optimizer<T> {
 
     /**
-     * Updates the parameters based on their gradients.
+     * Updates the parameters based on their internal gradients.
      * 
      * @param parameters valid map of parameters to update.
-     * @param gradients corresponding map of gradients.
      */
-    void update(Map<String, Tensor<T>> parameters, Map<String, Tensor<T>> gradients);
+    void step(Map<String, GraphNode<T>> parameters);
+    
+    /**
+     * Resets gradients to zero.
+     * 
+     * @param parameters map of parameters to reset.
+     */
+    default void zeroGrad(Map<String, GraphNode<T>> parameters) {
+        parameters.values().forEach(p -> p.setGrad(null));
+    }
 }

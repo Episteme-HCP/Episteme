@@ -24,6 +24,10 @@
 package org.jscience.social.politics.loaders;
 
 import org.jscience.social.politics.Country;
+import org.jscience.social.politics.GovernmentType;
+import org.jscience.social.economics.money.Money;
+import org.jscience.core.measure.Quantities;
+import org.jscience.core.measure.Units;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -34,22 +38,23 @@ import java.util.List;
 
 import org.jscience.core.io.AbstractResourceReader;
 import org.jscience.core.io.MiniCatalog;
+import org.jscience.core.util.persistence.PersistenceManager;
 import java.util.Optional;
 
 /**
  * Production loader for the CIA World Factbook XML data.
  * 
  * Parses country information including:
- * - Basic country details (name, capital, area)
- * - Population and demographics
- * - Government type
- * - Economic indicators
- * - Geographic information
+ * Reader for the CIA World Factbook XML data.
+ * <p>
+ * This loader parses country-level demographic, geographic, and political data
+ * and populates {@link Country} objects.
+ * </p>
  * 
  * @see <a href="https://www.cia.gov/the-world-factbook/">CIA World Factbook</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.1
  */
 public class FactbookReader extends AbstractResourceReader<List<Country>> {
 
@@ -162,6 +167,8 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
                     Country country = parseCountry(elem);
                     if (country != null) {
                         countries.add(country);
+                        // Persist to the global knowledge graph
+                        PersistenceManager.getInstance().save(country);
                     }
                 } catch (Exception e) {
                     LOG.warn("Failed to parse country at index {}: {}", i, e.getMessage());
@@ -276,7 +283,7 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         // Government type
         String government = getTextValue(elem, "government");
         if (government != null && !government.isEmpty()) {
-            country.setGovernmentType(government);
+            country.setGovernmentType(GovernmentType.of(government));
         }
 
         // Region/Continent
@@ -299,10 +306,28 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
             }
         }
 
-        // Economy & Demographics (if available in XML)
-        // String gdp = getTextValue(elem, "gdp");
-        // ... (Parsing other fields would go here, but XML structure is hypothetical.
-        // We will rely on sample data for full richness if XML is missing)
+        // Economy & Demographics
+        String lifeExp = getTextValue(elem, "lifeExpectancy");
+        if (lifeExp != null && !lifeExp.isEmpty()) {
+            try {
+                country.setLifeExpectancy(org.jscience.core.measure.Quantities.create(Double.parseDouble(lifeExp), org.jscience.core.measure.Units.YEAR));
+            } catch (NumberFormatException e) { }
+        }
+
+        String stability = getTextValue(elem, "stability");
+        if (stability != null && !stability.isEmpty()) {
+            try {
+                country.setStability(org.jscience.core.measure.Quantities.create(Double.parseDouble(stability), org.jscience.core.measure.Units.ONE));
+            } catch (NumberFormatException e) { }
+        }
+
+        String milSpending = getTextValue(elem, "militarySpending");
+        if (milSpending != null && !milSpending.isEmpty()) {
+            try {
+                // Assume USD for simplicity in XML tag
+                country.setMilitarySpending(org.jscience.social.economics.money.Money.usd(Double.parseDouble(milSpending)));
+            } catch (NumberFormatException e) { }
+        }
     }
 
     /**
@@ -337,13 +362,13 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
 
         // France
         Country france = new Country("France", "FR", "FRA", 250, "Paris", "Europe", 67_750_000L, 643_801.0);
-        france.setGovernmentType("Semi-presidential republic");
+        france.setGovernmentType(GovernmentType.of("Semi-presidential republic"));
         france.setIndependenceYear(843);
-        france.setLifeExpectancy(82.5);
-        france.setPopulationGrowthRate(0.21);
+        france.setLifeExpectancy(Quantities.create(82.5, Units.YEAR));
+        france.setPopulationGrowthRate(Quantities.create(0.21, Units.PERCENT));
         france.setCurrencyCode("EUR");
-        france.setStability(0.92);
-        france.setMilitarySpending(50.0);
+        france.setStability(Quantities.create(0.92, Units.ONE));
+        france.setMilitarySpending(Money.eur(50.0 * 1_000_000_000));
         france.getMajorIndustries().addAll(List.of("aerospace", "automotive", "pharmaceuticals", "tourism"));
         france.getNaturalResources().addAll(List.of("coal", "iron ore", "bauxite", "zinc"));
         france.getBorderCountries().addAll(List.of("BEL", "LUX", "DEU", "CHE", "ITA", "ESP", "AND", "MCO"));
@@ -352,13 +377,13 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         // United States
         Country usa = new Country("United States", "US", "USA", 840, "Washington, D.C.", "North America", 331_900_000L,
                 9_833_517.0);
-        usa.setGovernmentType("Federal presidential constitutional republic");
+        usa.setGovernmentType(GovernmentType.REPUBLIC);
         usa.setIndependenceYear(1776);
-        usa.setLifeExpectancy(78.5);
-        usa.setPopulationGrowthRate(0.4);
+        usa.setLifeExpectancy(Quantities.create(78.5, Units.YEAR));
+        usa.setPopulationGrowthRate(Quantities.create(0.4, Units.PERCENT));
         usa.setCurrencyCode("USD");
-        usa.setStability(0.95);
-        usa.setMilitarySpending(850.0);
+        usa.setStability(Quantities.create(0.95, Units.ONE));
+        usa.setMilitarySpending(Money.usd(850.0 * 1_000_000_000));
         usa.getMajorIndustries().addAll(List.of("technology", "aerospace", "automotive", "healthcare"));
         usa.getNaturalResources().addAll(List.of("coal", "copper", "lead", "uranium", "natural gas"));
         usa.getBorderCountries().addAll(List.of("CAN", "MEX"));
@@ -366,13 +391,13 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
 
         // China
         Country china = new Country("China", "CN", "CHN", 156, "Beijing", "Asia", 1_411_750_000L, 9_596_960.0);
-        china.setGovernmentType("Communist party-led state");
+        china.setGovernmentType(GovernmentType.COMMUNIST_STATE);
         china.setIndependenceYear(1949);
-        china.setLifeExpectancy(77.3);
-        china.setPopulationGrowthRate(0.03);
+        china.setLifeExpectancy(Quantities.create(77.3, Units.YEAR));
+        china.setPopulationGrowthRate(Quantities.create(0.03, Units.PERCENT));
         china.setCurrencyCode("CNY");
-        china.setStability(0.90);
-        china.setMilitarySpending(230.0);
+        china.setStability(Quantities.create(0.90, Units.ONE));
+        china.setMilitarySpending(Money.usd(230.0 * 1_000_000_000)); // USD equivalent
         china.getMajorIndustries().addAll(List.of("manufacturing", "mining", "electronics", "textiles"));
         china.getNaturalResources().addAll(List.of("coal", "iron ore", "rare earths", "tungsten"));
         china.getBorderCountries().addAll(List.of("AFG", "BTN", "IND", "KAZ", "PRK", "KGZ", "LAO", "MNG"));
@@ -380,13 +405,13 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
 
         // Brazil
         Country brazil = new Country("Brazil", "BR", "BRA", 76, "BrasÃ­lia", "South America", 214_000_000L, 8_515_767.0);
-        brazil.setGovernmentType("Federal presidential constitutional republic");
+        brazil.setGovernmentType(GovernmentType.REPUBLIC);
         brazil.setIndependenceYear(1822);
-        brazil.setLifeExpectancy(75.9);
-        brazil.setPopulationGrowthRate(0.52);
+        brazil.setLifeExpectancy(Quantities.create(75.9, Units.YEAR));
+        brazil.setPopulationGrowthRate(Quantities.create(0.52, Units.PERCENT));
         brazil.setCurrencyCode("BRL");
-        brazil.setStability(0.70);
-        brazil.setMilitarySpending(20.0);
+        brazil.setStability(Quantities.create(0.70, Units.ONE));
+        brazil.setMilitarySpending(Money.usd(20.0 * 1_000_000_000));
         brazil.getMajorIndustries().addAll(List.of("agriculture", "mining", "manufacturing", "services"));
         brazil.getNaturalResources().addAll(List.of("iron ore", "manganese", "bauxite", "gold", "timber"));
         brazil.getBorderCountries()
@@ -395,23 +420,23 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         
         // Russia (Merged)
         Country russia = new Country("Russia", "RU", "RUS", 643, "Moscow", "Europe", 144_100_000L, 17_098_242.0);
-        russia.setGovernmentType("Semi-presidential federation");
-        russia.setStability(0.40);
-        russia.setMilitarySpending(100.0);
+        russia.setGovernmentType(GovernmentType.FEDERATION);
+        russia.setStability(Quantities.create(0.40, Units.ONE));
+        russia.setMilitarySpending(Money.usd(100.0 * 1_000_000_000));
         samples.add(russia);
         
         // India (Merged)
         Country india = new Country("India", "IN", "IND", 356, "New Delhi", "Asia", 1_380_000_000L, 3_287_263.0);
-        india.setGovernmentType("Federal parliamentary republic");
-        india.setStability(0.85);
-        india.setMilitarySpending(75.0);
+        india.setGovernmentType(GovernmentType.of("Federal parliamentary republic"));
+        india.setStability(Quantities.create(0.85, Units.ONE));
+        india.setMilitarySpending(Money.usd(75.0 * 1_000_000_000));
         samples.add(india);
         
         // Canada (Merged)
         Country canada = new Country("Canada", "CA", "CAN", 124, "Ottawa", "North America", 38_000_000L, 9_984_670.0);
-        canada.setGovernmentType("Federal parliamentary constitutional monarchy");
-        canada.setStability(0.99);
-        canada.setMilitarySpending(25.0);
+        canada.setGovernmentType(GovernmentType.of("Federal parliamentary constitutional monarchy"));
+        canada.setStability(Quantities.create(0.99, Units.ONE));
+        canada.setMilitarySpending(Money.usd(25.0 * 1_000_000_000));
         samples.add(canada);
 
         return samples;

@@ -5,23 +5,30 @@
 
 package org.jscience.natural.computing.ml;
 
-import org.jscience.core.util.persistence.Attribute;
+import org.jscience.core.mathematics.ml.neural.layers.Layer;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Represents a neural network model.
+ * <p>
+ * This model wraps the modern tensor-based neural network architecture
+ * from {@code jscience-core} with persistent capabilities.
+ * </p>
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
 @Persistent
 public class NeuralNetworkModel extends Model {
     private static final long serialVersionUID = 1L;
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private final List<Layer> layers = new ArrayList<>();
+    private final List<Layer<?>> layers = new ArrayList<>();
 
     public NeuralNetworkModel() {
     }
@@ -30,39 +37,12 @@ public class NeuralNetworkModel extends Model {
         super(name);
     }
 
-    public void addLayer(Layer layer) {
+    public void addLayer(Layer<?> layer) {
         layers.add(layer);
     }
-
-    @Persistent
-    public static class Layer implements Serializable {
-        @Attribute
-        private int neuronCount;
-        @Attribute
-        private String activation;
-
-        @Relation(type = Relation.Type.ONE_TO_MANY)
-        private final List<Neuron> neurons = new ArrayList<>();
-
-        public Layer() {}
-        public Layer(int count) { this.neuronCount = count; }
-        public void setActivation(String activation) { this.activation = activation; }
-        public void addNeuron(Neuron neuron) { neurons.add(neuron); }
-    }
-
-    @Persistent
-    public static class Neuron implements Serializable {
-        @Attribute
-        private String id;
-        @Attribute
-        private double bias;
-        @Attribute
-        private final java.util.Map<String, Double> weights = new java.util.HashMap<>();
-
-        public Neuron() {}
-        public Neuron(String id) { this.id = id; }
-        public void setBias(double bias) { this.bias = bias; }
-        public void addWeight(String from, double weight) { weights.put(from, weight); }
+    
+    public List<Layer<?>> getLayers() {
+        return layers;
     }
 }
 

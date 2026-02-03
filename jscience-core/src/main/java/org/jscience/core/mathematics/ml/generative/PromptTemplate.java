@@ -20,50 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jscience.natural.computing.ai.agents.services;
+package org.jscience.core.mathematics.ml.generative;
 
-import org.jscience.core.util.persistence.Attribute;
-import org.jscience.core.util.persistence.Id;
-import org.jscience.core.util.persistence.Persistent;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
- * Describes a service offered by an agent.
+ * Engine for managing structured LLM prompts with variable substitution.
+ * Uses {{variable}} syntax.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
-@Persistent
-public class ServiceDescription {
-    @Id
-    private String id = UUID.randomUUID().toString();
-    
-    @Attribute
-    private String type;
-    
-    @Attribute
-    private String name;
-    
-    @Attribute
-    private Map<String, Object> properties = new HashMap<>();
+public class PromptTemplate {
 
-    public ServiceDescription(String type, String name) {
-        this.type = type;
-        this.name = name;
+    private final String template;
+
+    public PromptTemplate(String template) {
+        this.template = template;
     }
 
-    public String getType() { return type; }
-    public String getName() { return name; }
-    
-    public void addProperty(String key, Object value) {
-        properties.put(key, value);
-    }
-    
-    public Object getProperty(String key) {
-        return properties.get(key);
+    /**
+     * Renders the template with provided variables.
+     * 
+     * @param variables map of variable names to values.
+     * @return the rendered prompt.
+     */
+    public String render(Map<String, Object> variables) {
+        String result = template;
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+            String placeholder = "{{" + entry.getKey() + "}}";
+            result = result.replace(placeholder, String.valueOf(entry.getValue()));
+        }
+        return result;
     }
 
-    @Override
-    public String toString() {
-        return "ServiceDescription{type='" + type + "', name='" + name + "'}";
+    public static PromptTemplate of(String template) {
+        return new PromptTemplate(template);
     }
 }

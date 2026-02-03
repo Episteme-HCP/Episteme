@@ -7,12 +7,31 @@ package org.jscience.social.economics.models;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 /**
- * Implementation of the Leontief Input-Output model using high-performance backends.
+ * Implementation of the Leontief Input-Output model.
  * <p>
  * This model calculates the total output required to satisfy a given final demand,
- * taking into account inter-industry dependencies.
- * Formula: X = (I - A)^-1 * d
- *
+ * taking into account inter-industry dependencies. Developed by Wassily Leontief
+ * (Nobel Prize in Economics, 1973).
+ * </p>
+ * <p>
+ * The model is defined by the fundamental equation:
+ * <pre>
+ * X = (I - A)^-1 * d
+ * </pre>
+ * where:
+ * <ul>
+ *   <li><b>X</b>: Total output vector (n x 1)</li>
+ *   <li><b>A</b>: Technical coefficient matrix (n x n), where a<sub>ij</sub> 
+ *       represents the input from industry i required to produce one unit of industry j</li>
+ *   <li><b>d</b>: Final demand vector (n x 1)</li>
+ * </ul>
+ * </p>
+ * <p>
+ * This implementation uses a power series approximation (Neumann series) 
+ * which converges if the spectral radius of A is less than 1.
+ * </p>
+ * 
+ * @see <a href="https://doi.org/10.2307/1927392">Leontief, W. W. (1936). Quantitative Input and Output Relations in the Economic System of the United States.</a>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.1

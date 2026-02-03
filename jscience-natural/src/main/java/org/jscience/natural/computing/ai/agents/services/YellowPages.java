@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.jscience.core.util.persistence.PersistenceManager;
+import org.jscience.core.mathematics.ml.generative.EmbeddingStore;
+import org.jscience.core.mathematics.ml.generative.InMemoryEmbeddingStore;
+import org.jscience.core.mathematics.ml.generative.GenerativeModel;
+import java.util.HashMap;
 
 /**
  * Directory Facilitator (DF) for agent discovery.
@@ -36,8 +41,16 @@ public class YellowPages {
     
     // Map of AgentID -> List of Services
     private final Map<String, List<ServiceDescription>> registry = new ConcurrentHashMap<>();
+    
+    // Semantic index for services
+    private final EmbeddingStore embeddingStore = new InMemoryEmbeddingStore();
+    private GenerativeModel embeddingModel;
 
     private YellowPages() {}
+
+    public void setEmbeddingModel(GenerativeModel model) {
+        this.embeddingModel = model;
+    }
 
     public static YellowPages getInstance() {
         return INSTANCE;
@@ -48,6 +61,23 @@ public class YellowPages {
      */
     public void register(String agentId, List<ServiceDescription> services) {
         registry.put(agentId, new ArrayList<>(services));
+        
+        // Persist services to the global knowledge graph for semantic discovery
+        for (ServiceDescription sd : services) {
+            PersistenceManager.getInstance().save(sd);
+            
+            // Index semantically if an embedding model is available
+            if (embeddingModel != null) {
+                String content = sd.getType() + " " + sd.getName();
+                embeddingModel.embed(content).thenAccept(vec -> {
+                    Map<String, Object> meta = new HashMap<>();
+                    meta.put("agentId", agentId);
+                    meta.put("serviceName", sd.getName());
+                    embeddingStore.add(sd.getType() + ":" + agentId, vec, meta);
+                });
+            }
+        }
+        
         System.out.println("YellowPages: Registered agent " + agentId + " with " + services.size() + " services");
     }
 
@@ -66,5 +96,28 @@ public class YellowPages {
             .filter(entry -> entry.getValue().stream().anyMatch(s -> s.getType().equals(serviceType)))
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Performs a semantic search across registered services.
+     * 
+     * @param query the natural language query.
+     * @param maxResults maximum number of agents to return.
+     * @return a list of agent IDs.
+     */
+    public List<String> semanticSearch(String query, int maxResults) {
+        if (embeddingModel == null) {
+            throw new IllegalStateException("Embedding model not set for semantic search");
+        }
+        
+        try {
+            float[] queryVec = embeddingModel.embed(query).get(); // Synchronous for simplified search API
+            return embeddingStore.findNearest(queryVec, maxResults).stream()
+                .map(res -> (String) res.metadata().get("agentId"))
+                .distinct()
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Semantic search failed", e);
+        }
     }
 }

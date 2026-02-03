@@ -40,6 +40,7 @@ import org.jscience.server.server.politics.GeopoliticalEngineTask;
 import org.jscience.social.politics.loaders.FactbookReader;
 import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
+import org.jscience.social.politics.GovernmentType;
 
 
 import java.io.*;
@@ -101,7 +102,7 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
 
         for (org.jscience.social.politics.Country c : countries) {
             double stability = 0.5;
-            if (c.getGovernmentType() != null && c.getGovernmentType().toLowerCase().contains("republic")) {
+            if (c.getGovernmentType() != null && c.getGovernmentType().name().toLowerCase().contains("republic")) {
                 stability = 0.8;
             }
             // Estimate military as fraction of population * GDP proxy

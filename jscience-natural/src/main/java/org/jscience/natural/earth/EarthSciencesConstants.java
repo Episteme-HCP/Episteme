@@ -76,14 +76,7 @@ public final class EarthSciencesConstants {
         TROPOSPHERE, STRATOSPHERE, MESOSPHERE, THERMOSPHERE, EXOSPHERE, IONOSPHERE
     }
 
-    /**
-     * Major rock classifications.
-     */
-    public enum RockType {
-        SEDIMENTARY_CLASTIC, SEDIMENTARY_BIOGENIC, SEDIMENTARY_CHEMICAL,
-        METAMORPHIC_FOLIATED, METAMORPHIC_NON_FOLIATED,
-        IGNEOUS_PLUTONIC, IGNEOUS_VOLCANIC, UNKNOWN
-    }
+
 
     /**
      * Wentworth scale for sediment grain size.

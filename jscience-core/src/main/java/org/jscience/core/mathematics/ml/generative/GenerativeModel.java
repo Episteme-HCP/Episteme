@@ -46,6 +46,18 @@ public interface GenerativeModel {
     CompletableFuture<String> generate(String prompt);
 
     /**
+     * Generates a response considering available tools.
+     * 
+     * @param prompt the input text.
+     * @param tools list of available tools.
+     * @return a future containing either text or a tool call.
+     */
+    default CompletableFuture<Response> generate(String prompt, java.util.List<Tool> tools) {
+        // Default implementation for backends that don't support tools yet
+        return generate(prompt).thenApply(Response::new);
+    }
+
+    /**
      * Generates vector embeddings for the given text.
      * 
      * @param text the input text.
@@ -57,4 +69,26 @@ public interface GenerativeModel {
      * Returns the name of the model being used (e.g., "gpt-4", "llama3").
      */
     String getModelName();
+
+    /**
+     * Represent a response from the model, which can be text or a tool call.
+     */
+    class Response {
+        private final String text;
+        private final Tool.Call toolCall;
+
+        public Response(String text) {
+            this.text = text;
+            this.toolCall = null;
+        }
+
+        public Response(Tool.Call toolCall) {
+            this.text = null;
+            this.toolCall = toolCall;
+        }
+
+        public String getText() { return text; }
+        public Tool.Call getToolCall() { return toolCall; }
+        public boolean isToolCall() { return toolCall != null; }
+    }
 }

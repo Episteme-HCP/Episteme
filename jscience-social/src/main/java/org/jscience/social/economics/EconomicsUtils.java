@@ -23,6 +23,8 @@
 
 package org.jscience.social.economics;
 
+import org.jscience.core.mathematics.numbers.real.Real;
+
 /**
  * Utility functions for common economic modeling curves (Logistic, Logit, Richards).
  *
@@ -36,21 +38,34 @@ public final class EconomicsUtils {
     private EconomicsUtils() {}
 
     /** Generalised logistic curve (Richards' curve). */
-    public static double getRichards(double t, double lower, double upper,
-            double maxTime, double growthRate, double nearMax) {
-        return lower + (upper / Math.pow(1 + (nearMax * Math.exp(-growthRate * (t - maxTime))), 1/nearMax));
+    public static Real getRichards(Real t, Real lower, Real upper,
+            Real maxTime, Real growthRate, Real nearMax) {
+        // lower + (upper / (1 + nearMax * exp(-growthRate * (t - maxTime)))^(1/nearMax))
+        // Real doesn't typically have static Math methods, it has instance methods.
+        // Assuming Real has exp(), pow().
+        Real exponent = growthRate.negate().multiply(t.subtract(maxTime));
+        Real denominatorInner = Real.ONE.add(nearMax.multiply(exponent.exp()));
+        
+        // Power: (1/nearMax)
+        Real power = Real.ONE.divide(nearMax);
+        
+        return lower.add(upper.divide(denominatorInner.pow(power)));
     }
 
     /** Standard logistic curve. */
-    public static double getLogistic(double t, double cap, double m, double n, double tau) {
-        double expTerm = Math.exp(-t / tau);
-        return (cap * (1 + (m * expTerm))) / (1 + (n * expTerm));
+    public static Real getLogistic(Real t, Real cap, Real m, Real n, Real tau) {
+        Real expTerm = t.negate().divide(tau).exp();
+        // (cap * (1 + (m * expTerm))) / (1 + (n * expTerm))
+        Real numerator = cap.multiply(Real.ONE.add(m.multiply(expTerm)));
+        Real denominator = Real.ONE.add(n.multiply(expTerm));
+        return numerator.divide(denominator);
     }
 
     /** Standard logit function (log-odds). */
-    public static double getLogit(double p) {
-        if (p <= 0 || p >= 1) return Double.NaN;
-        return Math.log(p / (1.0 - p));
+    public static Real getLogit(Real p) {
+        if (p.compareTo(Real.ZERO) <= 0 || p.compareTo(Real.ONE) >= 0) return Real.NaN;
+        // ln(p / (1 - p))
+        return p.divide(Real.ONE.subtract(p)).log();
     }
 }
 

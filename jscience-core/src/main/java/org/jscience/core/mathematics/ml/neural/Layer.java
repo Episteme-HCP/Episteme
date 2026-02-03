@@ -24,13 +24,18 @@
 package org.jscience.core.mathematics.ml.neural;
 
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
+import org.jscience.core.util.persistence.Persistent;
+
+import java.io.Serializable;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Represents a layer in a neural network.
  * <p>
- * Layers are the building blocks of neural networks. They transform input tensors
- * to output tensors (forward pass) and propagate gradients (backward pass).
+ * Unified interface supporting both automatic differentiation (training) 
+ * and direct tensor operations (optimized inference).
  * </p>
  *
  * @param <T> the data type (e.g., Real, Complex).
@@ -38,45 +43,58 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public interface Layer<T> {
+@Persistent
+public interface Layer<T> extends Serializable {
 
     /**
-     * Performs the forward pass.
+     * Performs a forward pass using explicit autograd nodes.
+     * 
+     * @param input the input node.
+     * @return the transformed output node.
+     */
+    GraphNode<T> forward(GraphNode<T> input);
+
+    /**
+     * Performs an optimized forward pass using raw tensors.
+     * By default, wraps the tensor in a non-grad node and delegates to {@link #forward(GraphNode)}.
      * 
      * @param input the input tensor.
      * @return the transformed output tensor.
      */
-    Tensor<T> forward(Tensor<T> input);
-
-    /**
-     * Performs the backward pass (gradients propagation).
-     * 
-     * @param gradOutput the gradient of the loss with respect to the output.
-     * @return the gradient of the loss with respect to the input.
-     */
-    Tensor<T> backward(Tensor<T> gradOutput);
+    default Tensor<T> forward(Tensor<T> input) {
+        GraphNode<T> inNode = new GraphNode<>(input, false);
+        return forward(inNode).getData();
+    }
 
     /**
      * Returns the learnable parameters of this layer.
-     * Keys are parameter names (e.g., "weights", "bias").
+     * Keys should be unique within the layer (e.g., "weights", "bias").
      * 
-     * @return a map of parameter tensors.
+     * @return a map of parameter graph nodes.
      */
-    Map<String, Tensor<T>> getParameters();
+    Map<String, GraphNode<T>> getParameters();
 
     /**
      * Returns the gradients of the learnable parameters.
-     * Should correspond to the keys in {@link #getParameters()}.
      * 
      * @return a map of gradient tensors.
      */
-    Map<String, Tensor<T>> getGradients();
-    
+    default Map<String, Tensor<T>> getGradients() {
+        Map<String, Tensor<T>> grads = new HashMap<>();
+        getParameters().forEach((name, node) -> {
+            if (node.requiresGrad() && node.getGrad() != null) {
+                grads.put(name, node.getGrad());
+            }
+        });
+        return grads;
+    }
+
     /**
      * Sets the training mode.
-     * Some layers (like Dropout, BatchNorm) behave differently during training.
      * 
      * @param training true for training, false for inference.
      */
-    void setTraining(boolean training);
+    default void setTraining(boolean training) {
+        // Default: do nothing, specialized layers (Dropout/BatchNorm) override this.
+    }
 }

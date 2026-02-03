@@ -32,13 +32,9 @@ public class GraphVerification {
     
     static class MockLayer implements Layer<Float> {
         @Override
-        public Tensor<Float> forward(Tensor<Float> input) { return input; }
+        public org.jscience.core.mathematics.ml.neural.autograd.GraphNode<Float> forward(org.jscience.core.mathematics.ml.neural.autograd.GraphNode<Float> input) { return input; }
         @Override
-        public Tensor<Float> backward(Tensor<Float> gradOutput) { return gradOutput; }
-        @Override
-        public Map<String, Tensor<Float>> getParameters() { return Collections.emptyMap(); }
-        @Override
-        public Map<String, Tensor<Float>> getGradients() { return Collections.emptyMap(); }
+        public Map<String, org.jscience.core.mathematics.ml.neural.autograd.GraphNode<Float>> getParameters() { return Collections.emptyMap(); }
         @Override
         public void setTraining(boolean training) {}
     }

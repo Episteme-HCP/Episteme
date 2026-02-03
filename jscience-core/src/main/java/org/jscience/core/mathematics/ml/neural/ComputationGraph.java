@@ -24,6 +24,7 @@
 package org.jscience.core.mathematics.ml.neural;
 
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,43 +61,42 @@ public class ComputationGraph<T> {
      * @return the output tensor (prediction).
      */
     public Tensor<T> predict(Tensor<T> input) {
-        Tensor<T> current = input;
+        GraphNode<T> current = new GraphNode<>(input, false);
         for (Layer<T> layer : layers) {
-            // Ensure evaluation mode
             layer.setTraining(false);
             current = layer.forward(current);
         }
-        return current;
+        return current.getData();
     }
 
     /**
      * Performs a training step (forward + backward + optimize).
-     * <p>
-     * Note: This is a simplified training loop. In practice, loss calculation
-     * is separate.
-     * </p>
      * 
      * @param input input batch.
-     * @param lossGradient gradient of loss w.r.t network output.
+     * @param target target values.
      * @param optimizer optimizer to update weights.
      */
-    public void trainStep(Tensor<T> input, Tensor<T> lossGradient, Optimizer<T> optimizer) {
+    public void trainStep(Tensor<T> input, Tensor<T> target, Optimizer<T> optimizer) {
         // Forward
-        Tensor<T> current = input;
+        GraphNode<T> inNode = new GraphNode<>(input, false);
+        GraphNode<T> current = inNode;
         for (Layer<T> layer : layers) {
             layer.setTraining(true);
             current = layer.forward(current);
         }
         
+        // Calculate loss (example: Mean Squared Error)
+        // Note: Real loss calculation should be external, this is for demonstration
+        GraphNode<T> targetNode = new GraphNode<>(target, false);
+        GraphNode<T> diff = current.subtract(targetNode);
+        GraphNode<T> loss = diff.multiply(diff).mean();
+
         // Backward
-        Tensor<T> grad = lossGradient;
-        // Iterate backwards
-        for (int i = layers.size() - 1; i >= 0; i--) {
-            Layer<T> layer = layers.get(i);
-            grad = layer.backward(grad);
-            
-            // Update parameters
-            optimizer.update(layer.getParameters(), layer.getGradients());
+        loss.backward();
+        
+        // Update parameters
+        for (Layer<T> layer : layers) {
+            optimizer.step(layer.getParameters());
         }
     }
     

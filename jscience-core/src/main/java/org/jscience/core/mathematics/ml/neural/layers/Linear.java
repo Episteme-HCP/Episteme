@@ -1,18 +1,26 @@
 package org.jscience.core.mathematics.ml.neural.layers;
 
+import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 import org.jscience.core.mathematics.numbers.real.Real;
-import java.util.List;
+import org.jscience.core.util.persistence.Persistent;
+import org.jscience.core.util.persistence.Attribute;
+import java.util.Map;
 import java.util.Random;
 
 /**
  * Fully connected (linear) layer.
  */
+@Persistent
 public class Linear<T> implements Layer<T> {
     private static final long serialVersionUID = 1L;
+    
+    @Attribute
     private final GraphNode<T> weights;
+    
+    @Attribute
     private final GraphNode<T> bias;
 
     @SuppressWarnings("unchecked")
@@ -44,7 +52,10 @@ public class Linear<T> implements Layer<T> {
     }
 
     @Override
-    public List<GraphNode<T>> getParameters() {
-        return List.of(weights, bias);
+    public Map<String, GraphNode<T>> getParameters() {
+        Map<String, GraphNode<T>> params = new java.util.HashMap<>();
+        params.put("weights", weights);
+        params.put("bias", bias);
+        return params;
     }
 }

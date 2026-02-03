@@ -23,19 +23,36 @@
 
 package org.jscience.natural.biology;
 
+import org.jscience.core.util.EnumRegistry;
+import org.jscience.core.util.ExtensibleEnum;
+
 /**
  * Represents the nucleobases found in DNA and RNA.
+ * Uses EnumRegistry pattern to allow dynamic extension (e.g. artificial bases X/Y).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.1
  */
-public enum Base {
-    ADENINE,
-    CYTOSINE,
-    GUANINE,
-    THYMINE,
-    URACIL;
+public class Base extends ExtensibleEnum {
+
+    private static final long serialVersionUID = 1L;
+
+    public static final Base ADENINE = register("ADENINE");
+    public static final Base CYTOSINE = register("CYTOSINE");
+    public static final Base GUANINE = register("GUANINE");
+    public static final Base THYMINE = register("THYMINE");
+    public static final Base URACIL = register("URACIL");
+
+    protected Base(String name) {
+        super(name);
+    }
+
+    private static Base register(String name) {
+        Base base = new Base(name);
+        EnumRegistry.register(Base.class, base);
+        return base;
+    }
 
     /**
      * Returns the complementary base.
@@ -47,22 +64,15 @@ public enum Base {
      * @return the complementary base.
      */
     public Base getComplementary(boolean isRNA) {
-        switch (this) {
-            case ADENINE:
-                return isRNA ? URACIL : THYMINE;
-            case CYTOSINE:
-                return GUANINE;
-            case GUANINE:
-                return CYTOSINE;
-            case THYMINE:
-                return ADENINE; // Only in DNA
-            case URACIL:
-                return ADENINE; // Only in RNA
-            default:
-                return null;
-        }
+        if (this.equals(ADENINE)) return isRNA ? URACIL : THYMINE;
+        if (this.equals(CYTOSINE)) return GUANINE;
+        if (this.equals(GUANINE)) return CYTOSINE;
+        if (this.equals(THYMINE)) return ADENINE;
+        if (this.equals(URACIL)) return ADENINE;
+        return null;
     }
 }
+
 
 
 

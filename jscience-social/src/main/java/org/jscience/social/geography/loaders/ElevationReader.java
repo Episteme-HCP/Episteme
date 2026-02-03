@@ -26,6 +26,10 @@ package org.jscience.social.geography.loaders;
 import org.jscience.core.io.AbstractResourceReader;
 import org.jscience.core.io.Configuration;
 import org.jscience.core.ui.i18n.I18N;
+import org.jscience.core.measure.Quantity;
+import org.jscience.core.measure.quantity.Length;
+import org.jscience.core.measure.Quantities;
+import org.jscience.core.measure.Units;
 
 
 
@@ -45,7 +49,7 @@ import java.time.Duration;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ElevationReader extends AbstractResourceReader<Double> {
+public class ElevationReader extends AbstractResourceReader<Quantity<Length>> {
 
     public enum Source {
         GOOGLE_API,
@@ -92,8 +96,8 @@ public class ElevationReader extends AbstractResourceReader<Double> {
     }
 
     @Override
-    public Class<Double> getResourceType() {
-        return Double.class;
+    public Class<Quantity<Length>> getResourceType() {
+        return (Class) Quantity.class;
     }
 
     @Override
@@ -102,7 +106,7 @@ public class ElevationReader extends AbstractResourceReader<Double> {
     }
 
     @Override
-    protected Double loadFromSource(String coordinates) throws Exception {
+    protected Quantity<Length> loadFromSource(String coordinates) throws Exception {
         // coordinates format: "lat,lon"
         String[] parts = coordinates.split(",");
         double lat = Double.parseDouble(parts[0]);
@@ -117,17 +121,22 @@ public class ElevationReader extends AbstractResourceReader<Double> {
      * @param lon Longitude
      * @return Elevation in meters
      */
-    public double getElevation(double lat, double lon) {
+    public Quantity<Length> getElevation(double lat, double lon) {
+        double meters;
         switch (defaultSource) {
             case GOOGLE_API:
-                return getElevationGoogle(lat, lon);
+                meters = getElevationGoogle(lat, lon);
+                break;
             case SRTM:
-                return getElevationSRTM(lat, lon);
+                meters = getElevationSRTM(lat, lon);
+                break;
             case ETOPO1:
-                return getElevationETOPO1(lat, lon);
+                meters = getElevationETOPO1(lat, lon);
+                break;
             default:
                 throw new UnsupportedOperationException("Source not implemented: " + defaultSource);
         }
+        return Quantities.create(meters, Units.METER);
     }
 
     private double getElevationGoogle(double lat, double lon) {

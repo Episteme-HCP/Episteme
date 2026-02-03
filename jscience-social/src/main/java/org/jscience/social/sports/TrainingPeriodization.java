@@ -26,26 +26,38 @@ package org.jscience.social.sports;
 import java.io.Serializable;
 import java.util.List;
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.measure.Quantity;
+import org.jscience.core.measure.quantity.Time;
+import org.jscience.core.measure.quantity.Dimensionless;
+import org.jscience.core.measure.Quantities;
+import org.jscience.core.measure.Units;
 
 /**
  * Handles training periodization logic, including cycle generation and load monitoring.
- * Provides implementations for Chronic Training Load (CTL) and Acute Training Load (ATL).
+ * <p>
+ * Provides implementations for Chronic Training Load (CTL) and Acute Training Load (ATL) 
+ * based on the impulse-response models developed by Eric Banister and popularized 
+ * by Dr. Andrew Coggan (TSS/NP/IF metrics).
+ * </p>
+ * <p>
+ * References:
+ * <ul>
+ *   <li>Banister, E. W. (1991). Modeling Elite Athletic Performance. In Physiological Testing of the High-Performance Athlete.</li>
+ *   <li>Coggan, A. R. (2003). Training and racing with a power meter.</li>
+ * </ul>
+ * </p>
  */
 public final class TrainingPeriodization {
 
     private TrainingPeriodization() {}
 
-    /** Phases of a training period (Macro/Meso cycles).
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+    /** Phases of a training period (Macro/Meso cycles). */
     public enum MesoPhase {
         ANATOMICAL_ADAPTATION, HYPERTROPHY, STRENGTH, POWER, 
         ENDURANCE_BASE, THRESHOLD, VO2MAX, COMPETITION, RECOVERY
     }
 
-    /** Descriptive training intensity levels. */
+    /** Descriptive training intensity levels based on functional threshold ratios. */
     public enum TrainingLoad {
         RECOVERY(0.4), LOW(0.6), MODERATE(0.75), HIGH(0.85), MAX(0.95);
         private final double intensity;
@@ -58,7 +70,7 @@ public final class TrainingPeriodization {
         int weekNumber,
         MesoPhase phase,
         TrainingLoad load,
-        double volumeHours,
+        Quantity<Time> volume,
         double intensityAvg,
         String focus,
         List<String> keyWorkouts
@@ -77,7 +89,7 @@ public final class TrainingPeriodization {
     public record WorkoutSession(
         String name,
         String type,
-        int durationMinutes,
+        Quantity<Time> duration,
         double intensity,
         String description,
         List<String> exercises
@@ -85,23 +97,46 @@ public final class TrainingPeriodization {
 
     /** 
      * Calculates the Chronic Training Load (CTL), representing long-term fitness.
-     * Calculated as an exponentially weighted average.
+     * CTL is an exponentially weighted moving average (EWMA) of daily TSS, 
+     * typically using a 42-day time constant.
+     * 
+     * @param dailyTSS List of daily Training Stress Scores (TSS)
+     * @param timeConstant The time constant (tau), usually 42 days.
+     * @return The CTL value (dimensionless).
      */
-    public static Real calculateCTL(List<Double> dailyTSS, int days) {
-        if (dailyTSS == null || dailyTSS.isEmpty()) return Real.ZERO;
+    public static Quantity<Dimensionless> calculateCTL(List<Quantity<Dimensionless>> dailyTSS, int timeConstant) {
+        if (dailyTSS == null || dailyTSS.isEmpty()) return Quantities.create(0.0, Units.ONE);
         double sum = 0, weight = 0;
-        int n = Math.min(days, dailyTSS.size());
+        int n = Math.min(timeConstant * 2, dailyTSS.size()); // Sample window
         for (int i = 0; i < n; i++) {
-            double w = Math.exp(-i / (double) days);
-            sum += dailyTSS.get(dailyTSS.size() - 1 - i) * w;
+            double w = Math.exp(-i / (double) timeConstant);
+            sum += dailyTSS.get(dailyTSS.size() - 1 - i).getValue().doubleValue() * w;
             weight += w;
         }
-        return Real.of(sum / weight);
+        return Quantities.create(sum / weight, Units.ONE);
     }
 
-    /** Calculates Acute Training Load (ATL), representing short-term fatigue (7-day window). */
-    public static Real calculateATL(List<Double> dailyTSS) {
+    /** 
+     * Calculates Acute Training Load (ATL), representing short-term fatigue.
+     * ATL is an EWMA of daily TSS using a short time constant (typically 7 days).
+     * 
+     * @param dailyTSS List of daily Training Stress Scores (TSS)
+     * @return The ATL value (dimensionless).
+     */
+    public static Quantity<Dimensionless> calculateATL(List<Quantity<Dimensionless>> dailyTSS) {
         return calculateCTL(dailyTSS, 7);
+    }
+
+    /**
+     * Calculates Training Stress Balance (TSB), representing freshness.
+     * Formula: TSB = CTL - ATL.
+     * 
+     * @param ctl Chronic Training Load (Fitness)
+     * @param atl Acute Training Load (Fatigue)
+     * @return Training Stress Balance (Freshness)
+     */
+    public static Quantity<Dimensionless> calculateTSB(Quantity<Dimensionless> ctl, Quantity<Dimensionless> atl) {
+        return (Quantity<Dimensionless>) ctl.subtract(atl);
     }
 }
 

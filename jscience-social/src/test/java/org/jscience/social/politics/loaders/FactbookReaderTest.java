@@ -24,6 +24,7 @@
 package org.jscience.social.politics.loaders;
 
 import org.jscience.social.politics.Country;
+import org.jscience.social.politics.GovernmentType;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -43,10 +44,15 @@ class FactbookReaderTest {
                         <area>10,000 sq km</area>
                         <population>1,000,000</population>
                         <region>Europe</region>
+                        <government>Federal Republic</government>
+                        <lifeExpectancy>80.5</lifeExpectancy>
+                        <stability>0.98</stability>
+                        <militarySpending>1500000000</militarySpending>
                     </country>
                     <country name="Otherland" code="OTH">
                         <capital>Other City</capital>
                         <population>500000</population>
+                        <government>Monarchy</government>
                     </country>
                 </countries>
                 """;
@@ -64,11 +70,19 @@ class FactbookReaderTest {
             assertEquals(10000.0, c1.getAreaSqKm());
             assertEquals(1000000L, c1.getPopulationLong());
             assertEquals("Europe", c1.getContinent());
+            
+            // Check ExtensibleEnum and Quantities
+            assertNotNull(c1.getGovernmentType());
+            assertEquals("FEDERAL_REPUBLIC", c1.getGovernmentType().name());
+            assertEquals(80.5, c1.getLifeExpectancy().getValue().doubleValue());
+            assertEquals(0.98, c1.getStability().getValue().doubleValue());
+            assertEquals(1.5E9, c1.getMilitarySpending().getValue().doubleValue());
 
             Country c2 = countries.get(1);
             assertEquals("Otherland", c2.getName());
             assertEquals("OTH", c2.getAlpha2());
             assertEquals(500000L, c2.getPopulationLong());
+            assertEquals("MONARCHY", c2.getGovernmentType().name());
         }
     }
 

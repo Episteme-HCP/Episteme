@@ -20,50 +20,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jscience.natural.computing.ai.agents.services;
+package org.jscience.core.mathematics.ml.generative;
 
-import org.jscience.core.util.persistence.Attribute;
-import org.jscience.core.util.persistence.Id;
-import org.jscience.core.util.persistence.Persistent;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
- * Describes a service offered by an agent.
+ * Interface for storing and querying vector embeddings.
+ * Essential for Retrieval-Augmented Generation (RAG) and Semantic Search.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
-@Persistent
-public class ServiceDescription {
-    @Id
-    private String id = UUID.randomUUID().toString();
-    
-    @Attribute
-    private String type;
-    
-    @Attribute
-    private String name;
-    
-    @Attribute
-    private Map<String, Object> properties = new HashMap<>();
+public interface EmbeddingStore {
 
-    public ServiceDescription(String type, String name) {
-        this.type = type;
-        this.name = name;
-    }
+    /**
+     * Adds an embedding to the store.
+     * 
+     * @param id unique identifier for the content.
+     * @param embedding the vector representation.
+     * @param metadata associated metadata.
+     */
+    void add(String id, float[] embedding, Map<String, Object> metadata);
 
-    public String getType() { return type; }
-    public String getName() { return name; }
-    
-    public void addProperty(String key, Object value) {
-        properties.put(key, value);
-    }
-    
-    public Object getProperty(String key) {
-        return properties.get(key);
-    }
+    /**
+     * Finds the nearest neighbors to the query vector based on similarity.
+     * 
+     * @param query the search vector.
+     * @param maxResults maximum number of results to return.
+     * @return a list of search results.
+     */
+    List<SearchResult> findNearest(float[] query, int maxResults);
 
-    @Override
-    public String toString() {
-        return "ServiceDescription{type='" + type + "', name='" + name + "'}";
-    }
+    /**
+     * Represents a search result from the embedding store.
+     */
+    record SearchResult(String id, float score, Map<String, Object> metadata) {}
 }

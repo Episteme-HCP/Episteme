@@ -32,6 +32,10 @@ import org.jscience.social.geography.Region;
 import org.jscience.core.util.persistence.Attribute;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
+import org.jscience.core.measure.Quantity;
+import org.jscience.core.measure.quantity.Time;
+import org.jscience.core.measure.quantity.Dimensionless;
+import org.jscience.social.economics.money.Money;
 
 /**
  * Represents a sovereign state, kingdom, empire, or modern nation-state.
@@ -78,28 +82,32 @@ public class Country extends Region {
     private transient Image flag;
 
     @Attribute
-    private String governmentType;
+    private GovernmentType governmentType;
 
     @Attribute
     private Integer independenceYear;
 
     @Attribute
-    private Double lifeExpectancy;
+    private Quantity<Time> lifeExpectancy;
+
 
     @Attribute
-    private Double populationGrowthRate;
+    private Quantity<Dimensionless> populationGrowthRate;
 
     @Attribute
-    private Double stability; // Index from 0.0 to 1.0
+    private Quantity<Dimensionless> stability; // Index from 0.0 to 1.0 (Unit.ONE)
 
     @Attribute
-    private Double militarySpending; // Usually in billions of USD or % of GDP
+    private Quantity<Money> militarySpending; // Usually in billions of USD or % of GDP
 
     @Attribute
     private String continent;
     
     @Attribute
     private String alpha3;
+
+    @Attribute
+    private Quantity<Dimensionless> hdi; // Human Development Index (0.0 to 1.0)
 
     private final Set<String> majorIndustries = new HashSet<>();
     private final Set<String> naturalResources = new HashSet<>();
@@ -181,23 +189,23 @@ public class Country extends Region {
     public Image getFlag() { return flag; }
     public void setFlag(Image flag) { this.flag = flag; }
 
-    public String getGovernmentType() { return governmentType; }
-    public void setGovernmentType(String type) { this.governmentType = type; }
+    public GovernmentType getGovernmentType() { return governmentType; }
+    public void setGovernmentType(GovernmentType type) { this.governmentType = type; }
 
     public Integer getIndependenceYear() { return independenceYear; }
     public void setIndependenceYear(Integer year) { this.independenceYear = year; }
 
-    public Double getLifeExpectancy() { return lifeExpectancy; }
-    public void setLifeExpectancy(Double life) { this.lifeExpectancy = life; }
+    public Quantity<Time> getLifeExpectancy() { return lifeExpectancy; }
+    public void setLifeExpectancy(Quantity<Time> life) { this.lifeExpectancy = life; }
 
-    public Double getPopulationGrowthRate() { return populationGrowthRate; }
-    public void setPopulationGrowthRate(Double rate) { this.populationGrowthRate = rate; }
+    public Quantity<Dimensionless> getPopulationGrowthRate() { return populationGrowthRate; }
+    public void setPopulationGrowthRate(Quantity<Dimensionless> rate) { this.populationGrowthRate = rate; }
 
-    public Double getStability() { return stability; }
-    public void setStability(Double stability) { this.stability = stability; }
+    public Quantity<Dimensionless> getStability() { return stability; }
+    public void setStability(Quantity<Dimensionless> stability) { this.stability = stability; }
 
-    public Double getMilitarySpending() { return militarySpending; }
-    public void setMilitarySpending(Double spending) { this.militarySpending = spending; }
+    public Quantity<Money> getMilitarySpending() { return militarySpending; }
+    public void setMilitarySpending(Quantity<Money> spending) { this.militarySpending = spending; }
 
     public String getContinent() { return continent; }
     public void setContinent(String continent) { this.continent = continent; }
@@ -207,6 +215,9 @@ public class Country extends Region {
     
     public String getAlpha3() { return alpha3; }
     public void setAlpha3(String code) { this.alpha3 = code; }
+
+    public Quantity<Dimensionless> getHdi() { return hdi; }
+    public void setHdi(Quantity<Dimensionless> hdi) { this.hdi = hdi; }
 
     public Set<String> getMajorIndustries() { return majorIndustries; }
     public Set<String> getNaturalResources() { return naturalResources; }
