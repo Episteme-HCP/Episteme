@@ -122,7 +122,7 @@ jscience/
 
 ```bash
 # From project root
-mvn exec:java -pl jscience-core -Dexec.mainClass="org.jscience.ui.JScienceDemoApp"
+mvn exec:java -pl jscience-core -Dexec.mainClass="org.jscience.core.ui.JScienceDemosApp"
 
 # Or use batch script
 run_demos.bat
