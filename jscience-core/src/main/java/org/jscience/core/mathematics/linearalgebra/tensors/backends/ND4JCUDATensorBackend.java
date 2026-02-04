@@ -24,22 +24,20 @@
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
 
 /**
- * ND4J Native (CPU) Tensor Provider.
+ * ND4J CUDA (GPU) Tensor Provider.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ND4JNativeTensorBackendProvider extends ND4JBaseTensorBackendProvider {
+public class ND4JCUDATensorBackend extends ND4JBaseTensorBackend {
 
     @Override
     protected boolean checkAvailability() {
         if (!checkCommonClasses()) return false;
         try {
-            // Check specifically for Native backend being active
-            // Note: ND4J usually loads one backend. We just check if it's NOT CUDA.
-            // Or explicitly check for NativeBackend class presence
-            Class.forName("org.nd4j.linalg.cpu.nativecpu.CpuBackend");
+            // Check specifically for CUDA backend availability
+            Class.forName("org.nd4j.linalg.jcublas.JCublasBackend");
             return true;
         } catch (ClassNotFoundException e) {
             return false;
@@ -47,26 +45,27 @@ public class ND4JNativeTensorBackendProvider extends ND4JBaseTensorBackendProvid
     }
 
     public String getId() {
-        return "nd4j-native";
+        return "nd4j-cuda";
     }
 
     @Override
     public String getName() {
-        return "ND4J Native (CPU)";
+        return "ND4J CUDA (GPU)";
     }
 
     public String getDescription() {
-        return "ND4J Tensor Provider using Native CPU Backend (AVX/AVX2/AVX512)";
+        return "ND4J Tensor Provider using CUDA GPU Backend";
     }
 
     @Override
     public int getPriority() {
-        return isAvailable() ? 80 : 0;
+        // Higher priority than Native if available
+        return isAvailable() ? 100 : 0;
     }
 
     @Override
     public boolean supportsGPU() {
-        return false;
+        return true;
     }
 }
 
