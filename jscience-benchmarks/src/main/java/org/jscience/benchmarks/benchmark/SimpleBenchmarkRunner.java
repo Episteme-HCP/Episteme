@@ -84,7 +84,7 @@ public class SimpleBenchmarkRunner {
         // run("MatrixBenchmark.multiplyJScience", mb::multiplyJScience);
 
         // FFT Benchmarks
-        FFTBenchmark.run();
+        FFTBenchmark.execute();
 
     }
 }

@@ -125,6 +125,15 @@ public class BenchmarkRunner {
     }
 
     public static void main(String[] args) {
+        // Register benchmark I18N bundle
+        I18N.getInstance().addBundle("org.jscience.benchmarks.i18n.messages_benchmarks");
+
+        if (args.length > 0 && args[0].equals("--studio")) {
+            System.out.println("Launching JScience Studio...");
+            org.jscience.benchmarks.ui.JScienceStudioApp.main(args);
+            return;
+        }
+
         BenchmarkRunner runner = new BenchmarkRunner();
         runner.discover();
         runner.runAll();

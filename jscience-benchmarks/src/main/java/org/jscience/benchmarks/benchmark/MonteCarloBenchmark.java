@@ -9,10 +9,34 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class MonteCarloBenchmark {
+public class MonteCarloBenchmark implements RunnableBenchmark {
 
     @Param({"10000", "100000"})
-    public int iterations;
+    public int iterations = 100000;
+
+    @Override
+    public String getName() {
+        return "Monte Carlo Pi (" + iterations + ")";
+    }
+
+    @Override
+    public String getDomain() {
+        return "Statistics";
+    }
+
+    @Override
+    public void setup() {
+        doSetup();
+    }
+
+    @Override
+    public void run() {
+        benchmarkMulticorePi();
+    }
+
+    @Override
+    public void teardown() {
+    }
 
 
     private MonteCarloProvider multicoreProvider;

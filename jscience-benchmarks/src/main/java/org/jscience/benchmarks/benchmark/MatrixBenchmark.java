@@ -35,7 +35,6 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import org.jblas.DoubleMatrix;
-import org.jscience.core.ComputeContext;
 
 /**
  * Matrix multiplication benchmark comparing JScience with other libraries.
@@ -156,6 +155,16 @@ public class MatrixBenchmark {
     }
     */
 
+    private double[][] generateRandomData(int n) {
+        java.util.Random r = new java.util.Random(42);
+        double[][] data = new double[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                data[i][j] = r.nextDouble();
+            }
+        }
+        return data;
+    }
 
     public static void main(String[] args) throws org.openjdk.jmh.runner.RunnerException {
         org.openjdk.jmh.runner.options.Options opt = new org.openjdk.jmh.runner.options.OptionsBuilder()

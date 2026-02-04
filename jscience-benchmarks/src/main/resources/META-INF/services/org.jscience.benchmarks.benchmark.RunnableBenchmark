@@ -1,1 +1,3 @@
-org.jscience.benchmarks.benchmark.NBodyBenchmark
+org.jscience.benchmarks.benchmark.FFTBenchmark
+org.jscience.benchmarks.benchmark.SystematicMatrixBenchmark
+org.jscience.benchmarks.benchmark.MonteCarloBenchmark

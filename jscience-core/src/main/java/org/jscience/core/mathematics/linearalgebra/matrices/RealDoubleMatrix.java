@@ -142,6 +142,9 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> other) {
+        if (other instanceof RealDoubleMatrix) {
+            return multiply((RealDoubleMatrix) other);
+        }
         return provider.multiply(this, other);
     }
 

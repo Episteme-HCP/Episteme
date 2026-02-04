@@ -23,11 +23,8 @@
 
 package org.jscience.benchmarks.benchmark;
 
-import org.jscience.core.mathematics.analysis.transform.AlgebraicFFT;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.core.mathematics.sets.Complexes;
 
 import org.jscience.core.ui.i18n.I18N;
 import java.util.Random;
@@ -42,32 +39,52 @@ import java.util.Random;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FFTBenchmark {
+public class FFTBenchmark implements RunnableBenchmark {
 
     private static final int SIZE = 4096; // Power of 2
+    private Complex[] input;
+    private Vector<Complex> vector;
 
-    public static void run() {
-        System.out.println(I18N.getInstance().get("benchmark.fft.title"));
-
-        benchmarkBasicFFT(SIZE);
-        benchmarkJScienceFFT(SIZE);
+    @Override
+    public String getName() {
+        return "FFT (Size 4096)";
     }
 
-    private static void benchmarkBasicFFT(int size) {
-        Complex[] input = createRandomData(size);
-
-        SimpleBenchmarkRunner.run(I18N.getInstance().get("benchmark.fft.basic", size), () -> {
-            basicFFT(input);
-        });
+    @Override
+    public String getDomain() {
+        return "Signal Processing";
     }
 
-    private static void benchmarkJScienceFFT(int size) {
-        Complex[] input = createRandomData(size);
-        Vector<Complex> vector = new DenseVector<Complex>(java.util.Arrays.asList(input), Complexes.getInstance());
+    @Override
+    public void setup() {
+        input = createRandomData(SIZE);
+        vector = new org.jscience.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(input), org.jscience.core.mathematics.sets.Complexes.getInstance());
+    }
 
-        SimpleBenchmarkRunner.run(I18N.getInstance().get("benchmark.fft.jscience", size), () -> {
-            AlgebraicFFT.transform(vector);
-        });
+    @Override
+    public void run() {
+        org.jscience.core.mathematics.analysis.transform.AlgebraicFFT.transform(vector);
+    }
+
+    @Override
+    public void teardown() {
+        input = null;
+        vector = null;
+    }
+
+    @Override
+    public int getSuggestedIterations() {
+        return 100;
+    }
+
+    /**
+     * @deprecated Use standard RunnableBenchmark runner
+     */
+    @Deprecated
+    public static void execute() {
+        FFTBenchmark b = new FFTBenchmark();
+        b.setup();
+        SimpleBenchmarkRunner.run(I18N.getInstance().get("benchmark.fft.jscience", SIZE), b::run);
     }
 
     private static Complex[] createRandomData(int size) {
