@@ -1,0 +1,5 @@
+org.jscience.social.ui.viewers.geography.backends.JavaFXMapBackendProvider
+org.jscience.social.ui.viewers.geography.backends.GeoToolsBackendProvider
+org.jscience.social.ui.viewers.geography.backends.GoogleGeoChartBackendProvider
+org.jscience.social.ui.viewers.geography.backends.OpenMapBackendProvider
+org.jscience.social.ui.viewers.geography.backends.UnfoldingMapBackendProvider

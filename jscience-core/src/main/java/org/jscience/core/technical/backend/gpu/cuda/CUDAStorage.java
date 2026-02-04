@@ -26,19 +26,26 @@ package org.jscience.core.technical.backend.gpu.cuda;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
+import org.jscience.core.technical.backend.gpu.GPUStorage;
+
 import java.lang.ref.Cleaner;
 
 /**
- * Manages GPU memory for CUDA operations.
+ * CUDA implementation of GPU memory storage.
  * <p>
- * Holds a pointer to device memory and handles allocation/deallocation.
+ * Manages GPU memory for CUDA operations using JCublas.
+ * This class should only be used when the CUDA backend is available.
+ * </p>
+ * <p>
+ * <b>Usage:</b> Obtain instances through {@link CUDABackend} rather than
+ * direct instantiation to ensure proper backend initialization.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CUDAStorage implements AutoCloseable {
+public class CUDAStorage implements GPUStorage {
 
     private static final Cleaner CLEANER = Cleaner.create();
 
@@ -63,11 +70,17 @@ public class CUDAStorage implements AutoCloseable {
     private final Pointer devicePointer;
     private final int size; // Number of elements (doubles)
     private final Cleaner.Cleanable cleanable;
+    private volatile boolean closed = false;
 
     /**
      * Allocates memory on the GPU.
+     * <p>
+     * <b>Note:</b> Prefer using {@link CUDABackend#allocateStorage(int)}
+     * to ensure proper backend initialization.
+     * </p>
      * 
      * @param size number of double elements to allocate
+     * @throws RuntimeException if CUDA allocation fails
      */
     public CUDAStorage(int size) {
         this.size = size;
@@ -81,6 +94,9 @@ public class CUDAStorage implements AutoCloseable {
 
     /**
      * Wraps an existing device pointer.
+     * <p>
+     * Takes ownership of the pointer and will free it on close.
+     * </p>
      * 
      * @param devicePointer the pointer to device memory
      * @param size          number of elements
@@ -88,53 +104,60 @@ public class CUDAStorage implements AutoCloseable {
     public CUDAStorage(Pointer devicePointer, int size) {
         this.devicePointer = devicePointer;
         this.size = size;
-        // For wrapped pointers, we typically don't own them,
-        // but if we do, we should register. Assuming we DON'T own wrapped pointers for
-        // now,
-        // or we need a flag? The original code didn't set 'freed' here but close()
-        // works.
-        // Let's assume we own it if we wrap it, effectively taking ownership?
-        // Original close() frees it. So yes, we check.
         this.cleanable = CLEANER.register(this, new State(devicePointer));
     }
 
+    /**
+     * Returns the CUDA device pointer.
+     * 
+     * @return CUDA Pointer to device memory
+     */
     public Pointer getPointer() {
         return devicePointer;
     }
 
+    @Override
     public int getSize() {
         return size;
     }
 
-    /**
-     * Uploads data from host (CPU) to device (GPU).
-     * 
-     * @param hostData array of doubles
-     */
+    @Override
     public void upload(double[] hostData) {
+        if (closed) {
+            throw new IllegalStateException("Storage has been closed");
+        }
         if (hostData.length != size) {
-            throw new IllegalArgumentException("Data size mismatch");
+            throw new IllegalArgumentException("Data size mismatch: expected " + size + ", got " + hostData.length);
         }
         JCublas.cublasSetVector(size, Sizeof.DOUBLE, Pointer.to(hostData), 1, devicePointer, 1);
     }
 
-    /**
-     * Downloads data from device (GPU) to host (CPU).
-     * 
-     * @return array of doubles
-     */
+    @Override
     public double[] download() {
+        if (closed) {
+            throw new IllegalStateException("Storage has been closed");
+        }
         double[] hostData = new double[size];
         JCublas.cublasGetVector(size, Sizeof.DOUBLE, devicePointer, 1, Pointer.to(hostData), 1);
         return hostData;
     }
 
-    /**
-     * Frees the GPU memory.
-     */
+    @Override
+    public Object getNativeHandle() {
+        return devicePointer;
+    }
+
+    @Override
+    public boolean isClosed() {
+        return closed;
+    }
+
     @Override
     public void close() {
-        cleanable.clean();
+        if (!closed) {
+            closed = true;
+            cleanable.clean();
+        }
     }
 
 }

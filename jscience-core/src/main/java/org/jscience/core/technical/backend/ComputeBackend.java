@@ -27,14 +27,14 @@ package org.jscience.core.technical.backend;
  * Service Provider Interface for pluggable compute backends.
  * <p>
  * Implementations can provide CPU, GPU, quantum, or distributed computing
- * backends. Now unified with the BackendProvider system.
+ * backends. Now unified with the Backend system.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface ComputeBackend extends BackendProvider {
+public interface ComputeBackend extends Backend {
 
     @Override
     default String getType() {
@@ -94,5 +94,13 @@ public interface ComputeBackend extends BackendProvider {
     default boolean supportsComplexNumbers() {
         return true;
     }
+
+    /**
+     * Returns the type of hardware accelerator used by this backend.
+     * 
+     * @return the accelerator type
+     */
+    HardwareAccelerator getAcceleratorType();
 }
+
 

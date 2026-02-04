@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for BackendProvider.
+ * Automated baseline test for Backend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -20,7 +20,8 @@ public class BackendProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(BackendProvider.class);
+        assertNotNull(Backend.class);
     }
 }
+
 

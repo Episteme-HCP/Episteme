@@ -23,16 +23,16 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 
 /**
- * BackendProvider for JBlas.
+ * Backend for JBlas.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JBlasBackendProvider implements BackendProvider {
+public class JBlasBackendProvider implements Backend {
     @Override
     public String getType() {
         return BackendDiscovery.TYPE_MATH;
@@ -76,5 +76,6 @@ public class JBlasBackendProvider implements BackendProvider {
         return null;
     }
 }
+
 
 

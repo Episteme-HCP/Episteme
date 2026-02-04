@@ -23,10 +23,10 @@
 
 package org.jscience.social.ui.viewers.geography.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.social.ui.viewers.geography.MapBackend;
 
 /**
- * BackendProvider for OpenMap library.
+ * Backend for OpenMap library.
  * Java toolkit for viewing and manipulating geospatial data.
  * 
  * @see <a href="http://openmap-java.org/">OpenMap</a>
@@ -34,7 +34,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenMapBackendProvider implements BackendProvider {
+public class OpenMapBackendProvider implements MapBackend {
 
     @Override
     public String getType() {
@@ -67,9 +67,11 @@ public class OpenMapBackendProvider implements BackendProvider {
     }
 
     @Override
-    public int getPriority() {
         return 40; // Good priority for GIS applications
     }
+
+    @Override public boolean isSupportsLayering() { return true; }
+    @Override public boolean isSupportsInteractive() { return false; }
 
     @Override
     public Object createBackend() {

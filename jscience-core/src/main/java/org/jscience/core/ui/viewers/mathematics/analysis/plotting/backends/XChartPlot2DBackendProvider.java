@@ -23,16 +23,18 @@
 
 package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
+
+import org.jscience.core.technical.backend.Backend;
 
 /**
- * BackendProvider for XChart 2D plotting.
+ * Backend for XChart 2D plotting.
  * Available when XChart library is on classpath.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class XChartPlot2DBackendProvider implements BackendProvider {
+public class XChartPlot2DBackendProvider implements PlottingBackend {
 
     @Override
     public String getType() {
@@ -68,10 +70,13 @@ public class XChartPlot2DBackendProvider implements BackendProvider {
     public int getPriority() {
         return 60; // Highest priority for 2D (modern, lightweight)
     }
+    @Override public boolean isSupported2D() { return true; }
+    @Override public boolean isSupported3D() { return false; }
 
-    @Override
-    public Object createBackend() {
+    @Override Object createBackend() {
         return new XChartPlot2D("");
     }
 }
+
+
 

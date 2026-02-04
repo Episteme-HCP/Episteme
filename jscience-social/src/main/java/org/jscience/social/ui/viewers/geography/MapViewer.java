@@ -30,7 +30,7 @@ import org.jscience.core.ui.i18n.I18N;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.Viewer;
 import org.jscience.core.JScience;
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 import org.jscience.social.ui.viewers.geography.backends.JavaFXMapRenderer;
 import org.jscience.core.ui.ThemeManager;
@@ -55,7 +55,7 @@ public class MapViewer extends StackPane implements Viewer {
         
         // Discover backend
         String backendId = JScience.getMapBackendId();
-        Optional<BackendProvider> provider;
+        Optional<Backend> provider;
         
         if (backendId == null) {
             provider = BackendDiscovery.getInstance()

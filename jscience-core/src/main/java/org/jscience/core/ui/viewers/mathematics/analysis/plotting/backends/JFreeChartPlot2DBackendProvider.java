@@ -23,6 +23,8 @@
 
 package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
+import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
+
 import org.jscience.core.technical.backend.BackendProvider;
 
 /**
@@ -32,7 +34,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JFreeChartPlot2DBackendProvider implements BackendProvider {
+public class JFreeChartPlot2DBackendProvider implements PlottingBackendProvider {
 
     @Override
     public String getType() {
@@ -68,10 +70,12 @@ public class JFreeChartPlot2DBackendProvider implements BackendProvider {
     public int getPriority() {
         return 50; // Medium-high priority for 2D
     }
+    @Override public boolean isSupported2D() { return true; }
+    @Override public boolean isSupported3D() { return false; }
 
-    @Override
-    public Object createBackend() {
+    @Override Object createBackend() {
         return new JFreeChartPlot2D("");
     }
 }
+
 

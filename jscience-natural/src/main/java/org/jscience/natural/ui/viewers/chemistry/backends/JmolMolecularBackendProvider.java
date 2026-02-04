@@ -23,16 +23,19 @@
 
 package org.jscience.natural.ui.viewers.chemistry.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
+
+
+import org.jscience.core.technical.backend.Backend;
 
 /**
- * BackendProvider for Jmol molecular renderer.
+ * Backend for Jmol molecular renderer.
  * Available only when Jmol library is on the classpath.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JmolMolecularBackendProvider implements BackendProvider {
+public class JmolMolecularBackendProvider implements MolecularBackend {
 
     @Override
     public String getType() {
@@ -68,10 +71,13 @@ public class JmolMolecularBackendProvider implements BackendProvider {
     public int getPriority() {
         return 50; // Higher priority than JavaFX when available
     }
+    @Override public boolean isSupport3D() { return true; }
+    @Override public boolean isSupportInteractive() { return true; }
 
-    @Override
-    public Object createBackend() {
+    @Override Object createBackend() {
         return new JmolMolecularRenderer();
     }
 }
+
+
 

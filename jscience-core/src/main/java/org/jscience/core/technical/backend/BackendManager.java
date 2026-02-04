@@ -24,127 +24,69 @@
 package org.jscience.core.technical.backend;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Manages compute backends and provides access to the default backend.
- * <p>
+ * Global registry and manager for all discoverable backends.
+ * Provides static access for backward compatibility and a general-purpose manager.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class BackendManager {
+public class BackendManager extends AbstractBackendManager<Backend> {
 
-    private static final Map<String, ComputeBackend> backends = new ConcurrentHashMap<>();
-    private static ComputeBackend defaultBackend;
+    private static final BackendManager INSTANCE = new BackendManager();
 
-    static {
-        // Auto-discover backends via ServiceLoader
-        ServiceLoader<ComputeBackend> loader = ServiceLoader.load(ComputeBackend.class);
-        for (ComputeBackend backend : loader) {
-            registerBackend(backend);
-        }
-
-        // Select default backend (highest priority among available)
-        defaultBackend = selectBestBackend();
-    }
-
-    /**
-     * Private constructor to prevent instantiation.
-     */
     private BackendManager() {
+        super(Backend.class);
     }
 
     /**
-     * Returns the default compute backend.
-     * <p>
-     * The default backend is the highest-priority backend that is currently
-     * available.
-     * </p>
-     * 
-     * @return the default backend
-     * @throws IllegalStateException if no backends are available
+     * Returns the global singleton instance.
      */
-    public static ComputeBackend getDefault() {
-        if (defaultBackend == null) {
-            throw new IllegalStateException("No compute backends available");
-        }
-        return defaultBackend;
+    public static BackendManager getInstance() {
+        return INSTANCE;
     }
 
     /**
-     * Selects a specific backend by name.
-     * 
-     * @param name the backend name
-     * @return the backend, or null if not found
+     * Returns the default backend.
      */
-    public static ComputeBackend select(String name) {
-        return backends.get(name);
+    public static Backend getDefault() {
+        return INSTANCE.getDefault();
+    }
+
+    /**
+     * Selects a backend by name.
+     */
+    public static Backend select(String name) {
+        return INSTANCE.select(name);
     }
 
     /**
      * Sets the default backend.
-     * <p>
-     * This allows users to override the automatic backend selection.
-     * </p>
-     * 
-     * @param name the backend name
-     * @throws IllegalArgumentException if backend not found or not available
      */
     public static void setDefault(String name) {
-        ComputeBackend backend = backends.get(name);
-        if (backend == null) {
-            throw new IllegalArgumentException("Backend not found: " + name);
-        }
-        if (!backend.isAvailable()) {
-            throw new IllegalArgumentException("Backend not available: " + name);
-        }
-        defaultBackend = backend;
+        INSTANCE.setDefault(name);
     }
 
     /**
-     * Registers a backend manually.
-     * <p>
-     * This is called automatically during class initialization, but can also be
-     * used to register custom backends at runtime.
-     * </p>
-     * 
-     * @param backend the backend to register
+     * Registers a backend.
      */
-    public static void registerBackend(ComputeBackend backend) {
-        backends.put(backend.getName(), backend);
+    public static void registerBackend(Backend backend) {
+        INSTANCE.registerBackend(backend);
     }
 
     /**
-     * Returns the names of all registered backends.
-     * 
-     * @return collection of backend names
+     * Returns names of all registered backends.
      */
     public static Collection<String> getAvailableBackendNames() {
-        return Collections.unmodifiableSet(backends.keySet());
+        return INSTANCE.getAvailableNames();
     }
 
     /**
      * Returns all registered backends.
-     * 
-     * @return collection of backends
      */
-    public static Collection<ComputeBackend> getAllBackends() {
-        return Collections.unmodifiableCollection(backends.values());
-    }
-
-    /**
-     * Selects the best available backend based on priority.
-     * 
-     * @return the backend with highest priority, or null if none available
-     */
-    private static ComputeBackend selectBestBackend() {
-        return backends.values().stream()
-                .filter(ComputeBackend::isAvailable)
-                .max(Comparator.comparingInt(ComputeBackend::getPriority))
-                .orElse(null);
+    public static Collection<Backend> getAllBackends() {
+        return INSTANCE.getAllBackends();
     }
 }
-
-

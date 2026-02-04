@@ -23,9 +23,9 @@
 
 package org.jscience.core.media.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 
-public class MinimBackendProvider implements BackendProvider {
+public class MinimBackendProvider implements Backend {
     @Override public String getType() { return "audio"; }
     @Override public String getId() { return "minim"; }
     @Override public String getName() { return "Minim (Creative)"; }
@@ -34,4 +34,5 @@ public class MinimBackendProvider implements BackendProvider {
     @Override public int getPriority() { return 20; }
     @Override public Object createBackend() { return new MinimEngine(); }
 }
+
 

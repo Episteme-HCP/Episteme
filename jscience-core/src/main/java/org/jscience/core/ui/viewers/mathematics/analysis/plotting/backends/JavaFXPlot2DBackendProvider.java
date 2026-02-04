@@ -23,16 +23,18 @@
 
 package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
+
+import org.jscience.core.technical.backend.Backend;
 
 /**
- * BackendProvider for JavaFX 2D plotting.
+ * Backend for JavaFX 2D plotting.
  * Always available as JavaFX is a core dependency.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JavaFXPlot2DBackendProvider implements BackendProvider {
+public class JavaFXPlot2DBackendProvider implements PlottingBackend {
 
     @Override
     public String getType() {
@@ -63,10 +65,13 @@ public class JavaFXPlot2DBackendProvider implements BackendProvider {
     public int getPriority() {
         return 10; // Base priority, fallback option
     }
+    @Override public boolean isSupported2D() { return true; }
+    @Override public boolean isSupported3D() { return false; }
 
-    @Override
-    public Object createBackend() {
+    @Override Object createBackend() {
         return new JavaFXPlot2D(""); // Title set later
     }
 }
+
+
 

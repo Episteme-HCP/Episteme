@@ -25,6 +25,7 @@ package org.jscience.core.technical.backend.gpu.opencl;
 
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jocl.*;
 import java.nio.DoubleBuffer;
 
@@ -125,6 +126,11 @@ public class OpenCLBackend implements GPUBackend {
     @Override
     public int getPriority() {
         return 10; 
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.GPU;
     }
 
     @Override

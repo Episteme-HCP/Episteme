@@ -83,5 +83,10 @@ public class CPUBackend implements ComputeBackend {
     public int getPriority() {
         return 0; // Lowest priority (fallback)
     }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU;
+    }
 }
 

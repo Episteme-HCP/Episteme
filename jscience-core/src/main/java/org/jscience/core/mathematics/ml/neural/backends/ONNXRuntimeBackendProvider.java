@@ -23,7 +23,7 @@
 package org.jscience.core.mathematics.ml.neural.backends;
 
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -31,14 +31,14 @@ import java.util.Map;
  * Provider for running ONNX (Open Neural Network Exchange) models.
  * <p>
  * Allows executing pre-trained models (e.g., from PyTorch/TensorFlow) within JScience.
- * Implements {@link BackendProvider} for standardized discovery.
+ * Implements {@link Backend} for standardized discovery.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class ONNXRuntimeBackendProvider implements BackendProvider {
+public class ONNXRuntimeBackendProvider implements Backend {
 
     @Override
     public String getType() {
@@ -152,3 +152,4 @@ public class ONNXRuntimeBackendProvider implements BackendProvider {
         }
     }
 }
+

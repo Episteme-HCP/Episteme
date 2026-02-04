@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
  */
 public class BackendDiscovery {
 
-    public static final String TYPE_PLOTTING = "plotting";
-    public static final String TYPE_MOLECULAR = "molecular";
     public static final String TYPE_MATH = "math";
     public static final String TYPE_TENSOR = "tensor";
     public static final String TYPE_LINEAR_ALGEBRA = "linear-algebra";
+    public static final String TYPE_MOLECULAR = "molecular";
+    public static final String TYPE_PLOTTING = "plotting";
     public static final String TYPE_QUANTUM = "quantum";
     public static final String TYPE_MAP = "map";
-    public static final String TYPE_NETWORK = "network";
+    public static final String TYPE_GRAPH = "graph";
     public static final String TYPE_AUDIO = "audio";
     public static final String TYPE_DISTRIBUTED = "distributed";
 
@@ -36,44 +36,44 @@ public class BackendDiscovery {
         return INSTANCE;
     }
 
-    private List<BackendProvider> cachedProviders;
+    private List<Backend> cachedProviders;
 
-    public synchronized List<BackendProvider> getProviders() {
+    public synchronized List<Backend> getProviders() {
         if (cachedProviders == null) {
             cachedProviders = new ArrayList<>();
-            ServiceLoader<BackendProvider> loader = ServiceLoader.load(BackendProvider.class);
-            for (BackendProvider provider : loader) cachedProviders.add(provider);
+            ServiceLoader<Backend> loader = ServiceLoader.load(Backend.class);
+            for (Backend provider : loader) cachedProviders.add(provider);
         }
         return cachedProviders;
     }
 
-    public List<BackendProvider> getProvidersByType(String type) {
+    public List<Backend> getProvidersByType(String type) {
         return getProviders().stream()
-                .filter(p -> p.getType().equals(type))
+                .filter(p -> p.getType().equalsIgnoreCase(type))
                 .collect(Collectors.toList());
     }
 
-    public List<BackendProvider> getAvailableProvidersByType(String type) {
+    public List<Backend> getAvailableProvidersByType(String type) {
         return getProvidersByType(type).stream()
-                .filter(BackendProvider::isAvailable)
-                .sorted(Comparator.comparingInt(BackendProvider::getPriority).reversed())
+                .filter(Backend::isAvailable)
+                .sorted(Comparator.comparingInt(Backend::getPriority).reversed())
                 .collect(Collectors.toList());
     }
 
-    public Optional<BackendProvider> getProvider(String type, String id) {
+    public Optional<Backend> getProvider(String type, String id) {
         return getProvidersByType(type).stream()
-                .filter(p -> p.getId().equals(id))
+                .filter(p -> p.getId().equalsIgnoreCase(id))
                 .findFirst();
     }
 
-    public Optional<BackendProvider> getBestProvider(String type) {
+    public Optional<Backend> getBestProvider(String type) {
         return getAvailableProvidersByType(type).stream().findFirst();
     }
 
-    public Optional<BackendProvider> getPreferredProvider(String type) {
+    public Optional<Backend> getPreferredProvider(String type) {
         String preferredId = org.jscience.core.io.UserPreferences.getInstance().getPreferredBackend(type);
         if (preferredId != null && !preferredId.isEmpty()) {
-            Optional<BackendProvider> preferred = getProvider(type, preferredId);
+            Optional<Backend> preferred = getProvider(type, preferredId);
             if (preferred.isPresent() && preferred.get().isAvailable()) return preferred;
         }
         return getBestProvider(type);

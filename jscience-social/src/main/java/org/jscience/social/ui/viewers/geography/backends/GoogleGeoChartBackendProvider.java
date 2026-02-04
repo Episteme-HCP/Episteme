@@ -23,10 +23,10 @@
 
 package org.jscience.social.ui.viewers.geography.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.social.ui.viewers.geography.MapBackend;
 
 /**
- * BackendProvider for Google GeoChart via WebView.
+ * Backend for Google GeoChart via WebView.
  * Web-based geographic visualization using Google Charts.
  * 
  * @see <a href="https://developers.google.com/chart/interactive/docs/gallery/geochart">GeoChart</a>
@@ -34,7 +34,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GoogleGeoChartBackendProvider implements BackendProvider {
+public class GoogleGeoChartBackendProvider implements MapBackend {
 
     @Override
     public String getType() {
@@ -68,9 +68,11 @@ public class GoogleGeoChartBackendProvider implements BackendProvider {
     }
 
     @Override
-    public int getPriority() {
         return 30; // Lower priority - requires network connection
     }
+
+    @Override public boolean isSupportsLayering() { return false; }
+    @Override public boolean isSupportsInteractive() { return true; }
 
     @Override
     public Object createBackend() {

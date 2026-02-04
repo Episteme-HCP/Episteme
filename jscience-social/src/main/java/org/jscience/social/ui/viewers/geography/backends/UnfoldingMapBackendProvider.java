@@ -23,10 +23,10 @@
 
 package org.jscience.social.ui.viewers.geography.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.social.ui.viewers.geography.MapBackend;
 
 /**
- * BackendProvider for UnfoldingMap library.
+ * Backend for UnfoldingMap library.
  * Processing-based interactive map library.
  * 
  * @see <a href="https://github.com/ronit0717/unfoldingMap">UnfoldingMap</a>
@@ -34,7 +34,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class UnfoldingMapBackendProvider implements BackendProvider {
+public class UnfoldingMapBackendProvider implements MapBackend {
 
     @Override
     public String getType() {
@@ -67,9 +67,11 @@ public class UnfoldingMapBackendProvider implements BackendProvider {
     }
 
     @Override
-    public int getPriority() {
         return 50; // Higher priority than JavaFX when available
     }
+
+    @Override public boolean isSupportsLayering() { return true; }
+    @Override public boolean isSupportsInteractive() { return true; }
 
     @Override
     public Object createBackend() {

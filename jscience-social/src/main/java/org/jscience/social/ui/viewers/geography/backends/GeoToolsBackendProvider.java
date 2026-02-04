@@ -23,10 +23,10 @@
 
 package org.jscience.social.ui.viewers.geography.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.social.ui.viewers.geography.MapBackend;
 
 /**
- * BackendProvider for GeoTools library.
+ * Backend for GeoTools library.
  * Open source Java GIS toolkit for geospatial data.
  * 
  * @see <a href="https://www.osgeo.org/projects/geotools/">GeoTools</a>
@@ -34,7 +34,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoToolsBackendProvider implements BackendProvider {
+public class GeoToolsBackendProvider implements MapBackend {
 
     @Override
     public String getType() {
@@ -67,9 +67,11 @@ public class GeoToolsBackendProvider implements BackendProvider {
     }
 
     @Override
-    public int getPriority() {
         return 60; // High priority - professional GIS toolkit
     }
+
+    @Override public boolean isSupportsLayering() { return true; }
+    @Override public boolean isSupportsInteractive() { return true; }
 
     @Override
     public Object createBackend() {

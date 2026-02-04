@@ -168,8 +168,8 @@ public final class JScience {
 
             // Backends are now persisted immediately on setXXX(), so mostly no need to save here
             // except for legacy plotting/linear algebra fields kept in this class
-            if (plottingBackend2D != null) prefs.set("plotting.backend.2d", plottingBackend2D.name());
-            if (plottingBackend3D != null) prefs.set("plotting.backend.3d", plottingBackend3D.name());
+            prefs.set("plotting.backend.2d", getPlottingBackend2D().getId());
+            prefs.set("plotting.backend.3d", getPlottingBackend3D().getId());
             if (getLinearAlgebraProviderId() != null) prefs.set("linear.algebra.backend", getLinearAlgebraProviderId());
 
             prefs.save();
@@ -216,10 +216,10 @@ public final class JScience {
             // Load Backends (Using setters to populate runtime if needed, though mostly direct access is preferred)
             try {
                 String pb2d = prefs.get("plotting.backend.2d");
-                if (pb2d != null) plottingBackend2D = org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend.valueOf(pb2d);
+                if (pb2d != null) org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set2D(pb2d);
                 
                 String pb3d = prefs.get("plotting.backend.3d");
-                if (pb3d != null) plottingBackend3D = org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend.valueOf(pb3d);
+                if (pb3d != null) org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set3D(pb3d);
                 
                 // No need to load other backends into local fields as they are now fetching directly from UserPreferences
                 // The getters (getMolecularBackendId, etc.) read from UserPreferences directly.
@@ -557,7 +557,7 @@ public final class JScience {
         appendBackends(sb, "Molecular", org.jscience.core.technical.backend.BackendDiscovery.TYPE_MOLECULAR, getMolecularBackendId());
         appendBackends(sb, "Quantum", org.jscience.core.technical.backend.BackendDiscovery.TYPE_QUANTUM, getQuantumBackendId());
         appendBackends(sb, "Map (GIS)", org.jscience.core.technical.backend.BackendDiscovery.TYPE_MAP, getMapBackendId());
-        appendBackends(sb, "Network", org.jscience.core.technical.backend.BackendDiscovery.TYPE_NETWORK, getNetworkBackendId());
+        appendBackends(sb, "Graph", org.jscience.core.technical.backend.BackendDiscovery.TYPE_GRAPH, getGraphBackendId());
         
         // Plotting is special (Enum)
         sb.append("  Plotting (Current: 2D=").append(getPlottingBackend2D()).append(" / 3D=").append(getPlottingBackend3D()).append(")\n");
@@ -609,38 +609,32 @@ public final class JScience {
      */
     // ================= PLOTTING BACKEND =================
 
-    private static org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend plottingBackend2D = org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend.XCHART;
-    private static org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend plottingBackend3D = org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend.JZY3D;
-
     /**
      * Gets the current 2D plotting backend.
      */
     public static org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend2D() {
-        return plottingBackend2D;
+        return org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().get2D();
     }
 
     /**
      * Sets the current 2D plotting backend.
      */
     public static void setPlottingBackend2D(org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
-        plottingBackend2D = backend;
+        org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set2D(backend.getId());
     }
 
     /**
      * Gets the current 3D plotting backend.
      */
     public static org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend3D() {
-        return plottingBackend3D;
+        return org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().get3D();
     }
 
     /**
      * Sets the current 3D plotting backend.
      */
-    /**
-     * Sets the current 3D plotting backend.
-     */
     public static void setPlottingBackend3D(org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
-        plottingBackend3D = backend;
+        org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set3D(backend.getId());
     }
     
     // ================= QUANTUM BACKEND =================
@@ -703,13 +697,14 @@ public final class JScience {
      * Gets the ID of the current Molecular Backend.
      */
     public static String getMolecularBackendId() {
-        return org.jscience.core.io.UserPreferences.getInstance().getPreferredBackend("molecular");
+        return org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getPreferredId();
     }
 
     /**
      * Sets the Molecular Backend by ID.
      */
     public static void setMolecularBackendId(String id) {
+        org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().setPreferredId(id);
         org.jscience.core.io.UserPreferences.getInstance().setPreferredBackend("molecular", id);
     }
 
@@ -729,20 +724,21 @@ public final class JScience {
         org.jscience.core.io.UserPreferences.getInstance().setPreferredBackend("map", id);
     }
 
-    // ================= NETWORK BACKEND =================
+    // ================= GRAPH BACKEND =================
 
     /**
-     * Gets the ID of the current Network Backend.
+     * Gets the ID of the current Graph Backend.
      */
-    public static String getNetworkBackendId() {
-        return org.jscience.core.io.UserPreferences.getInstance().getPreferredBackend("network");
+    public static String getGraphBackendId() {
+        return org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().getPreferredId();
     }
 
     /**
-     * Sets the Network Backend by ID.
+     * Sets the Graph Backend by ID.
      */
-    public static void setNetworkBackendId(String id) {
-        org.jscience.core.io.UserPreferences.getInstance().setPreferredBackend("network", id);
+    public static void setGraphBackendId(String id) {
+        org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().setPreferredId(id);
+        org.jscience.core.io.UserPreferences.getInstance().setPreferredBackend("graph", id);
     }
 
     /**
@@ -793,12 +789,12 @@ public final class JScience {
     private static void appendBackends(StringBuilder sb, String label, String type, String currentId) {
         sb.append("  ").append(label).append(" (Current: ").append(currentId != null ? currentId : "AUTO").append("):\n");
         try {
-            java.util.List<org.jscience.core.technical.backend.BackendProvider> list = 
+            java.util.List<org.jscience.core.technical.backend.Backend> list = 
                  org.jscience.core.technical.backend.BackendDiscovery.getInstance().getProvidersByType(type);
             if (list == null || list.isEmpty()) {
                 sb.append("    (None registered via SPI)\n");
             } else {
-                for (org.jscience.core.technical.backend.BackendProvider p : list) {
+                for (org.jscience.core.technical.backend.Backend p : list) {
                      String marker = (p.getId().equals(currentId)) ? "*" : " ";
                      sb.append("    ").append(marker).append(" [").append(p.getId()).append("] ")
                        .append(p.getName()).append(p.isAvailable() ? "" : " (N/A)").append("\n");
@@ -834,4 +830,5 @@ public final class JScience {
          }
     }
 }
+
 

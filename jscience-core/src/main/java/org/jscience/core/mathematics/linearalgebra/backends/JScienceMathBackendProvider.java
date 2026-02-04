@@ -23,16 +23,16 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 
 /**
- * BackendProvider for JScience Core Math engine.
+ * Backend for JScience Core Math engine.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JScienceMathBackendProvider implements BackendProvider {
+public class JScienceMathBackendProvider implements Backend {
     @Override
     public String getType() {
         return BackendDiscovery.TYPE_MATH;
@@ -68,5 +68,6 @@ public class JScienceMathBackendProvider implements BackendProvider {
         return null;
     }
 }
+
 
 

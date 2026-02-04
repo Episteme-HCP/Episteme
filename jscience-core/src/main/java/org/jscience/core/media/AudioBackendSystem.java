@@ -25,14 +25,14 @@ package org.jscience.core.media;
 
 import org.jscience.core.media.backends.JavaSoundBackend;
 import org.jscience.core.technical.backend.BackendDiscovery;
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Manager for Audio Backends.
- * Discovers backends implementing BackendProvider with type="audio".
+ * Discovers backends implementing Backend with type="audio".
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -47,7 +47,7 @@ public class AudioBackendSystem {
     }
 
     public static void refresh() {
-        Optional<BackendProvider> provider = BackendDiscovery.getInstance()
+        Optional<Backend> provider = BackendDiscovery.getInstance()
             .getPreferredProvider(BackendDiscovery.TYPE_AUDIO);
         
         if (provider.isPresent()) {
@@ -62,21 +62,21 @@ public class AudioBackendSystem {
         return BackendDiscovery.getInstance()
             .getAvailableProvidersByType(BackendDiscovery.TYPE_AUDIO)
             .stream()
-            .map(BackendProvider::getName)
+            .map(Backend::getName)
             .collect(Collectors.toList());
     }
 
     public static AudioBackend getAudioBackend() {
         // Ensure backend is current with preferences if changed externally
-        Optional<BackendProvider> pref = BackendDiscovery.getInstance()
+        Optional<Backend> pref = BackendDiscovery.getInstance()
             .getPreferredProvider(BackendDiscovery.TYPE_AUDIO);
             
         if (pref.isPresent() && (currentBackend == null || !currentBackend.getBackendName().equals(pref.get().getName()))) {
-            // This check is a bit loose (Name vs ID), but BackendProvider mismatch implies change.
+            // This check is a bit loose (Name vs ID), but Backend mismatch implies change.
             // Ideally we check ID. 
             // For now, if preference exists, try to load it. 
             // But createBackend() creates a NEW instance. reusing singletons?
-            // The BackendProvider.createBackend() usually creates new.
+            // The Backend.createBackend() usually creates new.
             // If we want a singleton audio engine, we should manage it here.
              selectBackend(pref.get().getId());
         }
@@ -87,7 +87,7 @@ public class AudioBackendSystem {
 
     public static void selectBackend(String backendNameOrId) {
         // Try finding by Name first (for UI compat) then ID
-        Optional<BackendProvider> provider = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_AUDIO)
+        Optional<Backend> provider = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_AUDIO)
             .stream()
             .filter(p -> p.getName().equals(backendNameOrId) || p.getId().equals(backendNameOrId))
             .findFirst();
@@ -108,4 +108,5 @@ public class AudioBackendSystem {
         }
     }
 }
+
 

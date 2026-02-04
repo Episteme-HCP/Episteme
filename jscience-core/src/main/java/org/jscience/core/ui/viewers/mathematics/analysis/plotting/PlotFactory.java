@@ -24,7 +24,7 @@
 package org.jscience.core.ui.viewers.mathematics.analysis.plotting;
 
 import org.jscience.core.technical.backend.BackendDiscovery;
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,12 +61,12 @@ public class PlotFactory {
     /**
      * Creates 2D plot with default/AUTO backend.
      */
-    public static Plot2D create2D(String title) {
-        BackendProvider provider = getBackendProvider();
+    public static Plot2DRenderer create2D(String title) {
+        Backend provider = getBackendProvider();
         if (provider != null) {
             Object backend = provider.createBackend();
-            if (backend instanceof Plot2D) {
-                Plot2D plot = (Plot2D) backend;
+            if (backend instanceof Plot2DRenderer) {
+                Plot2DRenderer plot = (Plot2DRenderer) backend;
                 plot.setTitle(title);
                 return plot;
             }
@@ -79,16 +79,16 @@ public class PlotFactory {
     /**
      * Creates 2D plot with specified backend enum (compatibility).
      */
-    public static Plot2D create2D(String title, PlottingBackend backend) {
+    public static Plot2DRenderer create2D(String title, PlottingBackend backend) {
         if (backend == null || backend == PlottingBackend.AUTO) {
             return create2D(title);
         }
         String id = backend.name().toLowerCase();
-        Optional<BackendProvider> provider = BackendDiscovery.getInstance()
+        Optional<Backend> provider = BackendDiscovery.getInstance()
                 .getProvider(BackendDiscovery.TYPE_PLOTTING, id);
 
         if (provider.isPresent() && provider.get().isAvailable()) {
-            Plot2D plot = (Plot2D) provider.get().createBackend();
+            Plot2DRenderer plot = (Plot2DRenderer) provider.get().createBackend();
             plot.setTitle(title);
             return plot;
         }
@@ -98,28 +98,28 @@ public class PlotFactory {
     /**
      * Creates 3D plot with default/AUTO backend.
      */
-    public static Plot3D create3D(String title) {
+    public static Plot3DRenderer create3D(String title) {
         // For 3D, prefer jzy3d specifically if available
-        Optional<BackendProvider> jzy3d = BackendDiscovery.getInstance()
+        Optional<Backend> jzy3d = BackendDiscovery.getInstance()
                 .getProvider(BackendDiscovery.TYPE_PLOTTING, "jzy3d");
 
         if (jzy3d.isPresent() && jzy3d.get().isAvailable()) {
             Object backend = jzy3d.get().createBackend();
-            if (backend instanceof Plot3D) {
-                Plot3D plot = (Plot3D) backend;
+            if (backend instanceof Plot3DRenderer) {
+                Plot3DRenderer plot = (Plot3DRenderer) backend;
                 plot.setTitle(title);
                 return plot;
             }
         }
 
         // Fallback to JavaFX 3D
-        Optional<BackendProvider> javafx3d = BackendDiscovery.getInstance()
+        Optional<Backend> javafx3d = BackendDiscovery.getInstance()
                 .getProvider(BackendDiscovery.TYPE_PLOTTING, "javafx3d");
 
         if (javafx3d.isPresent()) {
             Object backend = javafx3d.get().createBackend();
-            if (backend instanceof Plot3D) {
-                Plot3D plot = (Plot3D) backend;
+            if (backend instanceof Plot3DRenderer) {
+                Plot3DRenderer plot = (Plot3DRenderer) backend;
                 plot.setTitle(title);
                 return plot;
             }
@@ -131,7 +131,7 @@ public class PlotFactory {
     /**
      * Creates 3D plot with specified backend enum (compatibility).
      */
-    public static Plot3D create3D(String title, PlottingBackend backend) {
+    public static Plot3DRenderer create3D(String title, PlottingBackend backend) {
         if (backend == null || backend == PlottingBackend.AUTO) {
             return create3D(title);
         }
@@ -140,13 +140,13 @@ public class PlotFactory {
             id = "javafx3d";
         }
 
-        Optional<BackendProvider> provider = BackendDiscovery.getInstance()
+        Optional<Backend> provider = BackendDiscovery.getInstance()
                 .getProvider(BackendDiscovery.TYPE_PLOTTING, id);
 
         if (provider.isPresent() && provider.get().isAvailable()) {
             Object backendObj = provider.get().createBackend();
-            if (backendObj instanceof Plot3D) {
-                Plot3D plot = (Plot3D) backendObj;
+            if (backendObj instanceof Plot3DRenderer) {
+                Plot3DRenderer plot = (Plot3DRenderer) backendObj;
                 plot.setTitle(title);
                 return plot;
             }
@@ -157,9 +157,9 @@ public class PlotFactory {
     /**
      * Gets the best available plotting backend provider for 2D.
      */
-    private static BackendProvider getBackendProvider() {
+    private static Backend getBackendProvider() {
         if (selectedBackendId != null) {
-            Optional<BackendProvider> specific = BackendDiscovery.getInstance()
+            Optional<Backend> specific = BackendDiscovery.getInstance()
                     .getProvider(BackendDiscovery.TYPE_PLOTTING, selectedBackendId);
             if (specific.isPresent() && specific.get().isAvailable()) {
                 return specific.get();
@@ -167,7 +167,7 @@ public class PlotFactory {
         }
 
         // Auto-select best available (sorted by priority)
-        Optional<BackendProvider> best = BackendDiscovery.getInstance()
+        Optional<Backend> best = BackendDiscovery.getInstance()
                 .getBestProvider(BackendDiscovery.TYPE_PLOTTING);
         return best.orElse(null);
     }
@@ -175,7 +175,7 @@ public class PlotFactory {
     /**
      * Returns all discovered plotting backend providers.
      */
-    public static List<BackendProvider> getAvailableBackends() {
+    public static List<Backend> getAvailableBackends() {
         return BackendDiscovery.getInstance()
                 .getProvidersByType(BackendDiscovery.TYPE_PLOTTING);
     }
@@ -183,7 +183,7 @@ public class PlotFactory {
     /**
      * Returns only the available (loaded) plotting backends.
      */
-    public static List<BackendProvider> getLoadedBackends() {
+    public static List<Backend> getLoadedBackends() {
         return BackendDiscovery.getInstance()
                 .getAvailableProvidersByType(BackendDiscovery.TYPE_PLOTTING);
     }
@@ -192,9 +192,10 @@ public class PlotFactory {
      * Checks if a specific backend is available.
      */
     public static boolean isBackendAvailable(String backendId) {
-        Optional<BackendProvider> provider = BackendDiscovery.getInstance()
+        Optional<Backend> provider = BackendDiscovery.getInstance()
                 .getProvider(BackendDiscovery.TYPE_PLOTTING, backendId);
         return provider.isPresent() && provider.get().isAvailable();
     }
 }
+
 

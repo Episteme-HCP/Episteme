@@ -1,4 +1,4 @@
 org.jscience.core.technical.backend.cpu.CPUBackend
 org.jscience.core.technical.backend.gpu.cuda.CUDABackend
 org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend
-org.jscience.natural.physics.quantum.backends.PythonQuantumBackend
+org.jscience.natural.physics.quantum.backends.PythonQuantumBackendProvider

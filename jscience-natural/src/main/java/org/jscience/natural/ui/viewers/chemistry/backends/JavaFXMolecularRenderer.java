@@ -24,6 +24,10 @@
 package org.jscience.natural.ui.viewers.chemistry.backends;
 
 
+import org.jscience.natural.ui.viewers.chemistry.MolecularRenderer;
+import org.jscience.natural.ui.viewers.chemistry.RenderStyle;
+import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
+
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
@@ -218,7 +222,7 @@ public class JavaFXMolecularRenderer implements MolecularRenderer {
 
     @Override
     public MolecularBackend getBackend() {
-        return MolecularBackend.JAVAFX;
+        return new JavaFXMolecularBackendProvider();
     }
 }
 

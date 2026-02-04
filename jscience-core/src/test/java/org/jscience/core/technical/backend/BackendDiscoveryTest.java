@@ -45,10 +45,10 @@ public class BackendDiscoveryTest {
     public void testGetProvidersCaching() {
         BackendDiscovery discovery = BackendDiscovery.getInstance();
         
-        List<BackendProvider> providers1 = discovery.getProviders();
+        List<Backend> providers1 = discovery.getProviders();
         assertNotNull(providers1);
         
-        List<BackendProvider> providers2 = discovery.getProviders();
+        List<Backend> providers2 = discovery.getProviders();
         assertSame(providers1, providers2, "getProviders() should return cached list");
     }
 
@@ -59,7 +59,7 @@ public class BackendDiscoveryTest {
         // Use a type that likely has no providers or known providers, just checking logic
         // Assuming we have at least one provider in the classpath (e.g. from tests or core)
         // If not, list is empty, but method should not fail.
-        List<BackendProvider> list = discovery.getProvidersByType("unknown-type-xyz");
+        List<Backend> list = discovery.getProvidersByType("unknown-type-xyz");
         assertNotNull(list);
         assertTrue(list.isEmpty());
     }
@@ -73,4 +73,5 @@ public class BackendDiscoveryTest {
         assertEquals("quantum", BackendDiscovery.TYPE_QUANTUM);
     }
 }
+
 

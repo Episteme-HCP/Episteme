@@ -23,16 +23,16 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 
 /**
- * BackendProvider for ND4J.
+ * Backend for ND4J.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ND4JBackendProvider implements BackendProvider {
+public class ND4JBackendProvider implements Backend {
     @Override
     public String getType() {
         return BackendDiscovery.TYPE_TENSOR;
@@ -96,4 +96,5 @@ public class ND4JBackendProvider implements BackendProvider {
         return null;
     }
 }
+
 

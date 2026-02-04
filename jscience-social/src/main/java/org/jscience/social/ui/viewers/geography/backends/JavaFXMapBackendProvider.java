@@ -23,17 +23,17 @@
 
 package org.jscience.social.ui.viewers.geography.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.social.ui.viewers.geography.MapBackend;
 
 /**
- * BackendProvider for JavaFX map renderer.
+ * Backend for JavaFX map renderer.
  * Always available as JavaFX is a core dependency.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JavaFXMapBackendProvider implements BackendProvider {
+public class JavaFXMapBackendProvider implements MapBackend {
 
     @Override
     public String getType() {
@@ -61,9 +61,11 @@ public class JavaFXMapBackendProvider implements BackendProvider {
     }
 
     @Override
-    public int getPriority() {
         return 10; // Base priority, fallback option
     }
+
+    @Override public boolean isSupportsLayering() { return true; }
+    @Override public boolean isSupportsInteractive() { return true; }
 
     @Override
     public Object createBackend() {

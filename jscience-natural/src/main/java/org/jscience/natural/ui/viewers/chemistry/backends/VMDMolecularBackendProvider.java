@@ -23,16 +23,18 @@
 
 package org.jscience.natural.ui.viewers.chemistry.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
+
+import org.jscience.core.technical.backend.Backend;
 
 /**
- * BackendProvider for VMD (Visual Molecular Dynamics).
+ * Backend for VMD (Visual Molecular Dynamics).
  * VMD is an external application for biomolecular simulations.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VMDMolecularBackendProvider implements BackendProvider {
+public class VMDMolecularBackendProvider implements MolecularBackend {
 
     @Override
     public String getType() {
@@ -56,20 +58,17 @@ public class VMDMolecularBackendProvider implements BackendProvider {
 
     @Override
     public boolean isAvailable() {
-        // Check if vmd executable exists in PATH
-        // For now, return false as not yet implemented
-        return false;
+        return true;
     }
 
     @Override
     public int getPriority() {
         return 30;
     }
+    @Override public boolean isSupport3D() { return true; }
+    @Override public boolean isSupportInteractive() { return true; }
 
-    @Override
-    public Object createBackend() {
-        // Would create a VMD bridge renderer
-        throw new UnsupportedOperationException("VMD backend not yet implemented");
+    @Override public Object createBackend() {
+        return new VMDMolecularRenderer();
     }
 }
-

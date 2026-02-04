@@ -23,10 +23,11 @@
 
 package org.jscience.core.ui.viewers.mathematics.discrete.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend;
+import org.jscience.core.technical.backend.Backend;
 
 /**
- * BackendProvider for JGraphT library.
+ * Backend for JGraphT library.
  * Graph theory library with algorithms and graph structures.
  * 
  * @see <a href="https://github.com/jgrapht/jgrapht">JGraphT</a>
@@ -34,11 +35,11 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JGraphTBackendProvider implements BackendProvider {
+public class JGraphTBackendProvider implements GraphBackend {
 
     @Override
     public String getType() {
-        return "network";
+        return "graph";
     }
 
     @Override
@@ -70,11 +71,11 @@ public class JGraphTBackendProvider implements BackendProvider {
     public int getPriority() {
         return 50; // Good priority for graph analysis
     }
+    @Override public boolean isSupports2D() { return true; }
+    @Override public boolean isSupports3D() { return true; }
 
     @Override
     public Object createBackend() {
-        // Placeholder - actual implementation would create JGraphT wrapper
-        return null;
+        return new JGraphTRenderer();
     }
 }
-

@@ -23,6 +23,8 @@
 
 package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
+import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
+
 import org.jscience.core.technical.backend.BackendProvider;
 
 /**
@@ -32,7 +34,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Jzy3dPlot3DBackendProvider implements BackendProvider {
+public class Jzy3dPlot3DBackendProvider implements PlottingBackendProvider {
 
     @Override
     public String getType() {
@@ -68,10 +70,12 @@ public class Jzy3dPlot3DBackendProvider implements BackendProvider {
     public int getPriority() {
         return 70; // High priority for 3D (OpenGL-based)
     }
+    @Override public boolean isSupported2D() { return false; }
+    @Override public boolean isSupported3D() { return true; }
 
-    @Override
-    public Object createBackend() {
+    @Override Object createBackend() {
         return new Jzy3dPlot3D("");
     }
 }
+
 

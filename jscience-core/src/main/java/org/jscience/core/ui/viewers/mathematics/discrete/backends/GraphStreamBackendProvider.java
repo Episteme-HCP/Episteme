@@ -23,10 +23,11 @@
 
 package org.jscience.core.ui.viewers.mathematics.discrete.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend;
+import org.jscience.core.technical.backend.Backend;
 
 /**
- * BackendProvider for GraphStream library.
+ * Backend for GraphStream library.
  * Dynamic graph visualization and interaction library.
  * 
  * @see <a href="https://graphstream-project.org/">GraphStream</a>
@@ -34,11 +35,11 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GraphStreamBackendProvider implements BackendProvider {
+public class GraphStreamBackendProvider implements GraphBackend {
 
     @Override
     public String getType() {
-        return "network";
+        return "graph";
     }
 
     @Override
@@ -70,11 +71,11 @@ public class GraphStreamBackendProvider implements BackendProvider {
     public int getPriority() {
         return 60; // High priority - excellent for dynamic graphs
     }
+    @Override public boolean isSupports2D() { return true; }
+    @Override public boolean isSupports3D() { return true; }
 
     @Override
     public Object createBackend() {
-        // Placeholder - actual implementation would create GraphStream wrapper
-        return null;
+        return new GraphStreamRenderer();
     }
 }
-

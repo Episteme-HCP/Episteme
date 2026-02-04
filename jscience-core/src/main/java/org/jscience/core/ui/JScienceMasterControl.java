@@ -34,7 +34,7 @@ import org.jscience.core.JScience;
 import org.jscience.core.ui.i18n.I18N;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 import org.jscience.core.technical.backend.BackendDiscovery;
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.io.ResourceIO;
 
 import java.util.Locale;
@@ -513,20 +513,19 @@ public class JScienceMasterControl extends Application {
 
         // Molecular Rendering Backend
         ComboBox<String> backendBox = new ComboBox<>();
-        // Fetch available molecular backends via SPI
-        List<BackendProvider> providers = 
-            BackendDiscovery.getInstance()
-                .getProvidersByType(BackendDiscovery.TYPE_MOLECULAR);
+        // Fetch available molecular backends via Manager
+        java.util.Collection<org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackend> providers = 
+            org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getAllBackends();
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", null);
-        for (BackendProvider p : providers) {
+        nameToId.put("AUTO", "auto");
+        for (org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackend p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = PREFS.getPreferredBackend("molecular");
+        String currentId = org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getPreferredId();
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -537,6 +536,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
+            org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().setPreferredId(nameToId.get(name));
             PREFS.setPreferredBackend("molecular", nameToId.get(name));
         });
 
@@ -579,14 +579,14 @@ public class JScienceMasterControl extends Application {
         // Quantum Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available quantum backends via SPI
-        List<BackendProvider> providers = 
+        List<Backend> providers = 
             BackendDiscovery.getInstance()
                 .getProvidersByType(BackendDiscovery.TYPE_QUANTUM);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (BackendProvider p : providers) {
+        for (Backend p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
@@ -643,14 +643,14 @@ public class JScienceMasterControl extends Application {
         // Map Rendering Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available map backends via SPI
-        List<BackendProvider> providers = 
+        List<Backend> providers = 
             BackendDiscovery.getInstance()
                 .getProvidersByType(BackendDiscovery.TYPE_MAP);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (BackendProvider p : providers) {
+        for (Backend p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
@@ -705,22 +705,21 @@ public class JScienceMasterControl extends Application {
         grid.setVgap(15);
         grid.setPadding(new Insets(10, 0, 10, 0));
 
-        // Network Rendering Backend
+        // Graph Rendering Backend
         ComboBox<String> backendBox = new ComboBox<>();
-        // Fetch available network backends via SPI
-        List<BackendProvider> providers = 
-            BackendDiscovery.getInstance()
-                .getProvidersByType(BackendDiscovery.TYPE_NETWORK);
+        // Fetch available graph backends via Manager
+        java.util.Collection<org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend> providers = 
+            org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().getAllBackends();
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", null);
-        for (BackendProvider p : providers) {
+        nameToId.put("AUTO", "auto");
+        for (org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = PREFS.getPreferredBackend("network");
+        String currentId = org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().getPreferredId();
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -731,7 +730,8 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            PREFS.setPreferredBackend("network", nameToId.get(name));
+            org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().setPreferredId(nameToId.get(name));
+            PREFS.setPreferredBackend("graph", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -772,14 +772,14 @@ public class JScienceMasterControl extends Application {
         // Audio Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available audio backends via SPI
-        List<BackendProvider> providers = 
+        List<Backend> providers = 
             BackendDiscovery.getInstance() // Now resolved
                 .getProvidersByType(BackendDiscovery.TYPE_AUDIO); 
 
         // Map names to IDs for lookups
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (BackendProvider p : providers) {
+        for (Backend p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
@@ -884,14 +884,14 @@ public class JScienceMasterControl extends Application {
 
         // Math Backend
         ComboBox<String> backendBox = new ComboBox<>();
-        java.util.List<org.jscience.core.technical.backend.BackendProvider> providers = 
+        java.util.List<org.jscience.core.technical.backend.Backend> providers = 
             org.jscience.core.technical.backend.BackendDiscovery.getInstance()
                 .getProvidersByType(org.jscience.core.technical.backend.BackendDiscovery.TYPE_MATH);
         
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (org.jscience.core.technical.backend.BackendProvider p : providers) {
+        for (org.jscience.core.technical.backend.Backend p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
@@ -964,7 +964,7 @@ public class JScienceMasterControl extends Application {
         GridPane listGrid = new GridPane();
         listGrid.setHgap(35); listGrid.setVgap(12);
         
-        List<BackendProvider> all = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_TENSOR);
+        List<Backend> all = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_TENSOR);
         java.util.function.Function<String, Integer> getWeight = (id) -> {
             id = id.toLowerCase();
             if (id.contains("cpu")) return 1;
@@ -973,13 +973,13 @@ public class JScienceMasterControl extends Application {
             return 10;
         };
 
-        List<BackendProvider> drivers = all.stream()
+        List<Backend> drivers = all.stream()
             .filter(p -> getWeight.apply(p.getId()) < 10)
             .sorted(java.util.Comparator.comparingInt(p -> getWeight.apply(p.getId())))
             .collect(java.util.stream.Collectors.toList());
 
         int r = 0;
-        for (BackendProvider p : drivers) {
+        for (Backend p : drivers) {
             addBackendRow(listGrid, r++, p, i18n);
         }
         
@@ -1003,14 +1003,14 @@ public class JScienceMasterControl extends Application {
 
         // Tensor Backend
         ComboBox<String> backendBox = new ComboBox<>();
-        java.util.List<org.jscience.core.technical.backend.BackendProvider> providers = 
+        java.util.List<org.jscience.core.technical.backend.Backend> providers = 
             org.jscience.core.technical.backend.BackendDiscovery.getInstance()
                 .getProvidersByType(org.jscience.core.technical.backend.BackendDiscovery.TYPE_TENSOR);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (org.jscience.core.technical.backend.BackendProvider p : providers) {
+        for (org.jscience.core.technical.backend.Backend p : providers) {
             if (!isDriverId(p.getId())) {
                 nameToId.put(p.getName(), p.getId());
             }
@@ -1046,12 +1046,12 @@ public class JScienceMasterControl extends Application {
         GridPane listGrid = new GridPane();
         listGrid.setHgap(35); listGrid.setVgap(12);
         
-        List<BackendProvider> tensors = providers.stream()
+        List<Backend> tensors = providers.stream()
             .filter(p -> !isDriverId(p.getId()))
             .collect(java.util.stream.Collectors.toList());
 
         int r = 0;
-        for (BackendProvider p : tensors) {
+        for (Backend p : tensors) {
             addBackendRow(listGrid, r++, p, i18n);
         }
         
@@ -1090,25 +1090,22 @@ public class JScienceMasterControl extends Application {
         
         // 2D Combo
         ComboBox<PlottingBackend> backendBox = new ComboBox<>();
-        backendBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
+        List<PlottingBackend> allPlotting = new ArrayList<>(org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().getAllBackends());
+        
+        backendBox.getItems().addAll(allPlotting.stream()
                 .filter(PlottingBackend::isSupported2D)
                 .collect(java.util.stream.Collectors.toList()));
+        
         backendBox.setConverter(new javafx.util.StringConverter<PlottingBackend>() {
             @Override
             public String toString(PlottingBackend object) {
-                if (object == null) return "";
-                switch (object) {
-                    case AUTO: return "Auto";
-                    case XCHART: return "XChart";
-                    case JAVAFX: return "JavaFX";
-                    case JFREECHART: return "JFreeChart";
-                    case JZY3D: return "Jzy3D";
-                    default: return object.name();
-                }
+                if (object == null) return "Auto";
+                return object.getName();
             }
             @Override
             public PlottingBackend fromString(String string) { return null; }
         });
+        
         backendBox.setValue(JScience.getPlottingBackend2D());
         backendBox.setOnAction(e -> {
             JScience.setPlottingBackend2D(backendBox.getValue());
@@ -1125,11 +1122,11 @@ public class JScienceMasterControl extends Application {
         // 2D List
         GridPane grid2DList = new GridPane();
         grid2DList.setHgap(35); grid2DList.setVgap(12);
-        java.util.List<org.jscience.core.technical.backend.BackendProvider> allPlotProviders = 
+        java.util.List<org.jscience.core.technical.backend.Backend> allPlotProviders = 
              BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_PLOTTING);
              
         int r2 = 0;
-        for (org.jscience.core.technical.backend.BackendProvider p : allPlotProviders) {
+        for (org.jscience.core.technical.backend.Backend p : allPlotProviders) {
              String id = p.getId().toLowerCase();
              if (id.contains("javafx")) continue; // Removed as per user request
              if (id.contains("chart")) {
@@ -1153,7 +1150,7 @@ public class JScienceMasterControl extends Application {
         
         // 3D Combo
         ComboBox<PlottingBackend> backend3DBox = new ComboBox<>();
-        backend3DBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
+        backend3DBox.getItems().addAll(allPlotting.stream()
                 .filter(PlottingBackend::isSupported3D)
                 .collect(java.util.stream.Collectors.toList()));
         backend3DBox.setConverter(backendBox.getConverter());
@@ -1174,7 +1171,7 @@ public class JScienceMasterControl extends Application {
         GridPane grid3DList = new GridPane();
         grid3DList.setHgap(35); grid3DList.setVgap(12);
         int r3 = 0;
-        for (org.jscience.core.technical.backend.BackendProvider p : allPlotProviders) {
+        for (org.jscience.core.technical.backend.Backend p : allPlotProviders) {
              String id = p.getId().toLowerCase();
              if (id.contains("javafx")) continue; // Removed as per user request
              if (!id.contains("chart")) {
@@ -1221,10 +1218,10 @@ public class JScienceMasterControl extends Application {
         grid.setHgap(35);
         grid.setVgap(12);
 
-        List<BackendProvider> providers = BackendDiscovery.getInstance().getProvidersByType(type);
+        List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
 
         int r = 0;
-        for (BackendProvider provider : providers) {
+        for (Backend provider : providers) {
             String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
             String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
             boolean available = provider.isAvailable();
@@ -1678,7 +1675,7 @@ public class JScienceMasterControl extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    private void addBackendRow(GridPane grid, int row, org.jscience.core.technical.backend.BackendProvider provider, I18N i18n) {
+    private void addBackendRow(GridPane grid, int row, org.jscience.core.technical.backend.Backend provider, I18N i18n) {
         String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
         String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
         boolean available = provider.isAvailable();
@@ -1702,4 +1699,5 @@ public class JScienceMasterControl extends Application {
 
 
 }
+
 

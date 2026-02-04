@@ -25,6 +25,7 @@ package org.jscience.core.technical.backend.gpu.cuda;
 
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.HardwareAccelerator;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.driver.JCudaDriver;
@@ -105,6 +106,11 @@ public class CUDABackend implements GPUBackend {
     }
 
     @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.GPU;
+    }
+
+    @Override
     public DeviceInfo[] getDevices() {
         if (!available) return new DeviceInfo[0];
         
@@ -135,6 +141,24 @@ public class CUDABackend implements GPUBackend {
     public void selectDevice(int deviceId) {
 
         cudaSetDevice(deviceId);
+    }
+
+    /**
+     * Allocates GPU storage through this backend.
+     * <p>
+     * This is the recommended way to create {@link CUDAStorage} instances,
+     * ensuring proper backend initialization and context management.
+     * </p>
+     * 
+     * @param size number of double elements to allocate
+     * @return CUDAStorage instance with allocated GPU memory
+     * @throws IllegalStateException if CUDA backend is not available
+     */
+    public CUDAStorage allocateStorage(int size) {
+        if (!available) {
+            throw new IllegalStateException("CUDA backend is not available");
+        }
+        return new CUDAStorage(size);
     }
 
     @Override

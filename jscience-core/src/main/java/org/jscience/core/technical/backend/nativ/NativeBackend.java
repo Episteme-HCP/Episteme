@@ -5,7 +5,7 @@
 
 package org.jscience.core.technical.backend.nativ;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 
 /**
  * Marker interface for Native backends.
@@ -16,11 +16,12 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public interface NativeBackend extends BackendProvider {
+public interface NativeBackend extends Backend {
     
     /**
      * Checks if the native library is loaded and available.
      */
     boolean isLoaded();
 }
+
 

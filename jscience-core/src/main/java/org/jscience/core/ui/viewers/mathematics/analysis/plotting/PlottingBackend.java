@@ -23,49 +23,24 @@
 
 package org.jscience.core.ui.viewers.mathematics.analysis.plotting;
 
+import org.jscience.core.technical.backend.Backend;
+
 /**
+ * Interface for analytical plotting backends (2D/3D).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public enum PlottingBackend {
-    AUTO(true, true),
+public interface PlottingBackend extends Backend {
 
     /**
-     * XChart - Modern, lightweight (recommended).
+     * Checks if this backend supports 2D plotting.
      */
-    XCHART(true, false),
+    boolean isSupported2D();
 
     /**
-     * JavaFX - Built-in, always available (fallback).
+     * Checks if this backend supports 3D plotting.
      */
-    JAVAFX(true, true),
-
-    /**
-     * JFreeChart - Feature-rich, publication quality (heavy).
-     */
-    JFREECHART(true, false),
-
-    /**
-     * Jzy3d - OpenGL-based 3D plotting.
-     */
-    JZY3D(false, true);
-
-    private final boolean support2D;
-    private final boolean support3D;
-
-    PlottingBackend(boolean support2D, boolean support3D) {
-        this.support2D = support2D;
-        this.support3D = support3D;
-    }
-
-    public boolean isSupported2D() {
-        return support2D;
-    }
-
-    public boolean isSupported3D() {
-        return support3D;
-    }
+    boolean isSupported3D();
 }
-

@@ -23,16 +23,18 @@
 
 package org.jscience.natural.ui.viewers.chemistry.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
+
+import org.jscience.core.technical.backend.Backend;
 
 /**
- * BackendProvider for JavaFX molecular renderer.
+ * Backend for JavaFX molecular renderer.
  * Always available as JavaFX is a core dependency.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JavaFXMolecularBackendProvider implements BackendProvider {
+public class JavaFXMolecularBackendProvider implements MolecularBackend {
 
     @Override
     public String getType() {
@@ -63,10 +65,10 @@ public class JavaFXMolecularBackendProvider implements BackendProvider {
     public int getPriority() {
         return 10; // Base priority, fallback option
     }
+    @Override public boolean isSupport3D() { return true; }
+    @Override public boolean isSupportInteractive() { return true; }
 
-    @Override
-    public Object createBackend() {
+    @Override public Object createBackend() {
         return new JavaFXMolecularRenderer();
     }
 }
-

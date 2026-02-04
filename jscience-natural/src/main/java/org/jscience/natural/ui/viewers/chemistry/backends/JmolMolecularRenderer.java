@@ -23,6 +23,10 @@
 
 package org.jscience.natural.ui.viewers.chemistry.backends;
 
+import org.jscience.natural.ui.viewers.chemistry.MolecularRenderer;
+import org.jscience.natural.ui.viewers.chemistry.RenderStyle;
+import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
+
 import javafx.scene.paint.Color;
 import org.jscience.natural.chemistry.Atom;
 import org.jscience.natural.chemistry.Bond;
@@ -203,7 +207,7 @@ public class JmolMolecularRenderer implements MolecularRenderer {
 
     @Override
     public MolecularBackend getBackend() {
-        return MolecularBackend.JMOL;
+        return new JmolMolecularBackendProvider();
     }
 
     /**

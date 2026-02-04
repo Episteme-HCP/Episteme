@@ -23,11 +23,11 @@
 
 package org.jscience.core.media.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.media.AudioBackend;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 
-public class JavaCVBackendProvider implements BackendProvider {
+public class JavaCVBackendProvider implements Backend {
     @Override public String getType() { return "audio"; }
     @Override public String getId() { return "javacv"; }
     @Override public String getName() { return "JavaCV (FFmpeg)"; }
@@ -53,4 +53,5 @@ class JavaCVBackend implements AudioBackend {
     @Override public float[] getSpectrum() { return new float[128]; }
     @Override public String getBackendName() { return "JavaCV (FFmpeg)"; }
 }
+
 

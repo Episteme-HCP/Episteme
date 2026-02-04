@@ -34,11 +34,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MapBackendProviderTest {
+public class MapBackendTest {
 
     @Test
-    void testJavaFXMapBackendProvider() {
-        JavaFXMapBackendProvider provider = new JavaFXMapBackendProvider();
+    void testJavaFXMapBackend() {
+        JavaFXMapBackend provider = new JavaFXMapBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("javafx_map", provider.getId());
@@ -49,8 +49,8 @@ public class MapBackendProviderTest {
     }
 
     @Test
-    void testGeoToolsBackendProvider() {
-        GeoToolsBackendProvider provider = new GeoToolsBackendProvider();
+    void testGeoToolsBackend() {
+        GeoToolsBackend provider = new GeoToolsBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("geotools", provider.getId());
@@ -61,8 +61,8 @@ public class MapBackendProviderTest {
     }
 
     @Test
-    void testOpenMapBackendProvider() {
-        OpenMapBackendProvider provider = new OpenMapBackendProvider();
+    void testOpenMapBackend() {
+        OpenMapBackend provider = new OpenMapBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("openmap", provider.getId());
@@ -72,8 +72,8 @@ public class MapBackendProviderTest {
     }
 
     @Test
-    void testUnfoldingMapBackendProvider() {
-        UnfoldingMapBackendProvider provider = new UnfoldingMapBackendProvider();
+    void testUnfoldingMapBackend() {
+        UnfoldingMapBackend provider = new UnfoldingMapBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("unfolding", provider.getId());
@@ -83,8 +83,8 @@ public class MapBackendProviderTest {
     }
 
     @Test
-    void testGoogleGeoChartBackendProvider() {
-        GoogleGeoChartBackendProvider provider = new GoogleGeoChartBackendProvider();
+    void testGoogleGeoChartBackend() {
+        GoogleGeoChartBackend provider = new GoogleGeoChartBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("geochart", provider.getId());
