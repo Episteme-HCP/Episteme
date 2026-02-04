@@ -40,7 +40,7 @@ import org.jscience.core.technical.backend.BackendDiscovery;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface LinearAlgebraProvider<E> extends ComputeBackend {
+public interface LinearAlgebraBackend<E> extends ComputeBackend {
 
     default String getType() {
         return BackendDiscovery.TYPE_LINEAR_ALGEBRA;

@@ -26,8 +26,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraBackend;
 
 
 import java.lang.reflect.Constructor;
@@ -41,13 +40,15 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraBackend;
+
 
 
 /**
- * Apache Commons Math Linear Algebra Provider.
+ * JBlas Linear Algebra Provider.
  * <p>
- * Uses Apache Commons Math library for linear algebra operations.
- * Falls back to CPU provider for non-Real types or when Commons Math
+ * Uses JBlas (native BLAS/LAPACK) for maximum performance linear algebra
+ * operations. Falls back to CPU provider for non-Real types or when JBlas
  * is not available.
  * </p>
  *
@@ -55,148 +56,154 @@ import org.jscience.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class JBlasLinearAlgebraBackend<E> implements LinearAlgebraBackend<E> {
 
-    private static boolean commonsMathAvailable = false;
+    private static boolean jblasAvailable = false;
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
-    private LinearAlgebraProvider<E> cmImpl;
+    private final CPUDenseLinearAlgebraBackend<E> cpuProvider;
+    private LinearAlgebraBackend<E> jblasImpl;
 
     static {
         try {
-            Class.forName("org.apache.commons.math3.linear.RealMatrix");
-            Class.forName("org.apache.commons.math3.linear.LUDecomposition");
-            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.CommonsMathSupport");
-            commonsMathAvailable = true;
+            Class.forName("org.jblas.DoubleMatrix");
+            Class.forName("org.jblas.Solve");
+            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.JBlasSupport");
+            jblasAvailable = true;
         } catch (ClassNotFoundException e) {
-            commonsMathAvailable = false;
+            jblasAvailable = false;
+        } catch (UnsatisfiedLinkError e) {
+            jblasAvailable = false;
+        } catch (Throwable t) {
+            jblasAvailable = false;
         }
     }
 
-    public CommonsMathLinearAlgebraProvider() {
+    public JBlasLinearAlgebraBackend() {
         this(null);
     }
 
-    public CommonsMathLinearAlgebraProvider(Field<E> field) {
+    public JBlasLinearAlgebraBackend(Field<E> field) {
         this.field = field;
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
+        this.cpuProvider = new CPUDenseLinearAlgebraBackend<>(field);
         
-        if (commonsMathAvailable && field != null) {
+        if (jblasAvailable && field != null) {
             try {
-                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.CommonsMathSupport");
+                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.JBlasSupport");
                 @SuppressWarnings("unchecked")
-                Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
-                this.cmImpl = ctor.newInstance(field);
+                Constructor<LinearAlgebraBackend<E>> ctor = (Constructor<LinearAlgebraBackend<E>>) clazz.getConstructor(Field.class);
+                this.jblasImpl = ctor.newInstance(field);
             } catch (Throwable t) {
-                this.cmImpl = null;
+                // Creation probably failed due to linkage error or missing implementation
+                this.jblasImpl = null;
             }
         }
     }
 
     @Override
     public String getName() {
-        return "Commons Math";
+        return "JBlas";
     }
 
     @Override
     public boolean isAvailable() {
-        return commonsMathAvailable;
+        // Double check runtime availability via impl check?
+        return jblasAvailable;
     }
 
 
 
     @Override
     public int getPriority() {
-        return commonsMathAvailable ? 50 : 0;
+        return jblasAvailable ? 90 : 0;
     }
 
-    private boolean canUseCommonsMath() {
-        return cmImpl != null && field != null && 
+    private boolean canUseJBlas() {
+        return jblasImpl != null && field != null && 
                (field instanceof org.jscience.core.mathematics.sets.Reals ||
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.add(a, b);
-        return cmImpl.add(a, b);
+        if (!canUseJBlas()) return cpuProvider.add(a, b);
+        return jblasImpl.add(a, b);
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.subtract(a, b);
-        return cmImpl.subtract(a, b);
+        if (!canUseJBlas()) return cpuProvider.subtract(a, b);
+        return jblasImpl.subtract(a, b);
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        if (!canUseCommonsMath()) return cpuProvider.multiply(vector, scalar);
-        return cmImpl.multiply(vector, scalar);
+        if (!canUseJBlas()) return cpuProvider.multiply(vector, scalar);
+        return jblasImpl.multiply(vector, scalar);
     }
 
     @Override
     public E dot(Vector<E> a, Vector<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.dot(a, b);
-        return cmImpl.dot(a, b);
+        if (!canUseJBlas()) return cpuProvider.dot(a, b);
+        return jblasImpl.dot(a, b);
     }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.add(a, b);
-        return cmImpl.add(a, b);
+        if (!canUseJBlas()) return cpuProvider.add(a, b);
+        return jblasImpl.add(a, b);
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.subtract(a, b);
-        return cmImpl.subtract(a, b);
+        if (!canUseJBlas()) return cpuProvider.subtract(a, b);
+        return jblasImpl.subtract(a, b);
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.multiply(a, b);
-        return cmImpl.multiply(a, b);
+        if (!canUseJBlas()) return cpuProvider.multiply(a, b);
+        return jblasImpl.multiply(a, b);
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.multiply(a, b);
-        return cmImpl.multiply(a, b);
+        if (!canUseJBlas()) return cpuProvider.multiply(a, b);
+        return jblasImpl.multiply(a, b);
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        if (!canUseCommonsMath()) return cpuProvider.inverse(a);
-        return cmImpl.inverse(a);
+        if (!canUseJBlas()) return cpuProvider.inverse(a);
+        return jblasImpl.inverse(a);
     }
 
     @Override
     public E determinant(Matrix<E> a) {
-        if (!canUseCommonsMath()) return cpuProvider.determinant(a);
-        return cmImpl.determinant(a);
+        // Explicit fallback because JBlasSupport doesn't support it
+        return cpuProvider.determinant(a);
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (!canUseCommonsMath()) return cpuProvider.solve(a, b);
-        return cmImpl.solve(a, b);
+        if (!canUseJBlas()) return cpuProvider.solve(a, b);
+        return jblasImpl.solve(a, b);
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        if (!canUseCommonsMath()) return cpuProvider.transpose(a);
-        return cmImpl.transpose(a);
+        if (!canUseJBlas()) return cpuProvider.transpose(a);
+        return jblasImpl.transpose(a);
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        if (!canUseCommonsMath()) return cpuProvider.scale(scalar, a);
-        return cmImpl.scale(scalar, a);
+        if (!canUseJBlas()) return cpuProvider.scale(scalar, a);
+        return jblasImpl.scale(scalar, a);
     }
 
     @Override
     public E norm(Vector<E> a) {
-        if (!canUseCommonsMath()) return cpuProvider.norm(a);
-        return cmImpl.norm(a);
+        if (!canUseJBlas()) return cpuProvider.norm(a);
+        return jblasImpl.norm(a);
     }
 }

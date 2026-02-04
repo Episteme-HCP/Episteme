@@ -41,10 +41,10 @@ import org.jscience.core.technical.backend.gpu.cuda.CUDAExecutionContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ND4JSparseTensorProvider implements TensorProvider {
+public class ND4JSparseTensorBackendProvider implements TensorBackendProvider {
 
     private static boolean isAvailable = false;
-    private static final CPUSparseTensorProvider fallback = new CPUSparseTensorProvider();
+    private static final CPUSparseTensorBackendProvider fallback = new CPUSparseTensorBackendProvider();
 
     static {
         try {
@@ -105,7 +105,7 @@ public class ND4JSparseTensorProvider implements TensorProvider {
         double sparsity = (double) nonZeroCount / data.length;
         if (sparsity > 0.3) {
             // Too dense, fall back to dense provider
-            return new ND4JNativeTensorProvider().create(data, shape);
+            return new ND4JNativeTensorBackendProvider().create(data, shape);
         }
         
         return fallback.create(data, shape);

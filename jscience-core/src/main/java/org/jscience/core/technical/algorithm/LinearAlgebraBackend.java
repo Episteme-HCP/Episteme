@@ -16,7 +16,7 @@ import org.jscience.core.mathematics.structures.rings.Ring;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
+public interface LinearAlgebraBackend<E> extends AlgorithmProvider {
 
     /**
      * Checks if this provider is compatible with the given ring.

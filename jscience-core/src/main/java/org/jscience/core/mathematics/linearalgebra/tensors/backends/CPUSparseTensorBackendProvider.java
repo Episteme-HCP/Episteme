@@ -34,7 +34,7 @@ import org.jscience.core.technical.backend.ExecutionContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CPUSparseTensorProvider implements TensorProvider {
+public class CPUSparseTensorBackendProvider implements TensorBackendProvider {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -197,7 +197,7 @@ public class CPUSparseTensorProvider implements TensorProvider {
 
     @Override
     public String getDescription() {
-        return "CPUSparseTensorProvider";
+        return "CPUSparseTensorBackendProvider";
     }
 }
 

@@ -5,7 +5,7 @@
 
 package org.jscience.core.technical.algorithm.linearalgebra;
 
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraBackend;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
@@ -27,16 +27,16 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class CPUDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E> {
 
     protected final Ring<E> ring;
     private static final int PARALLEL_THRESHOLD = 1000;
 
-    public CPUDenseLinearAlgebraProvider(Ring<E> ring) {
+    public CPUDenseLinearAlgebraBackend(Ring<E> ring) {
         this.ring = ring;
     }
 
-    public CPUDenseLinearAlgebraProvider() {
+    public CPUDenseLinearAlgebraBackend() {
         this(null);
     }
 

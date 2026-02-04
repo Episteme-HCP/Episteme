@@ -20,8 +20,8 @@ import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Field;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraBackend;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraBackend;
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import org.jscience.core.util.PerformanceLogger;
@@ -35,21 +35,21 @@ import org.jscience.core.util.PerformanceLogger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class OpenCLDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E> {
 
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
+    private final CPUDenseLinearAlgebraBackend<E> cpuProvider;
     private static final OpenCLBackend backend = new OpenCLBackend();
 
-    public OpenCLDenseLinearAlgebraProvider(Field<E> field) {
+    public OpenCLDenseLinearAlgebraBackend(Field<E> field) {
         this.field = field;
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
+        this.cpuProvider = new CPUDenseLinearAlgebraBackend<>(field);
     }
     
     /**
      * Public no-arg constructor required by ServiceLoader.
      */
-    public OpenCLDenseLinearAlgebraProvider() {
+    public OpenCLDenseLinearAlgebraBackend() {
         this.field = null;
         this.cpuProvider = null;
     }

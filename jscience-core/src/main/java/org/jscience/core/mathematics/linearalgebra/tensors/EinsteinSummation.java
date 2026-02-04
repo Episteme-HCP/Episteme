@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jscience.core.mathematics.linearalgebra.Tensor;
+
 /**
  * Utility for Einstein summation convention (einsum).
  * <p>

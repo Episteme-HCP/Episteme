@@ -41,7 +41,7 @@ import java.util.stream.IntStream;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.SparseMatrix;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraBackend;
 
 /**
  * Linear Algebra Provider for Sparse Matrices (CPU).
@@ -54,16 +54,16 @@ import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebra
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
+public class CPUSparseLinearAlgebraBackend<E> extends CPUDenseLinearAlgebraBackend<E> {
 
-    public CPUSparseLinearAlgebraProvider(org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
+    public CPUSparseLinearAlgebraBackend(org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
         super(ring);
     }
 
     /**
      * Public no-arg constructor required by ServiceLoader.
      */
-    public CPUSparseLinearAlgebraProvider() {
+    public CPUSparseLinearAlgebraBackend() {
         super(null);
     }
 

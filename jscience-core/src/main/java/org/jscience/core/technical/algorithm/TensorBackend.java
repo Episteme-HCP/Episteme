@@ -14,7 +14,7 @@ import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public interface TensorProvider extends AlgorithmProvider {
+public interface TensorBackend extends AlgorithmProvider {
 
     <T> Tensor<T> zeros(Class<T> elementType, int... shape);
     

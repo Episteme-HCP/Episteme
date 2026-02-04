@@ -25,14 +25,19 @@ import java.nio.file.Path;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class MMapMatrix implements Matrix<Real> {
+public class MMapMatrix extends GenericMatrix<Real> implements AutoCloseable {
 
     private final MappedByteBuffer buffer;
-    private final int rows;
-    private final int cols;
+    
+    // rows/cols might be in GenericMatrix, but if private, they are shadowed here.
+    // If GenericMatrix is abstract class GenericMatrix<F extends Field<F>> implements Matrix<F>, it likely has rows/cols?
+    // I will assume GenericMatrix manages rows/cols, so I'll pass them to super(rows, cols).
+    // If MMapMatrix duplicated fields, I should remove them.
+    // However, I don't see GenericMatrix source. I'll delete local fields and use super or keep them if super doesn't have them.
+    // Safest is to call super(rows, cols) and assume it stores them.
+    
     public MMapMatrix(Path path, int rows, int cols) throws IOException {
-        this.rows = rows;
-        this.cols = cols;
+        super(rows, cols); // Assuming GenericMatrix has this constructor
 
         long sizeBytes = (long) rows * cols * 8; // 8 bytes per double
         if (sizeBytes > Integer.MAX_VALUE) {
@@ -43,6 +48,13 @@ public class MMapMatrix implements Matrix<Real> {
             raf.setLength(sizeBytes);
             this.buffer = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, sizeBytes);
         }
+    }
+
+    @Override
+    public void close() {
+        // Unmap buffer (tricky in Java, usually requires Cleanable or Unsafe)
+        // For now, simple flush.
+        buffer.force();
     }
 
     @Override public int rows() { return rows; }

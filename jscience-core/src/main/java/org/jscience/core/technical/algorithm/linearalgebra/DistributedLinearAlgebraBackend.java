@@ -10,7 +10,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraBackend;
 
 /**
  * Linear algebra provider that delegates to distributed algorithms when appropriate.
@@ -23,17 +23,17 @@ import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class DistributedLinearAlgebraBackend<E> implements LinearAlgebraBackend<E> {
 
     // Fallback provider for local or small operations
-    private final CPUDenseLinearAlgebraProvider<E> localProvider;
+    private final CPUDenseLinearAlgebraBackend<E> localProvider;
 
-    public DistributedLinearAlgebraProvider() {
+    public DistributedLinearAlgebraBackend() {
         this(null);
     }
     
-    public DistributedLinearAlgebraProvider(Ring<E> ring) {
-        this.localProvider = new CPUDenseLinearAlgebraProvider<>(ring);
+    public DistributedLinearAlgebraBackend(Ring<E> ring) {
+        this.localProvider = new CPUDenseLinearAlgebraBackend<>(ring);
     }
 
     @Override

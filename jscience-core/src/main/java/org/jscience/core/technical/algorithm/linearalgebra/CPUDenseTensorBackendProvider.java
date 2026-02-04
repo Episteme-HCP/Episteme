@@ -5,7 +5,7 @@
 
 package org.jscience.core.technical.algorithm.linearalgebra;
 
-import org.jscience.core.technical.algorithm.TensorProvider;
+import org.jscience.core.technical.algorithm.TensorBackendProvider;
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 
@@ -16,7 +16,7 @@ import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class CPUDenseTensorProvider implements TensorProvider {
+public class CPUDenseTensorBackendProvider implements TensorBackendProvider {
 
     @Override
     public int getPriority() {

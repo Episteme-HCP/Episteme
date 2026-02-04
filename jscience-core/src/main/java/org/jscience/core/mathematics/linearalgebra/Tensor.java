@@ -1,139 +1,232 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.numbers.real.Real;
-import java.util.Arrays;
+import org.jscience.core.mathematics.linearalgebra.tensors.EinsteinSummation;
 
 /**
- * N-Dimensional Tensor Implementation.
+ * Represents a multidimensional array (tensor).
  * <p>
- * Supports basic tensor operations and contraction.
+ * Tensors generalize scalars (rank 0), vectors (rank 1), and matrices (rank 2)
+ * to arbitrary dimensions. They are fundamental in physics, machine learning,
+ * and numerical computing.
  * </p>
+ *
+ * <h2>Rank and Shape</h2>
+ * <ul>
+ * <li><b>Rank</b>: Number of dimensions (e.g., rank 3 = 3D tensor)</li>
+ * <li><b>Shape</b>: Size of each dimension (e.g., [2, 3, 4] = 2×3×4)</li>
+ * <li><b>Size</b>: Total number of elements (product of shape)</li>
+ * </ul>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @since 1.0
  */
-public class Tensor {
-
-    private final Real[] data;
-    private final int[] split;
-    private final int[] indices; // Dimensions
-
-    public Tensor(int... dimensions) {
-        this.indices = dimensions;
-        int size = 1;
-        this.split = new int[dimensions.length];
-        for (int i = dimensions.length - 1; i >= 0; i--) {
-            this.split[i] = size;
-            size *= dimensions[i];
-        }
-        this.data = new Real[size];
-        Arrays.fill(this.data, Real.ZERO);
-    }
-
-    public Tensor(Real[] data, int... dimensions) {
-        this.indices = dimensions;
-        int size = 1;
-        this.split = new int[dimensions.length];
-        for (int i = dimensions.length - 1; i >= 0; i--) {
-            this.split[i] = size;
-            size *= dimensions[i];
-        }
-        if (data.length != size) {
-            throw new IllegalArgumentException("Data size mismatch");
-        }
-        this.data = data;
-    }
-
-    public Real get(int... coords) {
-        return data[index(coords)];
-    }
-
-    public void set(Real value, int... coords) {
-        data[index(coords)] = value;
-    }
-
-    private int index(int... coords) {
-        int idx = 0;
-        for (int i = 0; i < coords.length; i++) {
-            idx += coords[i] * split[i];
-        }
-        return idx;
-    }
-
-    public int[] getDimensions() {
-        return indices.clone();
-    }
-    
-    public int getRank() {
-        return indices.length;
-    }
+public interface Tensor<T> extends java.io.Serializable {
 
     /**
-     * Performs Tensor Contraction along specified dimensions.
-     * Simple implementation (Einstein summation notation logic).
-     *
-     * @param other other tensor
-     * @param dimA dimension index in this tensor to contract
-     * @param dimB dimension index in other tensor to contract
-     * @return Resulting contracted tensor
+     * Returns the shape of this tensor.
+     * 
+     * @return array of dimension sizes
      */
-    public Tensor contract(Tensor other, int dimA, int dimB) {
-        if (this.indices[dimA] != other.indices[dimB]) {
-            throw new IllegalArgumentException("Contraction dimensions must match size.");
+    int[] shape();
+
+    /**
+     * Returns the rank (number of dimensions) of this tensor.
+     * 
+     * @return rank ≥ 0
+     */
+    int rank();
+
+    /**
+     * Returns the total number of elements.
+     * 
+     * @return size = product of shape
+     */
+    int size();
+
+    /**
+     * Gets the element at the specified indices.
+     * 
+     * @param indices the indices (length must equal rank)
+     * @return the element
+     * @throws IndexOutOfBoundsException if indices are invalid
+     */
+    T get(int... indices);
+
+    /**
+     * Sets the element at the specified indices.
+     * 
+     * @param value   the value to set
+     * @param indices the indices (length must equal rank)
+     * @throws IndexOutOfBoundsException if indices are invalid
+     */
+    void set(T value, int... indices);
+
+    /**
+     * Element-wise addition.
+     * 
+     * @param other tensor with same shape
+     * @return this + other
+     */
+    Tensor<T> add(Tensor<T> other);
+
+    /**
+     * Element-wise subtraction.
+     * 
+     * @param other tensor with same shape
+     * @return this - other
+     */
+    Tensor<T> subtract(Tensor<T> other);
+
+    /**
+     * Element-wise multiplication (Hadamard product).
+     * 
+     * @param other tensor with same shape
+     * @return this ⊙ other
+     */
+    Tensor<T> multiply(Tensor<T> other);
+
+    /**
+     * Scalar multiplication.
+     * 
+     * @param scalar the scalar value
+     * @return scalar * this
+     */
+    Tensor<T> scale(T scalar);
+
+    /**
+     * Reshapes this tensor to a new shape.
+     * <p>
+     * The new shape must have the same total size.
+     * </p>
+     * 
+     * @param newShape the new shape
+     * @return reshaped tensor
+     */
+    Tensor<T> reshape(int... newShape);
+
+    /**
+     * Broadcasts this tensor to a new shape.
+     * <p>
+     * Follows standard broadcasting rules (dimensions of size 1 can be expanded).
+     * </p>
+     * 
+     * @param newShape the target shape
+     * @return broadcasted tensor (view)
+     * @throws IllegalArgumentException if broadcasting is not possible
+     */
+    Tensor<T> broadcast(int... newShape);
+
+    /**
+     * Transposes dimensions according to the given permutation.
+     * <p>
+     * For a matrix (rank 2), transpose() swaps rows and columns.
+     * For higher-rank tensors, specify the permutation explicitly.
+     * </p>
+     * 
+     * @param permutation permutation of dimension indices
+     * @return transposed tensor
+     */
+    Tensor<T> transpose(int... permutation);
+
+    /**
+     * Transposes a rank-2 tensor (matrix).
+     * 
+     * @return transposed matrix
+     * @throws UnsupportedOperationException if rank != 2
+     */
+    default Tensor<T> transpose() {
+        if (rank() != 2) {
+            throw new UnsupportedOperationException("transpose() without arguments requires rank 2");
         }
-        
-        // Calculate new dimensions
-        int[] newDims = new int[this.getRank() + other.getRank() - 2];
-        int p = 0;
-        for (int i=0; i<this.getRank(); i++) if (i != dimA) newDims[p++] = this.indices[i];
-        for (int i=0; i<other.getRank(); i++) if (i != dimB) newDims[p++] = other.indices[i];
-        
-        Tensor result = new Tensor(newDims);
-        
-        // This is a naive loop implementation. 
-        // Optimized libraries use Reshape + GEMM.
-        
-        // ... (Nested loop implementation is too complex for simple generator, 
-        // usually we flatten to Matrix and multiply)
-        
-        return result; // Placeholder for structure
+        return transpose(1, 0);
     }
 
     /**
-     * Saves this tensor to a file.
-     * Delegates to a registered ResourceWriter based on file extension.
-     *
-     * @param path the destination path (e.g., "model.h5")
-     * @throws Exception if no suitable writer is found or I/O fails
+     * Returns a slice (sub-tensor) of this tensor.
+     * 
+     * @param starts starting index for each dimension
+     * @param sizes  size of the slice for each dimension
+     * @return sliced tensor (view)
+     * @throws IndexOutOfBoundsException if slice is out of bounds
+     */
+    Tensor<T> slice(int[] starts, int[] sizes);
+
+    /**
+     * Applies a function to each element of the tensor.
+     * 
+     * @param function the function to apply
+     * @return a new tensor with transformed elements
+     */
+    Tensor<T> map(java.util.function.Function<T, T> function);
+
+    /**
+     * Sums all elements.
+     * 
+     * @return Σ elements
+     */
+    T sum();
+
+    /**
+     * Sums along the specified axis.
+     * 
+     * @param axis the axis to sum over (0 to rank-1)
+     * @return tensor with rank reduced by 1
+     */
+    Tensor<T> sum(int axis);
+
+    /**
+     * Returns a copy of this tensor.
+     * 
+     * @return independent copy
+     */
+    Tensor<T> copy();
+
+    /**
+     * Converts this tensor to a multidimensional array.
+     * 
+     * @return nested array representation
+     */
+    Object toArray();
+
+    /**
+     * Performs Einstein summation.
+     * 
+     * @param equation the einsum equation (e.g. "ij,jk->ik")
+     * @param operands the other operands
+     * @return the result
      */
     @SuppressWarnings("unchecked")
-    public void save(String path) throws Exception {
-        java.util.ServiceLoader<org.jscience.core.io.ResourceWriter> loader = 
-            java.util.ServiceLoader.load(org.jscience.core.io.ResourceWriter.class);
-            
-        for (org.jscience.core.io.ResourceWriter<?> writer : loader) {
-            for (String ext : writer.getSupportedExtensions()) {
-                if (path.endsWith(ext)) {
-                    // Check if writer supports Tensor (runtime check)
-                    // In a real generic system, we'd check getResourceType()
-                    if (writer.getResourceType().isAssignableFrom(this.getClass())) {
-                         ((org.jscience.core.io.ResourceWriter<Tensor>) writer).save(this, path);
-                         return;
-                    }
-                }
-            }
-        }
-        throw new UnsupportedOperationException("No writer found for file extension: " + path);
-    }
-    
-    @Override
-    public String toString() {
-        return "Tensor" + Arrays.toString(indices);
+    default Tensor<T> einsum(String equation, Tensor<T>... operands) {
+        // Prepend 'this' to operands
+        Tensor<T>[] allOperands = new Tensor[operands.length + 1];
+        allOperands[0] = this;
+        System.arraycopy(operands, 0, allOperands, 1, operands.length);
+
+        // This relies on the utility class
+        return EinsteinSummation.einsum(equation, allOperands);
     }
 }

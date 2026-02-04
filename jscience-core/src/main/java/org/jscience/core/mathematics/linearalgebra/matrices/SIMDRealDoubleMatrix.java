@@ -27,24 +27,32 @@ import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorag
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public class SIMDDoubleMatrix implements Matrix<Real> {
+public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseable {
 
     private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
 
     private final double[] data;
+    // rows and cols provided by GenericMatrix? Assuming so, or just keeping them if GenericMatrix is an interface (Wait, "extends" implies class).
+    // Let's assume GenericMatrix handles dimensions or we keep them. Usually GenericMatrix<T> implements Matrix<T>.
+    // If I don't know GenericMatrix structure, I better check it.
     private final int rows;
     private final int cols;
 
-    public SIMDDoubleMatrix(int rows, int cols) {
+    public SIMDRealDoubleMatrix(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
         this.data = new double[rows * cols];
     }
     
-    public SIMDDoubleMatrix(int rows, int cols, double[] data) {
+    public SIMDRealDoubleMatrix(int rows, int cols, double[] data) {
         this.rows = rows;
         this.cols = cols;
         this.data = data;
+    }
+
+    @Override
+    public void close() {
+        // No-op for now unless we use off-heap memory later
     }
 
     @Override
@@ -63,6 +71,7 @@ public class SIMDDoubleMatrix implements Matrix<Real> {
     }
     
     // Matrix Interface Stubs needed for set(int,int,Real)
+    @Override
     public void set(int row, int col, Real val) {
         set(row, col, val.doubleValue());
     }

@@ -30,7 +30,7 @@ package org.jscience.core.mathematics.linearalgebra.tensors.backends;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ND4JCUDATensorProvider extends ND4JBaseTensorProvider {
+public class ND4JCUDATensorBackendProvider extends ND4JBaseTensorBackendProvider {
 
     @Override
     protected boolean checkAvailability() {

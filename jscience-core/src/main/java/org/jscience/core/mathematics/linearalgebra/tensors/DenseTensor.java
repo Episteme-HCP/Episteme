@@ -24,6 +24,7 @@
 package org.jscience.core.mathematics.linearalgebra.tensors;
 
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import java.util.Arrays;
 
 /**

@@ -5,7 +5,7 @@
 
 package org.jscience.core.technical.algorithm.linearalgebra;
 
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraBackend;
 
 /**
  * Marker interface for Linear Algebra Providers specialized for Sparse Matrices.
@@ -17,6 +17,6 @@ import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public interface SparseLinearAlgebraProvider<E> extends LinearAlgebraProvider<E> {
+public interface SparseLinearAlgebraBackend<E> extends LinearAlgebraBackend<E> {
     // No additional methods needed for now, acts as a specialized type for discovery.
 }

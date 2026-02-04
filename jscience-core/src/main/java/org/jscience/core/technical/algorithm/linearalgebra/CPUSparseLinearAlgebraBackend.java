@@ -18,13 +18,13 @@ import org.jscience.core.mathematics.structures.rings.Ring;
  * Linear Algebra Provider for Sparse Matrices (CPU).
  * Refactored to align with the new technical algorithm architecture.
  */
-public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
+public class CPUSparseLinearAlgebraBackend<E> extends CPUDenseLinearAlgebraBackend<E> implements SparseLinearAlgebraBackend<E> {
 
-    public CPUSparseLinearAlgebraProvider(Ring<E> ring) {
+    public CPUSparseLinearAlgebraBackend(Ring<E> ring) {
         super(ring);
     }
 
-    public CPUSparseLinearAlgebraProvider() {
+    public CPUSparseLinearAlgebraBackend() {
         super(null);
     }
 

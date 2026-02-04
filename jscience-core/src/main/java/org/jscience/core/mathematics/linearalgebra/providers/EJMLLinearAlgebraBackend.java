@@ -26,12 +26,12 @@
 
 package org.jscience.core.mathematics.linearalgebra.providers;
 
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraBackend;
 
 
 import java.lang.reflect.Constructor;
 
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraBackend;
 
 import org.jscience.core.mathematics.structures.rings.Field;
 
@@ -44,10 +44,10 @@ import org.jscience.core.mathematics.numbers.real.Real;
 
 
 /**
- * Colt Linear Algebra Provider.
+ * EJML Linear Algebra Provider.
  * <p>
- * Uses Colt library (cern.colt.matrix) for high-performance linear algebra
- * operations. Falls back to CPU provider for non-Real types or when Colt
+ * Uses EJML (Efficient Java Matrix Library) for high-performance linear algebra
+ * operations. Falls back to CPU provider for non-Real types or when EJML
  * is not available.
  * </p>
  *
@@ -55,156 +55,149 @@ import org.jscience.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class EJMLLinearAlgebraBackend<E> implements LinearAlgebraBackend<E> {
 
-    private static boolean coltAvailable = false;
+    private static boolean ejmlAvailable = false;
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
-    
-    // Delegate to actual Colt implementation if available and verified
-    private LinearAlgebraProvider<E> coltImpl;
+    private final CPUDenseLinearAlgebraBackend<E> cpuProvider;
+    private LinearAlgebraBackend<E> ejmlImpl;
 
     static {
         try {
-            Class.forName("cern.colt.matrix.DoubleMatrix2D");
-            Class.forName("cern.colt.matrix.linalg.Algebra");
-            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.ColtSupport");
-            coltAvailable = true;
+            Class.forName("org.ejml.simple.SimpleMatrix");
+            Class.forName("org.ejml.dense.row.CommonOps_DDRM");
+            Class.forName("org.jscience.core.mathematics.linearalgebra.providers.EJMLSupport");
+            ejmlAvailable = true;
         } catch (ClassNotFoundException e) {
-            coltAvailable = false;
+            ejmlAvailable = false;
         }
     }
 
-    /**
-     * Public no-arg constructor required by ServiceLoader.
-     */
-    public ColtLinearAlgebraProvider() {
+    public EJMLLinearAlgebraBackend() {
         this(null);
     }
 
-    public ColtLinearAlgebraProvider(Field<E> field) {
+    public EJMLLinearAlgebraBackend(Field<E> field) {
         this.field = field;
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
+        this.cpuProvider = new CPUDenseLinearAlgebraBackend<>(field);
         
-        if (coltAvailable && field != null) {
+        if (ejmlAvailable && field != null) {
             try {
-                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.ColtSupport");
+                Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.EJMLSupport");
                 @SuppressWarnings("unchecked")
-                Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
-                this.coltImpl = ctor.newInstance(field);
+                Constructor<LinearAlgebraBackend<E>> ctor = (Constructor<LinearAlgebraBackend<E>>) clazz.getConstructor(Field.class);
+                this.ejmlImpl = ctor.newInstance(field);
             } catch (Throwable t) {
-                // Creation failed (LinkageError? Exception?), fallback
-                this.coltImpl = null;
+                // Creation failed, fallback
+                this.ejmlImpl = null;
             }
         }
     }
 
     @Override
     public String getName() {
-        return "Colt";
+        return "EJML";
     }
 
     @Override
     public boolean isAvailable() {
-        return coltAvailable;
+        return ejmlAvailable;
     }
 
 
 
     @Override
     public int getPriority() {
-        return coltAvailable ? 60 : 0;
+        return ejmlAvailable ? 80 : 0;
     }
 
-    private boolean canUseColt() {
-        return coltImpl != null && field != null && 
+    private boolean canUseEJML() {
+        return ejmlImpl != null && field != null && 
                (field instanceof org.jscience.core.mathematics.sets.Reals ||
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
-    // Delegate methods
-
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        if (!canUseColt()) return cpuProvider.add(a, b);
-        return coltImpl.add(a, b);
+        if (!canUseEJML()) return cpuProvider.add(a, b);
+        return ejmlImpl.add(a, b);
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        if (!canUseColt()) return cpuProvider.subtract(a, b);
-        return coltImpl.subtract(a, b);
+        if (!canUseEJML()) return cpuProvider.subtract(a, b);
+        return ejmlImpl.subtract(a, b);
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        if (!canUseColt()) return cpuProvider.multiply(vector, scalar);
-        return coltImpl.multiply(vector, scalar);
+        if (!canUseEJML()) return cpuProvider.multiply(vector, scalar);
+        return ejmlImpl.multiply(vector, scalar);
     }
 
     @Override
     public E dot(Vector<E> a, Vector<E> b) {
-        if (!canUseColt()) return cpuProvider.dot(a, b);
-        return coltImpl.dot(a, b);
+        if (!canUseEJML()) return cpuProvider.dot(a, b);
+        return ejmlImpl.dot(a, b);
     }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        if (!canUseColt()) return cpuProvider.add(a, b);
-        return coltImpl.add(a, b);
+        if (!canUseEJML()) return cpuProvider.add(a, b);
+        return ejmlImpl.add(a, b);
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        if (!canUseColt()) return cpuProvider.subtract(a, b);
-        return coltImpl.subtract(a, b);
+        if (!canUseEJML()) return cpuProvider.subtract(a, b);
+        return ejmlImpl.subtract(a, b);
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (!canUseColt()) return cpuProvider.multiply(a, b);
-        return coltImpl.multiply(a, b);
+        if (!canUseEJML()) return cpuProvider.multiply(a, b);
+        return ejmlImpl.multiply(a, b);
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (!canUseColt()) return cpuProvider.multiply(a, b);
-        return coltImpl.multiply(a, b);
+        if (!canUseEJML()) return cpuProvider.multiply(a, b);
+        return ejmlImpl.multiply(a, b);
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        if (!canUseColt()) return cpuProvider.inverse(a);
-        return coltImpl.inverse(a);
+        if (!canUseEJML()) return cpuProvider.inverse(a);
+        return ejmlImpl.inverse(a);
     }
 
     @Override
     public E determinant(Matrix<E> a) {
-        if (!canUseColt()) return cpuProvider.determinant(a);
-        return coltImpl.determinant(a);
+        if (!canUseEJML()) return cpuProvider.determinant(a);
+        return ejmlImpl.determinant(a);
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (!canUseColt()) return cpuProvider.solve(a, b);
-        return coltImpl.solve(a, b);
+        if (!canUseEJML()) return cpuProvider.solve(a, b);
+        return ejmlImpl.solve(a, b);
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        if (!canUseColt()) return cpuProvider.transpose(a);
-        return coltImpl.transpose(a);
+        if (!canUseEJML()) return cpuProvider.transpose(a);
+        return ejmlImpl.transpose(a);
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        if (!canUseColt()) return cpuProvider.scale(scalar, a);
-        return coltImpl.scale(scalar, a);
+        if (!canUseEJML()) return cpuProvider.scale(scalar, a);
+        return ejmlImpl.scale(scalar, a);
     }
 
     @Override
     public E norm(Vector<E> a) {
-        if (!canUseColt()) return cpuProvider.norm(a);
-        return coltImpl.norm(a);
+        if (!canUseEJML()) return cpuProvider.norm(a);
+        return ejmlImpl.norm(a);
     }
 }

@@ -23,8 +23,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
 
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorProvider;
-import org.jscience.core.technical.algorithm.TensorProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorBackendProvider;
+import org.jscience.core.technical.algorithm.TensorBackendProvider;
 
 
 import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
@@ -44,12 +44,12 @@ import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class ND4JBaseTensorProvider implements TensorProvider {
+public abstract class ND4JBaseTensorBackendProvider implements TensorBackendProvider {
 
-    protected static final CPUDenseTensorProvider fallback = new CPUDenseTensorProvider();
+    protected static final CPUDenseTensorBackendProvider fallback = new CPUDenseTensorBackendProvider();
     protected final boolean isAvailable;
 
-    protected ND4JBaseTensorProvider() {
+    protected ND4JBaseTensorBackendProvider() {
         this.isAvailable = checkAvailability();
     }
 

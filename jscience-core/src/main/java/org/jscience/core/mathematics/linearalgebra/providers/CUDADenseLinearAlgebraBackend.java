@@ -15,8 +15,8 @@ import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Field;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.LinearAlgebraBackend;
+import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraBackend;
 
 /**
  * CUDA Linear Algebra Provider (Dense).
@@ -25,20 +25,20 @@ import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebra
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class CUDADenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E> {
 
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
+    private final CPUDenseLinearAlgebraBackend<E> cpuProvider;
 
-    public CUDADenseLinearAlgebraProvider(Field<E> field) {
+    public CUDADenseLinearAlgebraBackend(Field<E> field) {
         this.field = field;
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
+        this.cpuProvider = new CPUDenseLinearAlgebraBackend<>(field);
     }
 
     /**
      * Public no-arg constructor required by ServiceLoader.
      */
-    public CUDADenseLinearAlgebraProvider() {
+    public CUDADenseLinearAlgebraBackend() {
         this(null);
     }
 

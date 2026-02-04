@@ -34,63 +34,56 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
 
+import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
 
 /**
+ * OpenCL Linear Algebra Provider (Sparse).
+ * <p>
+ * Placeholder for sparse OpenCL implementation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-import org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraBackend;
 
-public class CUDASparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
+public class OpenCLSparseLinearAlgebraBackend<E> implements SparseLinearAlgebraBackend<E> {
 
-    private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
-
-    public CUDASparseLinearAlgebraProvider(Field<E> field) {
-        // this.field = field; // Unused
-        this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
-        if (checkAvailability()) {
-            java.util.logging.Logger.getLogger(getClass().getName()).info(
-                    "CUDASparseLinearAlgebraProvider initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
-        }
-    }
+    private final CPUSparseLinearAlgebraBackend<E> cpuProvider;
+    private static final OpenCLBackend backend = new OpenCLBackend();
 
     /**
      * Public no-arg constructor required by ServiceLoader.
      */
-    public CUDASparseLinearAlgebraProvider() {
-        this(null);
+    public OpenCLSparseLinearAlgebraBackend() {
+        this.cpuProvider = null;
     }
 
-    // Check if JCusparse is available? Usually assuming if JCuda matches.
-    private static boolean checkAvailability() {
-        try {
-            Class.forName("jcuda.jcusparse.JCusparse");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        } catch (UnsatisfiedLinkError e) {
-            return false;
+    public OpenCLSparseLinearAlgebraBackend(Field<E> field) {
+        this.cpuProvider = new CPUSparseLinearAlgebraBackend<>(field);
+        if (isAvailable()) {
+            java.util.logging.Logger.getLogger(getClass().getName()).info(
+                    "OpenCLSparseLinearAlgebraBackend initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
         }
     }
 
     @Override
     public boolean isAvailable() {
-        return checkAvailability();
+        return backend.isAvailable();
     }
 
     @Override
     public String getName() {
-        return "CUDA (Sparse)";
+        return "OpenCL (Sparse)";
     }
 
 
     @Override
     public int getPriority() {
-        return isAvailable() ? 100 : 0;
+        return 10;
     }
 
+    // Delegate to CPU Sparse for now
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
         return cpuProvider.add(a, b);
@@ -143,7 +136,7 @@ public class CUDASparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPr
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return cpuProvider.solve(a, b);
+        return cpuProvider.solve(a, b); // Sparse solver?
     }
 
     @Override
