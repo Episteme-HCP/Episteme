@@ -24,6 +24,7 @@
         </dependency>
 
 
+
         <!-- JSON Support -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -155,6 +156,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <!-- JAXB Plugin - Enabled to process restored XSDs -->
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
@@ -173,9 +175,10 @@
                         <source>src/main/resources/xsd/animl-technique.xsd</source>
                         <source>src/main/resources/xsd/ThermoML.xsd</source>
                     </sources>
-                    <!-- <packageName>org.astm.animl.schema.core.draft._0</packageName> -->
+                    <packageName>org.astm.animl.schema.core.draft._0</packageName>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>

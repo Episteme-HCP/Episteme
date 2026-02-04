@@ -181,11 +181,11 @@ public final class TaxCalculator {
     /**
      * Compares tax burdens across income levels.
      */
-    public static Map<Real, TaxResult> analyzeTaxBurden(List<TaxBracket> brackets,
-            Real standardDeduction, Real... incomes) {
+    public static Map<Money, TaxResult> analyzeTaxBurden(List<TaxBracket> brackets,
+            Money standardDeduction, Money... incomes) {
         
-        Map<Real, TaxResult> analysis = new LinkedHashMap<>();
-        for (Real income : incomes) {
+        Map<Money, TaxResult> analysis = new LinkedHashMap<>();
+        for (Money income : incomes) {
             analysis.put(income, calculateProgressiveTax(income, brackets, standardDeduction));
         }
         return analysis;

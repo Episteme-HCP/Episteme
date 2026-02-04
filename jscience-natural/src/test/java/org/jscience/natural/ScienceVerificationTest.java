@@ -33,11 +33,13 @@ import org.jscience.natural.biology.genetics.BioSequence;
 import org.jscience.natural.biology.genetics.SequenceAlignment;
 import org.jscience.natural.earth.coordinates.GeodeticCoordinate;
 import org.jscience.natural.earth.coordinates.ReferenceEllipsoid;
-import org.jscience.core.mathematics.ml.neural.layers.Layer;
+import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.layers.Linear;
 import org.jscience.core.mathematics.ml.neural.layers.ActivationLayer;
 import org.jscience.core.mathematics.ml.neural.layers.Sequential;
 import org.jscience.core.mathematics.ml.neural.ActivationFunction;
+import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Mass;
@@ -123,11 +125,12 @@ public class ScienceVerificationTest {
         inputList.add(Real.of(1.0));
         inputList.add(Real.of(1.0));
         inputList.add(Real.of(1.0));
-        Vector<Real> input = VectorFactory.create(inputList, Real.ZERO);
+        Real[] inputArr = inputList.toArray(new Real[0]);
+        GraphNode<Real> input = new GraphNode<>(TensorFactory.of(inputArr, 1, 3));
 
-        Vector<Real> output = layer.forward(input);
-        assertEquals(2, output.dimension());
-        System.out.println("Layer Output: " + output);
+        GraphNode<Real> output = layer.forward(input);
+        assertEquals(2, output.getData().shape()[1]);
+        System.out.println("Layer Output: " + output.getData());
     }
 }
 

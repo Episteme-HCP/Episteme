@@ -23,7 +23,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>org.jscience.benchmark.BenchmarkRunner</mainClass>
+                  <mainClass>org.jscience.benchmarks.benchmark.BenchmarkRunner</mainClass>
                 </transformer>
                 <transformer />
               </transformers>

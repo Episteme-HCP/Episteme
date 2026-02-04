@@ -32,11 +32,14 @@
             <artifactId>jscience-social</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- jscience-native temporarily removed due to build failure -->
+        <!-- 
         <dependency>
             <groupId>org.jscience</groupId>
             <artifactId>jscience-native</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
 
 
         <!-- JMH Benchmarking Framework -->
@@ -96,7 +99,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.jscience.benchmark.BenchmarkRunner</mainClass>
+                                    <mainClass>org.jscience.benchmarks.benchmark.BenchmarkRunner</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>

@@ -104,6 +104,33 @@ public class Tensor {
         
         return result; // Placeholder for structure
     }
+
+    /**
+     * Saves this tensor to a file.
+     * Delegates to a registered ResourceWriter based on file extension.
+     *
+     * @param path the destination path (e.g., "model.h5")
+     * @throws Exception if no suitable writer is found or I/O fails
+     */
+    @SuppressWarnings("unchecked")
+    public void save(String path) throws Exception {
+        java.util.ServiceLoader<org.jscience.core.io.ResourceWriter> loader = 
+            java.util.ServiceLoader.load(org.jscience.core.io.ResourceWriter.class);
+            
+        for (org.jscience.core.io.ResourceWriter<?> writer : loader) {
+            for (String ext : writer.getSupportedExtensions()) {
+                if (path.endsWith(ext)) {
+                    // Check if writer supports Tensor (runtime check)
+                    // In a real generic system, we'd check getResourceType()
+                    if (writer.getResourceType().isAssignableFrom(this.getClass())) {
+                         ((org.jscience.core.io.ResourceWriter<Tensor>) writer).save(this, path);
+                         return;
+                    }
+                }
+            }
+        }
+        throw new UnsupportedOperationException("No writer found for file extension: " + path);
+    }
     
     @Override
     public String toString() {

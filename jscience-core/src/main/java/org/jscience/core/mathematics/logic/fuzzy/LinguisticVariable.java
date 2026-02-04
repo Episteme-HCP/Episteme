@@ -13,32 +13,23 @@ import java.util.Hashtable;
  * @version 0.0.1
  */
 public class LinguisticVariable {
-    /**
-     * DOCUMENT ME!
-     */
+    /** The name of this linguistic variable (e.g. "Temperature"). */
     private String mName;
 
     // Membership Functions added to this LV.
 
-    /**
-     * DOCUMENT ME!
-     */
-    /**
-     * DOCUMENT ME!
-     */
+    /** Map of membership functions associated with this variable, keyed by function name. */
     private Hashtable<String, MembershipFunction<?>> mFunctions;
 
     // Input value for this LV used in fuzzification.
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The current crisp input value to be fuzzified. */
     private double mFuzzificationInputValue;
 
     /**
      * Creates a new LinguisticVariable object.
      *
-     * @param name DOCUMENT ME!
+     * @param name the name of the variable (case-insensitive)
      */
     public LinguisticVariable(String name) {
         mName = name.toLowerCase();
@@ -46,47 +37,48 @@ public class LinguisticVariable {
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a membership function to this variable.
      *
-     * @param function DOCUMENT ME!
+     * @param function the membership function to add
      */
     public void addMembershipFunction(MembershipFunction<?> function) {
         mFunctions.put(function.getName(), function);
     }
 
     /**
-     * DOCUMENT ME!
+     * Retrieves a membership function by name.
      *
-     * @param name DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param name the name of the function (e.g. "Hot", "Cold")
+     * @return the membership function or null if not found
      */
     public MembershipFunction<?> getMembershipFuncion(String name) {
         return mFunctions.get(name);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the name of this linguistic variable.
      *
-     * @param mName DOCUMENT ME!
+     * @param mName the new name
      */
     public void setName(String mName) {
         this.mName = mName;
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the name of this linguistic variable.
      *
-     * @return DOCUMENT ME!
+     * @return the name
      */
     public String getName() {
         return mName;
     }
 
     /**
-     * DOCUMENT ME!
+     * Performs defuzzification on this variable to produce a single crisp output.
+     * Uses the Center of Gravity/Area method based on active rules.
      *
-     * @return DOCUMENT ME!
-     * @throws NoRulesFiredException DOCUMENT ME!
+     * @return the crisp output value
+     * @throws NoRulesFiredException if no rules contributed to this variable's output
      */
     public double defuzzify() throws NoRulesFiredException {
         double total = 0;
@@ -108,27 +100,27 @@ public class LinguisticVariable {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the variable.
      *
-     * @return DOCUMENT ME!
+     * @return string representation
      */
     public String toString() {
         return mName;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the input value for fuzzification (converting crisp input to fuzzy degrees).
      *
-     * @param inputValue DOCUMENT ME!
+     * @param inputValue the crisp input value
      */
     public void setFuzzificationInputValue(double inputValue) {
         mFuzzificationInputValue = inputValue;
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the current fuzzification input value.
      *
-     * @return DOCUMENT ME!
+     * @return the input value
      */
     public double getFuzzificationInputValue() {
         return mFuzzificationInputValue;

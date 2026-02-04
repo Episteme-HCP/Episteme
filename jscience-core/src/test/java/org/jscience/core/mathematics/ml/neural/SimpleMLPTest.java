@@ -20,7 +20,7 @@ public class SimpleMLPTest {
         model.add(new ReLU<>());
         model.add(new Linear<>(4, 1));
         
-        SGD<Real> optimizer = new SGD<>(model.getParameters(), 0.1);
+        SGD<Real> optimizer = new SGD<>(0.1);
         
         // Input [1, 2]
         Real[] xData = {Real.of(0.5), Real.of(-0.5)};
@@ -32,7 +32,7 @@ public class SimpleMLPTest {
         
         Real initialLoss = null;
         for (int i = 0; i < 20; i++) {
-            optimizer.zeroGrad();
+            optimizer.zeroGrad(model.getParameters());
             
             GraphNode<Real> pred = model.forward(X);
             // MSE Loss: (pred - Y)^2
@@ -45,7 +45,7 @@ public class SimpleMLPTest {
             System.out.println("Iteration " + i + ", Loss: " + lossVal);
             
             loss.backward();
-            optimizer.step();
+            optimizer.step(model.getParameters());
             
             if (i == 19) {
                 assertTrue(lossVal.compareTo(initialLoss) < 0, "Loss should decrease");

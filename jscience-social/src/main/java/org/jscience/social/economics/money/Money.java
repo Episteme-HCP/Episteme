@@ -174,6 +174,20 @@ public class Money implements Quantity<Money>, java.io.Serializable {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Money)) return false;
+        Money other = (Money) obj;
+        return Objects.equals(amount, other.amount) &&
+               Objects.equals(currency, other.currency);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, currency);
+    }
+
+    @Override
     public Quantity<?> pow(int exponent) {
         return Quantities.create(amount.pow(exponent), currency.pow(exponent));
     }

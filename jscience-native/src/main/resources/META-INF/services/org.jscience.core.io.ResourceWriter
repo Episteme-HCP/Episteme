@@ -1,0 +1,2 @@
+org.jscience.nativ.physics.loaders.hdf5.HDF5Writer
+org.jscience.nativ.physics.loaders.hdf5.HDF5TensorWriter

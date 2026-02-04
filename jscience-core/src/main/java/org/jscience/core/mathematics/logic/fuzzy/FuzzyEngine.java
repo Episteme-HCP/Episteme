@@ -10,18 +10,15 @@ package org.jscience.core.mathematics.logic.fuzzy;
  */
 public class FuzzyEngine {
     /**
-     * DOCUMENT ME!
+     * Defuzzification method: Center of Maximum (CoM).
+     * Calculates the center of the area of the maximum membership values.
      */
     public static int DEFUZZIFICATION_CENTER_OF_MAXIMUM = 0;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The list of linguistic variables (inputs and outputs) managed by this engine. */
     private LinguisticVariable[] mLinguisticVariables = null;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The list of fuzzy rules derived for inference. */
     private FuzzyRule[] mFuzzyRules = null;
 
     /**
@@ -31,19 +28,20 @@ public class FuzzyEngine {
     }
 
     /**
-     * DOCUMENT ME!
+     * Evaluates a single rule provided as a string.
+     * The rule string is parsed, executed, and the results affect the associated linguistic variables.
      *
-     * @param rule DOCUMENT ME!
-     * @throws RuleParsingException DOCUMENT ME!
+     * @param rule the string representation of the fuzzy rule
+     * @throws RuleParsingException if the rule syntax is invalid
      */
     public void evaluateRule(String rule) throws RuleParsingException {
         (new FuzzyRule(this, rule)).evaluate();
     }
 
     /**
-     * DOCUMENT ME!
+     * Evaluates a pre-parsed FuzzyRule object.
      *
-     * @param rule DOCUMENT ME!
+     * @param rule the fuzzy rule to evaluate
      */
     public void evaluateRule(FuzzyRule rule) {
         rule.evaluate();
@@ -59,21 +57,21 @@ public class FuzzyEngine {
     }
 
     /**
-     * DOCUMENT ME!
+     * Parses and registers a new rule from its string representation.
      *
-     * @param rule DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws RuleParsingException DOCUMENT ME!
+     * @param rule the rule string
+     * @return the created FuzzyRule object
+     * @throws RuleParsingException if the rule format is incorrect
      */
     public FuzzyRule addRule(String rule) throws RuleParsingException {
         return addRule(new FuzzyRule(this, rule));
     }
 
     /**
-     * DOCUMENT ME!
+     * Registers an existing FuzzyRule object with the engine.
      *
-     * @param rule DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param rule the rule to add
+     * @return the added rule
      */
     public FuzzyRule addRule(FuzzyRule rule) {
         if (mFuzzyRules == null) {
@@ -94,9 +92,10 @@ public class FuzzyEngine {
     }
 
     /**
-     * DOCUMENT ME!
+     * Registers a Linguistic Variable (LV) with the engine.
+     * LVs represent concepts like "Temperature" or "Speed" with associated fuzzy sets.
      *
-     * @param lv DOCUMENT ME!
+     * @param lv the linguistic variable to add
      */
     public void addLinguisticVariable(LinguisticVariable lv) {
         if (mLinguisticVariables == null) {
@@ -116,10 +115,10 @@ public class FuzzyEngine {
     }
 
     /**
-     * DOCUMENT ME!
+     * Retrieves a registered Linguistic Variable by its name.
      *
-     * @param lv DOCUMENT ME!
-     * @return DOCUMENT ME!
+     * @param lv the name of the variable (e.g., "Pressure")
+     * @return the variable object, or null if not found
      */
     public LinguisticVariable getLinguisticVariable(String lv) {
         for (int i = 0; i < mLinguisticVariables.length; i++) {
@@ -132,9 +131,9 @@ public class FuzzyEngine {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of rules currently registered in the engine.
      *
-     * @return DOCUMENT ME!
+     * @return the rule count
      */
     public int getNumRules() {
         return mFuzzyRules.length;

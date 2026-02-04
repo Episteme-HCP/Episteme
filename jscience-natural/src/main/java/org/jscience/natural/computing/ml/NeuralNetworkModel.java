@@ -5,7 +5,7 @@
 
 package org.jscience.natural.computing.ml;
 
-import org.jscience.core.mathematics.ml.neural.layers.Layer;
+import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 

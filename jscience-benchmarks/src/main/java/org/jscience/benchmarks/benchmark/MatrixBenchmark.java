@@ -142,6 +142,7 @@ public class MatrixBenchmark {
         return jblasA.mmul(jblasB);
     }
 
+    /*
     @Benchmark
     public Matrix<Real> multiplyJSciencePanama() {
         // Switch to Panama/Native backend for this benchmark
@@ -153,16 +154,15 @@ public class MatrixBenchmark {
             ComputeContext.current().setBackend(old);
         }
     }
+    */
 
-    private double[][] generateRandomData(int n) {
-        Random r = new Random(42);
-        double[][] data = new double[n][n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                data[i][j] = r.nextDouble();
-            }
-        }
-        return data;
+
+    public static void main(String[] args) throws org.openjdk.jmh.runner.RunnerException {
+        org.openjdk.jmh.runner.options.Options opt = new org.openjdk.jmh.runner.options.OptionsBuilder()
+                .include(MatrixBenchmark.class.getSimpleName())
+                .forks(1)
+                .build();
+        new org.openjdk.jmh.runner.Runner(opt).run();
     }
 }
 

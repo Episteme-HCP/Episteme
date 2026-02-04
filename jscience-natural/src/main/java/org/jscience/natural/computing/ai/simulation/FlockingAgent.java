@@ -63,43 +63,43 @@ public class FlockingAgent implements Agent {
     /** The viewing angle of the agent. */
     protected static double viewA;
 
-    /** DOCUMENT ME! */
+    /** The visual avoidance angle (in radians). */
     protected static double vAvoidA;
 
-    /** DOCUMENT ME! */
+    /** The minimum velocity magnitude. */
     protected static double minV;
 
-    /** DOCUMENT ME! */
+    /** The radius for the alignment (copy) rule. */
     protected static double copyR;
 
-    /** DOCUMENT ME! */
+    /** The radius for the cohesion (centroid) rule. */
     protected static double centroidR;
 
-    /** DOCUMENT ME! */
+    /** The radius for the separation (avoidance) rule. */
     protected static double avoidR;
 
-    /** DOCUMENT ME! */
+    /** The radius for visual avoidance. */
     protected static double vAvoidR;
 
-    /** DOCUMENT ME! */
+    /** The weight for the alignment (copy) rule. */
     protected static double copyW;
 
-    /** DOCUMENT ME! */
+    /** The weight for the cohesion (centroid) rule. */
     protected static double centroidW;
 
-    /** DOCUMENT ME! */
+    /** The weight for the separation (avoidance) rule. */
     protected static double avoidW;
 
-    /** DOCUMENT ME! */
+    /** The weight for the visual avoidance rule. */
     protected static double vAvoidW;
 
-    /** DOCUMENT ME! */
+    /** The weight for random motion (noise). */
     protected static double randW;
 
-    /** DOCUMENT ME! */
+    /** The time step for the simulation. */
     protected static double dt;
 
-    /** DOCUMENT ME! */
+    /** The damping/inertia factor (0.0 to 1.0). High values mean more inertia. */
     protected static double ddt;
 
     /** The flock this agent is in. */
@@ -197,20 +197,26 @@ public class FlockingAgent implements Agent {
 
 
     /**
-     * DOCUMENT ME!
+     * Sets the dimensions of the toroidal world.
      *
-     * @param r DOCUMENT ME!
-     * @param rr DOCUMENT ME!
-     * @param cc DOCUMENT ME!
-     * @param va DOCUMENT ME!
-     * @param vaa DOCUMENT ME!
-     * @param mv DOCUMENT ME!
+     * @param rows height of the world
+     * @param cols width of the world
      */
     public void setWorldDimensions(int rows, int cols) {
         this.worldRows = rows;
         this.worldCols = cols;
     }
     
+    /**
+     * Initializes miscellaneous simulation parameters.
+     *
+     * @param r random number generator
+     * @param rr unused parameter (legacy)
+     * @param cc unused parameter (legacy)
+     * @param va view angle in degrees
+     * @param vaa visual avoidance angle in degrees
+     * @param mv minimum velocity
+     */
     public static void initMisc(Random r, int rr, int cc,
         double va, double vaa, double mv) {
         rnd = r;
@@ -220,12 +226,12 @@ public class FlockingAgent implements Agent {
     }
 
     /**
-     * DOCUMENT ME!
+     * Initializes the interaction radii for the Boids rules.
      *
-     * @param cr DOCUMENT ME!
-     * @param ccr DOCUMENT ME!
-     * @param ar DOCUMENT ME!
-     * @param vr DOCUMENT ME!
+     * @param cr alignment (copy) radius
+     * @param ccr cohesion (centroid) radius
+     * @param ar separation (avoid) radius
+     * @param vr visual avoidance radius
      */
     public static void initRadii(double cr, double ccr, double ar, double vr) {
         copyR = cr;
@@ -235,13 +241,13 @@ public class FlockingAgent implements Agent {
     }
 
     /**
-     * DOCUMENT ME!
+     * Initializes the weights for the Boids rules.
      *
-     * @param cw DOCUMENT ME!
-     * @param ccw DOCUMENT ME!
-     * @param aw DOCUMENT ME!
-     * @param vw DOCUMENT ME!
-     * @param rw DOCUMENT ME!
+     * @param cw alignment (copy) weight
+     * @param ccw cohesion (centroid) weight
+     * @param aw separation (avoid) weight
+     * @param vw visual avoidance weight
+     * @param rw random perturbation weight
      */
     public static void initWeights(double cw, double ccw, double aw, double vw,
         double rw) {
@@ -253,10 +259,10 @@ public class FlockingAgent implements Agent {
     }
 
     /**
-     * DOCUMENT ME!
+     * Initializes time parameters.
      *
-     * @param t DOCUMENT ME!
-     * @param tt DOCUMENT ME!
+     * @param t time step (delta time)
+     * @param tt damping/inertia factor
      */
     public static void initTime(double t, double tt) {
         dt = t;
@@ -264,19 +270,20 @@ public class FlockingAgent implements Agent {
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the reference to the entire flock.
      *
-     * @param flock DOCUMENT ME!
+     * @param flock array of all agents in the flock
      */
     public void setFlock(FlockingAgent[] flock) {
         this.myFlock = flock;
     }
 
     /**
-     * DOCUMENT ME!
+     * Normalizes a 2D vector.
      *
-     * @param x DOCUMENT ME!
-     * @param y DOCUMENT ME!
+     * @param x x component
+     * @param y y component
+     * @return the normalized vector {x, y}
      */
     protected static double[] normalize(double x, double y) {
         double l = len(x, y);
@@ -314,23 +321,23 @@ public class FlockingAgent implements Agent {
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the dot product of two 2D vectors.
      *
-     * @param x1 DOCUMENT ME!
-     * @param y1 DOCUMENT ME!
-     * @param x2 DOCUMENT ME!
-     * @param y2 DOCUMENT ME!
+     * @param x1 x component of vector 1
+     * @param y1 y component of vector 1
+     * @param x2 x component of vector 2
+     * @param y2 y component of vector 2
      *
-     * @return DOCUMENT ME!
+     * @return the dot product
      */
     protected static double dot(double x1, double y1, double x2, double y2) {
         return ((x1 * x2) + (y1 * y2));
     }
 
     /**
-     * DOCUMENT ME!
+     * Computes the new velocity vector for this agent based on Boids rules.
      *
-     * @param self
+     * @param self index of this agent in the flock array
      */
     public void computeNewHeading(int self) {
         int numcent = 0;
@@ -505,7 +512,8 @@ public class FlockingAgent implements Agent {
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the agent's position and velocity based on the computed heading.
+     * Handles toroidal world wrap-around.
      */
     public void update() {
         vx = nvx;
@@ -528,11 +536,11 @@ public class FlockingAgent implements Agent {
     }
 
     /**
-     * DOCUMENT ME!
+     * Renders the agent.
      *
-     * @param graphics DOCUMENT ME!
-     * @param sx DOCUMENT ME!
-     * @param sy DOCUMENT ME!
+     * @param graphics the graphics context
+     * @param sx scroll x offset
+     * @param sy scroll y offset
      */
     public void render(Graphics graphics, int sx, int sy) {
         double x1;

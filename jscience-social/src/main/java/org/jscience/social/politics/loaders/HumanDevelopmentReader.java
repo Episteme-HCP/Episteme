@@ -53,7 +53,7 @@ public class HumanDevelopmentReader extends AbstractResourceReader<List<Country>
                         // In JScience, we often lookup by ISO code
                         Country country = findCountry(iso3);
                         if (country != null) {
-                            country.setHdi(org.jscience.core.measure.Quantities.getQuantity(hdi, org.jscience.core.measure.Units.ONE));
+                            country.setHdi(org.jscience.core.measure.Quantities.create(hdi, org.jscience.core.measure.Units.ONE));
                             PersistenceManager.getInstance().save(country);
                             updated.add(country);
                         }

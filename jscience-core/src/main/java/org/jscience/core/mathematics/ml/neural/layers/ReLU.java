@@ -20,7 +20,7 @@ public class ReLU<T> extends ActivationLayer<T> {
     }
 
     @Override
-    public List<GraphNode<T>> getParameters() {
-        return Collections.emptyList();
+    public java.util.Map<String, GraphNode<T>> getParameters() {
+        return Collections.emptyMap();
     }
 }

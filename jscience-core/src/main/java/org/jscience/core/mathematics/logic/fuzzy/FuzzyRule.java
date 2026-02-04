@@ -9,52 +9,36 @@ package org.jscience.core.mathematics.logic.fuzzy;
  * @version 0.0.1
  */
 public class FuzzyRule {
-    /**
-     * DOCUMENT ME!
-     */
+    /** Operator constant for logical AND. */
     public static int OPERATOR_AND = 0;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** Operator constant for logical OR. */
     public static int OPERATOR_OR = 1;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The string representation of the rule. */
     private String mRule;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The parent engine execution context. */
     private FuzzyEngine mFuzzyEngine;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The array of fuzzy expressions on the LHS (IF part). */
     private FuzzyExpression<?>[] mLeftFuzzyExpressions;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The array of fuzzy expressions on the RHS (THEN part). */
     private FuzzyExpression<?>[] mRightFuzzyExpressions;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The operators combining LHS expressions (AND/OR). */
     private int[] mLeftOperators;
 
-    /**
-     * DOCUMENT ME!
-     */
+    /** The operators combining RHS expressions. */
     private int[] mRightOperators;
 
     /**
-     * Creates a new FuzzyRule object.
+     * Creates and parses a new FuzzyRule.
      *
-     * @param engine DOCUMENT ME!
-     * @param rule   DOCUMENT ME!
-     * @throws RuleParsingException DOCUMENT ME!
+     * @param engine the parent engine
+     * @param rule   the rule string (e.g. "IF temp IS hot THEN fan IS high")
+     * @throws RuleParsingException if the rule syntax is invalid
      */
     public FuzzyRule(FuzzyEngine engine, String rule)
             throws RuleParsingException {
@@ -64,9 +48,9 @@ public class FuzzyRule {
     }
 
     /**
-     * DOCUMENT ME!
+     * Parses the rule string into fuzzy expressions and operators.
      *
-     * @throws RuleParsingException DOCUMENT ME!
+     * @throws RuleParsingException if the rule structure is malformed
      */
     private void parseRule() throws RuleParsingException {
         /*
