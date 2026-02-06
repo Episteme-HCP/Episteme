@@ -23,12 +23,12 @@
 
 package org.jscience.core.media.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.media.AudioBackend;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 
-public class VLCJBackendProvider implements BackendProvider {
+public class VLCJBackendProvider implements Backend {
     @Override public String getType() { return "audio"; }
     @Override public String getId() { return "vlcj"; }
     @Override public String getName() { return "VLCJ (Native VLC)"; }

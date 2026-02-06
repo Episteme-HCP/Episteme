@@ -19,9 +19,11 @@ public class CUDAFFTProviderTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        // TODO: Enable once CUDAFFTProvider is implemented in Phase 10
-        // assertNotNull(CUDAFFTProvider.class);
+        // Placeholder test for CUDAFFTProvider (to be implemented in Phase 10)
+        // When implemented, this test should verify:
+        // - CUDAFFTProvider.class is reachable
+        // - CUDA library availability detection works
+        // - Basic FFT operations execute correctly on GPU
     }
 }
 

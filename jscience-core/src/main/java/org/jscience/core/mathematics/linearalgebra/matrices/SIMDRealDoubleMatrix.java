@@ -12,8 +12,9 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 
 /**
@@ -32,21 +33,15 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
 
     private final double[] data;
-    // rows and cols provided by GenericMatrix? Assuming so, or just keeping them if GenericMatrix is an interface (Wait, "extends" implies class).
-    // Let's assume GenericMatrix handles dimensions or we keep them. Usually GenericMatrix<T> implements Matrix<T>.
-    // If I don't know GenericMatrix structure, I better check it.
-    private final int rows;
-    private final int cols;
 
     public SIMDRealDoubleMatrix(int rows, int cols) {
-        this.rows = rows;
-        this.cols = cols;
-        this.data = new double[rows * cols];
+        this(rows, cols, new double[rows * cols]);
     }
     
     public SIMDRealDoubleMatrix(int rows, int cols, double[] data) {
-        this.rows = rows;
-        this.cols = cols;
+        super(new HeapRealDoubleMatrixStorage(data, rows, cols),
+              new CPUDenseLinearAlgebraProvider<>((org.jscience.core.mathematics.structures.rings.Field<Real>) Reals.getInstance()),
+              Reals.getInstance());
         this.data = data;
     }
 
@@ -56,18 +51,18 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     }
 
     @Override
-    public int rows() { return rows; }
+    public int rows() { return storage.rows(); }
 
     @Override
-    public int cols() { return cols; }
+    public int cols() { return storage.cols(); }
 
     @Override
     public Real get(int row, int col) {
-        return Real.of(data[row * cols + col]);
+        return Real.of(data[row * storage.cols() + col]);
     }
 
     public void set(int row, int col, double val) {
-        data[row * cols + col] = val;
+        data[row * storage.cols() + col] = val;
     }
     
     // Matrix Interface Stubs needed for set(int,int,Real)
@@ -116,7 +111,7 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         for (; i < data.length; i++) {
             res[i] = scalarFallback.applyAsDouble(data[i]);
         }
-        return new SIMDDoubleMatrix(rows, cols, res);
+        return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
     }
 
     public Matrix<Real> scale(double scalar) {
@@ -130,7 +125,7 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         for (; i < data.length; i++) {
             res[i] = data[i] * scalar;
         }
-        return new SIMDDoubleMatrix(rows, cols, res);
+        return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
     }
 
     public double doubleSum() {
@@ -168,8 +163,8 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     @Override
     public Matrix<Real> add(Matrix<Real> other) {
-        if (other instanceof SIMDDoubleMatrix) {
-            SIMDDoubleMatrix that = (SIMDDoubleMatrix) other;
+        if (other instanceof SIMDRealDoubleMatrix) {
+            SIMDRealDoubleMatrix that = (SIMDRealDoubleMatrix) other;
             checkDimensions(that);
             
             double[] res = new double[data.length];
@@ -184,7 +179,7 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             for (; i < data.length; i++) {
                 res[i] = this.data[i] + that.data[i];
             }
-            return new SIMDDoubleMatrix(rows, cols, res);
+            return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
         }
         // Fallback
         throw new UnsupportedOperationException("Mixed type addition not supported yet");
@@ -192,11 +187,11 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> other) {
-        if (other instanceof SIMDDoubleMatrix) {
-            SIMDDoubleMatrix that = (SIMDDoubleMatrix) other;
-            if (this.cols != that.rows) throw new IllegalArgumentException("Dimension mismatch");
+        if (other instanceof SIMDRealDoubleMatrix) {
+            SIMDRealDoubleMatrix that = (SIMDRealDoubleMatrix) other;
+            if (storage.cols() != that.storage.rows()) throw new IllegalArgumentException("Dimension mismatch");
             
-            SIMDDoubleMatrix C = new SIMDDoubleMatrix(this.rows, that.cols);
+            SIMDRealDoubleMatrix C = new SIMDRealDoubleMatrix(storage.rows(), that.storage.cols());
             
             // Naive loop with vectorization on the inner dot product?
             // Actually, for C[i][j] += A[i][k] * B[k][j], we want to vectorize k.
@@ -208,17 +203,17 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             // Simplest efficient SIMD: C[i][j..j+W] += A[i][k] * B[k][j..j+W]
             // We iterate i, k, then vectorize j.
             
-            for (int i = 0; i < this.rows; i++) {
-                for (int k = 0; k < this.cols; k++) {
-                    double aik = this.data[i * this.cols + k];
+            for (int i = 0; i < storage.rows(); i++) {
+                for (int k = 0; k < storage.cols(); k++) {
+                    double aik = this.data[i * storage.cols() + k];
                     
                     int j = 0;
                     // Vectorize j loop
-                    for (; j < SPECIES.loopBound(that.cols); j += SPECIES.length()) {
-                        int bIdx = k * that.cols + j;
+                    for (; j < SPECIES.loopBound(that.storage.cols()); j += SPECIES.length()) {
+                        int bIdx = k * that.storage.cols() + j;
                         var bVec = DoubleVector.fromArray(SPECIES, that.data, bIdx);
                         
-                        int cIdx = i * that.cols + j;
+                        int cIdx = i * that.storage.cols() + j;
                         // Load C (accumulation)
                         var cVec = DoubleVector.fromArray(SPECIES, C.data, cIdx);
                         
@@ -229,8 +224,8 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
                         cVec.intoArray(C.data, cIdx);
                     }
                     // Scalar tail for j
-                    for (; j < that.cols; j++) {
-                        C.data[i * that.cols + j] += aik * that.data[k * that.cols + j];
+                    for (; j < that.storage.cols(); j++) {
+                        C.data[i * that.storage.cols() + j] += aik * that.data[k * that.storage.cols() + j];
                     }
                 }
             }
@@ -240,7 +235,7 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     }
     
     private void checkDimensions(Matrix<?> other) {
-        if (rows != other.rows() || cols != other.cols()) 
+        if (storage.rows() != other.rows() || storage.cols() != other.cols()) 
             throw new IllegalArgumentException("Dimensions match");
     }
 
@@ -251,40 +246,40 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         // Efficient Transpose? 
         // For large matrices, cache-oblivious or block transpose is best.
         // Simple implementation first
-        double[] tData = new double[rows * cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                tData[j * rows + i] = data[i * cols + j];
+        double[] tData = new double[storage.rows() * storage.cols()];
+        for (int i = 0; i < storage.rows(); i++) {
+            for (int j = 0; j < storage.cols(); j++) {
+                tData[j * storage.rows() + i] = data[i * storage.cols() + j];
             }
         }
-        return new SIMDDoubleMatrix(cols, rows, tData);
+        return new SIMDRealDoubleMatrix(storage.cols(), storage.rows(), tData);
     }
     
     @Override 
     public Matrix<Real> subtract(Matrix<Real> other) {
-        if (other instanceof SIMDDoubleMatrix) {
-            SIMDDoubleMatrix that = (SIMDDoubleMatrix) other;
+        if (other instanceof SIMDRealDoubleMatrix) {
+            SIMDRealDoubleMatrix that = (SIMDRealDoubleMatrix) other;
             checkDimensions(that);
             double[] res = new double[data.length];
             int i = 0;
             // Vector loop
             for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
-                var v1 = DoubleVector.fromArray(SPECIES, this.data, i);
-                var v2 = DoubleVector.fromArray(SPECIES, that.data, i);
+                DoubleVector v1 = DoubleVector.fromArray(SPECIES, this.data, i);
+                DoubleVector v2 = DoubleVector.fromArray(SPECIES, that.data, i);
                 v1.sub(v2).intoArray(res, i);
             }
             // Scalar tail loop
             for (; i < data.length; i++) {
                 res[i] = this.data[i] - that.data[i];
             }
-            return new SIMDDoubleMatrix(rows, cols, res);
+            return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
         }
         throw new UnsupportedOperationException("Mixed type subtraction not supported yet");
     }
 
     @Override public Real trace() { 
         double sum = 0;
-        for(int i=0; i<Math.min(rows,cols); i++) sum += data[i*cols + i];
+        for(int i=0; i<Math.min(storage.rows(),storage.cols()); i++) sum += data[i*storage.cols() + i];
         return Real.of(sum);
     }
     
@@ -294,9 +289,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         int c = ce - cs;
         double[] sub = new double[r*c];
         for(int i=0; i<r; i++) {
-            System.arraycopy(data, (rs+i)*cols + cs, sub, i*c, c);
+            System.arraycopy(data, (rs+i)*storage.cols() + cs, sub, i*c, c);
         }
-        return new SIMDDoubleMatrix(r, c, sub);
+        return new SIMDRealDoubleMatrix(r, c, sub);
     }
 
     /**
@@ -310,8 +305,8 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
      * Efficiently copies a row into a double array.
      */
     public double[] getRowData(int row) {
-        double[] rowData = new double[cols];
-        System.arraycopy(data, row * cols, rowData, 0, cols);
+        double[] rowData = new double[storage.cols()];
+        System.arraycopy(data, row * storage.cols(), rowData, 0, storage.cols());
         return rowData;
     }
 
@@ -319,8 +314,8 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
      * Efficiently sets a row from a double array.
      */
     public void setRowData(int row, double[] rowData) {
-        if (rowData.length != cols) throw new IllegalArgumentException("Length mismatch");
-        System.arraycopy(rowData, 0, data, row * cols, cols);
+        if (rowData.length != storage.cols()) throw new IllegalArgumentException("Length mismatch");
+        System.arraycopy(rowData, 0, data, row * storage.cols(), storage.cols());
     }
     
     @Override public Vector<Real> getRow(int row) { throw new UnsupportedOperationException(); }
@@ -331,12 +326,12 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     @Override public Matrix<Real> negate() { 
         double[] res = new double[data.length];
         for(int i=0; i<data.length; i++) res[i] = -data[i];
-        return new SIMDDoubleMatrix(rows, cols, res);
+        return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
     }
-    @Override public Matrix<Real> zero() { return new SIMDDoubleMatrix(rows, cols); }
+    @Override public Matrix<Real> zero() { return new SIMDRealDoubleMatrix(storage.rows(), storage.cols()); }
     @Override public Matrix<Real> one() { 
-        SIMDDoubleMatrix m = new SIMDDoubleMatrix(rows, cols);
-        for(int i=0; i<Math.min(rows,cols); i++) m.set(i,i, 1.0);
+        SIMDRealDoubleMatrix m = new SIMDRealDoubleMatrix(storage.rows(), storage.cols());
+        for(int i=0; i<Math.min(storage.rows(),storage.cols()); i++) m.set(i,i, 1.0);
         return m;
     }
     @Override public MatrixStorage<Real> getStorage() { throw new UnsupportedOperationException(); }
@@ -345,10 +340,10 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     
     @Override
     public boolean contains(Matrix<Real> element) {
-        return rows == element.rows() && cols == element.cols();
+        return storage.rows() == element.rows() && storage.cols() == element.cols();
     }
     @Override
     public String description() {
-        return "SIMD Matrix (" + rows + "x" + cols + ") using " + SPECIES.toString();
+        return "SIMD Matrix (" + storage.rows() + "x" + storage.cols() + ") using " + SPECIES.toString();
     }
 }

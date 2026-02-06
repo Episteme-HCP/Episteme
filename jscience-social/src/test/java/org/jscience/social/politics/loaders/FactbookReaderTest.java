@@ -24,7 +24,6 @@
 package org.jscience.social.politics.loaders;
 
 import org.jscience.social.politics.Country;
-import org.jscience.social.politics.GovernmentType;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

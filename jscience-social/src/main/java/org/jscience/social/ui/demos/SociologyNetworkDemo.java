@@ -25,7 +25,7 @@ package org.jscience.social.ui.demos;
 
 import org.jscience.core.ui.AbstractDemo;
 import org.jscience.core.ui.i18n.I18N;
-import org.jscience.core.ui.viewers.mathematics.discrete.NetworkViewer;
+import org.jscience.core.ui.viewers.mathematics.discrete.GraphViewer;
 
 /**
  * Sociology Network Demo using JScience Vector2D types.
@@ -58,7 +58,7 @@ public class SociologyNetworkDemo extends AbstractDemo {
 
     @Override
     protected javafx.scene.Node createViewerNode() {
-        NetworkViewer v = new NetworkViewer();
+        GraphViewer v = new GraphViewer();
         this.viewer = v;
         return v;
     }

@@ -1,0 +1,80 @@
+{
+    "potentials": [
+        {
+            "reaction": "F2 + 2e- -> 2F-",
+            "E0": 2.87
+        },
+        {
+            "reaction": "Cl2 + 2e- -> 2Cl-",
+            "E0": 1.36
+        },
+        {
+            "reaction": "Br2 + 2e- -> 2Br-",
+            "E0": 1.07
+        },
+        {
+            "reaction": "I2 + 2e- -> 2I-",
+            "E0": 0.54
+        },
+        {
+            "reaction": "Ag+ + e- -> Ag",
+            "E0": 0.80
+        },
+        {
+            "reaction": "Cu2+ + 2e- -> Cu",
+            "E0": 0.34
+        },
+        {
+            "reaction": "Pb2+ + 2e- -> Pb",
+            "E0": -0.13
+        },
+        {
+            "reaction": "Sn2+ + 2e- -> Sn",
+            "E0": -0.14
+        },
+        {
+            "reaction": "Ni2+ + 2e- -> Ni",
+            "E0": -0.25
+        },
+        {
+            "reaction": "Fe2+ + 2e- -> Fe",
+            "E0": -0.44
+        },
+        {
+            "reaction": "Zn2+ + 2e- -> Zn",
+            "E0": -0.76
+        },
+        {
+            "reaction": "Al3+ + 3e- -> Al",
+            "E0": -1.66
+        },
+        {
+            "reaction": "Mg2+ + 2e- -> Mg",
+            "E0": -2.37
+        },
+        {
+            "reaction": "Na+ + e- -> Na",
+            "E0": -2.71
+        },
+        {
+            "reaction": "Ca2+ + 2e- -> Ca",
+            "E0": -2.87
+        },
+        {
+            "reaction": "K+ + e- -> K",
+            "E0": -2.93
+        },
+        {
+            "reaction": "Li+ + e- -> Li",
+            "E0": -3.04
+        },
+        {
+            "reaction": "2H+ + 2e- -> H2",
+            "E0": 0.00
+        },
+        {
+            "reaction": "O2 + 4H+ + 4e- -> 2H2O",
+            "E0": 1.23
+        }
+    ]
+}

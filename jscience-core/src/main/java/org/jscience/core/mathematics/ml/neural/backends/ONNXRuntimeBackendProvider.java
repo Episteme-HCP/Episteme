@@ -22,7 +22,7 @@
  */
 package org.jscience.core.mathematics.ml.neural.backends;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.technical.backend.Backend;
 import java.nio.file.Path;
 import java.util.Map;

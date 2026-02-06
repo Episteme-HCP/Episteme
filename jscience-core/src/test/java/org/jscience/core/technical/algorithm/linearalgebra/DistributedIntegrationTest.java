@@ -7,7 +7,8 @@ package org.jscience.core.technical.algorithm.linearalgebra;
 import org.jscience.core.distributed.DistributedCompute;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 
 import org.junit.jupiter.api.Test;

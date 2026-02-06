@@ -180,20 +180,17 @@ public class OpenCLBackend implements GPUBackend {
         throw new UnsupportedOperationException("OpenCL matrix multiplication kernel needs to be implemented.");
     }
 
-    @Override
     public void elementWise(String operation, DoubleBuffer input, DoubleBuffer output, int size) {
         throw new UnsupportedOperationException("OpenCL element-wise operations require kernel loading.");
     }
 
-    @Override
     public void fft(DoubleBuffer real, DoubleBuffer imag, 
-                   DoubleBuffer realOut, DoubleBuffer imagOut, 
-                   int n, boolean inverse) {
+                    DoubleBuffer realOut, DoubleBuffer imagOut, 
+                    int n, boolean inverse) {
         // Requires clFFT library or custom kernels
         throw new UnsupportedOperationException("FFT requires clFFT or custom kernels.");
     }
 
-    @Override
     public double reduce(String operation, DoubleBuffer input, int size) {
         throw new UnsupportedOperationException("Reduction not implemented for OpenCL.");
     }

@@ -1,0 +1,130 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * JScience Core module providing fundamental math and physics infrastructure.
+ */
+module org.jscience.core {
+    requires java.base;
+    requires transitive java.logging;
+    requires java.desktop;
+    requires java.naming;
+    requires java.sql;
+    requires java.management;
+    requires transitive java.xml;
+    requires java.compiler; // For FunctionCompiler
+    requires java.prefs;    // For ThemeManager
+    // requires static jdk.incubator.vector;
+
+    // Optional/External dependencies
+    requires static javafx.controls;
+    requires static javafx.graphics;
+    // requires static spark.core_2.13;
+    requires static com.fasterxml.jackson.databind;
+    requires static org.slf4j;
+    requires transitive java.measure;
+    requires transitive tech.units.indriya;
+    requires static colt;
+    requires static jblas;
+    requires static ejml.all;
+    requires static nd4j.api;
+    requires static jcuda;
+    requires static jcublas;
+    requires static jocl;
+    requires static uk.co.caprica.vlcj;
+    requires static minim;
+    requires static org.bytedeco.javacv;
+    requires static TarsosDSP.core;
+    requires static TarsosDSP.jvm;
+    requires static io.javalin;
+    requires static org.jfree.jfreechart;
+    requires static org.knowm.xchart;
+    requires static jzy3d.api;
+    requires static xercesImpl;
+
+    exports org.jscience.core;
+    exports org.jscience.core.mathematics;
+    exports org.jscience.core.mathematics.numbers;
+    exports org.jscience.core.mathematics.numbers.real;
+    exports org.jscience.core.mathematics.numbers.complex;
+    exports org.jscience.core.mathematics.geometry;
+    exports org.jscience.core.mathematics.geometry.volume;
+    exports org.jscience.core.mathematics.analysis;
+    exports org.jscience.core.mathematics.analysis.transform;
+    exports org.jscience.core.mathematics.analysis.ode;
+    exports org.jscience.core.mathematics.analysis.chaos;
+    exports org.jscience.core.mathematics.discrete;
+    exports org.jscience.core.mathematics.discrete.graph;
+    exports org.jscience.core.mathematics.topology;
+    exports org.jscience.core.mathematics.linearalgebra;
+    exports org.jscience.core.mathematics.linearalgebra.algorithms;
+    exports org.jscience.core.mathematics.linearalgebra.matrices;
+    exports org.jscience.core.mathematics.linearalgebra.matrices.solvers;
+    exports org.jscience.core.mathematics.linearalgebra.matrices.storage;
+    exports org.jscience.core.mathematics.linearalgebra.vectors;
+    exports org.jscience.core.mathematics.linearalgebra.vectors.storage;
+    exports org.jscience.core.mathematics.linearalgebra.backends;
+    exports org.jscience.core.mathematics.sets;
+    exports org.jscience.core.mathematics.structures;
+    exports org.jscience.core.mathematics.structures.rings;
+    exports org.jscience.core.mathematics.context;
+    exports org.jscience.core.mathematics.linearalgebra.tensors;
+    exports org.jscience.core.mathematics.linearalgebra.tensors.backends;
+    exports org.jscience.core.mathematics.loaders.mathml;
+    exports org.jscience.core.mathematics.loaders.mathml.beans;
+    exports org.w3c.dom.mathml;
+    exports org.jscience.core.measure;
+    exports org.jscience.core.measure.quantity;
+    exports org.jscience.core.measure.units;
+    exports org.jscience.core.measure.metrology;
+    exports org.jscience.core.measure.converters;
+    exports org.jscience.core.measure.adapters;
+    exports org.jscience.core.technical.backend;
+    exports org.jscience.core.technical.backend.algorithms;
+    exports org.jscience.core.technical.backend.gpu;
+    exports org.jscience.core.technical.backend.math;
+    exports org.jscience.core.technical.backend.physics;
+    exports org.jscience.core.technical.native_lib;
+    exports org.jscience.core.io;
+    exports org.jscience.core.io.properties;
+    exports org.jscience.core.io.cache;
+    exports org.jscience.core.methodology;
+    exports org.jscience.core.device;
+    exports org.jscience.core.device.sim;
+    exports org.jscience.core.distributed;
+    exports org.jscience.core.quantum;
+    exports org.jscience.core.ui;
+    exports org.jscience.core.ui.i18n;
+    exports org.jscience.core.ui.api;
+    exports org.jscience.core.ui.theme;
+    exports org.jscience.core.ui.demos;
+    exports org.jscience.core.ui.viewers.mathematics;
+    exports org.jscience.core.ui.viewers.mathematics.analysis.chaos;
+    exports org.jscience.core.ui.viewers.mathematics.analysis.plotting;
+    exports org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
+
+    exports org.jscience.core.util;
+    exports org.jscience.core.util.identity;
+    exports org.jscience.core.util.persistence;
+}
+

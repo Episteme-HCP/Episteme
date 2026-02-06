@@ -27,6 +27,7 @@ import org.jscience.core.mathematics.structures.spaces.Module;
 import org.jscience.core.mathematics.structures.rings.Ring;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 
 /**
  * Represents a matrix of scalar elements.
@@ -187,7 +188,7 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
      * 
      * @return the corresponding tensor
      */
-    default org.jscience.core.mathematics.linearalgebra.tensors.Tensor<E> toTensor() {
+    default Tensor<E> toTensor() {
         if (rows() == 0 || cols() == 0) {
             @SuppressWarnings("unchecked")
             Class<E> type = (Class<E>) getScalarRing().zero().getClass();
@@ -198,8 +199,7 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
         @SuppressWarnings("unchecked")
         Class<E> type = (Class<E>) sample.getClass();
 
-        org.jscience.core.mathematics.linearalgebra.tensors.Tensor<E> t = org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory
-                .zeros(type, rows(), cols());
+        Tensor<E> t = TensorFactory.zeros(type, rows(), cols());
 
         for (int i = 0; i < rows(); i++) {
             for (int j = 0; j < cols(); j++) {

@@ -37,8 +37,24 @@ public class MapBackendManager extends AbstractBackendManager<MapBackend> {
 
     private static final MapBackendManager INSTANCE = new MapBackendManager();
 
-    public static MapBackendManager getInstance() {
-        return INSTANCE;
+    public static MapBackend staticSelect(String name) {
+        return INSTANCE.managerSelect(name);
+    }
+
+    public static java.util.Collection<MapBackend> staticAllBackends() {
+        return INSTANCE.managerAll();
+    }
+
+    public static MapBackend staticGetDefault() {
+        return INSTANCE.managerDefault();
+    }
+
+    public static void staticSetDefault(String name) {
+        INSTANCE.managerSetDefault(name);
+    }
+
+    public static void staticRegister(MapBackend backend) {
+        INSTANCE.managerRegister(backend);
     }
 
     private String preferredId = "auto";
@@ -68,7 +84,7 @@ public class MapBackendManager extends AbstractBackendManager<MapBackend> {
         if ("auto".equalsIgnoreCase(preferredId)) {
             return selectBestBackend();
         }
-        MapBackend b = select(preferredId);
+        MapBackend b = managerSelect(preferredId);
         return (b != null) ? b : selectBestBackend();
     }
 

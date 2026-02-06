@@ -40,7 +40,6 @@ import org.jscience.server.server.politics.GeopoliticalEngineTask;
 import org.jscience.social.politics.loaders.FactbookReader;
 import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
-import org.jscience.social.politics.GovernmentType;
 
 
 import java.io.*;

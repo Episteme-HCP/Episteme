@@ -24,6 +24,7 @@
 package org.jscience.core.ui.viewers.mathematics.analysis.plotting;
 
 import org.jscience.core.technical.backend.AbstractBackendManager;
+import org.jscience.core.technical.backend.BackendDiscovery;
 import java.util.Comparator;
 
 /**
@@ -41,6 +42,14 @@ public class PlottingBackendManager extends AbstractBackendManager<PlottingBacke
         return INSTANCE;
     }
 
+    public static PlottingBackend staticSelect(String name) {
+        return INSTANCE.managerSelect(name);
+    }
+
+    public static java.util.Collection<PlottingBackend> staticAllBackends() {
+        return INSTANCE.managerAll();
+    }
+
     private String preferred2DId = "auto";
     private String preferred3DId = "auto";
 
@@ -55,7 +64,7 @@ public class PlottingBackendManager extends AbstractBackendManager<PlottingBacke
         if ("auto".equalsIgnoreCase(preferred2DId)) {
             return selectBest2D();
         }
-        PlottingBackend b = select(preferred2DId);
+        PlottingBackend b = managerSelect(preferred2DId);
         return (b != null && b.isSupported2D()) ? b : selectBest2D();
     }
 
@@ -73,7 +82,7 @@ public class PlottingBackendManager extends AbstractBackendManager<PlottingBacke
         if ("auto".equalsIgnoreCase(preferred3DId)) {
             return selectBest3D();
         }
-        PlottingBackend b = select(preferred3DId);
+        PlottingBackend b = managerSelect(preferred3DId);
         return (b != null && b.isSupported3D()) ? b : selectBest3D();
     }
 
@@ -82,6 +91,11 @@ public class PlottingBackendManager extends AbstractBackendManager<PlottingBacke
      */
     public void set3D(String id) {
         this.preferred3DId = id;
+    }
+
+    public static PlottingBackend getPreferred() {
+        return (PlottingBackend) BackendDiscovery.getInstance().getPreferredProvider(BackendDiscovery.TYPE_PLOTTING)
+                .orElse(INSTANCE.managerSelect(PlottingBackend.XCHART)); // Default fallback
     }
 
     private PlottingBackend selectBest2D() {

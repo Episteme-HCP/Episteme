@@ -24,11 +24,7 @@
 package org.jscience.social.ui.viewers.geography;
 
 import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.BackendDiscovery;
 import org.jscience.social.ui.viewers.geography.backends.JavaFXMapBackendProvider;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Factory for creating maps using SPI-based backend discovery.
@@ -105,30 +101,29 @@ public class MapFactory {
      */
     private static Backend getBackendProvider() {
         if (selectedBackendId != null) {
-             Optional<Backend> specific = MapBackendManager.getInstance().select(selectedBackendId) != null ? 
-                 Optional.of(MapBackendManager.getInstance().select(selectedBackendId)) : Optional.empty();
+             MapBackend specific = MapBackendManager.staticSelect(selectedBackendId);
                  
-             if (specific.isPresent() && specific.get().isAvailable()) {
-                return specific.get();
+             if (specific != null && specific.isAvailable()) {
+                return specific;
              }
         }
 
         // Auto-select best available (sorted by priority)
-        return MapBackendManager.getInstance().getActiveBackend();
+        return MapBackendManager.staticGetDefault();
     }
 
     /**
      * Returns all discovered map backend providers.
      */
-    public static List<MapBackend> getAvailableBackends() {
-        return (List<MapBackend>) MapBackendManager.getInstance().getAllBackends();
+    public static java.util.Collection<MapBackend> getAvailableBackends() {
+        return MapBackendManager.staticAllBackends();
     }
 
     /**
      * Checks if a specific backend is available.
      */
     public static boolean isBackendAvailable(String backendId) {
-        MapBackend b = MapBackendManager.getInstance().select(backendId);
+        MapBackend b = MapBackendManager.staticSelect(backendId);
         return b != null && b.isAvailable();
     }
 }

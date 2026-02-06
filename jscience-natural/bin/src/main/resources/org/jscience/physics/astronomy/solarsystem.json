@@ -1,0 +1,168 @@
+{
+    "name": "Solar System",
+    "stars": [
+        {
+            "name": "Sun",
+            "mass": 1.989e30,
+            "radius": 6.9634e8,
+            "luminosity": 3.828e26,
+            "temperature": 5778,
+            "texture": "2k_sun.jpg",
+            "planets": [
+                {
+                    "name": "Mercury",
+                    "mass": 3.285e23,
+                    "radius": 2.4397e6,
+                    "texture": "2k_mercury.jpg",
+                    "orbit": {
+                        "a": 5.791e10,
+                        "e": 0.2056,
+                        "i": 7.005,
+                        "Omega": 48.331,
+                        "omega": 29.124,
+                        "M": 174.796
+                    }
+                },
+                {
+                    "name": "Venus",
+                    "mass": 4.867e24,
+                    "radius": 6.0518e6,
+                    "texture": "2k_venus_atmosphere.jpg",
+                    "orbit": {
+                        "a": 1.0821e11,
+                        "e": 0.0067,
+                        "i": 3.3947,
+                        "Omega": 76.680,
+                        "omega": 54.884,
+                        "M": 50.115
+                    }
+                },
+                {
+                    "name": "Earth",
+                    "mass": 5.972e24,
+                    "radius": 6.371e6,
+                    "habitable": true,
+                    "surface_temperature": 288,
+                    "surface_pressure": 101325,
+                    "atmosphere": {
+                        "Nitrogen": 78.0,
+                        "Oxygen": 21.0,
+                        "Argon": 0.93
+                    },
+                    "texture": {
+                        "diffuse": "2k_earth_daymap.jpg",
+                        "normal": "2k_earth_normal_map.tif",
+                        "specular": "2k_earth_specular_map.tif",
+                        "clouds": "2k_earth_clouds.jpg",
+                        "night": "2k_earth_nightmap.jpg"
+                    },
+                    "orbit": {
+                        "a": 1.496e11,
+                        "e": 0.0167,
+                        "i": 0.0,
+                        "Omega": 0.0,
+                        "omega": 102.9,
+                        "M": 0.0
+                    },
+                    "moons": [
+                        {
+                            "name": "Moon",
+                            "mass": 7.342e22,
+                            "radius": 1.737e6,
+                            "texture": "2k_moon.jpg",
+                            "orbit": {
+                                "a": 3.844e8,
+                                "e": 0.0549,
+                                "i": 5.145,
+                                "Omega": 125.08,
+                                "omega": 318.15,
+                                "M": 135.27
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Mars",
+                    "mass": 6.39e23,
+                    "radius": 3.3895e6,
+                    "texture": "2k_mars.jpg",
+                    "surface_temperature": 210,
+                    "surface_pressure": 600,
+                    "atmosphere": {
+                        "Carbon Dioxide": 95.0,
+                        "Nitrogen": 2.8
+                    },
+                    "orbit": {
+                        "a": 2.279e11,
+                        "e": 0.0934,
+                        "i": 1.850,
+                        "Omega": 49.578,
+                        "omega": 336.04,
+                        "M": 355.45
+                    }
+                },
+                {
+                    "name": "Jupiter",
+                    "mass": 1.898e27,
+                    "radius": 6.9911e7,
+                    "texture": "2k_jupiter.jpg",
+                    "orbit": {
+                        "a": 7.785e11,
+                        "e": 0.0489,
+                        "i": 1.305,
+                        "Omega": 100.556,
+                        "omega": 274.3,
+                        "M": 18.72
+                    }
+                },
+                {
+                    "name": "Saturn",
+                    "mass": 5.683e26,
+                    "radius": 5.8232e7,
+                    "texture": "2k_saturn.jpg",
+                    "rings": {
+                        "inner": 7.45e7,
+                        "outer": 1.4022e8,
+                        "texture": "2k_saturn_ring_alpha.png"
+                    },
+                    "orbit": {
+                        "a": 1.4335e12,
+                        "e": 0.0565,
+                        "i": 2.485,
+                        "Omega": 113.715,
+                        "omega": 339.39,
+                        "M": 317.02
+                    }
+                },
+                {
+                    "name": "Uranus",
+                    "mass": 8.681e25,
+                    "radius": 2.5362e7,
+                    "texture": "2k_uranus.jpg",
+                    "orbit": {
+                        "a": 2.8725e12,
+                        "e": 0.0457,
+                        "i": 0.772,
+                        "Omega": 74.006,
+                        "omega": 96.661,
+                        "M": 142.956
+                    }
+                },
+                {
+                    "name": "Neptune",
+                    "mass": 1.024e26,
+                    "radius": 2.4622e7,
+                    "texture": "2k_neptune.jpg",
+                    "orbit": {
+                        "a": 4.4951e12,
+                        "e": 0.0113,
+                        "i": 1.769,
+                        "Omega": 131.784,
+                        "omega": 273.219,
+                        "M": 267.767
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -68,7 +68,7 @@ public class MolecularBackendManager extends AbstractBackendManager<MolecularBac
         if ("auto".equalsIgnoreCase(preferredId)) {
             return selectBestBackend();
         }
-        MolecularBackend b = select(preferredId);
+        MolecularBackend b = managerSelect(preferredId);
         return (b != null) ? b : selectBestBackend();
     }
 

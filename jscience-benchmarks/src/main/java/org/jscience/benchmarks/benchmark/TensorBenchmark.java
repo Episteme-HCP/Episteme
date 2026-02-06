@@ -24,7 +24,7 @@
 package org.jscience.benchmarks.benchmark;
 
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 import org.openjdk.jmh.annotations.*;

@@ -23,7 +23,6 @@
 
 package org.jscience.core.mathematics.discrete;
 
-import org.jscience.core.mathematics.discrete.Graph;
 import org.jscience.core.technical.algorithm.GraphAlgorithmProvider;
 import org.jscience.core.technical.algorithm.graph.MulticoreGraphAlgorithmProvider;
 import java.util.*;

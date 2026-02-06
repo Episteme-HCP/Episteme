@@ -29,8 +29,6 @@ import org.jscience.core.ui.viewers.mathematics.discrete.GraphRenderer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * GraphStream-based graph renderer.

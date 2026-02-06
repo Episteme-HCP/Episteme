@@ -1,0 +1,82 @@
+[
+    {
+        "symbol": "O",
+        "minTemp": 30000,
+        "maxTemp": 60000,
+        "color": "Blue",
+        "features": "He II lines",
+        "bvColorIndex": -0.33
+    },
+    {
+        "symbol": "B",
+        "minTemp": 10000,
+        "maxTemp": 30000,
+        "color": "Blue-white",
+        "features": "He I lines",
+        "bvColorIndex": -0.3
+    },
+    {
+        "symbol": "A",
+        "minTemp": 7500,
+        "maxTemp": 10000,
+        "color": "White",
+        "features": "Strong H lines",
+        "bvColorIndex": 0.0
+    },
+    {
+        "symbol": "F",
+        "minTemp": 6000,
+        "maxTemp": 7500,
+        "color": "Yellow-white",
+        "features": "Ca II lines",
+        "bvColorIndex": 0.3
+    },
+    {
+        "symbol": "G",
+        "minTemp": 5200,
+        "maxTemp": 6000,
+        "color": "Yellow",
+        "features": "Solar-type",
+        "bvColorIndex": 0.6
+    },
+    {
+        "symbol": "K",
+        "minTemp": 3700,
+        "maxTemp": 5200,
+        "color": "Orange",
+        "features": "Metal lines",
+        "bvColorIndex": 0.8
+    },
+    {
+        "symbol": "M",
+        "minTemp": 2400,
+        "maxTemp": 3700,
+        "color": "Red",
+        "features": "Molecular bands",
+        "bvColorIndex": 1.4
+    },
+    {
+        "symbol": "L",
+        "minTemp": 1300,
+        "maxTemp": 2400,
+        "color": "Red-infrared",
+        "features": "Metal hydrides",
+        "bvColorIndex": 2.0
+    },
+    {
+        "symbol": "T",
+        "minTemp": 700,
+        "maxTemp": 1300,
+        "color": "Infrared",
+        "features": "Methane",
+        "bvColorIndex": 3.0
+    },
+    {
+        "symbol": "Y",
+        "minTemp": 0,
+        "maxTemp": 700,
+        "color": "Infrared",
+        "features": "Ammonia",
+        "bvColorIndex": 4.0
+    }
+]

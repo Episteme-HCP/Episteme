@@ -25,7 +25,6 @@ package org.jscience.core.mathematics.linearalgebra;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.real.RealDouble;
 import org.junit.jupiter.api.Test;

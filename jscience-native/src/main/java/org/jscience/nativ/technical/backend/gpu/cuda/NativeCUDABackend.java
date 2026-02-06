@@ -128,17 +128,14 @@ public class NativeCUDABackend implements GPUBackend {
         // Future: cudaSetDevice(deviceId)
     }
 
-    @Override
     public void elementWise(String op, DoubleBuffer in, DoubleBuffer out, int s) {
         // Future: Launch custom CUDA kernel for element-wise operations
     }
 
-    @Override
     public void fft(DoubleBuffer r, DoubleBuffer i, DoubleBuffer ro, DoubleBuffer io, int n, boolean inv) {
         // Future: Use cuFFT library
     }
 
-    @Override
     public double reduce(String op, DoubleBuffer in, int s) {
         // Future: Parallel reduction kernel
         return 0;
@@ -179,6 +176,11 @@ public class NativeCUDABackend implements GPUBackend {
 
     @Override
     public boolean isAvailable() { return cuda != null && cublas != null; }
+
+    @Override
+    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    }
 
     @Override
     public org.jscience.core.technical.backend.ExecutionContext createContext() {

@@ -27,7 +27,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
 import org.jscience.social.ui.viewers.economics.FinancialPortfolioViewer;
-import org.jscience.core.ui.viewers.mathematics.discrete.NetworkViewer;
+import org.jscience.core.ui.viewers.mathematics.discrete.GraphViewer;
 import org.jscience.social.ui.viewers.sociology.DemographicProfileViewer;
 import org.jscience.social.economics.loaders.EconomicScenarioReader;
 import org.jscience.social.sociology.loaders.DemographicResourceReader;
@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 public final class GlobalStabilityStudio extends FeaturedAppBase {
 
     private FinancialPortfolioViewer marketViewer;
-    private NetworkViewer allianceViewer;
+    private GraphViewer allianceViewer;
     private DemographicProfileViewer demographyViewer;
 
     @Override
@@ -59,7 +59,7 @@ public final class GlobalStabilityStudio extends FeaturedAppBase {
         marketTab.setClosable(false);
         
         // Tab 2: Geopolitics
-        allianceViewer = new NetworkViewer();
+        allianceViewer = new GraphViewer();
         Tab geopoliticalTab = new Tab("Geopolitical Alliances", allianceViewer);
         geopoliticalTab.setClosable(false);
         

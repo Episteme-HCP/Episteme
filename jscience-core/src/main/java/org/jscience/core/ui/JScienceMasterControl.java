@@ -514,6 +514,7 @@ public class JScienceMasterControl extends Application {
         // Molecular Rendering Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available molecular backends via Manager
+        /*
         java.util.Collection<org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackend> providers = 
             org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getAllBackends();
 
@@ -539,6 +540,9 @@ public class JScienceMasterControl extends Application {
             org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().setPreferredId(nameToId.get(name));
             PREFS.setPreferredBackend("molecular", nameToId.get(name));
         });
+        */
+        backendBox.setDisable(true);
+        backendBox.setPromptText("Requires jscience-natural");
 
         VBox backendInfo = createInfoBox(
             i18n.get("mastercontrol.chemistry.backend", "Molecular Renderer"), 
@@ -709,7 +713,7 @@ public class JScienceMasterControl extends Application {
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available graph backends via Manager
         java.util.Collection<org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend> providers = 
-            org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().getAllBackends();
+            org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.staticAllBackends();
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
@@ -1090,7 +1094,7 @@ public class JScienceMasterControl extends Application {
         
         // 2D Combo
         ComboBox<PlottingBackend> backendBox = new ComboBox<>();
-        List<PlottingBackend> allPlotting = new ArrayList<>(org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().getAllBackends());
+        List<PlottingBackend> allPlotting = new ArrayList<>(org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.staticAllBackends());
         
         backendBox.getItems().addAll(allPlotting.stream()
                 .filter(PlottingBackend::isSupported2D)

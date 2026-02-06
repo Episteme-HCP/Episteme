@@ -26,6 +26,7 @@ package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.Plot2D;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlotFormat;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
+import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager;
 import org.jscience.core.mathematics.analysis.Function;
 import org.jscience.core.mathematics.numbers.real.Real;
 import javafx.application.Platform;
@@ -174,12 +175,11 @@ public class JavaFXPlot2D implements Plot2D {
 
     @Override
     public PlottingBackend getBackend() {
-        return PlottingBackend.JAVAFX;
+        return PlottingBackendManager.staticSelect(PlottingBackend.JAVAFX);
     }
 
     @Override
     public Plot2D addSeries(List<Real> xData, List<Real> yData, String label, SeriesStyle style) {
-        // Basic implementation - ignore styling for now
         return addData(xData, yData, label);
     }
 

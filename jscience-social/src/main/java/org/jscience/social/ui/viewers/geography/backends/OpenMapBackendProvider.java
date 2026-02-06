@@ -67,6 +67,7 @@ public class OpenMapBackendProvider implements MapBackend {
     }
 
     @Override
+    public int getPriority() {
         return 40; // Good priority for GIS applications
     }
 

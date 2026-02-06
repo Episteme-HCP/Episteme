@@ -23,7 +23,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.jscience.core.mathematics.linearalgebra.tensors.SparseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.backend.ExecutionContext;
@@ -46,8 +47,8 @@ public class CPUSparseTensorBackend implements TensorBackend {
                 org.jscience.core.mathematics.structures.rings.Ring<?> ringElem = (org.jscience.core.mathematics.structures.rings.Ring<?>) elementType
                         .getDeclaredConstructor().newInstance();
                 zero = (T) ringElem.zero();
-            } else if (Real.class.isAssignableFrom(elementType)) {
-                zero = (T) Real.ZERO;
+            } else if (org.jscience.core.mathematics.numbers.real.Real.class.isAssignableFrom(elementType)) {
+                zero = (T) org.jscience.core.mathematics.numbers.real.Real.ZERO;
             } else {
                 // Try default constructor generic fallback
                 T instance = elementType.getDeclaredConstructor().newInstance();
@@ -193,6 +194,11 @@ public class CPUSparseTensorBackend implements TensorBackend {
     @Override
     public String getId() {
         return "cpusparse";
+    }
+
+    @Override
+    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.jscience.core.technical.backend.HardwareAccelerator.CPU;
     }
 
     @Override

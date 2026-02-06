@@ -23,6 +23,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors;
 
+import org.jscience.core.mathematics.linearalgebra.Tensor;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

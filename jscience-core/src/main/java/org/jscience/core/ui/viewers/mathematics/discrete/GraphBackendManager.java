@@ -68,8 +68,16 @@ public class GraphBackendManager extends AbstractBackendManager<GraphBackend> {
         if ("auto".equalsIgnoreCase(preferredId)) {
             return selectBestBackend();
         }
-        GraphBackend b = select(preferredId);
+        GraphBackend b = INSTANCE.managerSelect(preferredId);
         return (b != null) ? b : selectBestBackend();
+    }
+
+    public static GraphBackend staticSelect(String name) {
+        return INSTANCE.managerSelect(name);
+    }
+
+    public static java.util.Collection<GraphBackend> staticAllBackends() {
+        return INSTANCE.managerAll();
     }
 
     @Override

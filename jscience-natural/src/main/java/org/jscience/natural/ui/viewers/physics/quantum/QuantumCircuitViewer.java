@@ -36,7 +36,7 @@ import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.NumericParameter;
 import org.jscience.core.ui.BooleanParameter;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
-import org.jscience.core.technical.backend.BackendManager;
+import org.jscience.natural.physics.quantum.QuantumBackendManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +58,8 @@ public final class QuantumCircuitViewer extends AbstractViewer {
     public QuantumCircuitViewer() {
         // Try to find a quantum backend
         try {
-            this.quantumBackend = (QuantumBackend) BackendManager.getAllBackends().stream()
-                    .filter(b -> b instanceof QuantumBackend && b.isAvailable())
+            this.quantumBackend = QuantumBackendManager.staticAllBackends().stream()
+                    .filter(QuantumBackend::isAvailable)
                     .findFirst()
                     .orElse(null);
         } catch (Exception e) {

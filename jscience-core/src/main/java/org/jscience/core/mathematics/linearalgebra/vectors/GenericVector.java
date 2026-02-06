@@ -24,13 +24,14 @@
 package org.jscience.core.mathematics.linearalgebra.vectors;
 
 import org.jscience.core.ComputeContext;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
+// import org.jscience.core.mathematics.linearalgebra.tensors.Tensor; // Removed incorrect import (Tensor is in linearalgebra package)
 import org.jscience.core.mathematics.structures.rings.Ring;
 
 /**

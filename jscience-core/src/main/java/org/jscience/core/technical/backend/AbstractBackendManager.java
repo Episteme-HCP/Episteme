@@ -51,7 +51,7 @@ public abstract class AbstractBackendManager<T extends Backend> {
     public void refresh() {
         ServiceLoader<T> loader = ServiceLoader.load(backendClass);
         for (T backend : loader) {
-            registerBackend(backend);
+            managerRegister(backend);
         }
         if (defaultBackend == null) {
             defaultBackend = selectBestBackend();
@@ -63,7 +63,7 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * 
      * @return the default backend
      */
-    public T getDefault() {
+    public T managerDefault() {
         if (defaultBackend == null) {
             throw new IllegalStateException("No backends available for " + backendClass.getSimpleName());
         }
@@ -76,7 +76,7 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * @param name the backend name or ID
      * @return the backend, or null if not found
      */
-    public T select(String name) {
+    public T managerSelect(String name) {
         if (name == null) return null;
         T b = backends.get(name);
         if (b == null) {
@@ -93,8 +93,8 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * 
      * @param name the backend name or ID
      */
-    public void setDefault(String name) {
-        T backend = select(name);
+    public void managerSetDefault(String name) {
+        T backend = managerSelect(name);
         if (backend == null) {
             throw new IllegalArgumentException("Backend not found: " + name);
         }
@@ -109,7 +109,7 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * 
      * @param backend the backend to register
      */
-    public void registerBackend(T backend) {
+    public void managerRegister(T backend) {
         backends.put(backend.getName(), backend);
     }
 
@@ -118,14 +118,14 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * 
      * @return collection of backends
      */
-    public Collection<T> getAllBackends() {
+    public Collection<T> managerAll() {
         return Collections.unmodifiableCollection(backends.values());
     }
 
     /**
      * Returns names of available backends.
      */
-    public Collection<String> getAvailableNames() {
+    public Collection<String> managerNames() {
         return Collections.unmodifiableSet(backends.keySet());
     }
 

@@ -25,8 +25,6 @@ package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 
-import org.jscience.core.technical.backend.BackendProvider;
-
 /**
  * BackendProvider for JFreeChart 2D plotting.
  * Available when JFreeChart library is on classpath.
@@ -34,7 +32,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JFreeChartPlot2DBackendProvider implements PlottingBackendProvider {
+public class JFreeChartPlot2DBackendProvider implements PlottingBackend {
 
     @Override
     public String getType() {
@@ -73,7 +71,7 @@ public class JFreeChartPlot2DBackendProvider implements PlottingBackendProvider 
     @Override public boolean isSupported2D() { return true; }
     @Override public boolean isSupported3D() { return false; }
 
-    @Override Object createBackend() {
+    @Override public Object createBackend() {
         return new JFreeChartPlot2D("");
     }
 }

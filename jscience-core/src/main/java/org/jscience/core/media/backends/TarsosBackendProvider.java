@@ -23,9 +23,9 @@
 
 package org.jscience.core.media.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 
-public class TarsosBackendProvider implements BackendProvider {
+public class TarsosBackendProvider implements Backend {
     @Override public String getType() { return "audio"; }
     @Override public String getId() { return "tarsos"; }
     @Override public String getName() { return "TarsosDSP (Scientific)"; }

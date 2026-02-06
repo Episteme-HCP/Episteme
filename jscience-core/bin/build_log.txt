@@ -1,0 +1,552 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< org.jscience:jscience-core >---------------------
+[INFO] Building JScience Core Engine 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-core ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-core\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-core ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-core\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- os:1.7.1:detect (default) @ jscience-core ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-core ---
+[INFO] Copying 59 resources from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] The encoding used to copy filtered properties files have not been set. This means that the same encoding will be used to copy filtered properties files as when copying other filtered resources. This might not be what you want! Run your build with --debug to see which files might be affected. Read more at https://maven.apache.org/plugins/maven-resources-plugin/examples/filtering-properties-files.html
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-core ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 1236 source files with javac [debug release 21] to target\classes
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/loaders/NeuralModelReader.java: C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\core\mathematics\loaders\NeuralModelReader.java uses unchecked or unsafe operations.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/loaders/NeuralModelReader.java: Recompile with -Xlint:unchecked for details.
+[INFO] Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] using incubating module(s): jdk.incubator.vector
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/loaders/openmath/OMSymbol.java:[72,19] deprecated item is not annotated with @Deprecated
+[INFO] 2 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[27,45] cannot find symbol
+  symbol:   class LinearAlgebraProvider
+  location: package org.jscience.core.technical.algorithm
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[48,15] cannot find symbol
+  symbol:   class LinearAlgebraProvider
+  location: class org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[51,52] cannot find symbol
+  symbol:   class LinearAlgebraProvider
+  location: class org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[3,59] cannot find symbol
+  symbol:   class Tensor
+  location: package org.jscience.core.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[20,13] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[21,13] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[27,22] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[31,22] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[35,25] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[81,13] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[88,12] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[89,12] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[90,25] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[311,25] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[346,23] cannot find symbol
+  symbol:   class Tensor
+  location: interface org.jscience.core.mathematics.ml.neural.autograd.GraphNode.BackwardFunc<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[28,66] cannot find symbol
+  symbol:   class Plot3D
+  location: package org.jscience.core.ui.viewers.mathematics.analysis.plotting
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[49,37] cannot find symbol
+  symbol: class Plot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[59,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[83,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[97,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[103,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[108,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[116,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[122,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[127,31] cannot find symbol
+  symbol:   class Colormap
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[127,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JSparseTensorBackend.java:[44,49] cannot find symbol
+  symbol: class TensorBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/layers/Linear.java:[6,51] cannot find symbol
+  symbol:   class TensorFactory
+  location: package org.jscience.core.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/matrices/SIMDRealDoubleMatrix.java:[15,59] cannot find symbol
+  symbol:   class CPUDenseLinearAlgebraProvider
+  location: package org.jscience.core.technical.algorithm.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.java:[26,59] cannot find symbol
+  symbol:   class CPUDenseTensorBackend
+  location: package org.jscience.core.technical.algorithm.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.java:[27,45] cannot find symbol
+  symbol:   class TensorBackend
+  location: package org.jscience.core.technical.algorithm
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.java:[47,56] cannot find symbol
+  symbol: class TensorBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/real/FunctionExplorer2DViewer.java:[37,66] cannot find symbol
+  symbol:   class Plot2D
+  location: package org.jscience.core.ui.viewers.mathematics.analysis.plotting
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[28,66] cannot find symbol
+  symbol:   class Plot2D
+  location: package org.jscience.core.ui.viewers.mathematics.analysis.plotting
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[47,38] cannot find symbol
+  symbol: class Plot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[63,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[83,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[101,79] cannot find symbol
+  symbol:   class SeriesStyle
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[101,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[116,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[122,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[129,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[137,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[143,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[150,12] cannot find symbol
+  symbol:   class Plot2D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3DBackendProvider.java:[28,43] cannot find symbol
+  symbol:   class BackendProvider
+  location: package org.jscience.core.technical.backend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3DBackendProvider.java:[37,52] cannot find symbol
+  symbol: class PlottingBackendProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/DistributedLinearAlgebraProvider.java:[29,19] cannot find symbol
+  symbol:   class CPUDenseLinearAlgebraProvider
+  location: class org.jscience.core.technical.algorithm.linearalgebra.DistributedLinearAlgebraProvider<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/cpu/CPUBackend.java:[88,12] cannot find symbol
+  symbol:   class HardwareAccelerator
+  location: class org.jscience.core.technical.backend.cpu.CPUBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[200,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[262,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[285,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[314,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[319,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[324,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[331,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[337,37] package Plot3D does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[337,12] cannot find symbol
+  symbol:   class Plot3D
+  location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[29,45] cannot find symbol
+  symbol:   class LinearAlgebraProvider
+  location: package org.jscience.core.technical.algorithm
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[34,59] cannot find symbol
+  symbol:   class CPUDenseLinearAlgebraProvider
+  location: package org.jscience.core.technical.algorithm.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[58,54] cannot find symbol
+  symbol: class LinearAlgebraProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[63,13] cannot find symbol
+  symbol:   class LinearAlgebraProvider
+  location: class org.jscience.core.mathematics.linearalgebra.providers.EJMLLinearAlgebraProvider<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[164,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[188,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[196,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[204,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[71,9] cannot find symbol
+  symbol:   class LinearAlgebraProvider
+  location: class org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[110,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[123,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[139,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[160,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[188,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[198,17] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[215,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[227,17] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[242,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[250,17] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[269,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[287,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[319,9] cannot find symbol
+  symbol:   class Tensor
+  location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3DBackendProvider.java:[71,22] createBackend() in org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3DBackendProvider cannot implement createBackend() in org.jscience.core.technical.backend.Backend
+  attempting to assign weaker access privileges; was public
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[44,8] org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend is not abstract and does not override abstract method getAcceleratorType() in org.jscience.core.technical.backend.ComputeBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[63,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[64,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[64,120] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[114,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[115,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[115,120] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[58,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[82,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[96,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[102,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[107,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[115,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[121,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[126,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[131,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[146,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CPUDenseLinearAlgebraProvider.java:[74,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CPUDenseLinearAlgebraProvider.java:[377,30] package org.jscience.util does not exist
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  34.777 s
+[INFO] Finished at: 2026-02-05T22:08:33+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project jscience-core: Compilation failure: Compilation failure: 
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[27,45] cannot find symbol
+[ERROR]   symbol:   class LinearAlgebraProvider
+[ERROR]   location: package org.jscience.core.technical.algorithm
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[48,15] cannot find symbol
+[ERROR]   symbol:   class LinearAlgebraProvider
+[ERROR]   location: class org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[51,52] cannot find symbol
+[ERROR]   symbol:   class LinearAlgebraProvider
+[ERROR]   location: class org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[3,59] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: package org.jscience.core.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[20,13] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[21,13] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[27,22] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[31,22] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[35,25] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[81,13] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[88,12] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[89,12] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[90,25] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[311,25] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[346,23] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: interface org.jscience.core.mathematics.ml.neural.autograd.GraphNode.BackwardFunc<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[28,66] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: package org.jscience.core.ui.viewers.mathematics.analysis.plotting
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[49,37] cannot find symbol
+[ERROR]   symbol: class Plot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[59,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[83,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[97,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[103,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[108,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[116,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[122,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[127,31] cannot find symbol
+[ERROR]   symbol:   class Colormap
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[127,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JSparseTensorBackend.java:[44,49] cannot find symbol
+[ERROR]   symbol: class TensorBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/layers/Linear.java:[6,51] cannot find symbol
+[ERROR]   symbol:   class TensorFactory
+[ERROR]   location: package org.jscience.core.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/matrices/SIMDRealDoubleMatrix.java:[15,59] cannot find symbol
+[ERROR]   symbol:   class CPUDenseLinearAlgebraProvider
+[ERROR]   location: package org.jscience.core.technical.algorithm.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.java:[26,59] cannot find symbol
+[ERROR]   symbol:   class CPUDenseTensorBackend
+[ERROR]   location: package org.jscience.core.technical.algorithm.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.java:[27,45] cannot find symbol
+[ERROR]   symbol:   class TensorBackend
+[ERROR]   location: package org.jscience.core.technical.algorithm
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.java:[47,56] cannot find symbol
+[ERROR]   symbol: class TensorBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/real/FunctionExplorer2DViewer.java:[37,66] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: package org.jscience.core.ui.viewers.mathematics.analysis.plotting
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[28,66] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: package org.jscience.core.ui.viewers.mathematics.analysis.plotting
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[47,38] cannot find symbol
+[ERROR]   symbol: class Plot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[63,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[83,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[101,79] cannot find symbol
+[ERROR]   symbol:   class SeriesStyle
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[101,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[116,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[122,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[129,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[137,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[143,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/XChartPlot2D.java:[150,12] cannot find symbol
+[ERROR]   symbol:   class Plot2D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3DBackendProvider.java:[28,43] cannot find symbol
+[ERROR]   symbol:   class BackendProvider
+[ERROR]   location: package org.jscience.core.technical.backend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3DBackendProvider.java:[37,52] cannot find symbol
+[ERROR]   symbol: class PlottingBackendProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/DistributedLinearAlgebraProvider.java:[29,19] cannot find symbol
+[ERROR]   symbol:   class CPUDenseLinearAlgebraProvider
+[ERROR]   location: class org.jscience.core.technical.algorithm.linearalgebra.DistributedLinearAlgebraProvider<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/cpu/CPUBackend.java:[88,12] cannot find symbol
+[ERROR]   symbol:   class HardwareAccelerator
+[ERROR]   location: class org.jscience.core.technical.backend.cpu.CPUBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[200,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[262,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[285,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[314,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[319,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[324,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[331,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[337,37] package Plot3D does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3D.java:[337,12] cannot find symbol
+[ERROR]   symbol:   class Plot3D
+[ERROR]   location: class org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[29,45] cannot find symbol
+[ERROR]   symbol:   class LinearAlgebraProvider
+[ERROR]   location: package org.jscience.core.technical.algorithm
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[34,59] cannot find symbol
+[ERROR]   symbol:   class CPUDenseLinearAlgebraProvider
+[ERROR]   location: package org.jscience.core.technical.algorithm.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[58,54] cannot find symbol
+[ERROR]   symbol: class LinearAlgebraProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[63,13] cannot find symbol
+[ERROR]   symbol:   class LinearAlgebraProvider
+[ERROR]   location: class org.jscience.core.mathematics.linearalgebra.providers.EJMLLinearAlgebraProvider<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[164,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[188,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[196,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[204,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/vectors/GenericVector.java:[71,9] cannot find symbol
+[ERROR]   symbol:   class LinearAlgebraProvider
+[ERROR]   location: class org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<E>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[110,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[123,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[139,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[160,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[188,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[198,17] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[215,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[227,17] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[242,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[250,17] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[269,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[287,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/ml/neural/autograd/GraphNode.java:[319,9] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: class org.jscience.core.mathematics.ml.neural.autograd.GraphNode<T>
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/JavaFXPlot3DBackendProvider.java:[71,22] createBackend() in org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3DBackendProvider cannot implement createBackend() in org.jscience.core.technical.backend.Backend
+[ERROR]   attempting to assign weaker access privileges; was public
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[44,8] org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend is not abstract and does not override abstract method getAcceleratorType() in org.jscience.core.technical.backend.ComputeBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[63,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[64,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[64,120] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[114,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[115,58] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/tensors/backends/CPUDenseTensorBackend.java:[115,120] package org.jscience.mathematics.structures.rings does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[58,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[82,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[96,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[102,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[107,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[115,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[121,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[126,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[131,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ui/viewers/mathematics/analysis/plotting/backends/Jzy3dPlot3D.java:[146,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CPUDenseLinearAlgebraProvider.java:[74,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CPUDenseLinearAlgebraProvider.java:[377,30] package org.jscience.util does not exist
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

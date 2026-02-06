@@ -23,8 +23,6 @@
 
 package org.jscience.natural.chemistry.elements;
 
-import org.jscience.natural.chemistry.Element;
-
 /**
  * A class representing transition metals.
  * * @author Silvere Martin-Michiellot

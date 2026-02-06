@@ -7,7 +7,7 @@ package org.jscience.core.mathematics.linearalgebra.algorithms;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.matrices.SIMDDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.ComputeContext;
@@ -40,11 +40,11 @@ public class MatrixMultiplicationPlanner {
     public static Matrix<Real> multiply(Matrix<Real> A, Matrix<Real> B) {
         int n = Math.max(A.rows(), A.cols());
         
-        if (A instanceof SIMDDoubleMatrix && B instanceof SIMDDoubleMatrix) {
+        if (A instanceof SIMDRealDoubleMatrix && B instanceof SIMDRealDoubleMatrix) {
             if (n >= STRASSEN_THRESHOLD && isPowerOfTwo(n)) {
-                return RealDoubleStrassenAlgorithm.multiply((SIMDDoubleMatrix) A, (SIMDDoubleMatrix) B);
+                return RealDoubleStrassenAlgorithm.multiply((SIMDRealDoubleMatrix) A, (SIMDRealDoubleMatrix) B);
             }
-            return RealDoubleCARMAAlgorithm.multiply((SIMDDoubleMatrix) A, (SIMDDoubleMatrix) B);
+            return RealDoubleCARMAAlgorithm.multiply((SIMDRealDoubleMatrix) A, (SIMDRealDoubleMatrix) B);
         }
         
         if (n >= STRASSEN_THRESHOLD && isPowerOfTwo(n)) {

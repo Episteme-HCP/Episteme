@@ -26,8 +26,6 @@ package org.jscience.core.mathematics.ml.neural.layers;
 import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.ActivationFunction;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Generic activation layer that applies a specified {@link ActivationFunction}.

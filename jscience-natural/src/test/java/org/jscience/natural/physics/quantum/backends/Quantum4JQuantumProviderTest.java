@@ -20,7 +20,7 @@ public class Quantum4JQuantumProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(Quantum4JQuantumProvider.class);
+        assertNotNull(Quantum4JBackendProvider.class);
     }
 }
 

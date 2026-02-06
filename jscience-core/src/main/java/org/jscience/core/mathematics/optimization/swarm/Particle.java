@@ -22,7 +22,6 @@
  */
 package org.jscience.core.mathematics.optimization.swarm;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**

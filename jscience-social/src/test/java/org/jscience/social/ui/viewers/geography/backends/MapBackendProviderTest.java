@@ -34,11 +34,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MapBackendTest {
+public class MapBackendProviderTest {
 
     @Test
     void testJavaFXMapBackend() {
-        JavaFXMapBackend provider = new JavaFXMapBackend();
+        JavaFXMapBackendProvider provider = new JavaFXMapBackendProvider();
         
         assertEquals("map", provider.getType());
         assertEquals("javafx_map", provider.getId());
@@ -50,7 +50,7 @@ public class MapBackendTest {
 
     @Test
     void testGeoToolsBackend() {
-        GeoToolsBackend provider = new GeoToolsBackend();
+        GeoToolsBackendProvider provider = new GeoToolsBackendProvider();
         
         assertEquals("map", provider.getType());
         assertEquals("geotools", provider.getId());
@@ -62,7 +62,7 @@ public class MapBackendTest {
 
     @Test
     void testOpenMapBackend() {
-        OpenMapBackend provider = new OpenMapBackend();
+        OpenMapBackendProvider provider = new OpenMapBackendProvider();
         
         assertEquals("map", provider.getType());
         assertEquals("openmap", provider.getId());
@@ -73,7 +73,7 @@ public class MapBackendTest {
 
     @Test
     void testUnfoldingMapBackend() {
-        UnfoldingMapBackend provider = new UnfoldingMapBackend();
+        UnfoldingMapBackendProvider provider = new UnfoldingMapBackendProvider();
         
         assertEquals("map", provider.getType());
         assertEquals("unfolding", provider.getId());
@@ -84,7 +84,7 @@ public class MapBackendTest {
 
     @Test
     void testGoogleGeoChartBackend() {
-        GoogleGeoChartBackend provider = new GoogleGeoChartBackend();
+        GoogleGeoChartBackendProvider provider = new GoogleGeoChartBackendProvider();
         
         assertEquals("map", provider.getType());
         assertEquals("geochart", provider.getId());

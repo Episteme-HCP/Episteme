@@ -27,6 +27,7 @@ public class BackendDiscovery {
     public static final String TYPE_GRAPH = "graph";
     public static final String TYPE_AUDIO = "audio";
     public static final String TYPE_DISTRIBUTED = "distributed";
+    public static final String TYPE_NETWORK = "network";
 
     private static final BackendDiscovery INSTANCE = new BackendDiscovery();
 

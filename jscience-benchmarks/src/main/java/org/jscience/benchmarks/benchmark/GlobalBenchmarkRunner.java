@@ -20,7 +20,9 @@ public class GlobalBenchmarkRunner {
         // 1. FFT Benchmarks
         try {
             System.out.println("[FFT Benchmarks]");
-            FFTBenchmark.execute();
+            FFTBenchmark b = new FFTBenchmark();
+            b.setup();
+            SimpleBenchmarkRunner.run("FFT (Size 4096)", b::run);
         } catch (Exception e) {
             System.err.println("FFT Benchmark failed: " + e.getMessage());
         }

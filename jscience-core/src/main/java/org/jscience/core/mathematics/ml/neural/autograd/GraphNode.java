@@ -1,6 +1,6 @@
 package org.jscience.core.mathematics.ml.neural.autograd;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.*;
 

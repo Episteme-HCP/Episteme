@@ -47,6 +47,30 @@ public class QuantumBackendManager extends AbstractBackendManager<QuantumBackend
         return INSTANCE;
     }
 
+    public static QuantumBackend staticSelect(String name) {
+        return INSTANCE.managerSelect(name);
+    }
+
+    public static java.util.Collection<QuantumBackend> staticAllBackends() {
+        return INSTANCE.managerAll();
+    }
+
+    /**
+     * @deprecated Use staticSelect
+     */
+    @Deprecated
+    public static QuantumBackend select(String name) {
+        return staticSelect(name);
+    }
+
+    /**
+     * @deprecated Use staticAllBackends
+     */
+    @Deprecated
+    public static java.util.Collection<QuantumBackend> getAllBackends() {
+        return staticAllBackends();
+    }
+
     private String preferredId = "auto";
 
     private QuantumBackendManager() {
@@ -76,7 +100,7 @@ public class QuantumBackendManager extends AbstractBackendManager<QuantumBackend
         if ("auto".equalsIgnoreCase(preferredId)) {
             return selectBestBackend();
         }
-        QuantumBackend backend = select(preferredId);
+        QuantumBackend backend = managerSelect(preferredId);
         return (backend != null) ? backend : selectBestBackend();
     }
 

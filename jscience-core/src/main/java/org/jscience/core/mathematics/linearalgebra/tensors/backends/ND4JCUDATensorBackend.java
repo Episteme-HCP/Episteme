@@ -23,6 +23,8 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
 
+import org.jscience.core.technical.backend.HardwareAccelerator;
+
 /**
  * ND4J CUDA (GPU) Tensor Provider.
  *
@@ -31,6 +33,11 @@ package org.jscience.core.mathematics.linearalgebra.tensors.backends;
  * @since 1.0
  */
 public class ND4JCUDATensorBackend extends ND4JBaseTensorBackend {
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.GPU;
+    }
 
     @Override
     protected boolean checkAvailability() {

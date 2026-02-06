@@ -61,6 +61,7 @@ public class JavaFXMapBackendProvider implements MapBackend {
     }
 
     @Override
+    public int getPriority() {
         return 10; // Base priority, fallback option
     }
 

@@ -76,14 +76,15 @@ public class NativeFITSReader extends AbstractResourceReader<NativeMatrix> imple
         }
     }
 
-    public FITSReader() {
+    public NativeFITSReader() {
         this.fitsPtr = MemorySegment.NULL;
         this.isShared = false;
     }
 
-    public FITSReader(Path path) {
+    public NativeFITSReader(Path path) {
         if (!AVAILABLE) throw new UnsupportedOperationException("cfitsio native library not found");
         this.isShared = true;
+        MemorySegment ptr = MemorySegment.NULL;
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment pathSegment = arena.allocateFrom(path.toString());
             MemorySegment fptrPtr = arena.allocate(ValueLayout.ADDRESS);
@@ -94,17 +95,18 @@ public class NativeFITSReader extends AbstractResourceReader<NativeMatrix> imple
             int res = (int) FFOPEN.invokeExact(fptrPtr, pathSegment, 0, status);
             if (res != 0) throw new RuntimeException("cfitsio error opening file: " + res);
             
-            this.fitsPtr = fptrPtr.get(ValueLayout.ADDRESS, 0);
+            ptr = fptrPtr.get(ValueLayout.ADDRESS, 0);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to open FITS file: " + path, t);
         }
+        this.fitsPtr = ptr;
     }
 
     /**
      * Opens a FITS file and reads the image data.
      */
     public static NativeMatrix open(String path) throws Exception {
-        try (FITSReader reader = new FITSReader()) {
+        try (NativeFITSReader reader = new NativeFITSReader()) {
             return reader.load(path);
         }
     }
@@ -121,7 +123,7 @@ public class NativeFITSReader extends AbstractResourceReader<NativeMatrix> imple
     @Override
     protected NativeMatrix loadFromSource(String resourceId) throws Exception {
         Path path = Paths.get(resourceId);
-        try (FITSReader reader = new FITSReader(path)) {
+        try (NativeFITSReader reader = new NativeFITSReader(path)) {
             long naxis1 = reader.readKeyLong("NAXIS1");
             long naxis2 = reader.readKeyLong("NAXIS2");
             

@@ -25,7 +25,6 @@ package org.jscience.social.sports;
 
 import java.io.Serializable;
 import java.util.List;
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Time;
 import org.jscience.core.measure.quantity.Dimensionless;

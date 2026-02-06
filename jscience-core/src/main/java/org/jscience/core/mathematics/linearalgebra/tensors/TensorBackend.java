@@ -24,8 +24,8 @@
 package org.jscience.core.mathematics.linearalgebra.tensors;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-
 import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.technical.algorithm.TensorProvider;
 
 /**
  * Service Provider Interface for tensor implementations.
@@ -42,7 +42,12 @@ import org.jscience.core.technical.backend.ComputeBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface TensorBackend extends ComputeBackend {
+public interface TensorBackend extends ComputeBackend, TensorProvider {
+
+    @Override
+    default boolean isAvailable() {
+        return true;
+    }
 
     /**
      * Creates a tensor with the given shape, filled with zeros.

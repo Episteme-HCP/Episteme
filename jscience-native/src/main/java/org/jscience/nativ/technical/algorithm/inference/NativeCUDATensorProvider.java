@@ -23,7 +23,7 @@
 
 package org.jscience.nativ.technical.algorithm.inference;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.technical.algorithm.TensorProvider;
 
 /**

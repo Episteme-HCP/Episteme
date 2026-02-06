@@ -1,0 +1,5 @@
+# Quantum Backend Providers for JScience Natural
+org.jscience.natural.physics.quantum.backends.StrangeBackendProvider
+org.jscience.natural.physics.quantum.backends.Quantum4JBackendProvider
+org.jscience.natural.physics.quantum.backends.QiskitBackendProvider
+org.jscience.natural.physics.quantum.backends.AmazonBraketBackendProvider

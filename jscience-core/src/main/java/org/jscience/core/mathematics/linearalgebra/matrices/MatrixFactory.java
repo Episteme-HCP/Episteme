@@ -24,10 +24,12 @@
 package org.jscience.core.mathematics.linearalgebra.matrices;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.*;
+import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -168,7 +170,7 @@ public final class MatrixFactory {
                     }
                     // Use SIMDDoubleMatrix directly if applicable
                     @SuppressWarnings("unchecked")
-                    Matrix<E> m = (Matrix<E>) new SIMDDoubleMatrix(rows, cols, flatData);
+                    Matrix<E> m = (Matrix<E>) new SIMDRealDoubleMatrix(rows, cols, flatData);
                     return m;
                 }
                 // Flatten for DenseMatrix constructor
@@ -278,7 +280,8 @@ public final class MatrixFactory {
      * @return a new Matrix instance
      */
     private static <E> LinearAlgebraProvider<E> getProvider(Ring<E> ring) {
-        return new CPUDenseLinearAlgebraProvider<>(ring);
+        Field<E> field = (Field<E>) ring;
+        return new CPUDenseLinearAlgebraProvider<E>(field);
     }
 
     /**
@@ -340,7 +343,7 @@ public final class MatrixFactory {
                         }
                     }
                     @SuppressWarnings("unchecked")
-                    Matrix<E> m = (Matrix<E>) new SIMDDoubleMatrix(rows, cols, flatData);
+                    Matrix<E> m = (Matrix<E>) new SIMDRealDoubleMatrix(rows, cols, flatData);
                     return m;
                 }
                 return new DenseMatrix<E>(data, ring);

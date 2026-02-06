@@ -19,9 +19,11 @@ public class OpenCLFFTProviderTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable
-        // TODO: Enable once OpenCLFFTProvider is implemented in Phase 10
-        // assertNotNull(OpenCLFFTProvider.class);
+        // Placeholder test for OpenCLFFTProvider (to be implemented in Phase 10)
+        // When implemented, this test should verify:
+        // - OpenCLFFTProvider.class is reachable
+        // - OpenCL library availability detection works
+        // - Basic FFT operations execute correctly on GPU
     }
 }
 

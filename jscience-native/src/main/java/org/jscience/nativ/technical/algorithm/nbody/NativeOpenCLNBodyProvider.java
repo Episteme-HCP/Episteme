@@ -18,12 +18,12 @@ import java.util.logging.Logger;
  * @since 1.2
  */
 public class NativeOpenCLNBodyProvider implements NBodyProvider {
-    private static final Logger LOGGER = Logger.getLogger(OpenCLNBodyProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLNBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
     private final boolean gpuAvailable;
 
-    public OpenCLNBodyProvider() {
+    public NativeOpenCLNBodyProvider() {
         boolean available = false;
         try {
             OpenCLBackend backend = new OpenCLBackend();

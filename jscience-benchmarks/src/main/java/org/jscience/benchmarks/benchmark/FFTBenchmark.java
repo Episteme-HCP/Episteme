@@ -95,35 +95,6 @@ public class FFTBenchmark implements RunnableBenchmark {
         }
         return data;
     }
-
-    // Simple recursive implementation for comparison
-    private static Complex[] basicFFT(Complex[] x) {
-        int n = x.length;
-        if (n == 1)
-            return new Complex[] { x[0] };
-
-        if (n % 2 != 0)
-            throw new IllegalArgumentException("n is not a power of 2");
-
-        Complex[] even = new Complex[n / 2];
-        Complex[] odd = new Complex[n / 2];
-        for (int i = 0; i < n / 2; i++) {
-            even[i] = x[2 * i];
-            odd[i] = x[2 * i + 1];
-        }
-
-        Complex[] q = basicFFT(even);
-        Complex[] r = basicFFT(odd);
-
-        Complex[] y = new Complex[n];
-        for (int k = 0; k < n / 2; k++) {
-            double kth = -2 * k * Math.PI / n;
-            Complex wk = Complex.of(Math.cos(kth), Math.sin(kth));
-            y[k] = q[k].add(wk.multiply(r[k]));
-            y[k + n / 2] = q[k].subtract(wk.multiply(r[k]));
-        }
-        return y;
-    }
 }
 
 

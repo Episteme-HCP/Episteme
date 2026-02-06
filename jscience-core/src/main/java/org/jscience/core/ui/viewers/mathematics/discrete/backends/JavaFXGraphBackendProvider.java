@@ -24,7 +24,6 @@
 package org.jscience.core.ui.viewers.mathematics.discrete.backends;
 
 import org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend;
-import org.jscience.core.technical.backend.Backend;
 
 /**
  * Backend for JavaFX graph renderer.

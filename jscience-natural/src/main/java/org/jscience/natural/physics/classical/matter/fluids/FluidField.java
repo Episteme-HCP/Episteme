@@ -24,7 +24,7 @@
 package org.jscience.natural.physics.classical.matter.fluids;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 
 /**
  * Represents a fluid field on an Eulerian grid.

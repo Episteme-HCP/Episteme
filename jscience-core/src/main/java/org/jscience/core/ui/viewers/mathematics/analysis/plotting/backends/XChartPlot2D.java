@@ -165,7 +165,7 @@ public class XChartPlot2D implements Plot2D {
 
     @Override
     public PlottingBackend getBackend() {
-        return PlottingBackend.XCHART;
+        return org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.staticSelect(PlottingBackend.XCHART);
     }
 }
 

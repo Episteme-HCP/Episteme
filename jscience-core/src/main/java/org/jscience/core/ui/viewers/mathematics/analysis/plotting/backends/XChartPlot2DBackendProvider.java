@@ -25,8 +25,6 @@ package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 
-import org.jscience.core.technical.backend.Backend;
-
 /**
  * Backend for XChart 2D plotting.
  * Available when XChart library is on classpath.
@@ -73,10 +71,7 @@ public class XChartPlot2DBackendProvider implements PlottingBackend {
     @Override public boolean isSupported2D() { return true; }
     @Override public boolean isSupported3D() { return false; }
 
-    @Override Object createBackend() {
+    @Override public Object createBackend() {
         return new XChartPlot2D("");
     }
 }
-
-
-

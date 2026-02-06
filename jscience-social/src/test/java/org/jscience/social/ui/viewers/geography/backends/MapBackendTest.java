@@ -5,6 +5,7 @@
 
 package org.jscience.social.ui.viewers.geography.backends;
 
+import org.jscience.social.ui.viewers.geography.MapBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

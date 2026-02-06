@@ -1,0 +1,121 @@
+[
+    {
+        "name": "Sun",
+        "spectralType": "G2V",
+        "mass": 1.9885e30,
+        "temperature": 5778,
+        "luminosity": 3.828e26,
+        "radius": 6.96e8,
+        "distance": 0
+    },
+    {
+        "name": "Sirius A",
+        "spectralType": "A1V",
+        "mass": 4.103e30,
+        "temperature": 9940,
+        "luminosity": 1.0e27,
+        "radius": 1.19e9,
+        "distance": 8.6,
+        "catalogId": "HIP32349"
+    },
+    {
+        "name": "Canopus",
+        "spectralType": "A9II",
+        "mass": 2.9e31,
+        "temperature": 7350,
+        "luminosity": 4.1e30,
+        "radius": 4.9e10,
+        "distance": 310,
+        "catalogId": "HIP30438"
+    },
+    {
+        "name": "Arcturus",
+        "spectralType": "K1.5III",
+        "mass": 2.18e30,
+        "temperature": 4286,
+        "luminosity": 6.5e28,
+        "radius": 1.7e10,
+        "distance": 36.7,
+        "catalogId": "HIP69673"
+    },
+    {
+        "name": "Vega",
+        "spectralType": "A0V",
+        "mass": 4.2e30,
+        "temperature": 9602,
+        "luminosity": 1.5e28,
+        "radius": 1.6e9,
+        "distance": 25.04,
+        "catalogId": "HIP91262"
+    },
+    {
+        "name": "Betelgeuse",
+        "spectralType": "M1-2Ia-Iab",
+        "mass": 3.3e31,
+        "temperature": 3600,
+        "luminosity": 4.8e31,
+        "radius": 6.1e11,
+        "distance": 548,
+        "catalogId": "HIP27989"
+    },
+    {
+        "name": "Rigel",
+        "spectralType": "B8Ia",
+        "mass": 4.2e31,
+        "temperature": 12100,
+        "luminosity": 4.6e31,
+        "radius": 5.5e10,
+        "distance": 860,
+        "catalogId": "HIP24436"
+    },
+    {
+        "name": "Bellatrix",
+        "spectralType": "B2III",
+        "mass": 1.7e31,
+        "temperature": 22000,
+        "luminosity": 3.5e30,
+        "radius": 4.0e9,
+        "distance": 250,
+        "catalogId": "HIP25336"
+    },
+    {
+        "name": "Mintaka",
+        "spectralType": "O9.5II",
+        "mass": 4.8e31,
+        "temperature": 29500,
+        "luminosity": 3.5e31,
+        "radius": 1.1e10,
+        "distance": 1200,
+        "catalogId": "HIP25930"
+    },
+    {
+        "name": "Alnilam",
+        "spectralType": "B0Ia",
+        "mass": 6.0e31,
+        "temperature": 27000,
+        "luminosity": 2.0e32,
+        "radius": 2.2e10,
+        "distance": 2000,
+        "catalogId": "HIP26311"
+    },
+    {
+        "name": "Alnitak",
+        "spectralType": "O9.5Iab",
+        "mass": 6.6e31,
+        "temperature": 29500,
+        "luminosity": 4.0e31,
+        "radius": 1.4e10,
+        "distance": 1260,
+        "catalogId": "HIP26727"
+    },
+    {
+        "name": "Saiph",
+        "spectralType": "B0.5Ia",
+        "mass": 3.1e31,
+        "temperature": 26000,
+        "luminosity": 2.2e31,
+        "radius": 1.5e10,
+        "distance": 650,
+        "catalogId": "HIP27366"
+    }
+]

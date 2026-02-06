@@ -41,6 +41,30 @@ public class MechanicsBackendManager extends AbstractBackendManager<MechanicsBac
         return INSTANCE;
     }
 
+    public static MechanicsBackend staticSelect(String name) {
+        return INSTANCE.managerSelect(name);
+    }
+
+    public static java.util.Collection<MechanicsBackend> staticAllBackends() {
+        return INSTANCE.managerAll();
+    }
+
+    /**
+     * @deprecated Use staticSelect
+     */
+    @Deprecated
+    public static MechanicsBackend select(String name) {
+        return staticSelect(name);
+    }
+
+    /**
+     * @deprecated Use staticAllBackends
+     */
+    @Deprecated
+    public static java.util.Collection<MechanicsBackend> getAllBackends() {
+        return staticAllBackends();
+    }
+
     private String preferredId = "auto";
 
     private MechanicsBackendManager() {
@@ -68,7 +92,7 @@ public class MechanicsBackendManager extends AbstractBackendManager<MechanicsBac
         if ("auto".equalsIgnoreCase(preferredId)) {
             return selectBestBackend();
         }
-        MechanicsBackend b = select(preferredId);
+        MechanicsBackend b = managerSelect(preferredId);
         return (b != null) ? b : selectBestBackend();
     }
 

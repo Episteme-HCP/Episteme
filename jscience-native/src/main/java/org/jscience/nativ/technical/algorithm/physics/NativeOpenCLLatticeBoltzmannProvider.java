@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class NativeOpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(OpenCLLatticeBoltzmannProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLLatticeBoltzmannProvider.class.getName());
     
     private static final int[][] D2Q9_VELOCITIES = {
             { 0, 0 }, { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 },
@@ -35,7 +35,7 @@ public class NativeOpenCLLatticeBoltzmannProvider implements LatticeBoltzmannPro
 
     private final boolean gpuAvailable;
 
-    public OpenCLLatticeBoltzmannProvider() {
+    public NativeOpenCLLatticeBoltzmannProvider() {
         boolean available = false;
         try {
             OpenCLBackend backend = new OpenCLBackend();

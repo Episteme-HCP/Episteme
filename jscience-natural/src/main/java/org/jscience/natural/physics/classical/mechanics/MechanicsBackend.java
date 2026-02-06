@@ -24,8 +24,6 @@
 package org.jscience.natural.physics.classical.mechanics;
 
 import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.natural.physics.classical.mechanics.RigidBody;
-import java.util.Collection;
 
 /**
  * Service Provider Interface for Physics Engines.
@@ -53,7 +51,7 @@ public interface MechanicsBackend extends ComputeBackend {
      * @param body the JScience RigidBody definition
      * @return the backend implementation
      */
-    RigidBodyBackend createRigidBody(RigidBody body);
+    NativeRigidBody createRigidBody(RigidBody body);
     
     @Override
     default String getType() {

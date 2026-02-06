@@ -51,42 +51,56 @@ public class BackendManager extends AbstractBackendManager<Backend> {
     /**
      * Returns the default backend.
      */
-    public static Backend getDefault() {
-        return INSTANCE.getDefault();
+    public static Backend staticGetDefault() {
+        return INSTANCE.managerDefault();
     }
 
     /**
      * Selects a backend by name.
      */
-    public static Backend select(String name) {
-        return INSTANCE.select(name);
+    public static Backend staticSelect(String name) {
+        return INSTANCE.managerSelect(name);
     }
 
     /**
      * Sets the default backend.
      */
-    public static void setDefault(String name) {
-        INSTANCE.setDefault(name);
+    public static void staticSetDefault(String name) {
+        INSTANCE.managerSetDefault(name);
+        // Backends are now persisted immediately on setXXX(), so mostly no need to save here
+        // except for legacy plotting/linear algebra fields kept in this class
+        // org.jscience.core.technical.backend.Backend b2d = (org.jscience.core.technical.backend.Backend) getPlottingBackend2D();
+        // org.jscience.core.technical.backend.Backend b3d = (org.jscience.core.technical.backend.Backend) getPlottingBackend3D();
+        // prefs.set("plotting.backend.2d", b2d != null ? b2d.getId() : "auto");
+        // prefs.set("plotting.backend.3d", b3d != null ? b3d.getId() : "auto");
+        // if (getLinearAlgebraProviderId() != null) prefs.set("linear.algebra.backend", getLinearAlgebraProviderId());
     }
 
     /**
      * Registers a backend.
      */
-    public static void registerBackend(Backend backend) {
-        INSTANCE.registerBackend(backend);
+    public static void staticRegister(Backend backend) {
+        INSTANCE.managerRegister(backend);
     }
 
     /**
      * Returns names of all registered backends.
      */
-    public static Collection<String> getAvailableBackendNames() {
-        return INSTANCE.getAvailableNames();
+    public static Collection<String> staticAvailableNames() {
+        return INSTANCE.managerNames();
     }
 
     /**
      * Returns all registered backends.
      */
-    public static Collection<Backend> getAllBackends() {
-        return INSTANCE.getAllBackends();
+    public static Collection<Backend> staticAllBackends() {
+        return INSTANCE.managerAll();
+    }
+
+    /**
+     * Returns providers by type using Discovery.
+     */
+    public static List<Backend> staticGetProvidersByType(String type) {
+        return BackendDiscovery.getInstance().getProvidersByType(type);
     }
 }

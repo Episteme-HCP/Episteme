@@ -67,6 +67,7 @@ public class UnfoldingMapBackendProvider implements MapBackend {
     }
 
     @Override
+    public int getPriority() {
         return 50; // Higher priority than JavaFX when available
     }
 

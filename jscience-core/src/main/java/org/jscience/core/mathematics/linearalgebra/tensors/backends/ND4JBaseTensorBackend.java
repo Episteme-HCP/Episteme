@@ -23,11 +23,10 @@
 
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
 
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorBackend;
-import org.jscience.core.technical.algorithm.TensorBackend;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
 
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.backend.ExecutionContext;

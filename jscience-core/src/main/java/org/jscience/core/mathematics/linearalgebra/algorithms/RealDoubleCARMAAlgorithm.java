@@ -1,6 +1,6 @@
 package org.jscience.core.mathematics.linearalgebra.algorithms;
 
-import org.jscience.core.mathematics.linearalgebra.matrices.SIMDDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 
 /**
  * Implementation of the CARMA Algorithm specialized for the double primitive type.
@@ -13,7 +13,7 @@ public class RealDoubleCARMAAlgorithm {
 
     private static final int RECURSION_THRESHOLD = 256; // Higher threshold for SIMD
 
-    public static SIMDDoubleMatrix multiply(SIMDDoubleMatrix A, SIMDDoubleMatrix B) {
+    public static SIMDRealDoubleMatrix multiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();
@@ -24,30 +24,30 @@ public class RealDoubleCARMAAlgorithm {
 
         // Base case: Use the SIMD-optimized multiply of SIMDDoubleMatrix
         if (m <= RECURSION_THRESHOLD && n <= RECURSION_THRESHOLD && k <= RECURSION_THRESHOLD) {
-            return (SIMDDoubleMatrix) A.multiply(B);
+            return (SIMDRealDoubleMatrix) A.multiply(B);
         }
 
         if (m >= n && m >= k) {
-            SIMDDoubleMatrix A1 = (SIMDDoubleMatrix) A.getSubMatrix(0, m / 2, 0, k);
-            SIMDDoubleMatrix A2 = (SIMDDoubleMatrix) A.getSubMatrix(m / 2, m, 0, k);
+            SIMDRealDoubleMatrix A1 = (SIMDRealDoubleMatrix) A.getSubMatrix(0, m / 2, 0, k);
+            SIMDRealDoubleMatrix A2 = (SIMDRealDoubleMatrix) A.getSubMatrix(m / 2, m, 0, k);
             return combineVertical(multiply(A1, B), multiply(A2, B));
         } else if (n >= m && n >= k) {
-            SIMDDoubleMatrix B1 = (SIMDDoubleMatrix) B.getSubMatrix(0, k, 0, n / 2);
-            SIMDDoubleMatrix B2 = (SIMDDoubleMatrix) B.getSubMatrix(0, k, n / 2, n);
+            SIMDRealDoubleMatrix B1 = (SIMDRealDoubleMatrix) B.getSubMatrix(0, k, 0, n / 2);
+            SIMDRealDoubleMatrix B2 = (SIMDRealDoubleMatrix) B.getSubMatrix(0, k, n / 2, n);
             return combineHorizontal(multiply(A, B1), multiply(A, B2));
         } else {
-            SIMDDoubleMatrix A1 = (SIMDDoubleMatrix) A.getSubMatrix(0, m, 0, k / 2);
-            SIMDDoubleMatrix A2 = (SIMDDoubleMatrix) A.getSubMatrix(0, m, k / 2, k);
-            SIMDDoubleMatrix B1 = (SIMDDoubleMatrix) B.getSubMatrix(0, k / 2, 0, n);
-            SIMDDoubleMatrix B2 = (SIMDDoubleMatrix) B.getSubMatrix(k / 2, k, 0, n);
+            SIMDRealDoubleMatrix A1 = (SIMDRealDoubleMatrix) A.getSubMatrix(0, m, 0, k / 2);
+            SIMDRealDoubleMatrix A2 = (SIMDRealDoubleMatrix) A.getSubMatrix(0, m, k / 2, k);
+            SIMDRealDoubleMatrix B1 = (SIMDRealDoubleMatrix) B.getSubMatrix(0, k / 2, 0, n);
+            SIMDRealDoubleMatrix B2 = (SIMDRealDoubleMatrix) B.getSubMatrix(k / 2, k, 0, n);
             
-            SIMDDoubleMatrix C1 = multiply(A1, B1);
-            SIMDDoubleMatrix C2 = multiply(A2, B2);
-            return (SIMDDoubleMatrix) C1.add(C2);
+            SIMDRealDoubleMatrix C1 = multiply(A1, B1);
+            SIMDRealDoubleMatrix C2 = multiply(A2, B2);
+            return (SIMDRealDoubleMatrix) C1.add(C2);
         }
     }
 
-    private static SIMDDoubleMatrix combineVertical(SIMDDoubleMatrix top, SIMDDoubleMatrix bottom) {
+    private static SIMDRealDoubleMatrix combineVertical(SIMDRealDoubleMatrix top, SIMDRealDoubleMatrix bottom) {
         int rows = top.rows() + bottom.rows();
         int cols = top.cols();
         double[] combinedData = new double[rows * cols];
@@ -55,10 +55,10 @@ public class RealDoubleCARMAAlgorithm {
         System.arraycopy(top.getInternalData(), 0, combinedData, 0, top.getInternalData().length);
         System.arraycopy(bottom.getInternalData(), 0, combinedData, top.getInternalData().length, bottom.getInternalData().length);
         
-        return new SIMDDoubleMatrix(rows, cols, combinedData);
+        return new SIMDRealDoubleMatrix(rows, cols, combinedData);
     }
 
-    private static SIMDDoubleMatrix combineHorizontal(SIMDDoubleMatrix left, SIMDDoubleMatrix right) {
+    private static SIMDRealDoubleMatrix combineHorizontal(SIMDRealDoubleMatrix left, SIMDRealDoubleMatrix right) {
         int rows = left.rows();
         int leftCols = left.cols();
         int rightCols = right.cols();
@@ -73,6 +73,6 @@ public class RealDoubleCARMAAlgorithm {
             System.arraycopy(rData, i * rightCols, combinedData, i * totalCols + leftCols, rightCols);
         }
         
-        return new SIMDDoubleMatrix(rows, totalCols, combinedData);
+        return new SIMDRealDoubleMatrix(rows, totalCols, combinedData);
     }
 }

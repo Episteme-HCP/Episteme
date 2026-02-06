@@ -33,4 +33,11 @@ public interface AlgorithmProvider {
     default boolean isAvailable() {
         return true;
     }
+
+    /**
+     * Returns the unique category of the algorithm.
+     */
+    default String getAlgorithmType() {
+        return "generic";
+    }
 }

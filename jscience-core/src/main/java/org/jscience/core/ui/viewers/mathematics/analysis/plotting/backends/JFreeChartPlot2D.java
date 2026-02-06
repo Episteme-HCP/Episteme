@@ -35,6 +35,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.Plot2D;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlotFormat;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
+import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -175,7 +176,7 @@ public class JFreeChartPlot2D implements Plot2D {
 
     @Override
     public PlottingBackend getBackend() {
-        return PlottingBackend.JFREECHART;
+        return PlottingBackendManager.staticSelect(PlottingBackend.JFREECHART);
     }
 }
 

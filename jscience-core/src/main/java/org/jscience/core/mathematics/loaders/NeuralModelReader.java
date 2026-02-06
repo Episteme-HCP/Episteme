@@ -5,9 +5,8 @@
 
 package org.jscience.core.mathematics.loaders;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
-import org.jscience.core.mathematics.ml.neural.ActivationFunction;
 import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import org.jscience.core.mathematics.numbers.real.Real;

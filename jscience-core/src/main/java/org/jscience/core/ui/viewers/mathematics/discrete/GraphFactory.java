@@ -27,7 +27,6 @@ import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.ui.viewers.mathematics.discrete.backends.JavaFXGraphBackendProvider;
 
 import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Factory for creating graphs using SPI-based backend discovery.
@@ -75,7 +74,7 @@ public class GraphFactory {
      */
     private static Backend getBackendProvider() {
         if (selectedBackendId != null) {
-             GraphBackend b = GraphBackendManager.getInstance().select(selectedBackendId);
+             GraphBackend b = GraphBackendManager.staticSelect(selectedBackendId);
              if (b != null && b.isAvailable()) {
                 return b;
              }
@@ -87,14 +86,14 @@ public class GraphFactory {
      * Returns all discovered graph backend providers.
      */
     public static Collection<GraphBackend> getAvailableBackends() {
-        return GraphBackendManager.getInstance().getAllBackends();
+        return GraphBackendManager.staticAllBackends();
     }
 
     /**
      * Checks if a specific backend is available.
      */
     public static boolean isBackendAvailable(String backendId) {
-        GraphBackend b = GraphBackendManager.getInstance().select(backendId);
+        GraphBackend b = GraphBackendManager.staticSelect(backendId);
         return b != null && b.isAvailable();
     }
 }

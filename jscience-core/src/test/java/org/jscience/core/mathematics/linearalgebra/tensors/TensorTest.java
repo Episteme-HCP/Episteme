@@ -26,6 +26,7 @@ package org.jscience.core.mathematics.linearalgebra.tensors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import org.junit.jupiter.api.Test;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 /**

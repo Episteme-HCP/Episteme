@@ -124,7 +124,7 @@ public class Jzy3dPlot3D implements Plot3D {
     }
 
     @Override
-    public Plot3D setColormap(Colormap colormap) {
+    public Plot3D setColormap(Plot3D.Colormap colormap) {
         return this;
     }
 

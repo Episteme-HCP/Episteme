@@ -20,7 +20,7 @@ public class ND4JCUDATensorProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(ND4JCUDATensorProvider.class);
+        assertNotNull(ND4JCUDATensorBackend.class);
     }
 }
 

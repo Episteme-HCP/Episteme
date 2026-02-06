@@ -115,21 +115,23 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeMatrix> imple
         }
     }
 
-    public HDF5Writer() {
+    public NativeHDF5Writer() {
         this.fileId = 0;
         this.isShared = false;
     }
 
-    public HDF5Writer(Path path) {
+    public NativeHDF5Writer(Path path) {
         if (!AVAILABLE) throw new UnsupportedOperationException("HDF5 native library not found");
         this.isShared = true;
+        long fId = 0;
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment pathSegment = arena.allocateFrom(path.toString());
             // H5F_ACC_TRUNC = 0x0002u
-            this.fileId = (long) H5F_CREATE.invokeExact(pathSegment, 2, 0L, 0L);
+            fId = (long) H5F_CREATE.invokeExact(pathSegment, 2, 0L, 0L);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to create HDF5 file: " + path, t);
         }
+        this.fileId = fId;
     }
 
     @Override public String getName() { return "Native HDF5 Writer"; }
@@ -144,7 +146,7 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeMatrix> imple
     @Override
     public void save(NativeMatrix resource, String destinationId) throws Exception {
         Path path = Paths.get(destinationId);
-        try (HDF5Writer writer = new HDF5Writer(path)) {
+        try (NativeHDF5Writer writer = new NativeHDF5Writer(path)) {
             writer.writeMatrix("data", resource);
         }
     }

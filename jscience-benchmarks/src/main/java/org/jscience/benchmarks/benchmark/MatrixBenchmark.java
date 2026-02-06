@@ -27,7 +27,6 @@ import org.openjdk.jmh.annotations.*;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.concurrent.TimeUnit;
-import java.util.Random;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.ejml.simple.SimpleMatrix;

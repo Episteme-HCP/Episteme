@@ -23,7 +23,6 @@
 
 package org.jscience.core.ui.viewers.mathematics.discrete;
 
-import org.jscience.core.mathematics.discrete.Graph;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 /**

@@ -23,7 +23,7 @@
 package org.jscience.core.mathematics.loaders;
 
 import org.jscience.core.io.AbstractResourceWriter;
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.ml.neural.Layer;
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -3,7 +3,7 @@ package org.jscience.benchmarks.benchmark;
 import org.openjdk.jmh.annotations.*;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
-import org.jscience.core.mathematics.linearalgebra.matrices.SIMDDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import java.util.concurrent.TimeUnit;
@@ -36,8 +36,8 @@ public class MatrixMultiplicationBenchmark {
         double[] flatA = flatten(dataA);
         double[] flatB = flatten(dataB);
         
-        simdA = new SIMDDoubleMatrix(size, size, flatA);
-        simdB = new SIMDDoubleMatrix(size, size, flatB);
+        simdA = new SIMDRealDoubleMatrix(size, size, flatA);
+        simdB = new SIMDRealDoubleMatrix(size, size, flatB);
     }
     
     private Real[][] generateRandomData(int n) {

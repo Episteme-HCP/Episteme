@@ -23,9 +23,6 @@
 
 package org.jscience.natural.physics.classical.mechanics;
 
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.BackendDiscovery;
-
 import java.util.Collection;
 
 /**
@@ -77,14 +74,14 @@ public class MechanicsFactory {
      * Returns all discovered mechanics backends.
      */
     public static Collection<MechanicsBackend> getAvailableBackends() {
-        return MechanicsBackendManager.getInstance().getAllBackends();
+        return MechanicsBackendManager.staticAllBackends();
     }
 
     /**
      * Checks if a specific backend is available.
      */
     public static boolean isBackendAvailable(String backendId) {
-        MechanicsBackend b = MechanicsBackendManager.getInstance().select(backendId);
+        MechanicsBackend b = MechanicsBackendManager.staticSelect(backendId);
         return b != null && b.isAvailable();
     }
 }

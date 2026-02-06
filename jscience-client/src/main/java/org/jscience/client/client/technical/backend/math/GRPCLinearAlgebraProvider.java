@@ -34,7 +34,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.structures.rings.Field;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 
 import java.util.ArrayList;
 import java.util.List;

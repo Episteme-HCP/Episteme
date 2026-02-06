@@ -97,7 +97,7 @@ public class ElevationReader extends AbstractResourceReader<Quantity<Length>> {
 
     @Override
     public Class<Quantity<Length>> getResourceType() {
-        return (Class) Quantity.class;
+        return (Class<Quantity<Length>>) (Class<?>) Quantity.class;
     }
 
     @Override

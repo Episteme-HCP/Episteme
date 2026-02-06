@@ -84,17 +84,14 @@ public class NativeOpenCLBackend implements GPUBackend {
         // Future: Set active device for subsequent operations
     }
 
-    @Override
     public void elementWise(String op, DoubleBuffer in, DoubleBuffer out, int s) {
         // Future: Implement element-wise operations (add, mul, sin, cos, etc.)
     }
 
-    @Override
     public void fft(DoubleBuffer r, DoubleBuffer i, DoubleBuffer ro, DoubleBuffer io, int n, boolean inv) {
         // Future: Use clFFT library or custom kernel
     }
 
-    @Override
     public double reduce(String op, DoubleBuffer in, int s) {
         // Future: Implement parallel reduction (sum, max, min, etc.)
         return 0;
@@ -134,6 +131,11 @@ public class NativeOpenCLBackend implements GPUBackend {
     @Override
     public boolean isAvailable() {
         return available;
+    }
+
+    @Override
+    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
     }
 
     @Override

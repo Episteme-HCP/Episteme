@@ -102,5 +102,11 @@ public interface GPUBackend extends ComputeBackend {
      * Synchronizes GPU execution (waits for all kernels to complete).
      */
     void synchronize();
+
+    /**
+     * Performs matrix multiplication C = A * B on the GPU.
+     * Dimensions: A(m x k), B(k x n), C(m x n).
+     */
+    void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k);
 }
 

@@ -25,7 +25,6 @@ package org.jscience.natural.physics.classical.mechanics;
 
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Time;
-import org.jscience.natural.physics.classical.mechanics.RigidBody;
 
 /**
  * Represents a physics simulation environment (Scene/World).

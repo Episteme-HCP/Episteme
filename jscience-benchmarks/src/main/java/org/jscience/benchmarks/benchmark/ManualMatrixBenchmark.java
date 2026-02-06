@@ -4,7 +4,6 @@
  */
 package org.jscience.benchmarks.benchmark;
 
-import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;

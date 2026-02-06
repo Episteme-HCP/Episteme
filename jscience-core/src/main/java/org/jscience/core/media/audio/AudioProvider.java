@@ -23,8 +23,6 @@
 
 package org.jscience.core.media.audio;
 
-import org.jscience.core.media.audio.AudioOp;
-
 /**
  * Service Provider Interface for audio processing backends.
  */

@@ -1,15 +1,11 @@
 package org.jscience.tests.integration;
 
-import org.jscience.core.measure.Quantities;
-import org.jscience.core.measure.Units;
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.computing.ai.agents.Agent;
 import org.jscience.natural.computing.ai.agents.Behavior;
 import org.jscience.natural.computing.ai.agents.Environment;
 import org.jscience.natural.computing.ai.agents.acl.ACLMessage;
 import org.jscience.natural.computing.ai.agents.services.YellowPages;
 import org.jscience.social.economics.money.Money;
-import org.jscience.social.economics.money.Currency;
 import org.jscience.natural.computing.ai.agents.acl.Performative;
 import org.jscience.natural.computing.ai.agents.services.ServiceDescription;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

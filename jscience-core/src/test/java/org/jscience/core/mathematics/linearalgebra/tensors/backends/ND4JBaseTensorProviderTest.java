@@ -20,7 +20,7 @@ public class ND4JBaseTensorProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(ND4JBaseTensorProvider.class);
+        assertNotNull(ND4JBaseTensorBackend.class);
     }
 }
 

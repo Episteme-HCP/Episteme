@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackendProvider;
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 
 /**

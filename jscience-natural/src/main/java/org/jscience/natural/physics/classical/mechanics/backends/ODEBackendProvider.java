@@ -24,6 +24,8 @@
 package org.jscience.natural.physics.classical.mechanics.backends;
 
 import org.jscience.core.technical.backend.HardwareAccelerator;
+import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.Operation;
 import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
 import org.jscience.natural.physics.classical.mechanics.NativePhysicsWorld;
 import org.jscience.natural.physics.classical.mechanics.NativeRigidBody;
@@ -89,6 +91,20 @@ public class ODEBackendProvider implements MechanicsBackend {
     public NativeRigidBody createRigidBody(RigidBody body) {
         // Placeholder for ODE body creation
         return null;
+    }
+
+    @Override
+    public ExecutionContext createContext() {
+        return new ExecutionContext() {
+            @Override
+            public <T> T execute(Operation<T> operation) {
+                return operation.compute(this);
+            }
+            @Override
+            public void close() {
+                // No-op
+            }
+        };
     }
 
     @Override

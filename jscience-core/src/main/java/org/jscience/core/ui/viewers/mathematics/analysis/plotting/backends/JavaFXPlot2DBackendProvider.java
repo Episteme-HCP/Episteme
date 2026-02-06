@@ -25,8 +25,6 @@ package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 
-import org.jscience.core.technical.backend.Backend;
-
 /**
  * Backend for JavaFX 2D plotting.
  * Always available as JavaFX is a core dependency.
@@ -68,10 +66,7 @@ public class JavaFXPlot2DBackendProvider implements PlottingBackend {
     @Override public boolean isSupported2D() { return true; }
     @Override public boolean isSupported3D() { return false; }
 
-    @Override Object createBackend() {
-        return new JavaFXPlot2D(""); // Title set later
+    @Override public Object createBackend() {
+        return new JavaFXPlot2D("");
     }
 }
-
-
-

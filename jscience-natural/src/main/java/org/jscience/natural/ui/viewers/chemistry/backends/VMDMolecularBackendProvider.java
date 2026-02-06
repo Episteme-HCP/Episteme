@@ -25,8 +25,6 @@ package org.jscience.natural.ui.viewers.chemistry.backends;
 
 import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
 
-import org.jscience.core.technical.backend.Backend;
-
 /**
  * Backend for VMD (Visual Molecular Dynamics).
  * VMD is an external application for biomolecular simulations.

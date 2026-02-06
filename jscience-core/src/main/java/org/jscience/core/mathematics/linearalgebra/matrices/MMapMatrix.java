@@ -29,15 +29,13 @@ public class MMapMatrix extends GenericMatrix<Real> implements AutoCloseable {
 
     private final MappedByteBuffer buffer;
     
-    // rows/cols might be in GenericMatrix, but if private, they are shadowed here.
-    // If GenericMatrix is abstract class GenericMatrix<F extends Field<F>> implements Matrix<F>, it likely has rows/cols?
-    // I will assume GenericMatrix manages rows/cols, so I'll pass them to super(rows, cols).
-    // If MMapMatrix duplicated fields, I should remove them.
-    // However, I don't see GenericMatrix source. I'll delete local fields and use super or keep them if super doesn't have them.
-    // Safest is to call super(rows, cols) and assume it stores them.
-    
+    private final int rows;
+    private final int cols;
+
     public MMapMatrix(Path path, int rows, int cols) throws IOException {
-        super(rows, cols); // Assuming GenericMatrix has this constructor
+        super(null, null, Reals.getInstance()); 
+        this.rows = rows;
+        this.cols = cols;
 
         long sizeBytes = (long) rows * cols * 8; // 8 bytes per double
         if (sizeBytes > Integer.MAX_VALUE) {

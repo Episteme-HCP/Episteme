@@ -1,50 +1,4 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.core;
-
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 
 import org.jscience.core.mathematics.context.ComputeMode;
 import org.jscience.core.mathematics.context.MathContext;
@@ -91,6 +45,8 @@ public final class JScience {
         loadPreferences();
         loadVersionInfo();
     }
+
+    private static java.math.MathContext INSTANCE_MATH_CONTEXT = java.math.MathContext.DECIMAL128;
 
     private static void loadConfiguration() {
         try (java.io.InputStream is = JScience.class.getResourceAsStream("/jscience.properties")) {
@@ -168,8 +124,10 @@ public final class JScience {
 
             // Backends are now persisted immediately on setXXX(), so mostly no need to save here
             // except for legacy plotting/linear algebra fields kept in this class
-            prefs.set("plotting.backend.2d", getPlottingBackend2D().getId());
-            prefs.set("plotting.backend.3d", getPlottingBackend3D().getId());
+            org.jscience.core.technical.backend.Backend b2d = (org.jscience.core.technical.backend.Backend) getPlottingBackend2D();
+            org.jscience.core.technical.backend.Backend b3d = (org.jscience.core.technical.backend.Backend) getPlottingBackend3D();
+            prefs.set("plotting.backend.2d", b2d != null ? b2d.getId() : "auto");
+            prefs.set("plotting.backend.3d", b3d != null ? b3d.getId() : "auto");
             if (getLinearAlgebraProviderId() != null) prefs.set("linear.algebra.backend", getLinearAlgebraProviderId());
 
             prefs.save();
@@ -372,17 +330,17 @@ public final class JScience {
     // ================= MATH CONTEXT =================
 
     /**
-     * Sets the global java.math.MathContext for arbitrary precision operations.
+     * Sets the default MathContext.
      */
-    public static void setMathContext(java.math.MathContext mathContext) {
-        ComputeContext.current().setMathContext(mathContext);
+    public static void setMathContext(java.math.MathContext context) {
+        INSTANCE_MATH_CONTEXT = context;
     }
 
     /**
-     * Returns the current java.math.MathContext.
+     * Gets the current MathContext.
      */
     public static java.math.MathContext getMathContext() {
-        return ComputeContext.current().getMathContext();
+        return INSTANCE_MATH_CONTEXT;
     }
 
     // ================= CONVENIENCE CONFIGURATIONS =================
@@ -487,7 +445,8 @@ public final class JScience {
      * @return collection of backend names (e.g., "Java CPU", "CUDA-JCublas")
      */
     public static java.util.Collection<String> getAvailableBackends() {
-        return org.jscience.core.technical.backend.BackendManager.getAvailableBackendNames();
+        java.util.List<String> bNames = new java.util.ArrayList<>(org.jscience.core.technical.backend.BackendManager.staticAvailableNames());
+        return bNames;
     }
 
     /**
@@ -554,7 +513,7 @@ public final class JScience {
         appendBackends(sb, "Math", org.jscience.core.technical.backend.BackendDiscovery.TYPE_MATH, getMathBackendId());
         appendBackends(sb, "Linear Algebra", "linear_algebra", getLinearAlgebraProviderId());
         appendBackends(sb, "Tensors", org.jscience.core.technical.backend.BackendDiscovery.TYPE_TENSOR, getTensorBackendId());
-        appendBackends(sb, "Molecular", org.jscience.core.technical.backend.BackendDiscovery.TYPE_MOLECULAR, getMolecularBackendId());
+        // appendBackends(sb, "Molecular", org.jscience.core.technical.backend.BackendDiscovery.TYPE_MOLECULAR, getMolecularBackendId());
         appendBackends(sb, "Quantum", org.jscience.core.technical.backend.BackendDiscovery.TYPE_QUANTUM, getQuantumBackendId());
         appendBackends(sb, "Map (GIS)", org.jscience.core.technical.backend.BackendDiscovery.TYPE_MAP, getMapBackendId());
         appendBackends(sb, "Graph", org.jscience.core.technical.backend.BackendDiscovery.TYPE_GRAPH, getGraphBackendId());
@@ -692,21 +651,17 @@ public final class JScience {
     }
 
     // ================= MOLECULAR BACKEND =================
-
-    /**
-     * Gets the ID of the current Molecular Backend.
-     */
+    // Module 'jscience-natural' not available in this context
+    /*
     public static String getMolecularBackendId() {
         return org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getPreferredId();
     }
 
-    /**
-     * Sets the Molecular Backend by ID.
-     */
     public static void setMolecularBackendId(String id) {
         org.jscience.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().setPreferredId(id);
         org.jscience.core.io.UserPreferences.getInstance().setPreferredBackend("molecular", id);
     }
+    */
 
     // ================= MAP BACKEND =================
 
@@ -790,7 +745,7 @@ public final class JScience {
         sb.append("  ").append(label).append(" (Current: ").append(currentId != null ? currentId : "AUTO").append("):\n");
         try {
             java.util.List<org.jscience.core.technical.backend.Backend> list = 
-                 org.jscience.core.technical.backend.BackendDiscovery.getInstance().getProvidersByType(type);
+                 org.jscience.core.technical.backend.BackendManager.staticGetProvidersByType(type);
             if (list == null || list.isEmpty()) {
                 sb.append("    (None registered via SPI)\n");
             } else {

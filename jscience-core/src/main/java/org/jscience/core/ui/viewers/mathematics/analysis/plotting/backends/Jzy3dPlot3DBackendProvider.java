@@ -25,8 +25,6 @@ package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 
-import org.jscience.core.technical.backend.BackendProvider;
-
 /**
  * BackendProvider for Jzy3D 3D plotting.
  * Available when Jzy3D library is on classpath.
@@ -34,7 +32,7 @@ import org.jscience.core.technical.backend.BackendProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Jzy3dPlot3DBackendProvider implements PlottingBackendProvider {
+public class Jzy3dPlot3DBackendProvider implements PlottingBackend {
 
     @Override
     public String getType() {
@@ -73,7 +71,7 @@ public class Jzy3dPlot3DBackendProvider implements PlottingBackendProvider {
     @Override public boolean isSupported2D() { return false; }
     @Override public boolean isSupported3D() { return true; }
 
-    @Override Object createBackend() {
+    @Override public Object createBackend() {
         return new Jzy3dPlot3D("");
     }
 }

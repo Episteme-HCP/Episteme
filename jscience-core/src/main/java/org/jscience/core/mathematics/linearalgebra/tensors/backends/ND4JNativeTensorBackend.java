@@ -17,11 +17,14 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * LIABILITY, WHETHER IN AN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
 
 package org.jscience.core.mathematics.linearalgebra.tensors.backends;
+
+import org.jscience.core.technical.backend.HardwareAccelerator;
 
 /**
  * ND4J Native (CPU) Tensor Provider.
@@ -46,6 +49,7 @@ public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
         }
     }
 
+    @Override
     public String getId() {
         return "nd4j-native";
     }
@@ -55,6 +59,7 @@ public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
         return "ND4J Native (CPU)";
     }
 
+    @Override
     public String getDescription() {
         return "ND4J Tensor Provider using Native CPU Backend (AVX/AVX2/AVX512)";
     }
@@ -67,6 +72,11 @@ public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
     @Override
     public boolean supportsGPU() {
         return false;
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU;
     }
 }
 

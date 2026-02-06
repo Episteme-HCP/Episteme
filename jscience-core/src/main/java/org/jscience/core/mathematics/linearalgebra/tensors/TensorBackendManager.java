@@ -50,7 +50,7 @@ public class TensorBackendManager extends AbstractBackendManager<TensorBackend> 
     /**
      * Returns the default backend.
      */
-    public static TensorBackend getDefault() {
-        return INSTANCE.getDefault();
+    public static TensorBackend getDefaultBackend() {
+        return INSTANCE.managerDefault();
     }
 }

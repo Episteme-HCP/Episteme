@@ -1,0 +1,2 @@
+org.jscience.core.technical.algorithm.nbody.MulticoreNBodyProvider
+org.jscience.core.technical.algorithm.nbody.DistributedNBodyProvider

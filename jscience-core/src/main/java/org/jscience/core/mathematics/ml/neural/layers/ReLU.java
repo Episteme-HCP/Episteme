@@ -3,7 +3,6 @@ package org.jscience.core.mathematics.ml.neural.layers;
 import org.jscience.core.mathematics.ml.neural.ActivationFunction;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Rectified Linear Unit (ReLU) activation layer.

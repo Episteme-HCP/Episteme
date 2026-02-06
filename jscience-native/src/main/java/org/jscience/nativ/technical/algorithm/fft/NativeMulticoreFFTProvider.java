@@ -8,14 +8,13 @@ package org.jscience.nativ.technical.algorithm.fft;
 import org.jscience.core.technical.algorithm.FFTProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.nativ.technical.backend.fft.PanamaFFTBackend;
 
 /**
  * Native multicore implementation of FFT using Panama and FFTW3.
  */
 public class NativeMulticoreFFTProvider implements FFTProvider {
 
-    private final PanamaFFTBackend backend = new PanamaFFTBackend();
+    private final NativeFFTProvider backend = new NativeFFTProvider();
 
     @Override
     public int getPriority() {

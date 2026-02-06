@@ -40,7 +40,7 @@ public class OptimizedImageHDU extends ImageHDU {
         
         NativeMatrix matrix = new NativeMatrix(height, width, arena);
         
-        try (FITSReader reader = new FITSReader(path)) {
+        try (NativeFITSReader reader = new NativeFITSReader(path)) {
             // Read first plane (assuming 2D for now)
             reader.readImage(1, (long) width * height, matrix);
         }

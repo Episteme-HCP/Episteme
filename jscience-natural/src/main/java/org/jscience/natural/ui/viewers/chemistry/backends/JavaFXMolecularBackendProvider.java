@@ -25,8 +25,6 @@ package org.jscience.natural.ui.viewers.chemistry.backends;
 
 import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
 
-import org.jscience.core.technical.backend.Backend;
-
 /**
  * Backend for JavaFX molecular renderer.
  * Always available as JavaFX is a core dependency.

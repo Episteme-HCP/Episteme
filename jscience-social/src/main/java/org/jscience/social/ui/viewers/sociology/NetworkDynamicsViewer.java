@@ -23,7 +23,7 @@
 
 package org.jscience.social.ui.viewers.sociology;
 
-import org.jscience.core.ui.viewers.mathematics.discrete.NetworkViewer;
+import org.jscience.core.ui.viewers.mathematics.discrete.GraphViewer;
 import org.jscience.core.ui.i18n.I18N;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.RealParameter;
@@ -33,7 +33,7 @@ import java.util.List;
  * Specialized Network Viewer for Social Dynamics.
  * Visualizes genealogies, political alliances, and opinion interaction graphs.
  */
-public final class NetworkDynamicsViewer extends NetworkViewer {
+public final class NetworkDynamicsViewer extends GraphViewer {
 
     public NetworkDynamicsViewer() {
         super();
@@ -54,5 +54,6 @@ public final class NetworkDynamicsViewer extends NetworkViewer {
     @Override public String getCategory() { return I18N.getInstance().get("category.social", "Social Sciences"); }
     @Override public String getName() { return I18N.getInstance().get("viewer.social.network.name", "Network Dynamics Viewer"); }
     @Override public String getDescription() { return I18N.getInstance().get("viewer.social.network.desc", "Universal graph motor for opinion and social relation networks."); }
+    @Override public String getLongDescription() { return I18N.getInstance().get("viewer.social.network.longdesc", "Advanced graph visualization for social dynamics."); }
 }
 

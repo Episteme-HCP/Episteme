@@ -14,13 +14,13 @@ import org.jscience.core.mathematics.context.MathContext.OverflowMode;
 import org.jscience.core.mathematics.context.MathContext.RealPrecision;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.TensorProvider;
+import org.jscience.core.mathematics.structures.rings.Field;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseLinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUDenseTensorProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.CPUSparseLinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.linearalgebra.SparseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
 
@@ -307,7 +307,7 @@ public class ComputeContext {
         }
 
         // Fallback to CPU Sparse
-        return new CPUSparseLinearAlgebraProvider<>(ring);
+        return new CPUSparseLinearAlgebraProvider<E>(ring);
     }
 
     /**
@@ -326,27 +326,24 @@ public class ComputeContext {
         }
 
         // Fallback: CPUDense
-        return new CPUDenseLinearAlgebraProvider<>(ring);
+        Field<E> field = (Field<E>) ring;
+        return new CPUDenseLinearAlgebraProvider<E>(field);
     }
 
     /**
-     * Gets the appropriate tensor provider for the current backend.
+     * Gets the appropriate tensor provider for the current context.
+     * 
+     * @return the tensor provider
      */
-    public TensorProvider getTensorProvider() {
-        switch (backend) {
-            case JAVA_CPU:
-                break;
-            case OPENCL_GPU:
-                break;
-            case COLT:
-            case EJML:
-            case NATIVE_BLAS:
-            case CUDA_GPU:
-                break;
-            case QUANTUM:
-                break;
-        }
-        return new CPUDenseTensorProvider();
+    public org.jscience.core.technical.algorithm.TensorProvider getTensorProvider() {
+        return getTensorBackend();
+    }
+
+    /**
+     * Gets the appropriate tensor backend for the current context.
+     */
+    public TensorBackend getTensorBackend() {
+        return new org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend();
     }
 
     /**

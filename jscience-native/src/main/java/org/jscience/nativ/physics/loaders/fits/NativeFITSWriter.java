@@ -50,14 +50,15 @@ public class NativeFITSWriter extends AbstractResourceWriter<NativeMatrix> imple
         }
     }
 
-    public FITSWriter() {
+    public NativeFITSWriter() {
         this.fitsPtr = MemorySegment.NULL;
         this.isShared = false;
     }
 
-    public FITSWriter(Path path) {
+    public NativeFITSWriter(Path path) {
         if (!AVAILABLE) throw new UnsupportedOperationException("cfitsio library not found");
         this.isShared = true;
+        MemorySegment ptr = MemorySegment.NULL;
         try (Arena arena = Arena.ofConfined()) {
             // Remove file if it exists (ffinit errors if file exists)
             java.io.File file = path.toFile();
@@ -70,10 +71,11 @@ public class NativeFITSWriter extends AbstractResourceWriter<NativeMatrix> imple
 
             int res = (int) FFINIT.invokeExact(fptrPtr, pathSegment, status);
             if (res != 0) throw new RuntimeException("cfitsio error creating file: " + res);
-            this.fitsPtr = fptrPtr.get(ValueLayout.ADDRESS, 0);
+            ptr = fptrPtr.get(ValueLayout.ADDRESS, 0);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to create FITS file: " + path, t);
         }
+        this.fitsPtr = ptr;
     }
 
     @Override public String getName() { return "Native FITS Writer"; }
@@ -88,7 +90,7 @@ public class NativeFITSWriter extends AbstractResourceWriter<NativeMatrix> imple
     @Override
     public void save(NativeMatrix resource, String destinationId) throws Exception {
         Path path = Paths.get(destinationId);
-        try (FITSWriter writer = new FITSWriter(path)) {
+        try (NativeFITSWriter writer = new NativeFITSWriter(path)) {
             writer.writeImage(resource);
         }
     }

@@ -23,7 +23,7 @@
 
 package org.jscience.natural.physics.classical.waves.electromagnetism.field;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.geometry.Vector3D;

@@ -1,7 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
 import org.jscience.core.technical.algorithm.FFTProvider;
-import org.jscience.core.technical.algorithm.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ public class BenchmarkRegistry {
                list.add(new RunnableBenchmark() {
                    @Override public String getName() { return "Matrix Mult [" + p.getName() + "]"; }
                    @Override public String getDomain() { return base.getDomain(); }
+                   @SuppressWarnings("unchecked")
                    @Override public void setup() { base.setup(); base.setProvider((LinearAlgebraProvider<Real>) p); }
                    @Override public void run() { base.run(); }
                    @Override public void teardown() { base.teardown(); }

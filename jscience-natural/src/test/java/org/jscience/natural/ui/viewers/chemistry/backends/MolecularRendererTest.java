@@ -5,6 +5,7 @@
 
 package org.jscience.natural.ui.viewers.chemistry.backends;
 
+import org.jscience.natural.ui.viewers.chemistry.MolecularRenderer;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -43,4 +43,10 @@ public interface PlottingBackend extends Backend {
      * Checks if this backend supports 3D plotting.
      */
     boolean isSupported3D();
+
+    // Backend IDs
+    public static final String XCHART = "xchart";
+    public static final String JAVAFX = "javafx";
+    public static final String JFREECHART = "jfreechart";
+    public static final String JZY3D = "jzy3d";
 }

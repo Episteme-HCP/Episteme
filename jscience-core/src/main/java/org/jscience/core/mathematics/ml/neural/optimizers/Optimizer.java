@@ -22,7 +22,7 @@
  */
 package org.jscience.core.mathematics.ml.neural.optimizers;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 
 /**
  * Optimizer interface for training neural networks.

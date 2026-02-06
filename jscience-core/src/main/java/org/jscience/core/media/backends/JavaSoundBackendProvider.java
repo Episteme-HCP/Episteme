@@ -23,9 +23,9 @@
 
 package org.jscience.core.media.backends;
 
-import org.jscience.core.technical.backend.BackendProvider;
+import org.jscience.core.technical.backend.Backend;
 
-public class JavaSoundBackendProvider implements BackendProvider {
+public class JavaSoundBackendProvider implements Backend {
     @Override public String getType() { return "audio"; }
     @Override public String getId() { return "javasound"; }
     @Override public String getName() { return "Standard JavaSound"; }

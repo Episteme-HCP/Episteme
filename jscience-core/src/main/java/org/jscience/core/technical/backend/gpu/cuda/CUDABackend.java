@@ -185,7 +185,6 @@ public class CUDABackend implements GPUBackend {
         cudaFree(d_C);
     }
 
-    @Override
     public void elementWise(String operation, DoubleBuffer input, DoubleBuffer output, int size) {
         // Implementation for common operations
         // For simplicity, we could use custom kernels, but for now let's use a placeholder
@@ -193,7 +192,6 @@ public class CUDABackend implements GPUBackend {
         throw new UnsupportedOperationException("Element-wise operations require separate kernel loading.");
     }
 
-    @Override
     public void fft(DoubleBuffer real, DoubleBuffer imag, 
                    DoubleBuffer realOut, DoubleBuffer imagOut, 
                    int n, boolean inverse) {
@@ -201,7 +199,6 @@ public class CUDABackend implements GPUBackend {
         throw new UnsupportedOperationException("FFT requires cuFFT dependency.");
     }
 
-    @Override
     public double reduce(String operation, DoubleBuffer input, int size) {
         // Use cuBLAS for sum reduction or custom kernel
         if ("sum".equals(operation)) {

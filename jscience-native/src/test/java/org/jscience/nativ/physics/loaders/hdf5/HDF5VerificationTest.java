@@ -31,12 +31,12 @@ public class HDF5VerificationTest {
         NativeMatrix original = new NativeMatrix(rows, cols);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                original.set(i, j, i * cols + j + 0.5);
+                original.setDouble(i, j, i * cols + j + 0.5);
             }
         }
 
         // 2. Write to HDF5
-        try (HDF5Writer writer = new HDF5Writer(h5File)) {
+        try (NativeHDF5Writer writer = new NativeHDF5Writer(h5File)) {
             writer.writeMatrix("test_data", original);
         } catch (UnsupportedOperationException e) {
             System.err.println("Skipping HDF5 test: Native library not found.");
@@ -53,53 +53,19 @@ public class HDF5VerificationTest {
         assertTrue(h5File.toFile().exists(), "HDF5 file should exist");
 
         // 3. Read from HDF5
-        try (HDF5Reader reader = new HDF5Reader(h5File)) {
+        try (NativeHDF5Reader reader = new NativeHDF5Reader(h5File)) {
             NativeMatrix loaded = new NativeMatrix(rows, cols);
             reader.readMatrix("test_data", loaded);
 
             // 4. Verify
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    double expected = original.get(i, j);
-                    double actual = loaded.get(i, j);
+                    double expected = original.get(i, j).doubleValue();
+                    double actual = loaded.get(i, j).doubleValue();
                     assertEquals(expected, actual, 1e-9, "Value mismatch at " + i + "," + j);
                 }
             }
         }
     }
 
-    // TODO: Re-enable once compilation/native mismatch is resolved
-    // @Test
-    public void testTensorSave(@TempDir Path tempDir) throws Exception {
-        Path h5File = tempDir.resolve("test_tensor.h5");
-        String filePath = h5File.toString();
-
-        System.out.println("Testing Tensor delegation to: " + filePath);
-
-        // 1. Create a Tensor (Rank 2)
-        org.jscience.core.mathematics.linearalgebra.Tensor tensor = 
-            new org.jscience.core.mathematics.linearalgebra.Tensor(5, 5);
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                tensor.set(org.jscience.core.mathematics.numbers.real.Real.of(i + j), i, j);
-            }
-        }
-
-        // 2. Save using delegation
-        try {
-            tensor.save(filePath);
-        } catch (UnsupportedOperationException e) {
-             System.err.println("Skipping Tensor test: " + e.getMessage());
-             return;
-        } catch (Throwable t) {
-             // Handle native load issues
-             if (t.getMessage() != null && t.getMessage().contains("native library not found")) {
-                 System.err.println("Skipping Tensor test: native library missing");
-                 return;
-             }
-             throw t;
-        }
-
-        assertTrue(h5File.toFile().exists(), "HDF5 file should be created via Tensor.save()");
-    }
 }

@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.ml.neural;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import java.util.ArrayList;
 import java.util.List;

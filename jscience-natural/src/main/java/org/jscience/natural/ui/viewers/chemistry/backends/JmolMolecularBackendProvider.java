@@ -26,8 +26,6 @@ package org.jscience.natural.ui.viewers.chemistry.backends;
 import org.jscience.natural.ui.viewers.chemistry.MolecularBackend;
 
 
-import org.jscience.core.technical.backend.Backend;
-
 /**
  * Backend for Jmol molecular renderer.
  * Available only when Jmol library is on the classpath.
@@ -74,7 +72,8 @@ public class JmolMolecularBackendProvider implements MolecularBackend {
     @Override public boolean isSupport3D() { return true; }
     @Override public boolean isSupportInteractive() { return true; }
 
-    @Override Object createBackend() {
+    @Override
+    public Object createBackend() {
         return new JmolMolecularRenderer();
     }
 }

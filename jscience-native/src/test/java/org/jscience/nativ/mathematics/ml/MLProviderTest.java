@@ -22,9 +22,9 @@
  */
 package org.jscience.nativ.mathematics.ml;
 
+import org.jscience.nativ.technical.algorithm.inference.NativeMulticoreMLProvider;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.Arrays;
 
 /**
  * Verification for Native ML Provider.

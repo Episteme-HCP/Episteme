@@ -67,6 +67,7 @@ public class GeoToolsBackendProvider implements MapBackend {
     }
 
     @Override
+    public int getPriority() {
         return 60; // High priority - professional GIS toolkit
     }
 

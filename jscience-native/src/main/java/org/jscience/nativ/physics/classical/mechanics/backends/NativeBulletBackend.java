@@ -14,6 +14,7 @@ import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 
+import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.natural.physics.classical.mechanics.CollisionBackend;
 
 /**
@@ -59,6 +60,11 @@ public class NativeBulletBackend implements CollisionBackend {
     @Override
     public int getPriority() {
         return 100;
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU; // Bullet is CPU-based
     }
 
     @Override

@@ -84,7 +84,9 @@ public class SimpleBenchmarkRunner {
         // run("MatrixBenchmark.multiplyJScience", mb::multiplyJScience);
 
         // FFT Benchmarks
-        FFTBenchmark.execute();
+        FFTBenchmark b = new FFTBenchmark();
+        b.setup();
+        SimpleBenchmarkRunner.run("FFT (Size 4096)", b::run);
 
     }
 }

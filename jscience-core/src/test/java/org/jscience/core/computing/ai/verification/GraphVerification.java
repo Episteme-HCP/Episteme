@@ -6,7 +6,6 @@ package org.jscience.core.computing.ai.verification;
 
 import org.jscience.core.mathematics.ml.neural.ComputationGraph;
 import org.jscience.core.mathematics.ml.neural.Layer;
-import org.jscience.core.mathematics.linearalgebra.tensors.Tensor;
 import java.util.Map;
 import java.util.Collections;
 

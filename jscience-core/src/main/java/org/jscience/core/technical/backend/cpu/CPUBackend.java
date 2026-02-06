@@ -25,6 +25,7 @@ package org.jscience.core.technical.backend.cpu;
 
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.HardwareAccelerator;
 
 /**
  * CPU-based compute backend (default fallback).

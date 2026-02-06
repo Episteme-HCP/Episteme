@@ -39,6 +39,14 @@ import java.util.Optional;
  */
 public class PlotFactory {
 
+    public enum PlottingBackendType {
+        AUTO,
+        JAVAFX,
+        XCHART,
+        JFREECHART,
+        JZY3D
+    }
+
     private static String selectedBackendId = null; // null = AUTO
 
     /**
@@ -61,12 +69,12 @@ public class PlotFactory {
     /**
      * Creates 2D plot with default/AUTO backend.
      */
-    public static Plot2DRenderer create2D(String title) {
+    public static Plot2D create2D(String title) {
         Backend provider = getBackendProvider();
         if (provider != null) {
             Object backend = provider.createBackend();
-            if (backend instanceof Plot2DRenderer) {
-                Plot2DRenderer plot = (Plot2DRenderer) backend;
+            if (backend instanceof Plot2D) {
+                Plot2D plot = (Plot2D) backend;
                 plot.setTitle(title);
                 return plot;
             }
@@ -77,10 +85,10 @@ public class PlotFactory {
     }
 
     /**
-     * Creates 2D plot with specified backend enum (compatibility).
+     * Creates 2D plot with specified backend enum.
      */
-    public static Plot2DRenderer create2D(String title, PlottingBackend backend) {
-        if (backend == null || backend == PlottingBackend.AUTO) {
+    public static Plot2D create2D(String title, PlottingBackendType backend) {
+        if (backend == null || backend == PlottingBackendType.AUTO) {
             return create2D(title);
         }
         String id = backend.name().toLowerCase();
@@ -88,9 +96,12 @@ public class PlotFactory {
                 .getProvider(BackendDiscovery.TYPE_PLOTTING, id);
 
         if (provider.isPresent() && provider.get().isAvailable()) {
-            Plot2DRenderer plot = (Plot2DRenderer) provider.get().createBackend();
-            plot.setTitle(title);
-            return plot;
+            Object backendInstance = provider.get().createBackend();
+             if (backendInstance instanceof Plot2D) {
+                Plot2D plot = (Plot2D) backendInstance;
+                plot.setTitle(title);
+                return plot;
+            }
         }
         return create2D(title);
     }
@@ -98,15 +109,15 @@ public class PlotFactory {
     /**
      * Creates 3D plot with default/AUTO backend.
      */
-    public static Plot3DRenderer create3D(String title) {
+    public static Plot3D create3D(String title) {
         // For 3D, prefer jzy3d specifically if available
         Optional<Backend> jzy3d = BackendDiscovery.getInstance()
                 .getProvider(BackendDiscovery.TYPE_PLOTTING, "jzy3d");
 
         if (jzy3d.isPresent() && jzy3d.get().isAvailable()) {
             Object backend = jzy3d.get().createBackend();
-            if (backend instanceof Plot3DRenderer) {
-                Plot3DRenderer plot = (Plot3DRenderer) backend;
+            if (backend instanceof Plot3D) {
+                Plot3D plot = (Plot3D) backend;
                 plot.setTitle(title);
                 return plot;
             }
@@ -118,8 +129,8 @@ public class PlotFactory {
 
         if (javafx3d.isPresent()) {
             Object backend = javafx3d.get().createBackend();
-            if (backend instanceof Plot3DRenderer) {
-                Plot3DRenderer plot = (Plot3DRenderer) backend;
+            if (backend instanceof Plot3D) {
+                Plot3D plot = (Plot3D) backend;
                 plot.setTitle(title);
                 return plot;
             }
@@ -129,14 +140,14 @@ public class PlotFactory {
     }
 
     /**
-     * Creates 3D plot with specified backend enum (compatibility).
+     * Creates 3D plot with specified backend enum.
      */
-    public static Plot3DRenderer create3D(String title, PlottingBackend backend) {
-        if (backend == null || backend == PlottingBackend.AUTO) {
+    public static Plot3D create3D(String title, PlottingBackendType backend) {
+        if (backend == null || backend == PlottingBackendType.AUTO) {
             return create3D(title);
         }
         String id = backend.name().toLowerCase();
-        if (backend == PlottingBackend.JAVAFX) {
+        if (backend == PlottingBackendType.JAVAFX) {
             id = "javafx3d";
         }
 
@@ -145,8 +156,8 @@ public class PlotFactory {
 
         if (provider.isPresent() && provider.get().isAvailable()) {
             Object backendObj = provider.get().createBackend();
-            if (backendObj instanceof Plot3DRenderer) {
-                Plot3DRenderer plot = (Plot3DRenderer) backendObj;
+            if (backendObj instanceof Plot3D) {
+                Plot3D plot = (Plot3D) backendObj;
                 plot.setTitle(title);
                 return plot;
             }

@@ -23,6 +23,8 @@
 
 package org.jscience.natural.physics.classical.matter.fluids;
 
+import org.jscience.core.mathematics.linearalgebra.Tensor;
+import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.physics.MulticoreNavierStokesProvider;
 import org.jscience.core.technical.algorithm.NavierStokesProvider;
@@ -96,7 +98,7 @@ public class NavierStokesSolver {
         field.setVelocityZ(unpack(w, width, height, depth));
     }
 
-    private void pack(org.jscience.core.mathematics.linearalgebra.tensors.Tensor<Real> tensor, double[] target, int w, int h,
+    private void pack(Tensor<Real> tensor, double[] target, int w, int h,
             int d) {
         int idx = 0;
         for (int x = 0; x < w; x++) {
@@ -108,12 +110,12 @@ public class NavierStokesSolver {
         }
     }
 
-    private org.jscience.core.mathematics.linearalgebra.tensors.Tensor<Real> unpack(double[] source, int w, int h, int d) {
+    private Tensor<Real> unpack(double[] source, int w, int h, int d) {
         Real[] data = new Real[source.length];
         for (int i = 0; i < source.length; i++) {
             data[i] = Real.of(source[i]);
         }
-        return new org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor<>(data, w, h, d);
+        return new DenseTensor<>(data, w, h, d);
     }
 }
 

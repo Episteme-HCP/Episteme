@@ -10,7 +10,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.ComputeContext;
-import org.jscience.core.mathematics.linearalgebra.matrices.SIMDDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import java.util.concurrent.Future;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,14 +103,14 @@ public class DistributedSUMMAAlgorithm {
     }
 
     private static void broadcastTile(Matrix<Real> tile, int row, int col, DistributedContext ctx) {
-        if (tile instanceof SIMDDoubleMatrix) {
-            broadcastTileFast((SIMDDoubleMatrix) tile, row, col, ctx);
+        if (tile instanceof SIMDRealDoubleMatrix) {
+            broadcastTileFast((SIMDRealDoubleMatrix) tile, row, col, ctx);
         } else {
             broadcastTileSlow(tile, row, col, ctx);
         }
     }
 
-    private static void broadcastTileFast(SIMDDoubleMatrix tile, int row, int col, DistributedContext ctx) {
+    private static void broadcastTileFast(SIMDRealDoubleMatrix tile, int row, int col, DistributedContext ctx) {
         double[] data = tile.getInternalData();
         DoubleBuffer buffer = DoubleBuffer.wrap(data);
         

@@ -99,27 +99,29 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeMatrix> imple
         }
     }
 
-    public HDF5Reader() {
+    public NativeHDF5Reader() {
         this.fileId = 0;
         this.isShared = false;
     }
 
-    public HDF5Reader(Path path) {
+    public NativeHDF5Reader(Path path) {
         if (!AVAILABLE) throw new UnsupportedOperationException("HDF5 native library not found");
         this.isShared = true;
+        long fId = 0;
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment pathSegment = arena.allocateFrom(path.toString());
-            this.fileId = (long) H5F_OPEN.invokeExact(pathSegment, 0, 0L);
+            fId = (long) H5F_OPEN.invokeExact(pathSegment, 0, 0L);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to open HDF5 file: " + path, t);
         }
+        this.fileId = fId;
     }
 
     /**
      * Opens an HDF5 file and reads the dataset named "data".
      */
     public static NativeMatrix open(String path) throws Exception {
-        try (HDF5Reader reader = new HDF5Reader()) {
+        try (NativeHDF5Reader reader = new NativeHDF5Reader()) {
             return reader.load(path);
         }
     }
@@ -136,7 +138,7 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeMatrix> imple
     @Override
     protected NativeMatrix loadFromSource(String resourceId) throws Exception {
         Path path = Paths.get(resourceId);
-        try (HDF5Reader reader = new HDF5Reader(path)) {
+        try (NativeHDF5Reader reader = new NativeHDF5Reader(path)) {
             String datasetName = "data"; // Default
             long[] dims = reader.getDatasetDimensions(datasetName);
             if (dims == null || dims.length < 2) {

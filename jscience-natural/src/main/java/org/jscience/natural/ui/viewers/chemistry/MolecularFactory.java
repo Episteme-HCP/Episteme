@@ -70,15 +70,7 @@ public class MolecularFactory {
         // I will add import for JavaFXMolecularBackendProvider. 
         // NOTE: I haven't checked if JavaFXMolecularBackendProvider exists and where.
         // Step 1169 showed `JavaFXMolecularRenderer`, I assume Provider is also there.
-        // Detailed check of `jscience-natural` ... `backends` folder:
-        // I saw `JavaFXMolecularBackendProvider` listed in `META-INF/services` file content in Step 1039!
-        // `org.jscience.natural.physics.chemistry.backends.JavaFXMolecularBackendProvider`.
-        // Wait, step 1039 showed `org.jscience.natural.physics.chemistry.backends...`
-        // But the user has been asking to move `jscience-natural.ui.viewers.chemistry`.
-        // There is a mix of `physics.chemistry` and `ui.viewers.chemistry`.
-        // Step 1169 said `jscience-natural\src\main\java\org\jscience\natural\ui\viewers\chemistry\backends\MolecularRenderer.java`.
-        // So `ui.viewers.chemistry` seems to be the current location for viewers.
-        // I will assume `JavaFXMolecularBackendProvider` is in `org.jscience.natural.ui.viewers.chemistry.backends`.
+        // Ultimate fallback
         
         return new JavaFXMolecularBackendProvider().createBackend();
     }
@@ -88,7 +80,7 @@ public class MolecularFactory {
      */
     private static Backend getBackendProvider() {
         if (selectedBackendId != null) {
-             MolecularBackend b = MolecularBackendManager.getInstance().select(selectedBackendId);
+             MolecularBackend b = MolecularBackendManager.getInstance().managerSelect(selectedBackendId);
              if (b != null && b.isAvailable()) {
                 return b;
              }
@@ -100,14 +92,14 @@ public class MolecularFactory {
      * Returns all discovered molecular backend providers.
      */
     public static Collection<MolecularBackend> getAvailableBackends() {
-        return MolecularBackendManager.getInstance().getAllBackends();
+        return MolecularBackendManager.getInstance().managerAll();
     }
 
     /**
      * Checks if a specific backend is available.
      */
     public static boolean isBackendAvailable(String backendId) {
-        MolecularBackend b = MolecularBackendManager.getInstance().select(backendId);
+        MolecularBackend b = MolecularBackendManager.getInstance().managerSelect(backendId);
         return b != null && b.isAvailable();
     }
 }

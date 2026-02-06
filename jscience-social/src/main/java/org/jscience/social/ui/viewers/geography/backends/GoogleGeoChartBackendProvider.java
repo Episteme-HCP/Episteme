@@ -68,6 +68,7 @@ public class GoogleGeoChartBackendProvider implements MapBackend {
     }
 
     @Override
+    public int getPriority() {
         return 30; // Lower priority - requires network connection
     }
 
