@@ -60,6 +60,11 @@ public class NativeMulticoreNBodyProvider implements NBodyProvider {
     }
 
     @Override
+    public int getPriority() {
+        return 60; // Higher than standard multicore
+    }
+
+    @Override
     public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int n = masses.length;
         
@@ -95,6 +100,6 @@ public class NativeMulticoreNBodyProvider implements NBodyProvider {
 
     @Override
     public String getName() {
-        return "Native Multicore N-Body Provider (SIMD)";
+        return "Native Multicore N-Body Simulation";
     }
 }

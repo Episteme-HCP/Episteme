@@ -3,26 +3,28 @@ package org.jscience.benchmarks.benchmark;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
-import java.util.ServiceLoader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * A benchmark that systematically tests all available LinearAlgebraProviders.
  */
-public class SystematicMatrixBenchmark implements RunnableBenchmark {
+public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
     private static final int SIZE = 500;
     private RealDoubleMatrix A;
     private RealDoubleMatrix B;
-    private final List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
     private LinearAlgebraProvider<Real> currentProvider;
 
+    @Override public String getId() { return getIdPrefix(); }
+    @Override public String getName() { return getNameBase(); }
+    @Override public String getIdPrefix() { return "matrix-systematic"; }
+    @Override public String getNameBase() { return "Systematic Matrix Mult"; }
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override public Class<LinearAlgebraProvider<Real>> getProviderClass() { return (Class) LinearAlgebraProvider.class; }
+
     @Override
-    public String getName() {
-        return "Systematic Matrix Mult (" + (currentProvider != null ? currentProvider.getName() : "None") + ")";
+    public String getDescription() {
+        return "Systematically benchmarks all discovered Linear Algebra providers on a standard 500x500 real matrix multiplication.";
     }
 
     @Override
@@ -36,31 +38,13 @@ public class SystematicMatrixBenchmark implements RunnableBenchmark {
         double[][] dataB = generateData(SIZE);
         A = RealDoubleMatrix.of(dataA);
         B = RealDoubleMatrix.of(dataB);
-        
-        // Discover providers
-        providers.clear();
-        @SuppressWarnings("rawtypes")
-        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-        for (LinearAlgebraProvider<?> p : loader) {
-            if (p.isCompatible(Reals.getInstance())) {
-               @SuppressWarnings("unchecked")
-               LinearAlgebraProvider<Real> realProvider = (LinearAlgebraProvider<Real>) p;
-               providers.add(realProvider);
-            }
-        }
-        
-        if (!providers.isEmpty()) {
-            currentProvider = providers.get(0); // Default to first for individual run
-        }
     }
 
+    @Override
     public void setProvider(LinearAlgebraProvider<Real> provider) {
         this.currentProvider = provider;
     }
 
-    public List<LinearAlgebraProvider<Real>> getProviders() {
-        return providers;
-    }
 
     @Override
     public void run() {

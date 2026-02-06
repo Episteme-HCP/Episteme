@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jscience.benchmarks.ui.MainController"
+            stylesheets="@studio.css" styleClass="root-pane">
+    
+    <top>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="20">
+            <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+            <Label text="JSCIENCE STUDIO" styleClass="header-title"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="SETTINGS" styleClass="icon-button" />
+            <Button text="ABOUT" styleClass="icon-button" />
+        </HBox>
+    </top>
+
+    <center>
+        <TabPane fx:id="mainTabPane" side="LEFT" tabClosingPolicy="UNAVAILABLE" styleClass="main-tab-pane">
+            
+            <!-- Tab 1: Execution Control -->
+            <Tab text="EXECUTION">
+                <VBox spacing="10">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Benchmark Selection" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="runSelectedBtn" text="RUN SELECTED" onAction="#handleRunSelected" styleClass="action-button-primary" />
+                        <Button fx:id="runAllBtn" text="RUN ALL" onAction="#handleRunAll" styleClass="action-button-secondary" />
+                    </HBox>
+                    
+                    <TreeTableView fx:id="benchmarkTreeTable" VBox.vgrow="ALWAYS" styleClass="benchmark-tree">
+                        <columns>
+                            <TreeTableColumn fx:id="nameColumn" text="Name" prefWidth="300" />
+                            <TreeTableColumn fx:id="domainColumn" text="Domain" prefWidth="150" />
+                            <TreeTableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
+                            <TreeTableColumn fx:id="resultColumn" text="Last Result" prefWidth="150" />
+                        </columns>
+                    </TreeTableView>
+                </VBox>
+            </Tab>
+
+            <!-- Tab 2: Visualization -->
+            <Tab text="VISUALIZATION">
+                <VBox spacing="20">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <Label text="Performance Analytics" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <ComboBox fx:id="metricSelector" promptText="Select Metric" />
+                        <Button text="EXPORT CHART" styleClass="action-button-outline" />
+                    </HBox>
+                    
+                    <AnchorPane VBox.vgrow="ALWAYS">
+                        <BarChart fx:id="performanceBarChart" title="Throughput (Ops/Sec)" 
+                                  AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" 
+                                  AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+                            <xAxis><CategoryAxis label="Benchmark" /></xAxis>
+                            <yAxis><NumberAxis label="Ops/Sec" /></yAxis>
+                        </BarChart>
+                    </AnchorPane>
+                </VBox>
+            </Tab>
+
+            <!-- Tab 3: History & Reports -->
+            <Tab text="HISTORY">
+                <VBox spacing="10">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                    <Label text="Historical Runs" styleClass="section-title"/>
+                    <TableView fx:id="historyTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="dateColumn" text="Date" prefWidth="180" />
+                            <TableColumn fx:id="suiteColumn" text="Suite Name" prefWidth="150" />
+                            <TableColumn fx:id="resultsColumn" text="Successful Benchmarks" prefWidth="150" />
+                            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="100" />
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+    </center>
+
+    <bottom>
+        <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="15">
+            <padding><Insets top="5" right="15" bottom="5" left="15"/></padding>
+            <ProgressBar fx:id="globalProgressBar" progress="0.0" prefWidth="250" />
+            <Label fx:id="statusBarLabel" text="Ready" styleClass="status-text"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="versionLabel" text="JScience Studio v1.0" styleClass="version-text"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

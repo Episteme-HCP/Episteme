@@ -101,6 +101,6 @@ public class NativeMulticoreMonteCarloProvider implements MonteCarloProvider {
 
     @Override
     public String getName() {
-        return "Native Multicore Monte Carlo Provider (SIMD/HPC)";
+        return "Native Multicore Monte Carlo";
     }
 }

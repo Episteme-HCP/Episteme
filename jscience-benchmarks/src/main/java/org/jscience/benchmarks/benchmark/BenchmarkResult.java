@@ -33,14 +33,41 @@ import java.util.Map;
  * @since 1.0
  */
 public record BenchmarkResult(
+        String benchmarkId,
         String benchmarkName,
         String domain,
+        long timestamp,
         long totalTimeMillis,
         long iterations,
         double averageTimePerOpMillis,
         double operationsPerSecond,
         long memoryUsedBytes,
+        Map<String, String> environmentInfo,
         Map<String, Object> extraMetrics) {
+    
+    public BenchmarkResult(
+            String benchmarkId,
+            String benchmarkName,
+            String domain,
+            long totalTimeMillis,
+            long iterations,
+            double averageTimePerOpMillis,
+            double operationsPerSecond,
+            long memoryUsedBytes,
+            Map<String, Object> extraMetrics) {
+        this(benchmarkId, benchmarkName, domain, System.currentTimeMillis(), totalTimeMillis, iterations,
+                averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes, 
+                generateEnvInfo(), extraMetrics);
+    }
+
+    private static Map<String, String> generateEnvInfo() {
+        Map<String, String> info = new java.util.HashMap<>();
+        info.put("os", System.getProperty("os.name"));
+        info.put("java.version", System.getProperty("java.version"));
+        info.put("processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
+        return info;
+    }
+
     public String toSummaryString() {
         return String.format("%-30s | %-15s | %10.3f ms/op | %10.0f ops/sec | %6d MB",
                 benchmarkName, domain, averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes / (1024 * 1024));

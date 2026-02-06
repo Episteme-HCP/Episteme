@@ -1,1 +1,1 @@
-org.jscience.nativ.mathematics.optimization.providers.NativeMulticoreGeneticAlgorithmProvider
+org.jscience.nativ.technical.algorithm.genetic.NativeMulticoreGeneticAlgorithmProvider

@@ -37,9 +37,19 @@ package org.jscience.benchmarks.benchmark;
 public interface RunnableBenchmark {
 
     /**
+     * @return A unique stable identifier for this benchmark (e.g. "ga-tsp-50")
+     */
+    String getId();
+
+    /**
      * @return Unique human-readable name of the benchmark
      */
     String getName();
+
+    /**
+     * @return A detailed description of what the benchmark measures
+     */
+    String getDescription();
 
     /**
      * @return The domain of this benchmark (e.g. "Linear Algebra", "Physics")
@@ -68,6 +78,13 @@ public interface RunnableBenchmark {
      */
     default int getSuggestedIterations() {
         return 10;
+    }
+
+    /**
+     * @return Metadata about the benchmark configuration
+     */
+    default java.util.Map<String, String> getMetadata() {
+        return java.util.Collections.emptyMap();
     }
 }
 

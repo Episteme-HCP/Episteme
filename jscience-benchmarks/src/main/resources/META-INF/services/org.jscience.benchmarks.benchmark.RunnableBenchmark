@@ -1,3 +1,12 @@
-org.jscience.benchmarks.benchmark.FFTBenchmark
+org.jscience.benchmarks.benchmark.SystematicFFTBenchmark
 org.jscience.benchmarks.benchmark.SystematicMatrixBenchmark
-org.jscience.benchmarks.benchmark.MonteCarloBenchmark
+org.jscience.benchmarks.benchmark.SystematicGraphBenchmark
+org.jscience.benchmarks.benchmark.SystematicMonteCarloBenchmark
+org.jscience.benchmarks.benchmark.SystematicNBodyBenchmark
+org.jscience.benchmarks.benchmark.SystematicBayesianInferenceBenchmark
+org.jscience.benchmarks.benchmark.SystematicTensorBenchmark
+org.jscience.benchmarks.benchmark.SystematicGeneticBenchmark
+org.jscience.benchmarks.benchmark.SystematicODEBenchmark
+org.jscience.benchmarks.benchmark.SystematicSPHBenchmark
+org.jscience.benchmarks.benchmark.SystematicMandelbrotBenchmark
+org.jscience.benchmarks.benchmark.SystematicSimulationBenchmark

@@ -19,7 +19,7 @@ public class NativeMulticoreNBodyProvider implements NBodyProvider {
 
     @Override
     public int getPriority() {
-        return 50;
+        return 60; // Higher than standard multicore
     }
 
     @Override
@@ -71,6 +71,6 @@ public class NativeMulticoreNBodyProvider implements NBodyProvider {
 
     @Override
     public String getName() {
-        return "Native Multicore N-Body (C++/AVX)";
+        return "Native Multicore N-Body (SIMD)";
     }
 }

@@ -1,1 +1,1 @@
-org.jscience.mathematics.linearalgebra.backends.NativeLinearAlgebraProvider
+org.jscience.nativ.technical.algorithm.linearalgebra.NativeMulticoreLinearAlgebraProvider

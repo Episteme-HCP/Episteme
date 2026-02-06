@@ -25,13 +25,6 @@ package org.jscience.benchmarks.benchmark;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.io.File;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtils;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jscience.core.ui.i18n.I18N;
 
 
@@ -48,8 +41,7 @@ public class BenchmarkRunner {
     private final List<BenchmarkResult> results = new ArrayList<>();
 
     public void discover() {
-        ServiceLoader<RunnableBenchmark> loader = ServiceLoader.load(RunnableBenchmark.class);
-        loader.forEach(benchmarks::add);
+        benchmarks.addAll(BenchmarkRegistry.discover());
         System.out.println(I18N.getInstance().get("benchmark.discovered", benchmarks.size()));
     }
 
@@ -62,6 +54,9 @@ public class BenchmarkRunner {
                 I18N.getInstance().get("benchmark.header.ops"),
                 I18N.getInstance().get("benchmark.header.mem"));
         System.out.println("-".repeat(90));
+
+        org.jscience.benchmarks.monitoring.DistributedMonitor monitor = 
+                org.jscience.benchmarks.monitoring.DistributedMonitor.getInstance();
 
         for (RunnableBenchmark b : benchmarks) {
             try {
@@ -81,16 +76,19 @@ public class BenchmarkRunner {
                 }
 
                 long end = System.nanoTime();
-                long endMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-
                 long durationNs = end - start;
+                
+                // Record to Monitor
+                monitor.recordExecution(b.getId(), b.getDomain(), durationNs / iterations);
+
+                long endMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
                 double avgMs = (durationNs / 1_000_000.0) / iterations;
                 double opsSec = (iterations * 1_000_000_000.0) / durationNs;
                 long memUsed = Math.max(0, endMem - startMem);
 
                 BenchmarkResult res = new BenchmarkResult(
-                        b.getName(), b.getDomain(), durationNs / 1_000_000, iterations, avgMs, opsSec, memUsed,
-                        Map.of());
+                        b.getId(), b.getName(), b.getDomain(), durationNs / 1_000_000, iterations, avgMs, opsSec, memUsed,
+                        java.util.Collections.emptyMap());
 
                 results.add(res);
                 System.out.println(res.toSummaryString());
@@ -104,35 +102,32 @@ public class BenchmarkRunner {
     }
 
     public void exportCharts() {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        for (BenchmarkResult r : results) {
-            dataset.addValue(r.operationsPerSecond(), "Ops/Sec", r.benchmarkName());
-        }
-
-        JFreeChart barChart = ChartFactory.createBarChart(
-                I18N.getInstance().get("benchmark.chart.title"),
-                I18N.getInstance().get("benchmark.header.name"),
-                I18N.getInstance().get("benchmark.chart.yaxis"),
-                dataset);
-
-        try {
-            File chartFile = new File("benchmark_results.png");
-            ChartUtils.saveChartAsPNG(chartFile, barChart, 800, 600);
-            System.out.println("\n" + I18N.getInstance().get("benchmark.chart.saved", chartFile.getAbsolutePath()));
-        } catch (Exception e) {
-            System.err.println(I18N.getInstance().get("benchmark.chart.error", e.getMessage()));
-        }
+        // JFreeChart removed. Charts are now handled natively in the JScience Studio GUI.
+        System.out.println("\nCharts are available in the JScience Studio GUI (--studio).");
+        System.out.println("Real-time metrics are available at http://localhost:7070/metrics");
     }
 
     public static void main(String[] args) {
         // Register benchmark I18N bundle
         I18N.getInstance().addBundle("org.jscience.benchmarks.i18n.messages_benchmarks");
 
-        if (args.length > 0 && args[0].equals("--studio")) {
-            System.out.println("Launching JScience Studio...");
-            org.jscience.benchmarks.ui.JScienceStudioApp.main(args);
-            return;
+        boolean monitorEnabled = false;
+        for (String arg : args) {
+            if (arg.equals("--monitor") || arg.equals("--studio")) {
+                monitorEnabled = true;
+                break;
+            }
         }
+
+        if (monitorEnabled) {
+            org.jscience.benchmarks.monitoring.DistributedMonitor.getInstance().startServer();
+        }
+
+        // if (args.length > 0 && args[0].equals("--studio")) {
+        //     System.out.println("Launching JScience Studio...");
+        //     org.jscience.benchmarks.ui.JScienceBenchmarkingApp.main(args);
+        //     return;
+        // }
 
         BenchmarkRunner runner = new BenchmarkRunner();
         runner.discover();

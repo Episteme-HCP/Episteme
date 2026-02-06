@@ -1,1 +1,1 @@
-org.jscience.nativ.mathematics.discrete.providers.NativeGraphAlgorithmProvider
+org.jscience.nativ.technical.algorithm.graph.NativeMulticoreGraphAlgorithmProvider

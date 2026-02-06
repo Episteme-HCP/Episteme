@@ -24,7 +24,7 @@ public class NativeMulticoreSimulationProvider implements SimulationProvider {
 
     @Override
     public String getName() {
-        return "Native Multicore Simulation Engine (HPC)";
+        return "Native Multicore Simulation";
     }
 
     @Override

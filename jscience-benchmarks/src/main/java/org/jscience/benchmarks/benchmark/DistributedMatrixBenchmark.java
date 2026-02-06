@@ -39,7 +39,27 @@ import java.util.Random;
 @Warmup(iterations = 3, time = 1)
 @Measurement(iterations = 5, time = 1)
 @Fork(1)
-public class DistributedMatrixBenchmark {
+public class DistributedMatrixBenchmark implements RunnableBenchmark {
+
+    @Override
+    public String getId() {
+        return "matrix-distributed-" + size + "-p" + parallelism;
+    }
+
+    @Override
+    public String getName() {
+        return "Distributed Matrix Mult (" + size + "x" + size + ", p=" + parallelism + ")";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Benchmarks distributed matrix multiplication algorithms (SUMMA, Cannon, CARMA, etc.) using a LocalDistributedContext.";
+    }
+
+    @Override
+    public String getDomain() {
+        return "Linear Algebra";
+    }
 
     @Param({ "256", "512", "1024" })
     public int size;
@@ -55,8 +75,26 @@ public class DistributedMatrixBenchmark {
     private TiledMatrix tiledA;
     private TiledMatrix tiledB;
 
-    @Setup(Level.Trial)
+    @Override
     public void setup() {
+        doSetup();
+    }
+
+    @Override
+    public void run() {
+        standardMultiply();
+    }
+
+    @Override
+    public void teardown() {
+        A = null;
+        B = null;
+        tiledA = null;
+        tiledB = null;
+    }
+
+    @Setup(Level.Trial)
+    public void doSetup() {
         // Configure distributed context
         DistributedContext ctx = new LocalDistributedContext(parallelism);
         ComputeContext.current().setDistributedContext(ctx);
@@ -75,43 +113,55 @@ public class DistributedMatrixBenchmark {
 
     @Benchmark
     public Matrix<Real> standardMultiply() {
-        return A.multiply(B);
+        long start = System.nanoTime();
+        Matrix<Real> res = A.multiply(B);
+        record("standard", System.nanoTime() - start);
+        return res;
     }
 
     @Benchmark
     public TiledMatrix summaMultiply() {
-        return DistributedSUMMAAlgorithm.multiply(tiledA, tiledB);
+        long start = System.nanoTime();
+        TiledMatrix res = DistributedSUMMAAlgorithm.multiply(tiledA, tiledB);
+        record("summa", System.nanoTime() - start);
+        return res;
     }
 
     @Benchmark
     public TiledMatrix cannonMultiply() {
-        // Only run if grid is square
         int gridSize = (int) Math.sqrt(parallelism);
         if (gridSize * gridSize == parallelism) {
-            return DistributedCannonAlgorithm.multiply(tiledA, tiledB);
+            long start = System.nanoTime();
+            TiledMatrix res = DistributedCannonAlgorithm.multiply(tiledA, tiledB);
+            record("cannon", System.nanoTime() - start);
+            return res;
         }
-        return null; // Skip if not square grid
+        return null;
     }
 
     @Benchmark
     public TiledMatrix foxMultiply() {
-        // Only run if grid is square
         int gridSize = (int) Math.sqrt(parallelism);
         if (gridSize * gridSize == parallelism) {
-            return DistributedFoxAlgorithm.multiply(tiledA, tiledB);
+            long start = System.nanoTime();
+            TiledMatrix res = DistributedFoxAlgorithm.multiply(tiledA, tiledB);
+            record("fox", System.nanoTime() - start);
+            return res;
         }
-        return null; // Skip if not square grid
+        return null;
     }
 
     @Benchmark
     public TiledMatrix twoAndHalfDMultiply() {
-        // Use 2 layers if parallelism allows
         int c = (parallelism >= 8) ? 2 : 1;
         if (parallelism % c == 0) {
             int pLayer = parallelism / c;
             int pSqrt = (int) Math.sqrt(pLayer);
             if (pSqrt * pSqrt == pLayer) {
-                return Distributed25DAlgorithm.multiply(tiledA, tiledB, c);
+                long start = System.nanoTime();
+                TiledMatrix res = Distributed25DAlgorithm.multiply(tiledA, tiledB, c);
+                record("2.5d", System.nanoTime() - start);
+                return res;
             }
         }
         return null;
@@ -119,7 +169,15 @@ public class DistributedMatrixBenchmark {
 
     @Benchmark
     public TiledMatrix carmaMultiply() {
-        return DistributedCARMAAlgorithm.multiply(tiledA, tiledB);
+        long start = System.nanoTime();
+        TiledMatrix res = DistributedCARMAAlgorithm.multiply(tiledA, tiledB);
+        record("carma", System.nanoTime() - start);
+        return res;
+    }
+
+    private void record(String algo, long durationNs) {
+        org.jscience.benchmarks.monitoring.DistributedMonitor.getInstance()
+                .recordDistributedTask(algo, "local-pseudo-node", durationNs);
     }
 
     private Real[][] toReal(double[][] data) {

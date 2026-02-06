@@ -1,9 +1,6 @@
 package org.jscience.benchmarks.benchmark;
 
-import org.jscience.core.technical.algorithm.FFTProvider;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -19,49 +16,38 @@ public class BenchmarkRegistry {
         // 1. Discover standard benchmarks
         ServiceLoader<RunnableBenchmark> loader = ServiceLoader.load(RunnableBenchmark.class);
         for (RunnableBenchmark b : loader) {
-            // If it's a "Systematic" one, we skip it as we will expand it manually
-            // OR we can make it return all variations.
-            if (b instanceof SystematicFFTBenchmark) {
-                expandFFT((SystematicFFTBenchmark) b, all);
-            } else if (b instanceof SystematicMatrixBenchmark) {
-                expandMatrix((SystematicMatrixBenchmark) b, all);
+            if (b instanceof SystematicBenchmark) {
+                expandSystematic((SystematicBenchmark<?>) b, all);
             } else {
                 all.add(b);
             }
         }
         
+        // 2. Discover ComparisonBenchmarks (future step)
+        
         return all;
     }
 
-    private static void expandFFT(SystematicFFTBenchmark base, List<RunnableBenchmark> list) {
-        ServiceLoader<FFTProvider> loader = ServiceLoader.load(FFTProvider.class);
-        for (FFTProvider p : loader) {
+    private static <P extends org.jscience.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list) {
+        ServiceLoader<P> loader = ServiceLoader.load(base.getProviderClass());
+        for (P p : loader) {
+            // Check compatibility if it's a LinearAlgebraProvider
+            if (p instanceof LinearAlgebraProvider) {
+                if (!((LinearAlgebraProvider<?>) p).isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
+                    continue;
+                }
+            }
+            
             list.add(new RunnableBenchmark() {
-                @Override public String getName() { return "FFT [" + p.getName() + "]"; }
+                @Override public String getId() { return base.getIdPrefix() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
+                @Override public String getName() { return base.getNameBase() + " [" + p.getName() + "]"; }
+                @Override public String getDescription() { return base.getDescription() + " using " + p.getName() + " provider."; }
                 @Override public String getDomain() { return base.getDomain(); }
                 @Override public void setup() { base.setup(); base.setProvider(p); }
                 @Override public void run() { base.run(); }
                 @Override public void teardown() { base.teardown(); }
                 @Override public int getSuggestedIterations() { return base.getSuggestedIterations(); }
             });
-        }
-    }
-
-    private static void expandMatrix(SystematicMatrixBenchmark base, List<RunnableBenchmark> list) {
-        @SuppressWarnings("rawtypes")
-        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-        for (LinearAlgebraProvider<?> p : loader) {
-            if (p.isCompatible(Reals.getInstance())) {
-               list.add(new RunnableBenchmark() {
-                   @Override public String getName() { return "Matrix Mult [" + p.getName() + "]"; }
-                   @Override public String getDomain() { return base.getDomain(); }
-                   @SuppressWarnings("unchecked")
-                   @Override public void setup() { base.setup(); base.setProvider((LinearAlgebraProvider<Real>) p); }
-                   @Override public void run() { base.run(); }
-                   @Override public void teardown() { base.teardown(); }
-                   @Override public int getSuggestedIterations() { return base.getSuggestedIterations(); }
-               });
-            }
         }
     }
 }

@@ -2,24 +2,26 @@ package org.jscience.benchmarks.benchmark;
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.technical.algorithm.FFTProvider;
-import java.util.ServiceLoader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * A benchmark that systematically tests all available FFTProviders.
  */
-public class SystematicFFTBenchmark implements RunnableBenchmark {
+public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> {
 
     private static final int SIZE = 4096;
     private Complex[] data;
-    private final List<FFTProvider> providers = new ArrayList<>();
     private FFTProvider currentProvider;
 
+    @Override public String getId() { return getIdPrefix(); }
+    @Override public String getName() { return getNameBase(); }
+    @Override public String getIdPrefix() { return "fft-systematic"; }
+    @Override public String getNameBase() { return "Systematic FFT"; }
+    @Override public Class<FFTProvider> getProviderClass() { return FFTProvider.class; }
+
     @Override
-    public String getName() {
-        return "Systematic FFT (" + (currentProvider != null ? currentProvider.getName() : "None") + ")";
+    public String getDescription() {
+        return "Systematically benchmarks all discovered FFT providers (Local, MultiCore, Native, etc.) on a fixed size data set.";
     }
 
     @Override
@@ -30,25 +32,11 @@ public class SystematicFFTBenchmark implements RunnableBenchmark {
     @Override
     public void setup() {
         data = generateData(SIZE);
-        
-        // Discover providers
-        providers.clear();
-        ServiceLoader<FFTProvider> loader = ServiceLoader.load(FFTProvider.class);
-        for (FFTProvider p : loader) {
-            providers.add(p);
-        }
-        
-        if (!providers.isEmpty()) {
-            currentProvider = providers.get(0);
-        }
     }
 
+    @Override
     public void setProvider(FFTProvider provider) {
         this.currentProvider = provider;
-    }
-
-    public List<FFTProvider> getProviders() {
-        return providers;
     }
 
     @Override
