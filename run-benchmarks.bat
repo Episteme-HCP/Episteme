@@ -4,6 +4,7 @@ setlocal
 set APP_CLASS=org.jscience.benchmarks.benchmark.BenchmarkRunner
 set JAR_PATH=jscience-benchmarks\target\jscience-benchmarks.jar
 set LIB_DIR=launchers\lib
+set DEPENDENCY_DIR=jscience-benchmarks\target\dependency
 set MODULE_PATH=jscience-benchmarks\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes
 
 echo ==========================================
@@ -35,7 +36,11 @@ if exist "%JAR_PATH%" (
         echo [INFO] Classes not found, building module...
         call mvn compile -pl jscience-benchmarks -am -DskipTests
     )
-    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%LIB_DIR%\*" %APP_CLASS% %*
+    if not exist "%DEPENDENCY_DIR%" (
+        echo [INFO] Dependencies not found in target, copying...
+        call mvn dependency:copy-dependencies -pl jscience-benchmarks -DincludeScope=runtime -DskipTests
+    )
+    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*" %APP_CLASS% %*
 )
 
 echo.

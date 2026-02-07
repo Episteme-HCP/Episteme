@@ -5,6 +5,10 @@
     -fx-font-family: 'Outfit', 'Inter', 'Segoe UI', sans-serif;
 }
 
+.label, .text {
+    -fx-text-fill: #ff9d00;
+}
+
 /* Header */
 .header-bar {
     -fx-background-color: linear-gradient(to right, #1a1a1d, #121214);
