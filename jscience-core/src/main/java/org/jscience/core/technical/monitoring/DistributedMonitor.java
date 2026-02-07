@@ -52,6 +52,9 @@ public class DistributedMonitor {
     public synchronized void startServer() {
         if (started) return;
         
+        // Silence Jetty noise on some platforms (e.g. SO_REUSEPORT issue on Windows)
+        System.setProperty("org.slf4j.simpleLogger.log.org.eclipse.jetty", "warn");
+        
         try {
             app = Javalin.create(config -> {
                 config.showJavalinBanner = false;
