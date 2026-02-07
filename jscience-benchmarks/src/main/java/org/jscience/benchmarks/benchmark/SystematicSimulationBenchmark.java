@@ -1,11 +1,13 @@
 package org.jscience.benchmarks.benchmark;
 
 import org.jscience.core.technical.algorithm.SimulationProvider;
+import com.google.auto.service.AutoService;
 import java.util.*;
 
 /**
  * A benchmark that systematically tests all available SimulationProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicSimulationBenchmark implements SystematicBenchmark<SimulationProvider> {
 
     private SimulationProvider currentProvider;

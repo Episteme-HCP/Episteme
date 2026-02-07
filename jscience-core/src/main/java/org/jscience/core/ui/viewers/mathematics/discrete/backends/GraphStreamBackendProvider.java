@@ -24,6 +24,7 @@
 package org.jscience.core.ui.viewers.mathematics.discrete.backends;
 
 import org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend;
+import com.google.auto.service.AutoService;
 
 /**
  * Backend for GraphStream library.
@@ -34,6 +35,7 @@ import org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(GraphBackend.class)
 public class GraphStreamBackendProvider implements GraphBackend {
 
     @Override

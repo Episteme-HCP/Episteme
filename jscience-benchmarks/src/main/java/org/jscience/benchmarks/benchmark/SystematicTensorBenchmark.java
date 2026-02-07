@@ -3,12 +3,14 @@ package org.jscience.benchmarks.benchmark;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.TensorProvider;
+import com.google.auto.service.AutoService;
 
 import java.util.Random;
 
 /**
  * A benchmark that systematically tests all available TensorProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicTensorBenchmark implements SystematicBenchmark<TensorProvider> {
 
     private int[] shape = {100, 100};

@@ -48,6 +48,8 @@ import org.jscience.social.politics.loaders.WorldBankReader;
 import org.jscience.social.politics.Country;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.io.AbstractResourceReader;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 /**
  * Pandemic Propagation Forecaster.
@@ -56,6 +58,7 @@ import org.jscience.core.io.AbstractResourceReader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class PandemicForecasterApp extends FeaturedAppBase {
 
     // UI Components

@@ -7,6 +7,8 @@ package org.jscience.core.technical.algorithm.physics;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.LatticeBoltzmannProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.stream.IntStream;
 
 /**
@@ -15,6 +17,7 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class MulticoreLatticeBoltzmannProvider implements LatticeBoltzmannProvider {
 
     private static final int[] CX = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };

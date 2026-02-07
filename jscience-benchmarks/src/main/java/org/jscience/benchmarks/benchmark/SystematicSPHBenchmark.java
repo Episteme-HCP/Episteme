@@ -1,5 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.technical.algorithm.SPHFluidProvider;
 
 import java.util.Random;
@@ -7,6 +9,7 @@ import java.util.Random;
 /**
  * A benchmark that systematically tests all available SPHFluidProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicSPHBenchmark implements SystematicBenchmark<SPHFluidProvider> {
 
     private SPHFluidProvider currentProvider;

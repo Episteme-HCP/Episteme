@@ -40,10 +40,13 @@ import org.jscience.social.economics.analysis.TechnicalIndicators;
 import org.jscience.social.economics.loaders.FinancialMarketReader;
 import org.jscience.social.economics.loaders.FinancialMarketReader.Candle;
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@AutoService(Viewer.class)
 public class MarketCrashApp extends FeaturedAppBase {
     private LineChart<Number, Number> priceChart;
     private LineChart<Number, Number> rsiChart;

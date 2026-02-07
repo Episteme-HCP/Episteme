@@ -16,6 +16,7 @@ import java.nio.IntBuffer;
 
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.natural.physics.classical.mechanics.CollisionBackend;
+import com.google.auto.service.AutoService;
 
 /**
  * Implementation of {@link CollisionBackend} using Bullet Physics via Project Panama.
@@ -24,6 +25,7 @@ import org.jscience.natural.physics.classical.mechanics.CollisionBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
+@AutoService(CollisionBackend.class)
 public class NativeBulletBackend implements CollisionBackend {
 
     private static final MethodHandle DETECT_SPHERES;

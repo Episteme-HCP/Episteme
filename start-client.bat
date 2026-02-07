@@ -1,11 +1,10 @@
 @echo off
-REM Start the JScience Demos App (Client)
-echo Starting JScience Client...
+setlocal
 
-if not exist "jscience-core\target\jscience-core-1.0.0-SNAPSHOT.jar" (
-    echo Building Core...
-    call mvn clean package -pl jscience-core -am -DskipTests
-)
+:: Determine the path to the jscience-core classes
+set MODULE_PATH=jscience-core\target\classes;jscience-featured-apps\target\classes;jscience-benchmarks\target\classes
 
-echo Launching App...
-java --module-path jscience-core\target\classes;jscience-core\target\lib --add-modules javafx.controls,javafx.fxml -cp jscience-core\target\jscience-core-1.0.0-SNAPSHOT.jar org.jscience.ui.JScienceDemosApp
+echo Launching JScience Studio...
+java --module-path %MODULE_PATH% --add-modules javafx.controls,javafx.fxml,org.jscience.core -m org.jscience.core.ui.JScienceDemosApp --monitor %*
+
+endlocal

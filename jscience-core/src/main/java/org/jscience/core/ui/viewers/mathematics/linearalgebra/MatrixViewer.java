@@ -33,6 +33,8 @@ import javafx.scene.paint.Color;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.io.Configuration;
@@ -40,6 +42,7 @@ import org.jscience.core.io.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+@AutoService(Viewer.class)
 public class MatrixViewer<T> extends AbstractViewer {
 
     private static final String CFG_PREFIX = "viewer.matrixviewer.default.";

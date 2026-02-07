@@ -38,6 +38,8 @@ import org.jscience.core.measure.Quantities;
 import org.jscience.core.measure.Units;
 import org.jscience.core.measure.quantity.*;
 import org.jscience.core.ui.i18n.I18N;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 /**
  * Civilization Evolution Simulator.
@@ -50,6 +52,7 @@ import org.jscience.core.ui.i18n.I18N;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class CivilizationApp extends FeaturedAppBase {
 
     // Model State (Stocks)

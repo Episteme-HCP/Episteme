@@ -1677,6 +1677,12 @@ public class JScienceMasterControl extends Application {
     }
 
     public static void main(String[] args) {
+        for (String arg : args) {
+            if (arg.equals("--monitor")) {
+                org.jscience.core.technical.monitoring.DistributedMonitor.getInstance().startServer();
+                break;
+            }
+        }
         launch(args);
     }
     private void addBackendRow(GridPane grid, int row, org.jscience.core.technical.backend.Backend provider, I18N i18n) {

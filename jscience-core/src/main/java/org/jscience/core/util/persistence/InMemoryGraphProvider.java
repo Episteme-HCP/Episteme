@@ -23,6 +23,8 @@
 
 package org.jscience.core.util.persistence;
 
+import com.google.auto.service.AutoService;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +40,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
+@AutoService(GraphProvider.class)
 public class InMemoryGraphProvider implements GraphProvider {
 
     private final Map<Class<?>, Map<Object, Object>> store = new ConcurrentHashMap<>();

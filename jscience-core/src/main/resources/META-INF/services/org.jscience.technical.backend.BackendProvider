@@ -1,5 +1,0 @@
-org.jscience.media.backends.JavaSoundBackendProvider
-org.jscience.media.backends.TarsosBackendProvider
-org.jscience.media.backends.VLCJBackendProvider
-org.jscience.media.backends.MinimBackendProvider
-org.jscience.media.backends.JavaCVBackendProvider

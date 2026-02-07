@@ -25,6 +25,8 @@ package org.jscience.apps.apps.physics;
 
 import javafx.scene.layout.Region;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.i18n.I18N;
 import org.jscience.natural.ui.viewers.physics.quantum.QuantumCircuitViewer;
 
@@ -35,6 +37,7 @@ import org.jscience.natural.ui.viewers.physics.quantum.QuantumCircuitViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class QuantumCircuitApp extends FeaturedAppBase {
 
     private QuantumCircuitViewer viewer;

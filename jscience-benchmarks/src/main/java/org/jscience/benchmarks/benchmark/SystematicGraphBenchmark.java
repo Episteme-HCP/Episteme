@@ -1,5 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.mathematics.discrete.Graph;
 import org.jscience.core.mathematics.discrete.generators.ScaleFreeGenerator;
 import org.jscience.core.mathematics.numbers.integers.Natural;
@@ -8,6 +10,7 @@ import org.jscience.core.technical.algorithm.GraphAlgorithmProvider;
 /**
  * A benchmark that systematically tests all available GraphAlgorithmProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicGraphBenchmark implements SystematicBenchmark<GraphAlgorithmProvider> {
 
     private static final int NUM_VERTICES = 500;

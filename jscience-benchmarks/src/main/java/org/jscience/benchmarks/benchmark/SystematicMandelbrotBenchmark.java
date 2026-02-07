@@ -1,10 +1,13 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.technical.algorithm.MandelbrotProvider;
 
 /**
  * A benchmark that systematically tests all available MandelbrotProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicMandelbrotBenchmark implements SystematicBenchmark<MandelbrotProvider> {
 
     private MandelbrotProvider currentProvider;

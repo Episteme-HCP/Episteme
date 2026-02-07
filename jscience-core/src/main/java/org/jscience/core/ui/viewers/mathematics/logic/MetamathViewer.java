@@ -26,6 +26,8 @@ package org.jscience.core.ui.viewers.mathematics.logic;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 
@@ -39,6 +41,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class MetamathViewer extends AbstractViewer {
 
     @Override

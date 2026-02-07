@@ -32,6 +32,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
+import com.google.auto.service.AutoService;
+import org.jscience.core.ui.Viewer;
 
 import org.jscience.core.ui.BooleanParameter;
 import org.jscience.core.media.AudioBackend;
@@ -44,6 +46,7 @@ import java.util.List;
  * Premium Audio Visualization Tool.
  * Demonstrates wave physics and FFT spectral analysis using pluggable backends.
  */
+@AutoService(Viewer.class)
 public final class AudioViewer extends AbstractViewer {
 
     private final Canvas canvas = new Canvas(800, 400);

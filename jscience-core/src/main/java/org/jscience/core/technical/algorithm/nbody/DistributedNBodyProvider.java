@@ -7,6 +7,8 @@ package org.jscience.core.technical.algorithm.nbody;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.NBodyProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Distributed N-body simulation provider.
@@ -16,6 +18,7 @@ import org.jscience.core.technical.algorithm.NBodyProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class DistributedNBodyProvider implements NBodyProvider {
 
     @Override

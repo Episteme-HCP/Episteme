@@ -15,6 +15,14 @@ import java.nio.DoubleBuffer;
 import org.jscience.core.mathematics.linearalgebra.MatrixBackend;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
+import com.google.auto.service.AutoService;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraBackend;
+import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.numbers.real.RealDouble;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Implementation of {@link MatrixBackend} using OpenBLAS or Intel MKL via Panama.
@@ -23,7 +31,8 @@ import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeBLASBackend implements MatrixBackend {
+@AutoService({MatrixBackend.class, LinearAlgebraBackend.class})
+public class NativeBLASBackend implements MatrixBackend, LinearAlgebraBackend<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;
     private static final MethodHandle DGEMV_HANDLE;
@@ -140,12 +149,10 @@ public class NativeBLASBackend implements MatrixBackend {
         if (!AVAILABLE) throw new UnsupportedOperationException("BLAS native library not found");
 
         try {
-            // MemorySegment.ofBuffer(A) requires direct buffer or heap array with offset
             MemorySegment segA = MemorySegment.ofBuffer(A);
             MemorySegment segB = MemorySegment.ofBuffer(B);
             MemorySegment segC = MemorySegment.ofBuffer(C);
 
-            // CblasRowMajor = 101, CblasNoTrans = 111
             DGEMM_HANDLE.invokeExact(CblasRowMajor, CblasNoTrans, CblasNoTrans, rowsA, colsB, colsA,
                 alpha, segA, lda, segB, ldb, beta, segC, ldc);
         } catch (Throwable t) {
@@ -166,7 +173,6 @@ public class NativeBLASBackend implements MatrixBackend {
             MemorySegment segX = MemorySegment.ofBuffer(x);
             MemorySegment segY = MemorySegment.ofBuffer(y);
 
-            // CblasRowMajor = 101, CblasNoTrans = 111
             DGEMV_HANDLE.invokeExact(CblasRowMajor, CblasNoTrans, rowsA, colsA,
                 alpha, segA, lda, segX, incx, beta, segY, incy);
         } catch (Throwable t) {
@@ -210,7 +216,6 @@ public class NativeBLASBackend implements MatrixBackend {
         }
     }
 
-    // LAPACK wrappers
     public int dgesv(int n, int nrhs, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv, DoubleBuffer B, int ldb) {
         if (!AVAILABLE || DGESV_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesv not available");
         try {
@@ -238,7 +243,6 @@ public class NativeBLASBackend implements MatrixBackend {
         }
     }
     
-    /** Optimized version for NativeMatrix. */
     public void multiply(NativeMatrix A, NativeMatrix B, NativeMatrix C, double alpha, double beta) {
         if (!AVAILABLE) throw new UnsupportedOperationException("BLAS native library not found");
         try {
@@ -248,10 +252,71 @@ public class NativeBLASBackend implements MatrixBackend {
             throw new RuntimeException("CBLAS call failed", t);
         }
     }
+
+    // --- LinearAlgebraBackend Implementation ---
+
+    @Override
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Real dot(Vector<Real> a, Vector<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Matrix<Real> inverse(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Real determinant(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Matrix<Real> transpose(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
 }
-
-
-
-
-
-

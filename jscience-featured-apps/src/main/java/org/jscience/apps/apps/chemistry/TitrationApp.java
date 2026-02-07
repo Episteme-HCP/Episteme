@@ -38,8 +38,11 @@ import javafx.scene.paint.Color;
 import org.jscience.core.ui.i18n.I18NManager;
 import org.jscience.apps.apps.framework.ChartFactory;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import java.text.MessageFormat;
 
+@AutoService(Viewer.class)
 public class TitrationApp extends FeaturedAppBase {
     private double volumeBaseAdded = 0.0; // mL
     private double maxBuretteVol = 50.0; // mL

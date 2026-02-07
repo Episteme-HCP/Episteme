@@ -6,6 +6,8 @@
 package org.jscience.core.technical.algorithm.genetic;
 
 import org.jscience.core.technical.algorithm.GeneticAlgorithmProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.Random;
 import java.util.function.Function;
@@ -19,6 +21,7 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class MulticoreGeneticAlgorithmProvider implements GeneticAlgorithmProvider {
 
     @Override

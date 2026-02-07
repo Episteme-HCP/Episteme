@@ -13,41 +13,94 @@ public class BenchmarkRegistry {
     public static List<RunnableBenchmark> discover() {
         List<RunnableBenchmark> all = new ArrayList<>();
         
-        // 1. Discover standard benchmarks
-        ServiceLoader<RunnableBenchmark> loader = ServiceLoader.load(RunnableBenchmark.class);
-        for (RunnableBenchmark b : loader) {
-            if (b instanceof SystematicBenchmark) {
-                expandSystematic((SystematicBenchmark<?>) b, all);
-            } else {
-                all.add(b);
+        try {
+            // 1. Discover explicit benchmarks
+            ServiceLoader<RunnableBenchmark> benchLoader = ServiceLoader.load(RunnableBenchmark.class);
+            for (RunnableBenchmark b : benchLoader) {
+                try {
+                    if (b instanceof SystematicBenchmark) {
+                        expandSystematic((SystematicBenchmark<?>) b, all);
+                    } else {
+                        all.add(b);
+                    }
+                } catch (Throwable t) {
+                    System.err.println("[WARN] Failed to load explicit benchmark: " + t.getMessage());
+                }
             }
+
+            // 2. Discover all generic AlgorithmProviders and wrap them
+            ServiceLoader<org.jscience.core.technical.algorithm.AlgorithmProvider> providerLoader = 
+                    ServiceLoader.load(org.jscience.core.technical.algorithm.AlgorithmProvider.class);
+            for (org.jscience.core.technical.algorithm.AlgorithmProvider p : providerLoader) {
+                try {
+                    if (!p.isAvailable()) continue;
+                    
+                    // Avoid duplicates if already covered by systematic expansion
+                    if (all.stream().anyMatch(b -> b.getId().contains(p.getName().toLowerCase().replace(" ", "-")))) {
+                        continue;
+                    }
+                    
+                    all.add(wrapProvider(p));
+                } catch (Throwable t) {
+                    System.err.println("[WARN] Failed to load provider benchmark for " + p.getName() + ": " + t.getMessage());
+                }
+            }
+        } catch (Throwable t) {
+            System.err.println("[ERROR] Critical failure during benchmark discovery: " + t.getMessage());
         }
-        
-        // 2. Discover ComparisonBenchmarks (future step)
         
         return all;
     }
 
-    private static <P extends org.jscience.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list) {
-        ServiceLoader<P> loader = ServiceLoader.load(base.getProviderClass());
-        for (P p : loader) {
-            // Check compatibility if it's a LinearAlgebraProvider
-            if (p instanceof LinearAlgebraProvider) {
-                if (!((LinearAlgebraProvider<?>) p).isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
-                    continue;
+    private static RunnableBenchmark wrapProvider(org.jscience.core.technical.algorithm.AlgorithmProvider p) {
+        return new RunnableBenchmark() {
+            @Override public String getId() { return "gen-" + p.getAlgorithmType() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
+            @Override public String getName() { return "[" + p.getAlgorithmType().toUpperCase() + "] " + p.getName(); }
+            @Override public String getDescription() { return "Generic benchmark for " + p.getName() + " (" + p.getAlgorithmType() + ")"; }
+            @Override public String getDomain() { 
+                String type = p.getAlgorithmType();
+                return type.substring(0, 1).toUpperCase() + type.substring(1);
+            }
+            @Override public void setup() { if (p instanceof org.jscience.core.technical.algorithm.FFTProvider) { /* Custom setup if needed */ } }
+            @Override public void run() { 
+                // Generic execution test
+                if (p instanceof org.jscience.core.technical.algorithm.FFTProvider) {
+                    ((org.jscience.core.technical.algorithm.FFTProvider)p).transform(new double[1024], new double[1024]);
                 }
             }
-            
-            list.add(new RunnableBenchmark() {
-                @Override public String getId() { return base.getIdPrefix() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
-                @Override public String getName() { return base.getNameBase() + " [" + p.getName() + "]"; }
-                @Override public String getDescription() { return base.getDescription() + " using " + p.getName() + " provider."; }
-                @Override public String getDomain() { return base.getDomain(); }
-                @Override public void setup() { base.setup(); base.setProvider(p); }
-                @Override public void run() { base.run(); }
-                @Override public void teardown() { base.teardown(); }
-                @Override public int getSuggestedIterations() { return base.getSuggestedIterations(); }
-            });
+            @Override public void teardown() {}
+            @Override public int getSuggestedIterations() { return 100; }
+        };
+    }
+
+    private static <P extends org.jscience.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list) {
+        try {
+            ServiceLoader<P> loader = ServiceLoader.load(base.getProviderClass());
+            for (P p : loader) {
+                try {
+                    // Check compatibility if it's a LinearAlgebraProvider
+                    if (p instanceof LinearAlgebraProvider) {
+                        if (!((LinearAlgebraProvider<?>) p).isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
+                            continue;
+                        }
+                    }
+                    
+                    list.add(new RunnableBenchmark() {
+                        @Override public String getId() { return base.getIdPrefix() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
+                        @Override public String getName() { return base.getNameBase() + " [" + p.getName() + "]"; }
+                        @Override public String getDescription() { return base.getDescription() + " using " + p.getName() + " provider."; }
+                        @Override public String getDomain() { return base.getDomain(); }
+                        @Override public void setup() { base.setup(); base.setProvider(p); }
+                        @Override public void run() { base.run(); }
+                        @Override public void teardown() { base.teardown(); }
+                        @Override public int getSuggestedIterations() { return base.getSuggestedIterations(); }
+                    });
+                } catch (Throwable t) {
+                    System.err.println("[WARN] Failed to instantiate provider for " + base.getNameBase() + ": " + t.getMessage());
+                }
+            }
+        } catch (Throwable t) {
+            System.err.println("[ERROR] Failed to discover providers for class " + base.getProviderClass().getSimpleName() + ": " + t.getMessage());
         }
     }
 }

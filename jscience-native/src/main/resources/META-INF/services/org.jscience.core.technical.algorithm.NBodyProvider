@@ -1,3 +1,0 @@
-org.jscience.nativ.technical.algorithm.nbody.NativeMulticoreNBodyProvider
-org.jscience.nativ.technical.algorithm.nbody.CUDANBodyProvider
-org.jscience.nativ.technical.algorithm.nbody.OpenCLNBodyProvider

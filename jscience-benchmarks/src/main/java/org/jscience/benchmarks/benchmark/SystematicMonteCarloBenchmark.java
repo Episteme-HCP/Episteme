@@ -1,10 +1,13 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.technical.algorithm.MonteCarloProvider;
 
 /**
  * A benchmark that systematically tests all available MonteCarloProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicMonteCarloBenchmark implements SystematicBenchmark<MonteCarloProvider> {
 
     private MonteCarloProvider currentProvider;

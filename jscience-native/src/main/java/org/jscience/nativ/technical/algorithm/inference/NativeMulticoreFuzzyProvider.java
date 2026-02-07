@@ -6,6 +6,7 @@ package org.jscience.nativ.technical.algorithm.inference;
 
 import org.jscience.core.mathematics.logic.fuzzy.FuzzyExpression;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import com.google.auto.service.AutoService;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * @author Silvere Martin-Michiellot
  * @since 2.0
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeMulticoreFuzzyProvider implements AlgorithmProvider {
 
     /**

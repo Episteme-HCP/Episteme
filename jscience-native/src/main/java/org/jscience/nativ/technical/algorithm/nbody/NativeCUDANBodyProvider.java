@@ -7,6 +7,8 @@ package org.jscience.nativ.technical.algorithm.nbody;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.NBodyProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.gpu.cuda.CUDABackend;
 import java.util.logging.Logger;
 
@@ -17,6 +19,7 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeCUDANBodyProvider implements NBodyProvider {
     private static final Logger LOGGER = Logger.getLogger(NativeCUDANBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;

@@ -7,6 +7,8 @@ package org.jscience.core.technical.algorithm.numerical;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.ODEProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.function.BiFunction;
 
 /**
@@ -16,6 +18,7 @@ import java.util.function.BiFunction;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class RungeKuttaODEProvider implements ODEProvider {
 
     @Override

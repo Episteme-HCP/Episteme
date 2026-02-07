@@ -1,15 +1,9 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 
-set APP_CLASS=org.jscience.ui.JScienceMasterControl
-set LIB_DIR=launchers\lib
-set MODULE_PATH=jscience-featured-apps\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes
+set MODULE_PATH=jscience-core\target\classes;jscience-featured-apps\target\classes
 
+echo Launching JScience Master Control...
+java --module-path %MODULE_PATH% --add-modules javafx.controls,javafx.fxml,org.jscience.core -m org.jscience.core.ui.JScienceMasterControl --monitor %*
 
-set CLASSPATH=%MODULE_PATH%;%LIB_DIR%\*
-
-echo Starting JScience Master Control...
-java --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "%LIB_DIR%\javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "!CLASSPATH!" %APP_CLASS%
-
-pause
 endlocal

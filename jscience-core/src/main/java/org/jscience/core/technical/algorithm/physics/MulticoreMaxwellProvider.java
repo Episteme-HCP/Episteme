@@ -8,6 +8,8 @@ package org.jscience.core.technical.algorithm.physics;
 import org.jscience.core.mathematics.geometry.Vector4D;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.MaxwellProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.MaxwellSource;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class MulticoreMaxwellProvider implements MaxwellProvider {
 
     private final List<MaxwellSource> sources = new ArrayList<>();

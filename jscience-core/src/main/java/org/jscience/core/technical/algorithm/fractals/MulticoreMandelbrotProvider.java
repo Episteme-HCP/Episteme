@@ -7,6 +7,9 @@ package org.jscience.core.technical.algorithm.fractals;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.MandelbrotProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import com.google.auto.service.AutoService;
 import java.util.stream.IntStream;
 
 /**
@@ -15,8 +18,9 @@ import java.util.stream.IntStream;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @since 1.0
  */
+@AutoService({MandelbrotProvider.class, AlgorithmProvider.class})
 public class MulticoreMandelbrotProvider implements MandelbrotProvider {
 
     @Override

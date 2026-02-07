@@ -1,5 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.technical.algorithm.FFTProvider;
 import java.util.Random;
@@ -7,6 +9,7 @@ import java.util.Random;
 /**
  * A benchmark that systematically tests all available FFTProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> {
 
     private static final int SIZE = 4096;

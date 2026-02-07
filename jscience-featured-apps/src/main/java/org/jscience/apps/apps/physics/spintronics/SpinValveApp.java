@@ -34,9 +34,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
+@AutoService(Viewer.class)
 public class SpinValveApp extends FeaturedAppBase {
 
     private SpinValve spinValve;

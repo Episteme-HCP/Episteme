@@ -25,6 +25,8 @@ package org.jscience.core.ui.viewers.mathematics.discrete;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Label;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.RealParameter;
@@ -41,6 +43,7 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class GraphViewer extends AbstractViewer {
 
     private JavaFXGraphRenderer nativeRenderer;

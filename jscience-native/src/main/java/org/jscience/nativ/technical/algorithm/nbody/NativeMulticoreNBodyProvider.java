@@ -6,6 +6,8 @@
 package org.jscience.nativ.technical.algorithm.nbody;
 
 import org.jscience.core.technical.algorithm.NBodyProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
@@ -15,6 +17,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeMulticoreNBodyProvider implements NBodyProvider {
 
     @Override

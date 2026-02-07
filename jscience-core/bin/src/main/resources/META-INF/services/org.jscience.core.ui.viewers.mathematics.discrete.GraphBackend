@@ -1,3 +1,0 @@
-org.jscience.core.ui.viewers.mathematics.discrete.backends.JavaFXGraphBackendProvider
-org.jscience.core.ui.viewers.mathematics.discrete.backends.GraphStreamBackendProvider
-org.jscience.core.ui.viewers.mathematics.discrete.backends.JGraphTBackendProvider

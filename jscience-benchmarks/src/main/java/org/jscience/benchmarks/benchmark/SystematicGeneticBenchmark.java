@@ -1,5 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.technical.algorithm.GeneticAlgorithmProvider;
 
 import java.util.function.Function;
@@ -7,6 +9,7 @@ import java.util.function.Function;
 /**
  * A benchmark that systematically tests all available GeneticAlgorithmProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicGeneticBenchmark implements SystematicBenchmark<GeneticAlgorithmProvider> {
 
     private GeneticAlgorithmProvider currentProvider;

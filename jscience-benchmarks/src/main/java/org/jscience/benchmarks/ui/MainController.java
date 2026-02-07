@@ -21,12 +21,18 @@ public class MainController {
     @FXML private ProgressBar globalProgressBar;
     @FXML private Label statusBarLabel;
     @FXML private TabPane mainTabPane;
+    @FXML private TableView<BenchmarkRunSummary> historyTable;
+    @FXML private TableColumn<BenchmarkRunSummary, String> dateColumn;
+    @FXML private TableColumn<BenchmarkRunSummary, String> suiteColumn;
+    @FXML private TableColumn<BenchmarkRunSummary, Integer> resultsColumn;
 
     private final XYChart.Series<String, Number> benchmarkSeries = new XYChart.Series<>();
+    private final List<BenchmarkRunSummary> historyList = new ArrayList<>();
 
     @FXML
     public void initialize() {
         setupTable();
+        setupHistoryTable();
         discoverBenchmarks();
         performanceBarChart.getData().add(benchmarkSeries);
         benchmarkSeries.setName("Throughput (Ops/Sec)");
@@ -39,6 +45,12 @@ public class MainController {
         resultColumn.setCellValueFactory(p -> p.getValue().getValue().resultProperty());
         
         benchmarkTreeTable.setShowRoot(false);
+    }
+
+    private void setupHistoryTable() {
+        dateColumn.setCellValueFactory(p -> p.getValue().dateProperty());
+        suiteColumn.setCellValueFactory(p -> p.getValue().suiteNameProperty());
+        resultsColumn.setCellValueFactory(p -> p.getValue().successfulCountProperty().asObject());
     }
 
     private void discoverBenchmarks() {
@@ -55,6 +67,26 @@ public class MainController {
             domainNode.getChildren().add(new TreeItem<>(new BenchmarkItem(b.getName(), b.getDomain(), b)));
         }
         benchmarkTreeTable.setRoot(root);
+    }
+
+    @FXML
+    private void handleSettings() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Settings");
+        alert.setHeaderText("JScience Benchmarking Settings");
+        alert.setContentText("Configuration options will be available in the next update (v1.1).");
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void handleAbout() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("About JScience Benchmarking");
+        alert.setHeaderText("JScience Benchmarking Suite v1.0");
+        alert.setContentText("A premium benchmarking suite for high-performance computing.\n\n" +
+                "Built with JScience Core and JavaFX.\n" +
+                "© 2026 JScience Project Contributors.");
+        alert.show();
     }
 
     @FXML
@@ -122,18 +154,32 @@ public class MainController {
         RunnableBenchmark b = item.getBenchmark();
         try {
             b.setup();
+            
+            // 1. Warmup Phase (non-measured)
+            Platform.runLater(() -> item.statusProperty().set("Warming up..."));
+            int warmupIter = Math.max(1, b.getSuggestedIterations() / 5);
+            for (int i = 0; i < warmupIter; i++) {
+                b.run();
+            }
+
+            // 2. Measurement Phase
+            Platform.runLater(() -> item.statusProperty().set("Measuring..."));
             long start = System.nanoTime();
             int iter = b.getSuggestedIterations();
-            for (int i = 0; i < iter; i++) b.run();
+            for (int i = 0; i < iter; i++) {
+                b.run();
+            }
             long end = System.nanoTime();
             
-            double opsSec = (iter * 1_000_000_000.0) / (end - start);
-            String resultText = String.format("%.0f ops/s", opsSec);
+            double durationSec = (end - start) / 1_000_000_000.0;
+            double opsSec = iter / durationSec;
+            String resultText = String.format("%.2f ops/s", opsSec);
 
             Platform.runLater(() -> {
                 item.statusProperty().set("Success");
                 item.resultProperty().set(resultText);
                 updateChart(item.getName(), opsSec);
+                addToHistory(item.getName(), resultText);
             });
             
             b.teardown();
@@ -153,5 +199,24 @@ public class MainController {
             }
         }
         benchmarkSeries.getData().add(new XYChart.Data<>(name, value));
+    }
+
+    private void addToHistory(String name, String result) {
+        // Record individual run for the current session suite
+        Platform.runLater(() -> {
+            boolean found = false;
+            for (BenchmarkRunSummary run : historyList) {
+                if (run.getSuiteName().equals("Session Run")) {
+                    run.successfulCountProperty().set(run.getSuccessfulCount() + 1);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                BenchmarkRunSummary newRun = new BenchmarkRunSummary("Session Run", 1);
+                historyList.add(newRun);
+                historyTable.getItems().add(newRun);
+            }
+        });
     }
 }

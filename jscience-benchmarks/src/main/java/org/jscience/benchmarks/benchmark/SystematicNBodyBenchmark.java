@@ -1,11 +1,14 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.NBodyProvider;
 
 /**
  * A benchmark that systematically tests all available NBodyProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicNBodyBenchmark implements SystematicBenchmark<NBodyProvider> {
 
     private static final int N = 128;

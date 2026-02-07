@@ -55,8 +55,8 @@ public class BenchmarkRunner {
                 I18N.getInstance().get("benchmark.header.mem"));
         System.out.println("-".repeat(90));
 
-        org.jscience.benchmarks.monitoring.DistributedMonitor monitor = 
-                org.jscience.benchmarks.monitoring.DistributedMonitor.getInstance();
+        org.jscience.core.technical.monitoring.DistributedMonitor monitor = 
+                org.jscience.core.technical.monitoring.DistributedMonitor.getInstance();
 
         for (RunnableBenchmark b : benchmarks) {
             try {
@@ -112,23 +112,27 @@ public class BenchmarkRunner {
         I18N.getInstance().addBundle("org.jscience.benchmarks.i18n.messages_benchmarks");
 
         boolean monitorEnabled = false;
+        boolean forceGui = false;
+        boolean forceCli = false;
+
         for (String arg : args) {
-            if (arg.equals("--monitor") || arg.equals("--studio")) {
-                monitorEnabled = true;
-                break;
-            }
+            if (arg.equals("--monitor")) monitorEnabled = true;
+            if (arg.equals("--studio") || arg.equals("--gui")) forceGui = true;
+            if (arg.equals("--cli") || arg.equals("--console")) forceCli = true;
         }
 
         if (monitorEnabled) {
-            org.jscience.benchmarks.monitoring.DistributedMonitor.getInstance().startServer();
+            org.jscience.core.technical.monitoring.DistributedMonitor.getInstance().startServer();
         }
 
-        // if (args.length > 0 && args[0].equals("--studio")) {
-        //     System.out.println("Launching JScience Studio...");
-        //     org.jscience.benchmarks.ui.JScienceBenchmarkingApp.main(args);
-        //     return;
-        // }
+        // GUI is default unless --cli/--console is specified
+        if (forceGui || !forceCli) {
+            System.out.println("Launching JScience Benchmarking Suite (GUI)...");
+            org.jscience.benchmarks.ui.JScienceBenchmarkingApp.main(args);
+            return;
+        }
 
+        System.out.println("Starting JScience Benchmarks (CLI mode)...");
         BenchmarkRunner runner = new BenchmarkRunner();
         runner.discover();
         runner.runAll();

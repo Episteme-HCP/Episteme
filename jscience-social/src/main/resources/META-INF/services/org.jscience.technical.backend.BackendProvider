@@ -1,6 +1,0 @@
-# Map Backend Providers
-org.jscience.ui.viewers.geography.backend.JavaFXMapBackendProvider
-org.jscience.ui.viewers.geography.backend.GeoToolsBackendProvider
-org.jscience.ui.viewers.geography.backend.OpenMapBackendProvider
-org.jscience.ui.viewers.geography.backend.UnfoldingMapBackendProvider
-org.jscience.ui.viewers.geography.backend.GoogleGeoChartBackendProvider

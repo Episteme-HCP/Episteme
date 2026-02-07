@@ -6,6 +6,7 @@
 package org.jscience.benchmarks.benchmark;
 
 import org.openjdk.jmh.annotations.*;
+import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
@@ -19,6 +20,7 @@ import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
 import org.jscience.core.ComputeContext;
+import org.jscience.core.technical.monitoring.DistributedMonitor;
 
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
@@ -39,6 +41,7 @@ import java.util.Random;
 @Warmup(iterations = 3, time = 1)
 @Measurement(iterations = 5, time = 1)
 @Fork(1)
+@AutoService(RunnableBenchmark.class)
 public class DistributedMatrixBenchmark implements RunnableBenchmark {
 
     @Override
@@ -176,7 +179,7 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
     }
 
     private void record(String algo, long durationNs) {
-        org.jscience.benchmarks.monitoring.DistributedMonitor.getInstance()
+        DistributedMonitor.getInstance()
                 .recordDistributedTask(algo, "local-pseudo-node", durationNs);
     }
 
@@ -202,5 +205,3 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
         return data;
     }
 }
-
-

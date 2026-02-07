@@ -7,10 +7,13 @@ package org.jscience.core.technical.algorithm.fft;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.FFTProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.analysis.transform.DiscreteFourierTransform;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
+import com.google.auto.service.AutoService;
 
 /**
  * Multicore implementation of FFTProvider using Fork/Join framework.
@@ -19,6 +22,7 @@ import java.util.concurrent.RecursiveTask;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService({FFTProvider.class, AlgorithmProvider.class})
 public class MulticoreFFTProvider implements FFTProvider {
 
     @Override
@@ -133,14 +137,47 @@ public class MulticoreFFTProvider implements FFTProvider {
     }
 
     private Real[][] computeLocalFFT(Real[] real, Real[] imag) {
-        Complex[] data = new Complex[real.length];
-        for (int i = 0; i < real.length; i++) data[i] = Complex.of(real[i], imag[i]);
-        Complex[] transformed = DiscreteFourierTransform.transform(data);
-        Real[] outReal = new Real[transformed.length], outImag = new Real[transformed.length];
-        for (int i = 0; i < transformed.length; i++) {
-            outReal[i] = transformed[i].getReal(); outImag[i] = transformed[i].getImaginary();
+        int n = real.length;
+        Complex[] data = new Complex[n];
+        for (int i = 0; i < n; i++) data[i] = Complex.of(real[i], imag[i]);
+        
+        // Use a basic recursive FFT for the base case to avoid circularity with AlgorithmManager
+        Complex[] transformed = basicRecursiveFFT(data, false);
+        
+        Real[] outReal = new Real[n], outImag = new Real[n];
+        for (int i = 0; i < n; i++) {
+            outReal[i] = transformed[i].getReal();
+            outImag[i] = transformed[i].getImaginary();
         }
         return new Real[][] { outReal, outImag };
+    }
+
+    private Complex[] basicRecursiveFFT(Complex[] x, boolean inverse) {
+        int n = x.length;
+        if (n == 1) return new Complex[] { x[0] };
+
+        Complex[] even = new Complex[n / 2];
+        Complex[] odd = new Complex[n / 2];
+        for (int i = 0; i < n / 2; i++) {
+            even[i] = x[2 * i];
+            odd[i] = x[2 * i + 1];
+        }
+
+        Complex[] q = basicRecursiveFFT(even, inverse);
+        Complex[] r = basicRecursiveFFT(odd, inverse);
+
+        Complex[] y = new Complex[n];
+        double angle = (inverse ? 2 : -2) * Math.PI / n;
+        Complex wn = Complex.of(Math.cos(angle), Math.sin(angle));
+        Complex w = Complex.ONE;
+
+        for (int k = 0; k < n / 2; k++) {
+            Complex wr = w.multiply(r[k]);
+            y[k] = q[k].add(wr);
+            y[k + n / 2] = q[k].subtract(wr);
+            w = w.multiply(wn);
+        }
+        return y;
     }
 
     private double[][] computeFFTPrimitive(double[] real, double[] imag, boolean parallel) {
@@ -177,12 +214,17 @@ public class MulticoreFFTProvider implements FFTProvider {
     }
 
     private double[][] computeLocalFFTPrimitive(double[] real, double[] imag) {
-        Complex[] data = new Complex[real.length];
-        for (int i = 0; i < real.length; i++) data[i] = Complex.of(real[i], imag[i]);
-        Complex[] transformed = DiscreteFourierTransform.transform(data);
-        double[] outReal = new double[transformed.length], outImag = new double[transformed.length];
-        for (int i = 0; i < transformed.length; i++) {
-            outReal[i] = transformed[i].real(); outImag[i] = transformed[i].imaginary();
+        int n = real.length;
+        Complex[] data = new Complex[n];
+        for (int i = 0; i < n; i++) data[i] = Complex.of(real[i], imag[i]);
+        
+        // Use a basic recursive FFT for the base case to avoid circularity with AlgorithmManager
+        Complex[] transformed = basicRecursiveFFT(data, false);
+        
+        double[] outReal = new double[n], outImag = new double[n];
+        for (int i = 0; i < n; i++) {
+            outReal[i] = transformed[i].real();
+            outImag[i] = transformed[i].imaginary();
         }
         return new double[][] { outReal, outImag };
     }

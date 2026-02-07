@@ -33,12 +33,15 @@ import org.jscience.core.mathematics.symbolic.parsing.SimpleExpressionParser;
 import org.jscience.core.mathematics.analysis.SymbolicUtil;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.RealParameter;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.Plot2D;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot2D;
 import java.util.*;
 import org.jscience.core.ui.i18n.I18N;
 
+@AutoService(Viewer.class)
 public class FunctionExplorer2DViewer extends AbstractViewer {
 
     private static final String DEFAULT_FX = "sin(x)";

@@ -39,6 +39,8 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
 import org.jscience.core.ui.i18n.I18N;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ import java.util.List;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
+@AutoService(Viewer.class)
 public class CrystalStructureApp extends FeaturedAppBase {
     private Group root3D;
     private Rotate rx, ry;

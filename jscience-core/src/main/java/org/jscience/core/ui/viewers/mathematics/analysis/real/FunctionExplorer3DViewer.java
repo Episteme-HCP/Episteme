@@ -28,6 +28,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.symbolic.parsing.SimpleExpressionParser;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.RealParameter;
@@ -35,6 +37,7 @@ import org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends.JavaF
 import org.jscience.core.ui.theme.ThemeColors;
 import java.util.*;
 
+@AutoService(Viewer.class)
 public class FunctionExplorer3DViewer extends AbstractViewer {
 
     private static final String DEFAULT_3D_FUNC = "sin(sqrt(x^2+y^2))";

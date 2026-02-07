@@ -91,6 +91,11 @@
             <scope>system</scope>
             <systemPath>C:/Silvere/Encours/Developpement/JScience/launchers/lib/java-fbx-loader-v1.0.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>

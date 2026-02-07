@@ -24,6 +24,8 @@
 package org.jscience.core.ui.viewers.measure.units;
 
 import org.jscience.core.ui.AbstractViewer;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.Parameter;
 import java.util.List;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ import static org.jscience.core.measure.Units.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class UnitConverterViewer extends AbstractViewer {
 
     @Override

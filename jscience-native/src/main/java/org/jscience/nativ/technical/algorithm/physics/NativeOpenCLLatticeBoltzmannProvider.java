@@ -7,6 +7,8 @@ package org.jscience.nativ.technical.algorithm.physics;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.LatticeBoltzmannProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
 import java.util.logging.Logger;
 
@@ -17,6 +19,7 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeOpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider {
 
     private static final Logger LOGGER = Logger.getLogger(NativeOpenCLLatticeBoltzmannProvider.class.getName());

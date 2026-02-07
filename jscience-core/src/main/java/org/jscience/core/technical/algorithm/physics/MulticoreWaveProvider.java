@@ -8,6 +8,8 @@ package org.jscience.core.technical.algorithm.physics;
 import java.util.stream.IntStream;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.WaveProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Multicore implementation of WaveProvider.
@@ -16,6 +18,7 @@ import org.jscience.core.technical.algorithm.WaveProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class MulticoreWaveProvider implements WaveProvider {
 
     @Override

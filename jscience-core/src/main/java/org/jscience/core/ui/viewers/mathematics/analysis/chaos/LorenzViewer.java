@@ -25,6 +25,8 @@ package org.jscience.core.ui.viewers.mathematics.analysis.chaos;
 
 import javafx.animation.AnimationTimer;
 import org.jscience.core.io.Configuration;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Simulatable;
 import org.jscience.core.ui.Parameter;
@@ -46,6 +48,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class LorenzViewer extends AbstractViewer implements Simulatable {
 
     private static final String CFG_PREFIX = "viewer.lorenz.default.";

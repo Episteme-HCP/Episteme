@@ -2,6 +2,8 @@ package org.jscience.nativ.technical.algorithm.inference;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.technical.algorithm.TensorProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Native CPU implementation of Neural Network operations.
@@ -14,6 +16,7 @@ import org.jscience.core.technical.algorithm.TensorProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeDenseNeuralProvider implements TensorProvider {
 
     @Override

@@ -41,9 +41,12 @@ import javafx.util.Duration;
 
 import org.jscience.apps.apps.framework.ChartFactory;
 import org.jscience.apps.apps.framework.FeaturedAppBase;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import java.text.MessageFormat;
 
+@AutoService(Viewer.class)
 public class SmartGridApp extends FeaturedAppBase {
     // UI Components
     private AreaChart<Number, Number> loadChart;

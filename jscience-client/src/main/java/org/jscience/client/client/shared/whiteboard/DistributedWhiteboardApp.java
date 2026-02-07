@@ -39,6 +39,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 /**
  * Collaborative Whiteboard - Real-time shared canvas using
@@ -48,6 +50,7 @@ import org.jscience.core.ui.ThemeManager;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class DistributedWhiteboardApp extends Application implements org.jscience.core.ui.App {
 
     private ManagedChannel channel;

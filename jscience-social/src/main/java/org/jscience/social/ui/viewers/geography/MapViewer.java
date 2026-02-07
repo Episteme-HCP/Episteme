@@ -23,6 +23,8 @@
 
 package org.jscience.social.ui.viewers.geography;
 
+import com.google.auto.service.AutoService;
+
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
@@ -48,6 +50,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class MapViewer extends StackPane implements Viewer {
 
     public MapViewer() {

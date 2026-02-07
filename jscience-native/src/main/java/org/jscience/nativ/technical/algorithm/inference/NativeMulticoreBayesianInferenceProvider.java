@@ -6,6 +6,8 @@
 package org.jscience.nativ.technical.algorithm.inference;
 
 import org.jscience.core.technical.algorithm.BayesianInferenceProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.inference.VariableEliminationProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.Map;
@@ -20,6 +22,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeMulticoreBayesianInferenceProvider implements BayesianInferenceProvider {
 
     @Override

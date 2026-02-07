@@ -7,6 +7,8 @@ package org.jscience.core.technical.algorithm.graph;
 
 import org.jscience.core.mathematics.discrete.Graph;
 import org.jscience.core.technical.algorithm.GraphAlgorithmProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class MulticoreGraphAlgorithmProvider implements GraphAlgorithmProvider {
 
     @Override

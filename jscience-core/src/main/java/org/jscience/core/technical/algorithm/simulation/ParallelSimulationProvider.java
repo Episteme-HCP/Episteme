@@ -11,60 +11,51 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import org.jscience.core.technical.algorithm.SimulationProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Parallel implementation of the SimulationProvider.
- * Uses a thread pool to execute simulation tasks in parallel.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @since 1.0
  */
+@AutoService({SimulationProvider.class, AlgorithmProvider.class})
 public class ParallelSimulationProvider implements SimulationProvider {
 
     @Override
     public int getPriority() {
-        return 40;
+        return 20;
     }
 
     @Override
     public String getName() {
-        return "Parallel Simulation (CPU)";
+        return "Parallel Simulation Engine (ForkJoin)";
     }
 
     @Override
-    public void parallelExecute(List<Runnable> tasks, int parallelism) {
-        if (tasks.isEmpty()) return;
-        
-        ExecutorService executor = Executors.newFixedThreadPool(parallelism, r -> {
-            Thread t = new Thread(r, "JScience-Simulation-Worker");
-            t.setDaemon(true);
-            return t;
-        });
-        
-        try {
-            Phaser phaser = new Phaser(1);
-            for (Runnable task : tasks) {
-                phaser.register();
-                executor.submit(() -> {
-                    try {
-                        task.run();
-                    } finally {
-                        phaser.arriveAndDeregister();
-                    }
-                });
-            }
-            phaser.arriveAndAwaitAdvance();
-        } finally {
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
+    public void parallelExecute(List<Runnable> tasks, int threadCount) {
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        Phaser phaser = new Phaser(1); // Register main thread
+
+        for (Runnable task : tasks) {
+            phaser.register();
+            executor.submit(() -> {
+                try {
+                    task.run();
+                } finally {
+                    phaser.arriveAndDeregister();
                 }
-            } catch (InterruptedException e) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
+            });
+        }
+
+        phaser.arriveAndAwaitAdvance();
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }

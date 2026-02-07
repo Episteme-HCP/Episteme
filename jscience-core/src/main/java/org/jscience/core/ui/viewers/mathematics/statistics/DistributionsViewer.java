@@ -23,6 +23,8 @@
 
 package org.jscience.core.ui.viewers.mathematics.statistics;
 
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.ChoiceParameter;
@@ -43,6 +45,7 @@ import javafx.scene.layout.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class DistributionsViewer extends AbstractViewer {
 
     private final StackPane chartContainer = new StackPane();
@@ -149,4 +152,3 @@ public class DistributionsViewer extends AbstractViewer {
     @Override public String getLongDescription() { return I18N.getInstance().get("viewer.distributionsviewer.longdesc", "Detailed visualization of various statistical distributions including Normal, Poisson, and Binomial. Interactively adjust parameters like mean, standard deviation, and lambda to see how they affect the shape and characteristics of the distribution curves."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }
-

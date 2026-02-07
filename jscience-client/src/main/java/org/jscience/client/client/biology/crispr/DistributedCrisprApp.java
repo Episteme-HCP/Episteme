@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.stage.FileChooser;
 import org.jscience.core.ui.ThemeManager;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 /**
  * Distributed CRISPR Design Application.
@@ -52,6 +54,7 @@ import org.jscience.core.ui.ThemeManager;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class DistributedCrisprApp extends Application implements org.jscience.core.ui.App {
 
     private ManagedChannel channel;

@@ -24,6 +24,8 @@
 package org.jscience.core.ui.viewers.mathematics.symbolic;
 
 
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import javafx.geometry.Insets;
@@ -39,6 +41,7 @@ import javafx.scene.text.Font;
 import java.util.List;
 import java.util.ArrayList;
 
+@AutoService(Viewer.class)
 public class FormulaNotationViewer extends AbstractViewer {
 
     @Override

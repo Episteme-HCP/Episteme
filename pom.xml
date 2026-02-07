@@ -78,6 +78,8 @@
     <mockito.version>5.11.0</mockito.version>
     <resilience4j.version>2.2.0</resilience4j.version>
     <onnxruntime.version>1.17.1</onnxruntime.version>
+    <auto-service.version>1.1.1</auto-service.version>
+    <jmh.version>1.37</jmh.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -199,6 +201,13 @@
         <groupId>org.ejml</groupId>
         <artifactId>ejml-all</artifactId>
         <version>0.43</version>
+      </dependency>
+      <!-- Annotation Processing -->
+      <dependency>
+        <groupId>com.google.auto.service</groupId>
+        <artifactId>auto-service</artifactId>
+        <version>${auto-service.version}</version>
+        <optional>true</optional>
       </dependency>
       <!-- Colt (scientific computing) -->
       <dependency>
@@ -325,6 +334,13 @@
         <artifactId>onnxruntime</artifactId>
         <version>${onnxruntime.version}</version>
       </dependency>
+      <!-- AutoService for SPI generation -->
+      <dependency>
+        <groupId>com.google.auto.service</groupId>
+        <artifactId>auto-service-annotations</artifactId>
+        <version>${auto-service.version}</version>
+        <optional>true</optional>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -347,6 +363,13 @@
               <arg>jdk.incubator.vector</arg>
               <arg>-Xpkginfo:always</arg>
             </compilerArgs>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${auto-service.version}</version>
+              </path>
+            </annotationProcessorPaths>
           </configuration>
         </plugin>
         <plugin>

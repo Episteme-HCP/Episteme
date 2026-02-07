@@ -76,15 +76,11 @@
             <scope>test</scope>
         </dependency>
 
-
-
         <!-- JFreeChart for Benchmark Graphs -->
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
         </dependency>
-
-
 
         <!-- XChart -->
         <dependency>
@@ -104,7 +100,6 @@
             <artifactId>jzy3d-api</artifactId>
             <version>1.0.0</version>
         </dependency>
-
 
         <!-- JCUDA (optional) -->
         <dependency>
@@ -188,6 +183,18 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <!-- Monitoring (Micrometer + Prometheus) -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <version>1.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>1.12.0</version>
+        </dependency>
+        
         <!-- Web Server (Javalin) -->
         <dependency>
             <groupId>io.javalin</groupId>
@@ -200,8 +207,6 @@
             <groupId>org.mpjexpress</groupId>
             <artifactId>mpi</artifactId>
             <version>0.44</version>
-            <!-- Scope provided because runtime is handled by mpjboot or included in Uber-JAR if needed, 
-                 but typically MPJ programs run with mpjrun which provides the classpath. -->
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -227,8 +232,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-
 
         <!-- Audio / Media Backends -->
         <dependency>
@@ -259,8 +262,13 @@
             <artifactId>javacv-platform</artifactId>
             <version>1.5.10</version>
         </dependency>
+        <!-- AutoService for SPI generation -->
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
-
 
     <repositories>
         <repository>
@@ -345,7 +353,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 </project>

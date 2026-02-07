@@ -6,6 +6,9 @@
 package org.jscience.core.technical.algorithm.simulation;
 
 import org.jscience.core.technical.algorithm.SimulationProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService({SimulationProvider.class, AlgorithmProvider.class})
 public class MulticoreSimulationProvider implements SimulationProvider {
 
     @Override

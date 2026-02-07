@@ -6,6 +6,8 @@
 package org.jscience.nativ.technical.algorithm.simulation;
 
 import org.jscience.core.technical.algorithm.SimulationProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.simulation.ParallelSimulationProvider;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeMulticoreSimulationProvider implements SimulationProvider {
 
     private final ParallelSimulationProvider fallback = new ParallelSimulationProvider();

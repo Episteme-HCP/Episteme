@@ -6,6 +6,8 @@
 package org.jscience.nativ.technical.algorithm.genetic;
 
 import org.jscience.core.technical.algorithm.GeneticAlgorithmProvider;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.genetic.MulticoreGeneticAlgorithmProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.function.Function;
@@ -18,6 +20,7 @@ import java.util.function.Function;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService(AlgorithmProvider.class)
 public class NativeMulticoreGeneticAlgorithmProvider implements GeneticAlgorithmProvider {
 
     private final MulticoreGeneticAlgorithmProvider fallback = new MulticoreGeneticAlgorithmProvider();

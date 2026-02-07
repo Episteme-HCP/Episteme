@@ -1,5 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.technical.algorithm.BayesianInferenceProvider;
 import org.jscience.core.technical.algorithm.BayesianInferenceProvider.BayesNodeData;
 
@@ -8,6 +10,7 @@ import java.util.*;
 /**
  * A benchmark that systematically tests all available BayesianInferenceProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicBayesianInferenceBenchmark implements SystematicBenchmark<BayesianInferenceProvider> {
 
     private final List<BayesNodeData> nodes = new ArrayList<>();

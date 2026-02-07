@@ -24,6 +24,8 @@
 package org.jscience.core.ui.viewers.mathematics.analysis.chaos.fractals;
 
 import org.jscience.core.io.Configuration;
+import org.jscience.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.NumericParameter;
@@ -47,6 +49,7 @@ import java.util.ArrayList;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class MandelbrotViewer extends AbstractViewer {
 
     private static final String CFG_PREFIX = "viewer.mandelbrot.default.";

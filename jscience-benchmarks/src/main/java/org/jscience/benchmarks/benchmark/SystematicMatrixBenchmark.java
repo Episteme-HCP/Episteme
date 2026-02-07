@@ -1,5 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
@@ -8,6 +10,7 @@ import java.util.Random;
 /**
  * A benchmark that systematically tests all available LinearAlgebraProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
     private static final int SIZE = 500;

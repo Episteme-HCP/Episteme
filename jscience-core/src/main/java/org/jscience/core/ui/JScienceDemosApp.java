@@ -315,6 +315,12 @@ public class JScienceDemosApp extends Application {
     }
 
     public static void main(String[] args) {
+        for (String arg : args) {
+            if (arg.equals("--monitor")) {
+                org.jscience.core.technical.monitoring.DistributedMonitor.getInstance().startServer();
+                break;
+            }
+        }
         launch(args);
     }
 }

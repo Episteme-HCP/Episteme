@@ -1,5 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
+import com.google.auto.service.AutoService;
+
 import org.jscience.core.technical.algorithm.ODEProvider;
 
 import java.util.function.BiFunction;
@@ -7,6 +9,7 @@ import java.util.function.BiFunction;
 /**
  * A benchmark that systematically tests all available ODEProviders.
  */
+@AutoService(RunnableBenchmark.class)
 public class SystematicODEBenchmark implements SystematicBenchmark<ODEProvider> {
 
     private ODEProvider currentProvider;
