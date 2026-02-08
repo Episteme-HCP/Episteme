@@ -24,7 +24,7 @@ public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> 
 
     @Override
     public String getDescription() {
-        return "Systematically benchmarks all discovered FFT providers (Local, MultiCore, Native, etc.) on a fixed size data set.";
+        return "Systematically benchmarks all discovered FFT providers (Local, MultiCore, Native, etc.) on a fixed size data set (4096 complex elements).";
     }
 
     @Override
@@ -52,6 +52,11 @@ public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> 
     @Override
     public void teardown() {
         data = null;
+    }
+
+    @Override
+    public int getSuggestedIterations() {
+        return 1000; // FFT is faster, more iterations needed for precision
     }
 
     private Complex[] generateData(int n) {

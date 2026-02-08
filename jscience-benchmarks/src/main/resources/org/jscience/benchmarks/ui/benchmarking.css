@@ -1,7 +1,7 @@
 /* JScience Benchmarking Suite - Premium Dark Theme */
 
 .root-pane {
-    -fx-background-color: #0b0b0d;
+    -fx-background-color: #2b2b2b;
     -fx-font-family: 'Outfit', 'Inter', 'Segoe UI', sans-serif;
 }
 
@@ -65,23 +65,32 @@
 }
 
 .action-button-secondary {
-    -fx-background-color: #3e3e42;
+    -fx-background-color: #0078d4;
     -fx-text-fill: white;
+    -fx-font-weight: bold;
     -fx-padding: 8 20 8 20;
     -fx-background-radius: 4;
 }
 
+.action-button-secondary:hover {
+    -fx-background-color: #0086f0;
+}
+
 .action-button-outline {
-    -fx-background-color: transparent;
-    -fx-border-color: #0078d4;
-    -fx-text-fill: #0078d4;
+    -fx-background-color: #0078d4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
     -fx-padding: 8 20 8 20;
     -fx-background-radius: 4;
+}
+
+.action-button-outline:hover {
+    -fx-background-color: #0086f0;
 }
 
 /* Tables */
 .benchmark-tree, .table-view {
-    -fx-background-color: #1e1e1e;
+    -fx-background-color: transparent;
     -fx-border-color: #333333;
     -fx-table-cell-border-color: #2a2a2a;
 }
@@ -91,9 +100,23 @@
     -fx-text-fill: #ffffff;
 }
 
+.table-row-cell, .tree-table-row-cell {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #e0e0e0;
+}
+
+.table-row-cell:odd, .tree-table-row-cell:odd {
+    -fx-background-color: #333333;
+    -fx-text-fill: #e0e0e0;
+}
+
+.table-cell, .tree-table-cell {
+    -fx-text-fill: #e0e0e0;
+}
+
 .tree-table-row-cell:filled:selected, .table-row-cell:filled:selected {
-    -fx-background-color: #3e3e42;
-    -fx-text-fill: #ff9d00;
+    -fx-background-color: #005a9e;
+    -fx-text-fill: white;
 }
 
 /* Status Bar */

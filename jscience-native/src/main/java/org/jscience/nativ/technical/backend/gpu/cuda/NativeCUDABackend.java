@@ -12,6 +12,10 @@ import org.jscience.core.technical.backend.gpu.GPUBackend;
 
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
+
 /**
  * Robust CUDA acceleration backend using Project Panama to interface with CUDA and CUBLAS.
  *
@@ -19,6 +23,7 @@ import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@AutoService({Backend.class, ComputeBackend.class})
 public class NativeCUDABackend implements GPUBackend {
 
     private final SymbolLookup cuda;

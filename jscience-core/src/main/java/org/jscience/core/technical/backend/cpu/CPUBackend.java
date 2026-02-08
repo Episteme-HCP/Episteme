@@ -27,6 +27,9 @@ import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.backend.Backend;
+
 /**
  * CPU-based compute backend (default fallback).
  * <p>
@@ -38,6 +41,7 @@ import org.jscience.core.technical.backend.HardwareAccelerator;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService({Backend.class, ComputeBackend.class})
 public class CPUBackend implements ComputeBackend {
 
     @Override

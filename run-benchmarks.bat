@@ -1,6 +1,13 @@
 @echo off
 setlocal
 
+rem --- Argument Parsing ---
+set "USE_SHADED_JAR="
+for %%a in (%*) do (
+    if "%%a"=="--shaded" set USE_SHADED_JAR=true
+    if "%%a"=="-jar" set USE_SHADED_JAR=true
+)
+
 set APP_CLASS=org.jscience.benchmarks.benchmark.BenchmarkRunner
 set JAR_PATH=jscience-benchmarks\target\jscience-benchmarks.jar
 set LIB_DIR=launchers\lib
@@ -27,11 +34,17 @@ if exist "%NATIVE_ROOT%\FFTW3" (
     set "PATH=%NATIVE_ROOT%\FFTW3;%PATH%"
 )
 
-if exist "%JAR_PATH%" (
-    echo [INFO] Found shaded JAR, launching...
+if defined USE_SHADED_JAR (
+    echo [INFO] Flag detected: Forcing use of Shaded JAR...
+    if not exist "%JAR_PATH%" (
+        echo [ERROR] Shaded JAR not found at %JAR_PATH%
+        echo [INFO] Please run 'mvn package -DskipTests' first.
+        pause
+        exit /b 1
+    )
     java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -jar "%JAR_PATH%" %*
 ) else (
-    echo [INFO] Shaded JAR not found, falling back to classes...
+    echo [INFO] Running latest compiled classes - Dev Mode. Use --shaded to force JAR.
     if not exist "jscience-benchmarks\target\classes" (
         echo [INFO] Classes not found, building module...
         call mvn compile -pl jscience-benchmarks -am -DskipTests

@@ -46,7 +46,11 @@ import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
  * @since 1.0
  */
 import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import com.google.auto.service.AutoService;
 
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+
+@AutoService({SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
 public class OpenCLSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
 
     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;

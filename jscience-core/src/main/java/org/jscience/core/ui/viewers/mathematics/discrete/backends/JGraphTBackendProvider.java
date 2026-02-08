@@ -35,7 +35,9 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService(GraphBackend.class)
+import org.jscience.core.technical.backend.Backend;
+
+@AutoService({GraphBackend.class, Backend.class})
 public class JGraphTBackendProvider implements GraphBackend {
 
     @Override

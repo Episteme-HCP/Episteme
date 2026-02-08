@@ -37,6 +37,10 @@ import static jcuda.runtime.JCuda.*;
 import static jcuda.driver.CUdevice_attribute.*;
 import static jcuda.runtime.cudaMemcpyKind.*;
 
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
+
 /**
  * CUDA implementation of GPUBackend for NVIDIA GPU acceleration.
  * <p>
@@ -47,6 +51,7 @@ import static jcuda.runtime.cudaMemcpyKind.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService({Backend.class, ComputeBackend.class})
 public class CUDABackend implements GPUBackend {
 
     private static boolean available;

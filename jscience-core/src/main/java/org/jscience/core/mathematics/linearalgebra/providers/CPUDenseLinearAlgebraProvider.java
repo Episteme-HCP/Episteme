@@ -54,7 +54,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     private static final int PARALLEL_THRESHOLD = 1000;
 
     public CPUDenseLinearAlgebraProvider(Field<E> field) {
-        this.field = field;
+        this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
     }
 
     /**

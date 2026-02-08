@@ -29,15 +29,16 @@
                         <Label text="Benchmark Selection" styleClass="section-title"/>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="runSelectedBtn" text="RUN SELECTED" onAction="#handleRunSelected" styleClass="action-button-primary" />
-                        <Button fx:id="runAllBtn" text="RUN ALL" onAction="#handleRunAll" styleClass="action-button-secondary" />
+                        <Button fx:id="runAllBtn" text="RUN ALL" onAction="#handleRunAll" styleClass="action-button-primary" />
                     </HBox>
                     
                     <TreeTableView fx:id="benchmarkTreeTable" VBox.vgrow="ALWAYS" styleClass="benchmark-tree">
                         <columns>
                             <TreeTableColumn fx:id="nameColumn" text="Name" prefWidth="300" />
-                            <TreeTableColumn fx:id="domainColumn" text="Domain" prefWidth="150" />
-                            <TreeTableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
-                            <TreeTableColumn fx:id="resultColumn" text="Last Result" prefWidth="150" />
+                            <TreeTableColumn fx:id="descriptionColumn" text="Description" prefWidth="250" />
+                            <TreeTableColumn fx:id="domainColumn" text="Domain" prefWidth="120" />
+                            <TreeTableColumn fx:id="statusColumn" text="Status" prefWidth="80" />
+                            <TreeTableColumn fx:id="resultColumn" text="Last Result" prefWidth="120" />
                         </columns>
                     </TreeTableView>
                 </VBox>
@@ -50,8 +51,8 @@
                     <HBox spacing="20" alignment="CENTER_LEFT">
                         <Label text="Performance Analytics" styleClass="section-title"/>
                         <Region HBox.hgrow="ALWAYS" />
-                        <ComboBox fx:id="metricSelector" promptText="Select Metric" />
-                        <Button text="EXPORT CHART" styleClass="action-button-outline" />
+                        <ComboBox fx:id="metricSelector" promptText="Select Metric" styleClass="combo-box-primary" />
+                        <Button fx:id="exportChartBtn" text="EXPORT CHART" onAction="#handleExportChart" styleClass="action-button-primary" />
                     </HBox>
                     
                     <AnchorPane VBox.vgrow="ALWAYS">
@@ -65,7 +66,12 @@
                 </VBox>
             </Tab>
 
-            <!-- Tab 3: History & Reports -->
+            <!-- Tab 3: Environment -->
+            <Tab text="ENVIRONMENT" styleClass="tab">
+                <fx:include source="EnvironmentView.fxml"/>
+            </Tab>
+
+            <!-- Tab 4: History & Reports -->
             <Tab text="HISTORY">
                 <VBox spacing="10">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
@@ -73,8 +79,8 @@
                     <TableView fx:id="historyTable" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="dateColumn" text="Date" prefWidth="180" />
-                            <TableColumn fx:id="suiteColumn" text="Suite Name" prefWidth="150" />
-                            <TableColumn fx:id="resultsColumn" text="Successful Benchmarks" prefWidth="150" />
+                            <TableColumn fx:id="suiteColumn" prefWidth="250.0" text="Benchmark" />
+                            <TableColumn fx:id="resultsColumn" prefWidth="250.0" text="Result" />
                             <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="100" />
                         </columns>
                     </TableView>

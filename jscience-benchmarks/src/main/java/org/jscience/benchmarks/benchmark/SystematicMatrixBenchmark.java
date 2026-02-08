@@ -62,6 +62,11 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
         B = null;
     }
 
+    @Override
+    public int getSuggestedIterations() {
+        return 100;
+    }
+
     private double[][] generateData(int n) {
         Random r = new Random(42);
         double[][] d = new double[n][n];

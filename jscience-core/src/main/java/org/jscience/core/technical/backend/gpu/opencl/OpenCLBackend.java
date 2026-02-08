@@ -31,6 +31,10 @@ import java.nio.DoubleBuffer;
 
 import static org.jocl.CL.*;
 
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
+
 /**
  * OpenCL implementation of GPUBackend for cross-platform hardware acceleration.
  * <p>
@@ -41,6 +45,7 @@ import static org.jocl.CL.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService({Backend.class, ComputeBackend.class})
 public class OpenCLBackend implements GPUBackend {
 
     private static boolean available;

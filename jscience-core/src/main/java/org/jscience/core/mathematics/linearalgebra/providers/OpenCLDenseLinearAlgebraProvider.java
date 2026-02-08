@@ -20,6 +20,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Field;
+import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext;
@@ -34,6 +35,9 @@ import org.jscience.core.util.PerformanceLogger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+
+@AutoService({LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private final Field<E> field;
@@ -48,9 +52,14 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
     /**
      * Public no-arg constructor required by ServiceLoader.
      */
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     * Defaults to Reals field as this OpenCL implementation is double-precision only.
+     */
+    @SuppressWarnings("unchecked")
     public OpenCLDenseLinearAlgebraProvider() {
-        this.field = null;
-        this.cpuProvider = null;
+        this.field = (Field<E>) Reals.getInstance();
+        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(this.field);
     }
 
     @Override

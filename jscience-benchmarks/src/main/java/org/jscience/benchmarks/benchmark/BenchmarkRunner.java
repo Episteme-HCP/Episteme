@@ -111,7 +111,7 @@ public class BenchmarkRunner {
         // Register benchmark I18N bundle
         I18N.getInstance().addBundle("org.jscience.benchmarks.i18n.messages_benchmarks");
 
-        boolean monitorEnabled = false;
+        boolean monitorEnabled = true;
         boolean forceGui = false;
         boolean forceCli = false;
 

@@ -10,21 +10,21 @@ import java.time.format.DateTimeFormatter;
  */
 public class BenchmarkRunSummary {
     private final SimpleStringProperty date = new SimpleStringProperty();
-    private final SimpleStringProperty suiteName = new SimpleStringProperty();
-    private final SimpleIntegerProperty successfulCount = new SimpleIntegerProperty();
+    private final SimpleStringProperty name = new SimpleStringProperty();
+    private final SimpleStringProperty result = new SimpleStringProperty();
 
-    public BenchmarkRunSummary(String suiteName, int successfulCount) {
+    public BenchmarkRunSummary(String name, String result) {
         this.date.set(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        this.suiteName.set(suiteName);
-        this.successfulCount.set(successfulCount);
+        this.name.set(name);
+        this.result.set(result);
     }
 
     public String getDate() { return date.get(); }
     public SimpleStringProperty dateProperty() { return date; }
 
-    public String getSuiteName() { return suiteName.get(); }
-    public SimpleStringProperty suiteNameProperty() { return suiteName; }
+    public String getName() { return name.get(); }
+    public SimpleStringProperty nameProperty() { return name; }
 
-    public int getSuccessfulCount() { return successfulCount.get(); }
-    public SimpleIntegerProperty successfulCountProperty() { return successfulCount; }
+    public String getResult() { return result.get(); }
+    public SimpleStringProperty resultProperty() { return result; }
 }

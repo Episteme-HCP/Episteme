@@ -5,8 +5,13 @@
 
 package org.jscience.nativ.technical.algorithm.linearalgebra;
 
+import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.backends.NativeBLASBackend;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 
 /**
  * Native multicore linear algebra provider using BLAS/LAPACK.
@@ -15,84 +20,59 @@ import org.jscience.nativ.mathematics.linearalgebra.matrices.backends.NativeBLAS
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvider<Double> {
+@AutoService(LinearAlgebraProvider.class)
+public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 
     private final NativeBLASBackend backend = new NativeBLASBackend();
 
     @Override
     public String getName() {
-        return "Native Multicore Linear Algebra (BLAS/LAPACK)";
+        return "Native Multicore (OpenBLAS)";
     }
 
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Vector<Double> add(org.jscience.core.mathematics.linearalgebra.Vector<Double> a, org.jscience.core.mathematics.linearalgebra.Vector<Double> b) {
-        throw new UnsupportedOperationException();
+    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+        if (a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
+            RealDoubleMatrix adm = (RealDoubleMatrix) a;
+            RealDoubleMatrix bdm = (RealDoubleMatrix) b;
+            RealDoubleMatrix cdm = RealDoubleMatrix.of(new double[a.rows() * b.cols()], a.rows(), b.cols());
+            
+            backend.dgemm(adm.rows(), adm.cols(), bdm.cols(), 
+                adm.getBuffer(), adm.cols(), 
+                bdm.getBuffer(), bdm.cols(), 
+                cdm.getBuffer(), cdm.cols(), 
+                1.0, 0.0);
+            return cdm;
+        }
+        throw new UnsupportedOperationException("Only RealDoubleMatrix supported by Native provider");
     }
 
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Vector<Double> subtract(org.jscience.core.mathematics.linearalgebra.Vector<Double> a, org.jscience.core.mathematics.linearalgebra.Vector<Double> b) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Vector<Double> multiply(org.jscience.core.mathematics.linearalgebra.Vector<Double> vector, Double scalar) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
     @Override
-    public Double dot(org.jscience.core.mathematics.linearalgebra.Vector<Double> a, org.jscience.core.mathematics.linearalgebra.Vector<Double> b) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException(); }
     @Override
-    public Double norm(org.jscience.core.mathematics.linearalgebra.Vector<Double> a) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Matrix<Double> add(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a, org.jscience.core.mathematics.linearalgebra.Matrix<Double> b) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Real norm(Vector<Real> a) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Matrix<Double> subtract(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a, org.jscience.core.mathematics.linearalgebra.Matrix<Double> b) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Matrix<Double> multiply(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a, org.jscience.core.mathematics.linearalgebra.Matrix<Double> b) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Vector<Double> multiply(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a, org.jscience.core.mathematics.linearalgebra.Vector<Double> b) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Matrix<Double> inverse(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException(); }
     @Override
-    public Double determinant(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Vector<Double> solve(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a, org.jscience.core.mathematics.linearalgebra.Vector<Double> b) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Matrix<Double> transpose(org.jscience.core.mathematics.linearalgebra.Matrix<Double> a) {
-        throw new UnsupportedOperationException();
-    }
-
+    public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException(); }
     @Override
-    public org.jscience.core.mathematics.linearalgebra.Matrix<Double> scale(Double scalar, org.jscience.core.mathematics.linearalgebra.Matrix<Double> a) {
-        throw new UnsupportedOperationException();
-    }
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) { throw new UnsupportedOperationException(); }
 
     @Override
     public boolean isAvailable() {

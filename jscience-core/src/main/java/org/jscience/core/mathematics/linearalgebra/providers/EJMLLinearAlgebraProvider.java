@@ -76,8 +76,8 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
     }
 
     public EJMLLinearAlgebraProvider(Field<E> field) {
-        this.field = field;
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
+        this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
+        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(this.field);
         
         if (ejmlAvailable && field != null) {
             try {

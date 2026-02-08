@@ -55,7 +55,7 @@ public class LocalDistributedContext implements DistributedContext {
 
     public LocalDistributedContext(int parallelism) {
         this.pool = new ForkJoinPool(parallelism);
-        LOG.info(() -> String.format("LocalDistributedContext initialized with parallelism=%d", pool.getParallelism()));
+        LOG.debug(() -> String.format("LocalDistributedContext initialized with parallelism=%d", pool.getParallelism()));
     }
 
     @Override

@@ -65,13 +65,13 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
     }
 
     @Param({ "256", "512", "1024" })
-    public int size;
+    public int size = 256;
 
     @Param({ "64", "128" })
-    public int tileSize;
+    public int tileSize = 64;
 
     @Param({ "1", "4" })
-    public int parallelism;
+    public int parallelism = 4;
 
     private Matrix<Real> A;
     private Matrix<Real> B;

@@ -16,6 +16,9 @@ import java.nio.IntBuffer;
 
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.natural.physics.classical.mechanics.CollisionBackend;
+import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;
 
 /**
@@ -25,7 +28,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService(CollisionBackend.class)
+@AutoService({CollisionBackend.class, ComputeBackend.class, Backend.class})
 public class NativeBulletBackend implements CollisionBackend {
 
     private static final MethodHandle DETECT_SPHERES;
