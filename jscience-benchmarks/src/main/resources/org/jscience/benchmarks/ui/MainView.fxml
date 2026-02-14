@@ -14,7 +14,7 @@
             <Label text="JSCIENCE BENCHMARKING" styleClass="header-title"/>
             <Region HBox.hgrow="ALWAYS" />
             <!-- Settings button removed as per user request -->
-            <Button text="ABOUT" onAction="#handleAbout" styleClass="icon-button" />
+            <Button text="ABOUT" onAction="#handleAbout" styleClass="action-button-primary" />
         </HBox>
     </top>
 

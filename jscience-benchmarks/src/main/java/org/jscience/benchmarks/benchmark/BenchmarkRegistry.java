@@ -34,7 +34,8 @@ public class BenchmarkRegistry {
                     ServiceLoader.load(org.jscience.core.technical.algorithm.AlgorithmProvider.class);
             for (org.jscience.core.technical.algorithm.AlgorithmProvider p : providerLoader) {
                 try {
-                    if (!p.isAvailable()) continue;
+                    // Display all providers, even unavailable ones (User Request)
+                    // if (!p.isAvailable()) continue; 
                     
                     // Avoid duplicates if already covered by systematic expansion
                     if (all.stream().anyMatch(b -> b.getId().contains(p.getName().toLowerCase().replace(" ", "-")))) {
@@ -76,6 +77,7 @@ public class BenchmarkRegistry {
             }
             @Override public void teardown() {}
             @Override public int getSuggestedIterations() { return 100; }
+            @Override public boolean isAvailable() { return p.isAvailable(); }
         };
     }
 
@@ -110,6 +112,7 @@ public class BenchmarkRegistry {
                         @Override public void run() { base.run(); }
                         @Override public void teardown() { base.teardown(); }
                         @Override public int getSuggestedIterations() { return base.getSuggestedIterations(); }
+                        @Override public boolean isAvailable() { return p.isAvailable(); }
                     });
                 } catch (Throwable t) {
                     System.err.println("[WARN] Failed to instantiate provider for " + base.getNameBase() + ": " + t.getMessage());

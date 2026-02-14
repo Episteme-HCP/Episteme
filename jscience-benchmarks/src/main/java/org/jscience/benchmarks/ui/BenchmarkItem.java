@@ -155,6 +155,7 @@ public class BenchmarkItem {
     // Unique ID helper for consistent usage
     public String getUniqueId() {
         if (benchmark == null) return getName();
-        return getName() + " (" + getLibrary() + ")";
+        // Include Provider to differentiate implementations within the same library
+        return getName() + " [" + getProvider() + "] (" + getLibrary() + ")";
     }
 }

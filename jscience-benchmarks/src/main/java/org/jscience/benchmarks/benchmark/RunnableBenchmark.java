@@ -100,6 +100,13 @@ public interface RunnableBenchmark {
     default java.util.Map<String, String> getMetadata() {
         return java.util.Collections.emptyMap();
     }
+    /**
+     * Checks if the benchmark requirements (e.g. native libraries, hardware) are met.
+     * @return true if the benchmark can be executed
+     */
+    default boolean isAvailable() {
+        return true;
+    }
 }
 
 

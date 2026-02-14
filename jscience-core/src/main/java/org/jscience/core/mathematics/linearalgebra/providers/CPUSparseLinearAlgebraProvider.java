@@ -94,6 +94,9 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
                     "Matrix dimensions must match: " + a.rows() + "x" + a.cols() +
                             " vs " + b.rows() + "x" + b.cols());
         }
+        
+        // Fix for NPE: Use ring from input matrix if this.ring is null (ServiceLoader instance)
+        Ring<E> r = (this.ring != null) ? this.ring : a.getField();
 
         int rows = a.rows();
         int cols = a.cols();
@@ -128,8 +131,8 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
                     E bVal = (E) bVals[i];
                     E existing = rowMap.get(col);
                     if (existing != null) {
-                        E sum = ring.add(existing, bVal);
-                        if (!sum.equals(ring.zero())) {
+                        E sum = r.add(existing, bVal);
+                        if (!sum.equals(r.zero())) {
                             rowMap.put(col, sum);
                         } else {
                             rowMap.remove(col);
@@ -152,11 +155,10 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
                     int col = bCols[i];
                     E bVal = (E) bVals[i];
                     E existing = rowMap.get(col);
-                    // Use a temporary variable to avoid map lookup race conditions?
-                    // No, rowMap is unique per thread (per row).
+                    
                     if (existing != null) {
-                        E sum = ring.add(existing, bVal);
-                        if (!sum.equals(ring.zero())) {
+                        E sum = r.add(existing, bVal);
+                        if (!sum.equals(r.zero())) {
                             rowMap.put(col, sum);
                         } else {
                             rowMap.remove(col);
@@ -169,13 +171,13 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         }
 
         // Build CSR format result
-        return buildCSRFromMaps(rowMaps, rows, cols);
+        return buildCSRFromMaps(rowMaps, rows, cols, r);
     }
 
     @SuppressWarnings("unchecked")
     private void computeRowMultiplication(int i, TreeMap<Integer, E> rowMap,
             int[] aRowPtrs, int[] aCols, Object[] aVals,
-            int[] bRowPtrs, int[] bCols, Object[] bVals) {
+            int[] bRowPtrs, int[] bCols, Object[] bVals, Ring<E> r) {
 
         for (int aIdx = aRowPtrs[i]; aIdx < aRowPtrs[i + 1]; aIdx++) {
             int k = aCols[aIdx];
@@ -185,11 +187,11 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
             for (int bIdx = bRowPtrs[k]; bIdx < bRowPtrs[k + 1]; bIdx++) {
                 int j = bCols[bIdx];
                 E bVal = (E) bVals[bIdx];
-                E product = ring.multiply(aVal, bVal);
+                E product = r.multiply(aVal, bVal);
 
                 E existing = rowMap.get(j);
                 if (existing != null) {
-                    rowMap.put(j, ring.add(existing, product));
+                    rowMap.put(j, r.add(existing, product));
                 } else {
                     rowMap.put(j, product);
                 }
@@ -197,7 +199,7 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         }
 
         // Remove zeros
-        rowMap.entrySet().removeIf(e -> e.getValue().equals(ring.zero()));
+        rowMap.entrySet().removeIf(e -> e.getValue().equals(r.zero()));
     }
 
     @Override
@@ -217,6 +219,9 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
                     "Matrix dimensions incompatible for multiplication: " +
                             a.rows() + "x" + a.cols() + " * " + b.rows() + "x" + b.cols());
         }
+        
+        // Fix for NPE: Use ring from input matrix
+        Ring<E> r = (this.ring != null) ? this.ring : a.getField();
 
         int resultRows = a.rows();
         int resultCols = b.cols();
@@ -238,24 +243,24 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         if (resultRows < PARALLEL_THRESHOLD) {
             // Sequential
             for (int i = 0; i < resultRows; i++) {
-                computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals);
+                computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals, r);
             }
         } else {
             // Parallel
             IntStream.range(0, resultRows).parallel().forEach(i -> {
-                computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals);
+                computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals, r);
             });
         }
 
-        return buildCSRFromMaps(rowMaps, resultRows, resultCols);
+        return buildCSRFromMaps(rowMaps, resultRows, resultCols, r);
     }
 
     /**
      * Builds a SparseMatrix in CSR format from row maps.
      */
-    private SparseMatrix<E> buildCSRFromMaps(List<TreeMap<Integer, E>> rowMaps, int rows, int cols) {
+    private SparseMatrix<E> buildCSRFromMaps(List<TreeMap<Integer, E>> rowMaps, int rows, int cols, Ring<E> r) {
         // Create storage
-        E zero = ring.zero();
+        E zero = r.zero();
         org.jscience.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = new org.jscience.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(
                 rows, cols, zero);
 
@@ -266,6 +271,6 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
             }
         }
 
-        return new SparseMatrix<E>(storage, ring);
+        return new SparseMatrix<E>(storage, r);
     }
 }

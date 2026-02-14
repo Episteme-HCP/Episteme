@@ -14,8 +14,7 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import org.jscience.benchmarks.benchmark.BenchmarkRegistry;
-import org.jscience.benchmarks.ui.BenchmarkRunSummary;
-import org.jscience.benchmarks.persistence.BenchmarkResultService;
+
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.*;
@@ -71,6 +70,7 @@ public class MainController {
         boolean anySuccess = false;
         int totalChildren = 0;
         int readyCount = 0;
+        int unavailableCount = 0;
 
         for (TreeItem<BenchmarkItem> child : root.getChildren()) {
             updateCategoryStatuses(child); // Recursive update
@@ -80,9 +80,10 @@ public class MainController {
             if (status == null) status = "";
             
             if (status.contains("Running") || status.contains("Initializing") || status.contains("Warming") || status.contains("Measuring")) anyRunning = true;
-            else if (status.contains("Error") || status.contains("Skipped")) anyError = true; // Treat skipped as error-like for aggregation? Or maybe neutral?
+            else if (status.contains("Error") || status.contains("Skipped")) anyError = true;
             else if ("Success".equals(status)) anySuccess = true;
-            else if ("Ready".equals(status) || status.isEmpty()) readyCount++;
+            else if ("Ready".equals(status) || status.isEmpty() || "Queued".equals(status)) readyCount++;
+            else if (status.contains("Unavailable")) unavailableCount++;
         }
 
         if (totalChildren == 0) return;
@@ -90,9 +91,13 @@ public class MainController {
         String newStatus = "";
         if (anyRunning) newStatus = "Running...";
         else if (anyError) newStatus = "Error (Partial)";
-        else if (readyCount == totalChildren) newStatus = "Ready"; // Nothing ran
-        else if (anySuccess && readyCount == 0 && !anyError) newStatus = "Success"; // All ran success
-        else newStatus = "Completed"; // Mixed bag (some success, some ready?)
+        else if (readyCount + unavailableCount == totalChildren) {
+             if (readyCount > 0) newStatus = "Ready";
+             else newStatus = "Unavailable";
+        }
+        else if (anySuccess && readyCount == 0 && !anyError && unavailableCount == 0) newStatus = "Success"; 
+        else if (anySuccess) newStatus = "Completed"; // Success + Unavailable/Skipped
+        else newStatus = "Ready"; // Fallback
 
         final String s = newStatus;
         Platform.runLater(() -> root.getValue().statusProperty().set(s));
@@ -108,6 +113,7 @@ public class MainController {
         resultColumn.setCellValueFactory(param -> param.getValue().getValue().resultProperty());
         
         benchmarkTreeTable.setShowRoot(false);
+        benchmarkTreeTable.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         
         benchmarkTreeTable.setRowFactory(tv -> {
             TreeTableRow<BenchmarkItem> row = new TreeTableRow<>();
@@ -128,6 +134,12 @@ public class MainController {
         suiteColumn.setCellValueFactory(data -> data.getValue().suiteProperty());
         resultsColumn.setCellValueFactory(data -> data.getValue().resultProperty());
     }
+
+    private final java.util.concurrent.ExecutorService benchmarkExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "BenchmarkInternalExecutor");
+        t.setDaemon(true);
+        return t;
+    });
 
     private void startDiscovery() {
         Task<TreeItem<BenchmarkItem>> task = new Task<>() {
@@ -151,6 +163,11 @@ public class MainController {
 
         new Thread(task).start();
     }
+    
+    // Shutdown executor on exit
+    public void shutdown() {
+        if (benchmarkExecutor != null) benchmarkExecutor.shutdownNow();
+    }
 
     private TreeItem<BenchmarkItem> buildTree(List<RunnableBenchmark> benchmarks) {
         TreeItem<BenchmarkItem> root = new TreeItem<>(new BenchmarkItem("Root", "Root", "", "", "", false));
@@ -173,6 +190,12 @@ public class MainController {
             
             BenchmarkItem itemData = new BenchmarkItem(b);
             TreeItem<BenchmarkItem> item = new TreeItem<>(itemData);
+            
+            // Mark unavailable benchmarks immediately
+            if (!b.isAvailable()) {
+                itemData.statusProperty().set("Unavailable");
+            }
+            
             domainItem.getChildren().add(item);
         }
         
@@ -242,9 +265,14 @@ public class MainController {
             protected Void call() throws Exception {
                 for (BenchmarkItem item : items) {
                      Platform.runLater(() -> {
-                         item.statusProperty().set("Queued");
-                         item.resultProperty().set("");
-                         item.setScore(0);
+                         // Only queue available benchmarks
+                         if (item.getBenchmark() != null && item.getBenchmark().isAvailable()) {
+                             item.statusProperty().set("Queued");
+                             item.resultProperty().set("");
+                             item.setScore(0);
+                         } else {
+                             item.statusProperty().set("Unavailable"); // Ensure status is clear
+                         }
                      });
                 }
                 
@@ -331,28 +359,48 @@ public class MainController {
 
     private void executeSingle(BenchmarkItem item) {
         RunnableBenchmark b = item.getBenchmark();
+        if (b == null) return;
+        
+        // Check availability logic as requested
+        if (!b.isAvailable()) {
+            Platform.runLater(() -> {
+                item.statusProperty().set("Skipped (Unavailable)");
+                item.resultProperty().set("N/A");
+                updateChart(item.getName(), 0.0, b.getDomain()); // Or allow 0.0 to show omission? Maybe not update chart at all.
+                // User said "juste pas avoir de mesure".
+            });
+            return;
+        }
+
         try {
-            Platform.runLater(() -> item.statusProperty().set("Initializing..."));
+            Platform.runLater(() -> item.statusProperty().set("Running..."));
             b.setup();
             
-            // 1. Warmup
+            // 1. Warmup (Adaptive: ~500ms)
             Platform.runLater(() -> item.statusProperty().set("Warming up..."));
-            int warmupIter = Math.max(1, b.getSuggestedIterations() / 5);
-            for (int i = 0; i < warmupIter; i++) {
+            long warmupStart = System.nanoTime();
+            while (System.nanoTime() - warmupStart < 500_000_000L) { // 500ms
                 b.run();
             }
 
-            // 2. Measure
+            // 2. Measure (Adaptive: ~2000ms)
             Platform.runLater(() -> item.statusProperty().set("Measuring..."));
+            
+            // Garbage Collect before measurement to reduce GC noise during run
+            System.gc();
+            Thread.sleep(100); 
+
             long start = System.nanoTime();
-            int iter = b.getSuggestedIterations();
-            for (int i = 0; i < iter; i++) {
+            long iterations = 0;
+            // Run for at least 2 seconds
+            while (System.nanoTime() - start < 2_000_000_000L) {
                 b.run();
+                iterations++;
             }
             long end = System.nanoTime();
             
             double durationSec = (end - start) / 1_000_000_000.0;
-            double opsSec = iter / durationSec;
+            double opsSec = iterations / durationSec;
             String resultText = String.format("%.2f ops/s", opsSec);
 
             Platform.runLater(() -> {
@@ -417,11 +465,13 @@ public class MainController {
         // Create new chart for this domain
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Benchmark");
-        xAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE); // White labels
-        
+        xAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE); 
+        xAxis.setStyle("-fx-tick-label-fill: white; -fx-text-fill: white;");
+
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Ops/Sec");
-        yAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE); // White labels
+        yAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE);
+        yAxis.setStyle("-fx-tick-label-fill: white; -fx-text-fill: white;");
         
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
         chart.setTitle(domain + " Performance");
