@@ -27,6 +27,7 @@
 package org.jscience.core.mathematics.linearalgebra.providers;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import com.google.auto.service.AutoService;
 
 
 import java.lang.reflect.Constructor;
@@ -53,6 +54,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(LinearAlgebraProvider.class)
 public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private static boolean ejmlAvailable = false;
@@ -94,7 +96,7 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     @Override
     public String getName() {
-        return "EJML";
+        return "EJML Wrapper";
     }
 
     @Override

@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 import org.jscience.core.mathematics.structures.rings.Field;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 
@@ -48,6 +49,7 @@ import org.jscience.core.technical.backend.HardwareAccelerator;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(LinearAlgebraProvider.class)
 public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E>, ComputeBackend {
 
     protected final Field<E> field;
@@ -66,7 +68,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     @Override
     public String getName() {
-        return "Java CPU (Dense)";
+        return "JScience CPU (Dense)";
     }
 
     @Override

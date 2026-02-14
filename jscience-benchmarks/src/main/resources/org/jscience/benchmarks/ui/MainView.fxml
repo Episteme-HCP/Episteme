@@ -13,7 +13,7 @@
             <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
             <Label text="JSCIENCE BENCHMARKING" styleClass="header-title"/>
             <Region HBox.hgrow="ALWAYS" />
-            <Button text="SETTINGS" onAction="#handleSettings" styleClass="icon-button" />
+            <!-- Settings button removed as per user request -->
             <Button text="ABOUT" onAction="#handleAbout" styleClass="icon-button" />
         </HBox>
     </top>
@@ -56,12 +56,9 @@
                     </HBox>
                     
                     <AnchorPane VBox.vgrow="ALWAYS">
-                        <BarChart fx:id="performanceBarChart" title="Throughput (Ops/Sec)" 
-                                  AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" 
-                                  AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
-                            <xAxis><CategoryAxis label="Benchmark" /></xAxis>
-                            <yAxis><NumberAxis label="Ops/Sec" /></yAxis>
-                        </BarChart>
+                        <TabPane fx:id="visualizationTabPane" side="TOP" tabClosingPolicy="UNAVAILABLE" 
+                                 AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" 
+                                 AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" />
                     </AnchorPane>
                 </VBox>
             </Tab>

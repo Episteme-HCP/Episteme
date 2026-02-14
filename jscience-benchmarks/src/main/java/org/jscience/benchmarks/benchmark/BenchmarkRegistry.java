@@ -1,6 +1,7 @@
 package org.jscience.benchmarks.benchmark;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.benchmarks.benchmark.benchmarks.SystematicBenchmark;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;

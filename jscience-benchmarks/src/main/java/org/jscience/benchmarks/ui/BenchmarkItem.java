@@ -34,6 +34,7 @@ public class BenchmarkItem {
     
     public RunnableBenchmark getBenchmark() { return benchmark; }
     public String getName() { return name.get(); }
+    public String getDomain() { return domain.get(); }
     public void setSelected(boolean value) { this.selected.set(value); }
     public boolean isSelected() { return selected.get(); }
 }

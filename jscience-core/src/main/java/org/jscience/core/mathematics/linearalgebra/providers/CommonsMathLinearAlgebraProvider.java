@@ -28,6 +28,7 @@ package org.jscience.core.mathematics.linearalgebra.providers;
 
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import com.google.auto.service.AutoService;
 
 import java.lang.reflect.Constructor;
 import org.jscience.core.mathematics.structures.rings.Field;
@@ -48,6 +49,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(LinearAlgebraProvider.class)
 public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private static boolean commonsMathAvailable = false;
@@ -88,7 +90,7 @@ public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
     @Override
     public String getName() {
-        return "Commons Math";
+        return "Apache Commons Math Wrapper";
     }
 
     @Override

@@ -27,7 +27,7 @@ public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvid
 
     @Override
     public String getName() {
-        return "Native Multicore (OpenBLAS)";
+        return "JScience Native (OpenBLAS)";
     }
 
     @Override

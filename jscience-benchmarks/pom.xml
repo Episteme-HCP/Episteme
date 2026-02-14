@@ -36,7 +36,6 @@
             <groupId>org.jscience</groupId>
             <artifactId>jscience-native</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <!-- JMH Benchmarking Framework -->

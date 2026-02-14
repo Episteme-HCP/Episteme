@@ -1,30 +1,33 @@
 package org.jscience.benchmarks.ui;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Represents a summary of a completed benchmarking suite run.
- */
 public class BenchmarkRunSummary {
-    private final SimpleStringProperty date = new SimpleStringProperty();
-    private final SimpleStringProperty name = new SimpleStringProperty();
-    private final SimpleStringProperty result = new SimpleStringProperty();
+    private final StringProperty date;
+    private final StringProperty name;
+    private final StringProperty result;
 
     public BenchmarkRunSummary(String name, String result) {
-        this.date.set(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        this.name.set(name);
-        this.result.set(result);
+        this.date = new SimpleStringProperty(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        this.name = new SimpleStringProperty(name);
+        this.result = new SimpleStringProperty(result);
+    }
+    
+    // Constructor for loading from persistence if needed
+     public BenchmarkRunSummary(String date, String name, String result) {
+        this.date = new SimpleStringProperty(date);
+        this.name = new SimpleStringProperty(name);
+        this.result = new SimpleStringProperty(result);
     }
 
+    public StringProperty dateProperty() { return date; }
+    public StringProperty nameProperty() { return name; }
+    public StringProperty resultProperty() { return result; }
+    
     public String getDate() { return date.get(); }
-    public SimpleStringProperty dateProperty() { return date; }
-
     public String getName() { return name.get(); }
-    public SimpleStringProperty nameProperty() { return name; }
-
     public String getResult() { return result.get(); }
-    public SimpleStringProperty resultProperty() { return result; }
 }
