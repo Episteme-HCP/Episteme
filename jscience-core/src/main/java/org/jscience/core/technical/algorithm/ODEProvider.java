@@ -31,4 +31,9 @@ public interface ODEProvider extends AlgorithmProvider {
     default String getName() {
         return "ODE Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "ODE Solver";
+    }
 }

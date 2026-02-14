@@ -37,9 +37,8 @@ public class OpenCLFFTProvider implements FFTProvider {
         }
     }
 
-    @Override
     public String getName() {
-        return "OpenCL (GPU)";
+        return "Native OpenCL (GPU)";
     }
 
     @Override

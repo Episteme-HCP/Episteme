@@ -17,5 +17,10 @@ package org.jscience.core.mathematics.linearalgebra;
  * @since 1.2
  */
 public interface SparseLinearAlgebraProvider<E> extends LinearAlgebraProvider<E> {
+
+    @Override
+    default String getAlgorithmType() {
+        return "Linear Algebra (Sparse)";
+    }
     // No additional methods needed for now, acts as a specialized type for discovery.
 }

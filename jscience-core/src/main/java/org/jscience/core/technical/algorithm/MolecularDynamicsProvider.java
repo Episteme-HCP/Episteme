@@ -50,4 +50,9 @@ public interface MolecularDynamicsProvider extends AlgorithmProvider {
     default String getName() {
         return "Molecular Dynamics Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Molecular Dynamics";
+    }
 }

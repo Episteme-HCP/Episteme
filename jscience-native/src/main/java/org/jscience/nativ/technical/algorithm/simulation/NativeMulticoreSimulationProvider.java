@@ -31,6 +31,11 @@ public class NativeMulticoreSimulationProvider implements SimulationProvider {
     }
 
     @Override
+    public String getAlgorithmType() {
+        return "simulation";
+    }
+
+    @Override
     public void parallelExecute(List<Runnable> tasks, int parallelism) {
         fallback.parallelExecute(tasks, parallelism);
     }

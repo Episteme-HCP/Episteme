@@ -30,4 +30,9 @@ public interface WaveProvider extends AlgorithmProvider {
     default String getName() {
         return "Wave Equation Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Wave Equation";
+    }
 }

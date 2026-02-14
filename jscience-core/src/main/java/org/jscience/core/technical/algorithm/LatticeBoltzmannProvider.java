@@ -30,4 +30,9 @@ public interface LatticeBoltzmannProvider extends AlgorithmProvider {
     default String getName() {
         return "Lattice Boltzmann Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Lattice Boltzmann";
+    }
 }

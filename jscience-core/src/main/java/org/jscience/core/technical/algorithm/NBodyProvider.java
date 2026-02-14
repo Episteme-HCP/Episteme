@@ -101,4 +101,9 @@ public interface NBodyProvider extends AlgorithmProvider {
     default String getName() {
         return "N-Body Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "N-Body Simulation";
+    }
 }

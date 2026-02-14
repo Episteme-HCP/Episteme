@@ -11,9 +11,8 @@ import org.jscience.core.technical.algorithm.FFTProvider;
 @AutoService({FFTProvider.class, org.jscience.core.technical.algorithm.AlgorithmProvider.class})
 public class StandardFFTProvider implements FFTProvider {
 
-    @Override
     public String getName() {
-        return "Java Standard (Single-threaded)";
+        return "Java Reference (Naive)";
     }
 
     @Override

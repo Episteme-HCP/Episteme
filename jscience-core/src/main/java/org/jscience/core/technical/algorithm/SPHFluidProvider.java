@@ -34,4 +34,9 @@ public interface SPHFluidProvider extends AlgorithmProvider {
     default String getName() {
         return "SPH Fluid Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "SPH Fluid Dynamics";
+    }
 }

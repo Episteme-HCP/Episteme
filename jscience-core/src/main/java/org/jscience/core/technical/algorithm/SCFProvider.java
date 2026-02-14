@@ -38,4 +38,9 @@ public interface SCFProvider extends AlgorithmProvider {
     default String getName() {
         return "SCF Provider (Quantum Chemistry)";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Self-Consistent Field";
+    }
 }

@@ -40,4 +40,9 @@ public interface BayesianInferenceProvider extends AlgorithmProvider {
     default String getName() {
         return "Bayesian Inference Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Bayesian Inference";
+    }
 }

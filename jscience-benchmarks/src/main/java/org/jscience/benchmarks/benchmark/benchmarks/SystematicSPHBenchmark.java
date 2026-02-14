@@ -60,7 +60,7 @@ public class SystematicSPHBenchmark implements SystematicBenchmark<SPHFluidProvi
     @Override public String getIdPrefix() { return "sph-systematic"; }
     @Override public String getNameBase() { return "Systematic SPH Fluid Simulation"; }
     @Override public String getDescription() { return "Systematically benchmarks Smoothed Particle Hydrodynamics (SPH) fluid simulation performance."; }
-    @Override public String getDomain() { return "Physics"; }
+    @Override public String getDomain() { return "Simulation"; }
     @Override public Class<SPHFluidProvider> getProviderClass() { return SPHFluidProvider.class; }
 
     @Override

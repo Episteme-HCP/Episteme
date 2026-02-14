@@ -26,4 +26,9 @@ public interface TensorProvider extends AlgorithmProvider {
     default String getName() {
         return "Tensor Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Tensor Operations";
+    }
 }

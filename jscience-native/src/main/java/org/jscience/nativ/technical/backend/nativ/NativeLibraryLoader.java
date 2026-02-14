@@ -54,7 +54,13 @@ public class NativeLibraryLoader {
                     "C:\\Windows\\System32\\",
                     System.getenv("NATIVE_ROOT") != null ? System.getenv("NATIVE_ROOT") : "C:\\JScience-Native",
                     "C:\\JScience-Native\\FFTW3",
-                    "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.0\\bin\\"
+                    "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.0\\bin\\",
+                    System.getProperty("user.dir"),
+                    System.getProperty("user.dir") + java.io.File.separator + "libs",
+                    System.getProperty("user.dir") + java.io.File.separator + "native",
+                    System.getProperty("user.dir"),
+                    System.getProperty("user.dir") + java.io.File.separator + "libs",
+                    System.getProperty("user.dir") + java.io.File.separator + "native"
                 };
                 
                 for (String path : searchPaths) {

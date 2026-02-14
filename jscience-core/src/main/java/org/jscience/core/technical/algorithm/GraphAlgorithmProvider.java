@@ -26,4 +26,9 @@ public interface GraphAlgorithmProvider extends AlgorithmProvider {
     default String getName() {
         return "Graph Algorithm Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Graph Algorithm";
+    }
 }

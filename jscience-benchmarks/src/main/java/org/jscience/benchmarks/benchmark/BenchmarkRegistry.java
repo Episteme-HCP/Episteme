@@ -56,8 +56,13 @@ public class BenchmarkRegistry {
     private static RunnableBenchmark wrapProvider(org.jscience.core.technical.algorithm.AlgorithmProvider p) {
         return new RunnableBenchmark() {
             @Override public String getId() { return "gen-" + p.getAlgorithmType() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
-            @Override public String getName() { return "[" + p.getAlgorithmType().toUpperCase() + "] " + p.getName(); }
-            @Override public String getDescription() { return "Generic benchmark for " + p.getName() + " (" + p.getAlgorithmType() + ")"; }
+            @Override public String getName() { 
+                String type = p.getAlgorithmType();
+                if (type == null || type.isEmpty()) return "Unknown";
+                return type.substring(0, 1).toUpperCase() + type.substring(1);
+            }
+            @Override public String getAlgorithmProvider() { return p.getName(); }
+            @Override public String getDescription() { return "Generic execution validation for " + p.getAlgorithmType(); }
             @Override public String getDomain() { 
                 String type = p.getAlgorithmType();
                 return type.substring(0, 1).toUpperCase() + type.substring(1);
@@ -85,11 +90,21 @@ public class BenchmarkRegistry {
                             continue;
                         }
                     }
+
+
+                    // Strict separation: Do not mix Sparse providers in Dense benchmarks
+                    boolean isProviderSparse = p.getAlgorithmType().contains("Sparse");
+                    boolean isBenchmarkDense = base.getDomain().contains("Dense") && !base.getDomain().contains("Sparse");
+                    
+                    if (isProviderSparse && isBenchmarkDense) {
+                         continue; 
+                    }
                     
                     list.add(new RunnableBenchmark() {
                         @Override public String getId() { return base.getIdPrefix() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
-                        @Override public String getName() { return base.getNameBase() + " [" + p.getName() + "]"; }
-                        @Override public String getDescription() { return base.getDescription() + " using " + p.getName() + " provider."; }
+                        @Override public String getName() { return base.getNameBase(); }
+                        @Override public String getAlgorithmProvider() { return p.getName(); }
+                        @Override public String getDescription() { return base.getDescription(); }
                         @Override public String getDomain() { return base.getDomain(); }
                         @Override public void setup() { base.setup(); base.setProvider(p); }
                         @Override public void run() { base.run(); }
@@ -101,7 +116,7 @@ public class BenchmarkRegistry {
                 }
             }
         } catch (Throwable t) {
-            System.err.println("[ERROR] Failed to discover providers for class " + base.getProviderClass().getSimpleName() + ": " + t.getMessage());
+                    System.err.println("[ERROR] Failed to discover providers for class " + base.getProviderClass().getSimpleName() + ": " + t.getMessage());
         }
     }
 }

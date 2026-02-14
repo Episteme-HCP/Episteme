@@ -57,6 +57,20 @@ public interface RunnableBenchmark {
     String getDomain();
 
     /**
+     * @return The algorithm provider name (e.g. "JScience", "OpenCL", "NativeBLAS") or "Standard" if not applicable.
+     */
+    default String getAlgorithmProvider() {
+        return "Standard";
+    }
+
+    /**
+     * @return The algorithm type (e.g. "inference", "linear algebra")
+     */
+    default String getAlgorithmType() {
+        return "Generic";
+    }
+
+    /**
      * Setup method called once before the benchmark runs.
      * Use this to initialize data structures.
      */

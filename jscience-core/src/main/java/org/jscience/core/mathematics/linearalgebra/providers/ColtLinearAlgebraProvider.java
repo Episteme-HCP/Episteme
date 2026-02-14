@@ -27,6 +27,7 @@
 package org.jscience.core.mathematics.linearalgebra.providers;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
 import java.lang.reflect.Constructor;
 
@@ -53,7 +54,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService(LinearAlgebraProvider.class)
+@AutoService({LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private static boolean coltAvailable = false;
@@ -98,9 +99,8 @@ public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         }
     }
 
-    @Override
     public String getName() {
-        return "Colt Wrapper";
+        return "Colt (Wrapper)";
     }
 
     @Override

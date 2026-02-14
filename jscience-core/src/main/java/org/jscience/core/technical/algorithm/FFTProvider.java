@@ -17,6 +17,11 @@ import org.jscience.core.mathematics.numbers.complex.Complex;
  */
 public interface FFTProvider extends AlgorithmProvider {
 
+    @Override
+    default String getAlgorithmType() {
+        return "Fast Fourier Transform";
+    }
+
     /**
      * Performs a 1D forward FFT on double data.
      * @return An array of two arrays: [real_parts, imaginary_parts]

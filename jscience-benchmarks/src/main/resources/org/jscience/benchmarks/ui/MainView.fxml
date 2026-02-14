@@ -34,12 +34,17 @@
                     
                     <TreeTableView fx:id="benchmarkTreeTable" VBox.vgrow="ALWAYS" styleClass="benchmark-tree">
                         <columns>
-                            <TreeTableColumn fx:id="nameColumn" text="Name" prefWidth="300" />
-                            <TreeTableColumn fx:id="descriptionColumn" text="Description" prefWidth="250" />
-                            <TreeTableColumn fx:id="domainColumn" text="Domain" prefWidth="120" />
-                            <TreeTableColumn fx:id="statusColumn" text="Status" prefWidth="80" />
-                            <TreeTableColumn fx:id="resultColumn" text="Last Result" prefWidth="120" />
+                            <TreeTableColumn fx:id="nameColumn" text="Name" prefWidth="250" />
+                            <TreeTableColumn fx:id="backendColumn" text="Backend" prefWidth="80" />
+                            <TreeTableColumn fx:id="libraryColumn" text="Library" prefWidth="120" />
+                            <TreeTableColumn fx:id="providerColumn" text="Algorithm Provider" prefWidth="150" />
+                            <TreeTableColumn fx:id="descriptionColumn" text="Description" prefWidth="350" />
+                            <TreeTableColumn fx:id="statusColumn" text="Status" prefWidth="90" />
+                            <TreeTableColumn fx:id="resultColumn" text="Last Result" prefWidth="200" />
                         </columns>
+                        <columnResizePolicy>
+                            <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
                     </TreeTableView>
                 </VBox>
             </Tab>

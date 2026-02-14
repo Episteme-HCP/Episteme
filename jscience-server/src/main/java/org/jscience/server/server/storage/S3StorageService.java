@@ -141,13 +141,49 @@ public class S3StorageService {
         }
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public void uploadFile(String key, Path filePath) {
-        if (s3Client == null)
-            return;
-        s3Client.putObject(PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build(), filePath);
+        if (s3Client == null) return;
+        try {
+            s3Client.putObject(PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build(), filePath);
+        } catch (Exception e) {
+            LOG.error("Failed to upload file to S3: {}", key, e);
+        }
+    }
+    
+    public boolean downloadFile(String key, Path destinationPath) {
+        if (s3Client == null) return false;
+        try {
+            software.amazon.awssdk.services.s3.model.GetObjectRequest request = software.amazon.awssdk.services.s3.model.GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+            s3Client.getObject(request, destinationPath);
+            return true;
+        } catch (software.amazon.awssdk.services.s3.model.NoSuchKeyException e) {
+            return false;
+        } catch (Exception e) {
+            LOG.error("Failed to download file from S3: {}", key, e);
+            return false;
+        }
+    }
+    
+    public void deleteFile(String key) {
+        if (s3Client == null) return;
+        try {
+           s3Client.deleteObject(software.amazon.awssdk.services.s3.model.DeleteObjectRequest.builder()
+                   .bucket(bucketName)
+                   .key(key)
+                   .build());
+        } catch (Exception e) {
+            LOG.error("Failed to delete file from S3: {}", key, e);
+        }
     }
 
     public String generateDownloadUrl(String key) {

@@ -40,4 +40,9 @@ public class NativeMulticoreFuzzyProvider implements AlgorithmProvider {
     public String getName() {
         return "Native Multicore Fuzzy Logic";
     }
+
+    @Override
+    public String getAlgorithmType() {
+        return "fuzzy logic";
+    }
 }

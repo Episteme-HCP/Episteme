@@ -30,4 +30,9 @@ public interface NavierStokesProvider extends AlgorithmProvider {
     default String getName() {
         return "Navier-Stokes Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Navier-Stokes";
+    }
 }

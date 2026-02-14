@@ -49,6 +49,13 @@ public class SparkDistributedContext implements DistributedContext {
     private final JavaSparkContext sparkContext;
 
     /**
+     * Creates a Spark distributed context with default configuration.
+     */
+    public SparkDistributedContext() {
+        this(new SparkConf().setAppName("JScience").setMaster("local[*]"));
+    }
+
+    /**
      * Creates a Spark distributed context.
      *
      * @param sparkConf Spark configuration

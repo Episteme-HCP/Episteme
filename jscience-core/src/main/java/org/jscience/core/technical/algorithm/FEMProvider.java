@@ -32,4 +32,9 @@ public interface FEMProvider extends AlgorithmProvider {
     default String getName() {
         return "FEM Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Finite Element Method";
+    }
 }

@@ -62,4 +62,9 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
     default String getName() {
         return "Linear Algebra Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Linear Algebra";
+    }
 }

@@ -13,7 +13,6 @@ import org.jscience.core.mathematics.analysis.transform.DiscreteFourierTransform
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
-import com.google.auto.service.AutoService;
 
 /**
  * Multicore implementation of FFTProvider using Fork/Join framework.

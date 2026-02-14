@@ -31,4 +31,9 @@ public interface GeneticAlgorithmProvider extends AlgorithmProvider {
     default String getName() {
         return "Genetic Algorithm Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Genetic Algorithm";
+    }
 }

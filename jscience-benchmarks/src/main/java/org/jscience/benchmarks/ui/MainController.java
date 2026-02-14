@@ -27,11 +27,14 @@ public class MainController {
 
     @FXML private TreeTableView<BenchmarkItem> benchmarkTreeTable;
     @FXML private TreeTableColumn<BenchmarkItem, String> nameColumn;
-    @FXML private TreeTableColumn<BenchmarkItem, String> domainColumn;
+    @FXML private TreeTableColumn<BenchmarkItem, String> backendColumn;
+    @FXML private TreeTableColumn<BenchmarkItem, String> libraryColumn;
+    @FXML private TreeTableColumn<BenchmarkItem, String> providerColumn;
+    @FXML private TreeTableColumn<BenchmarkItem, String> descriptionColumn;
     @FXML private TreeTableColumn<BenchmarkItem, String> statusColumn;
     @FXML private TreeTableColumn<BenchmarkItem, String> resultColumn;
 
-    @FXML private TabPane visualizationTabPane; // Changed from single BarChart
+    @FXML private TabPane visualizationTabPane;
     @FXML private ProgressBar globalProgressBar;
     @FXML private Label statusBarLabel;
     @FXML private TabPane mainTabPane;
@@ -39,7 +42,7 @@ public class MainController {
     @FXML private TableColumn<BenchmarkRunSummary, String> dateColumn;
     @FXML private TableColumn<BenchmarkRunSummary, String> suiteColumn;
     @FXML private TableColumn<BenchmarkRunSummary, String> resultsColumn;
-    @FXML private TreeTableColumn<BenchmarkItem, String> descriptionColumn;
+
 
     @FXML private ComboBox<String> metricSelector;
     @FXML private Button exportChartBtn;
@@ -63,33 +66,216 @@ public class MainController {
     private void updateCategoryStatuses(TreeItem<BenchmarkItem> root) {
         if (root == null || root.isLeaf()) return;
 
-        boolean allSuccess = true;
         boolean anyRunning = false;
         boolean anyError = false;
-        int childCount = 0;
+        boolean anySuccess = false;
+        int totalChildren = 0;
+        int readyCount = 0;
 
         for (TreeItem<BenchmarkItem> child : root.getChildren()) {
             updateCategoryStatuses(child); // Recursive update
-            childCount++;
+            totalChildren++;
             
             String status = child.getValue().statusProperty().get();
             if (status == null) status = "";
             
-            if (status.contains("Running") || status.contains("Initializing")) anyRunning = true;
-            if (status.contains("Error")) anyError = true;
-            if (!"Success".equals(status)) allSuccess = false;
+            if (status.contains("Running") || status.contains("Initializing") || status.contains("Warming") || status.contains("Measuring")) anyRunning = true;
+            else if (status.contains("Error") || status.contains("Skipped")) anyError = true; // Treat skipped as error-like for aggregation? Or maybe neutral?
+            else if ("Success".equals(status)) anySuccess = true;
+            else if ("Ready".equals(status) || status.isEmpty()) readyCount++;
         }
 
-        if (childCount == 0) return;
+        if (totalChildren == 0) return;
 
         String newStatus = "";
         if (anyRunning) newStatus = "Running...";
         else if (anyError) newStatus = "Error (Partial)";
-        else if (allSuccess) newStatus = "Success";
-        else newStatus = "Completed";
+        else if (readyCount == totalChildren) newStatus = "Ready"; // Nothing ran
+        else if (anySuccess && readyCount == 0 && !anyError) newStatus = "Success"; // All ran success
+        else newStatus = "Completed"; // Mixed bag (some success, some ready?)
 
         final String s = newStatus;
         Platform.runLater(() -> root.getValue().statusProperty().set(s));
+    }
+
+    private void setupTable() {
+        nameColumn.setCellValueFactory(param -> param.getValue().getValue().nameProperty());
+        backendColumn.setCellValueFactory(param -> param.getValue().getValue().backendProperty());
+        libraryColumn.setCellValueFactory(param -> param.getValue().getValue().libraryProperty());
+        providerColumn.setCellValueFactory(param -> param.getValue().getValue().providerProperty());
+        descriptionColumn.setCellValueFactory(param -> param.getValue().getValue().descriptionProperty());
+        statusColumn.setCellValueFactory(param -> param.getValue().getValue().statusProperty());
+        resultColumn.setCellValueFactory(param -> param.getValue().getValue().resultProperty());
+        
+        benchmarkTreeTable.setShowRoot(false);
+        
+        benchmarkTreeTable.setRowFactory(tv -> {
+            TreeTableRow<BenchmarkItem> row = new TreeTableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                    BenchmarkItem item = row.getItem();
+                    if (item.isBenchmark()) {
+                         new Thread(() -> executeSingle(item)).start();
+                    }
+                }
+            });
+            return row;
+        });
+    }
+
+    private void setupHistoryTable() {
+        dateColumn.setCellValueFactory(data -> data.getValue().dateProperty());
+        suiteColumn.setCellValueFactory(data -> data.getValue().suiteProperty());
+        resultsColumn.setCellValueFactory(data -> data.getValue().resultProperty());
+    }
+
+    private void startDiscovery() {
+        Task<TreeItem<BenchmarkItem>> task = new Task<>() {
+            @Override
+            protected TreeItem<BenchmarkItem> call() throws Exception {
+                List<RunnableBenchmark> benchmarks = BenchmarkRegistry.discover();
+                return buildTree(benchmarks);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            benchmarkTreeTable.setRoot(task.getValue());
+            initializeDomainTabs(task.getValue());
+            updateCategoryStatuses(task.getValue());
+        });
+
+        task.setOnFailed(e -> {
+            statusBarLabel.setText("Discovery Failed: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
+    }
+
+    private TreeItem<BenchmarkItem> buildTree(List<RunnableBenchmark> benchmarks) {
+        TreeItem<BenchmarkItem> root = new TreeItem<>(new BenchmarkItem("Root", "Root", "", "", "", false));
+        root.setExpanded(true);
+
+        Map<String, TreeItem<BenchmarkItem>> domainMap = new HashMap<>();
+
+        for (RunnableBenchmark b : benchmarks) {
+            String domain = b.getDomain(); 
+            if (domain == null || domain.isEmpty()) domain = "Uncategorized";
+            
+            domain = domain.substring(0, 1).toUpperCase() + domain.substring(1);
+
+            TreeItem<BenchmarkItem> domainItem = domainMap.computeIfAbsent(domain, d -> {
+                TreeItem<BenchmarkItem> item = new TreeItem<>(new BenchmarkItem(d, d, "", "", "", false));
+                item.setExpanded(true);
+                root.getChildren().add(item);
+                return item;
+            });
+            
+            BenchmarkItem itemData = new BenchmarkItem(b);
+            TreeItem<BenchmarkItem> item = new TreeItem<>(itemData);
+            domainItem.getChildren().add(item);
+        }
+        
+        root.getChildren().sort(Comparator.comparing(t -> t.getValue().getName()));
+        return root;
+    }
+    
+    private void initializeDomainTabs(TreeItem<BenchmarkItem> root) {
+        for (TreeItem<BenchmarkItem> domain : root.getChildren()) {
+            getOrCreateDomainChart(domain.getValue().getName());
+        }
+    }
+
+    @FXML
+    private void handleSettings() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Settings");
+        alert.setHeaderText("Settings");
+        alert.setContentText("Settings dialog not implemented yet.");
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void handleAbout() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("About");
+        alert.setHeaderText("JScience Benchmarking Suite");
+        alert.setContentText("Version 1.0\nCopyright 2026");
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void handleRunSelected() {
+        TreeItem<BenchmarkItem> selected = benchmarkTreeTable.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        Set<BenchmarkItem> itemsToRun = new HashSet<>();
+        collectBenchmarks(selected, itemsToRun);
+        
+        if (!itemsToRun.isEmpty()) {
+            runBenchmarkSuite(new ArrayList<>(itemsToRun));
+        }
+    }
+    
+    private void collectBenchmarks(TreeItem<BenchmarkItem> root, Set<BenchmarkItem> items) {
+        if (root == null) return;
+        
+        if (root.getValue().isBenchmark()) {
+            items.add(root.getValue());
+        } else {
+            for (TreeItem<BenchmarkItem> child : root.getChildren()) {
+                collectBenchmarks(child, items);
+            }
+        }
+    }
+
+    @FXML
+    private void handleRunAll() {
+        Set<BenchmarkItem> itemsToRun = new HashSet<>();
+        collectBenchmarks(benchmarkTreeTable.getRoot(), itemsToRun);
+        runBenchmarkSuite(new ArrayList<>(itemsToRun));
+    }
+    
+    private void runBenchmarkSuite(List<BenchmarkItem> items) {
+         Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                for (BenchmarkItem item : items) {
+                     Platform.runLater(() -> {
+                         item.statusProperty().set("Queued");
+                         item.resultProperty().set("");
+                         item.setScore(0);
+                     });
+                }
+                
+                int count = 0;
+                for (BenchmarkItem item : items) {
+                    if (isCancelled()) break;
+                    count++;
+                    updateProgress(count, items.size());
+                    executeSingle(item);
+                    Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
+                }
+                return null;
+            }
+        };
+        
+        globalProgressBar.progressProperty().bind(task.progressProperty());
+        
+        task.setOnSucceeded(e -> {
+             globalProgressBar.progressProperty().unbind();
+             globalProgressBar.setProgress(1.0);
+             statusBarLabel.setText("Suite Completed.");
+        });
+        
+        task.setOnFailed(e -> {
+             globalProgressBar.progressProperty().unbind();
+             globalProgressBar.setProgress(0);
+             statusBarLabel.setText("Suite Failed: " + task.getException().getMessage());
+             task.getException().printStackTrace();
+        });
+        
+        new Thread(task).start();
     }
 
     @FXML
@@ -103,193 +289,44 @@ public class MainController {
     }
 
     private void setupAnalytics() {
-        metricSelector.getItems().addAll("Throughput (Ops/Sec)", "Average Latency (ms)", "P99 Latency (ms)");
+        metricSelector.getItems().addAll("Throughput (Ops/Sec)", "Average Latency (ms)", "P99 Latency (N/A)");
         metricSelector.getSelectionModel().select(0);
-    }
-
-    private void setupTable() {
-        // Multi-selection enabled
-        benchmarkTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        
-        nameColumn.setCellValueFactory(p -> p.getValue().getValue().nameProperty());
-        descriptionColumn.setCellValueFactory(p -> p.getValue().getValue().descriptionProperty());
-        domainColumn.setCellValueFactory(p -> p.getValue().getValue().domainProperty());
-        statusColumn.setCellValueFactory(p -> p.getValue().getValue().statusProperty());
-        resultColumn.setCellValueFactory(p -> p.getValue().getValue().resultProperty());
-        
-        benchmarkTreeTable.setShowRoot(false);
-        
-        benchmarkTreeTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-                handleRunSelected();
-            }
+        metricSelector.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
+            refreshAllCharts();
         });
     }
 
-    private void setupHistoryTable() {
-        dateColumn.setCellValueFactory(p -> p.getValue().dateProperty());
-        suiteColumn.setCellValueFactory(p -> p.getValue().nameProperty());
-        resultsColumn.setCellValueFactory(p -> p.getValue().resultProperty());
-    }
-
-    private void startDiscovery() {
-         statusBarLabel.setText("Scanning for benchmarks... (This may take ~30s)");
-         globalProgressBar.setProgress(-1); // Indeterminate
-         
-         Task<TreeItem<BenchmarkItem>> task = new Task<>() {
-             @Override
-             protected TreeItem<BenchmarkItem> call() {
-                 return buildTree();
-             }
-         };
-         
-         task.setOnSucceeded(e -> {
-             benchmarkTreeTable.setRoot(task.getValue());
-             statusBarLabel.setText("Ready. Benchmarks loaded.");
-             globalProgressBar.setProgress(0);
-             
-             // Initialize tabs for discovered domains
-             initializeDomainTabs(task.getValue());
-         });
-         
-         task.setOnFailed(e -> {
-             statusBarLabel.setText("Discovery failed: " + task.getException().getMessage());
-             globalProgressBar.setProgress(0);
-             task.getException().printStackTrace();
-         });
-         
-         new Thread(task).start();
-    }
-
-    private void initializeDomainTabs(TreeItem<BenchmarkItem> root) {
-        if (root == null) return;
-        for (TreeItem<BenchmarkItem> child : root.getChildren()) {
-            if (!child.isLeaf()) {
-                 String domain = child.getValue().getName(); // Assuming category nodes use name as domain
-                 getOrCreateDomainChart(domain);
-            }
-        }
-    }
-
-    private TreeItem<BenchmarkItem> buildTree() {
-        TreeItem<BenchmarkItem> root = new TreeItem<>(new BenchmarkItem("Root", "Root", null));
-        Map<String, TreeItem<BenchmarkItem>> domainNodes = new HashMap<>();
-
-        // BenchmarkRegistry.discover() might be slow, so it runs in this background thread
-        List<RunnableBenchmark> discovered = BenchmarkRegistry.discover();
+    private void refreshAllCharts() {
+        // Clear all series data first? Or just update Y values.
+        // Easiest is to iterate over all items and update chart if they have a score.
+        List<BenchmarkItem> allItems = new ArrayList<>();
+        Set<BenchmarkItem> collected = new HashSet<>();
+        collectBenchmarks(benchmarkTreeTable.getRoot(), collected);
+        allItems.addAll(collected);
         
-        for (RunnableBenchmark b : discovered) {
-            TreeItem<BenchmarkItem> domainNode = domainNodes.computeIfAbsent(b.getDomain(), d -> {
-                TreeItem<BenchmarkItem> node = new TreeItem<>(new BenchmarkItem(d, d, null));
-                node.setExpanded(true);
-                Platform.runLater(() -> root.getChildren().add(node)); // UI updates on FX thread
-                return node;
-            });
-            Platform.runLater(() -> domainNode.getChildren().add(new TreeItem<>(new BenchmarkItem(b.getName(), b.getDomain(), b))));
-        }
-        return root;
-    }
-
-    @FXML
-    private void handleSettings() {
-        // Settings button removed
-    }
-
-    @FXML
-    private void handleAbout() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("About JScience Benchmarking");
-        alert.setHeaderText("JScience Benchmarking Suite v1.0");
-        alert.setContentText("A premium benchmarking suite for high-performance computing.\n\n" +
-                "Built with JScience Core and JavaFX.\n" +
-                "© 2026 JScience Project Contributors.");
-        alert.show();
-    }
-
-    @FXML
-    private void handleRunSelected() {
-        ObservableList<TreeItem<BenchmarkItem>> selectedItems = benchmarkTreeTable.getSelectionModel().getSelectedItems();
-        Set<BenchmarkItem> uniqueBenchmarks = new LinkedHashSet<>();
+        // Update Y-Axis label for all charts
+        String label = "Ops/Sec";
+        int index = metricSelector.getSelectionModel().getSelectedIndex();
+        if (index == 1) label = "Latency (ms)";
         
-        for (TreeItem<BenchmarkItem> item : selectedItems) {
-            if (item != null) {
-                // Determine if it's a category and expand it so user sees children running
-                if (!item.isLeaf()) {
-                     item.setExpanded(true);
-                }
-                collectBenchmarks(item, uniqueBenchmarks);
-            }
+        for (BarChart<String, Number> chart : domainChartMap.values()) {
+            ((NumberAxis) chart.getYAxis()).setLabel(label);
         }
-        
-        if (!uniqueBenchmarks.isEmpty()) {
-            runBenchmarkSuite(new ArrayList<>(uniqueBenchmarks));
-        } else {
-            statusBarLabel.setText("No benchmarks selected.");
-        }
-    }
 
-    private void collectBenchmarks(TreeItem<BenchmarkItem> node, Set<BenchmarkItem> result) {
-        if (node.isLeaf() && node.getValue().getBenchmark() != null) {
-            result.add(node.getValue());
-        } else {
-            for (TreeItem<BenchmarkItem> child : node.getChildren()) {
-                collectBenchmarks(child, result);
+        for (BenchmarkItem item : allItems) {
+            String status = item.statusProperty().get();
+            if ("Success".equals(status) && item.getScore() > 0) {
+                double val = calculateMetric(item.getScore());
+                updateChart(item.getUniqueId(), val, item.getDomain());
             }
         }
     }
-
-    @FXML
-    private void handleRunAll() {
-        List<BenchmarkItem> toRun = new ArrayList<>();
-        findLeafItems(benchmarkTreeTable.getRoot(), toRun);
-        runBenchmarkSuite(toRun);
-    }
-
-    private void findLeafItems(TreeItem<BenchmarkItem> root, List<BenchmarkItem> resultList) {
-        if (root == null) return;
-        for (TreeItem<BenchmarkItem> child : root.getChildren()) {
-            if (child.getChildren().isEmpty()) {
-                if (child.getValue().getBenchmark() != null) {
-                    resultList.add(child.getValue());
-                }
-            } else {
-                findLeafItems(child, resultList);
-            }
-        }
-    }
-
-    private void runBenchmarkSuite(List<BenchmarkItem> benchmarks) {
-        // Unbind first to prevent "A bound value cannot be set" exception
-        statusBarLabel.textProperty().unbind();
-        globalProgressBar.progressProperty().unbind();
-
-        // Reset progress status for new run
-        statusBarLabel.setText("Starting suite...");
-        globalProgressBar.setVisible(true);
-
-        Task<Void> suiteTask = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                int total = benchmarks.size();
-                for (int i = 0; i < total; i++) {
-                    if (isCancelled()) break;
-                    
-                    BenchmarkItem item = benchmarks.get(i);
-                    updateProgress(i, total);
-                    updateMessage("Running " + item.getName() + " (" + (i+1) + "/" + total + ")...");
-                    
-                    executeSingle(item);
-                }
-                updateProgress(total, total);
-                updateMessage("Suite Complete");
-                Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
-                return null;
-            }
-        };
-
-        globalProgressBar.progressProperty().bind(suiteTask.progressProperty());
-        statusBarLabel.textProperty().bind(suiteTask.messageProperty());
-        new Thread(suiteTask).start();
+    
+    private double calculateMetric(double opsSec) {
+        int index = metricSelector.getSelectionModel().getSelectedIndex();
+        if (index == 0) return opsSec; // Throughput
+        if (index == 1) return (opsSec > 0) ? 1000.0 / opsSec : 0.0; // Latency ms
+        return 0.0; // P99 not implemented
     }
 
     private void executeSingle(BenchmarkItem item) {
@@ -321,8 +358,13 @@ public class MainController {
             Platform.runLater(() -> {
                 item.statusProperty().set("Success");
                 item.resultProperty().set(resultText);
-                updateChart(item.getName(), opsSec, item.getDomain());
-                addToHistory(item.getName(), resultText);
+                item.setScore(opsSec);
+                
+                String uniqueId = item.getUniqueId();
+                double val = calculateMetric(opsSec);
+                
+                updateChart(uniqueId, val, item.getDomain());
+                addToHistory(uniqueId, resultText);
             });
             
             b.teardown();
@@ -355,7 +397,16 @@ public class MainController {
                 return;
             }
         }
-        series.getData().add(new XYChart.Data<>(name, value));
+        
+        XYChart.Data<String, Number> data = new XYChart.Data<>(name, value);
+        series.getData().add(data);
+        
+        // Apply Orange Color Style when node is created
+        data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+            if (newNode != null) {
+                newNode.setStyle("-fx-bar-fill: #ff9900;"); // Orange
+            }
+        });
     }
     
     private XYChart.Series<String, Number> getOrCreateDomainChart(String domain) {
@@ -366,8 +417,11 @@ public class MainController {
         // Create new chart for this domain
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Benchmark");
+        xAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE); // White labels
+        
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Ops/Sec");
+        yAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE); // White labels
         
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
         chart.setTitle(domain + " Performance");
@@ -375,7 +429,7 @@ public class MainController {
         chart.setLegendVisible(false); // Just one series usually
         
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Throughput");
+        series.setName("Performance");
         chart.getData().add(series);
         
         Tab tab = new Tab(domain);

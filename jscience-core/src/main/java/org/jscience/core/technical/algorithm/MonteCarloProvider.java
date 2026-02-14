@@ -52,4 +52,9 @@ public interface MonteCarloProvider extends AlgorithmProvider {
     default String getName() {
         return "Monte Carlo Provider";
     }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Monte Carlo Simulation";
+    }
 }

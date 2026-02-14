@@ -341,6 +341,20 @@
         <version>${auto-service.version}</version>
         <optional>true</optional>
       </dependency>
+      <!-- JBullet (Physics Simulation) -->
+      <dependency>
+        <groupId>cz.advel.jbullet</groupId>
+        <artifactId>jbullet</artifactId>
+        <version>20101010</version>
+        <optional>true</optional>
+      </dependency>
+      <!-- HDF5 (High-Performance IO) -->
+      <dependency>
+        <groupId>io.jhdf</groupId>
+        <artifactId>jhdf</artifactId>
+        <version>0.7.0</version>
+        <optional>true</optional>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

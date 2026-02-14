@@ -46,9 +46,15 @@ public class EnvironmentController {
         new Thread(() -> {
             ServiceLoader<AlgorithmProvider> loader = ServiceLoader.load(AlgorithmProvider.class);
             for (AlgorithmProvider p : loader) {
+                String type = p.getAlgorithmType();
+                if (type != null && !type.isEmpty()) {
+                    type = type.substring(0, 1).toUpperCase() + type.substring(1);
+                }
+                
+                final String capitalizedType = type;
                 String status = p.isAvailable() ? "Available" : "Unavailable";
                 ProviderItem item = new ProviderItem(
-                    p.getAlgorithmType(),
+                    capitalizedType,
                     p.getName(),
                     status,
                     p.getClass().getName()

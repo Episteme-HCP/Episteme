@@ -7,6 +7,7 @@ package org.jscience.nativ.technical.algorithm.linearalgebra;
 
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.backends.NativeBLASBackend;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -20,14 +21,13 @@ import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService(LinearAlgebraProvider.class)
+@AutoService({LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 
     private final NativeBLASBackend backend = new NativeBLASBackend();
 
-    @Override
     public String getName() {
-        return "JScience Native (OpenBLAS)";
+        return "Native JScience (OpenBLAS)";
     }
 
     @Override

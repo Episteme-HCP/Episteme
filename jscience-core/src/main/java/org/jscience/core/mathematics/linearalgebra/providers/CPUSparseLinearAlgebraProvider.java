@@ -36,6 +36,9 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import com.google.auto.service.AutoService;
 
 /**
  * Linear Algebra Provider for Sparse Matrices (CPU).
@@ -48,13 +51,19 @@ import org.jscience.core.mathematics.structures.rings.Ring;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
+@AutoService({LinearAlgebraProvider.class, org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
+public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> implements org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E> {
 
     protected final Ring<E> ring;
 
     public CPUSparseLinearAlgebraProvider(Ring<E> ring) {
         super(ring instanceof Field ? (Field<E>) ring : null);
         this.ring = ring;
+    }
+
+    @Override
+    public String getName() {
+        return "JScience CPU (Sparse)";
     }
 
     /**

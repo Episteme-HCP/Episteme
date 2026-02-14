@@ -29,6 +29,11 @@ public interface MaxwellProvider extends AlgorithmProvider {
 
     @Override
     default String getName() {
-        return "Maxwell Equations Provider";
+        return "Maxwell Provider";
+    }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Maxwell Equations";
     }
 }

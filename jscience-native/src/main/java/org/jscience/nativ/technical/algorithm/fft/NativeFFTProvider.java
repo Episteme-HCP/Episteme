@@ -70,6 +70,11 @@ public class NativeFFTProvider implements FFTProvider {
     }
 
     @Override
+    public String getName() {
+        return "Native FFTW3 (Wrapper)";
+    }
+
+    @Override
     public boolean isAvailable() {
         ensureInitialized();
         return available;

@@ -48,6 +48,7 @@ public class CheckpointManager {
 
     private final Path checkpointDir;
     private final ConcurrentHashMap<String, TaskCheckpoint> checkpoints = new ConcurrentHashMap<>();
+    private org.jscience.server.server.storage.S3StorageService s3Service;
 
     /**
      * Checkpoint data for a task.
@@ -104,11 +105,15 @@ public class CheckpointManager {
         this.checkpointDir = checkpointDir;
         ensureDirectoryExists();
     }
+    
+    public void setStorageService(org.jscience.server.server.storage.S3StorageService s3Service) {
+        this.s3Service = s3Service;
+    }
 
     private void ensureDirectoryExists() {
         try {
             Files.createDirectories(checkpointDir);
-            LOG.info("Ã°Å¸â€œÂ Checkpoint directory: {}", checkpointDir);
+            LOG.info("📂 Checkpoint directory: {}", checkpointDir);
         } catch (IOException e) {
             LOG.error("Failed to create checkpoint directory", e);
         }
@@ -123,7 +128,7 @@ public class CheckpointManager {
 
         // Persist to disk
         persistCheckpoint(checkpoint);
-        LOG.debug("Ã°Å¸â€™Â¾ Checkpoint saved: task={}, progress={}%, iteration={}",
+        LOG.debug("💾 Checkpoint saved: task={}, progress={}%, iteration={}",
                 taskId, progress, iteration);
     }
 
@@ -150,8 +155,8 @@ public class CheckpointManager {
             return checkpoint;
         }
 
-        // Try to load from disk
-        checkpoint = loadCheckpointFromDisk(taskId);
+        // Try to load from disk or S3
+        checkpoint = loadCheckpoint(taskId);
         if (checkpoint != null) {
             checkpoints.put(taskId, checkpoint);
         }
@@ -182,7 +187,8 @@ public class CheckpointManager {
      */
     public boolean hasCheckpoint(String taskId) {
         return checkpoints.containsKey(taskId) ||
-                Files.exists(getCheckpointPath(taskId));
+                Files.exists(getCheckpointPath(taskId)) ||
+                (s3Service != null && s3Service.isEnabled()); // Assume exists if S3 enabled? No, usually check S3 but that's expensive for generic check.
     }
 
     /**
@@ -192,7 +198,11 @@ public class CheckpointManager {
         checkpoints.remove(taskId);
         try {
             Files.deleteIfExists(getCheckpointPath(taskId));
-            LOG.debug("Ã°Å¸â€”â€˜Ã¯Â¸Â Checkpoint deleted: {}", taskId);
+            LOG.debug("🗑️ Checkpoint deleted: {}", taskId);
+            
+            if (s3Service != null && s3Service.isEnabled()) {
+                s3Service.deleteFile(getS3Key(taskId));
+            }
         } catch (IOException e) {
             LOG.warn("Failed to delete checkpoint file for task: {}", taskId, e);
         }
@@ -212,7 +222,7 @@ public class CheckpointManager {
             return false;
         });
 
-        LOG.info("Ã°Å¸Â§Â¹ Checkpoint cleanup complete");
+        LOG.info("🧹 Checkpoint cleanup complete");
     }
 
     /**
@@ -227,30 +237,57 @@ public class CheckpointManager {
     private Path getCheckpointPath(String taskId) {
         return checkpointDir.resolve(taskId + ".checkpoint");
     }
+    
+    private String getS3Key(String taskId) {
+        return "checkpoints/" + taskId + ".checkpoint";
+    }
 
     private void persistCheckpoint(TaskCheckpoint checkpoint) {
+        Path path = getCheckpointPath(checkpoint.getTaskId());
         try (ObjectOutputStream oos = new ObjectOutputStream(
-                Files.newOutputStream(getCheckpointPath(checkpoint.getTaskId())))) {
+                Files.newOutputStream(path))) {
             oos.writeObject(checkpoint);
+            
+            // Upload to S3 if enabled
+            if (s3Service != null && s3Service.isEnabled()) {
+                s3Service.uploadFile(getS3Key(checkpoint.getTaskId()), path);
+                LOG.debug("☁️ Checkpoint uploaded to S3: {}", checkpoint.getTaskId());
+            }
+            
         } catch (IOException e) {
             LOG.error("Failed to persist checkpoint for task: {}", checkpoint.getTaskId(), e);
         }
     }
 
-    private TaskCheckpoint loadCheckpointFromDisk(String taskId) {
+    private TaskCheckpoint loadCheckpoint(String taskId) {
         Path path = getCheckpointPath(taskId);
-        if (!Files.exists(path)) {
-            return null;
+        
+        // 1. Try Local Disk
+        if (Files.exists(path)) {
+            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
+                TaskCheckpoint checkpoint = (TaskCheckpoint) ois.readObject();
+                LOG.debug("📥 Checkpoint loaded from disk: {}", taskId);
+                return checkpoint;
+            } catch (IOException | ClassNotFoundException e) {
+                LOG.error("Failed to load checkpoint from disk for task: {}", taskId, e);
+                // Fallthrough to S3 attempt if disk works but file corrupt? Or stop?
+            }
+        }
+        
+        // 2. Try S3
+        if (s3Service != null && s3Service.isEnabled()) {
+             if (s3Service.downloadFile(getS3Key(taskId), path)) {
+                 try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
+                    TaskCheckpoint checkpoint = (TaskCheckpoint) ois.readObject();
+                    LOG.info("☁️📥 Checkpoint recovered from S3: {}", taskId);
+                    return checkpoint;
+                } catch (IOException | ClassNotFoundException e) {
+                    LOG.error("Failed to deserialize checkpoint from S3 download: {}", taskId, e);
+                }
+             }
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-            TaskCheckpoint checkpoint = (TaskCheckpoint) ois.readObject();
-            LOG.debug("Ã°Å¸â€œÂ¥ Checkpoint loaded from disk: {}", taskId);
-            return checkpoint;
-        } catch (IOException | ClassNotFoundException e) {
-            LOG.error("Failed to load checkpoint from disk for task: {}", taskId, e);
-            return null;
-        }
+        return null;
     }
 }
 

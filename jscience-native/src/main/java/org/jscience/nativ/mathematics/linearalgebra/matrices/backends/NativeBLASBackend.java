@@ -55,54 +55,87 @@ public class NativeBLASBackend implements MatrixBackend, LinearAlgebraBackend<Re
     public static final int CblasConjTrans = 113;
 
     static {
-        Linker linker = Linker.nativeLinker();
-        SymbolLookup lookup = SymbolLookup.libraryLookup("libopenblas", java.lang.foreign.Arena.global());
+        MethodHandle dgemm = null;
+        MethodHandle dgemv = null;
+        MethodHandle ddot = null;
+        MethodHandle dnrm2 = null;
+        MethodHandle daxpy = null;
+        MethodHandle dscal = null;
         
-        if (lookup.find("cblas_dgemm").isEmpty()) {
-            lookup = SymbolLookup.libraryLookup("mkl_rt", java.lang.foreign.Arena.global());
-        }
+        MethodHandle dgesv = null;
+        MethodHandle dgetrf = null;
+        MethodHandle dgetri = null;
+        
+        boolean avail = false;
 
-        MemorySegment symbol = lookup.find("cblas_dgemm").orElse(null);
-        if (symbol != null) {
-            DGEMM_HANDLE = linker.downcallHandle(symbol, FunctionDescriptor.ofVoid(
-                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE,
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT
-            ));
-            
-            MemorySegment mvSymbol = lookup.find("cblas_dgemv").orElse(null);
-            if (mvSymbol != null) {
-                DGEMV_HANDLE = linker.downcallHandle(mvSymbol, FunctionDescriptor.ofVoid(
-                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                    ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS,
-                    ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
-                    ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT
-                ));
-            } else {
-                DGEMV_HANDLE = null;
+        try {
+            Linker linker = Linker.nativeLinker();
+            SymbolLookup lookup;
+            try {
+                lookup = SymbolLookup.libraryLookup("libopenblas", java.lang.foreign.Arena.global());
+            } catch (Throwable t) {
+                // Try alternate name
+                try {
+                     lookup = SymbolLookup.libraryLookup("mkl_rt", java.lang.foreign.Arena.global());
+                } catch (Throwable t2) {
+                     // Last attempt or fail
+                     lookup = SymbolLookup.loaderLookup();
+                }
             }
             
-            // Level 1
-            DDOT_HANDLE = lookup.find("cblas_ddot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-            DNRM2_HANDLE = lookup.find("cblas_dnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-            DAXPY_HANDLE = lookup.find("cblas_daxpy").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-            DSCAL_HANDLE = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+            // Validate we have a lookup that works or at least doesn't throw immediate errors on find
+            // Check for basic symbol
+            if (lookup.find("cblas_dgemm").isPresent()) {
+                 MemorySegment symbol = lookup.find("cblas_dgemm").get();
+                 dgemm = linker.downcallHandle(symbol, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+                ));
+                
+                MemorySegment mvSymbol = lookup.find("cblas_dgemv").orElse(null);
+                if (mvSymbol != null) {
+                    dgemv = linker.downcallHandle(mvSymbol, FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS,
+                        ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+                    ));
+                }
+                
+                // Level 1
+                ddot = lookup.find("cblas_ddot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                dnrm2 = lookup.find("cblas_dnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                daxpy = lookup.find("cblas_daxpy").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                dscal = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-            // LAPACKE
-            DGESV_HANDLE = lookup.find("LAPACKE_dgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-            DGETRF_HANDLE = lookup.find("LAPACKE_dgetrf").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-            DGETRI_HANDLE = lookup.find("LAPACKE_dgetri").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                // LAPACKE
+                dgesv = lookup.find("LAPACKE_dgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                dgetrf = lookup.find("LAPACKE_dgetrf").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                dgetri = lookup.find("LAPACKE_dgetri").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-            AVAILABLE = true;
-        } else {
-            DGEMM_HANDLE = null;
-            DGEMV_HANDLE = null;
-            DDOT_HANDLE = DNRM2_HANDLE = DAXPY_HANDLE = DSCAL_HANDLE = null;
-            DGESV_HANDLE = DGETRF_HANDLE = DGETRI_HANDLE = null;
-            AVAILABLE = false;
+                avail = true;
+            }
+        } catch (Throwable t) {
+            // Native library not found or other linkage error
+            // We swallow this to allow the class to initialize with AVAILABLE = false
+            System.err.println("[WARN] NativeBLASBackend: Native library not found (" + t.getMessage() + ")");
         }
+        
+        DGEMM_HANDLE = dgemm;
+        DGEMV_HANDLE = dgemv;
+        DDOT_HANDLE = ddot;
+        DNRM2_HANDLE = dnrm2;
+        DAXPY_HANDLE = daxpy;
+        DSCAL_HANDLE = dscal;
+        
+        DGESV_HANDLE = dgesv;
+        DGETRF_HANDLE = dgetrf;
+        DGETRI_HANDLE = dgetri;
+        
+        AVAILABLE = avail;
     }
 
     @Override

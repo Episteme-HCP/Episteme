@@ -49,13 +49,13 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
     @Override public String getId() { return getIdPrefix(); }
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "matrix-systematic"; }
-    @Override public String getNameBase() { return "Systematic Matrix Mult"; }
+    @Override public String getNameBase() { return "Matrix Multiplication"; }
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override public Class<LinearAlgebraProvider<Real>> getProviderClass() { return (Class) LinearAlgebraProvider.class; }
 
     @Override
     public String getDescription() {
-        return "Systematically benchmarks all discovered Linear Algebra providers on a standard 500x500 real matrix multiplication.";
+        return "Dense Matrix Multiplication (500x500), Double Precision";
     }
 
     @Override
