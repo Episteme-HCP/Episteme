@@ -41,7 +41,7 @@ import java.util.Random;
 @AutoService(RunnableBenchmark.class)
 public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
-    private static final int SIZE = 500;
+    private static final int SIZE = 2000;
     private RealDoubleMatrix A;
     private RealDoubleMatrix B;
     private LinearAlgebraProvider<Real> currentProvider;
@@ -55,7 +55,7 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
 
     @Override
     public String getDescription() {
-        return "Dense Matrix Multiplication (500x500), Double Precision";
+        return "Dense Matrix Multiplication (2000x2000), Double Precision";
     }
 
     @Override

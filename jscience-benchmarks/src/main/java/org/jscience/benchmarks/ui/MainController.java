@@ -286,11 +286,13 @@ public class MainController {
                 int count = 0;
                 for (BenchmarkItem item : items) {
                     if (isCancelled()) break;
+                    executeSingle(item);
                     count++;
                     updateProgress(count, items.size());
-                    executeSingle(item);
                     Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
                 }
+                // Ensure progress is 100% at the end
+                updateProgress(items.size(), items.size());
                 return null;
             }
         };

@@ -55,16 +55,20 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements SparseLinearAlgebra
 
     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
     private static final OpenCLBackend backend = new OpenCLBackend();
+    private final boolean initialized;
 
     /**
      * Public no-arg constructor required by ServiceLoader.
+     * Provider is not usable without a Field — isAvailable() returns false.
      */
     public OpenCLSparseLinearAlgebraProvider() {
         this.cpuProvider = null;
+        this.initialized = false;
     }
 
     public OpenCLSparseLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
+        this.initialized = true;
         if (isAvailable()) {
             java.util.logging.Logger.getLogger(getClass().getName()).info(
                     "OpenCLSparseLinearAlgebraProvider initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
@@ -73,7 +77,7 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements SparseLinearAlgebra
 
     @Override
     public boolean isAvailable() {
-        return backend.isAvailable();
+        return initialized && backend.isAvailable();
     }
 
     public String getName() {

@@ -63,17 +63,22 @@ public class BenchmarkItem {
     }
 
     private String determineBackend(String providerName, String library) {
-        // External libraries get "External" backend
-        if (!library.equals("JScience") && !library.equals("JScience Native")) {
-            return "External";
-        }
-        
-        // For JScience's own providers, determine the actual compute backend
         String pName = providerName.toUpperCase();
+        
+        // GPU / Distributed backends
         if (pName.contains("CUDA")) return "CUDA"; 
         if (pName.contains("OPENCL") || pName.contains("GPU")) return "OpenCL";
         if (pName.contains("MPI") || pName.contains("SPARK")) return "Distributed";
-        return "CPU";
+        
+        // External libraries are generally single-threaded
+        if (!library.equals("JScience") && !library.equals("JScience Native")) {
+            // JBlas uses native BLAS which may be multi-threaded internally
+            if (library.equals("JBlas")) return "CPU (Native)";
+            return "Monocore";
+        }
+        
+        // JScience CPU providers use parallel streams above PARALLEL_THRESHOLD
+        return "Multicore";
     }
 
     private String determineLibrary(String providerName) {
@@ -101,13 +106,28 @@ public class BenchmarkItem {
             return library;
         }
         
-        // For JScience / JScience Native, show "Standard" by default.
-        // If the full name contains a distinctive qualifier (Dense, Sparse, SIMD, etc.),
-        // use it to differentiate from the standard implementation.
+        // For JScience / JScience Native, detect meaningful algorithm qualifiers
         String upper = fullName.toUpperCase();
         if (upper.contains("SPARSE")) return "Sparse";
         if (upper.contains("SIMD") || upper.contains("VECTOR")) return "SIMD";
         if (upper.contains("REFERENCE")) return "Reference";
+        if (upper.contains("MULTICORE")) return "Multicore";
+        if (upper.contains("VARIABLE ELIMINATION")) return "Variable Elimination";
+        if (upper.contains("MONTE CARLO")) return "Monte Carlo";
+        if (upper.contains("LOUVAIN")) return "Louvain";
+        if (upper.contains("BARNES")) return "Barnes-Hut";
+        if (upper.contains("RUNGE") || upper.contains("RK4")) return "Runge-Kutta";
+        if (upper.contains("EULER")) return "Euler";
+        
+        // Fallback: clean the full name to extract a meaningful qualifier
+        String cleaned = fullName.replaceAll("\\s*\\([^)]*\\)", "") // Remove parenthesized qualifiers
+                                 .replace("JScience", "")
+                                 .replace("Native", "")
+                                 .replace("CPU", "")
+                                 .replace("GPU", "")
+                                 .replaceAll("\\s+", " ")
+                                 .trim();
+        if (!cleaned.isEmpty()) return cleaned;
         
         return "Standard";
     }
