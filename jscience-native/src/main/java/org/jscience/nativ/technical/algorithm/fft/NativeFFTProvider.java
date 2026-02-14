@@ -63,8 +63,8 @@ public class NativeFFTProvider implements FFTProvider {
             
             available = true;
         } catch (Throwable t) {
-            // Log warning but don't crash, allowing other providers to work
-            System.err.println("NativeFFTProvider: FFTW3 native library not found/loaded. " + t.getMessage());
+            // Silently mark as unavailable — this is expected when FFTW3 is not installed.
+            // The benchmark UI will show "Unavailable" status.
             available = false;
         }
     }

@@ -68,7 +68,7 @@ public class SystematicBayesianInferenceBenchmark implements SystematicBenchmark
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "bayesian-systematic"; }
     @Override public String getNameBase() { return "Systematic Bayesian Inference"; }
-    @Override public String getDescription() { return "Systematically benchmarks Bayesian Inference using the standard WetGrass network."; }
+    @Override public String getDescription() { return "Bayesian inference (WetGrass network, probabilistic reasoning)"; }
     @Override public String getDomain() { return "Machine Learning"; }
     @Override public Class<BayesianInferenceProvider> getProviderClass() { return BayesianInferenceProvider.class; }
 

@@ -51,7 +51,7 @@ public class SystematicMandelbrotBenchmark implements SystematicBenchmark<Mandel
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "mandelbrot-systematic"; }
     @Override public String getNameBase() { return "Systematic Mandelbrot Generation"; }
-    @Override public String getDescription() { return "Systematically benchmarks Mandelbrot set generation performance through intense floating-point iterations."; }
+    @Override public String getDescription() { return "Mandelbrot set generation (800x800 viewport, 1000 max iterations)"; }
     @Override public String getDomain() { return "Visualization"; }
     @Override public Class<MandelbrotProvider> getProviderClass() { return MandelbrotProvider.class; }
 

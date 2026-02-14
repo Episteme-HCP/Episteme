@@ -73,8 +73,7 @@ public class BenchmarkItem {
         if (pName.contains("CUDA")) return "CUDA"; 
         if (pName.contains("OPENCL") || pName.contains("GPU")) return "OpenCL";
         if (pName.contains("MPI") || pName.contains("SPARK")) return "Distributed";
-        // JScience CPU providers use parallel streams, so they are effectively multicore
-        return "Multicore";
+        return "CPU";
     }
 
     private String determineLibrary(String providerName) {
@@ -92,27 +91,25 @@ public class BenchmarkItem {
         if (pName.contains("MPI")) return "MPJ Express";
         if (pName.contains("SPARK")) return "Apache Spark";
         if (pName.contains("NATIVE")) return "JScience Native";
-        if (pName.contains("JAVA REFERENCE")) return "JScience"; // Default java implementation
-        // Default fallback if not external lib
+        if (pName.contains("JAVA REFERENCE")) return "JScience";
         return "JScience"; 
     }
 
     private String determineSimpleProvider(String fullName, String backend, String library) {
-        // Strip all parenthesized qualifiers like (Dense), (CPU), (Wrapper), (Sparse) —
-        // that info is already in Backend/Library columns
-        String simple = fullName.replaceAll("\\s*\\([^)]*\\)", "").trim();
+        // For external libraries, the provider name IS the library name
+        if (!library.equals("JScience") && !library.equals("JScience Native")) {
+            return library;
+        }
         
-        // Remove known backend/library strings to leave only the qualifier
-        simple = simple.replace("JScience", "")
-                       .replace("Linear Algebra", "")
-                       .replace(backend, "")
-                       .replace(library, "")
-                       .replace("Native", "")
-                       .replaceAll("\\s+", " ")
-                       .trim();
+        // For JScience / JScience Native, show "Standard" by default.
+        // If the full name contains a distinctive qualifier (Dense, Sparse, SIMD, etc.),
+        // use it to differentiate from the standard implementation.
+        String upper = fullName.toUpperCase();
+        if (upper.contains("SPARSE")) return "Sparse";
+        if (upper.contains("SIMD") || upper.contains("VECTOR")) return "SIMD";
+        if (upper.contains("REFERENCE")) return "Reference";
         
-        if (simple.isEmpty()) return "Standard"; 
-        return simple;
+        return "Standard";
     }
 
     public String getName() { return name.get(); }

@@ -53,7 +53,7 @@ public class SystematicGraphBenchmark implements SystematicBenchmark<GraphAlgori
 
     @Override
     public String getDescription() {
-        return "Systematically benchmarks all discovered Graph algorithm providers (Multicore, Native, etc.) for community detection.";
+        return "Graph community detection (Louvain algorithm on random graph)";
     }
 
     @Override

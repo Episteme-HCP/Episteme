@@ -68,7 +68,7 @@ public class NativeCUDABackend implements GPUBackend {
             );
             
         } catch (Exception e) {
-            System.err.println("CUDA Backend initialization failed: " + e.getMessage());
+            // Silently mark unavailable — expected when CUDA is not installed
         }
         this.cuda = cudaLookup;
         this.cublas = cublasLookup;

@@ -47,7 +47,7 @@ public class SystematicSimulationBenchmark implements SystematicBenchmark<Simula
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "simulation-systematic"; }
     @Override public String getNameBase() { return "Systematic Parallel Simulation"; }
-    @Override public String getDescription() { return "Systematically benchmarks parallel task execution and scheduling efficiency across multiple nodes or threads."; }
+    @Override public String getDescription() { return "Parallel task execution and scheduling (multi-threaded workload distribution)"; }
     @Override public String getDomain() { return "Parallel Computing"; }
     @Override public Class<SimulationProvider> getProviderClass() { return SimulationProvider.class; }
 

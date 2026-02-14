@@ -1,33 +1,33 @@
-﻿mvn : WARNING: A restricted method in java.lang.System has 
-been called
+﻿mvn : WARNING: A restricted method in java.lang.System has been 
+called
 Au caractère Ligne:1 : 1
 + mvn compile -pl jscience-benchmarks -am 2>&1 | Out-File 
 -FilePath C:\ ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (WARNING: A 
-rest...ha    s been called:String) [], RemoteException
+    + CategoryInfo          : NotSpecified: (WARNING: A rest... 
+   has been called:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
 WARNING: java.lang.System::load has been called by 
-org.fusesource.jansi.internal.JansiLoader in an unnamed 
-module (file:/C:/Program%20Files/Apache/Maven/apache-maven-
-3.9.5/lib/jansi-2.4.0.jar)
+org.fusesource.jansi.internal.JansiLoader in an unnamed module (
+file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/jan
+si-2.4.0.jar)
 WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a 
 warning for callers in this module
-WARNING: Restricted methods will be blocked in a future 
-release unless native access is enabled
+WARNING: Restricted methods will be blocked in a future release 
+unless native access is enabled
 
-WARNING: A terminally deprecated method in sun.misc.Unsafe 
-has been called
-WARNING: sun.misc.Unsafe::objectFieldOffset has been 
-called by com.google.common.util.concurrent.AbstractFuture$
-UnsafeAtomicHelper (file:/C:/Program%20Files/Apache/Maven/a
-pache-maven-3.9.5/lib/guava-32.0.1-jre.jar)
-WARNING: Please consider reporting this to the maintainers 
-of class com.google.common.util.concurrent.AbstractFuture$U
-nsafeAtomicHelper
-WARNING: sun.misc.Unsafe::objectFieldOffset will be 
-removed in a future release
+WARNING: A terminally deprecated method in sun.misc.Unsafe has 
+been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by c
+om.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelp
+er (file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib
+/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of 
+class com.google.common.util.concurrent.AbstractFuture$UnsafeAto
+micHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in 
+a future release
 [INFO] Scanning for projects...
 [WARNING] 
 [WARNING] Some problems were encountered while building the effective model for org.jscience:jscience-natural:jar:1.0.0-SNAPSHOT
@@ -143,15 +143,15 @@ removed in a future release
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for JScience Unifying Parent 1.0.0-SNAPSHOT:
 [INFO] 
-[INFO] JScience Unifying Parent ........................... SUCCESS [  0.407 s]
-[INFO] JScience Core Engine ............................... SUCCESS [  8.928 s]
-[INFO] JScience Natural ................................... SUCCESS [ 35.157 s]
-[INFO] JScience Social .................................... SUCCESS [  2.885 s]
-[INFO] JScience Native .................................... SUCCESS [  2.008 s]
-[INFO] JScience Benchmarking Suite ........................ SUCCESS [  2.436 s]
+[INFO] JScience Unifying Parent ........................... SUCCESS [  2.554 s]
+[INFO] JScience Core Engine ............................... SUCCESS [ 12.497 s]
+[INFO] JScience Natural ................................... SUCCESS [ 45.826 s]
+[INFO] JScience Social .................................... SUCCESS [  1.826 s]
+[INFO] JScience Native .................................... SUCCESS [  1.337 s]
+[INFO] JScience Benchmarking Suite ........................ SUCCESS [  4.318 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  52.946 s
-[INFO] Finished at: 2026-02-15T00:02:51+01:00
+[INFO] Total time:  01:11 min
+[INFO] Finished at: 2026-02-15T00:15:12+01:00
 [INFO] ------------------------------------------------------------------------

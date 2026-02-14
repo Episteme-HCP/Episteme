@@ -62,7 +62,7 @@ public class SystematicGeneticBenchmark implements SystematicBenchmark<GeneticAl
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "genetic-systematic"; }
     @Override public String getNameBase() { return "Systematic Genetic Optimization"; }
-    @Override public String getDescription() { return "Systematically benchmarks genetic algorithm performance and convergence efficiency using the Sphere function optimization."; }
+    @Override public String getDescription() { return "Genetic algorithm optimization (Sphere function, population-based evolution)"; }
     @Override public String getDomain() { return "Optimization"; }
     @Override public Class<GeneticAlgorithmProvider> getProviderClass() { return GeneticAlgorithmProvider.class; }
 

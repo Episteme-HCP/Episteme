@@ -48,7 +48,7 @@ public class SystematicMonteCarloBenchmark implements SystematicBenchmark<MonteC
 
     @Override
     public String getDescription() {
-        return "Systematically benchmarks all discovered Monte Carlo providers (Local, MultiCore, Parallel, etc.) for Pi estimation.";
+        return "Monte Carlo Pi estimation (1M random samples)";
     }
 
     @Override

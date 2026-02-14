@@ -213,9 +213,7 @@ public class MainController {
     }
     
     private void initializeDomainTabs(TreeItem<BenchmarkItem> root) {
-        for (TreeItem<BenchmarkItem> domain : root.getChildren()) {
-            getOrCreateDomainChart(domain.getValue().getName());
-        }
+        // Charts are now created lazily per operation when results arrive
     }
 
     @FXML
@@ -354,7 +352,7 @@ public class MainController {
             String status = item.statusProperty().get();
             if ("Success".equals(status) && item.getScore() > 0) {
                 double val = calculateMetric(item.getScore());
-                updateChart(item.getUniqueId(), val, item.getDomain());
+                updateChart(item, val);
             }
         }
     }
@@ -375,8 +373,7 @@ public class MainController {
             Platform.runLater(() -> {
                 item.statusProperty().set("Skipped (Unavailable)");
                 item.resultProperty().set("N/A");
-                updateChart(item.getName(), 0.0, b.getDomain()); // Or allow 0.0 to show omission? Maybe not update chart at all.
-                // User said "juste pas avoir de mesure".
+                // No chart update for unavailable benchmarks — user wants no measurement shown
             });
             return;
         }
@@ -417,10 +414,9 @@ public class MainController {
                 item.resultProperty().set(resultText);
                 item.setScore(opsSec);
                 
-                String uniqueId = item.getUniqueId();
                 double val = calculateMetric(opsSec);
                 
-                updateChart(uniqueId, val, item.getDomain());
+                updateChart(item, val);
                 addToHistory(item, resultText);
             });
             
@@ -445,35 +441,57 @@ public class MainController {
         }
     }
 
-    private void updateChart(String name, double value, String domain) {
-        XYChart.Series<String, Number> series = getOrCreateDomainChart(domain);
+    // Library-specific colors for visual distinction
+    private static final String[] LIBRARY_COLORS = {
+        "#ff9900", "#3498db", "#2ecc71", "#e74c3c", "#9b59b6",
+        "#1abc9c", "#f39c12", "#e67e22", "#34495e", "#16a085"
+    };
+    private final Map<String, Integer> libraryColorIndex = new HashMap<>();
+    private int nextColorIndex = 0;
+
+    private String getLibraryColor(String library) {
+        return LIBRARY_COLORS[libraryColorIndex.computeIfAbsent(library, k -> nextColorIndex++ % LIBRARY_COLORS.length)];
+    }
+
+    private void updateChart(BenchmarkItem item, double value) {
+        String operationName = item.getName(); // e.g. "Matrix Multiplication"
+        String barLabel = item.getLibrary();   // e.g. "JScience", "EJML"
+        if (!"Standard".equals(item.getProvider())) {
+            barLabel += " (" + item.getProvider() + ")";
+        }
+        String color = getLibraryColor(item.getLibrary());
+
+        BarChart<String, Number> chart = getOrCreateOperationChart(operationName);
+        XYChart.Series<String, Number> series = domainSeriesMap.get(operationName);
         
+        // Check if bar already exists for this label
         for (XYChart.Data<String, Number> d : series.getData()) {
-            if (d.getXValue().equals(name)) {
+            if (d.getXValue().equals(barLabel)) {
                 d.setYValue(value);
                 return;
             }
         }
         
-        XYChart.Data<String, Number> data = new XYChart.Data<>(name, value);
+        XYChart.Data<String, Number> data = new XYChart.Data<>(barLabel, value);
         series.getData().add(data);
         
-        // Apply Orange Color Style when node is created
+        // Apply library-specific color
+        final String barColor = color;
         data.nodeProperty().addListener((obs, oldNode, newNode) -> {
             if (newNode != null) {
-                newNode.setStyle("-fx-bar-fill: #ff9900;"); // Orange
+                newNode.setStyle("-fx-bar-fill: " + barColor + ";");
             }
         });
     }
     
-    private XYChart.Series<String, Number> getOrCreateDomainChart(String domain) {
-        if (domainSeriesMap.containsKey(domain)) {
-            return domainSeriesMap.get(domain);
+    private BarChart<String, Number> getOrCreateOperationChart(String operationName) {
+        if (domainChartMap.containsKey(operationName)) {
+            return domainChartMap.get(operationName);
         }
         
-        // Create new chart for this domain
+        // Create new chart for this operation
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Benchmark");
+        xAxis.setLabel("Library / Provider");
         xAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE); 
         xAxis.setStyle("-fx-tick-label-fill: white; -fx-text-fill: white;");
 
@@ -483,22 +501,22 @@ public class MainController {
         yAxis.setStyle("-fx-tick-label-fill: white; -fx-text-fill: white;");
         
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle(domain + " Performance");
-        chart.setAnimated(false); // Disable animation for smoother updates
-        chart.setLegendVisible(false); // Just one series usually
+        chart.setTitle(operationName);
+        chart.setAnimated(false);
+        chart.setLegendVisible(false);
         
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Performance");
+        series.setName(operationName);
         chart.getData().add(series);
         
-        Tab tab = new Tab(domain);
+        Tab tab = new Tab(operationName);
         tab.setContent(chart);
         visualizationTabPane.getTabs().add(tab);
         
-        domainSeriesMap.put(domain, series);
-        domainChartMap.put(domain, chart);
+        domainSeriesMap.put(operationName, series);
+        domainChartMap.put(operationName, chart);
         
-        return series;
+        return chart;
     }
 
     @FXML

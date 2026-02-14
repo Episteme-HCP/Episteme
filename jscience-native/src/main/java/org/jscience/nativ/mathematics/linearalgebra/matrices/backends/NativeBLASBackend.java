@@ -119,9 +119,7 @@ public class NativeBLASBackend implements MatrixBackend, LinearAlgebraBackend<Re
                 avail = true;
             }
         } catch (Throwable t) {
-            // Native library not found or other linkage error
-            // We swallow this to allow the class to initialize with AVAILABLE = false
-            System.err.println("[WARN] NativeBLASBackend: Native library not found (" + t.getMessage() + ")");
+            // Silently mark unavailable — expected when OpenBLAS/MKL is not installed
         }
         
         DGEMM_HANDLE = dgemm;

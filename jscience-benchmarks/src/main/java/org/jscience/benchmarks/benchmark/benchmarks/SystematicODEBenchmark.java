@@ -57,7 +57,7 @@ public class SystematicODEBenchmark implements SystematicBenchmark<ODEProvider> 
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "ode-systematic"; }
     @Override public String getNameBase() { return "Systematic ODE Solver"; }
-    @Override public String getDescription() { return "Systematically benchmarks Ordinary Differential Equation (ODE) solvers using a harmonic oscillator simulation."; }
+    @Override public String getDescription() { return "ODE solver (harmonic oscillator, Runge-Kutta integration, 10k steps)"; }
     @Override public String getDomain() { return "Mathematics"; }
     @Override public Class<ODEProvider> getProviderClass() { return ODEProvider.class; }
 

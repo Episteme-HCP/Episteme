@@ -53,7 +53,7 @@ public class NativeOpenCLBackend implements GPUBackend {
             
             available = true;
         } catch (Exception e) {
-            System.err.println("OpenCL Backend initialization failed: " + e.getMessage());
+            // Silently mark unavailable — expected when OpenCL is not installed
         }
         this.opencl = openclLookup;
     }

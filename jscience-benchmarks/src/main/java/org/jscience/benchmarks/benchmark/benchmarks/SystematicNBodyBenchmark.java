@@ -53,7 +53,7 @@ public class SystematicNBodyBenchmark implements SystematicBenchmark<NBodyProvid
 
     @Override
     public String getDescription() {
-        return "Systematically benchmarks all discovered N-Body providers (Local, SIMD, Native, etc.) on a " + N + " body simulation.";
+        return "N-Body gravitational simulation (" + N + " bodies, Velocity-Verlet integration)";
     }
 
     @Override

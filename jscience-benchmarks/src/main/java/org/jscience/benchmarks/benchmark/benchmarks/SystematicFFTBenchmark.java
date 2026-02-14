@@ -52,7 +52,7 @@ public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> 
 
     @Override
     public String getDescription() {
-        return "Systematically benchmarks all discovered FFT providers (Local, MultiCore, Native, etc.) on a fixed size data set (4096 complex elements).";
+        return "Fast Fourier Transform (4096 complex elements, forward + inverse)";
     }
 
     @Override
