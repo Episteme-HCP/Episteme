@@ -93,26 +93,18 @@ public class BenchmarkItem {
     }
 
     private String determineSimpleProvider(String fullName, String backend, String library) {
-        // Remove known backend/library strings to leave only the qualifier (Generic, Wrapper, Sparse, etc)
-        String simple = fullName;
-        // We do basic cleanup
+        // Strip all parenthesized qualifiers like (Dense), (CPU), (Wrapper), (Sparse) —
+        // that info is already in Backend/Library columns
+        String simple = fullName.replaceAll("\\s*\\([^)]*\\)", "").trim();
+        
+        // Remove known backend/library strings to leave only the qualifier
         simple = simple.replace("JScience", "")
                        .replace("Linear Algebra", "")
                        .replace(backend, "")
                        .replace(library, "")
-                       .replace("Native", "") // Redundant if in Library or Backend
-                       .replace("Wrapper", "Wrapper")
-                       .replaceAll("\\b" + library + "\\b", "") // Remove library name
+                       .replace("Native", "")
+                       .replaceAll("\\s+", " ")
                        .trim();
-        
-        // Clean up double spaces or leftover parens
-        simple = simple.replace("()", "").trim(); 
-        
-        // If it contains "Wrapper", just return "Wrapper" + any other specifics like "Sparse"
-        if (simple.toUpperCase().contains("WRAPPER")) {
-            if (simple.toUpperCase().contains("SPARSE")) return "Sparse Wrapper";
-            return "Wrapper";
-        }
         
         if (simple.isEmpty()) return "Standard"; 
         return simple;

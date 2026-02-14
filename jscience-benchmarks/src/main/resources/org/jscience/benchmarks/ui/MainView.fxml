@@ -77,14 +77,24 @@
             <Tab text="HISTORY">
                 <VBox spacing="10">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-                    <Label text="Historical Runs" styleClass="section-title"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Historical Runs" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="exportHistoryBtn" text="EXPORT JSON" onAction="#handleExportHistoryJson" styleClass="action-button-primary" />
+                    </HBox>
                     <TableView fx:id="historyTable" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="dateColumn" text="Date" prefWidth="180" />
-                            <TableColumn fx:id="suiteColumn" prefWidth="250.0" text="Benchmark" />
-                            <TableColumn fx:id="resultsColumn" prefWidth="250.0" text="Result" />
-                            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="100" />
+                            <TableColumn fx:id="dateColumn" text="Date" prefWidth="150" />
+                            <TableColumn fx:id="histNameColumn" text="Name" prefWidth="200" />
+                            <TableColumn fx:id="histBackendColumn" text="Backend" prefWidth="80" />
+                            <TableColumn fx:id="histLibraryColumn" text="Library" prefWidth="120" />
+                            <TableColumn fx:id="histProviderColumn" text="Provider" prefWidth="150" />
+                            <TableColumn fx:id="histDomainColumn" text="Domain" prefWidth="120" />
+                            <TableColumn fx:id="resultsColumn" text="Result" prefWidth="200" />
                         </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
                     </TableView>
                 </VBox>
             </Tab>

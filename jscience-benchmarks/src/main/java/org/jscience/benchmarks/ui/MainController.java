@@ -39,8 +39,13 @@ public class MainController {
     @FXML private TabPane mainTabPane;
     @FXML private TableView<BenchmarkRunSummary> historyTable;
     @FXML private TableColumn<BenchmarkRunSummary, String> dateColumn;
-    @FXML private TableColumn<BenchmarkRunSummary, String> suiteColumn;
+    @FXML private TableColumn<BenchmarkRunSummary, String> histNameColumn;
+    @FXML private TableColumn<BenchmarkRunSummary, String> histBackendColumn;
+    @FXML private TableColumn<BenchmarkRunSummary, String> histLibraryColumn;
+    @FXML private TableColumn<BenchmarkRunSummary, String> histProviderColumn;
+    @FXML private TableColumn<BenchmarkRunSummary, String> histDomainColumn;
     @FXML private TableColumn<BenchmarkRunSummary, String> resultsColumn;
+    @FXML private Button exportHistoryBtn;
 
 
     @FXML private ComboBox<String> metricSelector;
@@ -131,7 +136,11 @@ public class MainController {
 
     private void setupHistoryTable() {
         dateColumn.setCellValueFactory(data -> data.getValue().dateProperty());
-        suiteColumn.setCellValueFactory(data -> data.getValue().suiteProperty());
+        histNameColumn.setCellValueFactory(data -> data.getValue().nameProperty());
+        histBackendColumn.setCellValueFactory(data -> data.getValue().backendProperty());
+        histLibraryColumn.setCellValueFactory(data -> data.getValue().libraryProperty());
+        histProviderColumn.setCellValueFactory(data -> data.getValue().providerProperty());
+        histDomainColumn.setCellValueFactory(data -> data.getValue().domainProperty());
         resultsColumn.setCellValueFactory(data -> data.getValue().resultProperty());
     }
 
@@ -412,7 +421,7 @@ public class MainController {
                 double val = calculateMetric(opsSec);
                 
                 updateChart(uniqueId, val, item.getDomain());
-                addToHistory(uniqueId, resultText);
+                addToHistory(item, resultText);
             });
             
             b.teardown();
@@ -527,13 +536,47 @@ public class MainController {
         }
     }
 
-    private void addToHistory(String name, String result) {
+    private void addToHistory(BenchmarkItem item, String result) {
         Platform.runLater(() -> {
-            BenchmarkRunSummary run = new BenchmarkRunSummary(name, result);
+            String backend = item.backendProperty().get();
+            String provider = item.providerProperty().get();
+            String library = item.libraryProperty().get();
+            String domain = item.getDomain();
+            BenchmarkRunSummary run = new BenchmarkRunSummary(
+                item.getName(), 
+                backend != null ? backend : "", 
+                provider != null ? provider : "",
+                library != null ? library : "",
+                domain != null ? domain : "",
+                result);
             historyList.add(0, run);
-            historyTable.getItems().add(0, run); // Explicitly add to table items if binding missing
-            // Save to persistent storage
+            historyTable.getItems().add(0, run);
             resultService.saveResults(new ArrayList<>(historyList));
         });
+    }
+
+    @FXML
+    private void handleExportHistoryJson() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export History as JSON");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        fileChooser.setInitialFileName("benchmark_history.json");
+
+        File file = fileChooser.showSaveDialog(exportHistoryBtn.getScene().getWindow());
+        if (file != null) {
+            try {
+                StringBuilder sb = new StringBuilder("[\n");
+                for (int i = 0; i < historyList.size(); i++) {
+                    sb.append("  ").append(historyList.get(i).toJson());
+                    if (i < historyList.size() - 1) sb.append(",");
+                    sb.append("\n");
+                }
+                sb.append("]");
+                java.nio.file.Files.writeString(file.toPath(), sb.toString());
+                statusBarLabel.setText("History exported to " + file.getName());
+            } catch (IOException e) {
+                statusBarLabel.setText("Failed to export history: " + e.getMessage());
+            }
+        }
     }
 }
