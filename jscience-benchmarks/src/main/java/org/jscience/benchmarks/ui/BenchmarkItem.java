@@ -44,8 +44,8 @@ public class BenchmarkItem {
         
         if (benchmark != null) {
             String fullPName = benchmark.getAlgorithmProvider();
-            String backendVal = determineBackend(fullPName);
             String libraryVal = determineLibrary(fullPName);
+            String backendVal = determineBackend(fullPName, libraryVal);
             this.backend = new SimpleStringProperty(backendVal);
             this.library = new SimpleStringProperty(libraryVal);
             this.provider = new SimpleStringProperty(determineSimpleProvider(fullPName, backendVal, libraryVal));
@@ -62,14 +62,19 @@ public class BenchmarkItem {
         return benchmark != null;
     }
 
-    private String determineBackend(String providerName) {
+    private String determineBackend(String providerName, String library) {
+        // External libraries get "External" backend
+        if (!library.equals("JScience") && !library.equals("JScience Native")) {
+            return "External";
+        }
+        
+        // For JScience's own providers, determine the actual compute backend
         String pName = providerName.toUpperCase();
         if (pName.contains("CUDA")) return "CUDA"; 
         if (pName.contains("OPENCL") || pName.contains("GPU")) return "OpenCL";
-        if (pName.contains("MPI") || pName.contains("SPARK")) return "External";
-        if (pName.contains("NATIVE") || pName.contains("JBLAS") || pName.contains("ND4J")) return "Native (CPU)";
-        if (pName.contains("MULTICORE")) return "Multicore";
-        return "CPU";
+        if (pName.contains("MPI") || pName.contains("SPARK")) return "Distributed";
+        // JScience CPU providers use parallel streams, so they are effectively multicore
+        return "Multicore";
     }
 
     private String determineLibrary(String providerName) {

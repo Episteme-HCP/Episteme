@@ -4,8 +4,8 @@ Au caractère Ligne:1 : 1
 + mvn compile -pl jscience-benchmarks -am 2>&1 | Out-File 
 -FilePath C:\ ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (WARNING: A re 
-   st...has been called:String) [], RemoteException
+    + CategoryInfo          : NotSpecified: (WARNING: A 
+rest...ha    s been called:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
 WARNING: java.lang.System::load has been called by 
@@ -143,15 +143,15 @@ removed in a future release
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for JScience Unifying Parent 1.0.0-SNAPSHOT:
 [INFO] 
-[INFO] JScience Unifying Parent ........................... SUCCESS [  0.977 s]
-[INFO] JScience Core Engine ............................... SUCCESS [  9.974 s]
-[INFO] JScience Natural ................................... SUCCESS [ 34.020 s]
-[INFO] JScience Social .................................... SUCCESS [  2.407 s]
-[INFO] JScience Native .................................... SUCCESS [  1.686 s]
-[INFO] JScience Benchmarking Suite ........................ SUCCESS [  2.769 s]
+[INFO] JScience Unifying Parent ........................... SUCCESS [  0.407 s]
+[INFO] JScience Core Engine ............................... SUCCESS [  8.928 s]
+[INFO] JScience Natural ................................... SUCCESS [ 35.157 s]
+[INFO] JScience Social .................................... SUCCESS [  2.885 s]
+[INFO] JScience Native .................................... SUCCESS [  2.008 s]
+[INFO] JScience Benchmarking Suite ........................ SUCCESS [  2.436 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  53.506 s
-[INFO] Finished at: 2026-02-14T23:57:25+01:00
+[INFO] Total time:  52.946 s
+[INFO] Finished at: 2026-02-15T00:02:51+01:00
 [INFO] ------------------------------------------------------------------------
