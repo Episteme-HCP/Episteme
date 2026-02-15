@@ -1,5 +1,6 @@
 package org.jscience.natural.physics.quantum.backends;
 
+import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
 import org.jscience.natural.physics.quantum.QuantumContext;
 import org.jscience.core.technical.backend.ExecutionContext;
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 /**
  * Quantum Backend that delegates to Qiskit (Python).
  */
+@AutoService(QuantumBackend.class)
 public class QiskitBackendProvider implements QuantumBackend {
 
     @Override public String getId() { return "qiskit"; }

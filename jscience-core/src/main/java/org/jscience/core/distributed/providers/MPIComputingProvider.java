@@ -6,6 +6,7 @@
 package org.jscience.core.distributed.providers;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.distributed.DistributedComputingProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.distributed.MPIDistributedContext;
@@ -19,7 +20,7 @@ import org.jscience.core.distributed.MPIDistributedContext;
  * @since 1.2
  */
 @AutoService(AlgorithmProvider.class)
-public class MPIComputingProvider implements AlgorithmProvider {
+public class MPIComputingProvider implements DistributedComputingProvider {
 
     private boolean available;
 

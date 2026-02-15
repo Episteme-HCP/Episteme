@@ -5,6 +5,7 @@
 
 package org.jscience.natural.physics.quantum.backends;
 
+import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
 
 
@@ -22,6 +23,7 @@ import java.nio.charset.StandardCharsets;
  * Robust Quantum computing backend with advanced Qiskit integration.
  * Supports hybrid algorithms (VQE, QAOA) and rich circuit features.
  */
+@AutoService(QuantumBackend.class)
 public class PythonQuantumBackendProvider implements QuantumBackend {
 
     private final String pythonExecutable;

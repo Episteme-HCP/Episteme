@@ -6,68 +6,82 @@
 package org.jscience.benchmarks.benchmark.benchmarks;
 
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.jscience.benchmarks.benchmark.benchmarks.SystematicBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.natural.physics.quantum.QuantumCircuit;
-import org.jscience.natural.physics.quantum.QuantumGate;
-import org.jscience.natural.physics.quantum.QuantumGateType;
+import org.jscience.core.technical.backend.quantum.QuantumBackend;
 
 /**
  * Benchmark for Quantum Circuit Simulation.
- * Simulates a Quantum Fourier Transform (QFT) circuit to measure classical simulation performance.
+ * Simulates a Quantum Fourier Transform (QFT) circuit to measure backend performance.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
 @AutoService(RunnableBenchmark.class)
-public class QuantumCircuitBenchmark implements RunnableBenchmark {
+public class QuantumCircuitBenchmark implements SystematicBenchmark<QuantumBackend> {
 
-    private static final int NUM_QUBITS = 10; // 2^10 = 1024 states, reasonable for repeated benchmark
-    private QuantumCircuit circuit;
+    private static final int NUM_QUBITS = 10;
+    private QuantumBackend provider;
+    private QuantumBackend.QuantumCircuit circuit;
 
-    @Override public String getId() { return "quantum-qft-" + NUM_QUBITS; }
-    @Override public String getName() { return "Quantum Circuit Simulation (QFT)"; }
-    @Override public String getDescription() { return "Simulates a " + NUM_QUBITS + "-qubit Quantum Fourier Transform circuit on a classical CPU."; }
+    @Override public Class<QuantumBackend> getProviderClass() { return QuantumBackend.class; }
+    @Override public String getIdPrefix() { return "quantum-qft-" + NUM_QUBITS; }
+    @Override public String getNameBase() { return "Quantum Circuit Simulation (QFT)"; }
+
+    @Override public String getId() { return getIdPrefix() + "-default"; }
+    @Override public String getName() { return getNameBase(); }
+    @Override public String getDescription() { return "Simulates a " + NUM_QUBITS + "-qubit Quantum Fourier Transform circuit using " + (provider != null ? provider.getName() : "default backend"); }
     @Override public String getDomain() { return "Quantum Computing"; }
     @Override public String getAlgorithmType() { return "Quantum Simulation"; }
+    @Override public String getAlgorithmProvider() { return provider != null ? provider.getName() : "None"; }
+
+    @Override
+    public void setProvider(QuantumBackend provider) {
+        this.provider = provider;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return provider != null && provider.isAvailable();
+    }
 
     @Override
     public void setup() {
-        // Construct QFT Circuit
-        circuit = new QuantumCircuit(NUM_QUBITS);
+        if (provider == null) throw new IllegalStateException("Provider not set");
+        
+        // Construct QFT Circuit via Backend API
+        circuit = provider.createCircuit(NUM_QUBITS, NUM_QUBITS);
         
         for (int j = 0; j < NUM_QUBITS; j++) {
             // Apply Hadamard to qubit j
-            circuit.addGate(QuantumGate.hadamard(), j);
+            circuit.hadamard(j);
             
             // Controlled Phase Rotations
             for (int k = j + 1; k < NUM_QUBITS; k++) {
-                // Use Standard Gates (H, Z, CNOT) to stress the simulator without needing parameterized gate support
-                // Standard CNOT for entanglement
-                circuit.addGate(QuantumGate.cnot(), k, j); 
+                // Controlled-Phase(theta) is equivalent to CNOT -> Rz -> CNOT structure or similar decomp
+                // Here we use CNOT + Rz + CNOT as a stress test pattern
                 
-                // Pauli-Z to simulate phase flip (instead of arbitrary rotation)
-                circuit.addGate(QuantumGate.pauliZ(), k);
-                
-                // Uncompute CNOT
-                circuit.addGate(QuantumGate.cnot(), k, j);
+                circuit.cnot(k, j); 
+                circuit.rz(k, Math.PI / Math.pow(2, k - j)); // CPhase angle
+                circuit.cnot(k, j);
             }
         }
         
-        // Swaps at the end (usual QFT step)
+        // Swaps at the end
         for (int i = 0; i < NUM_QUBITS / 2; i++) {
-            // Swap using 3 CNOTs
+            // Swap using CNOTs
             int q1 = i;
             int q2 = NUM_QUBITS - 1 - i;
-            circuit.addGate(QuantumGate.cnot(), q1, q2);
-            circuit.addGate(QuantumGate.cnot(), q2, q1);
-            circuit.addGate(QuantumGate.cnot(), q1, q2);
+            circuit.cnot(q1, q2);
+            circuit.cnot(q2, q1);
+            circuit.cnot(q1, q2);
         }
     }
 
     @Override
     public void run() {
-        if (circuit != null) {
-            circuit.run();
+        if (circuit != null && provider != null) {
+            provider.executeSimulator(circuit, 100);
         }
     }
 
@@ -78,6 +92,6 @@ public class QuantumCircuitBenchmark implements RunnableBenchmark {
 
     @Override
     public int getSuggestedIterations() {
-        return 50; // Exponential complexity, so keep iterations lower
+        return 20; // 10 qubits with 20 iterations
     }
 }

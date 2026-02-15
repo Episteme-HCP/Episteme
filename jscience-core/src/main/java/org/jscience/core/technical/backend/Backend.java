@@ -23,6 +23,8 @@
 
 package org.jscience.core.technical.backend;
 
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+
 /**
  * Base interface for discoverable backend providers.
  * Used by ServiceLoader to dynamically discover available backends

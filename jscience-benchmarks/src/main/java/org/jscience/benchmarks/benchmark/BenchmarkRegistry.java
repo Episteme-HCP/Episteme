@@ -18,6 +18,7 @@ public class BenchmarkRegistry {
             // 1. Discover explicit benchmarks
             ServiceLoader<RunnableBenchmark> benchLoader = ServiceLoader.load(RunnableBenchmark.class);
             for (RunnableBenchmark b : benchLoader) {
+                System.out.println("[DEBUG] Found explicit benchmark: " + b.getName() + " (" + b.getClass().getSimpleName() + ")");
                 try {
                     if (b instanceof SystematicBenchmark) {
                         expandSystematic((SystematicBenchmark<?>) b, all);
@@ -34,6 +35,7 @@ public class BenchmarkRegistry {
                     ServiceLoader.load(org.jscience.core.technical.algorithm.AlgorithmProvider.class);
             for (org.jscience.core.technical.algorithm.AlgorithmProvider p : providerLoader) {
                 try {
+                    System.out.println("[DEBUG] Processing provider: " + p.getName() + " (" + p.getClass().getName() + ")");
                     // Display all providers, even unavailable ones (User Request)
                     // if (!p.isAvailable()) continue; 
                     
@@ -85,6 +87,7 @@ public class BenchmarkRegistry {
         try {
             ServiceLoader<P> loader = ServiceLoader.load(base.getProviderClass());
             for (P p : loader) {
+                System.out.println("[DEBUG] Found systematic provider: " + p.getName() + " for " + base.getNameBase());
                 try {
                     // Check compatibility if it's a LinearAlgebraProvider
                     if (p instanceof LinearAlgebraProvider) {
@@ -108,7 +111,7 @@ public class BenchmarkRegistry {
                         @Override public String getAlgorithmProvider() { return p.getName(); }
                         @Override public String getDescription() { return base.getDescription(); }
                         @Override public String getDomain() { return base.getDomain(); }
-                        @Override public void setup() { base.setup(); base.setProvider(p); }
+                        @Override public void setup() { base.setProvider(p); base.setup(); }
                         @Override public void run() { base.run(); }
                         @Override public void teardown() { base.teardown(); }
                         @Override public int getSuggestedIterations() { return base.getSuggestedIterations(); }

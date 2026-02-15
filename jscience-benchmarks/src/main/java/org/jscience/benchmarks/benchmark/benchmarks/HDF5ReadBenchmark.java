@@ -23,7 +23,6 @@ public class HDF5ReadBenchmark implements RunnableBenchmark {
     private static final String FILE_NAME = "benchmark_read_data.h5";
     private static final String DATASET_NAME = "LargeArray";
     private static final int ARRAY_SIZE = 25 * 1024 * 1024; // 25M floats = 100MB
-    
     private FloatPointer buffer;
 
     @Override
@@ -56,33 +55,32 @@ public class HDF5ReadBenchmark implements RunnableBenchmark {
         try {
             // Check library availability
             try {
-                 org.bytedeco.hdf5.global.hdf5.H5get_libversion(new int[1], new int[1], new int[1]);
+                org.bytedeco.hdf5.global.hdf5.H5get_libversion(new int[1], new int[1], new int[1]);
             } catch (Throwable t) {
                 System.err.println("HDF5 Native Lib Load Failed: " + t.getMessage());
             }
 
-            // setupPath not needed for String filename usage in constructor
+            // Allocate read buffer
+            buffer = new FloatPointer(ARRAY_SIZE);
+
+            // Prepare File with Data (Write once)
+            Files.deleteIfExists(Path.of(FILE_NAME));
             
-            // Generate file for reading
             H5File file = new H5File(FILE_NAME, H5F_ACC_TRUNC);
             long[] dims = {ARRAY_SIZE};
             DataSpace dataspace = new DataSpace(1, dims);
             DataSet dataset = file.createDataSet(DATASET_NAME, new DataType((long)H5T_NATIVE_FLOAT), dataspace);
             
-            FloatPointer initData = new FloatPointer(ARRAY_SIZE);
-            for (int i = 0; i < ARRAY_SIZE; i++) {
-                initData.put(i, (float) Math.random());
-            }
-            dataset.write(initData, new DataType((long)H5T_NATIVE_FLOAT));
+            // Write random data
+            FloatPointer writeData = new FloatPointer(ARRAY_SIZE);
+            for (int i = 0; i < 1000; i++) writeData.put(i, (float)Math.random()); // Partial fill speedup
+            dataset.write(writeData, new DataType((long)H5T_NATIVE_FLOAT));
+            writeData.close();
             
             dataset.close();
             dataspace.close();
             file.close();
-            initData.close();
-            
-            // Allocate read buffer
-            buffer = new FloatPointer(ARRAY_SIZE);
-            
+
         } catch (java.lang.Exception e) {
             throw new RuntimeException("Setup failed", e);
         }
@@ -126,10 +124,10 @@ public class HDF5ReadBenchmark implements RunnableBenchmark {
     @Override
     public boolean isAvailable() {
         try {
-             Class.forName("org.bytedeco.hdf5.H5");
-             return true;
+            Class.forName("org.bytedeco.hdf5.H5");
+            return true;
         } catch (Throwable t) {
-             return false;
+            return false;
         }
     }
 }

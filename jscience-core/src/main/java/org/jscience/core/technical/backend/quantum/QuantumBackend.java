@@ -9,6 +9,7 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Quantum computing integration interface for hybrid classical-quantum workflows.
@@ -31,7 +32,20 @@ import org.jscience.core.technical.backend.ComputeBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public interface QuantumBackend extends ComputeBackend {
+public interface QuantumBackend extends ComputeBackend, AlgorithmProvider {
+
+    @Override
+    default int getPriority() {
+        return ComputeBackend.super.getPriority();
+    }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Quantum Backend";
+    }
+
+    @Override
+    boolean isAvailable();
 
     /**
      * Quantum circuit representation.
