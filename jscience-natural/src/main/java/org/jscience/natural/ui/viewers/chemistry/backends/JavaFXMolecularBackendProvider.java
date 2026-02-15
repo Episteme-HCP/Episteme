@@ -56,7 +56,12 @@ public class JavaFXMolecularBackendProvider implements MolecularBackend {
 
     @Override
     public boolean isAvailable() {
-        return true; // JavaFX is always available
+        try {
+            Class.forName("javafx.application.Platform");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     @Override

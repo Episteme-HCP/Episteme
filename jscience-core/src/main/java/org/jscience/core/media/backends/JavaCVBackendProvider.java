@@ -32,7 +32,15 @@ public class JavaCVBackendProvider implements Backend {
     @Override public String getId() { return "javacv"; }
     @Override public String getName() { return "JavaCV (FFmpeg)"; }
     @Override public String getDescription() { return "JavaCV/FFmpeg frame grabber."; }
-    @Override public boolean isAvailable() { return true; }
+    @Override 
+    public boolean isAvailable() { 
+        try {
+            Class.forName("org.bytedeco.javacv.FFmpegFrameGrabber");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
     @Override public int getPriority() { return 30; }
     @Override public Object createBackend() { return new JavaCVBackend(); }
 }

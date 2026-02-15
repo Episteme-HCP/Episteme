@@ -23,6 +23,8 @@
 
 package org.jscience.core.media;
 
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+
 /**
  * Interface definition for a generic Audio Engine.
  * Allows switching between JavaSound, TarsosDSP, or other backends.
@@ -30,7 +32,7 @@ package org.jscience.core.media;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface AudioEngine {
+public interface AudioEngine extends AlgorithmProvider {
     
     /**
      * Loads an audio file from a path.
@@ -74,5 +76,25 @@ public interface AudioEngine {
      * Returns the name of the backend engine (e.g., "JavaSound", "TarsosDSP").
      */
     String getBackendName();
+
+    @Override
+    default String getName() {
+        return getBackendName();
+    }
+
+    @Override
+    default String getAlgorithmType() {
+        return "Audio/Video Engine";
+    }
+
+    @Override
+    default boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    default int getPriority() {
+        return 0; // Default priority
+    }
 }
 

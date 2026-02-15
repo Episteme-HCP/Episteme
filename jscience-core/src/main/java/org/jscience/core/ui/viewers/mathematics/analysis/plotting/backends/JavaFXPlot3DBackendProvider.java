@@ -56,7 +56,12 @@ public class JavaFXPlot3DBackendProvider implements PlottingBackend {
 
     @Override
     public boolean isAvailable() {
-        return true;
+        try {
+            Class.forName("javafx.application.Platform");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     @Override

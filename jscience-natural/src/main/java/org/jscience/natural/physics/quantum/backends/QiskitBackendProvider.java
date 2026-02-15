@@ -30,7 +30,7 @@ public class QiskitBackendProvider implements QuantumBackend {
     @Override
     public boolean isAvailable() {
         try {
-            Process p = new ProcessBuilder("python", "--version").start();
+            Process p = new ProcessBuilder("python", "-c", "import qiskit").start();
             return p.waitFor() == 0;
         } catch (Exception e) { return false; }
     }

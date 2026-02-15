@@ -56,8 +56,14 @@ public class PyMOLMolecularBackendProvider implements MolecularBackend {
 
     @Override
     public boolean isAvailable() {
-        // Assume mostly available but ideally check for executable
-        return true; 
+        try {
+            // Check for PyMOL executable in PATH
+            ProcessBuilder pb = new ProcessBuilder(System.getProperty("os.name").toLowerCase().contains("win") ? "where" : "which", "pymol");
+            Process p = pb.start();
+            return p.waitFor() == 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

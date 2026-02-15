@@ -28,6 +28,8 @@ import ddf.minim.*;
 import ddf.minim.analysis.FFT;
 
 import org.jscience.core.media.AudioBackend;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Minim Backend (Creative Coding).
@@ -36,14 +38,29 @@ import org.jscience.core.media.AudioBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(AlgorithmProvider.class)
 public class MinimEngine implements AudioEngine, AudioBackend {
 
     private Minim minim;
     private AudioPlayer player;
     private FFT fft;
 
+    @Override
+    public boolean isAvailable() {
+        try {
+            Class.forName("ddf.minim.Minim");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     public MinimEngine() {
-        minim = new Minim(new MinimHelper());
+        if (isAvailable()) {
+            minim = new Minim(new MinimHelper());
+        } else {
+            System.err.println("[Minim] Library not available.");
+        }
     }
 
     @Override

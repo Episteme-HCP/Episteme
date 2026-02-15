@@ -24,6 +24,8 @@
 package org.jscience.core.media.backends;
 
 import be.tarsos.dsp.*;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.util.fft.FFT;
@@ -41,7 +43,18 @@ import java.util.concurrent.Executors;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(AlgorithmProvider.class)
 public class TarsosEngine implements AudioEngine, AudioBackend {
+
+    @Override 
+    public boolean isAvailable() { 
+        try {
+            Class.forName("be.tarsos.dsp.AudioDispatcher");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 
     private AudioDispatcher dispatcher;
     private FFT fft;

@@ -24,6 +24,8 @@
 package org.jscience.core.media.backends;
 
 import org.jscience.core.media.AudioEngine;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 
 /**
@@ -32,7 +34,18 @@ import org.bytedeco.javacv.FFmpegFrameGrabber;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(AlgorithmProvider.class)
 public class JavaCVEngine implements AudioEngine {
+
+    @Override 
+    public boolean isAvailable() { 
+        try {
+            Class.forName("org.bytedeco.javacv.FFmpegFrameGrabber");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 
     private FFmpegFrameGrabber grabber;
 

@@ -30,7 +30,15 @@ public class TarsosBackendProvider implements Backend {
     @Override public String getId() { return "tarsos"; }
     @Override public String getName() { return "TarsosDSP (Scientific)"; }
     @Override public String getDescription() { return "Scientific audio analysis engine."; }
-    @Override public boolean isAvailable() { return true; } 
+    @Override 
+    public boolean isAvailable() { 
+        try {
+            Class.forName("be.tarsos.dsp.AudioDispatcher");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    } 
     @Override public int getPriority() { return 50; }
     @Override public Object createBackend() { return new TarsosEngine(); }
 }

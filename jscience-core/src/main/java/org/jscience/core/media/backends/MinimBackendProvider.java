@@ -30,7 +30,15 @@ public class MinimBackendProvider implements Backend {
     @Override public String getId() { return "minim"; }
     @Override public String getName() { return "Minim (Creative)"; }
     @Override public String getDescription() { return "High-performance creative audio engine."; }
-    @Override public boolean isAvailable() { return true; }
+    @Override 
+    public boolean isAvailable() { 
+        try {
+            Class.forName("ddf.minim.Minim");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
     @Override public int getPriority() { return 20; }
     @Override public Object createBackend() { return new MinimEngine(); }
 }

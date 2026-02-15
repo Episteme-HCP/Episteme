@@ -24,6 +24,8 @@
 package org.jscience.core.mathematics.ml;
 
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.technical.algorithm.MLProvider;
+import java.util.ServiceLoader;
 import java.util.Random;
 
 /**
@@ -57,6 +59,17 @@ public class KMeans {
      * @return cluster assignments for each sample
      */
     public int[] fit(Real[][] data) {
+        // Try to use a high-performance provider first
+        ServiceLoader<MLProvider> loader = ServiceLoader.load(MLProvider.class);
+        MLProvider provider = loader.findFirst().orElse(null);
+        
+        if (provider != null && provider.isAvailable()) {
+            int[] assignments = provider.kMeans(data, k, maxIterations);
+            // Update internal state (centroids) based on provider's result
+            updateCentroids(data, assignments);
+            return assignments;
+        }
+
         int n = data.length;
 
         // Initialize centroids randomly (k-means++)

@@ -24,6 +24,8 @@
 package org.jscience.core.media.backends;
 
 import org.jscience.core.media.AudioEngine;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 // import uk.co.caprica.vlcj.player.component.AudioPlayerComponent;
@@ -35,7 +37,18 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(AlgorithmProvider.class)
 public class VLCJEngine implements AudioEngine {
+
+    @Override 
+    public boolean isAvailable() { 
+        try {
+            Class.forName("uk.co.caprica.vlcj.factory.MediaPlayerFactory");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 
     private MediaPlayerFactory factory;
     private MediaPlayer mediaPlayer;

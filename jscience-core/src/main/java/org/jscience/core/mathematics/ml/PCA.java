@@ -25,11 +25,14 @@ package org.jscience.core.mathematics.ml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
+
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
+import org.jscience.core.technical.algorithm.MLProvider;
 
 /**
  * Principal Component Analysis (PCA).
@@ -47,11 +50,15 @@ public class PCA {
     private Matrix<Real> components; // Principal components (eigenvectors)
     private Real[] explainedVariance; // Variance explained by each component
     private Real[] mean; // Feature means (for centering)
+    
+    // Internal fields for external provider support
+    private Real[][] fitData;
+    private Real[][] externalTransformResult;
 
     /**
      * Fits PCA model to data.
      * 
-     * @param data        n samples Ãƒâ€” d features
+     * @param data        n samples Ã— d features
      * @param nComponents number of components to keep (Ã¢â€°Â¤ d)
      */
     public void fit(Real[][] data, int nComponents) {
@@ -60,6 +67,19 @@ public class PCA {
 
         if (nComponents > d) {
             throw new IllegalArgumentException("nComponents must be Ã¢â€°Â¤ number of features");
+        }
+        
+        // Try to use external MLProvider
+        java.util.ServiceLoader<org.jscience.core.technical.algorithm.MLProvider> loader = 
+            java.util.ServiceLoader.load(org.jscience.core.technical.algorithm.MLProvider.class);
+        org.jscience.core.technical.algorithm.MLProvider provider = loader.findFirst().orElse(null);
+        
+        if (provider != null && provider.isAvailable()) {
+            this.fitData = data;
+            this.externalTransformResult = provider.pca(data, nComponents);
+            // Components are not exposed by provider, so we cannot populate 'components'.
+            // transform() will check for cached result.
+            return;
         }
 
         // 1. Center data (subtract mean)
@@ -120,17 +140,23 @@ public class PCA {
      * Transforms data to principal component space.
      * 
      * @param data data to transform (same features as training data)
-     * @return transformed data (n Ãƒâ€” nComponents)
+     * @return transformed data (n Ã— nComponents)
      */
     public Real[][] transform(Real[][] data) {
+        // Check if we have a cached result from external provider for THIS data
+        if (externalTransformResult != null && data == fitData) {
+            return externalTransformResult;
+        }
+        
         if (components == null) {
+            if (externalTransformResult != null) {
+                 throw new IllegalStateException("Provider used for fit(), but components are unavailable. Cannot transform new data or inverse transform.");
+            }
             throw new IllegalStateException("PCA not fitted yet");
         }
 
         int n = data.length;
         int d = data[0].length;
-        int nComponents = components.cols();
-
         // Center data
         Real[][] centered = new Real[n][d];
         for (int i = 0; i < n; i++) {
@@ -161,6 +187,10 @@ public class PCA {
      * </p>
      */
     public Real[][] inverseTransform(Real[][] transformedData) {
+        if (mean == null || components == null) {
+             throw new IllegalStateException("PCA not fitted or components unavailable (provider used).");
+        }
+        
         int n = transformedData.length;
         int nComponents = transformedData[0].length;
         int d = mean.length;
