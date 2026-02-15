@@ -60,6 +60,10 @@ install_package "Bullet Physics" \
 # Install build tools
 install_package "Build Tools" \
     gcc gcc-c++ make cmake git pkgconfig
+    
+# Install OpenCL
+install_package "OpenCL" \
+    ocl-icd-devel opencl-headers clinfo
 
 # Configure MPI paths
 echo ""
@@ -98,7 +102,9 @@ verify_lib "HDF5" "libhdf5.so"
 verify_lib "CFITSIO" "libcfitsio.so"
 verify_lib "FFTW3" "libfftw3.so"
 verify_lib "OpenBLAS" "libopenblas.so"
+verify_lib "OpenBLAS" "libopenblas.so"
 verify_lib "Bullet" "libBulletDynamics.so"
+verify_lib "OpenCL" "libOpenCL.so"
 
 # MPI check (need to source profile first)
 if [ -f /usr/lib64/openmpi/bin/mpirun ]; then

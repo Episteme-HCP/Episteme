@@ -56,6 +56,10 @@ install_package "Bullet Physics" \
 # Install build tools (for custom builds)
 install_package "Build Tools" \
     build-essential cmake git pkg-config
+    
+# Install OpenCL
+install_package "OpenCL" \
+    ocl-icd-opencl-dev opencl-headers clinfo
 
 # Update library cache
 echo ""
@@ -82,7 +86,9 @@ verify_lib "HDF5" "libhdf5.so"
 verify_lib "CFITSIO" "libcfitsio.so"
 verify_lib "FFTW3" "libfftw3.so"
 verify_lib "OpenBLAS" "libopenblas.so"
+verify_lib "OpenBLAS" "libopenblas.so"
 verify_lib "Bullet" "libBulletDynamics.so"
+verify_lib "OpenCL" "libOpenCL.so"
 
 if command -v mpirun &> /dev/null; then
     echo "✓ MPI: FOUND ($(mpirun --version | head -1))"
