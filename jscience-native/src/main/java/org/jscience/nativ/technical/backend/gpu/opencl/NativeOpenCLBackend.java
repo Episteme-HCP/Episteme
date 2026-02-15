@@ -53,8 +53,11 @@ public class NativeOpenCLBackend implements GPUBackend {
             
             available = true;
         } catch (Exception e) {
+        } catch (Exception e) {
             // Silently mark unavailable — expected when OpenCL is not installed
         }
+        // Force unavailable for now to avoid "1+2=NaN" errors until implemented
+        available = false;
         this.opencl = openclLookup;
     }
 

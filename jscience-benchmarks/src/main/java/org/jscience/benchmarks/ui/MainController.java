@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.*;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.collections.FXCollections;
 
@@ -57,6 +58,7 @@ public class MainController {
 
     private final ObservableList<BenchmarkRunSummary> historyList = FXCollections.observableArrayList();
     private final org.jscience.benchmarks.persistence.BenchmarkResultService resultService = new org.jscience.benchmarks.persistence.BenchmarkResultService();
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
     // Helper method to load history
     private void loadHistory() {
@@ -366,9 +368,39 @@ public class MainController {
         return 0.0; // P99 not implemented
     }
 
+    private String determineSimpleProvider(String provider, String simpleName) {
+        if (provider != null) {
+            if (provider.contains("OpenCL")) return "OpenCL (GPU)";
+            if (provider.contains("CUDA")) return "CUDA (GPU)";
+            if (provider.contains("Unsafe")) return "Unsafe (CPU)";
+            
+            // Detection of specific algorithms for JScience
+            if (provider.contains("Strassen")) return "Multicore JScience (Strassen)";
+            if (provider.contains("CARMA")) return "Multicore JScience (CARMA)";
+            if (provider.contains("Sparse")) return "Multicore JScience (Sparse)";
+            if (provider.contains("Standard")) return "Multicore JScience (Standard)";
+
+            if (provider.contains("Multicore")) return "Multicore " + simpleName + " (Standard)";
+            if (provider.contains("Dense")) return "Monocore " + simpleName + " (Standard)";
+        }
+        return provider; // Default to original if no specific match
+    }
+
     private void executeSingle(BenchmarkItem item) {
+        if (!isRunning.compareAndSet(false, true)) {
+            // Already running
+             Platform.runLater(() -> {
+                // Optional: show a small toast or just ignore
+                System.out.println("[INFO] Benchmark run ignored: execution already in progress.");
+            });
+            return;
+        }
+
         RunnableBenchmark b = item.getBenchmark();
-        if (b == null) return;
+        if (b == null) {
+            isRunning.set(false);
+            return;
+        }
         
         // Check availability logic as requested
         if (!b.isAvailable()) {
@@ -440,6 +472,8 @@ public class MainController {
                     item.resultProperty().set(errorMsg);
                 });
             }
+        } finally {
+            isRunning.set(false);
         }
     }
 
