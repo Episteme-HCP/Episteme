@@ -33,9 +33,8 @@ public class NativeOpenCLBackend implements GPUBackend {
     private final SymbolLookup opencl;
     private boolean available = false;
     
-    // Future: OpenCL method handles
-    // private MethodHandle clGetPlatformIDs;
-    // private MethodHandle clGetDeviceIDs;
+    private MethodHandle clGetPlatformIDs;
+    private MethodHandle clGetDeviceIDs;
     // private MethodHandle clCreateContext;
     // private MethodHandle clCreateCommandQueue;
     // private MethodHandle clCreateBuffer;
@@ -44,21 +43,77 @@ public class NativeOpenCLBackend implements GPUBackend {
     public NativeOpenCLBackend() {
         SymbolLookup openclLookup = null;
         try {
-            // Attempt to load OpenCL library (libOpenCL.so on Linux, OpenCL.dll on Windows)
+            // Attempt to load OpenCL library
             openclLookup = NativeLibraryLoader.loadLibrary("OpenCL");
-            
-            // Future: Initialize method handles
-            // Linker linker = NativeLibraryLoader.getLinker();
-            // clGetPlatformIDs = linker.downcallHandle(...);
-            
-            available = true;
-        } catch (Exception e) {
+            // If load succeeds, available = true for now
+            // But we must verify it works to avoid "1+2=NaN" nonsense
+            // If load succeeds, we initialize handles below
+            // if (openclLookup != null) {
+            //    available = performSelfTest();
+            // }
         } catch (Exception e) {
             // Silently mark unavailable — expected when OpenCL is not installed
+            available = false;
         }
-        // Force unavailable for now to avoid "1+2=NaN" errors until implemented
-        available = false;
         this.opencl = openclLookup;
+        
+        if (opencl != null) {
+             try {
+                Linker linker = Linker.nativeLinker();
+                
+                // clGetPlatformIDs(cl_uint num_entries, cl_platform_id *platforms, cl_uint *num_platforms)
+                clGetPlatformIDs = linker.downcallHandle(
+                    opencl.find("clGetPlatformIDs").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                );
+
+                // clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type, cl_uint num_entries, cl_device_id *devices, cl_uint *num_devices)
+                clGetDeviceIDs = linker.downcallHandle(
+                    opencl.find("clGetDeviceIDs").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                );
+                
+                available = performSelfTest();
+             } catch (Throwable e) {
+                 available = false;
+             }
+        } else {
+            available = false;
+        }
+    }
+
+    private boolean performSelfTest() {
+        try {
+            // 1. Get Platform Count
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment numPlatforms = arena.allocate(ValueLayout.JAVA_INT);
+                int res = (int) clGetPlatformIDs.invokeExact(0, MemorySegment.NULL, numPlatforms);
+                
+                if (res != 0) return false; // CL_SUCCESS is 0
+                
+                int platformCount = numPlatforms.get(ValueLayout.JAVA_INT, 0);
+                if (platformCount == 0) return false;
+                
+                // 2. Get First Platform
+                MemorySegment platforms = arena.allocate(ValueLayout.ADDRESS, platformCount);
+                res = (int) clGetPlatformIDs.invokeExact(platformCount, platforms, MemorySegment.NULL);
+                if (res != 0) return false;
+                
+                MemorySegment platformId = platforms.get(ValueLayout.ADDRESS, 0);
+                
+                // 3. Get Device Count (CL_DEVICE_TYPE_ALL = 0xFFFFFFFF)
+                MemorySegment numDevices = arena.allocate(ValueLayout.JAVA_INT);
+                res = (int) clGetDeviceIDs.invokeExact(platformId, -1L, 0, MemorySegment.NULL, numDevices); // -1L = CL_DEVICE_TYPE_ALL (unsigned int)
+                 
+                // Some implementations return CL_DEVICE_NOT_FOUND if no devices, which is arguably a "pass" for self-test but means unavailable
+                if (res != 0) return false;
+                
+                int deviceCount = numDevices.get(ValueLayout.JAVA_INT, 0);
+                return deviceCount > 0;
+            }
+        } catch (Throwable e) {
+            return false;
+        }
     }
 
     @Override

@@ -24,7 +24,7 @@ import java.util.Random;
 @AutoService(RunnableBenchmark.class)
 public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
-    private static final int SIZE = 1500;
+    private static final int SIZE = 800;
     private RealDoubleMatrix A;
     private RealDoubleVector B;
     private LinearAlgebraProvider<Real> currentProvider;

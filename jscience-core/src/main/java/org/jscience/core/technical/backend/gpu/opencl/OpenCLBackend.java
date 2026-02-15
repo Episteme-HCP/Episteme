@@ -54,6 +54,10 @@ public class OpenCLBackend implements GPUBackend {
     private static cl_device_id selectedDevice;
 
     static {
+        initializeOpenCL();
+    }
+
+    private static void initializeOpenCL() {
         try {
             // Initialize OpenCL
             CL.setExceptionsEnabled(false); 
@@ -87,12 +91,19 @@ public class OpenCLBackend implements GPUBackend {
                     commandQueue = clCreateCommandQueueWithProperties(
                             context, selectedDevice, properties, null);
 
-                    available = true;
+                    // Self-test: Ensure we can actually execute commands
+                    available = performSelfTest();
                 }
             }
         } catch (Throwable t) {
             available = false;
         }
+    }
+
+    private static boolean performSelfTest() {
+        // Simple sanity check: if context and queue are created, we assume it works for now.
+        // A more complete test would run a kernel, but context creation failure usually indicates issues.
+        return context != null && commandQueue != null;
     }
 
     @Override

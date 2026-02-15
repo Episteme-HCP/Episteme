@@ -58,7 +58,8 @@ public class MainController {
 
     private final ObservableList<BenchmarkRunSummary> historyList = FXCollections.observableArrayList();
     private final org.jscience.benchmarks.persistence.BenchmarkResultService resultService = new org.jscience.benchmarks.persistence.BenchmarkResultService();
-    private final AtomicBoolean isRunning = new AtomicBoolean(false);
+    private final java.util.Queue<BenchmarkItem> benchmarkQueue = new java.util.LinkedList<>();
+    private boolean isProcessingQueue = false;
 
     // Helper method to load history
     private void loadHistory() {
@@ -128,7 +129,7 @@ public class MainController {
                 if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                     BenchmarkItem item = row.getItem();
                     if (item.isBenchmark()) {
-                         new Thread(() -> executeSingle(item)).start();
+                         executeSingle(item);
                     }
                 }
             });
@@ -387,27 +388,39 @@ public class MainController {
     }
 
     private void executeSingle(BenchmarkItem item) {
-        if (!isRunning.compareAndSet(false, true)) {
-            // Already running
-             Platform.runLater(() -> {
-                // Optional: show a small toast or just ignore
-                System.out.println("[INFO] Benchmark run ignored: execution already in progress.");
-            });
-            return;
+        synchronized (benchmarkQueue) {
+            benchmarkQueue.add(item);
+            item.statusProperty().set("Queued");
+            if (!isProcessingQueue) {
+                isProcessingQueue = true;
+                new Thread(this::processQueue).start();
+            }
         }
+    }
 
-        RunnableBenchmark b = item.getBenchmark();
-        if (b == null) {
-            isRunning.set(false);
-            return;
+    private void processQueue() {
+        while (true) {
+            BenchmarkItem item;
+            synchronized (benchmarkQueue) {
+                item = benchmarkQueue.poll();
+                if (item == null) {
+                    isProcessingQueue = false;
+                    return;
+                }
+            }
+            runBenchmarkItem(item);
         }
+    }
+
+    private void runBenchmarkItem(BenchmarkItem item) {
+        RunnableBenchmark b = item.getBenchmark();
+        if (b == null) return;
         
         // Check availability logic as requested
         if (!b.isAvailable()) {
             Platform.runLater(() -> {
                 item.statusProperty().set("Skipped (Unavailable)");
                 item.resultProperty().set("N/A");
-                // No chart update for unavailable benchmarks — user wants no measurement shown
             });
             return;
         }
@@ -428,7 +441,7 @@ public class MainController {
             
             // Garbage Collect before measurement to reduce GC noise during run
             System.gc();
-            Thread.sleep(100); 
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
 
             long start = System.nanoTime();
             long iterations = 0;
@@ -441,7 +454,16 @@ public class MainController {
             
             double durationSec = (end - start) / 1_000_000_000.0;
             double opsSec = iterations / durationSec;
-            String resultText = String.format("%.2f ops/s", opsSec);
+            
+            // Smart formatting: more precision for small numbers
+            String resultText;
+            if (opsSec < 1.0) {
+                 resultText = String.format("%.5f ops/s", opsSec);
+            } else if (opsSec < 100.0) {
+                 resultText = String.format("%.3f ops/s", opsSec);
+            } else {
+                 resultText = String.format("%.2f ops/s", opsSec);
+            }
 
             Platform.runLater(() -> {
                 item.statusProperty().set("Success");
@@ -472,8 +494,6 @@ public class MainController {
                     item.resultProperty().set(errorMsg);
                 });
             }
-        } finally {
-            isRunning.set(false);
         }
     }
 

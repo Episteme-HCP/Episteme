@@ -22,7 +22,7 @@ import java.util.Random;
 @AutoService(RunnableBenchmark.class)
 public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
-    private static final int SIZE = 1000; // Inversion is O(N^3) and expensive
+    private static final int SIZE = 500; // Inversion is O(N^3) and expensive
     private RealDoubleMatrix A;
     private LinearAlgebraProvider<Real> currentProvider;
 
