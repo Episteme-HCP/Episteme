@@ -35,7 +35,7 @@ public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlg
 
     @Override
     public String getDescription() {
-        return "Matrix Inversion (1000x1000), Double Precision";
+        return "Matrix Inversion (500x500), Double Precision";
     }
 
     @Override

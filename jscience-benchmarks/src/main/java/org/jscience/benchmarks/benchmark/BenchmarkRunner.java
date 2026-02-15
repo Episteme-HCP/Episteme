@@ -45,7 +45,7 @@ public class BenchmarkRunner {
         System.out.println(I18N.getInstance().get("benchmark.discovered", benchmarks.size()));
     }
 
-    public void runAll() {
+    public void runAll(String filter) {
         System.out.println(I18N.getInstance().get("benchmark.suite.starting"));
         System.out.printf("%-30s | %-15s | %-13s | %-13s | %-9s%n",
                 I18N.getInstance().get("benchmark.header.name"),
@@ -59,6 +59,13 @@ public class BenchmarkRunner {
                 org.jscience.core.technical.monitoring.DistributedMonitor.getInstance();
 
         for (RunnableBenchmark b : benchmarks) {
+            // Apply filter if present
+            if (filter != null && !filter.isEmpty()) {
+                boolean matchId = b.getId().toLowerCase().contains(filter.toLowerCase());
+                boolean matchName = b.getName().toLowerCase().contains(filter.toLowerCase());
+                if (!matchId && !matchName) continue;
+            }
+
             try {
                 b.setup();
 
@@ -114,11 +121,13 @@ public class BenchmarkRunner {
         boolean monitorEnabled = true;
         boolean forceGui = false;
         boolean forceCli = false;
+        String filter = null;
 
         for (String arg : args) {
             if (arg.equals("--monitor")) monitorEnabled = true;
             if (arg.equals("--studio") || arg.equals("--gui")) forceGui = true;
             if (arg.equals("--cli") || arg.equals("--console")) forceCli = true;
+            if (arg.startsWith("--filter=")) filter = arg.substring(9);
         }
 
         if (monitorEnabled) {
@@ -135,7 +144,7 @@ public class BenchmarkRunner {
         System.out.println("Starting JScience Benchmarks (CLI mode)...");
         BenchmarkRunner runner = new BenchmarkRunner();
         runner.discover();
-        runner.runAll();
+        runner.runAll(filter);
         runner.exportCharts();
     }
 }

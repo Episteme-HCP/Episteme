@@ -55,7 +55,7 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
 
     @Override
     public String getDescription() {
-        return "Dense Matrix Multiplication (2000x2000), Double Precision";
+        return "Dense Matrix Multiplication (1024x1024), Double Precision";
     }
 
     @Override

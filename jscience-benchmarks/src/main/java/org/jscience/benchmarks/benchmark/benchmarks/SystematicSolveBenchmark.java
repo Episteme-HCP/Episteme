@@ -38,7 +38,7 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
 
     @Override
     public String getDescription() {
-        return "Linear System Solver (Ax=B, 1500x1500), Double Precision";
+        return "Linear System Solver (Ax=B, 800x800), Double Precision";
     }
 
     @Override

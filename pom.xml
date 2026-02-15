@@ -359,7 +359,7 @@
         <optional>true</optional>
       </dependency>
 
-      <!-- JavaCPP and OpenBLAS -->
+      <!-- JavaCPP and OpenBLAS alignment -->
       <dependency>
         <groupId>org.bytedeco</groupId>
         <artifactId>javacpp</artifactId>
@@ -368,19 +368,36 @@
       <dependency>
         <groupId>org.bytedeco</groupId>
         <artifactId>openblas</artifactId>
-        <version>${openblas.version}</version>
+        <version>0.3.26-${javacpp.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bytedeco</groupId>
         <artifactId>openblas</artifactId>
-        <version>${openblas.version}</version>
+        <version>0.3.26-${javacpp.version}</version>
         <classifier>windows-x86_64</classifier>
       </dependency>
       <dependency>
         <groupId>org.bytedeco</groupId>
         <artifactId>openblas</artifactId>
-        <version>${openblas.version}</version>
+        <version>0.3.26-${javacpp.version}</version>
         <classifier>linux-x86_64</classifier>
+      </dependency>
+      
+      <!-- ND4J Exclusions to prevent version conflict -->
+      <dependency>
+        <groupId>org.nd4j</groupId>
+        <artifactId>nd4j-native</artifactId>
+        <version>1.0.0-M2.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacpp</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>openblas</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -14,6 +14,15 @@ set LIB_DIR=launchers\lib
 set DEPENDENCY_DIR=jscience-benchmarks\target\dependency
 set MODULE_PATH=jscience-benchmarks\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes;jscience-native\target\classes
 
+rem --- Add Native JARs to Classpath ---
+if defined MPJ_HOME (
+    set "MPJ_JAR=%MPJ_HOME%\lib\mpj.jar"
+) else (
+    rem Fallback if MPJ_HOME not set but folder exists
+    if exist "C:\JScience-Native\MPJ\lib\mpj.jar" set "MPJ_JAR=C:\JScience-Native\MPJ\lib\mpj.jar"
+)
+
+
 echo ==========================================
 echo Running JScience Benchmarks
 echo ==========================================
@@ -53,7 +62,8 @@ if defined USE_SHADED_JAR (
         echo [INFO] Dependencies not found in target, copying...
         call mvn dependency:copy-dependencies -pl jscience-benchmarks -DincludeScope=runtime -DskipTests
     )
-    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*" %APP_CLASS% %*
+    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %*
+
 )
 
 echo.

@@ -1,6 +1,7 @@
 #!/bin/bash
 # JScience HPC - Native Libraries Auto-Installer
 # Bash script to download and install all required native libraries
+# Updated to prioritize local archives
 
 INSTALL_DIR="$HOME/JScience-Native"
 SKIP_MPI=false
@@ -8,6 +9,18 @@ SKIP_HDF5=false
 SKIP_FFTW=false
 SKIP_BULLET=false
 SKIP_OPENBLAS=false
+
+# Helper function to check for local archive
+get_local_archive() {
+    local filename=$1
+    if [ -f "./$filename" ]; then
+        echo "$(pwd)/$filename"
+    elif [ -f "$(dirname "$0")/$filename" ]; then
+        echo "$(dirname "$0")/$filename"
+    else
+        echo ""
+    fi
+}
 
 # Parse arguments
 for arg in "$@"
@@ -40,136 +53,156 @@ do
     esac
 done
 
-echo -e "\033[0;36m=== JScience HPC Native Libraries Installer ===\033[0m"
-echo -e "\033[0;33mInstallation Directory: $INSTALL_DIR\033[0m"
+echo "=== JScience HPC Native Libraries Installer ==="
+echo "Installation Directory: $INSTALL_DIR"
 echo ""
 
 # Create installation directory
-if [ ! -d "$INSTALL_DIR" ]; then
-    mkdir -p "$INSTALL_DIR"
-    echo -e "\033[0;32m✓ Created installation directory\033[0m"
-fi
+mkdir -p "$INSTALL_DIR"
 
 # Function to download and extract
 install_library() {
-    NAME=$1
-    URL=$2
-    FILENAME=$3
-    SUBDIR=$4
+    local name=$1
+    local url=$2
+    local filename=$3
+    local subdir=$4
     
-    echo -e "\n\033[0;36m--- Installing $NAME ---\033[0m"
+    echo ""
+    echo "--- Installing $name ---"
     
-    DOWNLOAD_PATH="/tmp/$FILENAME"
-    EXTRACT_PATH="$INSTALL_DIR/$SUBDIR"
-    mkdir -p "$EXTRACT_PATH"
-    
-    echo -e "\033[0;33mDownloading from $URL...\033[0m"
-    if command -v wget &> /dev/null; then
-        wget -q -O "$DOWNLOAD_PATH" "$URL"
-    elif command -v curl &> /dev/null; then
-        curl -L -s -o "$DOWNLOAD_PATH" "$URL"
+    local extract_path="$INSTALL_DIR/$subdir"
+    local local_archive=$(get_local_archive "$filename")
+    local archive_path=""
+
+    if [ -n "$local_archive" ]; then
+        echo "[INFO] Found local archive: $local_archive"
+        archive_path="$local_archive"
     else
-        echo -e "\033[0;31m✗ Error: Neither wget nor curl found.\033[0m"
-        return 1
+        # Download
+        echo "Downloading from $url..."
+        archive_path="/tmp/$filename"
+        if command -v wget >/dev/null 2>&1; then
+            wget -q --show-progress -O "$archive_path" "$url"
+        elif command -v curl >/dev/null 2>&1; then
+            curl -L -o "$archive_path" "$url"
+        else
+            echo "[ERROR] Neither wget nor curl found. Cannot download."
+            return 1
+        fi
+        
+        if [ $? -eq 0 ]; then
+            echo "[OK] Downloaded"
+        else
+            echo "[ERROR] Download failed"
+            rm -f "$archive_path"
+            return 1
+        fi
     fi
-    echo -e "\033[0;32m✓ Downloaded\033[0m"
     
-    echo -e "\033[0;33mExtracting to $EXTRACT_PATH...\033[0m"
-    if [[ "$FILENAME" == *.zip ]]; then
-        unzip -q -o "$DOWNLOAD_PATH" -d "$EXTRACT_PATH"
-    elif [[ "$FILENAME" == *.tar.gz ]] || [[ "$FILENAME" == *.tgz ]]; then
-        tar -xzf "$DOWNLOAD_PATH" -C "$EXTRACT_PATH"
+    # Extract
+    mkdir -p "$extract_path"
+    echo "Extracting to $extract_path..."
+    
+    if [[ "$filename" == *.zip ]]; then
+        if command -v unzip >/dev/null 2>&1; then
+            unzip -o -q "$archive_path" -d "$extract_path"
+            echo "[OK] Extracted"
+        else
+            echo "[ERROR] unzip not found"
+            return 1
+        fi
+    elif [[ "$filename" == *.tar.gz ]] || [[ "$filename" == *.tgz ]]; then
+        tar -xzf "$archive_path" -C "$extract_path" --strip-components=1 2>/dev/null || tar -xzf "$archive_path" -C "$extract_path"
+        echo "[OK] Extracted"
     fi
-    echo -e "\033[0;32m✓ Extracted\033[0m"
     
-    rm -f "$DOWNLOAD_PATH"
-    echo "$EXTRACT_PATH"
+    # Cleanup download
+    if [ -z "$local_archive" ]; then
+        rm -f "$archive_path"
+    fi
+    
+    return 0
 }
 
 # 1. Install MPJ Express
 if [ "$SKIP_MPI" = false ]; then
-    MPJ_PATH=$(install_library "MPJ Express" "https://sourceforge.net/projects/mpjexpress/files/releases/mpj-v0_44.tar.gz/download" "mpj-v0_44.tar.gz" "MPJ")
-    
-    if [ -n "$MPJ_PATH" ]; then
-        export MPJ_HOME="$MPJ_PATH"
-        echo -e "\033[0;32m✓ Set MPJ_HOME=$MPJ_PATH\033[0m"
-    fi
+    install_library "MPJ Express" \
+        "https://sourceforge.net/projects/mpjexpress/files/releases/mpj-v0_44.tar.gz/download" \
+        "mpj-v0_44.tar.gz" \
+        "MPJ"
+        
+    # MPJ specific: set MPJ_HOME in shell profile?
+    echo "[INFO] Please add the following to your .bashrc or .zshrc:"
+    echo "export MPJ_HOME=$INSTALL_DIR/MPJ"
+    echo "export PATH=\$PATH:\$MPJ_HOME/bin"
 fi
 
 # 2. Install HDF5
 if [ "$SKIP_HDF5" = false ]; then
-    # Linux binaries for HDF5
-    HDF5_URL="https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.3/bin/unix/hdf5-1.14.3-ubuntu-2204.tar.gz"
-    # Note: URL might need adjustment based on distro, using Ubuntu 22.04 as generically compatible base
+    echo ""
+    echo "--- Installing HDF5 ---"
+    # Linux distributions usually provide HDF5 via package manager
+    echo "[INFO] On Linux, it is recommended to install HDF5 via package manager:"
+    echo "  Ubuntu/Debian: sudo apt-get install libhdf5-dev"
+    echo "  RHEL/CentOS: sudo dnf install hdf5-devel"
+    echo "Attempting to download pre-built binaries (if available) or generic source..."
     
-    HDF5_PATH=$(install_library "HDF5" "$HDF5_URL" "hdf5-1.14.3.tar.gz" "HDF5")
-    
-    if [ -n "$HDF5_PATH" ]; then
-        export HDF5_DIR="$HDF5_PATH"
-        export PATH="$HDF5_PATH/bin:$PATH"
-        export LD_LIBRARY_PATH="$HDF5_PATH/lib:$LD_LIBRARY_PATH"
-        echo -e "\033[0;32m✓ Added HDF5 to PATH and LD_LIBRARY_PATH\033[0m"
-    fi
+    install_library "HDF5" \
+        "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.3/src/hdf5-1.14.3.tar.gz" \
+        "hdf5-1.14.3.tar.gz" \
+        "HDF5"
+        
+    echo "[WARN] HDF5 installed from source/archive. You may need to compile it or add to LD_LIBRARY_PATH."
+    echo "export HDF5_DIR=$INSTALL_DIR/HDF5"
+    echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\$HDF5_DIR/lib"
 fi
 
 # 3. Install FFTW3
 if [ "$SKIP_FFTW" = false ]; then
-    FFTW_PATH=$(install_library "FFTW3" "http://www.fftw.org/fftw-3.3.10.tar.gz" "fftw-3.3.10.tar.gz" "FFTW3")
-    
-    if [ -n "$FFTW_PATH" ]; then
-        echo -e "\033[0;33mBuilding FFTW3 from source (Linux/Mac)...\033[0m"
-        cd "$FFTW_PATH/fftw-3.3.10" || cd "$FFTW_PATH"
-        ./configure --enable-shared --enable-threads --enable-float
-        make -j$(nproc)
-        make install PREFIX="$INSTALL_DIR/FFTW3_build"
+    install_library "FFTW3" \
+        "http://www.fftw.org/fftw-3.3.10.tar.gz" \
+        "fftw-3.3.10.tar.gz" \
+        "FFTW3"
         
-        export LD_LIBRARY_PATH="$INSTALL_DIR/FFTW3_build/lib:$LD_LIBRARY_PATH"
-        echo -e "\033[0;32m✓ Built and added FFTW3 to LD_LIBRARY_PATH\033[0m"
-    fi
+    echo "[ABOVE] FFTW3 source installed. Compilation required:"
+    echo "  cd $INSTALL_DIR/FFTW3"
+    echo "  ./configure --enable-shared --enable-threads --enable-sse2 --enable-avx"
+    echo "  make -j4 && sudo make install"
 fi
 
 # 4. Install Bullet Physics
 if [ "$SKIP_BULLET" = false ]; then
-    echo -e "\n\033[0;36m--- Installing Bullet Physics ---\033[0m"
-    if command -v git &> /dev/null && command -v cmake &> /dev/null; then
+    echo ""
+    echo "--- Installing Bullet Physics ---"
+    if command -v git >/dev/null 2>&1; then
         BULLET_PATH="$INSTALL_DIR/bullet3"
         if [ ! -d "$BULLET_PATH" ]; then
+            echo "Cloning Bullet3..."
             git clone https://github.com/bulletphysics/bullet3.git "$BULLET_PATH"
-            echo -e "\033[0;32m✓ Cloned Bullet3\033[0m"
-            
-            mkdir -p "$BULLET_PATH/build"
-            cd "$BULLET_PATH/build"
-            cmake .. -DBUILD_SHARED_LIBS=ON
-            make -j$(nproc)
-            echo -e "\033[0;32m✓ Built Bullet3\033[0m"
+            echo "[OK] Cloned Bullet3"
         else
-            echo -e "\033[0;32m✓ Bullet3 already cloned\033[0m"
+            echo "[OK] Bullet3 already cloned"
         fi
-    else
-         echo -e "\033[0;33mSkipping Bullet (git or cmake not found)\033[0m"
+        echo "[INFO] Build Bullet3 with CMake:"
+        echo "  cd $BULLET_PATH && mkdir build && cd build && cmake .. && make -j4"
     fi
 fi
 
 # 5. Install OpenBLAS
 if [ "$SKIP_OPENBLAS" = false ]; then
-    # OpenBLAS often available via apt/yum, but here is a binary/source attempt
-    OPENBLAS_URL="https://github.com/xianyi/OpenBLAS/releases/download/v0.3.25/OpenBLAS-0.3.25.tar.gz"
-    OPENBLAS_PATH=$(install_library "OpenBLAS" "$OPENBLAS_URL" "OpenBLAS-0.3.25.tar.gz" "OpenBLAS")
-    
-    if [ -n "$OPENBLAS_PATH" ]; then
-         echo -e "\033[0;33mBuilding OpenBLAS from source...\033[0m"
-         cd "$OPENBLAS_PATH"
-         make -j$(nproc)
-         make install PREFIX="$INSTALL_DIR/OpenBLAS_build"
-         
-         export LD_LIBRARY_PATH="$INSTALL_DIR/OpenBLAS_build/lib:$LD_LIBRARY_PATH"
-         echo -e "\033[0;32m✓ Built and added OpenBLAS to LD_LIBRARY_PATH\033[0m"
-    fi
+    install_library "OpenBLAS" \
+        "https://github.com/xianyi/OpenBLAS/releases/download/v0.3.25/OpenBLAS-0.3.25.tar.gz" \
+        "OpenBLAS-0.3.25.tar.gz" \
+        "OpenBLAS"
+        
+    echo "[INFO] OpenBLAS source installed. Compilation required:"
+    echo "  cd $INSTALL_DIR/OpenBLAS"
+    echo "  make -j4 && sudo make install"
 fi
 
-
-echo -e "\n\033[0;36m=== Installation Summary ===\033[0m"
-echo "Installation directory: $INSTALL_DIR"
-echo -e "\n\033[0;33mNext steps:\033[0m"
-echo "1. Run 'source ~/.bashrc' (or equivalent) to apply changes if any were persisted (script only exports for this session)"
-echo "2. Add the exported variables to your shell profile manually."
+echo ""
+echo "=== Installation Summary ==="
+echo "Check output above for instructions on compiling sources (FFTW, OpenBLAS, Bullet)."
+echo "Ensure generated libraries are in your LD_LIBRARY_PATH."
+echo ""
+echo "[OK] Script complete."

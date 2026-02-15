@@ -1,197 +1,260 @@
 # JScience HPC - Native Libraries Auto-Installer
-# PowerShell script to download and install all required native libraries
+# PowerShell script to download and install required native libraries
+# Usage: .\install_native_libs.ps1 [[-Libraries] <String[]>] [-InstallDir <String>]
+# Example: .\install_native_libs.ps1 -Libraries HDF5, OpenBLAS
+# Example: .\install_native_libs.ps1 (Installs All)
 
 param(
-    [string]$InstallDir = "C:\JScience-Native",
-    [switch]$SkipMPI,
-    [switch]$SkipHDF5,
-    [switch]$SkipFFTW,
-    [switch]$SkipBullet,
-    [switch]$SkipOpenBLAS
+    [Parameter(Position=0)]
+    [ValidateSet("All", "MPJ", "HDF5", "FFTW", "Bullet", "OpenBLAS")]
+    [string[]]$Libraries = @("All"),
+    
+    [string]$InstallDir = "C:\JScience-Native"
 )
 
 $ErrorActionPreference = "Stop"
+$ScriptDir = $PSScriptRoot
 
 Write-Host "=== JScience HPC Native Libraries Installer ===" -ForegroundColor Cyan
 Write-Host "Installation Directory: $InstallDir" -ForegroundColor Yellow
+Write-Host "Selected Libraries: $($Libraries -join ', ')" -ForegroundColor Yellow
+Write-Host "Script Directory: $ScriptDir" -ForegroundColor White
 Write-Host ""
 
 # Create installation directory
 if (!(Test-Path $InstallDir)) {
-    New-Item -ItemType Directory -Path $InstallDir | Out-Null
-    Write-Host "✓ Created installation directory" -ForegroundColor Green
+    New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+    Write-Host "[OK] Created installation directory" -ForegroundColor Green
 }
 
-# Function to download and extract
+# Function to download or use local archive
 function Install-Library {
     param(
         [string]$Name,
         [string]$Url,
-        [string]$FileName,
-        [string]$SubDir
+        [string]$FileNamePattern, 
+        [string]$SubDir,
+        [scriptblock]$PostInstallAction = $null
     )
     
     Write-Host "`n--- Installing $Name ---" -ForegroundColor Cyan
     
-    $downloadPath = Join-Path $env:TEMP $FileName
-    $extractPath = Join-Path $InstallDir $SubDir
+    # 1. Search for local archive (in script dir or current dir)
+    $localArchive = $null
     
+    # Try exact match first if FileNamePattern is a specific file, else glob
+    $patterns = @($FileNamePattern)
+    if ($FileNamePattern -notlike "*") { $patterns += "$FileNamePattern" }
+    
+    foreach ($pat in $patterns) {
+        $candidates = @(Get-ChildItem -Path $ScriptDir -Filter $pat -ErrorAction SilentlyContinue)
+        $candidates += @(Get-ChildItem -Path (Get-Location) -Filter $pat -ErrorAction SilentlyContinue)
+        
+        if ($candidates.Count -gt 0) {
+            $localArchive = $candidates[0].FullName
+            break
+        }
+    }
+
+    $extractPath = Join-Path $InstallDir $SubDir
+    $archiveToExtract = $null
+    $downloaded = $false
+
     try {
-        # Download
-        Write-Host "Downloading from $Url..." -ForegroundColor Yellow
-        Invoke-WebRequest -Uri $Url -OutFile $downloadPath -UseBasicParsing
-        Write-Host "✓ Downloaded" -ForegroundColor Green
+        if ($localArchive) {
+            Write-Host "[INFO] Found local archive: $localArchive" -ForegroundColor Green
+            $archiveToExtract = $localArchive
+        } else {
+             # Download
+             if ([string]::IsNullOrWhiteSpace($Url)) {
+                 Write-Host "[WARN] No download URL available for $Name and no local archive found." -ForegroundColor Yellow
+                 Write-Host "       Please download '$FileNamePattern' manually and place it in this folder." -ForegroundColor Yellow
+                 return $null
+             }
+             
+             # Use the pattern as filename if it's a specific name, else use a default
+             $dlFileName = if ($FileNamePattern -notlike "*") { $FileNamePattern } else { "$Name.zip" }
+             $downloadPath = Join-Path $env:TEMP $dlFileName
+             
+             Write-Host "Downloading from $Url..." -ForegroundColor Yellow
+             try {
+                Invoke-WebRequest -Uri $Url -OutFile $downloadPath -UseBasicParsing
+                Write-Host "[OK] Downloaded" -ForegroundColor Green
+                $archiveToExtract = $downloadPath
+                $downloaded = $true
+             } catch {
+                 Write-Host "[ERROR] Download failed: $($_.Exception.Message)" -ForegroundColor Red
+                 Write-Host "       Please download '$dlFileName' manually and place it in this folder." -ForegroundColor Yellow
+                 return $null
+             }
+        }
         
         # Extract
-        Write-Host "Extracting to $extractPath..." -ForegroundColor Yellow
-        if ($FileName.EndsWith(".zip")) {
-            Expand-Archive -Path $downloadPath -DestinationPath $extractPath -Force
-        } elseif ($FileName.EndsWith(".tar.gz") -or $FileName.EndsWith(".tgz")) {
-            # Requires tar (available in Windows 10+)
-            tar -xzf $downloadPath -C $extractPath
+        if (-not (Test-Path $extractPath)) {
+            New-Item -ItemType Directory -Path $extractPath -Force | Out-Null
         }
-        Write-Host "✓ Extracted" -ForegroundColor Green
         
-        # Cleanup
-        Remove-Item $downloadPath -Force
+        Write-Host "Extracting to $extractPath..." -ForegroundColor Yellow
         
+        $ext = [System.IO.Path]::GetExtension($archiveToExtract).ToLower()
+        if ($ext -eq ".zip") {
+            Expand-Archive -Path $archiveToExtract -DestinationPath $extractPath -Force
+        } elseif ($ext -eq ".gz" -or $ext -eq ".tgz") {
+            # Requires tar (available in Windows 10+)
+            # Note: tar usually extracts to a subdirectory using the internal structure
+            # We assume user wants it in $extractPath or its subfolder
+            tar -xzf $archiveToExtract -C $InstallDir 
+            
+            # Heuristic: If tar created a folder like "mpj-v0_44", move its content or rename it
+            # This is tricky without knowing exact internal structure
+            if ($Name -eq "MPJ Express") {
+                 $extractedFolder = Join-Path $InstallDir "mpj-v0_44"
+                 if (Test-Path $extractedFolder) {
+                    if (Test-Path $extractPath) { Remove-Item $extractPath -Recurse -Force }
+                    Rename-Item -Path $extractedFolder -NewName $SubDir -Force
+                 }
+            }
+        } elseif ($ext -eq ".msi") {
+             Write-Host "[INFO] Installing MSI..." -ForegroundColor Yellow
+             Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$archiveToExtract`" /quiet /norestart TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
+        }
+        
+        Write-Host "[OK] Extracted/Installed" -ForegroundColor Green
+        
+        # Cleanup download
+        if ($downloaded) {
+            Remove-Item $archiveToExtract -Force
+        }
+        
+        # Run post-install logic
+        if ($PostInstallAction) {
+            & $PostInstallAction -InstallPath $extractPath
+        }
+
         return $extractPath
+
     } catch {
-        Write-Host "✗ Failed to install $Name : $_" -ForegroundColor Red
+        Write-Host "[ERROR] Failed to install $Name : $_" -ForegroundColor Red
         return $null
     }
 }
 
-# 1. Install MPJ Express
-if (!$SkipMPI) {
+# Add-Paths Function
+function Add-UserPath {
+    param([string]$NewPath)
+    $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', 'User')
+    if ($currentPath -split ';' -notcontains $NewPath) {
+        $cleanPath = $currentPath.TrimEnd(';') + ";$NewPath"
+        [System.Environment]::SetEnvironmentVariable('PATH', $cleanPath, 'User')
+        Write-Host "[OK] Added to User PATH: $NewPath" -ForegroundColor Green
+    } else {
+        Write-Host "[OK] Already in User PATH: $NewPath" -ForegroundColor Green
+    }
+}
+
+
+# --- Execution Loop ---
+
+# 1. MPJ Express
+if ($Libraries -contains "All" -or $Libraries -contains "MPJ") {
     $mpjPath = Install-Library `
         -Name "MPJ Express" `
-        -Url "https://sourceforge.net/projects/mpjexpress/files/releases/mpj-v0_44.tar.gz/download" `
-        -FileName "mpj-v0_44.tar.gz" `
+        -Url "https://sourceforge.net/projects/mpjexpress/files/releases/mpj-v0_44.tar.gz/download?use_mirror=autoselect" `
+        -FileNamePattern "mpj-*.tar.gz" `
         -SubDir "MPJ"
-    
+
     if ($mpjPath) {
-        [System.Environment]::SetEnvironmentVariable('MPJ_HOME', $mpjPath, 'Machine')
-        Write-Host "✓ Set MPJ_HOME=$mpjPath" -ForegroundColor Green
+        [System.Environment]::SetEnvironmentVariable('MPJ_HOME', $mpjPath, 'User')
+        Write-Host "[OK] Set MPJ_HOME=$mpjPath" -ForegroundColor Green
+        # Add MPJ bin to PATH check? Usually needed.
+        Add-UserPath (Join-Path $mpjPath "bin")
     }
 }
 
-# 2. Install HDF5
-if (!$SkipHDF5) {
-    Write-Host "`n--- Installing HDF5 ---" -ForegroundColor Cyan
-    Write-Host "Note: HDF5 Windows binaries require manual download from:" -ForegroundColor Yellow
-    Write-Host "https://www.hdfgroup.org/downloads/hdf5/" -ForegroundColor Yellow
-    Write-Host "Please download and extract to: $InstallDir\HDF5" -ForegroundColor Yellow
-    
-    # Alternative: Try to download pre-built binaries
-    $hdf5Url = "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.3/bin/windows/hdf5-1.14.3-2-win-vs2022_intel.zip"
+# 2. HDF5
+if ($Libraries -contains "All" -or $Libraries -contains "HDF5") {
+    # HDF5 is tricky. URL often dead or behind login.
+    # We check for MSI first because it's usually the binary installer
     $hdf5Path = Install-Library `
         -Name "HDF5" `
-        -Url $hdf5Url `
-        -FileName "hdf5-1.14.3.zip" `
+        -Url "" `
+        -FileNamePattern "hdf5-*.msi" `
         -SubDir "HDF5"
-    
+
+    if (-not $hdf5Path) {
+        # Fallback to ZIP
+        $hdf5Path = Install-Library `
+            -Name "HDF5" `
+            -Url "" `
+            -FileNamePattern "hdf5-*.zip" `
+            -SubDir "HDF5"
+    }
+
     if ($hdf5Path) {
-        [System.Environment]::SetEnvironmentVariable('HDF5_DIR', $hdf5Path, 'Machine')
-        $env:PATH += ";$hdf5Path\bin"
-        [System.Environment]::SetEnvironmentVariable('PATH', $env:PATH, 'Machine')
-        Write-Host "✓ Added HDF5 to PATH" -ForegroundColor Green
+        [System.Environment]::SetEnvironmentVariable('HDF5_DIR', $hdf5Path, 'User')
+        Add-UserPath (Join-Path $hdf5Path "bin")
     }
 }
 
-# 3. Install FFTW3
-if (!$SkipFFTW) {
+# 3. FFTW3
+if ($Libraries -contains "All" -or $Libraries -contains "FFTW") {
     $fftwPath = Install-Library `
         -Name "FFTW3" `
-        -Url "http://www.fftw.org/fftw-3.3.10-dll64.zip" `
-        -FileName "fftw-3.3.10-dll64.zip" `
-        -SubDir "FFTW3"
-    
-    if ($fftwPath) {
-        $env:PATH += ";$fftwPath"
-        [System.Environment]::SetEnvironmentVariable('PATH', $env:PATH, 'Machine')
-        Write-Host "✓ Added FFTW3 to PATH" -ForegroundColor Green
-        
-        # Generate import libraries
-        Write-Host "Generating import libraries..." -ForegroundColor Yellow
-        Push-Location $fftwPath
-        try {
-            lib /def:libfftw3-3.def /out:libfftw3-3.lib /machine:x64 2>&1 | Out-Null
-            lib /def:libfftw3f-3.def /out:libfftw3f-3.lib /machine:x64 2>&1 | Out-Null
-            lib /def:libfftw3l-3.def /out:libfftw3l-3.lib /machine:x64 2>&1 | Out-Null
-            Write-Host "✓ Generated import libraries" -ForegroundColor Green
-        } catch {
-            Write-Host "⚠ Could not generate import libraries (lib.exe not found)" -ForegroundColor Yellow
+        -Url "http://www.fftw.org/fftw-3.3.5-dll64.zip" `
+        -FileNamePattern "fftw-*.zip" `
+        -SubDir "FFTW3" `
+        -PostInstallAction {
+            param($InstallPath)
+            Write-Host "Generating import libraries..." -ForegroundColor Yellow
+            Push-Location $InstallPath
+            if (Get-Command lib -ErrorAction SilentlyContinue) {
+                try {
+                    lib /def:libfftw3-3.def /out:libfftw3-3.lib /machine:x64 2>&1 | Out-Null
+                    lib /def:libfftw3f-3.def /out:libfftw3f-3.lib /machine:x64 2>&1 | Out-Null
+                    lib /def:libfftw3l-3.def /out:libfftw3l-3.lib /machine:x64 2>&1 | Out-Null
+                    Write-Host "[OK] Generated import libraries" -ForegroundColor Green
+                } catch { Write-Host "[WARN] Lib generation failed: $_" -ForegroundColor Yellow }
+            } else {
+                 Write-Host "[WARN] 'lib.exe' not found (VS tools missing?). Skipping lib generation." -ForegroundColor Yellow
+            }
+            Pop-Location
         }
-        Pop-Location
+
+    if ($fftwPath) {
+        Add-UserPath $fftwPath
     }
 }
 
-# 4. Install Bullet Physics
-if (!$SkipBullet) {
-    Write-Host "`n--- Installing Bullet Physics ---" -ForegroundColor Cyan
-    Write-Host "Bullet Physics requires building from source." -ForegroundColor Yellow
-    Write-Host "Instructions:" -ForegroundColor Yellow
-    Write-Host "1. Install CMake: https://cmake.org/download/" -ForegroundColor White
-    Write-Host "2. Clone Bullet3: git clone https://github.com/bulletphysics/bullet3.git" -ForegroundColor White
-    Write-Host "3. Build with CMake (see NATIVE_LIBS_INSTALLATION.md)" -ForegroundColor White
-    
-    # Check if git is available
+# 4. Bullet Physics
+if ($Libraries -contains "All" -or $Libraries -contains "Bullet") {
     if (Get-Command git -ErrorAction SilentlyContinue) {
         $bulletPath = Join-Path $InstallDir "bullet3"
         if (!(Test-Path $bulletPath)) {
-            Write-Host "Cloning Bullet3 repository..." -ForegroundColor Yellow
+            Write-Host "`n--- Installing Bullet Physics ---" -ForegroundColor Cyan
+            Write-Host "Cloning Bullet3..." -ForegroundColor Yellow
             git clone https://github.com/bulletphysics/bullet3.git $bulletPath
-            Write-Host "✓ Cloned Bullet3" -ForegroundColor Green
-            Write-Host "⚠ You must build Bullet3 manually with CMake" -ForegroundColor Yellow
+            Write-Host "[OK] Cloned Bullet3" -ForegroundColor Green
         } else {
-            Write-Host "✓ Bullet3 already cloned at $bulletPath" -ForegroundColor Green
+            Write-Host "`n--- Bullet Physics ---" -ForegroundColor Cyan
+            Write-Host "[OK] Already cloned" -ForegroundColor Green
         }
+    } else {
+        Write-Host "`n[WARN] git not found. Skipping Bullet3." -ForegroundColor Yellow
     }
 }
 
-# 5. Install OpenBLAS
-if (!$SkipOpenBLAS) {
-    Write-Host "`n--- Installing OpenBLAS ---" -ForegroundColor Cyan
-    $openblasUrl = "https://github.com/xianyi/OpenBLAS/releases/download/v0.3.25/OpenBLAS-0.3.25-x64.zip"
+# 5. OpenBLAS
+if ($Libraries -contains "All" -or $Libraries -contains "OpenBLAS") {
     $openblasPath = Install-Library `
         -Name "OpenBLAS" `
-        -Url $openblasUrl `
-        -FileName "OpenBLAS-0.3.25-x64.zip" `
+        -Url "https://github.com/xianyi/OpenBLAS/releases/download/v0.3.25/OpenBLAS-0.3.25-x64.zip" `
+        -FileNamePattern "OpenBLAS-*.zip" `
         -SubDir "OpenBLAS"
-    
+
     if ($openblasPath) {
-        $env:PATH += ";$openblasPath\bin"
-        [System.Environment]::SetEnvironmentVariable('PATH', $env:PATH, 'Machine')
-        Write-Host "✓ Added OpenBLAS to PATH" -ForegroundColor Green
+        Add-UserPath (Join-Path $openblasPath "bin")
     }
 }
 
-# 6. Install CFITSIO
-Write-Host "`n--- Installing CFITSIO ---" -ForegroundColor Cyan
-Write-Host "CFITSIO Windows binaries are not readily available." -ForegroundColor Yellow
-Write-Host "Options:" -ForegroundColor Yellow
-Write-Host "1. Build from source: https://heasarc.gsfc.nasa.gov/fitsio/" -ForegroundColor White
-Write-Host "2. Use vcpkg: vcpkg install cfitsio:x64-windows" -ForegroundColor White
-
-# Summary
-Write-Host "`n=== Installation Summary ===" -ForegroundColor Cyan
-Write-Host "Installation directory: $InstallDir" -ForegroundColor White
-
-$installedLibs = @()
-if (Test-Path (Join-Path $InstallDir "MPJ")) { $installedLibs += "MPJ Express" }
-if (Test-Path (Join-Path $InstallDir "HDF5")) { $installedLibs += "HDF5" }
-if (Test-Path (Join-Path $InstallDir "FFTW3")) { $installedLibs += "FFTW3" }
-if (Test-Path (Join-Path $InstallDir "bullet3")) { $installedLibs += "Bullet3 (source)" }
-if (Test-Path (Join-Path $InstallDir "OpenBLAS")) { $installedLibs += "OpenBLAS" }
-
-Write-Host "`nInstalled libraries:" -ForegroundColor Green
-$installedLibs | ForEach-Object { Write-Host "  ✓ $_" -ForegroundColor Green }
-
-Write-Host "`nNext steps:" -ForegroundColor Yellow
-Write-Host "1. Restart your terminal to apply PATH changes" -ForegroundColor White
-Write-Host "2. Run verify_native_libs.ps1 to verify installation" -ForegroundColor White
-Write-Host "3. Build Bullet Physics if needed (see NATIVE_LIBS_INSTALLATION.md)" -ForegroundColor White
-Write-Host "4. Add MPJ jar to your Maven dependencies" -ForegroundColor White
-
-Write-Host "`n✓ Installation complete!" -ForegroundColor Green
+Write-Host "`n[OK] Installation/Configuration complete!" -ForegroundColor Green
+Write-Host "Please restart your terminal to apply environment variable changes." -ForegroundColor White
