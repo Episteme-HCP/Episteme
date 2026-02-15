@@ -13,6 +13,8 @@
             <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
             <Label text="JSCIENCE BENCHMARKING" styleClass="header-title"/>
             <Region HBox.hgrow="ALWAYS" />
+            <Label text="Language:" styleClass="header-label"/>
+            <ComboBox fx:id="languageSelector" promptText="Language" styleClass="combo-box-primary" />
             <!-- Settings button removed as per user request -->
             <Button text="ABOUT" onAction="#handleAbout" styleClass="action-button-primary" />
         </HBox>

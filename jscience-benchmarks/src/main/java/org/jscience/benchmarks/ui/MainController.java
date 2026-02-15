@@ -50,6 +50,7 @@ public class MainController {
 
 
     @FXML private ComboBox<String> metricSelector;
+    @FXML private ComboBox<String> languageSelector;
     @FXML private Button exportChartBtn;
 
     // Maps to manage dynamic charts per domain
@@ -325,6 +326,7 @@ public class MainController {
         loadHistory(); // Load persisted results
         startDiscovery(); // Background loading
         setupAnalytics();
+        setupLanguageSelector();
         // Charts will be added lazily as data comes in or domain nodes are discovered
     }
 
@@ -333,6 +335,24 @@ public class MainController {
         metricSelector.getSelectionModel().select(0);
         metricSelector.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
             refreshAllCharts();
+        });
+    }
+    
+    private void setupLanguageSelector() {
+        languageSelector.getItems().addAll("English", "Français", "Español", "Deutsch", "中文");
+        languageSelector.getSelectionModel().select(0); // Default to English
+        languageSelector.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
+            int index = newVal.intValue();
+            java.util.Locale newLocale = switch (index) {
+                case 1 -> java.util.Locale.FRENCH;
+                case 2 -> new java.util.Locale("es");
+                case 3 -> java.util.Locale.GERMAN;
+                case 4 -> java.util.Locale.CHINESE;
+                default -> java.util.Locale.ENGLISH;
+            };
+            org.jscience.core.ui.i18n.I18N.getInstance().setLocale(newLocale);
+            // Refresh UI labels (would require full UI rebuild or manual updates)
+            System.out.println("Language changed to: " + newLocale.getDisplayName());
         });
     }
 
