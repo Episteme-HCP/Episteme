@@ -16,6 +16,7 @@ import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgeb
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 
 /**
  * SIMD-accelerated Matrix implementation using JDK Vector API.
@@ -322,7 +323,47 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     @Override public Vector<Real> getColumn(int col) { throw new UnsupportedOperationException(); }
     @Override public Real determinant() { throw new UnsupportedOperationException(); }
     @Override public Matrix<Real> inverse() { throw new UnsupportedOperationException(); }
-    @Override public Vector<Real> multiply(Vector<Real> vector) { throw new UnsupportedOperationException(); }
+    @Override 
+    public Vector<Real> multiply(Vector<Real> vector) {
+        if (storage.cols() != vector.dimension()) {
+            throw new IllegalArgumentException("Dimension mismatch");
+        }
+        
+        // Extract vector data to double[]
+        double[] bData = new double[vector.dimension()];
+        for(int i=0; i<bData.length; i++) bData[i] = vector.get(i).doubleValue();
+        
+        double[] res = new double[storage.rows()];
+        
+        // Loop over rows
+        for (int i = 0; i < storage.rows(); i++) {
+            int rowOffset = i * storage.cols();
+            
+            // SIMD Dot Product
+            jdk.incubator.vector.DoubleVector acc = jdk.incubator.vector.DoubleVector.zero(SPECIES);
+            int j = 0;
+            for (; j < SPECIES.loopBound(storage.cols()); j += SPECIES.length()) {
+                var aVec = jdk.incubator.vector.DoubleVector.fromArray(SPECIES, data, rowOffset + j);
+                var bVec = jdk.incubator.vector.DoubleVector.fromArray(SPECIES, bData, j);
+                acc = acc.add(aVec.mul(bVec)); // FMA if supported
+            }
+            res[i] = acc.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
+            
+            // Tail
+            for (; j < storage.cols(); j++) {
+                res[i] += data[rowOffset + j] * bData[j];
+            }
+        }
+        
+        // Return GenericVector wrapping DenseVectorStorage (standard for CPU)
+        // Note: we can't easily return SIMD vector type for Vector<?> unless we define one.
+        // For now, return standard Vector implementation.
+        return new GenericVector<>(
+             new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
+                 java.util.stream.DoubleStream.of(res).mapToObj(Real::of).toArray(Real[]::new)),
+             new CPUDenseLinearAlgebraProvider<>((org.jscience.core.mathematics.structures.rings.Field<Real>) Reals.getInstance()),
+             Reals.getInstance());
+    }
     @Override public Matrix<Real> negate() { 
         double[] res = new double[data.length];
         for(int i=0; i<data.length; i++) res[i] = -data[i];

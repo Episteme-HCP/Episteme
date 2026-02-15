@@ -34,6 +34,9 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner;
+import org.jscience.core.mathematics.numbers.real.Real;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.technical.backend.ExecutionContext;
@@ -225,7 +228,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
+            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).add((SIMDRealDoubleMatrix) b);
+        }
+
         if (a.rows() != b.rows() || a.cols() != b.cols()) {
             throw new IllegalArgumentException("Matrix dimensions must match");
         }
@@ -248,7 +256,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
+            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).subtract((SIMDRealDoubleMatrix) b);
+        }
+
         if (a.rows() != b.rows() || a.cols() != b.cols()) {
             throw new IllegalArgumentException("Matrix dimensions must match");
         }
@@ -273,12 +286,19 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (a.cols() != b.rows()) {
             throw new IllegalArgumentException("Matrix inner dimensions must match");
         }
 
-        // Use Strassen if beneficial
+        // SIMD fast path: use hardware-vectorized Strassen/CARMA for RealDouble matrices
+        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
+            return (Matrix<E>) MatrixMultiplicationPlanner.multiply(
+                    (SIMDRealDoubleMatrix) a, (SIMDRealDoubleMatrix) b);
+        }
+
+        // Generic Strassen for large power-of-two square matrices
         if (a.rows() >= 64 && a.cols() >= 64 && b.cols() >= 64
                 && isSquarePowerOfTwo(a) && isSquarePowerOfTwo(b) && a.rows() == b.rows()) {
             return strassenRecursive(a, b);
@@ -345,7 +365,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
     }
 
-    private Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b) {
+    protected Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b) {
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), b.cols(), field.zero());
         long start = System.nanoTime();
         try {
@@ -386,7 +406,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> transpose(Matrix<E> a) {
+        if (a instanceof SIMDRealDoubleMatrix) {
+            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).transpose();
+        }
+
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), field.zero());
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
             for (int j = 0; j < a.cols(); j++) {
@@ -397,7 +422,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> scale(E scalar, Matrix<E> a) {
+        if (a instanceof SIMDRealDoubleMatrix && scalar instanceof Real) {
+            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).scale(((Real) scalar).doubleValue());
+        }
+
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
             for (int j = 0; j < a.cols(); j++) {
@@ -408,9 +438,14 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        if (a instanceof SIMDRealDoubleMatrix) {
+            return (Vector<E>) ((SIMDRealDoubleMatrix) a).multiply((Vector<Real>) b);
+        }
+
         if (a.cols() != b.dimension()) {
-            throw new IllegalArgumentException("Matrix columns must match vector dimension");
+             throw new IllegalArgumentException("Matrix columns must match vector dimension");
         }
 
         if (a.rows() < PARALLEL_THRESHOLD) {
