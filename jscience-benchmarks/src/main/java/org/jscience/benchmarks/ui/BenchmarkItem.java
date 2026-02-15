@@ -166,6 +166,11 @@ public class BenchmarkItem {
     public void setScore(double score) { this.rawScore = score; }
     public double getScore() { return rawScore; }
     
+    // P99 latency in milliseconds, computed from per-iteration measurements
+    private double p99LatencyMs = 0.0;
+    public void setP99LatencyMs(double p99) { this.p99LatencyMs = p99; }
+    public double getP99LatencyMs() { return p99LatencyMs; }
+    
     // Unique ID helper for consistent usage
     public String getUniqueId() {
         if (benchmark == null) return getName();

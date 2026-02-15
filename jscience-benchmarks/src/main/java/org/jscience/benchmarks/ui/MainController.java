@@ -329,7 +329,7 @@ public class MainController {
     }
 
     private void setupAnalytics() {
-        metricSelector.getItems().addAll("Throughput (Ops/Sec)", "Average Latency (ms)", "P99 Latency (N/A)");
+        metricSelector.getItems().addAll("Throughput (Ops/Sec)", "Average Latency (ms)", "P99 Latency (ms)");
         metricSelector.getSelectionModel().select(0);
         metricSelector.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
             refreshAllCharts();
@@ -356,17 +356,19 @@ public class MainController {
         for (BenchmarkItem item : allItems) {
             String status = item.statusProperty().get();
             if ("Success".equals(status) && item.getScore() > 0) {
-                double val = calculateMetric(item.getScore());
+                double val = calculateMetric(item);
                 updateChart(item, val);
             }
         }
     }
     
-    private double calculateMetric(double opsSec) {
+    private double calculateMetric(BenchmarkItem item) {
         int index = metricSelector.getSelectionModel().getSelectedIndex();
+        double opsSec = item.getScore();
         if (index == 0) return opsSec; // Throughput
-        if (index == 1) return (opsSec > 0) ? 1000.0 / opsSec : 0.0; // Latency ms
-        return 0.0; // P99 not implemented
+        if (index == 1) return (opsSec > 0) ? 1000.0 / opsSec : 0.0; // Average Latency ms
+        if (index == 2) return item.getP99LatencyMs(); // P99 Latency ms
+        return 0.0;
     }
 
     private String determineSimpleProvider(String provider, String simpleName) {
@@ -443,17 +445,25 @@ public class MainController {
             System.gc();
             try { Thread.sleep(100); } catch (InterruptedException e) {}
 
-            long start = System.nanoTime();
-            long iterations = 0;
-            // Run for at least 2 seconds
-            while (System.nanoTime() - start < 2_000_000_000L) {
+            // Per-iteration measurement for P99 computation
+            java.util.List<Long> iterNanos = new java.util.ArrayList<>();
+            long totalStart = System.nanoTime();
+            // Run for at least 2 seconds, recording each iteration
+            while (System.nanoTime() - totalStart < 2_000_000_000L) {
+                long iterStart = System.nanoTime();
                 b.run();
-                iterations++;
+                iterNanos.add(System.nanoTime() - iterStart);
             }
-            long end = System.nanoTime();
+            long totalEnd = System.nanoTime();
             
-            double durationSec = (end - start) / 1_000_000_000.0;
+            long iterations = iterNanos.size();
+            double durationSec = (totalEnd - totalStart) / 1_000_000_000.0;
             double opsSec = iterations / durationSec;
+            
+            // Compute P99 latency
+            java.util.Collections.sort(iterNanos);
+            int p99Index = Math.max(0, (int) Math.ceil(iterNanos.size() * 0.99) - 1);
+            double p99Ms = iterNanos.get(p99Index) / 1_000_000.0;
             
             // Smart formatting: more precision for small numbers
             String resultText;
@@ -469,8 +479,9 @@ public class MainController {
                 item.statusProperty().set("Success");
                 item.resultProperty().set(resultText);
                 item.setScore(opsSec);
+                item.setP99LatencyMs(p99Ms);
                 
-                double val = calculateMetric(opsSec);
+                double val = calculateMetric(item);
                 
                 updateChart(item, val);
                 addToHistory(item, resultText);

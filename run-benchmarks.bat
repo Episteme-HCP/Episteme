@@ -12,7 +12,7 @@ set APP_CLASS=org.jscience.benchmarks.benchmark.BenchmarkRunner
 set JAR_PATH=jscience-benchmarks\target\jscience-benchmarks.jar
 set LIB_DIR=launchers\lib
 set DEPENDENCY_DIR=jscience-benchmarks\target\dependency
-set MODULE_PATH=jscience-benchmarks\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes;jscience-native\target\classes
+set MODULE_PATH=jscience-benchmarks\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes;jscience-native\target\classes;jscience-client\target\classes;jscience-server\target\classes
 
 rem --- Add Native JARs to Classpath ---
 if defined MPJ_HOME (
@@ -37,6 +37,9 @@ if exist "%NATIVE_ROOT%\OpenBLAS\bin" (
 if exist "%NATIVE_ROOT%\HDF5\bin" (
     echo [INFO] Adding HDF5 to PATH...
     set "PATH=%NATIVE_ROOT%\HDF5\bin;%PATH%"
+) else if exist "C:\Program Files\HDF_Group\HDF5\2.0.0\bin" (
+    echo [INFO] Adding HDF5 ^(official install^) to PATH...
+    set "PATH=C:\Program Files\HDF_Group\HDF5\2.0.0\bin;%PATH%"
 )
 if exist "%NATIVE_ROOT%\FFTW3" (
     echo [INFO] Adding FFTW3 to PATH...
