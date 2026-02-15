@@ -80,6 +80,9 @@
     <onnxruntime.version>1.17.1</onnxruntime.version>
     <auto-service.version>1.1.1</auto-service.version>
     <jmh.version>1.37</jmh.version>
+    <!-- Native Libraries -->
+    <javacpp.version>1.5.10</javacpp.version>
+    <openblas.version>0.3.26-${javacpp.version}</openblas.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -354,6 +357,30 @@
         <artifactId>jhdf</artifactId>
         <version>0.7.0</version>
         <optional>true</optional>
+      </dependency>
+
+      <!-- JavaCPP and OpenBLAS -->
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>javacpp</artifactId>
+        <version>${javacpp.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>openblas</artifactId>
+        <version>${openblas.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>openblas</artifactId>
+        <version>${openblas.version}</version>
+        <classifier>windows-x86_64</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>openblas</artifactId>
+        <version>${openblas.version}</version>
+        <classifier>linux-x86_64</classifier>
       </dependency>
     </dependencies>
   </dependencyManagement>

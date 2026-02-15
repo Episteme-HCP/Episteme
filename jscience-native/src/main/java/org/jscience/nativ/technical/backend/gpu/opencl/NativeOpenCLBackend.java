@@ -6,6 +6,7 @@
 package org.jscience.nativ.technical.backend.gpu.opencl;
 
 import java.lang.foreign.*;
+import java.lang.invoke.MethodHandle;
 
 import java.nio.DoubleBuffer;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
