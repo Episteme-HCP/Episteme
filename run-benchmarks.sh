@@ -1,7 +1,7 @@
 #!/bin/bash
 # JScience Benchmarks Launcher
 
-APP_CLASS="org.jscience.benchmarks.ui.JScienceBenchmarkingApp"
+APP_CLASS="org.jscience.benchmarks.ui.Launcher"
 JAR_PATH="jscience-benchmarks/target/jscience-benchmarks.jar"
 LIB_DIR="launchers/lib"
 MODULE_PATH="jscience-benchmarks/target/classes:jscience-core/target/classes:jscience-natural/target/classes:jscience-social/target/classes:jscience-native/target/classes"

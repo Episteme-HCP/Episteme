@@ -16,24 +16,6 @@
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
@@ -42,7 +24,6 @@ package org.jscience.nativ.technical.algorithm.inference;
 
 import org.jscience.core.technical.algorithm.MLProvider;
 import java.util.stream.IntStream;
-
 import java.util.Random;
 
 /**
@@ -61,11 +42,11 @@ public class NativeMulticoreMLProvider implements MLProvider {
                 doubleData[i][j] = data[i][j].doubleValue();
             }
         }
-        
-        return kMeansDouble(doubleData, k, maxIterations);
+        return kMeans(doubleData, k, maxIterations);
     }
 
-    private int[] kMeansDouble(double[][] data, int k, int maxIterations) {
+    @Override
+    public int[] kMeans(double[][] data, int k, int maxIterations) {
         int n = data.length;
         int d = data[0].length;
         double[][] centroids = new double[k][d];
@@ -129,7 +110,12 @@ public class NativeMulticoreMLProvider implements MLProvider {
 
     @Override
     public org.jscience.core.mathematics.numbers.real.Real[][] pca(org.jscience.core.mathematics.numbers.real.Real[][] data, int nComponents) {
-        throw new UnsupportedOperationException("Native PCA not fully implemented yet");
+        throw new UnsupportedOperationException("Native PCA (Real) not fully implemented yet");
+    }
+
+    @Override
+    public double[][] pca(double[][] data, int nComponents) {
+        throw new UnsupportedOperationException("Native PCA (double) not fully implemented yet");
     }
 
     private double distSq(double[] a, double[] b) {
