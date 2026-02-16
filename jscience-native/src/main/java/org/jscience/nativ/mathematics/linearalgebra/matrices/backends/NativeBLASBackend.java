@@ -12,27 +12,32 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
-import org.jscience.core.mathematics.linearalgebra.MatrixBackend;
+import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraBackend;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.real.RealDouble;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Implementation of {@link MatrixBackend} using OpenBLAS or Intel MKL via Panama.
+ * Native BLAS/LAPACK backend using OpenBLAS or Intel MKL via Panama FFM.
+ * <p>
+ * Provides both low-level BLAS operations (dgemm, dgemv, etc.) and
+ * high-level {@link LinearAlgebraProvider} operations for {@link Real} elements.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({MatrixBackend.class, LinearAlgebraBackend.class})
-public class NativeBLASBackend implements MatrixBackend, LinearAlgebraBackend<Real> {
+@AutoService({ComputeBackend.class, AlgorithmProvider.class})
+public class NativeBLASBackend implements ComputeBackend, LinearAlgebraProvider<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;
     private static final MethodHandle DGEMV_HANDLE;
@@ -171,7 +176,6 @@ public class NativeBLASBackend implements MatrixBackend, LinearAlgebraBackend<Re
         };
     }
 
-    @Override
     public void dgemm(int rowsA, int colsA, int colsB,
                      DoubleBuffer A, int lda,
                      DoubleBuffer B, int ldb,
@@ -191,7 +195,6 @@ public class NativeBLASBackend implements MatrixBackend, LinearAlgebraBackend<Re
         }
     }
 
-    @Override
     public void dgemv(int rowsA, int colsA,
                      DoubleBuffer A, int lda,
                      DoubleBuffer x, int incx,
@@ -348,6 +351,11 @@ public class NativeBLASBackend implements MatrixBackend, LinearAlgebraBackend<Re
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
+    }
+
+    @Override
+    public Real norm(Vector<Real> a) {
         throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
     }
 }

@@ -40,4 +40,22 @@ public interface AlgorithmProvider {
     default String getAlgorithmType() {
         return "generic";
     }
+
+    /**
+     * Scores this provider for a specific operation context.
+     * <p>
+     * Higher scores indicate better suitability. Used by
+     * {@link ProviderSelector} for context-aware selection.
+     * </p>
+     * <p>
+     * Default implementation returns {@link #getPriority()}, so existing
+     * providers behave identically without changes.
+     * </p>
+     *
+     * @param context the operation context (data size, hints, etc.)
+     * @return suitability score (higher = better)
+     */
+    default double score(OperationContext context) {
+        return getPriority();
+    }
 }

@@ -7,6 +7,7 @@ package org.jscience.natural.physics.quantum.backends;
 
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.quantum.QuantumAlgorithmProvider;
 
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -24,7 +25,10 @@ import java.nio.charset.StandardCharsets;
  * Supports hybrid algorithms (VQE, QAOA) and rich circuit features.
  */
 @AutoService(QuantumBackend.class)
-public class PythonQuantumBackendProvider implements QuantumBackend {
+public class PythonQuantumBackendProvider implements QuantumBackend, QuantumAlgorithmProvider {
+
+    @Override
+    public int getPriority() { return 100; }
 
     private final String pythonExecutable;
 

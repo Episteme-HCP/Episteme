@@ -46,6 +46,12 @@ import java.util.concurrent.Executors;
 @AutoService(AlgorithmProvider.class)
 public class TarsosEngine implements AudioEngine, AudioBackend {
 
+    @Override
+    public int getPriority() { return 70; }
+
+    @Override
+    public String getName() { return getBackendName(); }
+
     @Override 
     public boolean isAvailable() { 
         try {

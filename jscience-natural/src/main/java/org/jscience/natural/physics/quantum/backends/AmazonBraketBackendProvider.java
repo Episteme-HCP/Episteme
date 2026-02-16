@@ -2,6 +2,7 @@ package org.jscience.natural.physics.quantum.backends;
 
 
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.quantum.QuantumAlgorithmProvider;
 import org.jscience.natural.physics.quantum.QuantumContext;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 /**
  * Amazon Braket backend implementation for JScience.
  */
-public class AmazonBraketBackendProvider implements QuantumBackend {
+public class AmazonBraketBackendProvider implements QuantumBackend, QuantumAlgorithmProvider {
 
     @Override public String getId() { return "amazon-braket"; }
     @Override public String getName() { return "Amazon Braket (AWS)"; }

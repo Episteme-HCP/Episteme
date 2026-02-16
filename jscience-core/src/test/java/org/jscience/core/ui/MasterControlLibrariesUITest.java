@@ -352,5 +352,15 @@ public class MasterControlLibrariesUITest {
         // Just verify we don't crash
         assertTrue(stage.isShowing(), "App should remain stable after checking ComboBoxes");
     }
+    
+    // ==================== Debug Dump Test ====================
+    
+    @Test
+    void dumpVerifyLibrariesLabels(FxRobot robot) {
+        robot.clickOn("#tab-libraries");
+        Set<Label> allLabels = robot.lookup(".label").queryAllAs(Label.class);
+        System.out.println("=== DUMP LIBRARIES TAB LABELS ===");
+        allLabels.stream().map(Label::getText).forEach(text -> System.out.println("LABEL: '" + text + "'"));
+        System.out.println("================================");
+    }
 }
-

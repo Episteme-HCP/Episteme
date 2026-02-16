@@ -41,6 +41,12 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 @AutoService(AlgorithmProvider.class)
 public class MinimEngine implements AudioEngine, AudioBackend {
 
+    @Override
+    public int getPriority() { return 60; }
+
+    @Override
+    public String getName() { return getBackendName(); }
+
     private Minim minim;
     private AudioPlayer player;
     private FFT fft;

@@ -1,6 +1,7 @@
 package org.jscience.natural.physics.quantum.backends;
 
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.quantum.QuantumAlgorithmProvider;
 import org.jscience.natural.physics.quantum.QuantumContext;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 /**
  * Quantum4J backend implementation for JScience.
  */
-public class Quantum4JBackendProvider implements QuantumBackend {
+public class Quantum4JBackendProvider implements QuantumBackend, QuantumAlgorithmProvider {
 
     @Override public String getId() { return "quantum4j"; }
     @Override public String getName() { return "Quantum4J (Enterprise)"; }

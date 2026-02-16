@@ -9,6 +9,7 @@ import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import org.jscience.benchmarks.benchmark.benchmarks.SystematicBenchmark;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.core.technical.backend.quantum.QuantumAlgorithmProvider;
 
 /**
  * Benchmark for Quantum Circuit Simulation.
@@ -18,13 +19,13 @@ import org.jscience.core.technical.backend.quantum.QuantumBackend;
  * @author Gemini AI (Google DeepMind)
  */
 @AutoService(RunnableBenchmark.class)
-public class QuantumCircuitBenchmark implements SystematicBenchmark<QuantumBackend> {
+public class QuantumCircuitBenchmark implements SystematicBenchmark<QuantumAlgorithmProvider> {
 
     private static final int NUM_QUBITS = 10;
     private QuantumBackend provider;
     private QuantumBackend.QuantumCircuit circuit;
 
-    @Override public Class<QuantumBackend> getProviderClass() { return QuantumBackend.class; }
+    @Override public Class<QuantumAlgorithmProvider> getProviderClass() { return QuantumAlgorithmProvider.class; }
     @Override public String getIdPrefix() { return "quantum-qft-" + NUM_QUBITS; }
     @Override public String getNameBase() { return "Quantum Circuit Simulation (QFT)"; }
 
@@ -36,8 +37,10 @@ public class QuantumCircuitBenchmark implements SystematicBenchmark<QuantumBacke
     @Override public String getAlgorithmProvider() { return provider != null ? provider.getName() : "None"; }
 
     @Override
-    public void setProvider(QuantumBackend provider) {
-        this.provider = provider;
+    public void setProvider(QuantumAlgorithmProvider provider) {
+        if (provider instanceof QuantumBackend) {
+            this.provider = (QuantumBackend) provider;
+        }
     }
 
     @Override

@@ -1,24 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.nativ.technical.algorithm.inference;
@@ -28,10 +10,18 @@ import org.jscience.core.technical.algorithm.TensorProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
+import jcuda.Pointer;
+import jcuda.Sizeof;
+import jcuda.driver.JCudaDriver;
+import jcuda.runtime.JCuda;
+import jcuda.runtime.cudaMemcpyKind;
+
+import java.util.Arrays;
+
 /**
  * CUDA-accelerated Neural Network provider.
  * <p>
- * Leverages cuDNN and cuBLAS for high-performance tensor operations.
+ * Implements Tensor operations using JCuda.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -40,26 +30,118 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  */
 @AutoService(AlgorithmProvider.class)
 public class NativeCUDATensorProvider implements TensorProvider {
-    
+
     @Override
     public boolean isAvailable() {
-        // Disabled: No true GPU implementation yet
-        return false;
+        try {
+            // Check if we can initialize CUDA Driver API
+            JCudaDriver.setExceptionsEnabled(true);
+            JCudaDriver.cuInit(0);
+            int[] deviceCount = new int[1];
+            JCudaDriver.cuDeviceGetCount(deviceCount);
+            return deviceCount[0] > 0;
+        } catch (Throwable t) {
+            // Log warning?
+            return false;
+        }
     }
 
     @Override
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
-        throw new UnsupportedOperationException("CUDA Tensor support coming soon via JCuda/cuDNN.");
+        ensureAvailable();
+        validateType(elementType);
+        
+        long totalElements = Arrays.stream(shape).asLongStream().reduce(1, (a, b) -> a * b);
+        long byteSize = totalElements * getSizeOf(elementType);
+        
+        Pointer ptr = new Pointer();
+        JCuda.cudaMalloc(ptr, byteSize);
+        JCuda.cudaMemset(ptr, 0, byteSize); // 0 byte pattern works for float/double 0.0
+        
+        return new CUDATensor<>(ptr, shape, elementType);
     }
 
     @Override
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
-        throw new UnsupportedOperationException("CUDA Tensor support coming soon via JCuda/cuDNN.");
+        ensureAvailable();
+        validateType(elementType);
+        
+        long totalElements = Arrays.stream(shape).asLongStream().reduce(1, (a, b) -> a * b);
+        
+        // Host allocation
+        if (elementType == Float.class) {
+            float[] hostData = new float[(int)totalElements];
+            Arrays.fill(hostData, 1.0f);
+            return createFromPrimitive(hostData, shape, elementType);
+        } else { // Double
+            double[] hostData = new double[(int)totalElements];
+            Arrays.fill(hostData, 1.0d);
+            return createFromPrimitive(hostData, shape, elementType);
+        }
     }
 
     @Override
     public <T> Tensor<T> create(T[] data, int... shape) {
-        throw new UnsupportedOperationException("CUDA Tensor support coming soon via JCuda/cuDNN.");
+        ensureAvailable();
+        if (data.length == 0) throw new IllegalArgumentException("Empty data");
+        Class<?> componentType = data.getClass().getComponentType();
+        // Since T is erased, we rely on array component type or passed implicit knowledge
+        // But create signature is create(T[] data...).
+        // We need to unbox.
+        
+        // This Cast is unchecked but necessary
+        @SuppressWarnings("unchecked")
+        Class<T> elementType = (Class<T>) componentType; 
+        validateType(elementType);
+        
+        long expectedSize = Arrays.stream(shape).asLongStream().reduce(1, (a, b) -> a * b);
+        if (data.length != expectedSize) {
+            throw new IllegalArgumentException("Data length " + data.length + " does not match shape size " + expectedSize);
+        }
+
+        if (elementType == Float.class) {
+            float[] primitives = new float[data.length];
+            for(int i=0; i<data.length; i++) primitives[i] = ((Number)data[i]).floatValue();
+            return createFromPrimitive(primitives, shape, elementType);
+        } else {
+            double[] primitives = new double[data.length];
+            for(int i=0; i<data.length; i++) primitives[i] = ((Number)data[i]).doubleValue();
+            return createFromPrimitive(primitives, shape, elementType);
+        }
+    }
+
+    private <T> Tensor<T> createFromPrimitive(Object primitiveArray, int[] shape, Class<T> type) {
+        long byteSize;
+        Pointer hostPtr;
+        if (type == Float.class) {
+            float[] arr = (float[]) primitiveArray;
+            byteSize = (long)arr.length * Sizeof.FLOAT;
+            hostPtr = Pointer.to(arr);
+        } else {
+            double[] arr = (double[]) primitiveArray;
+            byteSize = (long)arr.length * Sizeof.DOUBLE;
+            hostPtr = Pointer.to(arr);
+        }
+        
+        Pointer devicePtr = new Pointer();
+        JCuda.cudaMalloc(devicePtr, byteSize);
+        JCuda.cudaMemcpy(devicePtr, hostPtr, byteSize, cudaMemcpyKind.cudaMemcpyHostToDevice);
+        
+        return new CUDATensor<>(devicePtr, shape, type);
+    }
+
+    private void ensureAvailable() {
+        if (!isAvailable()) throw new UnsupportedOperationException("CUDA is not available on this system.");
+    }
+    
+    private void validateType(Class<?> type) {
+        if (type != Float.class && type != Double.class) {
+            throw new UnsupportedOperationException("Native CUDA Tensor only supports Float and Double, got: " + type.getName());
+        }
+    }
+
+    private int getSizeOf(Class<?> type) {
+        return (type == Float.class) ? Sizeof.FLOAT : Sizeof.DOUBLE;
     }
 
     @Override
@@ -67,4 +149,3 @@ public class NativeCUDATensorProvider implements TensorProvider {
         return "CUDA GPU Neural";
     }
 }
-

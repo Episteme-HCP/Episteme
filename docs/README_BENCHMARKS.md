@@ -46,5 +46,5 @@ To add a new systematic benchmark:
 
 ## Status
 - **HDF5 I/O**: Benchmarks for native Read/Write (via Bytedeco HDF5) are implemented.
-- **Vector API (SIMD)**: Pending final integration.
+- **Vector API (SIMD)**: Implemented. Leverage JDK Vector instructions (AVX-512/NEON) for matrix operations via SIMDRealLinearAlgebraProvider.
 - **Native Providers**: Supported via `jscience-native` module.

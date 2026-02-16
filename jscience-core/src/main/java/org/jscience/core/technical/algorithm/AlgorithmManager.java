@@ -8,10 +8,19 @@ package org.jscience.core.technical.algorithm;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.BackendDiscovery;
 
 /**
  * Universal manager for algorithm providers.
- * Discovery is based on ServiceProviderInterface (SPI) and priority.
+ * <p>
+ * Discovery uses two converging paths:
+ * <ol>
+ * <li>{@code ServiceLoader<AlgorithmProvider>} — direct SPI registration</li>
+ * <li>{@link BackendDiscovery} — via {@link Backend#getAlgorithmProviders()}</li>
+ * </ol>
+ * Results from both paths are merged, deduplicated, and sorted by priority.
+ * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -30,7 +39,7 @@ public final class AlgorithmManager {
      * @param <P> the provider type
      * @param providerClass the interface class of the provider
      * @return the best available provider
-     * @throws RuntimeException if no provider is found (including fallbacks)
+     * @throws NoSuchElementException if no provider is found
      */
     @SuppressWarnings("unchecked")
     public static <P extends AlgorithmProvider> P getProvider(Class<P> providerClass) {
@@ -39,21 +48,41 @@ public final class AlgorithmManager {
 
     /**
      * Finds and returns all available providers for the given interface, sorted by priority.
+     * <p>
+     * Merges providers from both the AlgorithmProvider SPI and the Backend SPI
+     * (via {@link Backend#getAlgorithmProviders()}).
+     * </p>
      * 
      * @param <P> the provider type
      * @param providerClass the interface class of the provider
-     * @return list of available providers (modifiable copy)
+     * @return list of available providers sorted by priority (descending)
      */
     public static <P extends AlgorithmProvider> List<P> getProviders(Class<P> providerClass) {
-        ServiceLoader<P> loader = ServiceLoader.load(providerClass);
+        // Use IdentityHashMap to deduplicate by instance identity
+        Set<AlgorithmProvider> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         List<P> available = new ArrayList<>();
-        
+
+        // Path 1: Direct SPI discovery
+        ServiceLoader<P> loader = ServiceLoader.load(providerClass);
         for (P provider : loader) {
-            if (provider.isAvailable()) {
+            if (provider.isAvailable() && seen.add(provider)) {
                 available.add(provider);
             }
         }
-        
+
+        // Path 2: Backend-bridged discovery
+        try {
+            for (Backend backend : BackendDiscovery.getInstance().getProviders()) {
+                for (AlgorithmProvider ap : backend.getAlgorithmProviders()) {
+                    if (providerClass.isInstance(ap) && ap.isAvailable() && seen.add(ap)) {
+                        available.add(providerClass.cast(ap));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.fine("BackendDiscovery not available for provider bridge: " + e.getMessage());
+        }
+
         available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
         return available;
     }
@@ -77,3 +106,4 @@ public final class AlgorithmManager {
         BEST_PROVIDERS.clear();
     }
 }
+

@@ -9,18 +9,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for MediaFactory.
+ * Automated baseline test for AudioBackendManager (replaces MediaFactory).
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public class MediaFactoryTest {
+public class AudioBackendManagerTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(MediaFactory.class);
+        assertNotNull(AudioBackendManager.class);
     }
 }
-
