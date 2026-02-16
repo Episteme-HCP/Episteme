@@ -33,12 +33,19 @@ public class VLCJBackendProvider implements Backend {
     @Override public String getId() { return "vlcj"; }
     @Override public String getName() { return "VLCJ (Native VLC)"; }
     @Override public String getDescription() { return "Bindings to native VLC player."; }
+    private static Boolean availableCache = null;
+
     @Override 
     public boolean isAvailable() { 
+        if (availableCache != null) return availableCache;
         try {
             Class.forName("uk.co.caprica.vlcj.factory.MediaPlayerFactory");
+            // Try to initialize factory to check native libs
+            new uk.co.caprica.vlcj.factory.MediaPlayerFactory().release();
+            availableCache = true;
             return true;
         } catch (Throwable t) {
+            availableCache = false;
             return false;
         }
     } 
