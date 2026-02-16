@@ -26,7 +26,7 @@ package org.jscience.core.media.audio.verification;
 import org.jscience.core.media.audio.AudioBuffer;
 import org.jscience.core.media.audio.AudioEqualizer;
 import org.jscience.core.media.audio.AudioProvider;
-import org.jscience.core.media.audio.providers.JavaSoundAudioAlgorithmProvider;
+import org.jscience.core.media.backends.JavaSoundBackend;
 import org.jscience.core.media.audio.ops.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +38,7 @@ public class AudioVerification {
 
     @Test
     public void testAudioOps() {
-        AudioProvider<AudioBuffer> provider = new JavaSoundAudioAlgorithmProvider();
+        AudioProvider<AudioBuffer> provider = new JavaSoundBackend();
         
         // Create a 1-second sine wave at 440Hz (mono, 44100Hz)
         int sampleRate = 44100;

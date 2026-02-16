@@ -24,7 +24,7 @@
 package org.jscience.social.ui.viewers.geography;
 
 import org.jscience.core.technical.backend.Backend;
-import org.jscience.social.ui.viewers.geography.backends.JavaFXMapBackendProvider;
+import org.jscience.social.ui.viewers.geography.backends.JavaFXMapBackend;
 
 /**
  * Factory for creating maps using SPI-based backend discovery.
@@ -70,7 +70,7 @@ public class MapFactory {
         }
 
         // Ultimate fallback
-        return new JavaFXMapBackendProvider().createBackend();
+        return new JavaFXMapBackend().createBackend();
     }
     
     /**

@@ -104,7 +104,7 @@ public class VMDMolecularRenderer implements MolecularRenderer {
 
     @Override
     public MolecularBackend getBackend() {
-        return new VMDMolecularBackendProvider();
+        return new VMDMolecularBackend();
     }
 
     public void launchVMD() {

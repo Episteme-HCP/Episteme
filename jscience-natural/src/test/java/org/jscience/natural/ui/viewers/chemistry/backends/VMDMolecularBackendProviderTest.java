@@ -9,18 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for VMDMolecularBackendProvider.
+ * Automated baseline test for VMDMolecularBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VMDMolecularBackendProviderTest {
+public class VMDMolecularBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(VMDMolecularBackendProvider.class);
+        assertNotNull(VMDMolecularBackend.class);
     }
 }
 

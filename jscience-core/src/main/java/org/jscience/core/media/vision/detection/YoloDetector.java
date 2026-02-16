@@ -32,14 +32,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
-import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackendProvider;
+import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackend;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 
 /**
  * Wrapper for YOLO (You Only Look Once) Object Detection models.
  * <p>
- * Uses {@link ONNXRuntimeBackendProvider} to execute YOLOv8 models.
+ * Uses {@link ONNXRuntimeBackend} to execute YOLOv8 models.
  * Provides sophisticated pre-processing and post-processing (NMS).
  * </p>
  *
@@ -52,7 +52,7 @@ public class YoloDetector {
     private static final float CONFIDENCE_THRESHOLD = 0.25f;
     private static final float IOU_THRESHOLD = 0.45f;
 
-    private final ONNXRuntimeBackendProvider.ONNXSession session;
+    private final ONNXRuntimeBackend.ONNXSession session;
     private final List<String> labels;
 
     /**

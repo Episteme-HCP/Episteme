@@ -16,6 +16,14 @@ import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.nativ.NativeBackend;
+import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.mathematics.sets.Reals;
 
 /**
  * Robust CUDA acceleration backend using Project Panama to interface with CUDA and CUBLAS.
@@ -24,8 +32,10 @@ import org.jscience.core.technical.backend.nativ.NativeBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class})
-public class NativeCUDABackend implements GPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
+public class NativeCUDABackend implements GPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
+
+    private final StandardLinearAlgebraProvider<Real> fallback = new StandardLinearAlgebraProvider<>();
 
     private final SymbolLookup cuda;
     private final SymbolLookup cublas;
@@ -207,5 +217,105 @@ public class NativeCUDABackend implements GPUBackend, NativeBackend {
                 // No-op
             }
         };
+    }
+    // LinearAlgebraProvider Implementation
+
+    @Override
+    public boolean isCompatible(Ring<?> ring) {
+        return ring instanceof Reals;
+    }
+
+    @Override
+    public int getPriority() {
+        return 100; // High priority when available
+    }
+
+    @Override
+    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+        // Bridge to GPU matrixMultiply(DoubleBuffer...)
+        int m = a.rows();
+        int k = a.cols();
+        int n = b.cols();
+        
+        if (k != b.rows()) throw new IllegalArgumentException("Dimension mismatch");
+        
+        // Convert to DoubleBuffers (simple copy for now)
+        // In a real optimized system, we'd handle data directly on GPU
+        DoubleBuffer da = toDoubleBuffer(a);
+        DoubleBuffer db = toDoubleBuffer(b);
+        DoubleBuffer dc = DoubleBuffer.allocate(m * n);
+        
+        matrixMultiply(da, db, dc, m, n, k);
+        
+        return fromDoubleBuffer(dc, m, n);
+    }
+    
+    @Override
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+        // Future: GPU addition
+        return fallback.add(a, b);
+    }
+
+    @Override
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+        return fallback.subtract(a, b);
+    }
+    
+    @Override
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        return fallback.scale(scalar, a);
+    }
+    
+    @Override
+    public Matrix<Real> transpose(Matrix<Real> a) {
+        return fallback.transpose(a);
+    }
+
+    @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        return fallback.multiply(a, b); // Future: GEMV
+    }
+
+    @Override
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return fallback.add(a, b); }
+    @Override
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return fallback.subtract(a, b); }
+    @Override
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { return fallback.multiply(vector, scalar); }
+    @Override
+    public Real dot(Vector<Real> a, Vector<Real> b) { return fallback.dot(a, b); }
+    @Override
+    public Real norm(Vector<Real> a) { return fallback.norm(a); }
+    @Override
+    public Matrix<Real> inverse(Matrix<Real> a) { return fallback.inverse(a); }
+    @Override
+    public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
+    @Override
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return fallback.solve(a, b); }
+
+    // Helpers
+    private DoubleBuffer toDoubleBuffer(Matrix<Real> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        DoubleBuffer buf = DoubleBuffer.allocate(rows * cols);
+        for(int i=0; i<rows; i++) {
+            for(int j=0; j<cols; j++) {
+                buf.put(m.get(i, j).doubleValue());
+            }
+        }
+        buf.flip();
+        return buf;
+    }
+    
+    private Matrix<Real> fromDoubleBuffer(DoubleBuffer buf, int rows, int cols) {
+        double[] data = new double[rows * cols];
+        buf.get(data);
+        Real[] reals = new Real[data.length];
+        for(int i=0; i<data.length; i++) reals[i] = Real.of(data[i]);
+        
+        return new org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<Real>(
+            reals, rows, cols, 
+            org.jscience.core.mathematics.sets.Reals.getInstance()
+        );
     }
 }

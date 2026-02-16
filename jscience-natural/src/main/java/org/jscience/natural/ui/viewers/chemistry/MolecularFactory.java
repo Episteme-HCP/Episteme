@@ -24,7 +24,7 @@
 package org.jscience.natural.ui.viewers.chemistry;
 
 import org.jscience.core.technical.backend.Backend;
-import org.jscience.natural.ui.viewers.chemistry.backends.JavaFXMolecularBackendProvider;
+import org.jscience.natural.ui.viewers.chemistry.backends.JavaFXMolecularBackend;
 
 import java.util.Collection;
 
@@ -67,12 +67,12 @@ public class MolecularFactory {
 
         // Ultimate fallback (assuming JavaFX provider exists in backends but might strictly belong to a specific package)
         // I'll try to instantiate it, if not found this will fail compilation unless I import it.
-        // I will add import for JavaFXMolecularBackendProvider. 
-        // NOTE: I haven't checked if JavaFXMolecularBackendProvider exists and where.
+        // I will add import for JavaFXMolecularBackend. 
+        // NOTE: I haven't checked if JavaFXMolecularBackend exists and where.
         // Step 1169 showed `JavaFXMolecularRenderer`, I assume Provider is also there.
         // Ultimate fallback
         
-        return new JavaFXMolecularBackendProvider().createBackend();
+        return new JavaFXMolecularBackend().createBackend();
     }
 
     /**

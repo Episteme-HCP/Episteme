@@ -23,8 +23,8 @@
 package org.jscience.core.mathematics.loaders;
 
 import org.jscience.core.io.AbstractResourceReader;
-import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackendProvider;
-import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackendProvider.ONNXSession;
+import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackend;
+import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackend.ONNXSession;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,7 +56,7 @@ public class ONNXModelReader extends AbstractResourceReader<ONNXSession> {
         // ID is expected to be a file path
         Path modelPath = Paths.get(id);
         
-        ONNXRuntimeBackendProvider provider = new ONNXRuntimeBackendProvider(); // Could be singleton/injected
+        ONNXRuntimeBackend provider = new ONNXRuntimeBackend(); // Could be singleton/injected
         ONNXSession session = provider.loadModel(modelPath);
         
         if (session == null) {

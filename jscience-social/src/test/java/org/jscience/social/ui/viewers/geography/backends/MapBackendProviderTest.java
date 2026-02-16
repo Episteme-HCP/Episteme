@@ -38,7 +38,7 @@ public class MapBackendProviderTest {
 
     @Test
     void testJavaFXMapBackend() {
-        JavaFXMapBackendProvider provider = new JavaFXMapBackendProvider();
+        JavaFXMapBackend provider = new JavaFXMapBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("javafx_map", provider.getId());
@@ -50,7 +50,7 @@ public class MapBackendProviderTest {
 
     @Test
     void testGeoToolsBackend() {
-        GeoToolsBackendProvider provider = new GeoToolsBackendProvider();
+        GeoToolsBackend provider = new GeoToolsBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("geotools", provider.getId());
@@ -62,7 +62,7 @@ public class MapBackendProviderTest {
 
     @Test
     void testOpenMapBackend() {
-        OpenMapBackendProvider provider = new OpenMapBackendProvider();
+        OpenMapBackend provider = new OpenMapBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("openmap", provider.getId());
@@ -73,7 +73,7 @@ public class MapBackendProviderTest {
 
     @Test
     void testUnfoldingMapBackend() {
-        UnfoldingMapBackendProvider provider = new UnfoldingMapBackendProvider();
+        UnfoldingMapBackend provider = new UnfoldingMapBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("unfolding", provider.getId());
@@ -84,7 +84,7 @@ public class MapBackendProviderTest {
 
     @Test
     void testGoogleGeoChartBackend() {
-        GoogleGeoChartBackendProvider provider = new GoogleGeoChartBackendProvider();
+        GoogleGeoChartBackend provider = new GoogleGeoChartBackend();
         
         assertEquals("map", provider.getType());
         assertEquals("geochart", provider.getId());

@@ -24,7 +24,7 @@
 package org.jscience.core.ui.viewers.mathematics.discrete;
 
 import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.ui.viewers.mathematics.discrete.backends.JavaFXGraphBackendProvider;
+import org.jscience.core.ui.viewers.mathematics.discrete.backends.JavaFXGraphBackend;
 
 import java.util.Collection;
 
@@ -66,7 +66,7 @@ public class GraphFactory {
         }
 
         // Ultimate fallback
-        return new JavaFXGraphBackendProvider().createBackend();
+        return new JavaFXGraphBackend().createBackend();
     }
 
     /**

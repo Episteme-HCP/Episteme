@@ -9,18 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for JavaFXMolecularBackendProvider.
+ * Automated baseline test for JavaFXMolecularBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JavaFXMolecularBackendProviderTest {
+public class JavaFXMolecularBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(JavaFXMolecularBackendProvider.class);
+        assertNotNull(JavaFXMolecularBackend.class);
     }
 }
 

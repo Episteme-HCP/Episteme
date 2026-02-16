@@ -113,7 +113,7 @@ public class PyMOLMolecularRenderer implements MolecularRenderer {
 
     @Override
     public MolecularBackend getBackend() {
-        return new PyMOLMolecularBackendProvider();
+        return new PyMOLMolecularBackend();
     }
 
     /**

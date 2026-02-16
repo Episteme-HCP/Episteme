@@ -207,7 +207,7 @@ public class JmolMolecularRenderer implements MolecularRenderer {
 
     @Override
     public MolecularBackend getBackend() {
-        return new JmolMolecularBackendProvider();
+        return new JmolMolecularBackend();
     }
 
     /**

@@ -222,7 +222,7 @@ public class JavaFXMolecularRenderer implements MolecularRenderer {
 
     @Override
     public MolecularBackend getBackend() {
-        return new JavaFXMolecularBackendProvider();
+        return new JavaFXMolecularBackend();
     }
 }
 

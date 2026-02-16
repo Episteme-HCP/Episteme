@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoToolsBackendProviderTest {
+public class GeoToolsBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(GeoToolsBackendProvider.class);
+        assertNotNull(GeoToolsBackend.class);
     }
 }
 
