@@ -59,11 +59,11 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements SparseLinearAlgebra
 
     /**
      * Public no-arg constructor required by ServiceLoader.
-     * Provider is not usable without a Field — isAvailable() returns false.
+     * Defaults to Reals field.
      */
+    @SuppressWarnings("unchecked")
     public OpenCLSparseLinearAlgebraProvider() {
-        this.cpuProvider = null;
-        this.initialized = false;
+        this((Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     public OpenCLSparseLinearAlgebraProvider(Field<E> field) {
