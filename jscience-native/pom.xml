@@ -15,9 +15,9 @@
     <description>Native library integration via Project Panama (FFM API)</description>
 
     <properties>
-        <!-- Requires Java 21+ for stable FFM API -->
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <!-- Requires Java 25 (Project Panama / Valhalla) -->
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -114,8 +114,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <!-- IMPORTANT: Ensure your IDE is configured for Java 21 for this module -->
-                    <release>21</release>
+                    <!-- IMPORTANT: Ensure your IDE is configured for Java 25 for this module -->
+                    <release>25</release>
                     <compilerArgs>
                         <!-- FFM is standard in 22+, but let's ensure preview is enabled if needed for other libs -->
                         <arg>--enable-preview</arg>
