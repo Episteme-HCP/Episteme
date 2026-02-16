@@ -28,3 +28,19 @@ jobs:
       # Currently skips tests because they are known to be broken.
       # TODO: Re-enable tests once Unit Tests are fixed.
       run: mvn -B package -DskipTests --file pom.xml
+
+    - name: Run Benchmarks (CLI)
+      # Run benchmarks and export JSON. 
+      # Note: Native libs for HDF5/OpenCL might be missing on GitHub runners, 
+      # but checks should skip them gracefully.
+      shell: bash
+      run: |
+        java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED \
+        -cp jscience-benchmarks/target/jscience-benchmarks.jar \
+        org.jscience.benchmarks.cli.BenchmarkCLI --run-all --export-file benchmark-results.json
+
+    - name: Upload Benchmark Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmark-results-${{ matrix.os }}
+        path: benchmark-results.json

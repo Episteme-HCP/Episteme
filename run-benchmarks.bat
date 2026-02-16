@@ -2,13 +2,12 @@
 setlocal
 
 rem --- Argument Parsing ---
-set "USE_SHADED_JAR="
+set APP_CLASS=org.jscience.benchmarks.ui.JScienceBenchmarkingApp
 for %%a in (%*) do (
+    if "%%a"=="--cli" set APP_CLASS=org.jscience.benchmarks.cli.BenchmarkCLI
     if "%%a"=="--shaded" set USE_SHADED_JAR=true
     if "%%a"=="-jar" set USE_SHADED_JAR=true
 )
-
-set APP_CLASS=org.jscience.benchmarks.benchmark.BenchmarkRunner
 set JAR_PATH=jscience-benchmarks\target\jscience-benchmarks.jar
 set LIB_DIR=launchers\lib
 set DEPENDENCY_DIR=jscience-benchmarks\target\dependency
