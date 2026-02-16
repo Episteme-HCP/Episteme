@@ -129,9 +129,20 @@ public class MasterControlLibrariesUITest {
         assertTrue(foundSpark, "Apache Spark should be listed in Libraries tab");
     }
 
+    private boolean isMPJAvailable() {
+        try {
+            Class.forName("mpi.MPI");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
     @Test
-    @org.junit.jupiter.api.Disabled("MPJ library is optional and may not be present on all environments")
     void testMPJLibraryDisplayed(FxRobot robot) {
+        // Only run this test if MPJ is actually present in the classpath
+        org.junit.jupiter.api.Assumptions.assumeTrue(isMPJAvailable(), "MPJ library not found in classpath - skipping UI check");
+
         // Navigate to Libraries tab
         robot.clickOn("#tab-libraries");
 
