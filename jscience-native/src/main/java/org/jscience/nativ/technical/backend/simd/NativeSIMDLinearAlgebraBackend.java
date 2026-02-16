@@ -27,7 +27,6 @@ import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgeb
  * @since 1.2
  */
 import jdk.incubator.vector.DoubleVector;
-import static jdk.incubator.vector.VectorOperators.ADD;
 import jdk.incubator.vector.VectorSpecies;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
@@ -191,7 +190,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
                  var vX = DoubleVector.fromArray(species, x, j);
                  vSum = vSum.add(vA.mul(vX));
             }
-            sum = vSum.reduceLanes(ADD);
+            sum = vSum.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
             for (; j < n; j++) {
                 sum += data[i*n + j] * x[j];
             }
@@ -284,7 +283,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
             DoubleVector vb = DoubleVector.fromArray(SPECIES, bData, i);
             sum = sum.add(va.mul(vb));
         }
-        double res = sum.reduceLanes(ADD);
+        double res = sum.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
         
         for (; i < n; i++) {
             res += aData[i] * bData[i];
