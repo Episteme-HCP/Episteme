@@ -40,7 +40,7 @@
  */
 package org.jscience.nativ.technical.algorithm.inference;
 
-import org.jscience.core.mathematics.ml.MLProvider;
+import org.jscience.core.technical.algorithm.MLProvider;
 import java.util.stream.IntStream;
 
 import java.util.Random;
@@ -52,7 +52,20 @@ import java.util.Random;
 public class NativeMulticoreMLProvider implements MLProvider {
 
     @Override
-    public int[] kMeans(double[][] data, int k, int maxIterations) {
+    public int[] kMeans(org.jscience.core.mathematics.numbers.real.Real[][] data, int k, int maxIterations) {
+        int n = data.length;
+        int d = data[0].length;
+        double[][] doubleData = new double[n][d];
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<d; j++) {
+                doubleData[i][j] = data[i][j].doubleValue();
+            }
+        }
+        
+        return kMeansDouble(doubleData, k, maxIterations);
+    }
+
+    private int[] kMeansDouble(double[][] data, int k, int maxIterations) {
         int n = data.length;
         int d = data[0].length;
         double[][] centroids = new double[k][d];
@@ -70,7 +83,6 @@ public class NativeMulticoreMLProvider implements MLProvider {
         while(changed && iter < maxIterations) {
             changed = false;
             iter++;
-            final boolean[] iterationChanged = {false};
             
             // Parallel assignment
             double[][] currentCentroids = centroids;
@@ -116,9 +128,7 @@ public class NativeMulticoreMLProvider implements MLProvider {
     }
 
     @Override
-    public double[][] pca(double[][] data, int nComponents) {
-        // Placeholder for SVD-based PCA
-        // In a real native implementation, we'd call LAPACK or cuSolver
+    public org.jscience.core.mathematics.numbers.real.Real[][] pca(org.jscience.core.mathematics.numbers.real.Real[][] data, int nComponents) {
         throw new UnsupportedOperationException("Native PCA not fully implemented yet");
     }
 

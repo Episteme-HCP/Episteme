@@ -92,7 +92,7 @@ public class SystematicFEMBenchmark implements SystematicBenchmark<FEMProvider> 
         testMesh.indexNodes();
         
         // Simple source term: f(x) = 1.0
-        sourceTerm = (vec) -> Real.valueOf(1.0);
+        sourceTerm = (vec) -> Real.of(1.0);
     }
 
     @Override

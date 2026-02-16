@@ -157,6 +157,7 @@ public class PCA {
 
         int n = data.length;
         int d = data[0].length;
+        int nComponents = components.cols();
         // Center data
         Real[][] centered = new Real[n][d];
         for (int i = 0; i < n; i++) {
