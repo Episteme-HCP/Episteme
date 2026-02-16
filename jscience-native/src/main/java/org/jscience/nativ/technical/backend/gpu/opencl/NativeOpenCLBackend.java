@@ -15,6 +15,7 @@ import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.technical.backend.nativ.NativeBackend;
 
 /**
  * OpenCL acceleration backend using Project Panama to interface with OpenCL.
@@ -27,8 +28,8 @@ import org.jscience.core.technical.backend.ComputeBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class})
-public class NativeOpenCLBackend implements GPUBackend {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class})
+public class NativeOpenCLBackend implements GPUBackend, NativeBackend {
 
     @SuppressWarnings("unused") // Reserved for future OpenCL implementation
     private final SymbolLookup opencl;
@@ -195,6 +196,16 @@ public class NativeOpenCLBackend implements GPUBackend {
     @Override
     public boolean isAvailable() {
         return available;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return available;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "OpenCL";
     }
 
     @Override

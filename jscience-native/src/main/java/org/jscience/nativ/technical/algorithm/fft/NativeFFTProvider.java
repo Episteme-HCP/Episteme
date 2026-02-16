@@ -17,6 +17,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.FFTProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.backend.nativ.NativeBackend;
 
 /**
  * FFTW3 implementation of FFTProvider using Project Panama.
@@ -25,8 +26,8 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({FFTProvider.class, AlgorithmProvider.class})
-public class NativeFFTProvider implements FFTProvider {
+@AutoService({FFTProvider.class, AlgorithmProvider.class, NativeBackend.class})
+public class NativeFFTProvider implements FFTProvider, NativeBackend {
 
     private static MethodHandle DPLAN_R2C_1D;
     private static MethodHandle DPLAN_C2R_1D;
@@ -36,6 +37,17 @@ public class NativeFFTProvider implements FFTProvider {
 
     private static boolean initialized = false;
     private static boolean available = false;
+
+    @Override
+    public boolean isLoaded() {
+        ensureInitialized();
+        return available;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "fftw3";
+    }
 
     private static synchronized void ensureInitialized() {
         if (initialized) return;

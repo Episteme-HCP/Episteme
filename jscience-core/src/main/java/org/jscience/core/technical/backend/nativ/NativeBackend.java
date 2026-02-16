@@ -5,24 +5,32 @@
 
 package org.jscience.core.technical.backend.nativ;
 
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.core.technical.backend.ExecutionContext;
-
 /**
- * Base interface for native backends that use JNI, FFM/Panama, or other
- * native interop mechanisms.
+ * Mixin interface for backends that load native libraries via JNI, Panama FFM,
+ * or other native interop mechanisms.
  * <p>
- * Extends {@link ComputeBackend} to provide full compute capabilities
- * (context creation, hardware queries) alongside native library management.
- * The package name 'nativ' avoids collision with the Java 'native' keyword.
+ * This is a <b>capability interface</b>, not a position in the
+ * {@link org.jscience.core.technical.backend.ComputeBackend} hierarchy.
+ * Any backend type (CPU, GPU, SIMD, etc.) can additionally implement
+ * {@code NativeBackend} to indicate it relies on native code.
+ * </p>
+ * <p>
+ * Examples:
+ * <ul>
+ *   <li>{@code NativeBLASBackend implements ComputeBackend, NativeBackend}
+ *       — CPU BLAS via Panama FFM</li>
+ *   <li>{@code NativeCUDABackend implements GPUBackend, NativeBackend}
+ *       — CUDA via Panama FFM</li>
+ *   <li>{@code NativeOpenCLBackend implements GPUBackend, NativeBackend}
+ *       — OpenCL via Panama FFM</li>
+ * </ul>
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public interface NativeBackend extends ComputeBackend {
+public interface NativeBackend {
 
     /**
      * Checks if the native library is loaded and available.
@@ -31,18 +39,12 @@ public interface NativeBackend extends ComputeBackend {
      */
     boolean isLoaded();
 
-    @Override
-    default boolean isAvailable() {
-        return isLoaded();
-    }
-
-    @Override
-    default HardwareAccelerator getAcceleratorType() {
-        return HardwareAccelerator.CPU; // Default; subinterfaces may override for GPU/FPGA
-    }
-
-    @Override
-    default String getType() {
-        return "native";
+    /**
+     * Returns the name of the native library this backend depends on.
+     *
+     * @return library name (e.g., "openblas", "cuda", "fftw3")
+     */
+    default String getNativeLibraryName() {
+        return "unknown";
     }
 }

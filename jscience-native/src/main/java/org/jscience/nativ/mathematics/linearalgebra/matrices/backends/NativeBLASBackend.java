@@ -38,8 +38,8 @@ import java.util.ArrayList;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({NativeBackend.class, ComputeBackend.class, AlgorithmProvider.class})
-public class NativeBLASBackend implements NativeBackend, LinearAlgebraProvider<Real> {
+@AutoService({ComputeBackend.class, NativeBackend.class, AlgorithmProvider.class})
+public class NativeBLASBackend implements ComputeBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;
     private static final MethodHandle DGEMV_HANDLE;
@@ -146,6 +146,11 @@ public class NativeBLASBackend implements NativeBackend, LinearAlgebraProvider<R
     @Override
     public boolean isLoaded() {
         return AVAILABLE;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "openblas";
     }
 
     @Override
