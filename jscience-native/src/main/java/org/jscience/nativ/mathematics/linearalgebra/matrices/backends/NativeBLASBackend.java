@@ -14,6 +14,7 @@ import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.HardwareAccelerator;
+import org.jscience.core.technical.backend.nativ.NativeBackend;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -30,14 +31,15 @@ import java.util.ArrayList;
  * <p>
  * Provides both low-level BLAS operations (dgemm, dgemv, etc.) and
  * high-level {@link LinearAlgebraProvider} operations for {@link Real} elements.
+ * Implements {@link NativeBackend} to properly participate in native backend discovery.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({ComputeBackend.class, AlgorithmProvider.class})
-public class NativeBLASBackend implements ComputeBackend, LinearAlgebraProvider<Real> {
+@AutoService({NativeBackend.class, ComputeBackend.class, AlgorithmProvider.class})
+public class NativeBLASBackend implements NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;
     private static final MethodHandle DGEMV_HANDLE;
@@ -139,6 +141,11 @@ public class NativeBLASBackend implements ComputeBackend, LinearAlgebraProvider<
         DGETRI_HANDLE = dgetri;
         
         AVAILABLE = avail;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return AVAILABLE;
     }
 
     @Override
