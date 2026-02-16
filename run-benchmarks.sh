@@ -1,7 +1,7 @@
 #!/bin/bash
 # JScience Benchmarks Launcher
 
-APP_CLASS="org.jscience.benchmarks.benchmark.BenchmarkRunner"
+APP_CLASS="org.jscience.benchmarks.ui.JScienceBenchmarkingApp"
 JAR_PATH="jscience-benchmarks/target/jscience-benchmarks.jar"
 LIB_DIR="launchers/lib"
 MODULE_PATH="jscience-benchmarks/target/classes:jscience-core/target/classes:jscience-natural/target/classes:jscience-social/target/classes:jscience-native/target/classes"
@@ -11,6 +11,9 @@ USE_SHADED=false
 # Parse arguments
 for arg in "$@"
 do
+    if [ "$arg" == "--cli" ]; then
+        APP_CLASS="org.jscience.benchmarks.cli.BenchmarkCLI"
+    fi
     if [ "$arg" == "--shaded" ] || [ "$arg" == "-jar" ]; then
         USE_SHADED=true
     fi
