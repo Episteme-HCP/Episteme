@@ -24,19 +24,7 @@ public class NativeCUDANBodyProvider implements NBodyProvider {
     private static final Logger LOGGER = Logger.getLogger(NativeCUDANBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
-    private final boolean gpuAvailable;
 
-    public NativeCUDANBodyProvider() {
-        CUDABackend backend = null;
-        boolean available = false;
-        try {
-            backend = new CUDABackend();
-            available = backend.isAvailable();
-        } catch (Exception e) {
-            LOGGER.warning("CUDA initialization failed: " + e.getMessage());
-        }
-        this.gpuAvailable = available;
-    }
 
     @Override
     public int getPriority() {

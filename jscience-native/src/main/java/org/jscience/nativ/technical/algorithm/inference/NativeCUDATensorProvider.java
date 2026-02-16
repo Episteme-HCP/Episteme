@@ -40,6 +40,12 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  */
 @AutoService(AlgorithmProvider.class)
 public class NativeCUDATensorProvider implements TensorProvider {
+    
+    @Override
+    public boolean isAvailable() {
+        // Disabled: No true GPU implementation yet
+        return false;
+    }
 
     @Override
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {

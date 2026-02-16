@@ -24,18 +24,7 @@ public class NativeOpenCLNBodyProvider implements NBodyProvider {
     private static final Logger LOGGER = Logger.getLogger(NativeOpenCLNBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
-    private final boolean gpuAvailable;
 
-    public NativeOpenCLNBodyProvider() {
-        boolean available = false;
-        try {
-            OpenCLBackend backend = new OpenCLBackend();
-            available = backend.isAvailable();
-        } catch (Exception e) {
-            LOGGER.warning("OpenCL initialization failed: " + e.getMessage());
-        }
-        this.gpuAvailable = available;
-    }
 
     @Override
     public int getPriority() {

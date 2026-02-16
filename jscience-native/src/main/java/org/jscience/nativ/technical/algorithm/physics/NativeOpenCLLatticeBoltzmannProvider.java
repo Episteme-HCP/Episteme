@@ -36,18 +36,7 @@ public class NativeOpenCLLatticeBoltzmannProvider implements LatticeBoltzmannPro
 
     private static final int[] OPPOSITE = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
 
-    private final boolean gpuAvailable;
 
-    public NativeOpenCLLatticeBoltzmannProvider() {
-        boolean available = false;
-        try {
-            OpenCLBackend backend = new OpenCLBackend();
-            available = backend.isAvailable();
-        } catch (Exception e) {
-            LOGGER.warning("OpenCL initialization failed: " + e.getMessage());
-        }
-        this.gpuAvailable = available;
-    }
 
     @Override
     public int getPriority() {
@@ -56,7 +45,8 @@ public class NativeOpenCLLatticeBoltzmannProvider implements LatticeBoltzmannPro
 
     @Override
     public boolean isAvailable() {
-        return gpuAvailable;
+        // Disabled: No true GPU implementation yet (was CPU placeholder)
+        return false; 
     }
 
     @Override

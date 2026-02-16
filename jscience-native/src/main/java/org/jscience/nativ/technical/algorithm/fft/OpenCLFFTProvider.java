@@ -43,7 +43,8 @@ public class OpenCLFFTProvider implements FFTProvider {
 
     @Override
     public boolean isAvailable() {
-        return backend.isAvailable();
+        // Disabled: No true GPU implementation yet (was CPU placeholder)
+        return false;
     }
 
     @Override
