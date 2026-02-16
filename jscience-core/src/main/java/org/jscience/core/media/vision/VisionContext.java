@@ -53,12 +53,12 @@ public class VisionContext {
 
     private static final ThreadLocal<VisionContext> CURRENT = ThreadLocal.withInitial(() -> {
         VisionContext ctx = new VisionContext();
-        ctx.registerProvider(Backend.JAVA_AWT, new org.jscience.core.media.vision.providers.JavaAWTVisionAlgorithmProvider());
+        ctx.registerBackend(Backend.JAVA_AWT, new org.jscience.core.media.vision.backends.JavaAWTVisionBackend());
         return ctx;
     });
     
     private volatile Backend backend = Backend.JAVA_AWT;
-    private final Map<Backend, VisionProvider<?>> providers = new ConcurrentHashMap<>();
+    private final Map<Backend, VisionAlgorithmBackend<?>> backends = new ConcurrentHashMap<>();
 
     /**
      * Returns the current thread-local vision context.
@@ -79,18 +79,18 @@ public class VisionContext {
     }
     
     /**
-     * Registers a provider for a specific backend.
+     * Registers a backend implementation.
      */
-    public void registerProvider(Backend backend, VisionProvider<?> provider) {
-        providers.put(backend, provider);
+    public void registerBackend(Backend backend, VisionAlgorithmBackend<?> implementation) {
+        backends.put(backend, implementation);
     }
     
     /**
-     * Gets the provider for the current backend.
-     * @return the provider, cast to the expected type.
+     * Gets the implementation for the current backend.
+     * @return the backend implementation, cast to the expected type.
      */
     @SuppressWarnings("unchecked")
-    public <T> VisionProvider<T> getProvider() {
-        return (VisionProvider<T>) providers.get(backend);
+    public <T> VisionAlgorithmBackend<T> getBackendImplementation() {
+        return (VisionAlgorithmBackend<T>) backends.get(backend);
     }
 }

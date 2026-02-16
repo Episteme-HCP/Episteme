@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VMDMolecularBackendTest {
+public class VMDMolecularBackendProviderTest {
 
     @Test
     public void testClassPresence() {

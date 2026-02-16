@@ -6,7 +6,6 @@
 package org.jscience.benchmarks.benchmark.benchmarks;
 
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.benchmarks.benchmark.benchmarks.SystematicBenchmark;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
 import org.jscience.core.technical.backend.quantum.QuantumAlgorithmProvider;

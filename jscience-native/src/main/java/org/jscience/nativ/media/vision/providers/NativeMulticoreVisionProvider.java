@@ -23,13 +23,15 @@
 
 package org.jscience.nativ.media.vision.providers;
 
+import org.jscience.core.media.vision.VisionAlgorithmBackend;
 import org.jscience.core.media.vision.ImageOp;
-import org.jscience.core.media.vision.VisionProvider;
+import org.jscience.core.technical.backend.Backend;
+import com.google.auto.service.AutoService;
 import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
 
 /**
- * Implementation of VisionProvider using Java Parallel Streams (multicore CPU).
+ * Implementation of VisionAlgorithmBackend using Java Parallel Streams (multicore CPU).
  * <p>
  * This provider handles BufferedImage objects and parallelizes pixel operations
  * across available CPU cores.
@@ -39,7 +41,18 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class NativeMulticoreVisionProvider implements VisionProvider<BufferedImage> {
+@AutoService(Backend.class)
+public class NativeMulticoreVisionProvider implements VisionAlgorithmBackend<BufferedImage> {
+
+    @Override public String getType() { return "vision"; }
+    @Override public String getId() { return "native-multicore-vision"; }
+    @Override public String getDescription() { return "Parallel CPU image processing using Java Streams."; }
+    @Override public boolean isAvailable() { return true; }
+    
+    @Override
+    public Object createBackend() {
+        return this;
+    }
 
     @Override
     public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {

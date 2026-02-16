@@ -21,6 +21,7 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 @AutoService(LinearAlgebraProvider.class)
 public class StrassenLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> extends CPUDenseLinearAlgebraProvider<E> {
 
+    @SuppressWarnings("unchecked")
     public StrassenLinearAlgebraProvider() {
         super((org.jscience.core.mathematics.structures.rings.Field<E>) Reals.getInstance());
     }

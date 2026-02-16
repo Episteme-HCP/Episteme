@@ -48,8 +48,8 @@ public class SystematicMapBenchmark implements RunnableBenchmark {
         for (MapBackend backend : backends) {
             String name = backend.getName();
             String id = backend.getId();
-            boolean avail = backend.isAvailable();
-            String desc = backend.getDescription();
+            backend.isAvailable();
+            backend.getDescription();
             
             if (name == null || id == null) {
                 throw new RuntimeException("Invalid backend metadata for: " + backend.getClass().getName());

@@ -9,7 +9,6 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.FFTProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.mathematics.analysis.transform.DiscreteFourierTransform;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;

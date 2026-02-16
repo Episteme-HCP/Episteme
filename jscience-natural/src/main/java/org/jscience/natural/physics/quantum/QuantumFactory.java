@@ -26,7 +26,7 @@ package org.jscience.natural.physics.quantum;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
-import org.jscience.natural.physics.quantum.backends.PythonQuantumBackendProvider;
+import org.jscience.natural.physics.quantum.backends.PythonQuantumBackend;
 
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +72,7 @@ public class QuantumFactory {
         }
 
         // Fallback
-        return new PythonQuantumBackendProvider();
+        return new PythonQuantumBackend();
     }
 
     /**

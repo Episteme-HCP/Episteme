@@ -5,6 +5,7 @@
 
 package org.jscience.core.media.backends;
 
+import org.jscience.core.media.audio.backends.JavaSoundBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,4 +24,3 @@ public class JavaSoundBackendTest {
         assertNotNull(JavaSoundBackend.class);
     }
 }
-

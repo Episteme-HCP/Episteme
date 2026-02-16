@@ -55,6 +55,7 @@ public class ACO {
     
     private Random random = new Random();
     
+    @Deprecated
     public ACO(int numAnts, double[][] distanceMatrix) {
         this.numAnts = numAnts;
         this.distanceMatrix = distanceMatrix;
@@ -67,6 +68,7 @@ public class ACO {
         }
     }
     
+    @Deprecated
     public void solve(int maxIterations) {
         for (int i = 0; i < maxIterations; i++) {
              List<int[]> tours = new ArrayList<>();
@@ -175,10 +177,12 @@ public class ACO {
         }
     }
     
+    @Deprecated
     public int[] getBestTour() {
         return bestTour;
     }
     
+    @Deprecated
     public double getBestTourLength() {
         return bestTourLength;
     }

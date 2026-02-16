@@ -6,7 +6,6 @@
 package org.jscience.core.mathematics.linearalgebra.providers;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -18,6 +17,7 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 @AutoService(LinearAlgebraProvider.class)
 public class StandardLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> extends CPUDenseLinearAlgebraProvider<E> {
 
+    @SuppressWarnings("unchecked")
     public StandardLinearAlgebraProvider() {
         super((org.jscience.core.mathematics.structures.rings.Field<E>) Reals.getInstance());
         // Note: Field casting is a bit hacky here because CPUDense is generic but we mostly use it for Reals in benchmarks.

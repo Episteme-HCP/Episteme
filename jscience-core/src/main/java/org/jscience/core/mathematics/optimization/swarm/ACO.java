@@ -110,5 +110,6 @@ public class ACO {
     }
 
     public List<Integer> getBestTour() { return bestTour; }
+    public int getNumAnts() { return numAnts; }
     public double getBestTourLength() { return bestTourLength; }
 }

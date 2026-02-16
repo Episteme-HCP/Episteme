@@ -9,21 +9,22 @@ import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.mathematics.sets.Reals;
 
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.nativ.NativeBackend;
+import org.jscience.core.technical.backend.nativ.LibraryBackend;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.mathematics.sets.Reals;
+import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 
 /**
  * Robust CUDA acceleration backend using Project Panama to interface with CUDA and CUBLAS.
@@ -32,8 +33,8 @@ import org.jscience.core.mathematics.sets.Reals;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
-public class NativeCUDABackend implements GPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
+@AutoService({Backend.class, ComputeBackend.class, LibraryBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
+public class NativeCUDABackend implements GPUBackend, LibraryBackend, SparseLinearAlgebraProvider<Real> {
 
     private final StandardLinearAlgebraProvider<Real> fallback = new StandardLinearAlgebraProvider<>();
 

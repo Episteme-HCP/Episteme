@@ -24,7 +24,9 @@
 package org.jscience.nativ.media.vision.providers;
 
 import org.jscience.core.media.vision.ImageOp;
-import org.jscience.core.media.vision.VisionProvider;
+import org.jscience.core.media.vision.VisionAlgorithmBackend;
+import org.jscience.core.technical.backend.Backend;
+import com.google.auto.service.AutoService;
 
 /**
  * CUDA-accelerated vision provider.
@@ -33,30 +35,41 @@ import org.jscience.core.media.vision.VisionProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class NativeCUDAVisionProvider implements VisionProvider<Object> {
+@AutoService(Backend.class)
+public class NativeCUDAVisionProvider implements VisionAlgorithmBackend<Object> {
+
+    @Override public String getType() { return "vision"; }
+    @Override public String getId() { return "native-cuda-vision"; }
+    @Override public String getDescription() { return "GPU-accelerated image processing using NVIDIA CUDA."; }
+    @Override public boolean isAvailable() {
+        try {
+            // Basic JCuda check
+            Class.forName("jcuda.driver.JCudaDriver");
+            return true; 
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
+    }
 
     static {
         // Initialize JCuda
-        // CUdeviceptr etc. would be used here
     }
 
     @Override
     public Object apply(Object image, ImageOp<Object> op) {
-        // 1. Ensure image is on GPU (CUdeviceptr)
-        // 2. Map ImageOp to a CUDA kernel
-        // 3. Launch kernel
-        
         if (!(image instanceof jcuda.driver.CUdeviceptr)) {
-            // Placeholder for automatic upload if given a BufferedImage or byte array
             throw new IllegalArgumentException("Expected CUdeviceptr for CUDAVisionProvider");
         }
-        
         return op.process(image);
     }
 
     @Override
     public Object createImage(Object data, int width, int height) {
-        // Allocate GPU memory and upload data
         if (data instanceof int[]) {
             int[] pixels = (int[]) data;
             jcuda.driver.CUdeviceptr deviceData = new jcuda.driver.CUdeviceptr();
@@ -70,6 +83,7 @@ public class NativeCUDAVisionProvider implements VisionProvider<Object> {
     private static class Sizeof {
         static final int INT = 4;
     }
+
     @Override
     public String getName() {
         return "CUDA Vision Provider";

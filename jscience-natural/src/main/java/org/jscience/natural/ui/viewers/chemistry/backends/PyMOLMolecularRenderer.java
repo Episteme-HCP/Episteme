@@ -97,9 +97,6 @@ public class PyMOLMolecularRenderer implements MolecularRenderer {
 
     @Override
     public void setBackgroundColor(Color color) {
-        int r = (int) (color.getRed() * 255);
-        int g = (int) (color.getGreen() * 255);
-        int b = (int) (color.getBlue() * 255);
         // PyMOL uses 0-1 range or color names, but we can define standard colors
         // set_color bg_color, [r, g, b]
         // actually 'bg_color' command takes name or rgb

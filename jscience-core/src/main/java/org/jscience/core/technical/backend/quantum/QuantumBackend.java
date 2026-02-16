@@ -5,7 +5,6 @@
 
 package org.jscience.core.technical.backend.quantum;
 
-import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.technical.backend.ComputeBackend;

@@ -23,7 +23,7 @@
 
 package org.jscience.core.media;
 
-import org.jscience.core.media.backends.JavaSoundBackend;
+import org.jscience.core.media.audio.backends.JavaSoundBackend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 import org.jscience.core.technical.backend.Backend;
 import java.util.List;

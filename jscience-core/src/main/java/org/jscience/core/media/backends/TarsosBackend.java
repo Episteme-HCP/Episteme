@@ -37,6 +37,7 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
     private AudioDispatcher dispatcher;
     private FFT fft;
     private float[] magnitudes;
+    private double currentTime = 0;
     private ExecutorService executor;
     private boolean isPlaying = false;
 
@@ -84,6 +85,7 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
         dispatcher.addAudioProcessor(new AudioProcessor() {
             @Override
             public boolean process(AudioEvent audioEvent) {
+                currentTime = audioEvent.getTimeStamp();
                 float[] buffer = audioEvent.getFloatBuffer();
                 float[] fftBuffer = buffer.clone();
                 fft.forwardTransform(fftBuffer);
@@ -121,8 +123,7 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
 
     @Override
     public double getTime() {
-        // return (dispatcher != null) ? dispatcher.secondsProcessed() : 0;
-        return 0; // TODO: Fix TarsosDSP version mismatch for secondsProcessed()
+        return currentTime;
     }
 
     @Override

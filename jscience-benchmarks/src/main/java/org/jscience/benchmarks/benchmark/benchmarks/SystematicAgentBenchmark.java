@@ -9,8 +9,6 @@ import org.jscience.natural.computing.ai.agents.acl.ACLMessage;
 import org.jscience.natural.computing.ai.agents.providers.VirtualThreadAgentProvider;
 
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -99,8 +97,7 @@ public class SystematicAgentBenchmark implements RunnableBenchmark {
         @Override 
         public void run() {
             // Simulate agent "thinking"
-            double x = 0;
-            for(int i=0; i<1000; i++) x += Math.sin(i);
+            for(int i=0; i<1000; i++) Math.sin(i);
             
             // Signal completion
             latch.countDown();

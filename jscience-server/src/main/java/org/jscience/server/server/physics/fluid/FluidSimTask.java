@@ -27,6 +27,7 @@ import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.LatticeBoltzmannProvider;
+import org.jscience.core.technical.algorithm.physics.FluidSimPrimitiveSupport;
 
 public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask> {
 

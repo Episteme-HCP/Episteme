@@ -20,7 +20,7 @@ public class StrangeQuantumProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(StrangeBackendProvider.class);
+        assertNotNull(StrangeBackend.class);
     }
 }
 

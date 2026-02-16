@@ -2,7 +2,7 @@ package org.jscience.benchmarks.benchmark.benchmarks;
 
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.core.media.vision.VisionProvider;
+import org.jscience.core.media.vision.VisionAlgorithmBackend;
 import org.jscience.core.media.vision.ImageOp;
 
 /**
@@ -13,13 +13,17 @@ import org.jscience.core.media.vision.ImageOp;
  * @author Gemini AI (Google DeepMind)
  */
 @AutoService(RunnableBenchmark.class)
-public class SystematicVisionBenchmark implements SystematicBenchmark<VisionProvider> {
+public class SystematicVisionBenchmark implements SystematicBenchmark<VisionAlgorithmBackend<?>> {
 
-    private VisionProvider provider;
+    private VisionAlgorithmBackend<Object> provider;
     private Object image;
-    private final ImageOp identityOp = (img) -> img;
+    private final ImageOp<Object> identityOp = (img) -> img;
 
-    @Override public Class<VisionProvider> getProviderClass() { return VisionProvider.class; }
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<VisionAlgorithmBackend<?>> getProviderClass() { 
+        return (Class<VisionAlgorithmBackend<?>>) (Class<?>) VisionAlgorithmBackend.class; 
+    }
     @Override public String getIdPrefix() { return "vision-throughput"; }
     @Override public String getNameBase() { return "Computer Vision Throughput"; }
     
@@ -31,8 +35,9 @@ public class SystematicVisionBenchmark implements SystematicBenchmark<VisionProv
     @Override public String getAlgorithmProvider() { return provider != null ? provider.getName() : "None"; }
 
     @Override
-    public void setProvider(VisionProvider provider) {
-        this.provider = provider;
+    @SuppressWarnings("unchecked")
+    public void setProvider(VisionAlgorithmBackend<?> provider) {
+        this.provider = (VisionAlgorithmBackend<Object>) provider;
     }
 
     @Override
@@ -41,7 +46,6 @@ public class SystematicVisionBenchmark implements SystematicBenchmark<VisionProv
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void setup() {
         if (provider == null) throw new IllegalStateException("Provider not set");
         try {
@@ -53,7 +57,6 @@ public class SystematicVisionBenchmark implements SystematicBenchmark<VisionProv
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void run() {
         if (image != null) {
             provider.apply(image, identityOp);

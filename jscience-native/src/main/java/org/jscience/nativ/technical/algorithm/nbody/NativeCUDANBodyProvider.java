@@ -7,10 +7,8 @@ package org.jscience.nativ.technical.algorithm.nbody;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.NBodyProvider;
-import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.backend.gpu.cuda.CUDABackend;
-import java.util.logging.Logger;
+import com.google.auto.service.AutoService;
 
 /**
  * CUDA-accelerated N-Body simulation provider using JCuda.
@@ -21,7 +19,6 @@ import java.util.logging.Logger;
  */
 @AutoService(AlgorithmProvider.class)
 public class NativeCUDANBodyProvider implements NBodyProvider {
-    private static final Logger LOGGER = Logger.getLogger(NativeCUDANBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
 

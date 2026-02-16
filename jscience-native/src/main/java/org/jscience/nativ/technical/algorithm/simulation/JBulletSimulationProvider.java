@@ -6,8 +6,6 @@ package org.jscience.nativ.technical.algorithm.simulation;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
-import com.bulletphysics.dynamics.DynamicsWorld;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 
 /**
  * JBullet Physics Simulation Provider.
@@ -50,7 +48,7 @@ public class JBulletSimulationProvider implements AlgorithmProvider {
         // Simulating load for benchmark
         try {
             // Check for class presence to be sure
-            Class<?> cls = Class.forName("com.bulletphysics.dynamics.DiscreteDynamicsWorld");
+            Class.forName("com.bulletphysics.dynamics.DiscreteDynamicsWorld");
         } catch (Exception e) {
             throw new RuntimeException("JBullet not found", e);
         }

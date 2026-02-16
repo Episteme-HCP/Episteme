@@ -83,6 +83,7 @@
     <!-- Native Libraries -->
     <javacpp.version>1.5.10</javacpp.version>
     <openblas.version>0.3.26-${javacpp.version}</openblas.version>
+    <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -292,13 +293,6 @@
         <artifactId>javafx-swing</artifactId>
         <version>${javafx.version}</version>
       </dependency>
-      <!-- ND4J (Tensor Operations) -->
-      <dependency>
-        <groupId>org.nd4j</groupId>
-        <artifactId>nd4j-native</artifactId>
-        <version>1.0.0-M2.1</version>
-        <optional>true</optional>
-      </dependency>
       <!-- gRPC / Protobuf -->
       <dependency>
         <groupId>io.grpc</groupId>
@@ -417,9 +411,7 @@
           <configuration>
             <release>21</release>
             <compilerArgs>
-              <arg>--add-modules</arg>
-              <arg>jdk.incubator.vector</arg>
-              <arg>-Xpkginfo:always</arg>
+              <arg>${maven.compiler.args}</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -541,11 +533,6 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
               <release>21</release>
-              <compilerArgs>
-                <arg>--add-modules</arg>
-                <arg>jdk.incubator.vector</arg>
-                <arg>-Xpkginfo:always</arg>
-              </compilerArgs>
               <testExcludes>
                 <exclude>module-info.java</exclude>
               </testExcludes>

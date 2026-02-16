@@ -12,8 +12,6 @@ import jcuda.runtime.cudaMemcpyKind;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas2;
 import jcuda.jcublas.cublasHandle;
-
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -209,12 +207,7 @@ public class CUDATensor<T> implements Tensor<T> {
     public Tensor<T> transpose(int... permutation) {
          // Basic matrix transpose (2D) can be done with cublasGeam.
          if (rank() == 2 && permutation.length == 2 && permutation[0] == 1 && permutation[1] == 0) {
-             // 2D Transpose
-             int rows = shape[0];
-             int cols = shape[1];
-             
              // New shape: [cols, rows]
-             int[] newShape = {cols, rows};
              
              // Allocate result
              // Note: cublas uses Column-Major !

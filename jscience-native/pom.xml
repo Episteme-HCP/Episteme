@@ -119,6 +119,7 @@
                     <compilerArgs>
                         <!-- FFM is standard in 22+, but let's ensure preview is enabled if needed for other libs -->
                         <arg>--enable-preview</arg>
+                        <arg>${maven.compiler.args}</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

@@ -43,7 +43,7 @@ public interface MechanicsBackend extends ComputeBackend {
      * 
      * @return a new PhysicsWorld instance
      */
-    NativePhysicsWorld createWorld();
+    PhysicsWorldBackend createWorld();
 
     /**
      * Creates a backend representation for a RigidBody.
@@ -51,7 +51,7 @@ public interface MechanicsBackend extends ComputeBackend {
      * @param body the JScience RigidBody definition
      * @return the backend implementation
      */
-    NativeRigidBody createRigidBody(RigidBody body);
+    RigidBodyBackend createRigidBody(RigidBody body);
     
     @Override
     default String getType() {

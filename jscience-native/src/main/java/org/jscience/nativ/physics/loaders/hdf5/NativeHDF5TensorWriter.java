@@ -31,6 +31,7 @@ public class NativeHDF5TensorWriter implements ResourceWriter<Tensor<?>> {
         return "I/O / Native";
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Class<Tensor<?>> getResourceType() {
         return (Class<Tensor<?>>) (Class<?>) Tensor.class;

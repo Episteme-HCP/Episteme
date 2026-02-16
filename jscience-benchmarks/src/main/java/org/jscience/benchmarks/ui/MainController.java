@@ -19,7 +19,6 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.*;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.collections.FXCollections;
 
@@ -205,7 +204,7 @@ public class MainController {
         resultColumn.setCellValueFactory(param -> param.getValue().getValue().resultProperty());
         
         benchmarkTreeTable.setShowRoot(false);
-        benchmarkTreeTable.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
+        benchmarkTreeTable.setColumnResizePolicy(TreeTableView.UNCONSTRAINED_RESIZE_POLICY);
         
         benchmarkTreeTable.setRowFactory(tv -> {
             TreeTableRow<BenchmarkItem> row = new TreeTableRow<>();
@@ -430,7 +429,7 @@ public class MainController {
             int index = newVal.intValue();
             java.util.Locale newLocale = switch (index) {
                 case 1 -> java.util.Locale.FRENCH;
-                case 2 -> new java.util.Locale("es");
+                case 2 -> Locale.forLanguageTag("es");
                 case 3 -> java.util.Locale.GERMAN;
                 case 4 -> java.util.Locale.CHINESE;
                 default -> java.util.Locale.ENGLISH;
@@ -474,24 +473,6 @@ public class MainController {
         if (index == 1) return (opsSec > 0) ? 1000.0 / opsSec : 0.0; // Average Latency ms
         if (index == 2) return item.getP99LatencyMs(); // P99 Latency ms
         return 0.0;
-    }
-
-    private String determineSimpleProvider(String provider, String simpleName) {
-        if (provider != null) {
-            if (provider.contains("OpenCL")) return "OpenCL (GPU)";
-            if (provider.contains("CUDA")) return "CUDA (GPU)";
-            if (provider.contains("Unsafe")) return "Unsafe (CPU)";
-            
-            // Detection of specific algorithms for JScience
-            if (provider.contains("Strassen")) return "Multicore JScience (Strassen)";
-            if (provider.contains("CARMA")) return "Multicore JScience (CARMA)";
-            if (provider.contains("Sparse")) return "Multicore JScience (Sparse)";
-            if (provider.contains("Standard")) return "Multicore JScience (Standard)";
-
-            if (provider.contains("Multicore")) return "Multicore " + simpleName + " (Standard)";
-            if (provider.contains("Dense")) return "Monocore " + simpleName + " (Standard)";
-        }
-        return provider; // Default to original if no specific match
     }
 
     private void executeSingle(BenchmarkItem item) {
@@ -633,7 +614,7 @@ public class MainController {
         }
         String color = getLibraryColor(item.getLibrary());
 
-        BarChart<String, Number> chart = getOrCreateOperationChart(operationName);
+        getOrCreateOperationChart(operationName);
         XYChart.Series<String, Number> series = domainSeriesMap.get(operationName);
         
         // Check if bar already exists for this label

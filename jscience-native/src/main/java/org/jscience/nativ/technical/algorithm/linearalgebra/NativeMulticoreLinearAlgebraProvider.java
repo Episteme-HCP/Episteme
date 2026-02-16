@@ -8,7 +8,7 @@ package org.jscience.nativ.technical.algorithm.linearalgebra;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.backends.NativeBLASBackend;
+import org.jscience.nativ.mathematics.linearalgebra.matrices.backends.NativeCPULinearAlgebraBackend;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
@@ -24,7 +24,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 @AutoService({LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 
-    private final NativeBLASBackend backend = new NativeBLASBackend();
+    private final NativeCPULinearAlgebraBackend backend = new NativeCPULinearAlgebraBackend();
 
     public String getName() {
         return "Native JScience (OpenBLAS)";

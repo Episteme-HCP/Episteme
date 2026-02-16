@@ -20,7 +20,7 @@ public class QiskitQuantumProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(QiskitBackendProvider.class);
+        assertNotNull(QiskitBackend.class);
     }
 }
 

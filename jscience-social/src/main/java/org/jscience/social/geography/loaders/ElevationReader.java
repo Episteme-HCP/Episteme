@@ -95,6 +95,7 @@ public class ElevationReader extends AbstractResourceReader<Quantity<Length>> {
         return "N/A";
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Class<Quantity<Length>> getResourceType() {
         return (Class<Quantity<Length>>) (Class<?>) Quantity.class;

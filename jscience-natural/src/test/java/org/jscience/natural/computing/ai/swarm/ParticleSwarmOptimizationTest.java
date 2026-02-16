@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@SuppressWarnings("deprecation")
 public class ParticleSwarmOptimizationTest {
 
     @Test

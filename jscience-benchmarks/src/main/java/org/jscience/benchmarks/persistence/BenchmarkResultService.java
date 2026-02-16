@@ -1,7 +1,6 @@
 package org.jscience.benchmarks.persistence;
 
 import org.jscience.benchmarks.ui.BenchmarkRunSummary;
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 

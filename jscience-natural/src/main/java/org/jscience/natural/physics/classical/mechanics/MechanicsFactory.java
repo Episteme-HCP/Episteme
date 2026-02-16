@@ -56,7 +56,7 @@ public class MechanicsFactory {
     /**
      * Creates a new physics world using the active backend.
      */
-    public static NativePhysicsWorld createWorld() {
+    public static PhysicsWorldBackend createWorld() {
         MechanicsBackend backend = MechanicsBackendManager.getInstance().getActiveBackend();
         return backend != null ? backend.createWorld() : null;
     }
@@ -64,7 +64,7 @@ public class MechanicsFactory {
     /**
      * Helper to create a native rigid body directly (though usually done via PhysicsWorld).
      */
-    public static NativeRigidBody createRigidBody(RigidBody body) {
+    public static RigidBodyBackend createRigidBody(RigidBody body) {
         MechanicsBackend backend = MechanicsBackendManager.getInstance().getActiveBackend();
         // Since createRigidBody was in the original PhysicsEngineProvider, it should be in MechanicsBackend
         return backend != null ? backend.createRigidBody(body) : null;

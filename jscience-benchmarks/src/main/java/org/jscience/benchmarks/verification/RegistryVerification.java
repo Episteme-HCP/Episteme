@@ -2,7 +2,6 @@ package org.jscience.benchmarks.verification;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
-import com.google.auto.service.AutoService;
 import java.util.ServiceLoader;
 
 /**

@@ -43,7 +43,9 @@ public class NeuralModelReader {
                 @SuppressWarnings("unchecked")
                 List<Map<String, Object>> layers = (List<Map<String, Object>>) map.get("layers");
                 for (Map<String, Object> layerMap : layers) {
-                    sequential.add((Layer<Real>) parseLayer(layerMap));
+                    @SuppressWarnings("unchecked")
+                    Layer<Real> layer = (Layer<Real>) (Layer<?>) parseLayer(layerMap);
+                    sequential.add(layer);
                 }
                 return sequential;
             } else if (type.contains("ActivationLayer")) {
@@ -57,8 +59,10 @@ public class NeuralModelReader {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> biasMap = (Map<String, Object>) params.get("bias");
 
-                Tensor<Real> weights = (Tensor<Real>) parseTensor(weightMap);
-                Tensor<Real> bias = (Tensor<Real>) parseTensor(biasMap);
+                @SuppressWarnings("unchecked")
+                Tensor<Real> weights = (Tensor<Real>) (Tensor<?>) parseTensor(weightMap);
+                @SuppressWarnings("unchecked")
+                Tensor<Real> bias = (Tensor<Real>) (Tensor<?>) parseTensor(biasMap);
 
                 int inFeatures = weights.shape()[0];
                 int outFeatures = weights.shape()[1];
@@ -77,9 +81,11 @@ public class NeuralModelReader {
     }
 
     private Tensor<?> parseTensor(Map<String, Object> map) {
-        List<Integer> shapeList = (List) map.get("shape");
+        @SuppressWarnings("unchecked")
+        List<Integer> shapeList = (List<Integer>) map.get("shape");
         int[] shape = shapeList.stream().mapToInt(i -> i).toArray();
-        List<Object> data = (List) map.get("data");
+        @SuppressWarnings("unchecked")
+        List<Object> data = (List<Object>) map.get("data");
         
         Real[] realData = flattenReal(data);
         return TensorFactory.of(realData, shape);
@@ -94,7 +100,9 @@ public class NeuralModelReader {
     private void recursiveFlatten(List<Object> data, List<Real> flat) {
         for (Object obj : data) {
             if (obj instanceof List) {
-                recursiveFlatten((List) obj, flat);
+                @SuppressWarnings("unchecked")
+                List<Object> subList = (List<Object>) obj;
+                recursiveFlatten(subList, flat);
             } else if (obj instanceof Number) {
                 flat.add(Real.of(((Number) obj).doubleValue()));
             }

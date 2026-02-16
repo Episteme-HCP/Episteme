@@ -93,7 +93,7 @@ public class JGraphTRenderer implements GraphRenderer {
     private static class Iterables {
         static long count(Iterable<?> it) {
             long c = 0;
-            for (Object o : it) c++;
+            for (@SuppressWarnings("unused") Object o : it) c++;
             return c;
         }
     }

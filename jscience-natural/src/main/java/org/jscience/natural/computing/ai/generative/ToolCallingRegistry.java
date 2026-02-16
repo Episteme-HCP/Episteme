@@ -52,16 +52,12 @@ public class ToolCallingRegistry {
     }
 
     private static class ToolDefinition {
-        String name;
         Object instance;
         Method method;
 
         ToolDefinition(String name, Object instance, Method method) {
-            this.name = name;
             this.instance = instance;
             this.method = method;
         }
-        
-        public String getName() { return name; }
     }
 }

@@ -2,7 +2,7 @@ package org.jscience.benchmarks.benchmark.benchmarks;
 
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.core.media.audio.AudioProvider;
+import org.jscience.core.media.audio.AudioAlgorithmBackend;
 import org.jscience.core.media.audio.AudioOp;
 
 /**
@@ -13,13 +13,17 @@ import org.jscience.core.media.audio.AudioOp;
  * @author Gemini AI (Google DeepMind)
  */
 @AutoService(RunnableBenchmark.class)
-public class SystematicAudioBenchmark implements SystematicBenchmark<AudioProvider> {
+public class SystematicAudioBenchmark implements SystematicBenchmark<AudioAlgorithmBackend<?>> {
 
-    private AudioProvider provider;
+    private AudioAlgorithmBackend<Object> provider;
     private Object audio;
-    private final AudioOp identityOp = (aud) -> aud;
+    private final AudioOp<Object> identityOp = (aud) -> aud;
 
-    @Override public Class<AudioProvider> getProviderClass() { return AudioProvider.class; }
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<AudioAlgorithmBackend<?>> getProviderClass() { 
+        return (Class<AudioAlgorithmBackend<?>>) (Class<?>) AudioAlgorithmBackend.class; 
+    }
     @Override public String getIdPrefix() { return "audio-throughput"; }
     @Override public String getNameBase() { return "Audio Processing Throughput"; }
 
@@ -31,8 +35,9 @@ public class SystematicAudioBenchmark implements SystematicBenchmark<AudioProvid
     @Override public String getAlgorithmProvider() { return provider != null ? provider.getName() : "None"; }
 
     @Override
-    public void setProvider(AudioProvider provider) {
-        this.provider = provider;
+    @SuppressWarnings("unchecked")
+    public void setProvider(AudioAlgorithmBackend<?> provider) {
+        this.provider = (AudioAlgorithmBackend<Object>) provider;
     }
 
     @Override
@@ -41,7 +46,6 @@ public class SystematicAudioBenchmark implements SystematicBenchmark<AudioProvid
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void setup() {
         if (provider == null) throw new IllegalStateException("Provider not set");
         try {
@@ -54,7 +58,6 @@ public class SystematicAudioBenchmark implements SystematicBenchmark<AudioProvid
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void run() {
         if (audio != null) {
             provider.apply(audio, identityOp);

@@ -25,14 +25,12 @@ package org.jscience.core.mathematics.ml;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ServiceLoader;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.technical.algorithm.MLProvider;
 
 /**
  * Principal Component Analysis (PCA).

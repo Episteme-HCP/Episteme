@@ -47,7 +47,6 @@ public class GraphStreamRenderer implements GraphRenderer {
     private final JTextArea statusArea;
     private Object graphStreamGraph; // org.graphstream.graph.Graph
     private Object viewer; // org.graphstream.ui.view.Viewer
-    private Object view; // org.graphstream.ui.view.View
 
     public GraphStreamRenderer() {
         panel = new JPanel(new BorderLayout());

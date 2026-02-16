@@ -59,6 +59,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     protected final Field<E> field;
     private static final int PARALLEL_THRESHOLD = 1000;
 
+    @SuppressWarnings("unchecked")
     public CPUDenseLinearAlgebraProvider(Field<E> field) {
         this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
     }
@@ -475,7 +476,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     .collect(Collectors.collectingAndThen(
                             Collectors.toList(),
                             list -> {
-                                @SuppressWarnings("unchecked")
                                 E[] arr = (E[]) list.toArray();
                                 return new GenericVector<>(
                                         new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(

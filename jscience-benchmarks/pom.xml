@@ -176,9 +176,7 @@
                 <configuration>
                     <release>21</release>
                     <compilerArgs>
-                        <arg>--add-modules</arg>
-                        <arg>jdk.incubator.vector</arg>
-                        <arg>-Xpkginfo:always</arg>
+                        <arg>${maven.compiler.args}</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>

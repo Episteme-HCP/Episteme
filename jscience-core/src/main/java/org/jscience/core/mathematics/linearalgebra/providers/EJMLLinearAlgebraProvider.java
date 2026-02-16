@@ -78,6 +78,7 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         this(null);
     }
 
+    @SuppressWarnings("unchecked")
     public EJMLLinearAlgebraProvider(Field<E> field) {
         this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(this.field);
@@ -85,7 +86,6 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         if (ejmlAvailable && field != null) {
             try {
                 Class<?> clazz = Class.forName("org.jscience.core.mathematics.linearalgebra.providers.EJMLSupport");
-                @SuppressWarnings("unchecked")
                 Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
                 this.ejmlImpl = ctor.newInstance(field);
             } catch (Throwable t) {

@@ -78,6 +78,7 @@ public class ParticleSwarmOptimization {
         }
     }
 
+    @Deprecated
     public ParticleSwarmOptimization(Function<Real[], Real> objective,
             int dimensions,
             Real[] lowerBounds,
@@ -96,6 +97,7 @@ public class ParticleSwarmOptimization {
      * @param iterations number of iterations
      * @return global best position found
      */
+    @Deprecated
     public Real[] optimize(int iterations) {
         Particle[] swarm = new Particle[swarmSize];
         Real[] globalBest = new Real[dimensions];
@@ -206,15 +208,18 @@ public class ParticleSwarmOptimization {
     }
 
     // Parameter setters
+    @Deprecated
     public void setInertiaWeight(Real omega) {
         this.inertiaWeight = omega;
     }
 
+    @Deprecated
     public void setCognitiveCoefficient(Real c1) {
         this.cognitiveCoeff = c1;
     }
 
-    public void socialCoefficient(Real c2) {
+    @Deprecated
+    public void setSocialCoefficient(Real c2) {
         this.socialCoeff = c2;
     }
 
@@ -225,6 +230,7 @@ public class ParticleSwarmOptimization {
      * Guarantees convergence.
      * </p>
      */
+    @Deprecated
     public void useConstrictionCoefficients() {
         Real phi = cognitiveCoeff.add(socialCoeff);
         if (phi.compareTo(Real.of(4)) <= 0) {

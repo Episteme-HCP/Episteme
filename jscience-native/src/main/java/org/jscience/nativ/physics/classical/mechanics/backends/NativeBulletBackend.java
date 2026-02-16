@@ -16,7 +16,6 @@ import java.nio.IntBuffer;
 
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.natural.physics.classical.mechanics.CollisionBackend;
-import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;

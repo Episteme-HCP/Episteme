@@ -66,7 +66,6 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         data[row * storage.cols() + col] = val;
     }
     
-    // Matrix Interface Stubs needed for set(int,int,Real)
     @Override
     public void set(int row, int col, Real val) {
         set(row, col, val.doubleValue());
@@ -98,15 +97,12 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         return applyOp(VectorOperators.COS, (d) -> Math.cos(d));
     }
 
-    /**
-     * Generic internal helper for Unary Operators
-     */
     private Matrix<Real> applyOp(jdk.incubator.vector.VectorOperators.Unary op, java.util.function.DoubleUnaryOperator scalarFallback) {
         double[] res = new double[data.length];
         int i = 0;
-        final jdk.incubator.vector.VectorSpecies<Double> species = SPECIES;
+        final VectorSpecies<Double> species = SPECIES;
         for (; i < species.loopBound(data.length); i += species.length()) {
-            var v = jdk.incubator.vector.DoubleVector.fromArray(species, this.data, i);
+            var v = DoubleVector.fromArray(species, this.data, i);
             v.lanewise(op).intoArray(res, i);
         }
         for (; i < data.length; i++) {
@@ -118,10 +114,10 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     public Matrix<Real> scale(double scalar) {
         double[] res = new double[data.length];
         int i = 0;
-        final jdk.incubator.vector.VectorSpecies<Double> species = SPECIES;
+        final VectorSpecies<Double> species = SPECIES;
         for (; i < species.loopBound(data.length); i += species.length()) {
-            var v = jdk.incubator.vector.DoubleVector.fromArray(species, this.data, i);
-            v.mul(jdk.incubator.vector.DoubleVector.broadcast(species, scalar)).intoArray(res, i);
+            var v = DoubleVector.fromArray(species, this.data, i);
+            v.mul(DoubleVector.broadcast(species, scalar)).intoArray(res, i);
         }
         for (; i < data.length; i++) {
             res[i] = data[i] * scalar;
@@ -131,9 +127,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     public double doubleSum() {
         int i = 0;
-        jdk.incubator.vector.DoubleVector acc = jdk.incubator.vector.DoubleVector.zero(SPECIES);
+        DoubleVector acc = DoubleVector.zero(SPECIES);
         for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
-            acc = acc.add(jdk.incubator.vector.DoubleVector.fromArray(SPECIES, data, i));
+            acc = acc.add(DoubleVector.fromArray(SPECIES, data, i));
         }
         double total = acc.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
         for (; i < data.length; i++) total += data[i];
@@ -142,9 +138,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     public double doubleMin() {
         int i = 0;
-        jdk.incubator.vector.DoubleVector acc = jdk.incubator.vector.DoubleVector.broadcast(SPECIES, java.lang.Double.POSITIVE_INFINITY);
+        DoubleVector acc = DoubleVector.broadcast(SPECIES, java.lang.Double.POSITIVE_INFINITY);
         for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
-            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MIN, jdk.incubator.vector.DoubleVector.fromArray(SPECIES, data, i));
+            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MIN, DoubleVector.fromArray(SPECIES, data, i));
         }
         double min = acc.reduceLanes(jdk.incubator.vector.VectorOperators.MIN);
         for (; i < data.length; i++) min = java.lang.Math.min(min, data[i]);
@@ -153,9 +149,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     public double doubleMax() {
         int i = 0;
-        jdk.incubator.vector.DoubleVector acc = jdk.incubator.vector.DoubleVector.broadcast(SPECIES, java.lang.Double.NEGATIVE_INFINITY);
+        DoubleVector acc = DoubleVector.broadcast(SPECIES, java.lang.Double.NEGATIVE_INFINITY);
         for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
-            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MAX, jdk.incubator.vector.DoubleVector.fromArray(SPECIES, data, i));
+            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MAX, DoubleVector.fromArray(SPECIES, data, i));
         }
         double max = acc.reduceLanes(jdk.incubator.vector.VectorOperators.MAX);
         for (; i < data.length; i++) max = java.lang.Math.max(max, data[i]);
@@ -170,19 +166,16 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             
             double[] res = new double[data.length];
             int i = 0;
-            // Vector loop
             for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
                 var v1 = DoubleVector.fromArray(SPECIES, this.data, i);
                 var v2 = DoubleVector.fromArray(SPECIES, that.data, i);
                 v1.add(v2).intoArray(res, i);
             }
-            // Scalar tail loop
             for (; i < data.length; i++) {
                 res[i] = this.data[i] + that.data[i];
             }
             return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
         }
-        // Fallback
         throw new UnsupportedOperationException("Mixed type addition not supported yet");
     }
 
@@ -194,37 +187,20 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             
             SIMDRealDoubleMatrix C = new SIMDRealDoubleMatrix(storage.rows(), that.storage.cols());
             
-            // Naive loop with vectorization on the inner dot product?
-            // Actually, for C[i][j] += A[i][k] * B[k][j], we want to vectorize k.
-            // B needs to be accessed column-wise.
-            
-            // Blocked multiplication is better, but let's do a simple vectorized row-by-row
-            // or use "broadcast A[i][k]" * "Vector B[k][...]"
-            
-            // Simplest efficient SIMD: C[i][j..j+W] += A[i][k] * B[k][j..j+W]
-            // We iterate i, k, then vectorize j.
-            
             for (int i = 0; i < storage.rows(); i++) {
                 for (int k = 0; k < storage.cols(); k++) {
                     double aik = this.data[i * storage.cols() + k];
                     
                     int j = 0;
-                    // Vectorize j loop
                     for (; j < SPECIES.loopBound(that.storage.cols()); j += SPECIES.length()) {
                         int bIdx = k * that.storage.cols() + j;
                         var bVec = DoubleVector.fromArray(SPECIES, that.data, bIdx);
                         
                         int cIdx = i * that.storage.cols() + j;
-                        // Load C (accumulation)
                         var cVec = DoubleVector.fromArray(SPECIES, C.data, cIdx);
-                        
-                        // FMA: c = c + a * b
-                        cVec = bVec.fma(jdk.incubator.vector.DoubleVector.broadcast(SPECIES, aik), cVec); 
-                        // Or: cVec = cVec.add(bVec.mul(DoubleVector.broadcast(SPECIES, aik)));
-                        
+                        cVec = bVec.fma(DoubleVector.broadcast(SPECIES, aik), cVec); 
                         cVec.intoArray(C.data, cIdx);
                     }
-                    // Scalar tail for j
                     for (; j < that.storage.cols(); j++) {
                         C.data[i * that.storage.cols() + j] += aik * that.data[k * that.storage.cols() + j];
                     }
@@ -240,13 +216,8 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             throw new IllegalArgumentException("Dimensions match");
     }
 
-    // --- Required Boilerplate ---
-    
     @Override
     public Matrix<Real> transpose() {
-        // Efficient Transpose? 
-        // For large matrices, cache-oblivious or block transpose is best.
-        // Simple implementation first
         double[] tData = new double[storage.rows() * storage.cols()];
         for (int i = 0; i < storage.rows(); i++) {
             for (int j = 0; j < storage.cols(); j++) {
@@ -263,13 +234,11 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             checkDimensions(that);
             double[] res = new double[data.length];
             int i = 0;
-            // Vector loop
             for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
                 DoubleVector v1 = DoubleVector.fromArray(SPECIES, this.data, i);
                 DoubleVector v2 = DoubleVector.fromArray(SPECIES, that.data, i);
                 v1.sub(v2).intoArray(res, i);
             }
-            // Scalar tail loop
             for (; i < data.length; i++) {
                 res[i] = this.data[i] - that.data[i];
             }
@@ -285,7 +254,6 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     }
     
     @Override public Matrix<Real> getSubMatrix(int rs, int re, int cs, int ce) { 
-        // Standard Java pattern: end indices (re, ce) are exclusive
         int r = re - rs;
         int c = ce - cs;
         double[] sub = new double[r*c];
@@ -295,25 +263,16 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         return new SIMDRealDoubleMatrix(r, c, sub);
     }
 
-    /**
-     * Returns the underlying double array. Use with caution.
-     */
     public double[] getInternalData() {
         return data;
     }
 
-    /**
-     * Efficiently copies a row into a double array.
-     */
     public double[] getRowData(int row) {
         double[] rowData = new double[storage.cols()];
         System.arraycopy(data, row * storage.cols(), rowData, 0, storage.cols());
         return rowData;
     }
 
-    /**
-     * Efficiently sets a row from a double array.
-     */
     public void setRowData(int row, double[] rowData) {
         if (rowData.length != storage.cols()) throw new IllegalArgumentException("Length mismatch");
         System.arraycopy(rowData, 0, data, row * storage.cols(), storage.cols());
@@ -329,35 +288,28 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             throw new IllegalArgumentException("Dimension mismatch");
         }
         
-        // Extract vector data to double[]
         double[] bData = new double[vector.dimension()];
         for(int i=0; i<bData.length; i++) bData[i] = vector.get(i).doubleValue();
         
         double[] res = new double[storage.rows()];
         
-        // Loop over rows
         for (int i = 0; i < storage.rows(); i++) {
             int rowOffset = i * storage.cols();
             
-            // SIMD Dot Product
-            jdk.incubator.vector.DoubleVector acc = jdk.incubator.vector.DoubleVector.zero(SPECIES);
+            DoubleVector acc = DoubleVector.zero(SPECIES);
             int j = 0;
             for (; j < SPECIES.loopBound(storage.cols()); j += SPECIES.length()) {
-                var aVec = jdk.incubator.vector.DoubleVector.fromArray(SPECIES, data, rowOffset + j);
-                var bVec = jdk.incubator.vector.DoubleVector.fromArray(SPECIES, bData, j);
-                acc = acc.add(aVec.mul(bVec)); // FMA if supported
+                var aVec = DoubleVector.fromArray(SPECIES, data, rowOffset + j);
+                var bVec = DoubleVector.fromArray(SPECIES, bData, j);
+                acc = acc.add(aVec.mul(bVec)); 
             }
             res[i] = acc.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
             
-            // Tail
             for (; j < storage.cols(); j++) {
                 res[i] += data[rowOffset + j] * bData[j];
             }
         }
         
-        // Return GenericVector wrapping DenseVectorStorage (standard for CPU)
-        // Note: we can't easily return SIMD vector type for Vector<?> unless we define one.
-        // For now, return standard Vector implementation.
         return new GenericVector<>(
              new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                  java.util.stream.DoubleStream.of(res).mapToObj(Real::of).toArray(Real[]::new)),

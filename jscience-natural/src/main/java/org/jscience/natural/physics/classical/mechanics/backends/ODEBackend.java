@@ -27,8 +27,8 @@ import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
 import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
-import org.jscience.natural.physics.classical.mechanics.NativePhysicsWorld;
-import org.jscience.natural.physics.classical.mechanics.NativeRigidBody;
+import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBackend;
+import org.jscience.natural.physics.classical.mechanics.RigidBodyBackend;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 
 /**
@@ -82,13 +82,13 @@ public class ODEBackend implements MechanicsBackend {
     }
 
     @Override
-    public NativePhysicsWorld createWorld() {
+    public PhysicsWorldBackend createWorld() {
         // Placeholder for ODE world creation
         return null;
     }
 
     @Override
-    public NativeRigidBody createRigidBody(RigidBody body) {
+    public RigidBodyBackend createRigidBody(RigidBody body) {
         // Placeholder for ODE body creation
         return null;
     }

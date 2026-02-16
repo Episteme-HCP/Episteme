@@ -44,7 +44,8 @@ public class SerializationTest {
         NeuralModelWriter.getInstance().save(model, modelPath);
 
         // 5. Load model
-        Layer<Real> loadedModel = (Layer<Real>) NeuralModelReader.getInstance().load(modelPath);
+        @SuppressWarnings("unchecked")
+        Layer<Real> loadedModel = (Layer<Real>) (Layer<?>) NeuralModelReader.getInstance().load(modelPath);
 
         // 6. Verify architecture
         assertNotNull(loadedModel);

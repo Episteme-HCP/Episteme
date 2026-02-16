@@ -23,8 +23,10 @@
 
 package org.jscience.nativ.media.vision.providers;
 
+import org.jscience.core.media.vision.VisionAlgorithmBackend;
 import org.jscience.core.media.vision.ImageOp;
-import org.jscience.core.media.vision.VisionProvider;
+import org.jscience.core.technical.backend.Backend;
+import com.google.auto.service.AutoService;
 
 /**
  * OpenCL-accelerated vision provider.
@@ -41,7 +43,25 @@ import org.jscience.core.media.vision.VisionProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class NativeOpenCLVisionProvider implements VisionProvider<Object> {
+@AutoService(Backend.class)
+public class NativeOpenCLVisionProvider implements VisionAlgorithmBackend<Object> {
+
+    @Override public String getType() { return "vision"; }
+    @Override public String getId() { return "native-opencl-vision"; }
+    @Override public String getDescription() { return "GPU-accelerated image processing using OpenCL."; }
+    @Override public boolean isAvailable() {
+        try {
+            Class.forName("org.jocl.CL");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
+    }
     
     // Placeholder for cl_context, cl_command_queue, etc.
     private org.jocl.cl_context context;

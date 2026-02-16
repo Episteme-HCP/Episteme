@@ -20,7 +20,7 @@ public class AmazonBraketBackendProviderTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(AmazonBraketBackendProvider.class);
+        assertNotNull(AmazonBraketBackend.class);
     }
 }
 
