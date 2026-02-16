@@ -130,6 +130,7 @@ public class MasterControlLibrariesUITest {
     }
 
     @Test
+    @org.junit.jupiter.api.Disabled("MPJ library is optional and may not be present on all environments")
     void testMPJLibraryDisplayed(FxRobot robot) {
         // Navigate to Libraries tab
         robot.clickOn("#tab-libraries");
