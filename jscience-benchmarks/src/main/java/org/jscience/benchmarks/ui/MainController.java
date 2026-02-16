@@ -61,6 +61,49 @@ public class MainController {
     private final org.jscience.benchmarks.persistence.BenchmarkResultService resultService = new org.jscience.benchmarks.persistence.BenchmarkResultService();
     private final java.util.Queue<BenchmarkItem> benchmarkQueue = new java.util.LinkedList<>();
     private boolean isProcessingQueue = false;
+    private ResourceBundle resources;
+
+    private void updateUI(Locale locale) {
+        try {
+            resources = ResourceBundle.getBundle("org.jscience.benchmarks.ui.messages", locale);
+            
+            // Update Columns
+            nameColumn.setText(resources.getString("col.name"));
+            backendColumn.setText(resources.getString("col.backend"));
+            libraryColumn.setText(resources.getString("col.library"));
+            providerColumn.setText(resources.getString("col.provider"));
+            // descriptionColumn.setText(resources.getString("col.description")); // Key missing in props
+            statusColumn.setText(resources.getString("col.status"));
+            resultColumn.setText(resources.getString("col.result"));
+            
+            // Update History Columns
+            // dateColumn.setText(resources.getString("col.date"));
+            histNameColumn.setText(resources.getString("col.name"));
+            histBackendColumn.setText(resources.getString("col.backend"));
+            histLibraryColumn.setText(resources.getString("col.library"));
+            histProviderColumn.setText(resources.getString("col.provider"));
+            // histDomainColumn.setText(resources.getString("col.domain"));
+            resultsColumn.setText(resources.getString("col.result"));
+
+            // Update Buttons
+            // runSelectedBtn ? (Need FXML ref if exists, seemingly handled via context menu or not exposed)
+            exportHistoryBtn.setText(resources.getString("btn.exportHistory"));
+            exportChartBtn.setText(resources.getString("btn.exportChart"));
+            
+            // Update Tabs (Access via index as they are not injected fields)
+            if (mainTabPane.getTabs().size() >= 2) {
+                mainTabPane.getTabs().get(0).setText(resources.getString("tab.benchmarks"));
+                mainTabPane.getTabs().get(1).setText(resources.getString("tab.history"));
+            }
+             if (visualizationTabPane.getTabs().size() > 0) {
+                 // Visualization tabs are dynamic per chart, but the pane title? 
+                 // It's inside a layout. We might need a Label ref for "Visualization".
+             }
+
+        } catch (Exception e) {
+            System.err.println("Failed to update UI language: " + e.getMessage());
+        }
+    }
 
     // Helper method to load history
     private void loadHistory() {
@@ -327,6 +370,8 @@ public class MainController {
         startDiscovery(); // Background loading
         setupAnalytics();
         setupLanguageSelector();
+        // Initialize UI with default locale (English)
+        updateUI(Locale.ENGLISH);
         // Charts will be added lazily as data comes in or domain nodes are discovered
     }
 
@@ -351,7 +396,7 @@ public class MainController {
                 default -> java.util.Locale.ENGLISH;
             };
             org.jscience.core.ui.i18n.I18N.getInstance().setLocale(newLocale);
-            // Refresh UI labels (would require full UI rebuild or manual updates)
+            updateUI(newLocale);
             System.out.println("Language changed to: " + newLocale.getDisplayName());
         });
     }
