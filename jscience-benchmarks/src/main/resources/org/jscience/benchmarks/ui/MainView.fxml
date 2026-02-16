@@ -11,12 +11,12 @@
     <top>
         <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="20">
             <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
-            <Label text="JSCIENCE BENCHMARKING" styleClass="header-title"/>
+            <Label fx:id="mainTitleLabel" text="JSCIENCE BENCHMARKING" styleClass="header-title"/>
             <Region HBox.hgrow="ALWAYS" />
-            <Label text="Language:" styleClass="header-label"/>
+            <Label fx:id="languageLabel" text="Language:" styleClass="header-label"/>
             <ComboBox fx:id="languageSelector" promptText="Language" styleClass="combo-box-primary" />
             <!-- Settings button removed as per user request -->
-            <Button text="ABOUT" onAction="#handleAbout" styleClass="action-button-primary" />
+            <Button fx:id="aboutBtn" text="ABOUT" onAction="#handleAbout" styleClass="action-button-primary" />
         </HBox>
     </top>
 
@@ -24,11 +24,11 @@
         <TabPane fx:id="mainTabPane" side="LEFT" tabClosingPolicy="UNAVAILABLE" styleClass="main-tab-pane">
             
             <!-- Tab 1: Execution Control -->
-            <Tab text="EXECUTION">
+            <Tab fx:id="executionTab" text="EXECUTION">
                 <VBox spacing="10">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="Benchmark Selection" styleClass="section-title"/>
+                        <Label fx:id="benchmarkSelectionLabel" text="Benchmark Selection" styleClass="section-title"/>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="runSelectedBtn" text="RUN SELECTED" onAction="#handleRunSelected" styleClass="action-button-primary" />
                         <Button fx:id="runAllBtn" text="RUN ALL" onAction="#handleRunAll" styleClass="action-button-primary" />
@@ -52,11 +52,11 @@
             </Tab>
 
             <!-- Tab 2: Visualization -->
-            <Tab text="VISUALIZATION">
+            <Tab fx:id="visualizationTab" text="VISUALIZATION">
                 <VBox spacing="20">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
                     <HBox spacing="20" alignment="CENTER_LEFT">
-                        <Label text="Performance Analytics" styleClass="section-title"/>
+                        <Label fx:id="analyticsLabel" text="Performance Analytics" styleClass="section-title"/>
                         <Region HBox.hgrow="ALWAYS" />
                         <ComboBox fx:id="metricSelector" promptText="Select Metric" styleClass="combo-box-primary" />
                         <Button fx:id="exportChartBtn" text="EXPORT CHART" onAction="#handleExportChart" styleClass="action-button-primary" />
@@ -71,16 +71,16 @@
             </Tab>
 
             <!-- Tab 3: Environment -->
-            <Tab text="ENVIRONMENT" styleClass="tab">
+            <Tab fx:id="environmentTab" text="ENVIRONMENT" styleClass="tab">
                 <fx:include source="EnvironmentView.fxml"/>
             </Tab>
 
             <!-- Tab 4: History & Reports -->
-            <Tab text="HISTORY">
+            <Tab fx:id="historyTab" text="HISTORY">
                 <VBox spacing="10">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="Historical Runs" styleClass="section-title"/>
+                        <Label fx:id="historyTitleLabel" text="Historical Runs" styleClass="section-title"/>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="exportHistoryBtn" text="EXPORT JSON" onAction="#handleExportHistoryJson" styleClass="action-button-primary" />
                     </HBox>

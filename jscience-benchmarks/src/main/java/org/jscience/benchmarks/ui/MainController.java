@@ -25,6 +25,19 @@ import javafx.collections.FXCollections;
 
 public class MainController {
 
+    @FXML private Label mainTitleLabel;
+    @FXML private Label languageLabel;
+    @FXML private Button aboutBtn;
+    @FXML private Tab executionTab;
+    @FXML private Tab visualizationTab;
+    @FXML private Tab environmentTab;
+    @FXML private Tab historyTab;
+    @FXML private Label benchmarkSelectionLabel;
+    @FXML private Button runSelectedBtn;
+    @FXML private Button runAllBtn;
+    @FXML private Label analyticsLabel;
+    @FXML private Label historyTitleLabel;
+
     @FXML private TreeTableView<BenchmarkItem> benchmarkTreeTable;
     @FXML private TreeTableColumn<BenchmarkItem, String> nameColumn;
     @FXML private TreeTableColumn<BenchmarkItem, String> backendColumn;
@@ -48,7 +61,6 @@ public class MainController {
     @FXML private TableColumn<BenchmarkRunSummary, String> resultsColumn;
     @FXML private Button exportHistoryBtn;
 
-
     @FXML private ComboBox<String> metricSelector;
     @FXML private ComboBox<String> languageSelector;
     @FXML private Button exportChartBtn;
@@ -67,41 +79,52 @@ public class MainController {
         try {
             resources = ResourceBundle.getBundle("org.jscience.benchmarks.ui.messages", locale);
             
-            // Update Columns
+            // Header
+            mainTitleLabel.setText(resources.getString("app.title"));
+            languageLabel.setText(resources.getString("app.language"));
+            aboutBtn.setText(resources.getString("app.about"));
+
+            // Tabs
+            executionTab.setText(resources.getString("tab.execution"));
+            visualizationTab.setText(resources.getString("tab.visualization"));
+            environmentTab.setText(resources.getString("tab.environment"));
+            historyTab.setText(resources.getString("tab.history"));
+
+            // Execution Tab
+            benchmarkSelectionLabel.setText(resources.getString("lbl.benchmark_selection"));
+            runSelectedBtn.setText(resources.getString("btn.run_selected"));
+            runAllBtn.setText(resources.getString("btn.run_all"));
+            
+            // Columns
             nameColumn.setText(resources.getString("col.name"));
             backendColumn.setText(resources.getString("col.backend"));
             libraryColumn.setText(resources.getString("col.library"));
             providerColumn.setText(resources.getString("col.provider"));
-            // descriptionColumn.setText(resources.getString("col.description")); // Key missing in props
+            descriptionColumn.setText(resources.getString("col.description"));
             statusColumn.setText(resources.getString("col.status"));
             resultColumn.setText(resources.getString("col.result"));
             
-            // Update History Columns
-            // dateColumn.setText(resources.getString("col.date"));
+            // Visualization Tab
+            analyticsLabel.setText(resources.getString("lbl.analytics"));
+            metricSelector.setPromptText(resources.getString("prompt.metric"));
+            exportChartBtn.setText(resources.getString("btn.export_chart"));
+
+            // History Tab
+            historyTitleLabel.setText(resources.getString("lbl.historical_runs"));
+            exportHistoryBtn.setText(resources.getString("btn.export_json"));
+            
+            // History Columns
+            dateColumn.setText(resources.getString("col.date"));
             histNameColumn.setText(resources.getString("col.name"));
             histBackendColumn.setText(resources.getString("col.backend"));
             histLibraryColumn.setText(resources.getString("col.library"));
             histProviderColumn.setText(resources.getString("col.provider"));
-            // histDomainColumn.setText(resources.getString("col.domain"));
+            histDomainColumn.setText(resources.getString("col.domain"));
             resultsColumn.setText(resources.getString("col.result"));
-
-            // Update Buttons
-            // runSelectedBtn ? (Need FXML ref if exists, seemingly handled via context menu or not exposed)
-            exportHistoryBtn.setText(resources.getString("btn.exportHistory"));
-            exportChartBtn.setText(resources.getString("btn.exportChart"));
-            
-            // Update Tabs (Access via index as they are not injected fields)
-            if (mainTabPane.getTabs().size() >= 2) {
-                mainTabPane.getTabs().get(0).setText(resources.getString("tab.benchmarks"));
-                mainTabPane.getTabs().get(1).setText(resources.getString("tab.history"));
-            }
-             if (visualizationTabPane.getTabs().size() > 0) {
-                 // Visualization tabs are dynamic per chart, but the pane title? 
-                 // It's inside a layout. We might need a Label ref for "Visualization".
-             }
 
         } catch (Exception e) {
             System.err.println("Failed to update UI language: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
