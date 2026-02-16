@@ -53,8 +53,8 @@ class JavaCVBackend implements AudioBackend {
         grabber = new FFmpegFrameGrabber(path);
         grabber.start();
     }
-    @Override public void play() {}
-    @Override public void pause() {}
+    @Override public void play() { throw new UnsupportedOperationException("Playback not supported by JavaCV backend"); }
+    @Override public void pause() { throw new UnsupportedOperationException("Pause not supported by JavaCV backend"); }
     @Override public void stop() { try{ if(grabber!=null) grabber.stop(); }catch(Exception e){} }
     @Override public double getTime() { return (grabber!=null) ? grabber.getTimestamp() / 1_000_000.0 : 0; }
     @Override public double getDuration() { return (grabber!=null) ? grabber.getLengthInTime() / 1_000_000.0 : 0; }

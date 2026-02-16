@@ -70,9 +70,10 @@ public class MinimEngine implements AudioEngine, AudioBackend {
             player.close();
         }
         player = minim.loadFile(path, 1024);
-        if (player != null) {
-            fft = new FFT(player.bufferSize(), player.sampleRate());
+        if (player == null) {
+            throw new Exception("Minim failed to load audio file: " + path);
         }
+        fft = new FFT(player.bufferSize(), player.sampleRate());
     }
 
     @Override public void play() { 
