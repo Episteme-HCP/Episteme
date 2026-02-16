@@ -29,7 +29,7 @@
     </TableView>
     
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Button text="Refresh Providers" onAction="#handleRefresh" styleClass="action-button-outline"/>
+        <Button fx:id="refreshBtn" text="Refresh Providers" onAction="#handleRefresh" styleClass="action-button-outline"/>
         <Label fx:id="systemInfoLabel" text="Java Version: ..." styleClass="status-text"/>
     </HBox>
 

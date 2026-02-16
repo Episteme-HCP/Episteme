@@ -36,6 +36,16 @@ public class EnvironmentController {
         refreshProviders();
     }
 
+    @FXML private javafx.scene.control.Button refreshBtn;
+    
+    public void updateUI(java.util.ResourceBundle resources) {
+        if (refreshBtn != null) refreshBtn.setText(resources.getString("btn.refresh"));
+        if (typeColumn != null) typeColumn.setText(resources.getString("col.type")); // Need key
+        if (nameColumn != null) nameColumn.setText(resources.getString("col.name"));
+        if (statusColumn != null) statusColumn.setText(resources.getString("col.status"));
+        if (classColumn != null) classColumn.setText(resources.getString("col.implementation")); // Need key? Or use col.result?
+    }
+
     @FXML
     private void handleRefresh() {
         refreshProviders();

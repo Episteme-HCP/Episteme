@@ -72,7 +72,7 @@
 
             <!-- Tab 3: Environment -->
             <Tab fx:id="environmentTab" text="ENVIRONMENT" styleClass="tab">
-                <fx:include source="EnvironmentView.fxml"/>
+                <fx:include fx:id="environmentView" source="EnvironmentView.fxml"/>
             </Tab>
 
             <!-- Tab 4: History & Reports -->

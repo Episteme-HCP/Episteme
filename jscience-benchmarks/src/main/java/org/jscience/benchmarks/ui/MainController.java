@@ -75,12 +75,23 @@ public class MainController {
     private boolean isProcessingQueue = false;
     private ResourceBundle resources;
 
+    private javafx.stage.Stage primaryStage;
+    @FXML private EnvironmentController environmentViewController;
+
+    public void setPrimaryStage(javafx.stage.Stage stage) {
+        this.primaryStage = stage;
+        // Trigger UI update once stage is set (to update title)
+        if (resources != null) updateUI(java.util.Locale.getDefault());
+    }
+
     private void updateUI(Locale locale) {
         try {
             resources = ResourceBundle.getBundle("org.jscience.benchmarks.ui.messages", locale);
             
             // Header
             mainTitleLabel.setText(resources.getString("app.title"));
+            if (primaryStage != null) primaryStage.setTitle(resources.getString("app.window.title"));
+            
             languageLabel.setText(resources.getString("app.language"));
             aboutBtn.setText(resources.getString("app.about"));
 
@@ -112,6 +123,7 @@ public class MainController {
             // History Tab
             historyTitleLabel.setText(resources.getString("lbl.historical_runs"));
             exportHistoryBtn.setText(resources.getString("btn.export_json"));
+            historyTable.setPlaceholder(new Label(resources.getString("msg.no_history")));
             
             // History Columns
             dateColumn.setText(resources.getString("col.date"));
@@ -122,12 +134,17 @@ public class MainController {
             histDomainColumn.setText(resources.getString("col.domain"));
             resultsColumn.setText(resources.getString("col.result"));
 
+            // Update nested controller
+            if (environmentViewController != null) {
+                environmentViewController.updateUI(resources);
+            }
+
         } catch (Exception e) {
             System.err.println("Failed to update UI language: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
+    
     // Helper method to load history
     private void loadHistory() {
         for (BenchmarkRunSummary summary : resultService.loadResults()) {
