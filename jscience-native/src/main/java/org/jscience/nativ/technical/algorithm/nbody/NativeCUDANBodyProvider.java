@@ -45,7 +45,8 @@ public class NativeCUDANBodyProvider implements NBodyProvider {
 
     @Override
     public boolean isAvailable() {
-        return gpuAvailable;
+        // Disabled: No true GPU implementation yet (was CPU placeholder)
+        return false;
     }
 
     @Override

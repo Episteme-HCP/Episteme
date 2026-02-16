@@ -77,7 +77,8 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements SparseLinearAlgebra
 
     @Override
     public boolean isAvailable() {
-        return initialized && backend.isAvailable();
+        // Disabled: No true OpenCL implementation yet (was CPU placeholder)
+        return false; 
     }
 
     public String getName() {

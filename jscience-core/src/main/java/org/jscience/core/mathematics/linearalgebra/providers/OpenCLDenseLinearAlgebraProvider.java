@@ -174,14 +174,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
     private Vector<E> executeBinaryOp(Vector<E> a, Vector<E> b, String kernelName) {
         ensureInitialized();
         if (!usable || !(field.zero() instanceof Real)) {
-            // Fallback to CPU provider if OpenCL is not usable or element type is not Real
-            if ("vectorAdd".equals(kernelName)) {
-                return cpuProvider.add(a, b);
-            } else if ("vectorSubtract".equals(kernelName)) {
-                return cpuProvider.subtract(a, b);
-            }
-            // Should not happen if all binary ops are handled
-            throw new UnsupportedOperationException("Unsupported binary operation: " + kernelName);
+            throw new UnsupportedOperationException("OpenCL backend not usable or field not supported.");
         }
 
         try {
@@ -196,15 +189,9 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
             return toVector(dataC);
         } catch (Exception e) {
-            // Log the exception and fallback to CPU
-            System.err.println("OpenCL operation failed for " + kernelName + ", falling back to CPU: " + e.getMessage());
+            System.err.println("OpenCL operation failed for " + kernelName + ": " + e.getMessage());
             e.printStackTrace();
-            if ("vectorAdd".equals(kernelName)) {
-                return cpuProvider.add(a, b);
-            } else if ("vectorSubtract".equals(kernelName)) {
-                return cpuProvider.subtract(a, b);
-            }
-            throw new UnsupportedOperationException("Unsupported binary operation: " + kernelName, e);
+            throw new RuntimeException("OpenCL execution failed", e);
         }
     }
 
@@ -313,7 +300,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         ensureInitialized();
         if (!usable || !(field.zero() instanceof Real)) {
-            return cpuProvider.multiply(a, b);
+            throw new UnsupportedOperationException("OpenCL backend not usable or field not supported.");
         }
 
         try {
@@ -323,11 +310,6 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
             if (k != b.rows()) {
                 throw new IllegalArgumentException("Matrix dimension mismatch");
-            }
-
-            // Only use OpenCL for "large enough" matrices to amortize overhead
-            if ((long) m * n * k < 1_000_000) {
-                return cpuProvider.multiply(a, b);
             }
 
             double[] dataA = null;
@@ -372,7 +354,7 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
             return res;
         } catch (Exception e) {
             e.printStackTrace();
-            return cpuProvider.multiply(a, b);
+            throw new RuntimeException("OpenCL Matrix Multiply failed", e);
         }
     }
 
