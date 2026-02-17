@@ -341,6 +341,58 @@ public class MPIDistributedContext implements DistributedContext {
                 throw new RuntimeException("MPI Fence failed", e);
             }
         }
+
+        @Override
+        public void broadcast(DoubleBuffer buffer, int root) {
+            try {
+                // Comm.Bcast(Object buf, int offset, int count, Datatype type, int root)
+                Class<?> datatypeClass = Class.forName("mpi.Datatype");
+                Object doubleType = mpiClass.getField("DOUBLE").get(null);
+                
+                // For direct buffers, we might need a different approach or ensure MPI supports them.
+                // MPJ Express supports direct buffers.
+                // However, the signature usually takes Object buf.
+                
+                mpiClass.getField("COMM_WORLD").get(null).getClass()
+                    .getMethod("Bcast", Object.class, int.class, int.class, datatypeClass, int.class)
+                    .invoke(commWorld, buffer, 0, buffer.capacity(), doubleType, root);
+                    
+            } catch (Exception e) {
+                 throw new RuntimeException("MPI Broadcast failed", e);
+            }
+        }
+
+        @Override
+        public void allGather(DoubleBuffer sendBuffer, DoubleBuffer recvBuffer) {
+             try {
+                // Comm.Allgather(Object sendbuf, int sendoffset, int sendcount, Datatype sendtype, 
+                //                Object recvbuf, int recvoffset, int recvcount, Datatype recvtype)
+                
+                Class<?> datatypeClass = Class.forName("mpi.Datatype");
+                Object doubleType = mpiClass.getField("DOUBLE").get(null);
+                
+                mpiClass.getField("COMM_WORLD").get(null).getClass()
+                    .getMethod("Allgather", Object.class, int.class, int.class, datatypeClass, 
+                                            Object.class, int.class, int.class, datatypeClass)
+                    .invoke(commWorld, 
+                            sendBuffer, 0, sendBuffer.capacity(), doubleType,
+                            recvBuffer, 0, sendBuffer.capacity(), doubleType); // recv count is per-process count!
+                            
+            } catch (Exception e) {
+                 throw new RuntimeException("MPI Allgather failed", e);
+            }
+        }
+
+        @Override
+        public void barrier() {
+            try {
+                 mpiClass.getField("COMM_WORLD").get(null).getClass()
+                    .getMethod("Barrier")
+                    .invoke(commWorld);
+            } catch (Exception e) {
+                 throw new RuntimeException("MPI Barrier failed", e);
+            }
+        }
     }
 }
 

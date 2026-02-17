@@ -240,4 +240,43 @@ public class NativeFFTProvider implements FFTProvider, LibraryBackend {
             throw new RuntimeException("Complex Inverse FFT execution failed", e);
         }
     }
+    @Override
+    public double[][][] transform2D(double[][] real, double[][] imag) {
+        throw new UnsupportedOperationException("2D FFT not implemented in NativeFFTProvider yet");
+    }
+
+    @Override
+    public double[][][] inverseTransform2D(double[][] real, double[][] imag) {
+        throw new UnsupportedOperationException("2D Inverse FFT not implemented in NativeFFTProvider yet");
+    }
+
+    @Override
+    public double[][][][] transform3D(double[][][] real, double[][][] imag) {
+        throw new UnsupportedOperationException("3D FFT not implemented in NativeFFTProvider yet");
+    }
+
+    @Override
+    public double[][][][] inverseTransform3D(double[][][] real, double[][][] imag) {
+        throw new UnsupportedOperationException("3D Inverse FFT not implemented in NativeFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][] transform2D(Real[][] real, Real[][] imag) {
+        throw new UnsupportedOperationException("2D FFT (Real) not implemented in NativeFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][] inverseTransform2D(Real[][] real, Real[][] imag) {
+        throw new UnsupportedOperationException("2D Inverse FFT (Real) not implemented in NativeFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][][] transform3D(Real[][][] real, Real[][][] imag) {
+        throw new UnsupportedOperationException("3D FFT (Real) not implemented in NativeFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][][] inverseTransform3D(Real[][][] real, Real[][][] imag) {
+        throw new UnsupportedOperationException("3D Inverse FFT (Real) not implemented in NativeFFTProvider yet");
+    }
 }

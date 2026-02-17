@@ -100,9 +100,14 @@ public class LocalDistributedContext implements DistributedContext {
                 })
                 .collect(Collectors.toList());
 
-        return pool.invokeAll(wrappedTasks).stream()
-                .map(f -> (Future<T>) f)
-                .collect(Collectors.toList());
+        try {
+            return pool.invokeAll(wrappedTasks).stream()
+                    .map(f -> (Future<T>) f)
+                    .collect(Collectors.toList());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted during parallel task execution", e);
+        }
     }
 
     @Override
@@ -134,6 +139,36 @@ public class LocalDistributedContext implements DistributedContext {
     @Override
     public void fence() {
         // No-op for local memory
+    }
+
+    @Override
+    public void broadcast(DoubleBuffer buffer, int root) {
+        // In a local context (single node), broadcast is a no-op as the data is already present.
+    }
+
+    @Override
+    public void allGather(DoubleBuffer sendBuffer, DoubleBuffer recvBuffer) {
+        // In a local context, AllGather effectively copies sendBuffer to recvBuffer
+        if (recvBuffer.remaining() < sendBuffer.remaining()) {
+             throw new IllegalArgumentException("Receive buffer too small for local AllGather");
+        }
+        
+        // Save position/limit
+        int sendPos = sendBuffer.position();
+        // int recvPos = recvBuffer.position(); // Unused
+        
+        // Copy data
+        recvBuffer.put(sendBuffer);
+        
+        // Restore positions (optional, but good practice for "simulating" independent buffers)
+        // However, for typical AllGather usage, recvBuffer is expected to be filled.
+        // We leave recvBuffer at its new position.
+        sendBuffer.position(sendPos);
+    }
+
+    @Override
+    public void barrier() {
+        // No-op for single threaded/local context
     }
 }
 

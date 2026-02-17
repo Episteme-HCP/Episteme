@@ -7,9 +7,7 @@ package org.jscience.core.technical.backend.gpu.opencl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
-import org.jscience.core.media.vision.providers.OpenCLVisionProvider;
 
-import java.awt.image.BufferedImage;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -18,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class RealOpenCLVerificationTest {
 
+    @SuppressWarnings("unused")
     private static boolean isOpenCLAvailable() {
         return new OpenCLBackend().isAvailable();
     }

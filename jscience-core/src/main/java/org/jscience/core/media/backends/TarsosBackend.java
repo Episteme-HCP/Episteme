@@ -17,10 +17,6 @@ import org.jscience.core.media.AudioBackend;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 
-import javax.sound.sampled.AudioFormat;
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * TarsosDSP Backend (Scientific Analysis).
@@ -43,7 +39,6 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
     */
     private double currentTime = 0;
     // private ExecutorService executor;
-    private boolean isPlaying = false;
 
     // ---- Backend Implementation ----
 

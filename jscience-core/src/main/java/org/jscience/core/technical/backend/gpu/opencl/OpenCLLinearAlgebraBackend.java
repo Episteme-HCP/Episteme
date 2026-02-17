@@ -16,8 +16,7 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
-import org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext;
+
 import org.jscience.core.technical.backend.nativ.LibraryBackend;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.core.technical.backend.ExecutionContext;

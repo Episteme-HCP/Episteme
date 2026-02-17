@@ -36,8 +36,7 @@ import org.jocl.cl_program;
 import org.jocl.cl_kernel;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
-import org.jocl.cl_mem;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
+
 import java.nio.DoubleBuffer;
 
 import static org.jocl.CL.*;
@@ -93,6 +92,7 @@ public class OpenCLBackend implements GPUBackend {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void start() {
         if (isInitialized) return;
         try {

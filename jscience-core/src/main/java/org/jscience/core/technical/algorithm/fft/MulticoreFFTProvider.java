@@ -12,6 +12,7 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
+import java.util.stream.IntStream;
 
 /**
  * Multicore implementation of FFTProvider using Fork/Join framework.
@@ -98,6 +99,235 @@ public class MulticoreFFTProvider implements FFTProvider {
         Real[][] res = inverseTransform(real, imag);
         Complex[] out = new Complex[n];
         for (int i = 0; i < n; i++) out[i] = Complex.of(res[0][i], res[1][i]);
+        return out;
+    }
+
+    // ========== 2D PARALLEL FFT ==========
+
+    @Override
+    public double[][][] transform2D(double[][] real, double[][] imag) {
+        return computeFFT2D(real, imag, false);
+    }
+
+    @Override
+    public double[][][] inverseTransform2D(double[][] real, double[][] imag) {
+        return computeFFT2D(real, imag, true);
+    }
+
+    @Override
+    public Real[][][] transform2D(Real[][] real, Real[][] imag) {
+        return computeFFT2DReal(real, imag, false);
+    }
+
+    @Override
+    public Real[][][] inverseTransform2D(Real[][] real, Real[][] imag) {
+        return computeFFT2DReal(real, imag, true);
+    }
+
+    // ========== 3D PARALLEL FFT ==========
+
+    @Override
+    public double[][][][] transform3D(double[][][] real, double[][][] imag) {
+        return computeFFT3D(real, imag, false);
+    }
+
+    @Override
+    public double[][][][] inverseTransform3D(double[][][] real, double[][][] imag) {
+        return computeFFT3D(real, imag, true);
+    }
+
+    @Override
+    public Real[][][][] transform3D(Real[][][] real, Real[][][] imag) {
+        return computeFFT3DReal(real, imag, false);
+    }
+
+    @Override
+    public Real[][][][] inverseTransform3D(Real[][][] real, Real[][][] imag) {
+        return computeFFT3DReal(real, imag, true);
+    }
+
+    // --- Helpers 2D ---
+
+    private double[][][] computeFFT2D(double[][] real, double[][] imag, boolean inverse) {
+        int rows = real.length;
+        int cols = real[0].length;
+        Complex[][] data = new Complex[rows][cols];
+
+        // Parallel Copy
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            for (int j = 0; j < cols; j++) {
+                data[i][j] = Complex.of(real[i][j], imag[i][j]);
+            }
+        });
+
+        // 1. Rows (Parallel)
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            data[i] = basicRecursiveFFT(data[i], inverse);
+        });
+
+        // 2. Columns (Parallel)
+        IntStream.range(0, cols).parallel().forEach(j -> {
+            Complex[] col = new Complex[rows];
+            for (int i = 0; i < rows; i++) col[i] = data[i][j];
+            col = basicRecursiveFFT(col, inverse);
+            for (int i = 0; i < rows; i++) data[i][j] = col[i];
+        });
+
+        double[][][] out = new double[2][rows][cols];
+        double scale = inverse ? 1.0 / (rows * cols) : 1.0;
+
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            for (int j = 0; j < cols; j++) {
+                out[0][i][j] = data[i][j].real() * scale;
+                out[1][i][j] = data[i][j].imaginary() * scale;
+            }
+        });
+        return out;
+    }
+
+    private Real[][][] computeFFT2DReal(Real[][] real, Real[][] imag, boolean inverse) {
+        int rows = real.length;
+        int cols = real[0].length;
+        Complex[][] data = new Complex[rows][cols];
+
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            for (int j = 0; j < cols; j++) {
+                data[i][j] = Complex.of(real[i][j], imag[i][j]);
+            }
+        });
+
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            data[i] = basicRecursiveFFT(data[i], inverse);
+        });
+
+        IntStream.range(0, cols).parallel().forEach(j -> {
+            Complex[] col = new Complex[rows];
+            for (int i = 0; i < rows; i++) col[i] = data[i][j];
+            col = basicRecursiveFFT(col, inverse);
+            for (int i = 0; i < rows; i++) data[i][j] = col[i];
+        });
+
+        Real[][][] out = new Real[2][rows][cols];
+        Real scale = inverse ? Real.ONE.divide(Real.of(rows * cols)) : Real.ONE;
+
+        IntStream.range(0, rows).parallel().forEach(i -> {
+            for (int j = 0; j < cols; j++) {
+                out[0][i][j] = data[i][j].getReal().multiply(scale);
+                out[1][i][j] = data[i][j].getImaginary().multiply(scale);
+            }
+        });
+        return out;
+    }
+
+    // --- Helpers 3D ---
+
+    private double[][][][] computeFFT3D(double[][][] real, double[][][] imag, boolean inverse) {
+        int n = real.length;
+        int m = real[0].length;
+        int d = real[0][0].length;
+        Complex[][][] data = new Complex[n][m][d];
+
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < d; k++) {
+                    data[i][j][k] = Complex.of(real[i][j][k], imag[i][j][k]);
+                }
+            }
+        });
+
+        // 1. Z-dimension (Depth)
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int j = 0; j < m; j++) {
+                data[i][j] = basicRecursiveFFT(data[i][j], inverse);
+            }
+        });
+
+        // 2. Y-dimension (Cols)
+        IntStream.range(0, n).parallel().forEach(i -> {
+            Complex[] buffer = new Complex[m];
+            for (int k = 0; k < d; k++) {
+                for (int j = 0; j < m; j++) buffer[j] = data[i][j][k];
+                buffer = basicRecursiveFFT(buffer, inverse);
+                for (int j = 0; j < m; j++) data[i][j][k] = buffer[j];
+            }
+        });
+
+        // 3. X-dimension (Rows)
+        IntStream.range(0, m).parallel().forEach(j -> {
+            Complex[] buffer = new Complex[n];
+            for (int k = 0; k < d; k++) {
+                for (int i = 0; i < n; i++) buffer[i] = data[i][j][k];
+                buffer = basicRecursiveFFT(buffer, inverse);
+                for (int i = 0; i < n; i++) data[i][j][k] = buffer[i];
+            }
+        });
+
+        double[][][][] out = new double[2][n][m][d];
+        double scale = inverse ? 1.0 / (n * m * d) : 1.0;
+
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < d; k++) {
+                    out[0][i][j][k] = data[i][j][k].real() * scale;
+                    out[1][i][j][k] = data[i][j][k].imaginary() * scale;
+                }
+            }
+        });
+        return out;
+    }
+
+    private Real[][][][] computeFFT3DReal(Real[][][] real, Real[][][] imag, boolean inverse) {
+        int n = real.length;
+        int m = real[0].length;
+        int d = real[0][0].length;
+        Complex[][][] data = new Complex[n][m][d];
+
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < d; k++) {
+                    data[i][j][k] = Complex.of(real[i][j][k], imag[i][j][k]);
+                }
+            }
+        });
+
+        // 1. Z
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int j = 0; j < m; j++) {
+                data[i][j] = basicRecursiveFFT(data[i][j], inverse);
+            }
+        });
+
+        // 2. Y
+        IntStream.range(0, n).parallel().forEach(i -> {
+            Complex[] buffer = new Complex[m];
+            for (int k = 0; k < d; k++) {
+                for (int j = 0; j < m; j++) buffer[j] = data[i][j][k];
+                buffer = basicRecursiveFFT(buffer, inverse);
+                for (int j = 0; j < m; j++) data[i][j][k] = buffer[j];
+            }
+        });
+
+        // 3. X
+        IntStream.range(0, m).parallel().forEach(j -> {
+            Complex[] buffer = new Complex[n];
+            for (int k = 0; k < d; k++) {
+                for (int i = 0; i < n; i++) buffer[i] = data[i][j][k];
+                buffer = basicRecursiveFFT(buffer, inverse);
+                for (int i = 0; i < n; i++) data[i][j][k] = buffer[i];
+            }
+        });
+
+        Real[][][][] out = new Real[2][n][m][d];
+        Real scale = inverse ? Real.ONE.divide(Real.of(n * m * d)) : Real.ONE;
+
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < d; k++) {
+                    out[0][i][j][k] = data[i][j][k].getReal().multiply(scale);
+                    out[1][i][j][k] = data[i][j][k].getImaginary().multiply(scale);
+                }
+            }
+        });
         return out;
     }
 

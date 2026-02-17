@@ -339,9 +339,7 @@ public class CUDATensor<T> implements Tensor<T> {
              float[] data = copyToHostFloat();
              float[] result = new float[size];
              for (int i = 0; i < size; i++) {
-                 @SuppressWarnings("unchecked")
-                 T val = (T) Float.valueOf(data[i]);
-                 @SuppressWarnings("unchecked")
+                 T val = explicitType.cast(Float.valueOf(data[i]));
                  float mapped = ((Number) function.apply(val)).floatValue();
                  result[i] = mapped;
              }
@@ -350,9 +348,7 @@ public class CUDATensor<T> implements Tensor<T> {
              double[] data = copyToHostDouble();
              double[] result = new double[size];
              for (int i = 0; i < size; i++) {
-                 @SuppressWarnings("unchecked")
-                 T val = (T) Double.valueOf(data[i]);
-                 @SuppressWarnings("unchecked")
+                 T val = explicitType.cast(Double.valueOf(data[i]));
                  double mapped = ((Number) function.apply(val)).doubleValue();
                  result[i] = mapped;
              }
@@ -442,7 +438,7 @@ public class CUDATensor<T> implements Tensor<T> {
         return data;
     }
 
-    @SuppressWarnings("unchecked")
+
     private static <T> CUDATensor<T> fromHostFloat(float[] data, int[] shape, Class<T> type) {
         long byteSize = (long)data.length * Sizeof.FLOAT;
         Pointer ptr = new Pointer();
@@ -451,7 +447,7 @@ public class CUDATensor<T> implements Tensor<T> {
         return new CUDATensor<>(ptr, shape, type);
     }
 
-    @SuppressWarnings("unchecked")
+
     private static <T> CUDATensor<T> fromHostDouble(double[] data, int[] shape, Class<T> type) {
         long byteSize = (long)data.length * Sizeof.DOUBLE;
         Pointer ptr = new Pointer();
@@ -465,14 +461,14 @@ public class CUDATensor<T> implements Tensor<T> {
     private static void broadcastCopy(Object src, Object dst, int[] srcShape, int[] dstShape, int dimOffset) {
         int dstSize = Arrays.stream(dstShape).reduce(1, (a, b) -> a * b);
         int srcRank = srcShape.length;
-        int dstRank = dstShape.length;
+        // int dstRank = dstShape.length; // Unused
         int[] srcStrides = computeStrides(srcShape);
         int[] dstStrides = computeStrides(dstShape);
 
         for (int i = 0; i < dstSize; i++) {
             int[] dstIndices = flatToIndices(i, dstShape, dstStrides);
             int srcIdx = 0;
-            int srcStride = 1;
+            // int srcStride = 1; // Unused
             for (int d = srcRank - 1; d >= 0; d--) {
                 int dstDimIdx = d + dimOffset;
                 int coord = (srcShape[d] == 1) ? 0 : dstIndices[dstDimIdx];

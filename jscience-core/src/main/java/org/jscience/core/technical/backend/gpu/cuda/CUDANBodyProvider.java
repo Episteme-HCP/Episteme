@@ -9,10 +9,8 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.NBodyProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
+import jcuda.driver.JCudaDriver;
 
-import jcuda.Pointer;
-import jcuda.Sizeof;
-import jcuda.driver.*;
 // import jcuda.nvrtc.JNvrtc;
 // import jcuda.nvrtc.nvrtcProgram;
 
@@ -34,41 +32,6 @@ public class CUDANBodyProvider implements NBodyProvider {
 
     private static final int GPU_THRESHOLD = 1000;
     private static volatile Boolean cudaAvailable;
-
-    /** CUDA kernel source for N-Body force computation (O(N²) all-pairs). */
-    private static final String NBODY_KERNEL_SOURCE =
-        "extern \"C\"                                                          \n" +
-        "__global__ void computeForcesKernel(                                  \n" +
-        "    const double* __restrict__ positions,                             \n" +
-        "    const double* __restrict__ masses,                                \n" +
-        "    double* __restrict__ forces,                                      \n" +
-        "    int n, double G, double softening)                                \n" +
-        "{                                                                     \n" +
-        "    int i = blockIdx.x * blockDim.x + threadIdx.x;                    \n" +
-        "    if (i >= n) return;                                               \n" +
-        "                                                                      \n" +
-        "    double xi = positions[i*3], yi = positions[i*3+1], zi = positions[i*3+2];\n" +
-        "    double mi = masses[i];                                            \n" +
-        "    double fx = 0.0, fy = 0.0, fz = 0.0;                             \n" +
-        "                                                                      \n" +
-        "    for (int j = 0; j < n; j++) {                                     \n" +
-        "        if (j == i) continue;                                         \n" +
-        "        double dx = positions[j*3]     - xi;                          \n" +
-        "        double dy = positions[j*3 + 1] - yi;                          \n" +
-        "        double dz = positions[j*3 + 2] - zi;                          \n" +
-        "        double dist2 = dx*dx + dy*dy + dz*dz + softening*softening;   \n" +
-        "        double invDist = rsqrt(dist2);                                \n" +
-        "        double invDist3 = invDist * invDist * invDist;                 \n" +
-        "        double f = G * mi * masses[j] * invDist3;                     \n" +
-        "        fx += f * dx;                                                 \n" +
-        "        fy += f * dy;                                                 \n" +
-        "        fz += f * dz;                                                 \n" +
-        "    }                                                                 \n" +
-        "                                                                      \n" +
-        "    forces[i*3]     = fx;                                             \n" +
-        "    forces[i*3 + 1] = fy;                                             \n" +
-        "    forces[i*3 + 2] = fz;                                             \n" +
-        "}                                                                     \n";
 
 
     @Override

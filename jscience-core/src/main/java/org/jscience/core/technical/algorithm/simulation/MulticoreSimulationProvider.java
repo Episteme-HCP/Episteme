@@ -8,7 +8,7 @@ package org.jscience.core.technical.algorithm.simulation;
 import org.jscience.core.technical.algorithm.SimulationProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.algorithm.simulation.ParallelSimulationProvider;
+
 import java.util.List;
 
 /**

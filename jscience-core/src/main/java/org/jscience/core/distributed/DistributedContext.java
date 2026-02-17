@@ -117,6 +117,35 @@ public interface DistributedContext {
     default void fence() {
         // No-op by default
     }
+
+    /**
+     * Broadcasts data from a root node to all other nodes.
+     *
+     * @param buffer The buffer containing data to broadcast. On root, this contains the source data.
+     *               On other nodes, this buffer will be filled with the received data.
+     * @param root   The rank of the root node broadcasting the data.
+     */
+    default void broadcast(DoubleBuffer buffer, int root) {
+        throw new UnsupportedOperationException("Broadcast not supported by this context");
+    }
+
+    /**
+     * Gathers data from all tasks and distributes the combined data to all tasks.
+     *
+     * @param sendBuffer The buffer containing the data to be sent by this task.
+     * @param recvBuffer The buffer where the gathered data from all tasks will be stored.
+     */
+    default void allGather(DoubleBuffer sendBuffer, DoubleBuffer recvBuffer) {
+        throw new UnsupportedOperationException("AllGather not supported by this context");
+    }
+
+    /**
+     * Synchronizes all processes.
+     * A process waits at this call until all processes have reached this barrier.
+     */
+    default void barrier() {
+        // No-op by default for single-threaded/local contexts
+    }
 }
 
 

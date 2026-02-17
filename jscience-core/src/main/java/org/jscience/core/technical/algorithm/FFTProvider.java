@@ -56,9 +56,42 @@ public interface FFTProvider extends AlgorithmProvider {
     /**
      * Performs a 2D forward FFT on double data.
      */
-    default double[][][] transform2D(double[][] real, double[][] imag) {
-        throw new UnsupportedOperationException("2D FFT not implemented");
-    }
+    double[][][] transform2D(double[][] real, double[][] imag);
+
+    /**
+     * Performs a 2D inverse FFT on double data.
+     */
+    double[][][] inverseTransform2D(double[][] real, double[][] imag);
+
+    /**
+     * Performs a 2D forward FFT on Real data.
+     */
+    Real[][][] transform2D(Real[][] real, Real[][] imag);
+
+    /**
+     * Performs a 2D inverse FFT on Real data.
+     */
+    Real[][][] inverseTransform2D(Real[][] real, Real[][] imag);
+
+    /**
+     * Performs a 3D forward FFT on double data.
+     */
+    double[][][][] transform3D(double[][][] real, double[][][] imag);
+
+    /**
+     * Performs a 3D inverse FFT on double data.
+     */
+    double[][][][] inverseTransform3D(double[][][] real, double[][][] imag);
+
+    /**
+     * Performs a 3D forward FFT on Real data.
+     */
+    Real[][][][] transform3D(Real[][][] real, Real[][][] imag);
+
+    /**
+     * Performs a 3D inverse FFT on Real data.
+     */
+    Real[][][][] inverseTransform3D(Real[][][] real, Real[][][] imag);
 
     @Override
     default String getName() {

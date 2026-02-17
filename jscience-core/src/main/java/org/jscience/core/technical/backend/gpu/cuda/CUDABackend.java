@@ -36,6 +36,7 @@ import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@SuppressWarnings("preview")
 @AutoService({Backend.class, ComputeBackend.class, LibraryBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
 public class CUDABackend implements GPUBackend, LibraryBackend, SparseLinearAlgebraProvider<Real> {
 

@@ -10,8 +10,7 @@ import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.FFTProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
-import org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext;
+
 
 import static org.jocl.CL.*;
 import org.jocl.*;
@@ -236,5 +235,44 @@ public class OpenCLFFTProvider implements FFTProvider {
             out[k] = Complex.of(res[0][k], res[1][k]);
         }
         return out;
+    }
+    @Override
+    public double[][][] transform2D(double[][] real, double[][] imag) {
+        throw new UnsupportedOperationException("2D FFT not implemented in OpenCLFFTProvider yet");
+    }
+
+    @Override
+    public double[][][] inverseTransform2D(double[][] real, double[][] imag) {
+        throw new UnsupportedOperationException("2D Inverse FFT not implemented in OpenCLFFTProvider yet");
+    }
+
+    @Override
+    public double[][][][] transform3D(double[][][] real, double[][][] imag) {
+        throw new UnsupportedOperationException("3D FFT not implemented in OpenCLFFTProvider yet");
+    }
+
+    @Override
+    public double[][][][] inverseTransform3D(double[][][] real, double[][][] imag) {
+        throw new UnsupportedOperationException("3D Inverse FFT not implemented in OpenCLFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][] transform2D(Real[][] real, Real[][] imag) {
+        throw new UnsupportedOperationException("2D FFT (Real) not implemented in OpenCLFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][] inverseTransform2D(Real[][] real, Real[][] imag) {
+        throw new UnsupportedOperationException("2D Inverse FFT (Real) not implemented in OpenCLFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][][] transform3D(Real[][][] real, Real[][][] imag) {
+        throw new UnsupportedOperationException("3D FFT (Real) not implemented in OpenCLFFTProvider yet");
+    }
+
+    @Override
+    public Real[][][][] inverseTransform3D(Real[][][] real, Real[][][] imag) {
+        throw new UnsupportedOperationException("3D Inverse FFT (Real) not implemented in OpenCLFFTProvider yet");
     }
 }

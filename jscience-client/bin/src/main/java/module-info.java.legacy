@@ -1,0 +1,24 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+/**
+ * JScience Client module providing client-side interfaces and distributed tasks.
+ */
+module org.jscience.client {
+    requires transitive org.jscience.core;
+    requires transitive org.jscience.natural;
+    requires transitive org.jscience.social;
+    
+    exports org.jscience.client.client;
+    exports org.jscience.client.client.biology;
+    exports org.jscience.client.client.chemistry;
+    exports org.jscience.client.client.distributed;
+    exports org.jscience.client.client.earth;
+    exports org.jscience.client.client.mathematics;
+    exports org.jscience.client.client.physics;
+    exports org.jscience.client.client.politics;
+    exports org.jscience.client.client.shared;
+    exports org.jscience.client.client.util;
+}

@@ -40,7 +40,7 @@ public class DenseNeuralProvider implements TensorProvider {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
         int size = computeSize(shape);
         T[] data = createFilledArray(elementType, size, zeroValue(elementType));
@@ -48,7 +48,7 @@ public class DenseNeuralProvider implements TensorProvider {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
         int size = computeSize(shape);
         T[] data = createFilledArray(elementType, size, oneValue(elementType));

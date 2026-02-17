@@ -9,8 +9,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.NBodyProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
-import org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext;
+
 import java.util.logging.Logger;
 
 import org.jocl.cl_context;
