@@ -1,0 +1,383 @@
+﻿[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] JScience Unifying Parent                                           [pom]
+[INFO] JScience Core Engine                                               [jar]
+[INFO] JScience Natural                                                   [jar]
+[INFO] JScience Social                                                    [jar]
+[INFO] JScience Native                                                    [jar]
+[INFO] JScience Server                                                    [jar]
+[INFO] JScience Client Applications                                       [jar]
+[INFO] JScience Benchmarking Suite                                        [jar]
+[INFO] JScience Featured Apps                                             [jar]
+[INFO] JScience Worker Node                                               [jar]
+[INFO] JScience Database                                                  [jar]
+[INFO] jscience-jni                                                       [jar]
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-parent >--------------------
+[INFO] Building JScience Unifying Parent 1.0.0-SNAPSHOT                  [1/12]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-parent ---
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-parent ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ jscience-parent ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ jscience-parent ---
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\pom.xml to C:\Users\silve\.m2\repository\org\jscience\jscience-parent\1.0.0-SNAPSHOT\jscience-parent-1.0.0-SNAPSHOT.pom
+[INFO] 
+[INFO] ---------------------< org.jscience:jscience-core >---------------------
+[INFO] Building JScience Core Engine 1.0.0-SNAPSHOT                      [2/12]
+[INFO]   from jscience-core\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-core ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-core\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-core ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-core\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- os:1.7.1:detect (default) @ jscience-core ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-core ---
+[INFO] Copying 32 resources from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] The encoding used to copy filtered properties files have not been set. This means that the same encoding will be used to copy filtered properties files as when copying other filtered resources. This might not be what you want! Run your build with --debug to see which files might be affected. Read more at https://maven.apache.org/plugins/maven-resources-plugin/examples/filtering-properties-files.html
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-core ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 1258 source files with javac [debug release 25] to target\classes
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[40,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/cuda/CUDABackend.java:[40,1] Service provider org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/media/audio/backends/MulticoreAudioBackend.java:[24,1] Service provider org.jscience.core.media.audio.AudioAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/opencl/OpenCLLinearAlgebraBackend.java:[48,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/technical/backend/gpu/opencl/OpenCLLinearAlgebraBackend.java:[48,1] Service provider org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/StrassenLinearAlgebraProvider.java:[21,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CPUSparseLinearAlgebraProvider.java:[54,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CPUSparseLinearAlgebraProvider.java:[54,1] Service provider org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/ColtLinearAlgebraProvider.java:[57,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/media/vision/backends/JavaAWTVisionBackend.java:[21,1] Service provider org.jscience.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CARMALinearAlgebraProvider.java:[21,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CommonsMathLinearAlgebraProvider.java:[53,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/StandardLinearAlgebraProvider.java:[17,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/CPUDenseLinearAlgebraProvider.java:[56,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/JBlasLinearAlgebraProvider.java:[53,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/EJMLLinearAlgebraProvider.java:[58,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/media/audio/backends/JavaSoundBackend.java:[27,1] Service provider org.jscience.core.media.audio.AudioAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/linearalgebra/providers/ND4JLinearAlgebraProvider.java:[20,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/mathematics/loaders/openmath/OMSymbol.java:[72,19] deprecated item is not annotated with @Deprecated
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ComputeContext.java: C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\core\ComputeContext.java uses unchecked or unsafe operations.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-core/src/main/java/org/jscience/core/ComputeContext.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-core ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-core\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-core ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 936 source files with javac [debug release 25] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ jscience-core ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ jscience-core ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ jscience-core ---
+[INFO] Building jar: C:\Silvere\Encours\Developpement\JScience\jscience-core\target\jscience-core-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ jscience-core ---
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-core\pom.xml to C:\Users\silve\.m2\repository\org\jscience\jscience-core\1.0.0-SNAPSHOT\jscience-core-1.0.0-SNAPSHOT.pom
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-core\target\jscience-core-1.0.0-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jscience\jscience-core\1.0.0-SNAPSHOT\jscience-core-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] -------------------< org.jscience:jscience-natural >--------------------
+[INFO] Building JScience Natural 1.0.0-SNAPSHOT                          [3/12]
+[INFO]   from jscience-natural\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-natural ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-natural\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-natural ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-natural\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-natural ---
+[INFO] Copying 4794 resources from src\main\resources to target\classes
+[INFO] Copying 27 resources from src\main\resources to target\classes
+[INFO] The encoding used to copy filtered properties files have not been set. This means that the same encoding will be used to copy filtered properties files as when copying other filtered resources. This might not be what you want! Run your build with --debug to see which files might be affected. Read more at https://maven.apache.org/plugins/maven-resources-plugin/examples/filtering-properties-files.html
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-natural ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 911 source files with javac [debug release 21] to target\classes
+[WARNING] using incubating module(s): jdk.incubator.vector
+[WARNING] using incubating module(s): jdk.incubator.vector
+[WARNING] using incubating module(s): jdk.incubator.vector
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-natural/src/main/java/org/jscience/natural/chemistry/loaders/cml/cmlimpl/CMLBaseImpl.java:[350,17] deprecated item is not annotated with @Deprecated
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-natural ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-natural ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 541 source files with javac [debug release 21] to target\test-classes
+[WARNING] using incubating module(s): jdk.incubator.vector
+[WARNING] using incubating module(s): jdk.incubator.vector
+[WARNING] using incubating module(s): jdk.incubator.vector
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ jscience-natural ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ jscience-natural ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ jscience-natural ---
+[INFO] Building jar: C:\Silvere\Encours\Developpement\JScience\jscience-natural\target\jscience-natural-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ jscience-natural ---
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-natural\pom.xml to C:\Users\silve\.m2\repository\org\jscience\jscience-natural\1.0.0-SNAPSHOT\jscience-natural-1.0.0-SNAPSHOT.pom
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-natural\target\jscience-natural-1.0.0-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jscience\jscience-natural\1.0.0-SNAPSHOT\jscience-natural-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-social >--------------------
+[INFO] Building JScience Social 1.0.0-SNAPSHOT                           [4/12]
+[INFO]   from jscience-social\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-social ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-social\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-social ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-social\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-social ---
+[INFO] Copying 9 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-social ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 755 source files with javac [debug release 25] to target\classes
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/social/linguistics/loaders/tigerxml/Sentence.java:[273,16] deprecated item is not annotated with @Deprecated
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/social/linguistics/loaders/tigerxml/Sentence.java:[464,16] deprecated item is not annotated with @Deprecated
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/social/arts/ArtsConstants.java:[31,14] deprecated item is not annotated with @Deprecated
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/social/law/LawSuitSituation.java: C:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\social\law\LawSuitSituation.java uses or overrides a deprecated API.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/social/law/LawSuitSituation.java: Recompile with -Xlint:deprecation for details.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/social/psychology/social/HumanTimeline.java: C:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\social\psychology\social\HumanTimeline.java uses unchecked or unsafe operations.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/social/psychology/social/HumanTimeline.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-social ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-social\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-social ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 672 source files with javac [debug release 25] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ jscience-social ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ jscience-social ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ jscience-social ---
+[INFO] Building jar: C:\Silvere\Encours\Developpement\JScience\jscience-social\target\jscience-social-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ jscience-social ---
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-social\pom.xml to C:\Users\silve\.m2\repository\org\jscience\jscience-social\1.0.0-SNAPSHOT\jscience-social-1.0.0-SNAPSHOT.pom
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-social\target\jscience-social-1.0.0-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jscience\jscience-social\1.0.0-SNAPSHOT\jscience-social-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-native >--------------------
+[INFO] Building JScience Native 1.0.0-SNAPSHOT                           [5/12]
+[INFO]   from jscience-native\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-native ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-native\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-native ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-native\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-native ---
+[INFO] Copying 199 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-native ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 28 source files with javac [debug release 25] to target\classes
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/blas/NativeFFMBLASBackend.java:[30,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/technical/backend/simd/NativeSIMDLinearAlgebraBackend.java:[38,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/technical/algorithm/linearalgebra/NativeMulticoreLinearAlgebraProvider.java:[24,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-native ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-native\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-native ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 2 source files with javac [debug release 25] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ jscience-native ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ jscience-native ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ jscience-native ---
+[INFO] Building jar: C:\Silvere\Encours\Developpement\JScience\jscience-native\target\jscience-native-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ jscience-native ---
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-native\pom.xml to C:\Users\silve\.m2\repository\org\jscience\jscience-native\1.0.0-SNAPSHOT\jscience-native-1.0.0-SNAPSHOT.pom
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-native\target\jscience-native-1.0.0-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jscience\jscience-native\1.0.0-SNAPSHOT\jscience-native-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-server >--------------------
+[INFO] Building JScience Server 1.0.0-SNAPSHOT                           [6/12]
+[INFO]   from jscience-server\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-server ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-server\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-server ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-server\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- os:1.7.1:detect (default) @ jscience-server ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --- protobuf:0.6.1:compile (default) @ jscience-server ---
+[INFO] Compiling 6 proto file(s) to C:\Silvere\Encours\Developpement\JScience\jscience-server\target\generated-sources\protobuf\java
+[INFO] 
+[INFO] --- protobuf:0.6.1:compile-custom (default) @ jscience-server ---
+[INFO] Compiling 6 proto file(s) to C:\Silvere\Encours\Developpement\JScience\jscience-server\target\generated-sources\protobuf\grpc-java
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-server ---
+[INFO] Copying 6 resources from src\main\resources to target\classes
+[INFO] Copying 6 resources from src\main\proto to target\classes
+[INFO] Copying 6 resources from src\main\proto to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-server ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 201 source files with javac [debug release 25] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-server ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-server\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-server ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 10 source files with javac [debug release 25] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ jscience-server ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ jscience-server ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ jscience-server ---
+[INFO] Building jar: C:\Silvere\Encours\Developpement\JScience\jscience-server\target\jscience-server-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ jscience-server ---
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-server\pom.xml to C:\Users\silve\.m2\repository\org\jscience\jscience-server\1.0.0-SNAPSHOT\jscience-server-1.0.0-SNAPSHOT.pom
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-server\target\jscience-server-1.0.0-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jscience\jscience-server\1.0.0-SNAPSHOT\jscience-server-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-client >--------------------
+[INFO] Building JScience Client Applications 1.0.0-SNAPSHOT              [7/12]
+[INFO]   from jscience-client\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-client ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-client\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-client ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-client\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-client ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-client ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 37 source files with javac [debug release 25] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-client ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-client\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-client ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 1 source file with javac [debug release 25] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ jscience-client ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ jscience-client ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ jscience-client ---
+[INFO] Building jar: C:\Silvere\Encours\Developpement\JScience\jscience-client\target\jscience-client-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ jscience-client ---
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-client\pom.xml to C:\Users\silve\.m2\repository\org\jscience\jscience-client\1.0.0-SNAPSHOT\jscience-client-1.0.0-SNAPSHOT.pom
+[INFO] Installing C:\Silvere\Encours\Developpement\JScience\jscience-client\target\jscience-client-1.0.0-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jscience\jscience-client\1.0.0-SNAPSHOT\jscience-client-1.0.0-SNAPSHOT.jar
+[INFO] 
+[INFO] ------------------< org.jscience:jscience-benchmarks >------------------
+[INFO] Building JScience Benchmarking Suite 1.0.0-SNAPSHOT               [8/12]
+[INFO]   from jscience-benchmarks\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-benchmarks ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-benchmarks\target
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for JScience Unifying Parent 1.0.0-SNAPSHOT:
+[INFO] 
+[INFO] JScience Unifying Parent ........................... SUCCESS [  0.624 s]
+[INFO] JScience Core Engine ............................... SUCCESS [01:20 min]
+[INFO] JScience Natural ................................... SUCCESS [03:57 min]
+[INFO] JScience Social .................................... SUCCESS [ 28.201 s]
+[INFO] JScience Native .................................... SUCCESS [  8.417 s]
+[INFO] JScience Server .................................... SUCCESS [ 31.198 s]
+[INFO] JScience Client Applications ....................... SUCCESS [ 16.710 s]
+[INFO] JScience Benchmarking Suite ........................ FAILURE [  2.649 s]
+[INFO] JScience Featured Apps ............................. SKIPPED
+[INFO] JScience Worker Node ............................... SKIPPED
+[INFO] JScience Database .................................. SKIPPED
+[INFO] jscience-jni ....................................... SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  06:46 min
+[INFO] Finished at: 2026-02-17T23:48:42+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean (default-clean) on project jscience-benchmarks: Failed to clean project: Failed to delete C:\Silvere\Encours\Developpement\JScience\jscience-benchmarks\target\dependency\zstd-jni-1.5.5-4.jar -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :jscience-benchmarks

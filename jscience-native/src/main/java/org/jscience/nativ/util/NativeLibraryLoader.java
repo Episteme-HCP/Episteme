@@ -34,7 +34,7 @@ public class NativeLibraryLoader {
             
             // Search Paths
             String[] searchPaths = {
-                "C:\\JScience-Native",
+
                 System.getProperty("user.dir") + "/libs/" + libName, // e.g. libs/OpenBLAS
                 System.getProperty("user.dir") + "/libs",
                 System.getProperty("user.dir")
