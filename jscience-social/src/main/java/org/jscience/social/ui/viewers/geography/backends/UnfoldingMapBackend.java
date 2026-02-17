@@ -24,6 +24,8 @@
 package org.jscience.social.ui.viewers.geography.backends;
 
 import org.jscience.social.ui.viewers.geography.MapBackend;
+import org.jscience.core.technical.backend.Backend;
+import com.google.auto.service.AutoService;
 
 /**
  * Backend for UnfoldingMap library.
@@ -34,6 +36,7 @@ import org.jscience.social.ui.viewers.geography.MapBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService({MapBackend.class, Backend.class})
 public class UnfoldingMapBackend implements MapBackend {
 
     @Override

@@ -110,6 +110,12 @@
             <groupId>org.jcuda</groupId>
             <artifactId>jcublas</artifactId>
         </dependency>
+        <!--
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcuda-nvrtc</artifactId>
+        </dependency>
+        -->
 
         <!-- JOCL (OpenCL) -->
         <dependency>
@@ -239,6 +245,7 @@
             <artifactId>vlcj</artifactId>
             <version>4.8.2</version>
         </dependency>
+        <!-- TarsosDSP commented out due to missing repository
         <dependency>
             <groupId>be.tarsos.dsp</groupId>
             <artifactId>core</artifactId>
@@ -249,11 +256,26 @@
             <artifactId>jvm</artifactId>
             <version>2.5</version>
         </dependency>
+        -->
 
         <dependency>
             <groupId>net.compartmental.code</groupId>
             <artifactId>minim</artifactId>
             <version>2.2.2</version>
+        </dependency>
+
+        <!-- JBullet (Physics) -->
+        <dependency>
+            <groupId>cz.advel.jbullet</groupId>
+            <artifactId>jbullet</artifactId>
+            <version>20101010-1</version>
+        </dependency>
+
+        <!-- HDF5 (JHDF) -->
+        <dependency>
+            <groupId>io.jhdf</groupId>
+            <artifactId>jhdf</artifactId>
+            <version>0.7.0</version>
         </dependency>
 
         <!-- JavaCV -->
@@ -278,11 +300,7 @@
     </dependencies>
 
     <repositories>
-        <repository>
-            <id>tarsosdsp-releases</id>
-            <name>TarsosDSP Releases</name>
-            <url>https://mvn.0110.be/releases</url>
-        </repository>
+
         <repository>
             <id>jzy3d-releases</id>
             <name>Jzy3d Releases</name>

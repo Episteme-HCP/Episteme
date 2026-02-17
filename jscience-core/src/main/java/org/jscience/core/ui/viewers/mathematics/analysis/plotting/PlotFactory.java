@@ -70,7 +70,7 @@ public class PlotFactory {
      * Creates 2D plot with default/AUTO backend.
      */
     public static Plot2D create2D(String title) {
-        Backend provider = getBackendProvider();
+        Backend provider = getBackend();
         if (provider != null) {
             Object backend = provider.createBackend();
             if (backend instanceof Plot2D) {
@@ -168,7 +168,7 @@ public class PlotFactory {
     /**
      * Gets the best available plotting backend provider for 2D.
      */
-    private static Backend getBackendProvider() {
+    private static Backend getBackend() {
         if (selectedBackendId != null) {
             Optional<Backend> specific = BackendDiscovery.getInstance()
                     .getProvider(BackendDiscovery.TYPE_PLOTTING, selectedBackendId);

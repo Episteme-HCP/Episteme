@@ -60,7 +60,7 @@ public class MolecularFactory {
      * Creates a molecular viewer with default/AUTO backend.
      */
     public static Object createViewer(String title) {
-        Backend provider = getBackendProvider();
+        Backend provider = getBackend();
         if (provider != null) {
             return provider.createBackend();
         }
@@ -78,7 +78,7 @@ public class MolecularFactory {
     /**
      * Gets the best available molecular backend provider.
      */
-    private static Backend getBackendProvider() {
+    private static Backend getBackend() {
         if (selectedBackendId != null) {
              MolecularBackend b = MolecularBackendManager.getInstance().managerSelect(selectedBackendId);
              if (b != null && b.isAvailable()) {

@@ -60,7 +60,7 @@ public class GraphFactory {
      * Creates a graph with default/AUTO backend.
      */
     public static Object createGraph(String title) {
-        Backend provider = getBackendProvider();
+        Backend provider = getBackend();
         if (provider != null) {
             return provider.createBackend();
         }
@@ -72,7 +72,7 @@ public class GraphFactory {
     /**
      * Gets the best available graph backend provider.
      */
-    private static Backend getBackendProvider() {
+    private static Backend getBackend() {
         if (selectedBackendId != null) {
              GraphBackend b = GraphBackendManager.staticSelect(selectedBackendId);
              if (b != null && b.isAvailable()) {

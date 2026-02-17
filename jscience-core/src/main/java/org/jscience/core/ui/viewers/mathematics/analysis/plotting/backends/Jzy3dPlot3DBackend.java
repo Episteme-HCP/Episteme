@@ -26,7 +26,7 @@ package org.jscience.core.ui.viewers.mathematics.analysis.plotting.backends;
 import org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 
 /**
- * BackendProvider for Jzy3D 3D plotting.
+ * Backend for Jzy3D 3D plotting.
  * Available when Jzy3D library is on classpath.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

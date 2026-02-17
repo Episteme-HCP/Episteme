@@ -26,7 +26,18 @@ package org.jscience.core.technical.backend.gpu.opencl;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jocl.*;
+import org.jocl.CL;
+import org.jocl.cl_context;
+import org.jocl.cl_context_properties;
+import org.jocl.cl_device_id;
+import org.jocl.cl_platform_id;
+import org.jocl.cl_command_queue;
+import org.jocl.cl_program;
+import org.jocl.cl_kernel;
+import org.jocl.Pointer;
+import org.jocl.Sizeof;
+import org.jocl.cl_mem;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.nio.DoubleBuffer;
 
 import static org.jocl.CL.*;
@@ -48,63 +59,10 @@ import org.jscience.core.technical.backend.ComputeBackend;
 @AutoService({Backend.class, ComputeBackend.class})
 public class OpenCLBackend implements GPUBackend {
 
-    private static boolean available;
-    private static cl_context context;
-    private static cl_command_queue commandQueue;
-    private static cl_device_id selectedDevice;
-
-    static {
-        initializeOpenCL();
-    }
-
-    private static void initializeOpenCL() {
-        try {
-            // Initialize OpenCL
-            CL.setExceptionsEnabled(false); 
-
-            int numPlatformsArray[] = new int[1];
-            clGetPlatformIDs(0, null, numPlatformsArray);
-            int numPlatforms = numPlatformsArray[0];
-
-            if (numPlatforms > 0) {
-                cl_platform_id platforms[] = new cl_platform_id[numPlatforms];
-                clGetPlatformIDs(platforms.length, platforms, null);
-                cl_platform_id platform = platforms[0]; 
-
-                cl_context_properties contextProperties = new cl_context_properties();
-                contextProperties.addProperty(CL_CONTEXT_PLATFORM, platform);
-
-                int numDevicesArray[] = new int[1];
-                clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, null, numDevicesArray);
-                int numDevices = numDevicesArray[0];
-
-                if (numDevices > 0) {
-                    cl_device_id devices[] = new cl_device_id[numDevices];
-                    clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, numDevices, devices, null);
-                    selectedDevice = devices[0]; 
-
-                    context = clCreateContext(
-                            contextProperties, 1, new cl_device_id[] { selectedDevice },
-                            null, null, null);
-
-                    cl_queue_properties properties = new cl_queue_properties();
-                    commandQueue = clCreateCommandQueueWithProperties(
-                            context, selectedDevice, properties, null);
-
-                    // Self-test: Ensure we can actually execute commands
-                    available = performSelfTest();
-                }
-            }
-        } catch (Throwable t) {
-            available = false;
-        }
-    }
-
-    private static boolean performSelfTest() {
-        // Simple sanity check: if context and queue are created, we assume it works for now.
-        // A more complete test would run a kernel, but context creation failure usually indicates issues.
-        return context != null && commandQueue != null;
-    }
+    private cl_context context;
+    private cl_command_queue commandQueue;
+    private cl_device_id device;
+    private boolean isInitialized = false;
 
     @Override
     public String getId() {
@@ -123,13 +81,97 @@ public class OpenCLBackend implements GPUBackend {
 
     @Override
     public boolean isAvailable() {
-        return available;
+        try {
+            // Check if JOCL is in classpath
+            Class.forName("org.jocl.CL");
+            // Check if we can get platforms
+            int[] numPlatformsArray = new int[1];
+            CL.clGetPlatformIDs(0, null, numPlatformsArray);
+            return numPlatformsArray[0] > 0;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public void start() {
+        if (isInitialized) return;
+        try {
+            CL.setExceptionsEnabled(true);
+            
+            // 1. Get Platform
+            int[] numPlatformsArray = new int[1];
+            CL.clGetPlatformIDs(0, null, numPlatformsArray);
+            int numPlatforms = numPlatformsArray[0];
+            
+            cl_platform_id[] platforms = new cl_platform_id[numPlatforms];
+            CL.clGetPlatformIDs(platforms.length, platforms, null);
+            cl_platform_id platform = platforms[0]; // Use first platform
+            
+            // 2. Get Device
+            int[] numDevicesArray = new int[1];
+            CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 0, null, numDevicesArray);
+            int numDevices = numDevicesArray[0];
+            
+            cl_device_id[] devices = new cl_device_id[numDevices];
+            CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, numDevices, devices, null);
+            device = devices[0]; // Use first device
+            
+            // 3. Create Context
+            cl_context_properties contextProperties = new cl_context_properties();
+            contextProperties.addProperty(CL.CL_CONTEXT_PLATFORM, platform);
+            context = CL.clCreateContext(contextProperties, 1, new cl_device_id[]{device}, null, null, null);
+            
+            // 4. Create Command Queue
+            commandQueue = CL.clCreateCommandQueue(context, device, 0, null);
+            
+            isInitialized = true;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize OpenCL Backend", e);
+        }
+    }
+
+    public void stop() {
+        if (!isInitialized) return;
+        if (commandQueue != null) CL.clReleaseCommandQueue(commandQueue);
+        if (context != null) CL.clReleaseContext(context);
+        isInitialized = false;
+    }
+
+    public cl_context getContext() {
+        if (!isInitialized) start();
+        return context;
+    }
+
+    public cl_command_queue getCommandQueue() {
+        if (!isInitialized) start();
+        return commandQueue;
+    }
+    
+    public cl_program compileProgram(String source) {
+        if (!isInitialized) start();
+        
+        cl_program program = CL.clCreateProgramWithSource(context, 1, new String[]{ source }, null, null);
+        try {
+            CL.clBuildProgram(program, 0, null, null, null, null);
+        } catch (org.jocl.CLException e) {
+             // Get build log
+             long[] size = new long[1];
+             CL.clGetProgramBuildInfo(program, device, CL.CL_PROGRAM_BUILD_LOG, 0, null, size);
+             byte[] log = new byte[(int)size[0]];
+             CL.clGetProgramBuildInfo(program, device, CL.CL_PROGRAM_BUILD_LOG, size[0], org.jocl.Pointer.to(log), null);
+             throw new RuntimeException("OpenCL Build Error:\n" + new String(log).trim(), e);
+        }
+        return program;
+    }
+    
+    public cl_kernel createKernel(cl_program program, String kernelName) {
+        return CL.clCreateKernel(program, kernelName, null);
     }
 
     @Override
     public ExecutionContext createContext() {
-        if (!available) {
-            throw new IllegalStateException("GPU backend is not available");
+        if (!isInitialized) {
+            start();
         }
         return new OpenCLExecutionContext(context, commandQueue);
     }
@@ -151,7 +193,7 @@ public class OpenCLBackend implements GPUBackend {
 
     @Override
     public DeviceInfo[] getDevices() {
-        if (!available) return new DeviceInfo[0];
+        if (!isAvailable()) return new DeviceInfo[0];
         
         int numPlatformsArray[] = new int[1];
         clGetPlatformIDs(0, null, numPlatformsArray);

@@ -63,7 +63,7 @@ public class QuantumFactory {
      * Creates a quantum backend with default/AUTO settings.
      */
     public static QuantumBackend createBackend() {
-        Backend provider = getBackendProvider();
+        Backend provider = getBackend();
         if (provider != null) {
             Object backend = provider.createBackend();
             if (backend instanceof QuantumBackend) {
@@ -78,7 +78,7 @@ public class QuantumFactory {
     /**
      * Gets the best available quantum backend provider.
      */
-    private static Backend getBackendProvider() {
+    private static Backend getBackend() {
         if (selectedBackendId != null) {
             Optional<Backend> specific = BackendDiscovery.getInstance()
                     .getProvider(BackendDiscovery.TYPE_QUANTUM, selectedBackendId);

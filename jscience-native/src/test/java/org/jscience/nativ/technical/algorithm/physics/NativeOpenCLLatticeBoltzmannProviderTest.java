@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NativeOpenCLLatticeBoltzmannProviderTest {
+public class OpenCLLatticeBoltzmannProviderTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(NativeOpenCLLatticeBoltzmannProvider.class);
+        assertNotNull(OpenCLLatticeBoltzmannProvider.class);
     }
 }
 

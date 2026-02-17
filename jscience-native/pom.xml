@@ -49,37 +49,6 @@
             <version>1.17.0</version>
         </dependency>
 
-        <!-- JCuda (CUDA Bindings) -->
-        <dependency>
-            <groupId>org.jcuda</groupId>
-            <artifactId>jcuda</artifactId>
-            <version>11.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jcuda</groupId>
-            <artifactId>jcublas</artifactId>
-            <version>11.8.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jocl</groupId>
-            <artifactId>jocl</artifactId>
-            <version>2.0.5</version>
-        </dependency>
-
-        <!-- JBullet (Physics) -->
-        <dependency>
-            <groupId>cz.advel.jbullet</groupId>
-            <artifactId>jbullet</artifactId>
-            <version>20101010-1</version>
-        </dependency>
-
-        <!-- HDF5 (JHDF) -->
-        <dependency>
-            <groupId>io.jhdf</groupId>
-            <artifactId>jhdf</artifactId>
-            <version>0.7.0</version>
-        </dependency>
         
         <!-- FFTW (JavaCPP) -->
         <dependency>

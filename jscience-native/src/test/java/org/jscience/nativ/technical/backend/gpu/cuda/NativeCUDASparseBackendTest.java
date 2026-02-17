@@ -3,13 +3,13 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.cuda;
+package org.jscience.core.technical.backend.gpu.cuda;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for NativeCUDABackend (Sparse).
+ * Automated baseline test for CUDABackend (Sparse).
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -20,6 +20,6 @@ public class NativeCUDASparseBackendTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(NativeCUDABackend.class);
+        assertNotNull(CUDABackend.class);
     }
 }

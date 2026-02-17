@@ -25,6 +25,7 @@ package org.jscience.core.ui.viewers.mathematics.discrete.backends;
 
 import org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend;
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.backend.Backend;
 
 /**
  * Backend for JGraphT library.
@@ -35,7 +36,6 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-import org.jscience.core.technical.backend.Backend;
 
 @AutoService({GraphBackend.class, Backend.class})
 public class JGraphTBackend implements GraphBackend {

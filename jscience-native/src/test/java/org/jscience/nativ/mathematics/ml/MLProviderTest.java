@@ -22,7 +22,7 @@
  */
 package org.jscience.nativ.mathematics.ml;
 
-import org.jscience.nativ.technical.algorithm.inference.NativeMulticoreMLProvider;
+import org.jscience.nativ.technical.algorithm.inference.MulticoreMLProvider;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +33,7 @@ public class MLProviderTest {
 
     @Test
     public void testKMeans() {
-        NativeMulticoreMLProvider provider = new NativeMulticoreMLProvider();
+        MulticoreMLProvider provider = new MulticoreMLProvider();
         
         // Simple 2D data: 2 clusters, one around (-10,-10), one around (10,10)
         double[][] data = {

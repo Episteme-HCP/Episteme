@@ -19,9 +19,9 @@ package org.jscience.core.technical.backend.nativ;
  * <ul>
  *   <li>{@code NativeBLASBackend implements ComputeBackend, NativeBackend}
  *       — CPU BLAS via Panama FFM</li>
- *   <li>{@code NativeCUDABackend implements GPUBackend, NativeBackend}
+ *   <li>{@code CUDABackend implements GPUBackend, NativeBackend}
  *       — CUDA via Panama FFM</li>
- *   <li>{@code NativeOpenCLBackend implements GPUBackend, NativeBackend}
+ *   <li>{@code OpenCLBackend implements GPUBackend, NativeBackend}
  *       — OpenCL via Panama FFM</li>
  * </ul>
  * </p>

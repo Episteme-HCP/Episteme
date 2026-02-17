@@ -8,65 +8,35 @@ package org.jscience.core.technical.algorithm.simulation;
 import org.jscience.core.technical.algorithm.SimulationProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.simulation.ParallelSimulationProvider;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Multicore implementation of SimulationProvider using a thread pool.
+ * Native multicore implementation of SimulationProvider.
+ * Currently delegates to Parallel (CPU) implementation as a placeholder for
+ * a future high-performance native simulation kernel.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.2
+ * @since 1.1
  */
-@AutoService({SimulationProvider.class, AlgorithmProvider.class})
+@AutoService(AlgorithmProvider.class)
 public class MulticoreSimulationProvider implements SimulationProvider {
 
+    private final ParallelSimulationProvider fallback = new ParallelSimulationProvider();
+
     @Override
-    public int getPriority() {
-        return 40;
+    public String getName() {
+        return "Native Multicore Simulation";
+    }
+
+    @Override
+    public String getAlgorithmType() {
+        return "simulation";
     }
 
     @Override
     public void parallelExecute(List<Runnable> tasks, int parallelism) {
-        if (tasks.isEmpty()) return;
-        
-        ExecutorService executor = Executors.newFixedThreadPool(parallelism, r -> {
-            Thread t = new Thread(r, "JScience-Simulation-Worker");
-            t.setDaemon(true);
-            return t;
-        });
-        
-        try {
-            Phaser phaser = new Phaser(1);
-            for (Runnable task : tasks) {
-                phaser.register();
-                executor.submit(() -> {
-                    try {
-                        task.run();
-                    } finally {
-                        phaser.arriveAndDeregister();
-                    }
-                });
-            }
-            phaser.arriveAndAwaitAdvance();
-        } finally {
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
-    @Override
-    public String getName() {
-        return "Java Multicore Simulation (CPU)";
+        fallback.parallelExecute(tasks, parallelism);
     }
 }
