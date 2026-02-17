@@ -3,24 +3,24 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.social.ui.viewers.geography.backends;
+package org.jscience.natural.ui.viewers.chemistry.backends;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for GeoToolsBackend.
+ * Automated baseline test for VMDMolecularBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoToolsBackendProviderTest {
+public class VMDMolecularBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(GeoToolsBackend.class);
+        assertNotNull(VMDMolecularBackend.class);
     }
 }
 

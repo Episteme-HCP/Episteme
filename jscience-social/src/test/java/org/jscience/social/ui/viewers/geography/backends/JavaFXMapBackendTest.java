@@ -9,18 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for OpenMapBackend.
+ * Automated baseline test for JavaFXMapBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenMapBackendProviderTest {
+public class JavaFXMapBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(OpenMapBackend.class);
+        assertNotNull(JavaFXMapBackend.class);
     }
 }
 

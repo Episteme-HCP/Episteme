@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E> {
 
     private final ManagedChannel channel;
     private final MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
@@ -71,7 +71,7 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
      * @param port  Server port
      * @param field The field for element operations
      */
-    public GRPCLinearAlgebraProvider(String host, int port, Field<E> field) {
+    public GRPCLinearAlgebraBackend(String host, int port, Field<E> field) {
         this.serverAddress = host + ":" + port;
         this.field = field;
         this.channel = ManagedChannelBuilder.forAddress(host, port)

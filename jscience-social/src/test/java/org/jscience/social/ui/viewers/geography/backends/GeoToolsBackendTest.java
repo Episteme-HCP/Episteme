@@ -9,18 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for GoogleGeoChartBackend.
+ * Automated baseline test for GeoToolsBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GoogleGeoChartBackendProviderTest {
+public class GeoToolsBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(GoogleGeoChartBackend.class);
+        assertNotNull(GeoToolsBackend.class);
     }
 }
 

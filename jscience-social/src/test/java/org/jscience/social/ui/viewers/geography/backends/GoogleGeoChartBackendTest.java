@@ -3,24 +3,24 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.natural.ui.viewers.chemistry.backends;
+package org.jscience.social.ui.viewers.geography.backends;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for VMDMolecularBackend.
+ * Automated baseline test for GoogleGeoChartBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VMDMolecularBackendProviderTest {
+public class GoogleGeoChartBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(VMDMolecularBackend.class);
+        assertNotNull(GoogleGeoChartBackend.class);
     }
 }
 
