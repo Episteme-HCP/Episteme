@@ -1,0 +1,34 @@
+graph TD
+    subgraph JScience_Ecosystem
+        Parent[jscience-parent]
+        Core[jscience-core]
+        Native[jscience-native]
+        Natural[jscience-natural]
+        Social[jscience-social]
+        Apps[jscience-featured-apps]
+        Bench[jscience-benchmarks]
+        DB[jscience-database]
+        JNI[jscience-jni]
+    end
+    
+    subgraph Distributed_Stack
+        Server[jscience-server]
+        Client[jscience-client]
+        Worker[jscience-worker]
+    end
+
+    Parent --> Core
+    Parent --> Native
+    
+    Native -.->|SPI| Core
+    Natural --> Core
+    Social --> Core
+    Apps --> Core
+    Bench --> Core
+    
+    Server --> Core
+    Client --> Core
+    Worker --> Core
+    
+    JNI --> Native
+    DB --> Core

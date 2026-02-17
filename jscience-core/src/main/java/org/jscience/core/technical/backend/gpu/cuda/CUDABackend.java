@@ -185,6 +185,12 @@ public class CUDABackend implements GPUBackend, LibraryBackend, SparseLinearAlge
 
     public void elementWise(String op, DoubleBuffer in, DoubleBuffer out, int s) {
         // Future: Launch custom CUDA kernel for element-wise operations
+        // CPU Fallback
+        if ("sqrt".equals(op)) {
+            for(int i=0; i<s; i++) out.put(i, Math.sqrt(in.get(i)));
+        } else if ("abs".equals(op)) {
+             for(int i=0; i<s; i++) out.put(i, Math.abs(in.get(i)));
+        }
     }
 
     public void fft(DoubleBuffer r, DoubleBuffer i, DoubleBuffer ro, DoubleBuffer io, int n, boolean inv) {
@@ -193,7 +199,12 @@ public class CUDABackend implements GPUBackend, LibraryBackend, SparseLinearAlge
 
     public double reduce(String op, DoubleBuffer in, int s) {
         // Future: Parallel reduction kernel
-        return 0;
+        // CPU Fallback for now to satisfy interface
+        double res = 0;
+        if ("sum".equals(op)) {
+            for(int i=0; i<s; i++) res += in.get(i);
+        }
+        return res;
     }
 
     @Override

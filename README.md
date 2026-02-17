@@ -175,6 +175,7 @@ Switch language via `Preferences > Language` menu.
 ## Architecture
 
 See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete design.
+[Architecture Diagrams (Mermaid)](docs/mermaid/README.md)
 
 **Core Principles:**
 

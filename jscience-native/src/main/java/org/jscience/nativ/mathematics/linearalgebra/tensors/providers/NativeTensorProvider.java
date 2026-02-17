@@ -15,6 +15,7 @@ import com.google.auto.service.AutoService;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
+import java.lang.foreign.ValueLayout;
 import java.util.Optional;
 
 /**
@@ -50,6 +51,11 @@ public class NativeTensorProvider implements TensorProvider, Backend {
             IS_AVAILABLE = false;
         }
     }
+    
+    // Missing Libraries Report:
+    // This backend requires 'dnnl' (oneDNN) or 'mkl_rt' (Intel MKL) dynamic libraries.
+    // Ensure they are installed (e.g., via Apt/Yum) or in java.library.path.
+    // If not found, performance falls back to CPU (or Java Panama FFM raw access).
 
     @Override
     public String getType() {
@@ -95,6 +101,9 @@ public class NativeTensorProvider implements TensorProvider, Backend {
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
         // NativeTensor<T> tensor = new NativeTensor<>(elementType, shape);
         // T one; // Unused
+        long size = 1;
+        for(int s : shape) size *= s;
+
         if (elementType == Float.class) {
              // one = elementType.cast(1.0f);
         } else if (elementType == Double.class) {
@@ -103,22 +112,17 @@ public class NativeTensorProvider implements TensorProvider, Backend {
              throw new IllegalArgumentException("Unsupported type: " + elementType);
         }
          
-         // Better approach:
-         int size = 1;
-         for (int s : shape) size *= s; // Calculate size
-         // NativeTensor helper calculates size internally but we need it here for array
-
+         // Using create which is now optimized
          if (elementType == Float.class) {
-             float[] data = new float[size];
+             float[] data = new float[(int)size];
              java.util.Arrays.fill(data, 1.0f);
-             // TODO: NativeTensor should expose a way to load from flat array
-             // tensor.setFrom(data);
-             // Re-creating is easier for this prototype
-             return (Tensor<T>) create(toObjectArray(data), shape); // Logic loop
-         } else {
-             double[] data = new double[size];
+             return (Tensor<T>) create(toObjectArray(data), shape);
+         } else if (elementType == Double.class) {
+             double[] data = new double[(int)size];
              java.util.Arrays.fill(data, 1.0d);
              return (Tensor<T>) create(toObjectArray(data), shape);
+         } else {
+             throw new IllegalArgumentException("Unsupported type: " + elementType);
          }
     }
 
@@ -129,40 +133,38 @@ public class NativeTensorProvider implements TensorProvider, Backend {
         NativeTensor<T> tensor = new NativeTensor<>(type, shape);
         
         // Populate
-        // Ideally NativeTensor would accept the array directly to copy to memory segment
-        // We'll do a naive copy here via set()
-        for (int i = 0; i < data.length; i++) {
-            // set() takes multi-indices... that's slow.
-            // NativeTensor needs a flat set(index, value).
-            // I didn't verify if I added flat set to NativeTensor.
-            // Checking NativeTensor... it has generic `set(T, int...)`. 
-            // It doesn't have flat set.
-            // I'll update NativeTensor to support flat access or add a helper.
-            // Or just use the slow path for now.
-        }
-        
-        // Optimization: Access segment directly? 
-        // Provider is in same package? No, sub-package `providers`.
-        // NativeTensor public methods only?
-        // `NativeTensor.getSegment()` is package-private?
-        // Let's check NativeTensor again.
-        // `public MemorySegment getSegment() { return segment; }` 
-        // But `NativeTensor` is in `...tensors` and `Provider` is in `...tensors.providers`.
-        // `NativeTensor` is public. `getSegment` is public? 
-        // I implemented: `public MemorySegment getSegment() { return segment; }`
-        // So I can use it!
-        
         MemorySegment segment = tensor.getSegment();
         if (type == Float.class) {
              for (int i = 0; i < data.length; i++) {
-                 segment.setAtIndex(java.lang.foreign.ValueLayout.JAVA_FLOAT, i, (Float) data[i]);
+                 segment.setAtIndex(ValueLayout.JAVA_FLOAT, i, (Float) data[i]);
              }
         } else if (type == Double.class) {
              for (int i = 0; i < data.length; i++) {
-                 segment.setAtIndex(java.lang.foreign.ValueLayout.JAVA_DOUBLE, i, (Double) data[i]);
+                 segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, (Double) data[i]);
              }
         }
         return tensor;
+    }
+    
+    // Internal helper for memory creation if needed separately
+    private MemorySegment createMemory(float[] data) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segment = arena.allocate(ValueLayout.JAVA_FLOAT, data.length);
+            for (int i = 0; i < data.length; i++) {
+                segment.setAtIndex(ValueLayout.JAVA_FLOAT, i, data[i]);
+            }
+            return null;
+        }
+    }
+
+    private MemorySegment createMemory(double[] data) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segment = arena.allocate(ValueLayout.JAVA_DOUBLE, data.length);
+            for (int i = 0; i < data.length; i++) {
+                segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, data[i]);
+            }
+            return null;
+        }
     }
     
     // Helper
@@ -184,6 +186,6 @@ public class NativeTensorProvider implements TensorProvider, Backend {
 
     @Override
     public int getPriority() {
-        return 10; // Higher than default 0, but can be configured
+        return 10; 
     }
 }

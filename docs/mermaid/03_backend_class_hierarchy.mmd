@@ -1,0 +1,52 @@
+classDiagram
+    namespace API {
+        class ComputeContext {
+            +selectBackend()
+            +compute()
+        }
+        class AlgorithmProvider {
+            <<interface>>
+            +getPriority()
+            +isAvailable()
+        }
+    }
+    
+    namespace SPI {
+        class Backend {
+            <<interface>>
+            +getName()
+            +isAvailable()
+        }
+        class ComputeBackend {
+            <<interface>>
+        }
+        class AudioBackend {
+            <<interface>>
+        }
+    }
+    
+    namespace Implementations {
+        class OpenCLBackend
+        class CUDABackend
+        class NativeSIMDBackend
+        class NativeAudioBackend
+        class OpenCLNBodyProvider
+        class CUDANBodyProvider
+    }
+    
+    ComputeContext --> Backend : Manages
+    Backend <|-- ComputeBackend
+    Backend <|-- AudioBackend
+    
+    ComputeBackend <|.. OpenCLBackend
+    ComputeBackend <|.. CUDABackend
+    ComputeBackend <|.. NativeSIMDBackend
+    
+    AudioBackend <|.. NativeAudioBackend
+    
+    AlgorithmProvider <|.. OpenCLNBodyProvider
+    AlgorithmProvider <|.. CUDANBodyProvider
+    AlgorithmProvider <|.. NativeSIMDBackend : (LinearAlgebra)
+    
+    OpenCLBackend ..> OpenCLNBodyProvider : Supports
+    CUDABackend ..> CUDANBodyProvider : Supports

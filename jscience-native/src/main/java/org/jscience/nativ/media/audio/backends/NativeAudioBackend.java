@@ -32,7 +32,8 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
     private static MethodHandle MA_DEVICE_INIT;
     private static MethodHandle MA_DEVICE_START;
     private static MethodHandle MA_DEVICE_STOP;
-    // Unused decoder handles removed
+    private static MethodHandle MA_DECODER_INIT_FILE;
+    private static MethodHandle MA_DECODER_GET_LENGTH;
 
     static {
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("miniaudio", Arena.global());
@@ -48,27 +49,43 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
                 Linker linker = Linker.nativeLinker();
                 
                 // Load miniaudio functions (assuming miniaudio symbols are exported)
-                // Note: miniaudio is usually static, so these symbols must be in a shared lib wrapper.
-                // We'll proceed optimistically, catch errors if symbols missing.
-                
                 // ma_result ma_device_init(ma_context* pContext, const ma_device_config* pConfig, ma_device* pDevice);
                 // simplified signature for now
-                MA_DEVICE_INIT = linker.downcallHandle(
-                        LOOKUP.find("ma_device_init").orElseThrow(),
-                        FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-                );
-                
-                MA_DEVICE_START = linker.downcallHandle(
-                        LOOKUP.find("ma_device_start").orElseThrow(),
-                        FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-                );
+                try {
+                     MA_DEVICE_INIT = linker.downcallHandle(
+                            LOOKUP.find("ma_device_init").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                    );
+                    
+                    MA_DEVICE_START = linker.downcallHandle(
+                            LOOKUP.find("ma_device_start").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                    );
 
-                MA_DEVICE_STOP = linker.downcallHandle(
-                        LOOKUP.find("ma_device_stop").orElseThrow(),
-                        FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-                );
+                    MA_DEVICE_STOP = linker.downcallHandle(
+                            LOOKUP.find("ma_device_stop").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                    );
 
-                avail = true;
+                    // ma_result ma_decoder_init_file(const char* pFilePath, const ma_decoder_config* pConfig, ma_decoder* pDecoder);
+                     MA_DECODER_INIT_FILE = linker.downcallHandle(
+                            LOOKUP.find("ma_decoder_init_file").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                    );
+                    
+                     // ma_uint64 ma_decoder_get_length_in_pcm_frames(ma_decoder* pDecoder);
+                     MA_DECODER_GET_LENGTH = linker.downcallHandle(
+                            LOOKUP.find("ma_decoder_get_length_in_pcm_frames").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS)
+                    );
+
+                    avail = true;
+                } catch (RuntimeException e) {
+                     // Symbols missing, partial loading
+                     System.err.println("NativeAudioBackend: Symbols missing in native library. " + e.getMessage());
+                     avail = false;
+                }
+
             } catch (Throwable t) {
                 // If symbols missing, mark unavailable
                 avail = false;

@@ -27,6 +27,15 @@ public class NativeLibraryLoader {
      */
     public static Optional<SymbolLookup> loadLibrary(String libName, Arena arena) {
         try {
+            // 0. Priority Check: C:\JScience-Native (User Configuration)
+            String os = System.getProperty("os.name", "").toLowerCase();
+            if (os.contains("win")) {
+                java.nio.file.Path customPath = java.nio.file.Path.of("C:\\JScience-Native", libName + ".dll");
+                if (java.nio.file.Files.exists(customPath)) {
+                    return Optional.of(SymbolLookup.libraryLookup(customPath, arena));
+                }
+            }
+
             // 1. Try System.loadLibrary equivalent via libraryLookup
             // Note: libraryLookup requires a specific file path or name usually handled by OS loader.
             // For simplicity in FFM, we often use SymbolLookup.libraryLookup(name, arena)
