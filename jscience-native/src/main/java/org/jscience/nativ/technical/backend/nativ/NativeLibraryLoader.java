@@ -57,9 +57,8 @@ public class NativeLibraryLoader {
                     "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.0\\bin\\",
                     System.getProperty("user.dir"),
                     System.getProperty("user.dir") + java.io.File.separator + "libs",
-                    System.getProperty("user.dir") + java.io.File.separator + "native",
-                    System.getProperty("user.dir"),
-                    System.getProperty("user.dir") + java.io.File.separator + "libs",
+                    System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + libName, // e.g. libs/FFTW3
+                    System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "native",
                     System.getProperty("user.dir") + java.io.File.separator + "native"
                 };
                 

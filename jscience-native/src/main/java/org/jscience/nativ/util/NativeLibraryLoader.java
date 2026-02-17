@@ -29,19 +29,32 @@ public class NativeLibraryLoader {
         try {
             // 0. Priority Check: C:\JScience-Native (User Configuration)
             String os = System.getProperty("os.name", "").toLowerCase();
-            if (os.contains("win")) {
-                java.nio.file.Path customPath = java.nio.file.Path.of("C:\\JScience-Native", libName + ".dll");
-                if (java.nio.file.Files.exists(customPath)) {
-                    return Optional.of(SymbolLookup.libraryLookup(customPath, arena));
+            boolean isWin = os.contains("win");
+            String libFileName = libName + (isWin ? ".dll" : ".so");
+            
+            // Search Paths
+            String[] searchPaths = {
+                "C:\\JScience-Native",
+                System.getProperty("user.dir") + "/libs/" + libName, // e.g. libs/OpenBLAS
+                System.getProperty("user.dir") + "/libs",
+                System.getProperty("user.dir")
+            };
+
+            for (String path : searchPaths) {
+                java.nio.file.Path p = java.nio.file.Path.of(path, libFileName);
+                 if (java.nio.file.Files.exists(p)) {
+                    return Optional.of(SymbolLookup.libraryLookup(p, arena));
+                }
+                // Try with "lib" prefix?
+                java.nio.file.Path pLib = java.nio.file.Path.of(path, (isWin ? "" : "lib") + libName + (isWin ? ".dll" : ".so"));
+                if (java.nio.file.Files.exists(pLib)) {
+                     return Optional.of(SymbolLookup.libraryLookup(pLib, arena));
                 }
             }
 
             // 1. Try System.loadLibrary equivalent via libraryLookup
-            // Note: libraryLookup requires a specific file path or name usually handled by OS loader.
-            // For simplicity in FFM, we often use SymbolLookup.libraryLookup(name, arena)
             return Optional.of(SymbolLookup.libraryLookup(libName, arena));
         } catch (IllegalArgumentException | UnsatisfiedLinkError e) {
-            // Library not found in java.library.path
             return Optional.empty();
         }
     }
