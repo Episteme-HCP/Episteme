@@ -23,6 +23,8 @@ import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlge
 import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.core.technical.algorithm.OperationContext;
+import org.jscience.core.technical.algorithm.ProviderSelector;
 
 /**
  * Compute context for configuring linear algebra and numerical computation
@@ -313,16 +315,44 @@ public class ComputeContext {
     /**
      * Gets a linear algebra provider suited for the given ring, respecting priorities.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public <E> LinearAlgebraProvider<E> getLinearAlgebraProvider(Ring<E> ring) {
-        Class<LinearAlgebraProvider> type = LinearAlgebraProvider.class;
-        List<LinearAlgebraProvider> candidates = AlgorithmManager.getProviders(type);
+        // Build OperationContext from ComputeContext state
+        OperationContext.Builder builder = new OperationContext.Builder();
         
-        for (LinearAlgebraProvider<?> p : candidates) {
-            LinearAlgebraProvider<E> typedProvider = (LinearAlgebraProvider<E>) p;
-            if (typedProvider.isCompatible(ring)) {
-                return typedProvider;
+        // Add hints based on configuration
+        if (this.floatPrecision == FloatPrecision.FLOAT) {
+            builder.addHint(OperationContext.Hint.FLOAT32_OK);
+        }
+        
+        // Hint based on preferred backend
+        if (this.backend == Backend.CUDA_GPU || this.backend == Backend.OPENCL_GPU) {
+            builder.addHint(OperationContext.Hint.GPU_RESIDENT); // Bias towards GPU
+        } else if (this.backend == Backend.JAVA_CPU) {
+            // No specific hint, or maybe LOW_LATENCY?
+        }
+        
+        OperationContext ctx = builder.build();
+        
+        try {
+            // Use ProviderSelector to pick best scoring provider
+            LinearAlgebraProvider<E> best = ProviderSelector.select(LinearAlgebraProvider.class, ctx);
+            if (best.isCompatible(ring)) {
+                return best;
             }
+            
+            // If best is not compatible (e.g. selected Float provider but ring is Double),
+            // fallback to finding compatible one via standard iteration (but sorted by score?)
+            // For now, consistent fallback to standard manager iteration but strictly compatible
+            // Reuse AlgorithmManager logic but filter for compatibility
+             List<LinearAlgebraProvider> candidates = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
+             for (LinearAlgebraProvider<?> p : candidates) {
+                 LinearAlgebraProvider<E> typedProvider = (LinearAlgebraProvider<E>) p;
+                 if (typedProvider.isCompatible(ring)) {
+                     return typedProvider;
+                 }
+             }
+        } catch (Exception e) {
+            // Log?
         }
 
         // Fallback: CPUDense

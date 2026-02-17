@@ -1,0 +1,22 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-native >--------------------
+[INFO] Building JScience Native 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The POM for org.jscience:jscience-core:jar:1.0.0-SNAPSHOT is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-native ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-native\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-native ---
+[INFO] Copying 199 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-native ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.761 s
+[INFO] Finished at: 2026-02-17T23:38:51+01:00
+[INFO] ------------------------------------------------------------------------

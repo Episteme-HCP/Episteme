@@ -12,6 +12,7 @@ import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.nativ.util.NativeLibraryLoader;
+import org.jscience.core.technical.algorithm.OperationContext;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 
@@ -283,6 +284,30 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     public boolean isCompatible(Ring<?> ring) {
         // Only supports Double (Real)
         return ring.zero() instanceof Double || ring.zero().getClass().getSimpleName().equals("Real");
+    }
+
+    @Override
+    public double score(OperationContext context) {
+        if (!IS_AVAILABLE) return -1.0;
+
+        double score = getPriority();
+
+        // Penalty if GPU operations are preferred
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) {
+            score -= 50.0;
+        }
+
+        // Small data penalty (FFM overhead)
+        if (context.getDataSize() > 0 && context.getDataSize() < 256) {
+           score -= 20.0;
+        }
+
+        // Double precision bonus (since this is a double provider)
+        if (!context.hasHint(OperationContext.Hint.FLOAT32_OK)) {
+            score += 10.0;
+        }
+
+        return score;
     }
 
     // --- Matrix Multiply (cblas_dgemm) ---
