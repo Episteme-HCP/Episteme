@@ -10,6 +10,17 @@ This document describes how to build the JScience project, which consists of mul
   * Verification: Run `java -version` and ensure it shows build 25+.
 * **Apache Maven 3.8+**.
 
+### Local Library Installation
+
+Some dependencies are not available in public Maven repositories and must be installed manually into your local repository.
+
+**java-fbx-loader (v1.0)**:
+This library is required by `jscience-natural`. Run the following command from the project root:
+
+```bash
+mvn install:install-file -Dfile=launchers/lib/java-fbx-loader-v1.0.jar -DgroupId=com.github.studygameengines -DartifactId=java-fbx-loader -Dversion=1.0 -Dpackaging=jar
+```
+
 ## Project Structure & Java Versions
 
 * **jscience-core, jscience-natural, jscience-social**: Compiled with **Java 21** compatibility (`--release 21`).
