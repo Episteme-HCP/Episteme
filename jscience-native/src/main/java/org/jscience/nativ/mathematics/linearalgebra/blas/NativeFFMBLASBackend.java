@@ -13,11 +13,14 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.nativ.util.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
+import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * High-Performance Native BLAS Backend using Project Panama (FFM).
@@ -35,19 +38,26 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     private static final int CblasNoTrans = 111;
     private static final int CblasTrans = 112;
 
-    // Method Handles
+    // BLAS Method Handles
     private static MethodHandle DGEMM;
     private static MethodHandle DGEMV;
     private static MethodHandle DDOT;
     private static MethodHandle DAXPY;
     private static MethodHandle DNRM2;
+    
+    // LAPACK Method Handles
+    private static MethodHandle DGESV;
+    private static MethodHandle DGETRF;
+    private static MethodHandle DGETRI;
+    
+    // LAPACK Constants
+    private static final int LAPACK_ROW_MAJOR = 101;
 
     static {
-        // Attempt to load 'openblas' first, then fallback to system lookup
+        // ... (Existing BLAS lookup code) ...
         Arena arena = Arena.ofAuto();
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("openblas", arena);
         if (lib.isEmpty()) {
-             // Try 'mkl_rt' on Windows/Linux or 'blas' on Mac
              lib = NativeLibraryLoader.loadLibrary("mkl_rt", arena);
              if (lib.isEmpty()) {
                  lib = NativeLibraryLoader.getSystemLookup();
@@ -59,7 +69,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
 
         if (LOOKUP != null) {
             try {
-                // void cblas_dgemm(int Order, int TransA, int TransB, int M, int N, int K, double alpha, double *A, int lda, double *B, int ldb, double beta, double *C, int ldc);
+                // BLAS Handles (Existing)
                 FunctionDescriptor dgemmDesc = FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
@@ -69,27 +79,175 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
                 );
                 DGEMM = LINKER.downcallHandle(LOOKUP.find("cblas_dgemm").orElseThrow(), dgemmDesc);
 
-                // double cblas_ddot(int N, double *X, int incX, double *Y, int incY);
                 FunctionDescriptor ddotDesc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
                 DDOT = LINKER.downcallHandle(LOOKUP.find("cblas_ddot").orElseThrow(), ddotDesc);
 
-                // double cblas_dnrm2(const int N, const double *X, const int incX);
                 FunctionDescriptor dnrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
-                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                        ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
                 DNRM2 = LINKER.downcallHandle(LOOKUP.find("cblas_dnrm2").orElseThrow(), dnrm2Desc);
 
+                // LAPACK Handles
+                // Try LAPACKE (C Interface) first for Row-Major support
+                // lapack_int LAPACKE_dgesv(int matrix_layout, lapack_int n, lapack_int nrhs, double* a, lapack_int lda, lapack_int* ipiv, double* b, lapack_int ldb);
+                Optional<MemorySegment> dgesvAddr = LOOKUP.find("LAPACKE_dgesv");
+                if (dgesvAddr.isPresent()) {
+                    FunctionDescriptor dgesvDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS,
+                            AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                    );
+                    DGESV = LINKER.downcallHandle(dgesvAddr.get(), dgesvDesc);
+                }
+
+                // lapack_int LAPACKE_dgetrf(int matrix_layout, lapack_int m, lapack_int n, double* a, lapack_int lda, lapack_int* ipiv);
+                Optional<MemorySegment> dgetrfAddr = LOOKUP.find("LAPACKE_dgetrf");
+                if (dgetrfAddr.isPresent()) {
+                    FunctionDescriptor dgetrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+                    );
+                    DGETRF = LINKER.downcallHandle(dgetrfAddr.get(), dgetrfDesc);
+                }
+                
+                // lapack_int LAPACKE_dgetri(int matrix_layout, lapack_int n, double* a, lapack_int lda, const lapack_int* ipiv);
+                Optional<MemorySegment> dgetriAddr = LOOKUP.find("LAPACKE_dgetri");
+                if (dgetriAddr.isPresent()) {
+                    FunctionDescriptor dgetriDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+                    );
+                    DGETRI = LINKER.downcallHandle(dgetriAddr.get(), dgetriDesc);
+                }
+
                 available = true;
             } catch (Throwable t) {
-                // System.err.println("Native BLAS symbols not found: " + t.getMessage());
                 available = false;
             }
         }
         IS_AVAILABLE = available;
     }
+    
+    // ... (Existing implementation methods) ...
+
+
+
+    // ... (Existing imports) ...
+
+    @Override
+    public Vector<Double> solve(Matrix<Double> A, Vector<Double> b) {
+        if (!IS_AVAILABLE || DGESV == null) throw new UnsupportedOperationException("Native LAPACK dgesv not available");
+        
+        int n = A.rows();
+        if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
+        if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        
+        try (Arena arena = Arena.ofConfined()) {
+            // Allocate A (copy)
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+            double[] arrA = ((DenseMatrix<?>)A).toDoubleArray();
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, arrA.length);
+            
+            // Allocate b (copy) - will become x
+            MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+            for(int i=0; i<n; i++) segB.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+            
+            // Allocate IPIV (pivots)
+            MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+            
+            // Call LAPACKE_dgesv
+            int info = (int) DGESV.invokeExact(LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
+            
+            if (info != 0) throw new ArithmeticException("Linear solve failed (singular matrix). Info: " + info);
+            
+            // Read result x from segB
+            double[] result = new double[n];
+            MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0, result, 0, n);
+            
+            // Construct DenseVector result
+            List<Double> list = new ArrayList<>(n);
+            for(double v : result) list.add(v);
+            
+            return new DenseVector<>(list, (Ring<Double>) A.getScalarRing());
+        } catch (Throwable e) {
+             throw new RuntimeException(e);
+        }
+    }
+    
+    // Stub for now to allow partial update
+    @Override
+    public Matrix<Double> inverse(Matrix<Double> A) {
+         if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) throw new UnsupportedOperationException("Native LAPACK inverse not available");
+         int n = A.rows();
+         if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+         try (Arena arena = Arena.ofConfined()) {
+             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+             double[] arrA = ((DenseMatrix<?>)A).toDoubleArray();
+             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, arrA.length);
+             
+             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+             
+             // LU Factorization
+             int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+             if (info != 0) throw new ArithmeticException("LU Factorization failed. Info: " + info);
+             
+             // Inverse
+             info = (int) DGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
+             if (info != 0) throw new ArithmeticException("Inverse failed. Info: " + info);
+             
+             double[] result = new double[n * n];
+             MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0, result, 0, n * n);
+             
+             Double[][] resObj = new Double[n][n];
+             for(int i=0; i<n; i++) {
+                 for(int j=0; j<n; j++) {
+                     resObj[i][j] = result[i*n + j];
+                 }
+             }
+             return new DenseMatrix<>(resObj, (Ring<Double>) A.getScalarRing());
+         } catch (Throwable e) {
+             throw new RuntimeException(e);
+         }
+    }
+
+    @Override
+    public Double determinant(Matrix<Double> A) {
+         if (!IS_AVAILABLE || DGETRF == null) throw new UnsupportedOperationException("Native LAPACK determinant not available");
+         int n = A.rows();
+         if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+         try (Arena arena = Arena.ofConfined()) {
+             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+             double[] arrA = ((DenseMatrix<?>)A).toDoubleArray();
+             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, arrA.length);
+             
+             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+             
+             // LU Factorization
+             int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+             if (info > 0) return 0.0; // Singular
+             
+             // Det = Product(diag(U)) * (-1)^swaps
+             // U is in segA (upper triangle). L is in lower (unit diagonal).
+             // Pivots in segIpiv.
+             
+             double det = 1.0;
+             for(int i=0; i<n; i++) {
+                 det *= segA.getAtIndex(ValueLayout.JAVA_DOUBLE, i * n + i);
+                 int pivot = segIpiv.getAtIndex(ValueLayout.JAVA_INT, i);
+                 if (pivot != i + 1) det = -det; // Swap changes sign (LAPACK pivots are 1-based)
+             }
+             return det;
+         } catch (Throwable e) {
+             throw new RuntimeException(e);
+         }
+    }
+    
+    // ... (Rest of existing methods) ...
 
     @Override
     public boolean isAvailable() {
@@ -271,20 +429,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    @Override
-    public Matrix<Double> inverse(Matrix<Double> a) {
-        throw new UnsupportedOperationException("Use LAPACK provider for inverse");
-    }
 
-    @Override
-    public Double determinant(Matrix<Double> a) {
-        throw new UnsupportedOperationException("Use LAPACK provider for determinant");
-    }
-
-    @Override
-    public Vector<Double> solve(Matrix<Double> a, Vector<Double> b) {
-        throw new UnsupportedOperationException("Use LAPACK provider for solve");
-    }
 
     @Override
     public Matrix<Double> transpose(Matrix<Double> a) {
