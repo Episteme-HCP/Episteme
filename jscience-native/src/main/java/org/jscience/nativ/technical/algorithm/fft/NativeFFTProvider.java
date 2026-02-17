@@ -32,6 +32,8 @@ public class NativeFFTProvider implements FFTProvider, LibraryBackend {
     private static MethodHandle DPLAN_R2C_1D;
     private static MethodHandle DPLAN_C2R_1D;
     private static MethodHandle DPLAN_DFT_1D; // For Complex-to-Complex
+    private static MethodHandle DPLAN_DFT_2D;
+    private static MethodHandle DPLAN_DFT_3D;
     private static MethodHandle DEXECUTE;
     private static MethodHandle DDESTROY_PLAN;
 
@@ -67,6 +69,16 @@ public class NativeFFTProvider implements FFTProvider, LibraryBackend {
             DPLAN_DFT_1D = linker.downcallHandle(lookup.find("fftw_plan_dft_1d").get(),
                     FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
                             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+
+            // fftw_plan fftw_plan_dft_2d(int n0, int n1, fftw_complex *in, fftw_complex *out, int sign, unsigned flags);
+            DPLAN_DFT_2D = linker.downcallHandle(lookup.find("fftw_plan_dft_2d").get(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+
+            // fftw_plan fftw_plan_dft_3d(int n0, int n1, int n2, fftw_complex *in, fftw_complex *out, int sign, unsigned flags);
+            DPLAN_DFT_3D = linker.downcallHandle(lookup.find("fftw_plan_dft_3d").get(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
 
             DEXECUTE = linker.downcallHandle(lookup.find("fftw_execute").get(),
                     FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
@@ -242,22 +254,175 @@ public class NativeFFTProvider implements FFTProvider, LibraryBackend {
     }
     @Override
     public double[][][] transform2D(double[][] real, double[][] imag) {
-        throw new UnsupportedOperationException("2D FFT not implemented in NativeFFTProvider yet");
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library not available");
+
+        int n0 = real.length;
+        int n1 = real[0].length;
+        long totalElements = (long) n0 * n1;
+        
+        try (Arena arena = Arena.ofConfined()) {
+            // Allocate interleaved complex input (real, imag, real, imag...)
+            MemorySegment in = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    long offset = ((long) i * n1 + j) * 2;
+                    in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset, real[i][j]);
+                    in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1, imag[i][j]);
+                }
+            }
+            
+            MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+            
+            // -1 for Forward
+            MemorySegment plan = (MemorySegment) DPLAN_DFT_2D.invokeExact(n0, n1, in, out, -1, 1 << 6); // FFTW_ESTIMATE
+            DEXECUTE.invokeExact(plan);
+            DDESTROY_PLAN.invokeExact(plan);
+            
+            double[][][] result = new double[2][n0][n1];
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    long offset = ((long) i * n1 + j) * 2;
+                    result[0][i][j] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset);
+                    result[1][i][j] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1);
+                }
+            }
+            return result;
+        } catch (Throwable e) {
+            throw new RuntimeException("2D FFT execution failed", e);
+        }
     }
 
     @Override
     public double[][][] inverseTransform2D(double[][] real, double[][] imag) {
-        throw new UnsupportedOperationException("2D Inverse FFT not implemented in NativeFFTProvider yet");
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library not available");
+
+        int n0 = real.length;
+        int n1 = real[0].length;
+        long totalElements = (long) n0 * n1;
+        
+        try (Arena arena = Arena.ofConfined()) {
+             MemorySegment in = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     long offset = ((long) i * n1 + j) * 2;
+                     in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset, real[i][j]);
+                     in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1, imag[i][j]);
+                 }
+             }
+             
+             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+             
+             // 1 for Backward
+             MemorySegment plan = (MemorySegment) DPLAN_DFT_2D.invokeExact(n0, n1, in, out, 1, 1 << 6);
+             DEXECUTE.invokeExact(plan);
+             DDESTROY_PLAN.invokeExact(plan);
+             
+             double[][][] result = new double[2][n0][n1];
+             double norm = (double) totalElements;
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     long offset = ((long) i * n1 + j) * 2;
+                     result[0][i][j] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset) / norm;
+                     result[1][i][j] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1) / norm;
+                 }
+             }
+             return result;
+        } catch (Throwable e) {
+             throw new RuntimeException("2D Inverse FFT execution failed", e);
+        }
     }
 
     @Override
     public double[][][][] transform3D(double[][][] real, double[][][] imag) {
-        throw new UnsupportedOperationException("3D FFT not implemented in NativeFFTProvider yet");
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library not available");
+
+        int n0 = real.length;
+        int n1 = real[0].length;
+        int n2 = real[0][0].length;
+        long totalElements = (long) n0 * n1 * n2;
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment in = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    for(int k=0; k<n2; k++) {
+                        long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                        in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset, real[i][j][k]);
+                        in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1, imag[i][j][k]);
+                    }
+                }
+            }
+            
+            MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+            
+            // -1 for Forward
+            MemorySegment plan = (MemorySegment) DPLAN_DFT_3D.invokeExact(n0, n1, n2, in, out, -1, 1 << 6);
+            DEXECUTE.invokeExact(plan);
+            DDESTROY_PLAN.invokeExact(plan);
+            
+            double[][][][] result = new double[2][n0][n1][n2];
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    for(int k=0; k<n2; k++) {
+                        long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                        result[0][i][j][k] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset);
+                        result[1][i][j][k] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1);
+                    }
+                }
+            }
+            return result;
+        } catch (Throwable e) {
+            throw new RuntimeException("3D FFT execution failed", e);
+        }
     }
 
     @Override
     public double[][][][] inverseTransform3D(double[][][] real, double[][][] imag) {
-        throw new UnsupportedOperationException("3D Inverse FFT not implemented in NativeFFTProvider yet");
+         ensureInitialized();
+         if (!available) throw new UnsupportedOperationException("FFTW3 library not available");
+ 
+         int n0 = real.length;
+         int n1 = real[0].length;
+         int n2 = real[0][0].length;
+         long totalElements = (long) n0 * n1 * n2;
+         
+         try (Arena arena = Arena.ofConfined()) {
+             MemorySegment in = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     for(int k=0; k<n2; k++) {
+                         long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                         in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset, real[i][j][k]);
+                         in.setAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1, imag[i][j][k]);
+                     }
+                 }
+             }
+             
+             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
+             
+             // 1 for Backward
+             MemorySegment plan = (MemorySegment) DPLAN_DFT_3D.invokeExact(n0, n1, n2, in, out, 1, 1 << 6);
+             DEXECUTE.invokeExact(plan);
+             DDESTROY_PLAN.invokeExact(plan);
+             
+             double[][][][] result = new double[2][n0][n1][n2];
+             double norm = (double) totalElements;
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     for(int k=0; k<n2; k++) {
+                         long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                         result[0][i][j][k] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset) / norm;
+                         result[1][i][j][k] = out.getAtIndex(ValueLayout.JAVA_DOUBLE, offset + 1) / norm;
+                     }
+                 }
+             }
+             return result;
+         } catch (Throwable e) {
+             throw new RuntimeException("3D Inverse FFT execution failed", e);
+         }
     }
 
     @Override
