@@ -6,10 +6,19 @@ This document provides a comprehensive summary of the current state of the JScie
 
 ## 🚀 Active & Pending Tasks
 
-- [ ] **Task 30: Fix Native Provider Fidelity**
+- [ ] **Task 30: Fix Native Provider Fidelity (Audit Corrections)**
     - **Status**: HIGH PRIORITY.
-    - **Goal**: Prevent ND4J, SIMD, and Bullet providers from silently degrading precision.
-    - **Action**: Implement "Precision Guards" that throw `UnsupportedOperationException` or return null if the current `MathContext` requires precision higher than `double`. This will trigger the `ProviderSelector` to fallback to `CPUDenseLinearAlgebraProvider`.
+    - **Action**: Implement "Precision Guards" for the following providers to prevent silent degradation:
+        - [ ] **ND4JLinearAlgebraProvider** (Degrades to double)
+        - [ ] **NativeSIMDLinearAlgebraBackend** (Degrades to double)
+        - [ ] **NativeBulletSimulationProvider** (Degrades to float)
+        - [ ] **JBlasLinearAlgebraProvider** (Degrades to double)
+    - **Goal**: Throw `UnsupportedOperationException` or return null if `MathContext` precision > double/float.
+
+- [ ] **Task 34: Verify and Fix CI/CD Pipelines**
+    - **Status**: ACTIVE.
+    - **Goal**: End-to-end testing of `maven.yml` and `release.yml`.
+    - **Rationale**: Workflows have been modified for artifact paths and flags, but typically require multiple iterations to stabilize.
 
 - [ ] **Task 31: Python Binding for Genesis**
     - **Status**: **BLOCKED**.
@@ -64,21 +73,28 @@ The recent **Precision Fidelity Audit** (Task 26) revealed a systemic issue:
 ## 📋 Comprehensive Task List (Master)
 
 ### Infrastructure & Core
+
 - [x] Task 10: `jscience-core` `mvn clean compile`
 - [x] Task 13: Address `@AutoService` generic warnings
 - [x] Task 16: Fix `TarsosBackend` unused fields
 - [x] Task 17: Verify `MulticoreNBodyProvider` singleton status
 - [x] Task 29: **Fix UI Provider Detection** (StackOverflow & NoClassDefFound)
 - [x] Task 33: **Fix CI/CD Workflows** (JaCoCo & Artifact upload)
+- [ ] Task 34: **Verify and Fix CI/CD Pipelines** (Pending stability testing)
 - [ ] Task 4: Refactor `ComputeContext` God Object (High Complexity)
 
 ### Native & Performance
+
 - [x] Task 1 & 19: Implement/Move `ND4JLinearAlgebraProvider` to native
 - [x] Task 6: Fix missing `bullet_capi` DLL loading
 - [x] Task 20: Implement `NativeBulletBackend` (Panama FFM)
 - [x] Task 18: Complete `NativeFFMBLASBackend`
 - [x] Task 9: Implement `score()` for GPU (OpenCL/CUDA)
-- [ ] Task 30: **Fix Native Provider Fidelity** (Precision Guards)
+- [ ] Task 30: **Fix Native Provider Fidelity (Audit Corrections)**
+    - [ ] ND4J Precision Guards
+    - [ ] SIMD Precision Guards
+    - [ ] Bullet Precision Guards
+    - [ ] JBlas Precision Guards
 
 ### Benchmarks & UI
 - [x] Task 21: Benchmark UI: Multiselection (Ctrl+Click)
@@ -88,8 +104,9 @@ The recent **Precision Fidelity Audit** (Task 26) revealed a systemic issue:
 - [ ] Task 25: Fix Unavailable Libraries (Native path audit)
 
 ### Verification
+
 - [x] Task 26: **Full Provider Audit** (Manual + Initial automated logic)
-- [x] Task 27: Implement `ProviderVerificationSuite`
+- [x] Task 27: **Implement ProviderVerificationSuite** (Comparative framework)
 - [ ] Task 28: Enforce Precision Context
 
 ---
