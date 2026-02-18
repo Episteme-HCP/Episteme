@@ -35,6 +35,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorSt
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
 
+@SuppressWarnings("rawtypes") // LinearAlgebraProvider.class is a raw type reference (unavoidable in @AutoService)
 @AutoService({Backend.class, ComputeBackend.class, SIMDBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebraProvider<Real> {
 

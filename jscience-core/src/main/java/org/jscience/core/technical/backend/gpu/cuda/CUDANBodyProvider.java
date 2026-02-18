@@ -8,6 +8,7 @@ package org.jscience.core.technical.backend.gpu.cuda;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.NBodyProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.OperationContext;
 import com.google.auto.service.AutoService;
 import jcuda.driver.JCudaDriver;
 
@@ -37,6 +38,24 @@ public class CUDANBodyProvider implements NBodyProvider {
     @Override
     public int getPriority() {
         return 70;
+    }
+
+    /**
+     * Context-aware scoring that accounts for GPU data transfer overhead.
+     * <p>
+     * Uses the existing {@link #GPU_THRESHOLD} to determine when CUDA
+     * N-body becomes worthwhile.
+     * </p>
+     */
+    @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1;
+        double base = getPriority();
+        if (context.getDataSize() < GPU_THRESHOLD) base -= 100;
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
+        if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
+        if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
+        return base;
     }
 
     @Override

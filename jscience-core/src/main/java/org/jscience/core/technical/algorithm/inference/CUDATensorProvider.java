@@ -9,6 +9,7 @@ import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.technical.algorithm.TensorProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.OperationContext;
 
 import jcuda.Pointer;
 import jcuda.Sizeof;
@@ -147,5 +148,32 @@ public class CUDATensorProvider implements TensorProvider {
     @Override
     public String getName() {
         return "CUDA GPU Neural";
+    }
+
+    @Override
+    public int getPriority() {
+        return 80;
+    }
+
+    /** Minimum tensor element count where CUDA outperforms CPU. */
+    private static final int GPU_TENSOR_THRESHOLD = 1024;
+
+    /**
+     * Context-aware scoring that accounts for GPU data transfer overhead.
+     * <p>
+     * Tensor operations are highly parallelizable, so GPU benefits
+     * appear at relatively small tensor sizes.
+     * </p>
+     */
+    @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1;
+        double base = getPriority();
+        if (context.getDataSize() < GPU_TENSOR_THRESHOLD) base -= 100;
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
+        if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
+        if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
+        if (context.hasHint(OperationContext.Hint.FLOAT32_OK)) base += 20;
+        return base;
     }
 }

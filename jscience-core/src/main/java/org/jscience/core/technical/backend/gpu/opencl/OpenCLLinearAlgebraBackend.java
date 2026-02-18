@@ -13,6 +13,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
@@ -45,6 +46,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorSt
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@SuppressWarnings("rawtypes") // LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class are raw type references (unavoidable in @AutoService)
 @AutoService({Backend.class, ComputeBackend.class, LibraryBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
 public class OpenCLLinearAlgebraBackend implements GPUBackend, LibraryBackend, SparseLinearAlgebraProvider<Real> {
 
@@ -124,6 +126,28 @@ public class OpenCLLinearAlgebraBackend implements GPUBackend, LibraryBackend, S
     @Override
     public int getPriority() {
         return 50;
+    }
+
+    /** Minimum data size where GPU linear algebra outperforms CPU. */
+    private static final int GPU_LINALG_THRESHOLD = 100;
+
+    /**
+     * Context-aware scoring that accounts for GPU data transfer overhead.
+     * <p>
+     * GPU linear algebra is beneficial for large matrices where the
+     * O(N³) compute gain outweighs the host→device transfer cost.
+     * </p>
+     */
+    @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1;
+        double base = getPriority();
+        if (context.getDataSize() < GPU_LINALG_THRESHOLD) base -= 100;
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
+        if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
+        if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
+        if (context.hasHint(OperationContext.Hint.SPARSE)) base += 15;
+        return base;
     }
 
     @Override

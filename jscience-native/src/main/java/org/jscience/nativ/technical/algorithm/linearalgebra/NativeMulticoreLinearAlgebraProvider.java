@@ -26,6 +26,7 @@ import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgeb
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
+@SuppressWarnings("rawtypes") // LinearAlgebraProvider.class is a raw type reference (unavoidable in @AutoService)
 @AutoService({LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 

@@ -9,6 +9,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.LatticeBoltzmannProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend;
 import org.jscience.core.technical.backend.gpu.opencl.OpenCLExecutionContext;
 
@@ -133,6 +134,28 @@ public class OpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider 
     @Override
     public int getPriority() {
         return 65;
+    }
+
+    /** Minimum grid size where GPU LBM outperforms CPU. */
+    private static final int GPU_LBM_THRESHOLD = 256;
+
+    /**
+     * Context-aware scoring that accounts for GPU data transfer overhead.
+     * <p>
+     * LBM is inherently parallelizable, so GPU benefits kick in at
+     * relatively small grid sizes.
+     * </p>
+     */
+    @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1;
+        double base = getPriority();
+        if (context.getDataSize() < GPU_LBM_THRESHOLD) base -= 100;
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
+        if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
+        if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
+        if (context.hasHint(OperationContext.Hint.HIGH_THROUGHPUT)) base += 25;
+        return base;
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.algorithm.FFTProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.OperationContext;
 
 
 import static org.jocl.CL.*;
@@ -92,6 +93,27 @@ public class OpenCLFFTProvider implements FFTProvider {
     @Override
     public int getPriority() {
         return 20;
+    }
+
+    /** Minimum FFT size where GPU outperforms CPU. */
+    private static final int GPU_FFT_THRESHOLD = 4096;
+
+    /**
+     * Context-aware scoring that accounts for GPU data transfer overhead.
+     * <p>
+     * GPU FFT is particularly beneficial for large transforms where the
+     * O(N log N) compute gain outweighs the host→device transfer cost.
+     * </p>
+     */
+    @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1;
+        double base = getPriority();
+        if (context.getDataSize() < GPU_FFT_THRESHOLD) base -= 100;
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
+        if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
+        if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
+        return base;
     }
 
     @Override

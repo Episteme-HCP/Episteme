@@ -26,6 +26,7 @@ import java.util.List;
  * High-Performance Native BLAS Backend using Project Panama (FFM).
  * Binds to OpenBLAS/MKL for Matrix Operations.
  */
+@SuppressWarnings("rawtypes") // LinearAlgebraProvider.class is a raw type reference (unavoidable in @AutoService)
 @AutoService({Backend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Backend {
 
