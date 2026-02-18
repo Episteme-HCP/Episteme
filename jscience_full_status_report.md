@@ -16,6 +16,7 @@
 | Fixed `TarsosBackend` unused `currentPath` field | 1 file | ✅ |
 | Verified `MulticoreNBodyProvider` — only ONE exists | Investigation only | ✅ |
 | `jscience-core` `mvn clean compile` | 1257 files, passed | ✅ |
+| Unit tests for Smart Dispatch | `jscience-core` (ProviderSelectorTest) | ✅ |
 | Clarified `ND4JLinearAlgebraProvider` design | Javadoc updated | ✅ Intentional stubs |
 | Implemented `NativeFFMBLASBackend` stubs | `jscience-native` | ✅ |
 | Documented `BackendDiscovery`/`BackendManager` roles | `jscience-core` | ✅ Resolved |
