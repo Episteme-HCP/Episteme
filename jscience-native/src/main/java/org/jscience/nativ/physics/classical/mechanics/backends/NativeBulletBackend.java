@@ -36,10 +36,33 @@ public class NativeBulletBackend implements CollisionBackend {
 
     static {
         Linker linker = Linker.nativeLinker();
-        // Assuming a custom wrapper or Bullet C-API library
-        SymbolLookup lookup = SymbolLookup.libraryLookup("bullet_capi", java.lang.foreign.Arena.global());
-        
-        if (lookup.find("bt_detect_sphere_collisions").isPresent()) {
+        SymbolLookup lookup = null;
+        java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
+
+        // 1. Try standard library path
+        try {
+            lookup = SymbolLookup.libraryLookup("bullet_capi", arena);
+        } catch (Throwable t) {
+            // 2. Try explicit path: libs/Bullet3DLL/libbulletc.dll
+            java.nio.file.Path libPath = java.nio.file.Path.of("libs", "Bullet3DLL", "libbulletc.dll");
+            if (java.nio.file.Files.exists(libPath)) {
+                try {
+                    lookup = SymbolLookup.libraryLookup(libPath, arena);
+                } catch (Throwable t2) {
+                     // ignore
+                }
+            } else {
+                 // 3. Try root fallback (just in case)
+                 java.nio.file.Path rootPath = java.nio.file.Path.of("libbulletc.dll");
+                 if (java.nio.file.Files.exists(rootPath)) {
+                     try {
+                         lookup = SymbolLookup.libraryLookup(rootPath, arena);
+                     } catch (Throwable t3) {}
+                 }
+            }
+        }
+
+        if (lookup != null && lookup.find("bt_detect_sphere_collisions").isPresent()) {
             DETECT_SPHERES = linker.downcallHandle(lookup.find("bt_detect_sphere_collisions").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             RESOLVE_COLLISIONS = linker.downcallHandle(lookup.find("bt_resolve_sphere_collisions").get(),

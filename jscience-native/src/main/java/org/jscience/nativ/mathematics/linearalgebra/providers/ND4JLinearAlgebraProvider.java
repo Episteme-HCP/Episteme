@@ -2,12 +2,13 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.core.mathematics.linearalgebra.providers;
+package org.jscience.nativ.mathematics.linearalgebra.providers;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import com.google.auto.service.AutoService;
 
 /**
@@ -15,18 +16,11 @@ import com.google.auto.service.AutoService;
  * <p>
  * When the ND4J library ({@code org.nd4j:nd4j-native-platform}) is on the classpath,
  * this provider delegates to ND4J's optimized BLAS/LAPACK backends (Native/AVX/CUDA).
- * When ND4J is absent, all operations fall back to {@link CPUDenseLinearAlgebraProvider},
- * ensuring correct results at the cost of native acceleration.
- * </p>
- * <p>
- * To enable ND4J acceleration, add the ND4J dependency to your project and ensure
- * the native libraries are available on the library path. The {@link #isAvailable()}
- * method checks for ND4J classpath presence at runtime.
+ * All operations fall back to {@link CPUDenseLinearAlgebraProvider} if ND4J is absent.
  * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @since 1.0
- * @see CPUDenseLinearAlgebraProvider
  */
 @AutoService(LinearAlgebraProvider.class)
 public class ND4JLinearAlgebraProvider implements LinearAlgebraProvider<Real> {

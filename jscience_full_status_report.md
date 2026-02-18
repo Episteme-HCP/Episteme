@@ -17,7 +17,8 @@
 | Verified `MulticoreNBodyProvider` — only ONE exists | Investigation only | ✅ |
 | `jscience-core` `mvn clean compile` | 1257 files, passed | ✅ |
 | Unit tests for Smart Dispatch | `jscience-core` (ProviderSelectorTest) | ✅ |
-| Clarified `ND4JLinearAlgebraProvider` design | Javadoc updated | ✅ Intentional stubs |
+| Clarified `ND4JLinearAlgebraProvider` design | Moved to `jscience-native` + Added Deps | ✅ In Progress |
+| Completed `NativeFFMBLASBackend` | `jscience-native` (Add/Sub/Scale) | ✅ |
 | Implemented `NativeFFMBLASBackend` stubs | `jscience-native` | ✅ |
 | Documented `BackendDiscovery`/`BackendManager` roles | `jscience-core` | ✅ Resolved |
 | Documented `Real` vs `Double` contract | `jscience-native` | ✅ |
@@ -37,22 +38,21 @@
 
 | # | Task | Module | Details |
 |---|------|--------|---------|
-| 18 | **Complete `NativeFFMBLASBackend`** | `jscience-native` | Currently partial (missing `add`/`sub`/`scale`). Implement these using FFM/BLAS calls. |
-| 8 | **Unit tests for Smart Dispatch** | `jscience-core` | `ProviderSelector` score logic needs verification with mocked scenarios. |
+| 1 | **Implement `ND4JLinearAlgebraProvider`** | `jscience-native` | **In Progress**: Added deps. Moving to `native`. |
+| 6 | **Fix missing `bullet_capi` DLL** | `jscience-native` | **Ready**: `libbulletc.dll` found in root. Needs loading logic (`System.load` or `java.library.path`). |
+| 14 | **Connect Distributed N-Body** | `jscience-server` | **Ready**: MPJ jars found in `libs/MPJ/lib`. Needs dependency config. |
+| 15 | **Custom C AVX-512 kernels** | `jscience-native` | Only if JDK Vector API proven insufficient via benchmarks. |
 
 ### 🟠 HIGH — Architecture / Design Debt
 
 | # | Task | Module | Details |
 |---|------|--------|---------|
 
-| 6 | **Fix missing `bullet_capi` DLL** | `jscience-native` | `NativeBulletBackend` uses Panama FFM to load `bullet_capi.dll` — but `install_native_libs.ps1` only clones the Bullet repo, doesn't compile a C-API wrapper. Needs: cmake + MSVC, or pre-built DLL. |
-
 ### 🟡 MEDIUM — Tests & Verification
 
 | # | Task | Module | Details |
 |---|------|--------|---------|
 | 8 | **Unit tests for Smart Dispatch** | `jscience-core` | `ProviderSelector` + `score()` logic exists but has NO unit tests. Need mocked `OperationContext` scenarios to verify correct provider selection per the scoring table. |
-
 | 11 | **CI/CD: Add test result upload** | `.github/workflows` | Currently tests are skipped (`-DskipTests`). Should re-enable and upload results as build artifacts. |
 | 12 | **CI/CD: Guard benchmark step** | `.github/workflows` | Benchmark runs `--add-modules jdk.incubator.vector` — fails if Vector API unavailable. |
 
@@ -60,8 +60,8 @@
 
 | # | Task | Module | Details |
 |---|------|--------|---------|
-| 14 | **Connect Distributed N-Body to MPI/Hazelcast** | `jscience-server` | **Deferred**: High complexity/Low priority. Local threading (Multicore) is sufficient for current needs. |
-| 15 | **Custom C AVX-512 kernels** | `jscience-native` | Only if JDK Vector API proven insufficient via benchmarks. |
+| 11 | **CI/CD: Add test result upload** | `.github/workflows` | Currently tests are skipped (`-DskipTests`). Should re-enable and upload results as build artifacts. |
+| 12 | **CI/CD: Guard benchmark step** | `.github/workflows` | Benchmark runs `--add-modules jdk.incubator.vector` — fails if Vector API unavailable. |
 
 
 ---
@@ -85,12 +85,12 @@
 
 | Provider | Type | Status | Native Lib |
 |----------|------|--------|------------|
-| `NativeFFMBLASBackend` | FFM → OpenBLAS/MKL | ⚠️ Partial (add/sub/scale missing) | libopenblas |
+| `NativeFFMBLASBackend` | FFM → OpenBLAS/MKL | ✅ Functional (Add/Sub/Scale Impl) | libopenblas |
 | `NativeFFMLAPACKProvider` | FFM → LAPACK | ✅ Functional | liblapack |
 | `NativeFFTProvider` | FFM → FFTW3 | ✅ Functional (1D/2D/3D) | libfftw3 |
 | `NativeSIMDLinearAlgebraBackend` | JDK Vector + FFM | ✅ Functional | None |
 | `NativeCPULinearAlgebraBackend` | FFM → BLAS | ✅ Functional | libopenblas |
-| `NativeBulletBackend` | FFM → Bullet3 | ❌ DLL missing | bullet_capi |
+| `NativeBulletBackend` | FFM → Bullet3 | ⚠️ DLL Config Pending | bullet_capi |
 | `NativeOpenCLLinearAlgebraBackend` | JOCL | ✅ Functional | OpenCL runtime |
 | `NativeCUDABackend` | JCuda | ✅ Functional | CUDA toolkit |
 
@@ -125,5 +125,5 @@
 - **Medium-term** (quality): Items 8, 10-12 (tests + CI)
 - **Long-term** (optional): Items 14-15 (Distributed/Avx)
 
-**Total remaining items: 8**  
-**Completed this session: 20 actions**
+**Total remaining items: 6**  
+**Completed this session: 22 actions**
