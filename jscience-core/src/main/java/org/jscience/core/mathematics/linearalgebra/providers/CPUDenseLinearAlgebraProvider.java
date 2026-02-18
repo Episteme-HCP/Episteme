@@ -39,13 +39,8 @@ import org.jscience.core.mathematics.linearalgebra.algorithms.MatrixMultiplicati
 import org.jscience.core.mathematics.numbers.real.Real;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
-
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
 
 /**
  * 
@@ -54,7 +49,7 @@ import org.jscience.core.technical.backend.HardwareAccelerator;
  * @since 1.0
  */
 @AutoService({LinearAlgebraProvider.class, AlgorithmProvider.class})
-public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E>, ComputeBackend {
+public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     protected final Field<E> field;
     private static final int PARALLEL_THRESHOLD = 1000;
@@ -81,10 +76,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return true;
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return new CPUExecutionContext();
-    }
 
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
@@ -664,21 +655,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 .toArray();
         return new GenericVector<>(
                 new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
-    }
-
-    @Override
-    public String getId() {
-        return "cpudense";
-    }
-
-    @Override
-    public String getDescription() {
-        return "CPUDenseLinearAlgebraProvider";
-    }
-
-    @Override
-    public HardwareAccelerator getAcceleratorType() {
-        return HardwareAccelerator.CPU;
     }
 
     @Override

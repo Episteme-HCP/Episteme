@@ -31,7 +31,6 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
     private float[] magnitudes;
     private double currentTime = 0;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private String currentPath;
 
     // ---- Backend Implementation ----
 
@@ -60,7 +59,6 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
 
     @Override
     public void load(String path) throws Exception {
-        this.currentPath = path;
         // Verify file exists
         File audioFile = new File(path);
         if (!audioFile.exists()) {
