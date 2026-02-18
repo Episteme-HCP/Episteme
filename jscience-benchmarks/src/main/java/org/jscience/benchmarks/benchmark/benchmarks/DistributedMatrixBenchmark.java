@@ -129,8 +129,8 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
         double[][] dataA = generateRandomData(size);
         double[][] dataB = generateRandomData(size);
 
-        A = new DenseMatrix<>(toReal(dataA), Reals.getInstance());
-        B = new DenseMatrix<>(toReal(dataB), Reals.getInstance());
+        A = org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(toReal(dataA), Reals.getInstance());
+        B = org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(toReal(dataB), Reals.getInstance());
 
         // Create tiled versions
         tiledA = new TiledMatrix(A, tileSize, tileSize);

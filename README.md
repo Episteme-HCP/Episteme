@@ -128,6 +128,42 @@ mvn exec:java -pl jscience-core -Dexec.mainClass="org.jscience.core.ui.JScienceD
 run_demos.bat
 ```
 
+
+## Running Examples
+
+### Linear Algebra (Smart Dispatch)
+```bash
+mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.linearalgebra.LinearAlgebraExample"
+```
+
+### Audio Analysis (TarsosDSP)
+```bash
+mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.audio.AudioAnalysisExample" -Dexec.args="path/to/audio.wav"
+```
+
+### Physics Simulation (Native Bullet/Jolt)
+```bash
+mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.physics.PhysicsSimulationExample"
+```
+
+
+## Running Examples
+
+### Linear Algebra (Smart Dispatch)
+```bash
+mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.linearalgebra.LinearAlgebraExample"
+```
+
+### Audio Analysis (TarsosDSP)
+```bash
+mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.audio.AudioAnalysisExample" -Dexec.args="path/to/audio.wav"
+```
+
+### Physics Simulation (Native Bullet/Jolt)
+```bash
+mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.physics.PhysicsSimulationExample"
+```
+
 ## Data Loaders
 
 External data sources with built-in caching (TTL: 24h):

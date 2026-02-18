@@ -313,26 +313,9 @@ public class ComputeContext {
     }
 
     /**
-     * Gets a linear algebra provider suited for the given ring, respecting priorities.
+     * Gets a linear algebra provider suited for the given operation context and ring.
      */
-    public <E> LinearAlgebraProvider<E> getLinearAlgebraProvider(Ring<E> ring) {
-        // Build OperationContext from ComputeContext state
-        OperationContext.Builder builder = new OperationContext.Builder();
-        
-        // Add hints based on configuration
-        if (this.floatPrecision == FloatPrecision.FLOAT) {
-            builder.addHint(OperationContext.Hint.FLOAT32_OK);
-        }
-        
-        // Hint based on preferred backend
-        if (this.backend == Backend.CUDA_GPU || this.backend == Backend.OPENCL_GPU) {
-            builder.addHint(OperationContext.Hint.GPU_RESIDENT); // Bias towards GPU
-        } else if (this.backend == Backend.JAVA_CPU) {
-            // No specific hint, or maybe LOW_LATENCY?
-        }
-        
-        OperationContext ctx = builder.build();
-        
+    public <E> LinearAlgebraProvider<E> getLinearAlgebraProvider(OperationContext ctx, Ring<E> ring) {
         try {
             // Use ProviderSelector to pick best scoring provider
             LinearAlgebraProvider<E> best = ProviderSelector.select(LinearAlgebraProvider.class, ctx);
@@ -358,6 +341,29 @@ public class ComputeContext {
         // Fallback: CPUDense
         Field<E> field = (Field<E>) ring;
         return new CPUDenseLinearAlgebraProvider<E>(field);
+    }
+
+    /**
+     * Gets a linear algebra provider suited for the given ring, respecting priorities.
+     */
+    public <E> LinearAlgebraProvider<E> getLinearAlgebraProvider(Ring<E> ring) {
+        // Build OperationContext from ComputeContext state
+        OperationContext.Builder builder = new OperationContext.Builder();
+        
+        // Add hints based on configuration
+        if (this.floatPrecision == FloatPrecision.FLOAT) {
+            builder.addHint(OperationContext.Hint.FLOAT32_OK);
+        }
+        
+        // Hint based on preferred backend
+        if (this.backend == Backend.CUDA_GPU || this.backend == Backend.OPENCL_GPU) {
+            builder.addHint(OperationContext.Hint.GPU_RESIDENT); // Bias towards GPU
+        } else if (this.backend == Backend.JAVA_CPU) {
+            // No specific hint, or maybe LOW_LATENCY?
+        }
+        
+        OperationContext ctx = builder.build();
+        return getLinearAlgebraProvider(ctx, ring);
     }
 
     /**

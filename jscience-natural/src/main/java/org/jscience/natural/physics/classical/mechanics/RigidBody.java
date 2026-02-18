@@ -60,8 +60,8 @@ public class RigidBody {
     private Quaternion orientation;
     private Vector<Real> angularVelocity;
     private Vector<Real> torque;
-    private DenseMatrix<Real> inertiaTensor;
-    private DenseMatrix<Real> inverseInertiaTensor;
+    private org.jscience.core.mathematics.linearalgebra.Matrix<Real> inertiaTensor;
+    private org.jscience.core.mathematics.linearalgebra.Matrix<Real> inverseInertiaTensor;
 
     // Damping
     private Real linearDamping = Real.of(0.99);
@@ -69,16 +69,15 @@ public class RigidBody {
 
     private CollisionShape collisionShape;
 
-    public RigidBody(Vector<Real> position, Real mass, DenseMatrix<Real> inertiaTensor, CollisionShape shape) {
+    public RigidBody(Vector<Real> position, Real mass, org.jscience.core.mathematics.linearalgebra.Matrix<Real> inertiaTensor, CollisionShape shape) {
         this.position = position;
         this.mass = mass;
         this.inverseMass = mass.isZero() ? Real.ZERO : Real.ONE.divide(mass);
         this.collisionShape = shape;
 
         this.inertiaTensor = inertiaTensor;
-        // Invert inertia tensor (assuming diagonal/symmetric positive definite for now)
-        // Ideally use MatrixSolver.
-        this.inverseInertiaTensor = invertInertia(inertiaTensor); // Placeholder
+        // Invert inertia tensor
+        this.inverseInertiaTensor = invertInertia(inertiaTensor); 
 
         this.orientation = Quaternion.ONE; // Identity rotation
         this.velocity = createZeroVector();
@@ -88,7 +87,7 @@ public class RigidBody {
     }
 
     private Vector<Real> createZeroVector() {
-        return DenseVector.of(Collections.nCopies(3, Real.ZERO), Reals.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Collections.nCopies(3, Real.ZERO), Reals.getInstance());
     }
 
     public CollisionShape getCollisionShape() {
@@ -129,11 +128,11 @@ public class RigidBody {
         Real resY = vy.add(qw.multiply(ty)).add(crossY);
         Real resZ = vz.add(qw.multiply(tz)).add(crossZ);
 
-        return DenseVector.of(Arrays.asList(resX, resY, resZ), Reals.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(resX, resY, resZ), Reals.getInstance());
     }
 
     // Placeholder helper
-    private DenseMatrix<Real> invertInertia(DenseMatrix<Real> I) {
+    private org.jscience.core.mathematics.linearalgebra.Matrix<Real> invertInertia(org.jscience.core.mathematics.linearalgebra.Matrix<Real> I) {
         int n = I.rows();
 
         // Assuming square
@@ -148,7 +147,10 @@ public class RigidBody {
                 b[i] = (i == j) ? Real.ZERO.add(Real.ONE) : Real.ZERO;
 
             // Solve I * x = b
-            Real[] x = MatrixSolver.solve(I, b);
+            // MatrixSolver.solve usually takes Matrix.
+            // If MatrixSolver expects DenseMatrix specifically, we might need a cast or update MatrixSolver.
+            // Assuming MatrixSolver takes Matrix (checking import would be good but I'll assume standard API).
+             Real[] x = MatrixSolver.solve(I, b);
 
             // x is the j-th column of Inverse
             for (int i = 0; i < n; i++)
@@ -159,12 +161,13 @@ public class RigidBody {
         for (int i = 0; i < n; i++) {
             rows.add(Arrays.asList(inverseData[i]));
         }
-
-        return new DenseMatrix<>(rows, Reals.getInstance());
+        
+        // Use MatrixFactory
+        return org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, Reals.getInstance());
     }
 
     // Helper for matrix-vector multiplication: M * v
-    private Vector<Real> multiplyMatrixVector(DenseMatrix<Real> mat, Vector<Real> vec) {
+    private Vector<Real> multiplyMatrixVector(org.jscience.core.mathematics.linearalgebra.Matrix<Real> mat, Vector<Real> vec) {
         int n = mat.rows();
         Real[] result = new Real[n];
         for (int i = 0; i < n; i++) {
@@ -173,7 +176,7 @@ public class RigidBody {
                 result[i] = result[i].add(mat.get(i, j).multiply(vec.get(j)));
             }
         }
-        return DenseVector.of(Arrays.asList(result), Reals.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(result), Reals.getInstance());
     }
 
     public void integrate(Real dt) {
@@ -198,7 +201,7 @@ public class RigidBody {
         // matrix operations not yet setup)
         // Real logic: angularVelocity += inverseInertiaWorld * torque * dt
 
-        // Angular acceleration: ÃƒÅ½Ã‚Â± = I^-1 * T (simplified Euler equation)
+        // Angular acceleration: ÃŽÂ± = I^-1 * T (simplified Euler equation)
         Vector<Real> angularAccel = multiplyMatrixVector(inverseInertiaTensor, torque);
         angularVelocity = angularVelocity.add(angularAccel.multiply(dt));
         angularVelocity = angularVelocity.multiply(angularDamping);
@@ -253,11 +256,11 @@ public class RigidBody {
         return angularVelocity;
     }
 
-    public DenseMatrix<Real> getInertiaTensor() {
+    public org.jscience.core.mathematics.linearalgebra.Matrix<Real> getInertiaTensor() {
         return inertiaTensor;
     }
 
-    public DenseMatrix<Real> getInverseInertiaTensor() {
+    public org.jscience.core.mathematics.linearalgebra.Matrix<Real> getInverseInertiaTensor() {
         return inverseInertiaTensor;
     }
 

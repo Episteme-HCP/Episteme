@@ -19,26 +19,19 @@ import java.util.List;
  */
 public class BraKet {
 
-    private final DenseVector<Complex> stateVector;
+    private final Vector<Complex> stateVector;
     private final boolean isDual; // True if Bra, False if Ket
 
     public BraKet(Complex... amplitudes) {
-        this(new DenseVector<>(Arrays.asList(amplitudes), null), false);
+        this(org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(amplitudes), org.jscience.core.mathematics.sets.Complexes.getInstance()), false);
     }
 
     public BraKet(Vector<Complex> vector) {
-        if (vector instanceof DenseVector) {
-            this.stateVector = (DenseVector<Complex>) vector;
-        } else {
-            List<Complex> list = new ArrayList<>();
-            for (int i = 0; i < vector.dimension(); i++)
-                list.add(vector.get(i));
-            this.stateVector = new DenseVector<>(list, null);
-        }
+        this.stateVector = vector;
         this.isDual = false;
     }
 
-    private BraKet(DenseVector<Complex> vector, boolean isDual) {
+    private BraKet(Vector<Complex> vector, boolean isDual) {
         this.stateVector = vector;
         this.isDual = isDual;
     }
@@ -56,7 +49,7 @@ public class BraKet {
         for (int i = 0; i < stateVector.dimension(); i++) {
             dualData[i] = stateVector.get(i).conjugate();
         }
-        return new BraKet(new DenseVector<>(Arrays.asList(dualData), null), !isDual);
+        return new BraKet(org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(dualData), org.jscience.core.mathematics.sets.Complexes.getInstance()), !isDual);
     }
 
     public Complex dot(BraKet other) {
@@ -84,10 +77,10 @@ public class BraKet {
                 result[i * dim2 + j] = this.stateVector.get(i).multiply(other.stateVector.get(j));
             }
         }
-        return new BraKet(new DenseVector<>(Arrays.asList(result), null), this.isDual);
+        return new BraKet(org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(result), org.jscience.core.mathematics.sets.Complexes.getInstance()), this.isDual);
     }
 
-    public DenseVector<Complex> vector() {
+    public Vector<Complex> vector() {
         return stateVector;
     }
 

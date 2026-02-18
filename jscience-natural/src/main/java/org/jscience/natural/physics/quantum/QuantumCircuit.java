@@ -29,9 +29,9 @@ package org.jscience.natural.physics.quantum;
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory;
 import org.jscience.core.mathematics.sets.Complexes;
 import java.util.ArrayList;
 
@@ -144,7 +144,7 @@ public class QuantumCircuit {
         // Apply 2x2 gate matrix to this pair.
 
         int dim = 1 << numQubits;
-        DenseVector<Complex> v = state.vector();
+        Vector<Complex> v = state.vector();
         Complex[] newData = new Complex[dim];
         for (int i = 0; i < dim; i++)
             newData[i] = v.get(i); // Copy
@@ -174,12 +174,12 @@ public class QuantumCircuit {
             }
         }
 
-        // Create new DenseVector (requires list)
+        // Create new Vector via factory
         List<Complex> dataList = new ArrayList<>(dim);
         for (Complex c : newData)
             dataList.add(c);
 
-        return new BraKet(new DenseVector<>(dataList, Complexes.getInstance()));
+        return new BraKet(VectorFactory.create(dataList, Complexes.getInstance()));
     }
 
     private Matrix<Complex> buildFullOperator(GateApplication app) {
@@ -228,7 +228,7 @@ public class QuantumCircuit {
             }
         }
 
-        return new DenseMatrix<>(rows, Complexes.getInstance());
+        return MatrixFactory.create(rows, Complexes.getInstance());
     }
 
 }

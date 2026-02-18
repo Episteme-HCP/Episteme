@@ -133,8 +133,43 @@ public final class VectorFactory {
         }
     }
 
+    // --- Auto-Discovery ---
+    private static final List<VectorStorageFactory> storageFactories = new java.util.ArrayList<>();
+
+    static {
+        // Try to load Native Factory by name
+        try {
+            Class<?> clazz = Class.forName("org.jscience.nativ.mathematics.linearalgebra.vectors.NativeVectorStorageFactory");
+            VectorStorageFactory factory = (VectorStorageFactory) clazz.getDeclaredConstructor().newInstance();
+            storageFactories.add(factory);
+        } catch (Throwable t) {
+            // Native module not present or failed to load
+        }
+    }
+
     public static <E> VectorStorage<E> createDenseStorage(List<E> data, org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
         int dim = data.size();
+
+        // 1. Try Auto-Discovered Factories
+        boolean tryNative = true;
+        if (tryNative) {
+            for (VectorStorageFactory factory : storageFactories) {
+                if (factory.getPriority() > 0) {
+                    try {
+                        VectorStorage<E> storage = factory.createDense(dim, ring);
+                        if (storage != null) {
+                            for (int i = 0; i < dim; i++) {
+                                storage.set(i, data.get(i));
+                            }
+                            return storage;
+                        }
+                    } catch (Exception e) {
+                        // Ignore
+                    }
+                }
+            }
+        }
+
         boolean isReal = (dim > 0 && data.get(0) instanceof org.jscience.core.mathematics.numbers.real.Real);
 
         if (isReal) {

@@ -67,7 +67,7 @@ public class SU2Group implements Group<Matrix<Complex>> {
         List<List<Complex>> rows = new ArrayList<>();
         for (Complex[] rowData : data)
             rows.add(Arrays.asList(rowData));
-        return new DenseMatrix<>(rows, Complexes.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, org.jscience.core.mathematics.sets.Complexes.getInstance());
     }
 
     @Override

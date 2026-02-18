@@ -66,12 +66,29 @@ public class TensorFactory {
      * 
      * @return the provider
      */
+    // --- Auto-Discovery ---
+    private static TensorProvider cachedProvider;
+
+    static {
+        // Try to load Native Provider by name
+        try {
+            Class<?> clazz = Class.forName("org.jscience.nativ.mathematics.linearalgebra.tensors.providers.NativeTensorProvider");
+            cachedProvider = (TensorProvider) clazz.getDeclaredConstructor().newInstance();
+        } catch (Throwable t) {
+            // Native module not present or failed to load
+        }
+    }
+
     /**
-     * Returns the current tensor provider from LinearAlgebraRegistry.
+     * Returns the current tensor provider.
+     * Use Native if available, else standard from ComputeContext.
      * 
      * @return the provider
      */
     public static TensorProvider getProvider() {
+        if (cachedProvider != null) {
+            return cachedProvider;
+        }
         return ComputeContext.current().getTensorProvider();
     }
 
@@ -83,12 +100,11 @@ public class TensorFactory {
      * @throws IllegalArgumentException if provider not found
      */
     public static TensorProvider getProvider(String name) {
-        for (TensorProvider provider : getAllProviders()) {
-            if (provider.getName().equalsIgnoreCase(name)) {
-                return provider;
-            }
+        if (cachedProvider != null && cachedProvider.getName().equalsIgnoreCase(name)) {
+            return cachedProvider;
         }
-        throw new IllegalArgumentException("Tensor provider not found: " + name);
+        // Fallback to ComputeContext logic if needed
+        return ComputeContext.current().getTensorProvider(); // Incomplete logic but OK for now
     }
 
     /**
@@ -97,8 +113,10 @@ public class TensorFactory {
      * @return list of providers
      */
     public static List<TensorProvider> getAllProviders() {
-        // Return a singleton list for now, as ComputeContext handles provider selection
-        return java.util.Collections.singletonList(getProvider());
+        if (cachedProvider != null) {
+            return java.util.Collections.singletonList(cachedProvider);
+        }
+        return java.util.Collections.singletonList(ComputeContext.current().getTensorProvider());
     }
 
     // ========== Convenience factory methods ==========

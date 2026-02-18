@@ -418,12 +418,50 @@ public final class MatrixFactory {
     }
     // --- Helper methods for Constructors ---
 
+    // --- Auto-Discovery ---
+    private static final List<MatrixStorageFactory> storageFactories = new ArrayList<>();
+
+    static {
+        // Try to load Native Factory by name
+        try {
+            Class<?> clazz = Class.forName("org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrixStorageFactory");
+            MatrixStorageFactory factory = (MatrixStorageFactory) clazz.getDeclaredConstructor().newInstance();
+            storageFactories.add(factory);
+        } catch (Throwable t) {
+            // Native module not present or failed to load
+        }
+    }
+
     /**
      * Determines and creates the optimal Dense storage for the given data.
      */
     public static <E> MatrixStorage<E> createDenseStorage(E[][] data, Ring<E> ring) {
         int rows = data.length;
         int cols = rows > 0 ? data[0].length : 0;
+
+        // 1. Try Auto-Discovered Factories (e.g. Native)
+        boolean tryNative = true; 
+        
+        if (tryNative) {
+            for (MatrixStorageFactory factory : storageFactories) {
+                if (factory.getPriority() > 0) {
+                     try {
+                        MatrixStorage<E> storage = factory.createDense(rows, cols, ring);
+                        if (storage != null) {
+                            // Populate
+                            for (int i = 0; i < rows; i++) {
+                                for (int j = 0; j < cols; j++) {
+                                    storage.set(i, j, data[i][j]);
+                                }
+                            }
+                            return storage;
+                        }
+                     } catch (Exception e) {
+                         // Ignore and fallback
+                     }
+                }
+            }
+        }
 
         boolean isReal = (rows > 0 && cols > 0 && data[0][0] instanceof org.jscience.core.mathematics.numbers.real.Real);
 
@@ -457,6 +495,29 @@ public final class MatrixFactory {
     public static <E> MatrixStorage<E> createDenseStorage(List<List<E>> data, Ring<E> ring) {
         int rows = data.size();
         int cols = rows > 0 ? data.get(0).size() : 0;
+
+        // 1. Try SPI Factories (e.g. Native)
+        boolean tryNative = true; // Could check ComputeContext
+        if (tryNative) {
+            for (MatrixStorageFactory factory : storageFactories) {
+                if (factory.getPriority() > 0) {
+                     try {
+                        MatrixStorage<E> storage = factory.createDense(rows, cols, ring);
+                        if (storage != null) {
+                            for (int i = 0; i < rows; i++) {
+                                List<E> row = data.get(i);
+                                for (int j = 0; j < cols; j++) {
+                                    storage.set(i, j, row.get(j));
+                                }
+                            }
+                            return storage;
+                        }
+                     } catch (Exception e) {
+                         // Ignore
+                     }
+                }
+            }
+        }
 
         boolean isReal = (rows > 0 && cols > 0
                 && data.get(0).get(0) instanceof org.jscience.core.mathematics.numbers.real.Real);

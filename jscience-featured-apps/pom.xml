@@ -31,6 +31,11 @@
             <artifactId>jscience-social</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience-native</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
         <!-- JavaFX -->
