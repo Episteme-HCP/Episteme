@@ -1,5 +1,5 @@
 # JScience Provider Architecture — Full Status Report
-**Date**: 2026-02-18 14:55 CET
+**Date**: 2026-02-18 18:25 CET
 
 ---
 
@@ -24,8 +24,9 @@
 | Implemented `score()` for 7 GPU Providers | `jscience-core` | ✅ Context-aware dispatch |
 | Fixed `@AutoService` rawtypes warnings | 5 files | ✅ |
 | Refactored `ComputeContext` God Object | Created `NumericalConfig`, `ProviderRegistry` | ✅ |
-| Automated GitHub Releases | Created `.github/workflows/release.yml` | ✅ |
+| Automated GitHub Releases | Created `.github/workflows/release.yml` (JDK 25-ea) | ✅ |
 | Generated Javadoc | Manual user action | ✅ |
+| Excluded Heavy Resources | `jscience-natural` (anatomy models) | ✅ |
 
 ---
 
@@ -117,10 +118,10 @@
 
 ## 5. Summary by Priority
 
-- **Immediate** (before next release): Items 1-2 (stub implementations)
-- **Short-term** (architecture health): Items 3-7 (design debt)
-- **Medium-term** (quality): Items 8-12 (tests + CI)
-- **Long-term** (optional): Items 13-17 (polish)
+- **Immediate** (before next release): Item 1 (Stub/Future)
+- **Short-term** (architecture health): Item 6 (Native/DLL)
+- **Medium-term** (quality): Items 8, 10-12 (tests + CI)
+- **Long-term** (optional): Items 14-15 (Distributed/Avx)
 
-**Total remaining items: 7**  
-**Completed this session: 19 actions**
+**Total remaining items: 8**  
+**Completed this session: 20 actions**
