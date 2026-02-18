@@ -10,7 +10,21 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Service provider interface for linear algebra operations.
+ * <p>
+ * This interface is parameterized by element type {@code E}. Two main
+ * parameterizations exist in the codebase:
+ * </p>
+ * <ul>
+ *   <li><strong>{@code LinearAlgebraProvider<Real>}</strong> — Public-facing API.
+ *       Users and high-level code operate through this type. Providers like
+ *       {@code ND4JLinearAlgebraProvider} and {@code NativeMulticoreLinearAlgebraProvider}
+ *       implement this interface and bridge to native backends internally.</li>
+ *   <li><strong>{@code LinearAlgebraProvider<Double>}</strong> — Internal optimization layer.
+ *       Used by native BLAS backends (e.g., {@code NativeFFMBLASBackend}) that operate
+ *       directly on raw {@code double} arrays via FFM/Panama for maximum performance.</li>
+ * </ul>
  * 
+ * @param <E> the element type (typically {@code Real} for public API or {@code Double} for native)
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.2

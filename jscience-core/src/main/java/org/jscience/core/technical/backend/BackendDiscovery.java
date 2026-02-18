@@ -10,10 +10,27 @@ import java.util.stream.Collectors;
 
 /**
  * Utility for discovering and accessing backends of different types.
+ * <p>
+ * This class provides <strong>type-based</strong> backend lookup using string type constants
+ * (e.g., {@link #TYPE_PLOTTING}, {@link #TYPE_TENSOR}). It is the primary entry point for
+ * UI code that needs to enumerate, filter, and select backends by category. It also integrates
+ * with {@link org.jscience.core.io.UserPreferences} for persistent user preferences.
+ * </p>
+ * <p>
+ * <strong>Relationship to {@link BackendManager} / {@link AbstractBackendManager}:</strong>
+ * Domain-specific managers (e.g., {@code PlottingBackendManager}, {@code AudioBackendManager})
+ * extend {@link AbstractBackendManager} for typed management with registration and default
+ * selection. {@code BackendDiscovery} complements this by providing cross-cutting, type-string
+ * based queries used in the settings UI. Both use {@link java.util.ServiceLoader} independently,
+ * which is intentional — domain managers load their specific subtypes (e.g., {@code PlottingBackend}),
+ * while this class loads the generic {@link Backend} service.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
+ * @see BackendManager
+ * @see AbstractBackendManager
  */
 public class BackendDiscovery {
 

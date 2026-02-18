@@ -27,11 +27,25 @@ import java.util.*;
 
 /**
  * Global registry and manager for all discoverable backends.
+ * <p>
  * Provides static access for backward compatibility and a general-purpose manager.
+ * This class manages instances of the base {@link Backend} type, while domain-specific
+ * managers (e.g., {@code PlottingBackendManager}, {@code AudioBackendManager}) extend
+ * {@link AbstractBackendManager} with their specific backend interfaces.
+ * </p>
+ * <p>
+ * <strong>Relationship to {@link BackendDiscovery}:</strong>
+ * {@code BackendDiscovery} provides type-string based queries and user preference integration,
+ * primarily for UI backend selection panels. This class provides name-based lookup and
+ * explicit registration. The {@link #staticGetProvidersByType(String)} method delegates to
+ * {@code BackendDiscovery} to avoid duplicating type-based filtering logic.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @see BackendDiscovery
+ * @see AbstractBackendManager
  */
 public class BackendManager extends AbstractBackendManager<Backend> {
 
