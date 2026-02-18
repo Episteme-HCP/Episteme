@@ -45,6 +45,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     private static MethodHandle DDOT;
     private static MethodHandle DAXPY;
     private static MethodHandle DNRM2;
+    private static MethodHandle DSCAL;
     
     // LAPACK Method Handles
     private static MethodHandle DGESV;
@@ -90,6 +91,28 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
                 DNRM2 = LINKER.downcallHandle(LOOKUP.find("cblas_dnrm2").orElseThrow(), dnrm2Desc);
+
+                // DAXPY: void cblas_daxpy(int n, double alpha, const double *x, int incx, double *y, int incy)
+                FunctionDescriptor daxpyDesc = FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DAXPY = LINKER.downcallHandle(LOOKUP.find("cblas_daxpy").orElseThrow(), daxpyDesc);
+                
+                // DSCAL: void cblas_dscal(int n, double alpha, double *x, int incx)
+                FunctionDescriptor dscalDesc = FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DSCAL = LINKER.downcallHandle(LOOKUP.find("cblas_dscal").orElseThrow(), dscalDesc);
+
+                // DGEMV: void cblas_dgemv(int Layout, int TransA, int M, int N, double alpha, const double *A, int lda, const double *X, int incX, double beta, double *Y, int incY)
+                FunctionDescriptor dgemvDesc = FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DGEMV = LINKER.downcallHandle(LOOKUP.find("cblas_dgemv").orElseThrow(), dgemvDesc);
 
                 // LAPACK Handles
                 // Try LAPACKE (C Interface) first for Row-Major support
@@ -419,7 +442,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     @SuppressWarnings("unused")
     private void useHandles() {
         // Dummy usage to avoid warnings for now
-        if (DGEMV == null || DAXPY == null || CblasTrans == 0) return;
+        if (DGEMV == null || DAXPY == null || DSCAL == null || CblasTrans == 0) return;
     }
 
     // --- Other Methods (Stubs / Fallbacks) ---
@@ -476,6 +499,21 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     @Override
     public Vector<Double> multiply(Vector<Double> vector, Double scalar) {
         int n = vector.dimension();
+        if (IS_AVAILABLE) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+                for (int i = 0; i < n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, vector.get(i));
+                
+                try {
+                    // DSCAL(n, alpha, x, incx)
+                    DSCAL.invokeExact(n, scalar.doubleValue(), segX, 1);
+                } catch (Throwable e) { throw new RuntimeException(e); }
+                
+                Double[] result = new Double[n];
+                for (int i = 0; i < n; i++) result[i] = segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+                return DenseVector.of(java.util.Arrays.asList(result), getRing(vector));
+            }
+        }
         Double[] result = new Double[n];
         for (int i = 0; i < n; i++) result[i] = vector.get(i) * scalar;
         return DenseVector.of(java.util.Arrays.asList(result), getRing(vector));
@@ -485,6 +523,28 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     public Matrix<Double> add(Matrix<Double> a, Matrix<Double> b) {
         int m = a.rows(), n = a.cols();
         if (m != b.rows() || n != b.cols()) throw new IllegalArgumentException("Matrix dimensions mismatch");
+        
+        if (IS_AVAILABLE) {
+             try (Arena arena = Arena.ofConfined()) {
+                 int len = m * n;
+                 MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+                 MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+                 
+                 double[] arrA = ((DenseMatrix<?>)a).toDoubleArray(); // x
+                 double[] arrB = ((DenseMatrix<?>)b).toDoubleArray(); // y
+                 
+                 MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
+                 MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
+                 
+                 // Y = 1.0 * X + Y => B + A
+                 try { DAXPY.invokeExact(len, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+                 
+                 double[] result = new double[len];
+                 MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+                 return createDenseMatrix(result, m, n, a);
+             }
+        }
+        
         Double[][] result = new Double[m][n];
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
@@ -496,11 +556,43 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     public Matrix<Double> subtract(Matrix<Double> a, Matrix<Double> b) {
         int m = a.rows(), n = a.cols();
         if (m != b.rows() || n != b.cols()) throw new IllegalArgumentException("Matrix dimensions mismatch");
+
+        if (IS_AVAILABLE) {
+             try (Arena arena = Arena.ofConfined()) {
+                 int len = m * n;
+                 MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+                 MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+                 
+                 double[] arrA = ((DenseMatrix<?>)a).toDoubleArray(); // y (initial)
+                 double[] arrB = ((DenseMatrix<?>)b).toDoubleArray(); // x
+                 
+                 // Y = -1.0 * X + Y => -B + A
+                 MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
+                 MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
+                 
+                 try { DAXPY.invokeExact(len, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+                 
+                 double[] result = new double[len];
+                 MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+                 return createDenseMatrix(result, m, n, a);
+             }
+        }
+
         Double[][] result = new Double[m][n];
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
                 result[i][j] = a.get(i, j) - b.get(i, j);
         return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
+    }
+    
+    private Matrix<Double> createDenseMatrix(double[] data, int rows, int cols, Matrix<Double> proto) {
+         Double[][] resObj = new Double[rows][cols];
+         for(int i=0; i<rows; i++) {
+             for(int j=0; j<cols; j++) {
+                 resObj[i][j] = data[i*cols + j];
+             }
+         }
+         return new DenseMatrix<>(resObj, (Ring<Double>) proto.getScalarRing());
     }
 
     @Override
@@ -552,6 +644,23 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
     @Override
     public Matrix<Double> scale(Double scalar, Matrix<Double> a) {
         int m = a.rows(), n = a.cols();
+        
+        if (IS_AVAILABLE) {
+             try (Arena arena = Arena.ofConfined()) {
+                 int len = m * n;
+                 MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+                 double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
+                 MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
+                 
+                 // DSCAL(n, alpha, x, incx)
+                 try { DSCAL.invokeExact(len, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+                 
+                 double[] result = new double[len];
+                 MemorySegment.copy(segX, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+                 return createDenseMatrix(result, m, n, a);
+             }
+        }
+        
         Double[][] result = new Double[m][n];
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)

@@ -36,7 +36,8 @@
 
 | # | Task | Module | Details |
 |---|------|--------|---------|
-| 1 | **Implement `ND4JLinearAlgebraProvider`** | `jscience-core` | *Clarified as intentional stubs (see above).* Future: Implement actual INDArray wrapping. |
+| 18 | **Complete `NativeFFMBLASBackend`** | `jscience-native` | Currently partial (missing `add`/`sub`/`scale`). Implement these using FFM/BLAS calls. |
+| 8 | **Unit tests for Smart Dispatch** | `jscience-core` | `ProviderSelector` score logic needs verification with mocked scenarios. |
 
 ### 🟠 HIGH — Architecture / Design Debt
 
@@ -50,7 +51,7 @@
 | # | Task | Module | Details |
 |---|------|--------|---------|
 | 8 | **Unit tests for Smart Dispatch** | `jscience-core` | `ProviderSelector` + `score()` logic exists but has NO unit tests. Need mocked `OperationContext` scenarios to verify correct provider selection per the scoring table. |
-| 10 | **Full project `mvn clean install`** | All modules | Last verified: `jscience-core` compiles ✅. `jscience-natural`, `jscience-server`, `jscience-native`, `jscience-benchmarks`, `jscience-featured-apps` need verification. |
+
 | 11 | **CI/CD: Add test result upload** | `.github/workflows` | Currently tests are skipped (`-DskipTests`). Should re-enable and upload results as build artifacts. |
 | 12 | **CI/CD: Guard benchmark step** | `.github/workflows` | Benchmark runs `--add-modules jdk.incubator.vector` — fails if Vector API unavailable. |
 
@@ -58,7 +59,7 @@
 
 | # | Task | Module | Details |
 |---|------|--------|---------|
-| 14 | **Connect Distributed N-Body to MPI/Hazelcast** | `jscience-server` | `DistributedNBodyProvider` logic works locally but isn't wired to real distributed frameworks yet. |
+| 14 | **Connect Distributed N-Body to MPI/Hazelcast** | `jscience-server` | **Deferred**: High complexity/Low priority. Local threading (Multicore) is sufficient for current needs. |
 | 15 | **Custom C AVX-512 kernels** | `jscience-native` | Only if JDK Vector API proven insufficient via benchmarks. |
 
 
