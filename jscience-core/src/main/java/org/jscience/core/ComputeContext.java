@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 import org.jscience.core.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
 import java.math.MathContext;
+import org.jscience.core.mathematics.context.ComputeMode;
 import org.jscience.core.mathematics.context.MathContext.OverflowMode;
 import org.jscience.core.mathematics.context.MathContext.RealPrecision;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;

@@ -114,6 +114,8 @@
                     <exclude>**/*.stl</exclude>
                 </excludes>
             </resource>
+            <!-- Exclude heavy binary resources (anatomy models) as requested -->
+            <!--
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
@@ -130,6 +132,7 @@
                     <include>**/*.stl</include>
                 </includes>
             </resource>
+            -->
         </resources>
         <plugins>
             <plugin>
