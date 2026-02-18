@@ -5,9 +5,7 @@
 package org.jscience.core.media.backends;
 
 import com.google.auto.service.AutoService;
-import ddf.minim.AudioPlayer;
-import ddf.minim.Minim;
-import ddf.minim.analysis.FFT;
+import java.io.File;
 import org.jscience.core.media.AudioBackend;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
@@ -133,6 +131,7 @@ public class MinimBackend implements AudioBackend, AlgorithmProvider {
             return new float[128];
         }
 
+        @SuppressWarnings("unused")
         private class MinimHelper {
             public String sketchPath(String fileName) { return new File(fileName).getAbsolutePath(); }
             public java.io.InputStream createInput(String fileName) {

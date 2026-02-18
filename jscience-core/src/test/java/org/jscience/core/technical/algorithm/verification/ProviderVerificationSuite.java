@@ -9,8 +9,10 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.real.RealDouble;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.jscience.core.mathematics.numbers.MathContext;
+import org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.jscience.core.mathematics.context.MathContext;
 
 import java.util.Random;
 
@@ -35,7 +37,7 @@ public class ProviderVerificationSuite {
     /**
      * Verifies Matrix Multiplication: C = A * B
      */
-    public static AuditResult verifyMultiply(LinearAlgebraProvider target, int size, double epsilon) {
+    public static AuditResult verifyMultiply(LinearAlgebraProvider<Real> target, int size, double epsilon) {
         Random rnd = new Random(42);
         double[][] dataA = generateRandom(size, size, rnd);
         double[][] dataB = generateRandom(size, size, rnd);
@@ -67,7 +69,7 @@ public class ProviderVerificationSuite {
     /**
      * Verifies Linear System Solving: A * X = B => solve(A, B) = X
      */
-    public static AuditResult verifySolve(LinearAlgebraProvider target, int size, double epsilon) {
+    public static AuditResult verifySolve(LinearAlgebraProvider<Real> target, int size, double epsilon) {
         Random rnd = new Random(42);
         // Generate a well-conditioned matrix if possible, or just random
         double[][] dataA = generateRandom(size, size, rnd);
@@ -77,17 +79,17 @@ public class ProviderVerificationSuite {
         double[][] dataB = generateRandom(size, 1, rnd);
 
         Matrix<Real> A = RealDoubleMatrix.of(dataA);
-        Matrix<Real> B = RealDoubleMatrix.of(dataB);
-
-        // 1. Target result
-        Matrix<Real> X = target.solve(A, B);
+        double[] flatB = new double[size];
+        for(int i=0; i<size; i++) flatB[i] = dataB[i][0];
+        Vector<Real> V_B = RealDoubleVector.of(flatB);
+        Vector<Real> X = target.solve(A, V_B);
 
         // 2. Verification: Check if A * X approx B
-        Matrix<Real> B_check = target.multiply(A, X);
+        Vector<Real> B_check = target.multiply(A, X);
 
         double maxErr = 0;
         for (int i = 0; i < size; i++) {
-            double actual = B_check.get(i, 0).doubleValue();
+            double actual = B_check.get(i).doubleValue();
             maxErr = Math.max(maxErr, Math.abs(actual - dataB[i][0]));
         }
 

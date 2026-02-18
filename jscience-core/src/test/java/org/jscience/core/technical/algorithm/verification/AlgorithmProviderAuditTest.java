@@ -5,6 +5,7 @@
 
 package org.jscience.core.technical.algorithm.verification;
 
+import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.junit.jupiter.api.DynamicTest;
@@ -35,13 +36,17 @@ public class AlgorithmProviderAuditTest {
             
             // Multiply Test
             tests.add(DynamicTest.dynamicTest(pName + " - Multiplication Correctness", () -> {
-                ProviderVerificationSuite.AuditResult result = ProviderVerificationSuite.verifyMultiply(provider, 10, 1e-9);
+                @SuppressWarnings("unchecked")
+                LinearAlgebraProvider<Real> realProvider = (LinearAlgebraProvider<Real>) provider;
+                ProviderVerificationSuite.AuditResult result = ProviderVerificationSuite.verifyMultiply(realProvider, 10, 1e-9);
                 assertTrue(result.passed, "Multiplication failed for " + pName + ". Max error: " + result.maxError);
             }));
             
             // Solve Test
             tests.add(DynamicTest.dynamicTest(pName + " - Solve Correctness", () -> {
-                ProviderVerificationSuite.AuditResult result = ProviderVerificationSuite.verifySolve(provider, 10, 1e-7);
+                @SuppressWarnings("unchecked")
+                LinearAlgebraProvider<Real> realProvider = (LinearAlgebraProvider<Real>) provider;
+                ProviderVerificationSuite.AuditResult result = ProviderVerificationSuite.verifySolve(realProvider, 10, 1e-7);
                 assertTrue(result.passed, "Solve failed for " + pName + ". Max error: " + result.maxError);
             }));
         }
