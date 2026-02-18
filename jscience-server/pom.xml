@@ -186,6 +186,11 @@
             <artifactId>auto-service</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>mpi.mpi</groupId>
+            <artifactId>mpj</artifactId>
+            <version>0.44</version>
+        </dependency>
     </dependencies>
 
     <build>
