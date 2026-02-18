@@ -23,6 +23,9 @@
 | Fixed `jscience-benchmarks` build lock | `pom.xml` | ✅ Added `maven-clean-plugin` config |
 | Implemented `score()` for 7 GPU Providers | `jscience-core` | ✅ Context-aware dispatch |
 | Fixed `@AutoService` rawtypes warnings | 5 files | ✅ |
+| Refactored `ComputeContext` God Object | Created `NumericalConfig`, `ProviderRegistry` | ✅ |
+| Automated GitHub Releases | Created `.github/workflows/release.yml` | ✅ |
+| Generated Javadoc | Manual user action | ✅ |
 
 ---
 
@@ -38,7 +41,7 @@
 
 | # | Task | Module | Details |
 |---|------|--------|---------|
-| 4 | **Refactor `ComputeContext` God Object** | `jscience-core` | 396 lines mixing configuration, backend selection, and GPU operations. Needs decomposition into smaller, focused classes. |
+
 | 6 | **Fix missing `bullet_capi` DLL** | `jscience-native` | `NativeBulletBackend` uses Panama FFM to load `bullet_capi.dll` — but `install_native_libs.ps1` only clones the Bullet repo, doesn't compile a C-API wrapper. Needs: cmake + MSVC, or pre-built DLL. |
 
 ### 🟡 MEDIUM — Tests & Verification
@@ -56,8 +59,7 @@
 |---|------|--------|---------|
 | 14 | **Connect Distributed N-Body to MPI/Hazelcast** | `jscience-server` | `DistributedNBodyProvider` logic works locally but isn't wired to real distributed frameworks yet. |
 | 15 | **Custom C AVX-512 kernels** | `jscience-native` | Only if JDK Vector API proven insufficient via benchmarks. |
-| 16 | **Generate Javadoc** | All | Optional documentation generation. |
-| 17 | **Upload artifacts to GitHub Release** | Manual | Manual step when ready for release. |
+
 
 ---
 
@@ -120,5 +122,5 @@
 - **Medium-term** (quality): Items 8-12 (tests + CI)
 - **Long-term** (optional): Items 13-17 (polish)
 
-**Total remaining items: 10**  
-**Completed this session: 16 actions**
+**Total remaining items: 7**  
+**Completed this session: 19 actions**
