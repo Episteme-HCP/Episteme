@@ -18,7 +18,6 @@ import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
@@ -359,10 +358,10 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
             double[] result = new double[m * n];
             MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, result, 0, m * n);
 
-            // Convert back to Generic Matrix (boxing)
-            // Ideally, we'd have a Matrix implementation backed by double[] directly.
-            // Using DenseMatrix(Double[][]) factory for now.
-            // TODO: Optimize Result Construction
+            // NOTE: Result construction boxes double[] → Double[][] for DenseMatrix compatibility.
+            // A native-backed Matrix implementation (backed by MemorySegment directly) would
+            // eliminate this copy. This is acceptable for now as the BLAS multiply itself
+            // dominates execution time for large matrices.
             Double[][] resObj = new Double[m][n];
             for(int i=0; i<m; i++) {
                 for(int j=0; j<n; j++) {
@@ -426,45 +425,162 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, Back
 
     @Override
     public Vector<Double> add(Vector<Double> a, Vector<Double> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int n = a.dimension();
+        if (n != b.dimension()) throw new IllegalArgumentException("Vector dimensions mismatch");
+        // result = a + b  via DAXPY: y = alpha*x + y (alpha=1, x=a, y=copy-of-b)
+        if (IS_AVAILABLE) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+                MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+                for (int i = 0; i < n; i++) {
+                    segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
+                    segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+                }
+                try { DAXPY.invokeExact(n, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+                Double[] result = new Double[n];
+                for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+                return DenseVector.of(java.util.Arrays.asList(result), getRing(a));
+            }
+        }
+        // Java fallback
+        Double[] result = new Double[n];
+        for (int i = 0; i < n; i++) result[i] = a.get(i) + b.get(i);
+        return DenseVector.of(java.util.Arrays.asList(result), getRing(a));
     }
 
     @Override
     public Vector<Double> subtract(Vector<Double> a, Vector<Double> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int n = a.dimension();
+        if (n != b.dimension()) throw new IllegalArgumentException("Vector dimensions mismatch");
+        // result = a - b via DAXPY: y = -1*x + y where x=b, y=copy-of-a
+        if (IS_AVAILABLE) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+                MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+                for (int i = 0; i < n; i++) {
+                    segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+                    segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
+                }
+                try { DAXPY.invokeExact(n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+                Double[] result = new Double[n];
+                for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+                return DenseVector.of(java.util.Arrays.asList(result), getRing(a));
+            }
+        }
+        Double[] result = new Double[n];
+        for (int i = 0; i < n; i++) result[i] = a.get(i) - b.get(i);
+        return DenseVector.of(java.util.Arrays.asList(result), getRing(a));
     }
 
     @Override
     public Vector<Double> multiply(Vector<Double> vector, Double scalar) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int n = vector.dimension();
+        Double[] result = new Double[n];
+        for (int i = 0; i < n; i++) result[i] = vector.get(i) * scalar;
+        return DenseVector.of(java.util.Arrays.asList(result), getRing(vector));
     }
 
     @Override
     public Matrix<Double> add(Matrix<Double> a, Matrix<Double> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int m = a.rows(), n = a.cols();
+        if (m != b.rows() || n != b.cols()) throw new IllegalArgumentException("Matrix dimensions mismatch");
+        Double[][] result = new Double[m][n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                result[i][j] = a.get(i, j) + b.get(i, j);
+        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
     }
 
     @Override
     public Matrix<Double> subtract(Matrix<Double> a, Matrix<Double> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int m = a.rows(), n = a.cols();
+        if (m != b.rows() || n != b.cols()) throw new IllegalArgumentException("Matrix dimensions mismatch");
+        Double[][] result = new Double[m][n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                result[i][j] = a.get(i, j) - b.get(i, j);
+        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
     }
 
     @Override
     public Vector<Double> multiply(Matrix<Double> a, Vector<Double> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int m = a.rows(), k = a.cols();
+        if (k != b.dimension()) throw new IllegalArgumentException("Matrix cols must equal vector dimension");
+        // Use DGEMV if available: y = alpha*A*x + beta*y
+        if (IS_AVAILABLE) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * k);
+                for (int i = 0; i < m; i++)
+                    for (int j = 0; j < k; j++)
+                        segA.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * k + j, a.get(i, j));
+
+                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, k);
+                for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+
+                MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
+
+                try {
+                    DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, k, 1.0, segA, k, segX, 1, 0.0, segY, 1);
+                } catch (Throwable e) { throw new RuntimeException("DGEMV error", e); }
+
+                Double[] result = new Double[m];
+                for (int i = 0; i < m; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+                return DenseVector.of(java.util.Arrays.asList(result), getRing(b));
+            }
+        }
+        // Java fallback
+        Double[] result = new Double[m];
+        for (int i = 0; i < m; i++) {
+            double sum = 0;
+            for (int j = 0; j < k; j++) sum += a.get(i, j) * b.get(j);
+            result[i] = sum;
+        }
+        return DenseVector.of(java.util.Arrays.asList(result), getRing(b));
     }
-
-
 
     @Override
     public Matrix<Double> transpose(Matrix<Double> a) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int m = a.rows(), n = a.cols();
+        Double[][] result = new Double[n][m];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                result[j][i] = a.get(i, j);
+        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
     }
 
     @Override
     public Matrix<Double> scale(Double scalar, Matrix<Double> a) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int m = a.rows(), n = a.cols();
+        Double[][] result = new Double[m][n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                result[i][j] = scalar * a.get(i, j);
+        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
     }
+
+    @SuppressWarnings("unchecked")
+    private Ring<Double> getRing(Vector<Double> v) {
+        if (v instanceof org.jscience.core.mathematics.linearalgebra.vectors.GenericVector) {
+            return ((org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<Double>) v).getScalarRing();
+        }
+        return DOUBLE_RING;
+    }
+
+    // Simple Ring<Double> for fallback construction
+    @SuppressWarnings("unchecked")
+    private static final Ring<Double> DOUBLE_RING = new Ring<Double>() {
+        @Override public Double operate(Double a, Double b) { return a + b; }
+        @Override public Double add(Double a, Double b) { return a + b; }
+        @Override public Double zero() { return 0.0; }
+        @Override public Double inverse(Double e) { return -e; }
+        @Override public Double negate(Double e) { return -e; }
+        @Override public Double multiply(Double a, Double b) { return a * b; }
+        @Override public Double one() { return 1.0; }
+        @Override public boolean isMultiplicationCommutative() { return true; }
+        @Override public boolean contains(Double element) { return element != null; }
+        @Override public boolean isEmpty() { return false; }
+        @Override public String description() { return "ℝ (Double precision reals)"; }
+    };
     
     @Override
     public Object createBackend() {

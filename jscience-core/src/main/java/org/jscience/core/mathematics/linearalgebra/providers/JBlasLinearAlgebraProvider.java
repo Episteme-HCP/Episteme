@@ -176,8 +176,9 @@ public class JBlasLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     /**
      * Inner implementation class that touches JBlas types.
-     * This class is only loaded if JBlas is present.
+     * Instantiated via reflection in the constructor to avoid hard dependency.
      */
+    @SuppressWarnings("unused") // Loaded via Class.forName in constructor
     private static class JBlasImpl<E> implements LinearAlgebraProvider<E> {
         private final Field<E> field;
 

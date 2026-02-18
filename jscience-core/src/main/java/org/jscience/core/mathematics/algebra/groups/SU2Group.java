@@ -26,8 +26,6 @@ package org.jscience.core.mathematics.algebra.groups;
 import org.jscience.core.mathematics.structures.groups.Group;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.jscience.core.mathematics.sets.Complexes;
 import java.util.*;
 
 /**
@@ -72,9 +70,19 @@ public class SU2Group implements Group<Matrix<Complex>> {
 
     @Override
     public Matrix<Complex> inverse(Matrix<Complex> element) {
-        // For SU(2), inverse is conjugate transpose
-        // And since det=1, M^-1 = M^dagger
-        throw new UnsupportedOperationException("Matrix inversion not yet fully exposed");
+        // For SU(2), inverse = conjugate transpose (M†)
+        // Since det=1 and M is unitary: M^-1 = M^dagger
+        // For 2x2: [[a,b],[c,d]]† = [[conj(a),conj(c)],[conj(b),conj(d)]]
+        Complex[][] result = new Complex[2][2];
+        result[0][0] = element.get(0, 0).conjugate();
+        result[0][1] = element.get(1, 0).conjugate();
+        result[1][0] = element.get(0, 1).conjugate();
+        result[1][1] = element.get(1, 1).conjugate();
+
+        List<List<Complex>> rows = new ArrayList<>();
+        for (Complex[] rowData : result)
+            rows.add(Arrays.asList(rowData));
+        return org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, org.jscience.core.mathematics.sets.Complexes.getInstance());
     }
 
     @Override

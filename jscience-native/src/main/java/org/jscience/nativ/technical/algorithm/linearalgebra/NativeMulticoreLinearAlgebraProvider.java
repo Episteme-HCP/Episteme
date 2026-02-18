@@ -13,9 +13,14 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 
 /**
  * Native multicore linear algebra provider using BLAS/LAPACK.
+ * <p>
+ * Delegates to native BLAS for {@link RealDoubleMatrix} operations and
+ * falls back to {@link CPUDenseLinearAlgebraProvider} for generic operations.
+ * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -25,6 +30,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 
     private final NativeCPULinearAlgebraBackend backend = new NativeCPULinearAlgebraBackend();
+    private final CPUDenseLinearAlgebraProvider<Real> fallback = new CPUDenseLinearAlgebraProvider<>();
 
     public String getName() {
         return "Native JScience (OpenBLAS)";
@@ -44,35 +50,35 @@ public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvid
                 1.0, 0.0);
             return cdm;
         }
-        throw new UnsupportedOperationException("Only RealDoubleMatrix supported by Native provider");
+        return fallback.multiply(a, b);
     }
 
     @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return fallback.add(a, b); }
     @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return fallback.subtract(a, b); }
     @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException(); }
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { return fallback.multiply(vector, scalar); }
     @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
+    public Real dot(Vector<Real> a, Vector<Real> b) { return fallback.dot(a, b); }
     @Override
-    public Real norm(Vector<Real> a) { throw new UnsupportedOperationException(); }
+    public Real norm(Vector<Real> a) { return fallback.norm(a); }
     @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException(); }
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return fallback.add(a, b); }
     @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException(); }
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return fallback.subtract(a, b); }
     @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { return fallback.multiply(a, b); }
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException(); }
+    public Matrix<Real> inverse(Matrix<Real> a) { return fallback.inverse(a); }
     @Override
-    public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException(); }
+    public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
     @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException(); }
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return fallback.solve(a, b); }
     @Override
-    public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException(); }
+    public Matrix<Real> transpose(Matrix<Real> a) { return fallback.transpose(a); }
     @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) { throw new UnsupportedOperationException(); }
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) { return fallback.scale(scalar, a); }
 
     @Override
     public boolean isAvailable() {

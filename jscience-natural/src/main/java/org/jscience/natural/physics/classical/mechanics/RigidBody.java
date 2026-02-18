@@ -24,11 +24,9 @@
 package org.jscience.natural.physics.classical.mechanics;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 
 import org.jscience.core.mathematics.numbers.complex.Quaternion;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.geometry.collision.CollisionShape;

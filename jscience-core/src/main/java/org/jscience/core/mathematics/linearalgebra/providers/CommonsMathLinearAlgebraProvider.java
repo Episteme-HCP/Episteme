@@ -104,7 +104,9 @@ public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
     /**
      * Inner implementation class that touches Commons Math types.
+     * Instantiated via reflection in the constructor to avoid hard dependency.
      */
+    @SuppressWarnings("unused") // Loaded via Class.forName in constructor
     private static class CommonsImpl<E> implements LinearAlgebraProvider<E> {
         private final Field<E> field;
 

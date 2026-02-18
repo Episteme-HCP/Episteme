@@ -296,75 +296,51 @@ public class NativeCPULinearAlgebraBackend implements ComputeBackend, LibraryBac
         }
     }
 
-    // --- LinearAlgebraBackend Implementation ---
+    // --- LinearAlgebraProvider Implementation ---
+    // Falls back to CPUDenseLinearAlgebraProvider for high-level operations.
+    // TODO: Replace with native BLAS-backed implementations using the low-level methods above.
+    private final org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Real> cpuFallback = 
+        new org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<>();
 
     @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return cpuFallback.add(a, b); }
 
     @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return cpuFallback.subtract(a, b); }
 
     @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { return cpuFallback.multiply(vector, scalar); }
 
     @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Real dot(Vector<Real> a, Vector<Real> b) { return cpuFallback.dot(a, b); }
 
     @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return cpuFallback.add(a, b); }
 
     @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return cpuFallback.subtract(a, b); }
 
     @Override
-    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) { return cpuFallback.multiply(a, b); }
 
     @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { return cpuFallback.multiply(a, b); }
 
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Matrix<Real> inverse(Matrix<Real> a) { return cpuFallback.inverse(a); }
 
     @Override
-    public Real determinant(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Real determinant(Matrix<Real> a) { return cpuFallback.determinant(a); }
 
     @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return cpuFallback.solve(a, b); }
 
     @Override
-    public Matrix<Real> transpose(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Matrix<Real> transpose(Matrix<Real> a) { return cpuFallback.transpose(a); }
 
     @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) { return cpuFallback.scale(scalar, a); }
 
     @Override
-    public Real norm(Vector<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet in NativeBLASBackend");
-    }
+    public Real norm(Vector<Real> a) { return cpuFallback.norm(a); }
 }

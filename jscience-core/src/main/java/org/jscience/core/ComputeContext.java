@@ -315,6 +315,7 @@ public class ComputeContext {
     /**
      * Gets a linear algebra provider suited for the given operation context and ring.
      */
+    @SuppressWarnings("unchecked")
     public <E> LinearAlgebraProvider<E> getLinearAlgebraProvider(OperationContext ctx, Ring<E> ring) {
         try {
             // Use ProviderSelector to pick best scoring provider
@@ -327,8 +328,9 @@ public class ComputeContext {
             // fallback to finding compatible one via standard iteration (but sorted by score?)
             // For now, consistent fallback to standard manager iteration but strictly compatible
             // Reuse AlgorithmManager logic but filter for compatibility
-             List<LinearAlgebraProvider> candidates = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
-             for (LinearAlgebraProvider<?> p : candidates) {
+             List<?> candidates = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
+             for (Object obj : candidates) {
+                 LinearAlgebraProvider<?> p = (LinearAlgebraProvider<?>) obj;
                  LinearAlgebraProvider<E> typedProvider = (LinearAlgebraProvider<E>) p;
                  if (typedProvider.isCompatible(ring)) {
                      return typedProvider;

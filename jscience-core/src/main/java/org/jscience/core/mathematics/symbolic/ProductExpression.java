@@ -89,7 +89,10 @@ public class ProductExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public Expression<T> integrate(Variable<T> variable) {
-        throw new UnsupportedOperationException("Integration of products not yet implemented");
+        // General integration of products requires integration by parts,
+        // which is not always expressible in closed form.
+        // Return a symbolic integral representation.
+        return new IntegralExpression<>(this, variable, ring);
     }
 
     @Override

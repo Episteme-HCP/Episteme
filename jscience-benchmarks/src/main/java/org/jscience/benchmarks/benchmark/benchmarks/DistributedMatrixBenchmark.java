@@ -34,7 +34,6 @@ import org.openjdk.jmh.annotations.*;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCannonAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedFoxAlgorithm;

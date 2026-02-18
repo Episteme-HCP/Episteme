@@ -427,21 +427,61 @@ public class NativeFFTProvider implements FFTProvider, LibraryBackend {
 
     @Override
     public Real[][][] transform2D(Real[][] real, Real[][] imag) {
-        throw new UnsupportedOperationException("2D FFT (Real) not implemented in NativeFFTProvider yet");
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = transform2D(r, i);
+        return new Real[][][]{toReal2D(res[0]), toReal2D(res[1])};
     }
 
     @Override
     public Real[][][] inverseTransform2D(Real[][] real, Real[][] imag) {
-        throw new UnsupportedOperationException("2D Inverse FFT (Real) not implemented in NativeFFTProvider yet");
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = inverseTransform2D(r, i);
+        return new Real[][][]{toReal2D(res[0]), toReal2D(res[1])};
     }
 
     @Override
     public Real[][][][] transform3D(Real[][][] real, Real[][][] imag) {
-        throw new UnsupportedOperationException("3D FFT (Real) not implemented in NativeFFTProvider yet");
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = transform3D(r, i);
+        return new Real[][][][]{toReal3D(res[0]), toReal3D(res[1])};
     }
 
     @Override
     public Real[][][][] inverseTransform3D(Real[][][] real, Real[][][] imag) {
-        throw new UnsupportedOperationException("3D Inverse FFT (Real) not implemented in NativeFFTProvider yet");
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = inverseTransform3D(r, i);
+        return new Real[][][][]{toReal3D(res[0]), toReal3D(res[1])};
+    }
+
+    // --- Conversion helpers ---
+    private static double[][] toDouble2D(Real[][] a) {
+        double[][] result = new double[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            result[i] = new double[a[i].length];
+            for (int j = 0; j < a[i].length; j++) result[i][j] = a[i][j].doubleValue();
+        }
+        return result;
+    }
+    private static double[][][] toDouble3D(Real[][][] a) {
+        double[][][] result = new double[a.length][][];
+        for (int i = 0; i < a.length; i++) result[i] = toDouble2D(a[i]);
+        return result;
+    }
+    private static Real[][] toReal2D(double[][] a) {
+        Real[][] result = new Real[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            result[i] = new Real[a[i].length];
+            for (int j = 0; j < a[i].length; j++) result[i][j] = Real.of(a[i][j]);
+        }
+        return result;
+    }
+    private static Real[][][] toReal3D(double[][][] a) {
+        Real[][][] result = new Real[a.length][][];
+        for (int i = 0; i < a.length; i++) result[i] = toReal2D(a[i]);
+        return result;
     }
 }

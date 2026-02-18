@@ -12,13 +12,16 @@ import com.google.auto.service.AutoService;
 
 /**
  * ND4J Linear Algebra Provider (Dense).
- * Delegates to ND4J backend (Native/AVX/CUDA).
+ * Delegates to ND4J backend (Native/AVX/CUDA) when available,
+ * falls back to CPUDenseLinearAlgebraProvider otherwise.
  * 
  * @author Silvere Martin-Michiellot
  * @since 1.0
  */
 @AutoService(LinearAlgebraProvider.class)
 public class ND4JLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
+
+    private final CPUDenseLinearAlgebraProvider<Real> fallback = new CPUDenseLinearAlgebraProvider<>();
 
     public String getName() {
         return "ND4J (Native Wrapper)";
@@ -47,71 +50,71 @@ public class ND4JLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 
     @Override
     public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.add(a, b);
     }
 
     @Override
     public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.subtract(a, b);
     }
 
     @Override
     public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.multiply(vector, scalar);
     }
 
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.dot(a, b);
     }
 
     @Override
     public Real norm(Vector<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.norm(a);
     }
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.add(a, b);
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.subtract(a, b);
     }
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.multiply(a, b);
     }
 
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.multiply(a, b);
     }
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.inverse(a);
     }
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.determinant(a);
     }
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.solve(a, b);
     }
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.transpose(a);
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return fallback.scale(scalar, a);
     }
 }

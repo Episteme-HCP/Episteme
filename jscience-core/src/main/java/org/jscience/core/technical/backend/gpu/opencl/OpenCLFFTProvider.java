@@ -238,41 +238,163 @@ public class OpenCLFFTProvider implements FFTProvider {
     }
     @Override
     public double[][][] transform2D(double[][] real, double[][] imag) {
-        throw new UnsupportedOperationException("2D FFT not implemented in OpenCLFFTProvider yet");
+        int rows = real.length;
+        int cols = real[0].length;
+
+        // Row-wise 1D FFT
+        double[][] rowR = new double[rows][cols];
+        double[][] rowI = new double[rows][cols];
+        for (int r = 0; r < rows; r++) {
+            double[][] res = transform(real[r], imag[r]);
+            rowR[r] = res[0];
+            rowI[r] = res[1];
+        }
+
+        // Column-wise 1D FFT
+        double[][] outR = new double[rows][cols];
+        double[][] outI = new double[rows][cols];
+        for (int c = 0; c < cols; c++) {
+            double[] colR = new double[rows];
+            double[] colI = new double[rows];
+            for (int r = 0; r < rows; r++) { colR[r] = rowR[r][c]; colI[r] = rowI[r][c]; }
+            double[][] res = transform(colR, colI);
+            for (int r = 0; r < rows; r++) { outR[r][c] = res[0][r]; outI[r][c] = res[1][r]; }
+        }
+        return new double[][][]{outR, outI};
     }
 
     @Override
     public double[][][] inverseTransform2D(double[][] real, double[][] imag) {
-        throw new UnsupportedOperationException("2D Inverse FFT not implemented in OpenCLFFTProvider yet");
+        int rows = real.length;
+        int cols = real[0].length;
+
+        double[][] rowR = new double[rows][cols];
+        double[][] rowI = new double[rows][cols];
+        for (int r = 0; r < rows; r++) {
+            double[][] res = inverseTransform(real[r], imag[r]);
+            rowR[r] = res[0];
+            rowI[r] = res[1];
+        }
+
+        double[][] outR = new double[rows][cols];
+        double[][] outI = new double[rows][cols];
+        for (int c = 0; c < cols; c++) {
+            double[] colR = new double[rows];
+            double[] colI = new double[rows];
+            for (int r = 0; r < rows; r++) { colR[r] = rowR[r][c]; colI[r] = rowI[r][c]; }
+            double[][] res = inverseTransform(colR, colI);
+            for (int r = 0; r < rows; r++) { outR[r][c] = res[0][r]; outI[r][c] = res[1][r]; }
+        }
+        return new double[][][]{outR, outI};
     }
 
     @Override
     public double[][][][] transform3D(double[][][] real, double[][][] imag) {
-        throw new UnsupportedOperationException("3D FFT not implemented in OpenCLFFTProvider yet");
+        int d0 = real.length, d1 = real[0].length, d2 = real[0][0].length;
+
+        // Apply 2D FFT to each slice along first dimension
+        double[][][] outR = new double[d0][d1][d2];
+        double[][][] outI = new double[d0][d1][d2];
+        for (int i = 0; i < d0; i++) {
+            double[][][] res = transform2D(real[i], imag[i]);
+            outR[i] = res[0];
+            outI[i] = res[1];
+        }
+
+        // FFT along the first dimension
+        for (int j = 0; j < d1; j++) {
+            for (int k = 0; k < d2; k++) {
+                double[] colR = new double[d0];
+                double[] colI = new double[d0];
+                for (int i = 0; i < d0; i++) { colR[i] = outR[i][j][k]; colI[i] = outI[i][j][k]; }
+                double[][] res = transform(colR, colI);
+                for (int i = 0; i < d0; i++) { outR[i][j][k] = res[0][i]; outI[i][j][k] = res[1][i]; }
+            }
+        }
+        return new double[][][][]{outR, outI};
     }
 
     @Override
     public double[][][][] inverseTransform3D(double[][][] real, double[][][] imag) {
-        throw new UnsupportedOperationException("3D Inverse FFT not implemented in OpenCLFFTProvider yet");
+        int d0 = real.length, d1 = real[0].length, d2 = real[0][0].length;
+
+        double[][][] outR = new double[d0][d1][d2];
+        double[][][] outI = new double[d0][d1][d2];
+        for (int i = 0; i < d0; i++) {
+            double[][][] res = inverseTransform2D(real[i], imag[i]);
+            outR[i] = res[0];
+            outI[i] = res[1];
+        }
+
+        for (int j = 0; j < d1; j++) {
+            for (int k = 0; k < d2; k++) {
+                double[] colR = new double[d0];
+                double[] colI = new double[d0];
+                for (int i = 0; i < d0; i++) { colR[i] = outR[i][j][k]; colI[i] = outI[i][j][k]; }
+                double[][] res = inverseTransform(colR, colI);
+                for (int i = 0; i < d0; i++) { outR[i][j][k] = res[0][i]; outI[i][j][k] = res[1][i]; }
+            }
+        }
+        return new double[][][][]{outR, outI};
     }
 
     @Override
     public Real[][][] transform2D(Real[][] real, Real[][] imag) {
-        throw new UnsupportedOperationException("2D FFT (Real) not implemented in OpenCLFFTProvider yet");
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = transform2D(r, i);
+        return new Real[][][]{toReal2D(res[0]), toReal2D(res[1])};
     }
 
     @Override
     public Real[][][] inverseTransform2D(Real[][] real, Real[][] imag) {
-        throw new UnsupportedOperationException("2D Inverse FFT (Real) not implemented in OpenCLFFTProvider yet");
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = inverseTransform2D(r, i);
+        return new Real[][][]{toReal2D(res[0]), toReal2D(res[1])};
     }
 
     @Override
     public Real[][][][] transform3D(Real[][][] real, Real[][][] imag) {
-        throw new UnsupportedOperationException("3D FFT (Real) not implemented in OpenCLFFTProvider yet");
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = transform3D(r, i);
+        return new Real[][][][]{toReal3D(res[0]), toReal3D(res[1])};
     }
 
     @Override
     public Real[][][][] inverseTransform3D(Real[][][] real, Real[][][] imag) {
-        throw new UnsupportedOperationException("3D Inverse FFT (Real) not implemented in OpenCLFFTProvider yet");
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = inverseTransform3D(r, i);
+        return new Real[][][][]{toReal3D(res[0]), toReal3D(res[1])};
+    }
+
+    // --- Conversion helpers ---
+    private static double[][] toDouble2D(Real[][] a) {
+        double[][] r = new double[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            r[i] = new double[a[i].length];
+            for (int j = 0; j < a[i].length; j++) r[i][j] = a[i][j].doubleValue();
+        }
+        return r;
+    }
+    private static double[][][] toDouble3D(Real[][][] a) {
+        double[][][] r = new double[a.length][][];
+        for (int i = 0; i < a.length; i++) r[i] = toDouble2D(a[i]);
+        return r;
+    }
+    private static Real[][] toReal2D(double[][] a) {
+        Real[][] r = new Real[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            r[i] = new Real[a[i].length];
+            for (int j = 0; j < a[i].length; j++) r[i][j] = Real.of(a[i][j]);
+        }
+        return r;
+    }
+    private static Real[][][] toReal3D(double[][][] a) {
+        Real[][][] r = new Real[a.length][][];
+        for (int i = 0; i < a.length; i++) r[i] = toReal2D(a[i]);
+        return r;
     }
 }

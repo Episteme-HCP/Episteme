@@ -6,12 +6,9 @@
 package org.jscience.natural.physics.quantum;
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Represents a quantum state using Dirac notation.

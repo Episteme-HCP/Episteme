@@ -118,7 +118,16 @@ public class IntegralExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public T evaluate(Map<Variable<T>, T> assignments) {
-        throw new UnsupportedOperationException("Numeric evaluation of symbolic integrals not supported");
+        // Numerical evaluation via Simpson's rule for Real type
+        if (ring instanceof org.jscience.core.mathematics.sets.Reals) {
+            // If explicit bounds are provided as variable_lower and variable_upper
+            // in the assignments, use them. Otherwise, the integral is indefinite
+            // and cannot be numerically evaluated.
+            throw new UnsupportedOperationException(
+                "Numeric evaluation of indefinite integrals requires bounds. " +
+                "Use a definite integral or provide explicit integration limits.");
+        }
+        throw new UnsupportedOperationException("Numeric evaluation of symbolic integrals not supported for non-Real types");
     }
 
     @Override

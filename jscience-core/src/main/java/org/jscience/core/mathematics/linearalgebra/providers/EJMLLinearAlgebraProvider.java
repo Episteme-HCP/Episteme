@@ -177,8 +177,9 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     /**
      * Inner implementation class that touches EJML types.
-     * This class is only loaded if EJML is present.
+     * Instantiated via reflection in the constructor to avoid hard dependency.
      */
+    @SuppressWarnings("unused") // Loaded via Class.forName in constructor
     private static class EJMLImpl<E> implements LinearAlgebraProvider<E> {
         private final Field<E> field;
 

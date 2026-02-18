@@ -104,7 +104,9 @@ public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     /**
      * Inner implementation class that touches Colt types.
+     * Instantiated via reflection in the constructor to avoid hard dependency.
      */
+    @SuppressWarnings("unused") // Loaded via Class.forName in constructor
     private static class ColtImpl<E> implements LinearAlgebraProvider<E> {
         private final Field<E> field;
 

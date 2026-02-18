@@ -141,14 +141,51 @@ public class FunctionExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public Expression<T> differentiate(Variable<T> variable) {
-        // Differentiation requires division and multiplication operations
-        // which need Ring parameter - not yet fully integrated
-        throw new UnsupportedOperationException("Differentiation not yet fully integrated with Ring interface");
+        // Chain rule: d/dx f(g(x)) = f'(g(x)) * g'(x)
+        Expression<T> innerDeriv = argument.differentiate(variable);
+        Ring<T> ring = getRing();
+        Expression<T> one = ConstantExpression.ofConstant(ring.one(), ring);
+
+        switch (type) {
+            case SIN:
+                // d/dx sin(u) = cos(u) * u'
+                return new ProductExpression<>(cos(argument), innerDeriv, ring);
+            case COS:
+                // d/dx cos(u) = -sin(u) * u'
+                return new ProductExpression<>(sin(argument).negate(), innerDeriv, ring);
+            case TAN:
+                // d/dx tan(u) = sec²(u) * u' = (1/cos²(u)) * u'
+                Expression<T> cosU = cos(argument);
+                Expression<T> sec2 = new DivisionExpression<>(one, new ProductExpression<>(cosU, cosU, ring), ring);
+                return new ProductExpression<>(sec2, innerDeriv, ring);
+            case EXP:
+                // d/dx exp(u) = exp(u) * u'
+                return new ProductExpression<>(this, innerDeriv, ring);
+            case LOG:
+                // d/dx log(u) = (1/u) * u'
+                return new ProductExpression<>(new DivisionExpression<>(one, argument, ring), innerDeriv, ring);
+            case SQRT:
+                // d/dx sqrt(u) = 1/(2*sqrt(u)) * u'
+                Expression<T> two = new SumExpression<>(one, one, ring);
+                Expression<T> twoSqrt = new ProductExpression<>(two, sqrt(argument), ring);
+                return new ProductExpression<>(new DivisionExpression<>(one, twoSqrt, ring), innerDeriv, ring);
+            case POW:
+                // d/dx u^v = u^v * (v' * ln(u) + v * u'/u)
+                // Simplified case when exponent is constant: d/dx u^n = n * u^(n-1) * u'
+                Expression<T> vPrime = exponent.differentiate(variable);
+                Expression<T> term1 = new ProductExpression<>(vPrime, log(argument), ring);
+                Expression<T> term2 = new ProductExpression<>(exponent, new DivisionExpression<>(innerDeriv, argument, ring), ring);
+                return new ProductExpression<>(this, new SumExpression<>(term1, term2, ring), ring);
+            default:
+                throw new IllegalStateException("Unknown function type: " + type);
+        }
     }
 
     @Override
     public Expression<T> integrate(Variable<T> variable) {
-        throw new UnsupportedOperationException("Integration not yet implemented");
+        // General symbolic integration of transcendental functions
+        // is non-trivial. Wrap as IntegralExpression for symbolic representation.
+        return new IntegralExpression<>(this, variable, getRing());
     }
 
     @Override

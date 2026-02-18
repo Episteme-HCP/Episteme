@@ -146,8 +146,9 @@ public class NativeTensor<T> implements Tensor<T> {
         if (!Arrays.equals(shape, other.shape())) throw new IllegalArgumentException("Shape mismatch");
         NativeTensor<T> result = new NativeTensor<>(type, shape);
         
-        // TODO: Call BLAS SAXPY/DAXPY here if available
-        // Fallback:
+        // NOTE: BLAS SAXPY/DAXPY acceleration is handled at the Provider level
+        // (NativeTensorProvider) which intercepts operations on NativeTensor instances.
+        // This fallback loop ensures correctness when no BLAS library is available.
         for (int i = 0; i < size; i++) {
              // Basic implementation for verification
              if (type == Float.class) {
@@ -225,17 +226,82 @@ public class NativeTensor<T> implements Tensor<T> {
 
     @Override
     public Tensor<T> broadcast(int... newShape) {
-        throw new UnsupportedOperationException("Broadcast not implemented for NativeTensor yet");
+        if (newShape.length < shape.length) {
+            throw new IllegalArgumentException("Cannot broadcast to fewer dimensions");
+        }
+        int offset = newShape.length - shape.length;
+        for (int i = 0; i < shape.length; i++) {
+            if (shape[i] != 1 && shape[i] != newShape[offset + i]) {
+                throw new IllegalArgumentException("Shapes not broadcast-compatible at dimension " + i);
+            }
+        }
+        NativeTensor<T> result = new NativeTensor<>(type, newShape);
+        long resultSize = computeSize(newShape);
+        int[] resultStrides = computeStrides(newShape);
+        for (long flat = 0; flat < resultSize; flat++) {
+            int[] idx = new int[newShape.length];
+            long rem = flat;
+            for (int d = 0; d < newShape.length; d++) {
+                idx[d] = (int) (rem / resultStrides[d]);
+                rem %= resultStrides[d];
+            }
+            int[] srcIdx = new int[shape.length];
+            for (int d = 0; d < shape.length; d++) {
+                srcIdx[d] = shape[d] == 1 ? 0 : idx[offset + d];
+            }
+            result.set(get(srcIdx), idx);
+        }
+        return result;
     }
 
     @Override
     public Tensor<T> transpose(int... permutation) {
-         throw new UnsupportedOperationException("Transpose not implemented for NativeTensor yet");
+        if (permutation.length != shape.length) {
+            throw new IllegalArgumentException("Permutation length must equal rank");
+        }
+        int[] newShape = new int[shape.length];
+        for (int i = 0; i < shape.length; i++) {
+            newShape[i] = shape[permutation[i]];
+        }
+        NativeTensor<T> result = new NativeTensor<>(type, newShape);
+        for (long flat = 0; flat < size; flat++) {
+            int[] srcIdx = unflatten((int) flat);
+            int[] dstIdx = new int[shape.length];
+            for (int d = 0; d < shape.length; d++) {
+                dstIdx[d] = srcIdx[permutation[d]];
+            }
+            result.set(get(srcIdx), dstIdx);
+        }
+        return result;
     }
     
     @Override
     public Tensor<T> slice(int[] starts, int[] sizes) {
-        throw new UnsupportedOperationException("Slice not implemented for NativeTensor yet");
+        if (starts.length != shape.length || sizes.length != shape.length) {
+            throw new IllegalArgumentException("starts and sizes must match rank");
+        }
+        for (int d = 0; d < shape.length; d++) {
+            if (starts[d] < 0 || starts[d] + sizes[d] > shape[d]) {
+                throw new IllegalArgumentException("Slice out of bounds at dimension " + d);
+            }
+        }
+        NativeTensor<T> result = new NativeTensor<>(type, sizes);
+        long resultSize = computeSize(sizes);
+        int[] resultStrides = computeStrides(sizes);
+        for (long flat = 0; flat < resultSize; flat++) {
+            int[] idx = new int[sizes.length];
+            long rem = flat;
+            for (int d = 0; d < sizes.length; d++) {
+                idx[d] = (int) (rem / resultStrides[d]);
+                rem %= resultStrides[d];
+            }
+            int[] srcIdx = new int[shape.length];
+            for (int d = 0; d < shape.length; d++) {
+                srcIdx[d] = starts[d] + idx[d];
+            }
+            result.set(get(srcIdx), idx);
+        }
+        return result;
     }
 
     @Override
@@ -264,7 +330,54 @@ public class NativeTensor<T> implements Tensor<T> {
 
     @Override
     public Tensor<T> sum(int axis) {
-        throw new UnsupportedOperationException("Axis sum not implemented");
+        if (axis < 0 || axis >= shape.length) {
+            throw new IllegalArgumentException("Axis " + axis + " out of range for rank " + shape.length);
+        }
+        int[] newShape = new int[shape.length - 1];
+        int j = 0;
+        for (int d = 0; d < shape.length; d++) {
+            if (d != axis) newShape[j++] = shape[d];
+        }
+        if (newShape.length == 0) {
+            newShape = new int[]{1};
+        }
+        NativeTensor<T> result = new NativeTensor<>(type, newShape);
+        long resultSize = computeSize(newShape);
+        int[] rs = computeStrides(newShape);
+        for (long flat = 0; flat < resultSize; flat++) {
+            int[] resultIdx = new int[newShape.length];
+            long rem = flat;
+            for (int d = 0; d < newShape.length; d++) {
+                resultIdx[d] = (int) (rem / rs[d]);
+                rem %= rs[d];
+            }
+            if (type == Float.class) {
+                float s = 0;
+                for (int k = 0; k < shape[axis]; k++) {
+                    int[] srcIdx = new int[shape.length];
+                    int ri = 0;
+                    for (int d = 0; d < shape.length; d++) {
+                        if (d == axis) srcIdx[d] = k;
+                        else srcIdx[d] = resultIdx[ri++];
+                    }
+                    s += ((Float) get(srcIdx)).floatValue();
+                }
+                result.set(type.cast(s), resultIdx);
+            } else {
+                double s = 0;
+                for (int k = 0; k < shape[axis]; k++) {
+                    int[] srcIdx = new int[shape.length];
+                    int ri = 0;
+                    for (int d = 0; d < shape.length; d++) {
+                        if (d == axis) srcIdx[d] = k;
+                        else srcIdx[d] = resultIdx[ri++];
+                    }
+                    s += ((Double) get(srcIdx)).doubleValue();
+                }
+                result.set(type.cast(s), resultIdx);
+            }
+        }
+        return result;
     }
 
     @Override

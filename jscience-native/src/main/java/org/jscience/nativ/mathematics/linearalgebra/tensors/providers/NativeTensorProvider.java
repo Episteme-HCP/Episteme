@@ -146,26 +146,6 @@ public class NativeTensorProvider implements TensorProvider, Backend {
         return tensor;
     }
     
-    // Internal helper for memory creation if needed separately
-    private MemorySegment createMemory(float[] data) {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segment = arena.allocate(ValueLayout.JAVA_FLOAT, data.length);
-            for (int i = 0; i < data.length; i++) {
-                segment.setAtIndex(ValueLayout.JAVA_FLOAT, i, data[i]);
-            }
-            return null;
-        }
-    }
-
-    private MemorySegment createMemory(double[] data) {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segment = arena.allocate(ValueLayout.JAVA_DOUBLE, data.length);
-            for (int i = 0; i < data.length; i++) {
-                segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, data[i]);
-            }
-            return null;
-        }
-    }
     
     // Helper
     private Float[] toObjectArray(float[] arr) {

@@ -23,8 +23,9 @@ public class AudioAnalysisExample {
             filePath = args[0];
         } else {
             System.out.println("Please enter the path to an audio file (wav/mp3):");
-            Scanner scanner = new Scanner(System.in);
-            filePath = scanner.nextLine().trim();
+            try (Scanner scanner = new Scanner(System.in)) {
+                filePath = scanner.nextLine().trim();
+            }
         }
         
         if (filePath.isEmpty()) {
