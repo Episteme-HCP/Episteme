@@ -72,6 +72,7 @@ public class MainController {
     private final org.jscience.benchmarks.persistence.BenchmarkResultService resultService = new org.jscience.benchmarks.persistence.BenchmarkResultService();
     private final java.util.Queue<BenchmarkItem> benchmarkQueue = new java.util.LinkedList<>();
     private boolean isProcessingQueue = false;
+    private final Object executionLock = new Object();
     private ResourceBundle resources;
 
     private javafx.stage.Stage primaryStage;
@@ -170,7 +171,7 @@ public class MainController {
             String status = child.getValue().statusProperty().get();
             if (status == null) status = "";
             
-            if (status.contains("Running") || status.contains("Initializing") || status.contains("Warming") || status.contains("Measuring")) anyRunning = true;
+            if (status.contains("Running") || status.contains("Initializing") || status.contains("Warming") || status.contains("Measuring") || "Queued".equals(status)) anyRunning = true;
             else if (status.contains("Error") || status.contains("Skipped")) anyError = true;
             else if ("Success".equals(status)) anySuccess = true;
             else if ("Ready".equals(status) || status.isEmpty() || "Queued".equals(status)) readyCount++;
@@ -205,6 +206,7 @@ public class MainController {
         
         benchmarkTreeTable.setShowRoot(false);
         benchmarkTreeTable.setColumnResizePolicy(TreeTableView.UNCONSTRAINED_RESIZE_POLICY);
+        benchmarkTreeTable.getSelectionModel().setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE);
         
         benchmarkTreeTable.setRowFactory(tv -> {
             TreeTableRow<BenchmarkItem> row = new TreeTableRow<>();
@@ -322,11 +324,13 @@ public class MainController {
 
     @FXML
     private void handleRunSelected() {
-        TreeItem<BenchmarkItem> selected = benchmarkTreeTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
+        ObservableList<TreeItem<BenchmarkItem>> selectedItems = benchmarkTreeTable.getSelectionModel().getSelectedItems();
+        if (selectedItems == null || selectedItems.isEmpty()) return;
 
         Set<BenchmarkItem> itemsToRun = new HashSet<>();
-        collectBenchmarks(selected, itemsToRun);
+        for (TreeItem<BenchmarkItem> selected : selectedItems) {
+            collectBenchmarks(selected, itemsToRun);
+        }
         
         if (!itemsToRun.isEmpty()) {
             runBenchmarkSuite(new ArrayList<>(itemsToRun));
@@ -372,7 +376,11 @@ public class MainController {
                 int count = 0;
                 for (BenchmarkItem item : items) {
                     if (isCancelled()) break;
-                    executeSingle(item);
+                    
+                    // Run synchronously to track progress correctly
+                    Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
+                    runBenchmarkItem(item);
+                    
                     count++;
                     updateProgress(count, items.size());
                     Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
@@ -501,21 +509,22 @@ public class MainController {
     }
 
     private void runBenchmarkItem(BenchmarkItem item) {
-        RunnableBenchmark b = item.getBenchmark();
-        if (b == null) return;
-        
-        // Check availability logic as requested
-        if (!b.isAvailable()) {
-            Platform.runLater(() -> {
-                item.statusProperty().set("Skipped (Unavailable)");
-                item.resultProperty().set("N/A");
-            });
-            return;
-        }
-
-        try {
-            Platform.runLater(() -> item.statusProperty().set("Running..."));
-            b.setup();
+        synchronized (executionLock) {
+            RunnableBenchmark b = item.getBenchmark();
+            if (b == null) return;
+            
+            // Check availability logic as requested
+            if (!b.isAvailable()) {
+                Platform.runLater(() -> {
+                    item.statusProperty().set("Skipped (Unavailable)");
+                    item.resultProperty().set("N/A");
+                });
+                return;
+            }
+    
+            try {
+                Platform.runLater(() -> item.statusProperty().set("Running..."));
+                b.setup();
             
             // 1. Warmup (Adaptive: ~500ms)
             Platform.runLater(() -> item.statusProperty().set("Warming up..."));
@@ -592,6 +601,7 @@ public class MainController {
                 });
             }
         }
+      } // End synchronized
     }
 
     // Library-specific colors for visual distinction
@@ -736,13 +746,24 @@ public class MainController {
         File file = fileChooser.showSaveDialog(exportHistoryBtn.getScene().getWindow());
         if (file != null) {
             try {
-                StringBuilder sb = new StringBuilder("[\n");
+                StringBuilder sb = new StringBuilder("{\n");
+                // System Context
+                sb.append("  \"context\": {\n");
+                sb.append("    \"java_version\": \"").append(System.getProperty("java.version")).append("\",\n");
+                sb.append("    \"os_name\": \"").append(System.getProperty("os.name")).append("\",\n");
+                sb.append("    \"os_arch\": \"").append(System.getProperty("os.arch")).append("\",\n");
+                sb.append("    \"processors\": ").append(Runtime.getRuntime().availableProcessors()).append(",\n");
+                sb.append("    \"timestamp\": \"").append(java.time.Instant.now().toString()).append("\"\n");
+                sb.append("  },\n");
+                
+                sb.append("  \"runs\": [\n");
                 for (int i = 0; i < historyList.size(); i++) {
-                    sb.append("  ").append(historyList.get(i).toJson());
+                    sb.append("    ").append(historyList.get(i).toJson());
                     if (i < historyList.size() - 1) sb.append(",");
                     sb.append("\n");
                 }
-                sb.append("]");
+                sb.append("  ]\n}");
+                
                 java.nio.file.Files.writeString(file.toPath(), sb.toString());
                 statusBarLabel.setText("History exported to " + file.getName());
             } catch (IOException e) {

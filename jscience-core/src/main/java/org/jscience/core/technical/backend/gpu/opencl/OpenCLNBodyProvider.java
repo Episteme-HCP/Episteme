@@ -41,6 +41,7 @@ public class OpenCLNBodyProvider implements NBodyProvider {
 
     // Kernel: x,y,z,mass packed in p[i*4]. v[i*3]. f[i*3].
     private static final String KERNEL_SOURCE = 
+        "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
         "__kernel void nbody_forces(__global double* p, __global double* v, __global double* f, int n, double dt, double G) {\n" +
         "    int i = get_global_id(0);\n" +
         "    if (i >= n) return;\n" +

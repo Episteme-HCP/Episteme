@@ -172,7 +172,8 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
                 data[i*n + k] = 0;
                 
                 int j = k + 1;
-                for (; j < species.loopBound(n); j += species.length()) {
+                // Fix for unaligned start: check if j + length <= n
+                for (; j + species.length() <= n; j += species.length()) {
                     var vRowK = DoubleVector.fromArray(species, data, k*n + j);
                     var vRowI = DoubleVector.fromArray(species, data, i*n + j);
                     vRowI.sub(vRowK.mul(factor)).intoArray(data, i*n + j);
@@ -187,7 +188,8 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
             double sum = 0.0;
             int j = i + 1;
             var vSum = DoubleVector.zero(species);
-            for (; j < species.loopBound(n); j += species.length()) {
+            // Fix for unaligned start
+            for (; j + species.length() <= n; j += species.length()) {
                  var vA = DoubleVector.fromArray(species, data, i*n + j);
                  var vX = DoubleVector.fromArray(species, x, j);
                  vSum = vSum.add(vA.mul(vX));

@@ -30,7 +30,7 @@ jobs:
     - name: Build with Maven
       # Currently skips tests because they are known to be broken.
       # TODO: Re-enable tests once Unit Tests are fixed.
-      run: mvn -B package -DskipTests --file pom.xml
+      run: mvn -B package -DskipTests -Djacoco.skip=true --file pom.xml
 
     - name: Run Benchmarks (CLI)
       # Run benchmarks and export JSON. 
@@ -40,7 +40,7 @@ jobs:
       continue-on-error: true
       run: |
         java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED \
-        -cp jscience-benchmarks/target/jscience-benchmarks.jar \
+        -cp "jscience-benchmarks/target/jscience-benchmarks-*.jar" \
         org.jscience.benchmarks.cli.BenchmarkCLI --run-all --export-file benchmark-results.json
 
     - name: Upload Benchmark Results

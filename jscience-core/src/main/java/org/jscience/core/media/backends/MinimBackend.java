@@ -19,23 +19,15 @@ import org.jscience.core.technical.backend.Backend;
 @AutoService({Backend.class, AudioBackend.class, AlgorithmProvider.class})
 public class MinimBackend implements AudioBackend, AlgorithmProvider {
 
-    // ...
+    private MinimEngine engine;
 
     @Override
     public String getAlgorithmType() {
         return "Audio/Video Engine";
     }
 
-    private Minim minim;
-    private AudioPlayer player;
-    private FFT fft;
-
     public MinimBackend() {
-        if (isAvailable()) {
-            minim = new Minim(new MinimHelper());
-        } else {
-            System.err.println("[Minim] Library not available.");
-        }
+        // Empty constructor, avoids initializing Minim unless used
     }
 
     // ---- Backend Implementation ----
@@ -48,7 +40,7 @@ public class MinimBackend implements AudioBackend, AlgorithmProvider {
     @Override 
     public boolean isAvailable() { 
         try {
-            Class.forName("ddf.minim.Minim");
+            Class.forName("ddf.minim.Minim", false, getClass().getClassLoader());
             return true;
         } catch (Throwable t) {
             return false;
@@ -66,64 +58,86 @@ public class MinimBackend implements AudioBackend, AlgorithmProvider {
 
     @Override
     public void load(String path) throws Exception {
-        System.out.println("[Minim] Loading " + path);
-        if (player != null) {
-            player.close();
-        }
-        player = minim.loadFile(path, 1024);
-        if (player == null) {
-            throw new Exception("Minim failed to load audio file: " + path);
-        }
-        fft = new FFT(player.bufferSize(), player.sampleRate());
+        if (!isAvailable()) throw new IllegalStateException("Minim not available");
+        if (engine == null) engine = new MinimEngine();
+        engine.load(path);
     }
 
     @Override public void play() { 
-        if (player != null) player.play(); 
+        if (engine != null) engine.play(); 
     }
     
     @Override public void pause() { 
-        if (player != null) player.pause(); 
+        if (engine != null) engine.pause(); 
     }
     
     @Override public void stop() { 
-        if (player != null) {
-            player.pause();
-            player.rewind();
-        }
+        if (engine != null) engine.stop(); 
     }
     
     @Override public double getTime() { 
-        return (player != null) ? player.position() / 1000.0 : 0.0; 
+        return (engine != null) ? engine.getTime() : 0.0; 
     }
 
     @Override public double getDuration() { 
-        return (player != null) ? player.length() / 1000.0 : 0.0; 
+        return (engine != null) ? engine.getDuration() : 0.0; 
     }
 
     @Override
     public float[] getSpectrum() {
-        if (player != null && fft != null) {
-            fft.forward(player.mix);
-            float[] spectrum = new float[fft.specSize()];
-            for (int i = 0; i < fft.specSize(); i++) {
-                spectrum[i] = fft.getBand(i);
-            }
-            return spectrum;
-        }
+        if (engine != null) return engine.getSpectrum();
         return new float[128];
     }
 
     @Override public String getBackendName() { return "Minim (Creative)"; }
 
-    // Helper to allow Minim to run outside PApplet
-    private class MinimHelper {
-        @SuppressWarnings("unused")
-        public String sketchPath(String fileName) {
-            return new java.io.File(fileName).getAbsolutePath(); 
+    /**
+     * Isolated engine to prevent NoClassDefFoundError during class loading of MinimBackend.
+     */
+    private static class MinimEngine {
+        private ddf.minim.Minim minim;
+        private ddf.minim.AudioPlayer player;
+        private ddf.minim.analysis.FFT fft;
+
+        public MinimEngine() {
+            minim = new ddf.minim.Minim(new MinimHelper());
         }
-        @SuppressWarnings("unused")
-        public java.io.InputStream createInput(String fileName) {
-            try { return new java.io.FileInputStream(fileName); } catch(Exception e) { return null; }
+
+        public void load(String path) throws Exception {
+            if (player != null) player.close();
+            player = minim.loadFile(path, 1024);
+            if (player == null) throw new Exception("Minim failed to load audio file: " + path);
+            fft = new ddf.minim.analysis.FFT(player.bufferSize(), player.sampleRate());
+        }
+
+        public void play() { if (player != null) player.play(); }
+        public void pause() { if (player != null) player.pause(); }
+        public void stop() {
+            if (player != null) {
+                player.pause();
+                player.rewind();
+            }
+        }
+        public double getTime() { return (player != null) ? player.position() / 1000.0 : 0.0; }
+        public double getDuration() { return (player != null) ? player.length() / 1000.0 : 0.0; }
+
+        public float[] getSpectrum() {
+            if (player != null && fft != null) {
+                fft.forward(player.mix);
+                float[] spectrum = new float[fft.specSize()];
+                for (int i = 0; i < fft.specSize(); i++) {
+                    spectrum[i] = fft.getBand(i);
+                }
+                return spectrum;
+            }
+            return new float[128];
+        }
+
+        private class MinimHelper {
+            public String sketchPath(String fileName) { return new File(fileName).getAbsolutePath(); }
+            public java.io.InputStream createInput(String fileName) {
+                try { return new java.io.FileInputStream(fileName); } catch(Exception e) { return null; }
+            }
         }
     }
 }

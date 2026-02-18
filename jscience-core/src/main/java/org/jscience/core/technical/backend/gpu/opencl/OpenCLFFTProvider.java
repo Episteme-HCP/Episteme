@@ -36,6 +36,7 @@ public class OpenCLFFTProvider implements FFTProvider {
 
     // Simple DFT kernel for correctness/verification on GPU
     private static final String KERNEL_SOURCE = 
+        "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
         "__kernel void dft_naive(__global double* real, __global double* imag, __global double* outReal, __global double* outImag, int n, int sign) {\n" +
         "    int k = get_global_id(0);\n" +
         "    if (k >= n) return;\n" +

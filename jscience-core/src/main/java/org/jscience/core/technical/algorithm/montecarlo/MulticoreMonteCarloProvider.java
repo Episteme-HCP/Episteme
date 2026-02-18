@@ -26,7 +26,24 @@ import java.util.stream.IntStream;
 @AutoService(AlgorithmProvider.class)
 public class MulticoreMonteCarloProvider implements MonteCarloProvider {
 
-    private final MulticoreMonteCarloProvider fallback = new MulticoreMonteCarloProvider();
+    private MonteCarloProvider fallback;
+
+    private MonteCarloProvider getFallback() {
+        if (fallback == null) {
+            // Find a provider that is NOT this one
+            for (MonteCarloProvider p : org.jscience.core.technical.algorithm.AlgorithmManager.getProviders(MonteCarloProvider.class)) {
+                if (!(p instanceof MulticoreMonteCarloProvider)) {
+                    fallback = p;
+                    break;
+                }
+            }
+            if (fallback == null) {
+                // Should not happen if at least one other provider is registered
+                fallback = org.jscience.core.technical.algorithm.AlgorithmManager.getProvider(MonteCarloProvider.class);
+            }
+        }
+        return fallback;
+    }
 
     @Override
     public double integrate(ToDoubleFunction<double[]> function, double[] lowerBounds, 
@@ -75,7 +92,7 @@ public class MulticoreMonteCarloProvider implements MonteCarloProvider {
             return Real.of(integrate(doubleFunc, d_lower, d_upper, samples));
         } else {
             // Fallback to high-precision Java implementation
-            return fallback.integrate(function, lowerBounds, upperBounds, samples);
+            return getFallback().integrate(function, lowerBounds, upperBounds, samples);
         }
     }
 

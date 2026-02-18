@@ -108,7 +108,9 @@ public class BenchmarkItem {
         
         // For JScience / JScience Native, detect meaningful algorithm qualifiers
         String upper = fullName.toUpperCase();
-        if (upper.contains("SPARSE")) return "Sparse";
+        if (upper.contains("OPENBLAS")) return "OpenBLAS";
+        if (upper.contains("VECTOR API")) return "Vector API";
+        if (upper.contains("AVX")) return "AVX";
         if (upper.contains("SIMD") || upper.contains("VECTOR")) return "SIMD";
         if (upper.contains("REFERENCE")) return "Reference";
         if (upper.contains("MULTICORE")) return "Multicore";
@@ -119,8 +121,20 @@ public class BenchmarkItem {
         if (upper.contains("RUNGE") || upper.contains("RK4")) return "Runge-Kutta";
         if (upper.contains("EULER")) return "Euler";
         
-        // Fallback: clean the full name to extract a meaningful qualifier
-        String cleaned = fullName.replaceAll("\\s*\\([^)]*\\)", "") // Remove parenthesized qualifiers
+        // Fallback: If there's a qualifier in parentheses, use it!
+        if (fullName.contains("(") && fullName.contains(")")) {
+            int start = fullName.lastIndexOf("(") + 1;
+            int end = fullName.lastIndexOf(")");
+            if (end > start) {
+                String inParens = fullName.substring(start, end).trim();
+                if (!inParens.equalsIgnoreCase("CPU") && !inParens.equalsIgnoreCase("GPU") && !inParens.equalsIgnoreCase("Wrapper")) {
+                    return inParens;
+                }
+            }
+        }
+        
+        // Fallback: clean the full name
+        String cleaned = fullName.replaceAll("\\s*\\([^)]*\\)", "") // Remove parenthesized keys
                                  .replace("JScience", "")
                                  .replace("Native", "")
                                  .replace("CPU", "")

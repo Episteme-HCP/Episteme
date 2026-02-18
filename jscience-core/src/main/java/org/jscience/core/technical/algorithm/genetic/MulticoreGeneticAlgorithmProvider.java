@@ -23,12 +23,24 @@ import java.util.function.Function;
 @AutoService(AlgorithmProvider.class)
 public class MulticoreGeneticAlgorithmProvider implements GeneticAlgorithmProvider {
 
-    private final MulticoreGeneticAlgorithmProvider fallback = new MulticoreGeneticAlgorithmProvider();
+    private GeneticAlgorithmProvider fallback;
+
+    private GeneticAlgorithmProvider getFallback() {
+        if (fallback == null) {
+            for (GeneticAlgorithmProvider p : org.jscience.core.technical.algorithm.AlgorithmManager.getProviders(GeneticAlgorithmProvider.class)) {
+                if (!(p instanceof MulticoreGeneticAlgorithmProvider)) {
+                    fallback = p;
+                    break;
+                }
+            }
+        }
+        return fallback;
+    }
 
     @Override
     public double[] solve(Function<double[], Double> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate) {
         // Future: JNI call to native C++/Fortran optimizer
-        return fallback.solve(fitnessFunction, dimensions, populationSize, generations, mutationRate);
+        return getFallback().solve(fitnessFunction, dimensions, populationSize, generations, mutationRate);
     }
 
     @Override
@@ -46,7 +58,7 @@ public class MulticoreGeneticAlgorithmProvider implements GeneticAlgorithmProvid
             for (int i = 0; i < result.length; i++) realResult[i] = Real.of(result[i]);
             return realResult;
         } else {
-            return fallback.solveReal(fitnessFunction, dimensions, populationSize, generations, mutationRate);
+            return getFallback().solveReal(fitnessFunction, dimensions, populationSize, generations, mutationRate);
         }
     }
 

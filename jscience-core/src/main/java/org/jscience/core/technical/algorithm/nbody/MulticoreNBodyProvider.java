@@ -27,16 +27,41 @@ public class MulticoreNBodyProvider implements NBodyProvider {
 
     @Override
     public void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G, Real softening) {
-        double[] d_pos = new double[positions.length];
-        double[] d_mass = new double[masses.length];
-        double[] d_forces = new double[forces.length];
+        int n = masses.length;
+        // Zero forces
+        for (int i = 0; i < forces.length; i++) forces[i] = Real.ZERO;
         
-        for (int i = 0; i < positions.length; i++) d_pos[i] = positions[i].doubleValue();
-        for (int i = 0; i < masses.length; i++) d_mass[i] = masses[i].doubleValue();
-        
-        computeForces(d_pos, d_mass, d_forces, G.doubleValue(), softening.doubleValue());
-        
-        for (int i = 0; i < forces.length; i++) forces[i] = Real.of(d_forces[i]);
+        // Generic Real implementation (High Precision)
+        for (int i = 0; i < n; i++) {
+            int idx_i = i * 3;
+            Real xi = positions[idx_i], yi = positions[idx_i + 1], zi = positions[idx_i + 2];
+            Real mi = masses[i];
+            
+            for (int j = i + 1; j < n; j++) {
+                int idx_j = j * 3;
+                Real dx = positions[idx_j].subtract(xi);
+                Real dy = positions[idx_j + 1].subtract(yi);
+                Real dz = positions[idx_j + 2].subtract(zi);
+                
+                Real r2 = dx.multiply(dx).add(dy.multiply(dy)).add(dz.multiply(dz)).add(softening.multiply(softening));
+                // f = G * mi * mj / (r^2 * sqrt(r^2)) = G * mi * mj * r^-3
+                // invR = 1/sqrt(r2)
+                Real invR = r2.sqrt().inverse();
+                Real f = G.multiply(mi).multiply(masses[j]).divide(r2).multiply(invR);
+                
+                Real fx = f.multiply(dx);
+                Real fy = f.multiply(dy);
+                Real fz = f.multiply(dz);
+                
+                forces[idx_i] = forces[idx_i].add(fx);
+                forces[idx_i + 1] = forces[idx_i + 1].add(fy);
+                forces[idx_i + 2] = forces[idx_i + 2].add(fz);
+                
+                forces[idx_j] = forces[idx_j].subtract(fx);
+                forces[idx_j + 1] = forces[idx_j + 1].subtract(fy);
+                forces[idx_j + 2] = forces[idx_j + 2].subtract(fz);
+            }
+        }
     }
 
     @Override

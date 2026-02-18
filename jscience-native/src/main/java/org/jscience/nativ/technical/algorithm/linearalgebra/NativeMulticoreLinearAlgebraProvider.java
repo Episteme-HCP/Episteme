@@ -42,16 +42,43 @@ public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvid
         if (a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
             RealDoubleMatrix adm = (RealDoubleMatrix) a;
             RealDoubleMatrix bdm = (RealDoubleMatrix) b;
-            RealDoubleMatrix cdm = RealDoubleMatrix.of(new double[a.rows() * b.cols()], a.rows(), b.cols());
             
-            backend.dgemm(adm.rows(), adm.cols(), bdm.cols(), 
-                adm.getBuffer(), adm.cols(), 
-                bdm.getBuffer(), bdm.cols(), 
-                cdm.getBuffer(), cdm.cols(), 
+            // Validate dimensions
+            if (adm.cols() != bdm.rows()) {
+                throw new IllegalArgumentException("Matrix dimension mismatch: " + adm.cols() + " != " + bdm.rows());
+            }
+
+            int m = adm.rows(); // Rows of A
+            int k = adm.cols(); // Cols of A / Rows of B
+            int n = bdm.cols(); // Cols of B
+            
+            // Result C must be Direct for native interop (M x N)
+            RealDoubleMatrix cdm = RealDoubleMatrix.direct(m, n);
+            
+            // Ensure A and B are accessible by native code (Direct Buffers)
+            java.nio.DoubleBuffer aBuf = ensureDirect(adm);
+            java.nio.DoubleBuffer bBuf = ensureDirect(bdm);
+            
+            // Backend dgemm expects: rowsA (M), colsB (N), colsA (K)
+            // cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc)
+            backend.dgemm(m, n, k, 
+                aBuf, k,   // lda = k (RowMajor)
+                bBuf, n,   // ldb = n (RowMajor)
+                cdm.getBuffer(), n, // ldc = n
                 1.0, 0.0);
+            
             return cdm;
         }
         return fallback.multiply(a, b);
+    }
+
+    private java.nio.DoubleBuffer ensureDirect(RealDoubleMatrix m) {
+        if (m.getBuffer().isDirect()) return m.getBuffer();
+        java.nio.DoubleBuffer direct = java.nio.ByteBuffer.allocateDirect(m.rows() * m.cols() * 8)
+            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        direct.put(m.toDoubleArray());
+        direct.flip();
+        return direct;
     }
 
     @Override
@@ -71,7 +98,37 @@ public class NativeMulticoreLinearAlgebraProvider implements LinearAlgebraProvid
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { return fallback.multiply(a, b); }
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) { return fallback.inverse(a); }
+    public Matrix<Real> inverse(Matrix<Real> a) {
+        if (a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+            int n = a.rows();
+            
+            // Create direct matrix for result to ensure efficient native interop
+            RealDoubleMatrix res = RealDoubleMatrix.direct(n, n);
+            RealDoubleMatrix src = (RealDoubleMatrix) a;
+            
+            // Copy data. We use toDoubleArray() which is reasonably fast (System.arraycopy for heap).
+            // For critical path, zero-allocation copy would be better but this is O(N^2) vs O(N^3) compute.
+            res.getBuffer().put(src.toDoubleArray());
+            res.getBuffer().position(0);
+            
+            // Prepare pivot buffer
+            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
+                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+            
+            // LU Factorization (dgetrf)
+            int info = backend.dgetrf(n, n, res.getBuffer(), n, ipiv);
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+            if (info > 0) throw new ArithmeticException("Matrix is singular");
+            
+            // Inverse (dgetri)
+            info = backend.dgetri(n, res.getBuffer(), n, ipiv);
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetri: " + info);
+            if (info > 0) throw new ArithmeticException("Matrix is singular");
+            
+            return res;
+        }
+        return fallback.inverse(a);
+    }
     @Override
     public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
     @Override

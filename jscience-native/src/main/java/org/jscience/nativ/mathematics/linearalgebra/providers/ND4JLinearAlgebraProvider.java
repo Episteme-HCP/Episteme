@@ -48,77 +48,138 @@ public class ND4JLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 
     @Override
     public boolean isCompatible(org.jscience.core.mathematics.structures.rings.Ring<?> ring) {
-        // ND4J primarily supports floating point
         return true; 
+    }
+
+    private org.nd4j.linalg.api.ndarray.INDArray toINDArray(Matrix<Real> m) {
+        double[][] data = new double[m.rows()][m.cols()];
+        for(int r=0; r<m.rows(); r++) {
+            for(int c=0; c<m.cols(); c++) {
+                data[r][c] = m.get(r,c).doubleValue();
+            }
+        }
+        return org.nd4j.linalg.factory.Nd4j.create(data);
+    }
+
+    private Matrix<Real> fromINDArray(org.nd4j.linalg.api.ndarray.INDArray arr) {
+        int rows = (int) arr.rows();
+        int cols = (int) arr.columns();
+        org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Real> storage = 
+            new org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, Real.ZERO);
+        for(int r=0; r<rows; r++) {
+            for(int c=0; c<cols; c++) {
+                storage.set(r, c, Real.of(arr.getDouble(r, c)));
+            }
+        }
+        return new org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage, this, org.jscience.core.mathematics.sets.Reals.getInstance());
+    }
+
+    private org.nd4j.linalg.api.ndarray.INDArray toINDArray(Vector<Real> v) {
+        double[] data = new double[v.dimension()];
+        for(int i=0; i<v.dimension(); i++) {
+            data[i] = v.get(i).doubleValue();
+        }
+        return org.nd4j.linalg.factory.Nd4j.create(data, new int[]{v.dimension(), 1}); // Column vector
+    }
+
+    private Vector<Real> fromINDArrayVector(org.nd4j.linalg.api.ndarray.INDArray arr) {
+        int dim = (int) arr.length();
+        Real[] data = new Real[dim];
+        for(int i=0; i<dim; i++) {
+            data[i] = Real.of(arr.getDouble(i));
+        }
+        return new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
+            new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), 
+            this, org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     @Override
     public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        return fallback.add(a, b);
+        if (!isAvailable()) return fallback.add(a, b);
+        return fromINDArrayVector(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        return fallback.subtract(a, b);
+        if (!isAvailable()) return fallback.subtract(a, b);
+        return fromINDArrayVector(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        return fallback.multiply(vector, scalar);
+        if (!isAvailable()) return fallback.multiply(vector, scalar);
+        return fromINDArrayVector(toINDArray(vector).mul(scalar.doubleValue()));
     }
 
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        return fallback.dot(a, b);
+        if (!isAvailable()) return fallback.dot(a, b);
+        // dot returns a scalar INDArray
+        return Real.of(org.nd4j.linalg.factory.Nd4j.getBlasWrapper().dot(toINDArray(a), toINDArray(b)));
     }
 
     @Override
     public Real norm(Vector<Real> a) {
-        return fallback.norm(a);
+        if (!isAvailable()) return fallback.norm(a);
+        return Real.of(toINDArray(a).norm2Number().doubleValue());
     }
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        return fallback.add(a, b);
+        if (!isAvailable()) return fallback.add(a, b);
+        return fromINDArray(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        return fallback.subtract(a, b);
+        if (!isAvailable()) return fallback.subtract(a, b);
+        return fromINDArray(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        return fallback.multiply(a, b);
+        if (!isAvailable()) return fallback.multiply(a, b);
+        return fromINDArray(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        return fallback.multiply(a, b);
+        if (!isAvailable()) return fallback.multiply(a, b);
+        return fromINDArrayVector(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        return fallback.inverse(a);
+        if (!isAvailable()) return fallback.inverse(a);
+        return fromINDArray(org.nd4j.linalg.inverse.InvertMatrix.invert(toINDArray(a), false));
     }
 
     @Override
     public Real determinant(Matrix<Real> a) {
+        // ND4J determinant might be complex to access directly or not available in all versions
+        // In 1.0.0-M1, check for determinant support
+        // fallback to CPU for safety as it's rarely critical in inner loops compared to multiply/solve
         return fallback.determinant(a);
     }
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        return fallback.solve(a, b);
+        if (!isAvailable()) return fallback.solve(a, b);
+        // x = A^-1 * b (naive) or use specific solver if available
+        // ND4J Solve.solve(A, b) exists?
+        // Using inverse for now as basic implementation
+        return multiply(inverse(a), b);
     }
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        return fallback.transpose(a);
+        if (!isAvailable()) return fallback.transpose(a);
+        return fromINDArray(toINDArray(a).transpose());
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        return fallback.scale(scalar, a);
+        if (!isAvailable()) return fallback.scale(scalar, a);
+        return fromINDArray(toINDArray(a).mul(scalar.doubleValue()));
     }
 }
