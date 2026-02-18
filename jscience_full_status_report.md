@@ -46,7 +46,6 @@
 | # | Task | Module | Details |
 |---|------|--------|---------|
 | 8 | **Unit tests for Smart Dispatch** | `jscience-core` | `ProviderSelector` + `score()` logic exists but has NO unit tests. Need mocked `OperationContext` scenarios to verify correct provider selection per the scoring table. |
-| 8 | **Unit tests for Smart Dispatch** | `jscience-core` | `ProviderSelector` + `score()` logic exists but has NO unit tests. Need mocked `OperationContext` scenarios to verify correct provider selection per the scoring table. |
 | 10 | **Full project `mvn clean install`** | All modules | Last verified: `jscience-core` compiles ✅. `jscience-natural`, `jscience-server`, `jscience-native`, `jscience-benchmarks`, `jscience-featured-apps` need verification. |
 | 11 | **CI/CD: Add test result upload** | `.github/workflows` | Currently tests are skipped (`-DskipTests`). Should re-enable and upload results as build artifacts. |
 | 12 | **CI/CD: Guard benchmark step** | `.github/workflows` | Benchmark runs `--add-modules jdk.incubator.vector` — fails if Vector API unavailable. |
