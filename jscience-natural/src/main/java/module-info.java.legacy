@@ -26,12 +26,19 @@ module org.jscience.natural {
     exports org.jscience.natural.biology.genealogy;
     exports org.jscience.natural.biology.genetics;
     exports org.jscience.natural.biology.taxonomy;
+    exports org.jscience.natural.biology.loaders;
     exports org.jscience.natural.chemistry;
     exports org.jscience.natural.chemistry.electrochemistry;
     exports org.jscience.natural.chemistry.thermochemistry;
+    exports org.jscience.natural.chemistry.loaders;
     exports org.jscience.natural.earth.coordinates;
-    exports org.jscience.natural.astronomy;
+    exports org.jscience.natural.physics;
+    exports org.jscience.natural.physics.astronomy;
+    exports org.jscience.natural.physics.loaders;
     exports org.jscience.natural.computing;
     exports org.jscience.natural.environment;
+    exports org.jscience.natural.medicine;
+    exports org.jscience.natural.engineering;
+    exports org.jscience.natural.device;
 
 }

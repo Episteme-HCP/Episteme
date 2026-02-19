@@ -27,6 +27,8 @@ import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
 
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.natural.chemistry.Atom;
+import org.jscience.natural.chemistry.Element;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +52,7 @@ public class MolecularDynamicsTask
 
 
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
-    private List<org.jscience.natural.chemistry.Atom> jscienceAtoms;
+    private List<Atom> jscienceAtoms;
 
     public MolecularDynamicsTask(int numAtoms, double timeStep, int steps, double boxSize) {
         this.numAtoms = numAtoms;
@@ -95,11 +97,11 @@ public class MolecularDynamicsTask
 
     private void syncToJScience() {
         jscienceAtoms = new ArrayList<>(numAtoms);
-        org.jscience.natural.chemistry.Element hydrogen = new org.jscience.natural.chemistry.Element("Hydrogen", "H");
+        Element hydrogen = new Element("Hydrogen", "H");
         for (AtomState a : atoms) {
             org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> pos = createVector(
                     a.x, a.y, a.z);
-            org.jscience.natural.chemistry.Atom atom = new org.jscience.natural.chemistry.Atom(hydrogen, pos);
+            Atom atom = new Atom(hydrogen, pos);
             atom.setVelocity(createVector(a.vx, a.vy, a.vz));
             jscienceAtoms.add(atom);
         }
@@ -107,7 +109,7 @@ public class MolecularDynamicsTask
 
     private void syncFromJScience() {
         for (int i = 0; i < numAtoms; i++) {
-            org.jscience.natural.chemistry.Atom atom = jscienceAtoms.get(i);
+            Atom atom = jscienceAtoms.get(i);
             AtomState a = atoms.get(i);
             a.x = atom.getPosition().get(0).doubleValue();
             a.y = atom.getPosition().get(1).doubleValue();
@@ -177,7 +179,7 @@ public class MolecularDynamicsTask
         org.jscience.core.mathematics.numbers.real.Real[] masses = new org.jscience.core.mathematics.numbers.real.Real[n];
 
         for (int i = 0; i < n; i++) {
-            org.jscience.natural.chemistry.Atom a = jscienceAtoms.get(i);
+            Atom a = jscienceAtoms.get(i);
             positions[i * 3] = a.getPosition().get(0);
             positions[i * 3 + 1] = a.getPosition().get(1);
             positions[i * 3 + 2] = a.getPosition().get(2);
@@ -200,7 +202,7 @@ public class MolecularDynamicsTask
                 org.jscience.core.mathematics.numbers.real.Real.ONE);
 
         for (int i = 0; i < n; i++) {
-            org.jscience.natural.chemistry.Atom a = jscienceAtoms.get(i);
+            Atom a = jscienceAtoms.get(i);
             a.setPosition(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
             a.setVelocity(velocities[i * 3], velocities[i * 3 + 1], velocities[i * 3 + 2]);
 
