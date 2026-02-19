@@ -397,22 +397,16 @@ public final class JScience {
      * Checks if CUDA is available.
      */
     public static boolean isCudaAvailable() {
-        try {
-            return new org.jscience.core.technical.backend.gpu.cuda.CUDABackend().isAvailable();
-        } catch (Throwable t) {
-            return false;
-        }
+        return org.jscience.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
+                .anyMatch(p -> p.getId().toLowerCase().contains("cuda") && p.isAvailable());
     }
 
     /**
      * Checks if OpenCL is available.
      */
     public static boolean isOpenCLAvailable() {
-        try {
-            return new org.jscience.core.technical.backend.gpu.opencl.OpenCLBackend().isAvailable();
-        } catch (Throwable t) {
-            return false;
-        }
+        return org.jscience.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
+                .anyMatch(p -> p.getId().toLowerCase().contains("opencl") && p.isAvailable());
     }
 
     /**

@@ -13,7 +13,6 @@ import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
-import org.jscience.core.technical.backend.nativ.LibraryBackend;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 
 import java.util.stream.IntStream;
@@ -21,8 +20,8 @@ import java.util.stream.IntStream;
 /**
  * High-performance AudioBackend using Java Parallel Streams.
  */
-@AutoService({Backend.class, ComputeBackend.class, LibraryBackend.class, AlgorithmProvider.class, AudioAlgorithmBackend.class})
-public class MulticoreAudioBackend implements ComputeBackend, LibraryBackend, AudioAlgorithmBackend<AudioBuffer> {
+@AutoService({Backend.class, ComputeBackend.class, AlgorithmProvider.class, AudioAlgorithmBackend.class})
+public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBackend<AudioBuffer> {
 
 
     @Override
@@ -97,11 +96,6 @@ public class MulticoreAudioBackend implements ComputeBackend, LibraryBackend, Au
         public void close() {
             // No-op
         }
-    }
-
-    @Override
-    public boolean isLoaded() {
-        return true; 
     }
 
     @Override

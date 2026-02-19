@@ -28,6 +28,11 @@ import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.BackendDiscovery;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
+import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
+import com.google.auto.service.AutoService;
 
 /**
  * Native (pure Java) tensor provider.
@@ -41,7 +46,8 @@ import org.jscience.core.technical.backend.ExecutionContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CPUDenseTensorBackend implements TensorBackend {
+@AutoService({Backend.class, CPUBackend.class})
+public class CPUDenseTensorBackend implements TensorBackend, CPUBackend {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -148,7 +154,12 @@ public class CPUDenseTensorBackend implements TensorBackend {
 
     @Override
     public String getName() {
-        return "Native";
+        return "CPU Dense Tensor";
+    }
+
+    @Override
+    public String getType() {
+        return BackendDiscovery.TYPE_TENSOR;
     }
 
     @Override
@@ -158,8 +169,7 @@ public class CPUDenseTensorBackend implements TensorBackend {
 
     @Override
     public ExecutionContext createContext() {
-        // CPU default execution context
-        return null;
+        return new CPUExecutionContext();
     }
 
     @Override

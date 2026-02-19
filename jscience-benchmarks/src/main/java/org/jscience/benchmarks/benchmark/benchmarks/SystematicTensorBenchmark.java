@@ -7,7 +7,7 @@ package org.jscience.benchmarks.benchmark.benchmarks;
 
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.TensorProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.Random;

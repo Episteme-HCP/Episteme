@@ -45,6 +45,8 @@ public class BackendDiscovery {
     public static final String TYPE_AUDIO = "audio";
     public static final String TYPE_DISTRIBUTED = "distributed";
     public static final String TYPE_NETWORK = "network";
+    public static final String TYPE_IO = "io";
+    public static final String TYPE_ML = "ml";
 
     private static final BackendDiscovery INSTANCE = new BackendDiscovery();
 

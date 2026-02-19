@@ -28,6 +28,11 @@ import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.jscience.core.mathematics.linearalgebra.tensors.SparseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.BackendDiscovery;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
+import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
+import com.google.auto.service.AutoService;
 
 /**
  *
@@ -35,7 +40,8 @@ import org.jscience.core.technical.backend.ExecutionContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CPUSparseTensorBackend implements TensorBackend {
+@AutoService({Backend.class, CPUBackend.class})
+public class CPUSparseTensorBackend implements TensorBackend, CPUBackend {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -173,7 +179,12 @@ public class CPUSparseTensorBackend implements TensorBackend {
 
     @Override
     public String getName() {
-        return "CPU Sparse";
+        return "CPU Sparse Tensor";
+    }
+
+    @Override
+    public String getType() {
+        return BackendDiscovery.TYPE_TENSOR;
     }
 
     @Override
@@ -183,7 +194,7 @@ public class CPUSparseTensorBackend implements TensorBackend {
 
     @Override
     public ExecutionContext createContext() {
-        return null; // Local execution
+        return new CPUExecutionContext();
     }
 
     @Override

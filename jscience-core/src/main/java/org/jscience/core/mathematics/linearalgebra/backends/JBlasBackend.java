@@ -25,17 +25,30 @@ package org.jscience.core.mathematics.linearalgebra.backends;
 
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
+import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
+import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
+import com.google.auto.service.AutoService;
 
 /**
- * Backend for JBlas.
+ * CPU compute backend for JBlas (Java BLAS).
+ * <p>
+ * JBlas provides linear algebra for Java based on native BLAS/LAPACK libraries,
+ * offering high performance for dense matrix operations. This backend wraps the
+ * JBlas linear algebra provider and integrates it into the JScience backend
+ * discovery system.
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JBlasBackend implements Backend {
+@AutoService({Backend.class, CPUBackend.class})
+public class JBlasBackend implements CPUBackend {
+
     @Override
     public String getType() {
-        return BackendDiscovery.TYPE_MATH;
+        return BackendDiscovery.TYPE_LINEAR_ALGEBRA;
     }
 
     @Override
@@ -69,6 +82,11 @@ public class JBlasBackend implements Backend {
     }
 
     @Override
+    public ExecutionContext createContext() {
+        return new CPUExecutionContext();
+    }
+
+    @Override
     public Object createBackend() {
         if (isAvailable()) {
             return new org.jscience.core.mathematics.linearalgebra.providers.JBlasLinearAlgebraProvider<>();
@@ -76,6 +94,3 @@ public class JBlasBackend implements Backend {
         return null;
     }
 }
-
-
-

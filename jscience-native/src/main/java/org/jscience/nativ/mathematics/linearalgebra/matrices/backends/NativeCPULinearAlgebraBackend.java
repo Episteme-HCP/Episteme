@@ -14,7 +14,7 @@ import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.core.technical.backend.nativ.LibraryBackend;
+import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -35,8 +35,8 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({ComputeBackend.class, LibraryBackend.class, AlgorithmProvider.class})
-public class NativeCPULinearAlgebraBackend implements ComputeBackend, LibraryBackend, LinearAlgebraProvider<Real> {
+@AutoService({ComputeBackend.class, NativeBackend.class, AlgorithmProvider.class})
+public class NativeCPULinearAlgebraBackend implements ComputeBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;
     private static final MethodHandle DGEMV_HANDLE;

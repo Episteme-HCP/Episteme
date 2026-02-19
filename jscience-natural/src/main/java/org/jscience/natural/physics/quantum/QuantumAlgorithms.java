@@ -26,6 +26,8 @@ package org.jscience.natural.physics.quantum;
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.natural.technical.backend.quantum.QuantumBackend;
+import org.jscience.natural.technical.backend.quantum.QuantumAlgorithmProvider;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -222,13 +224,13 @@ public class QuantumAlgorithms {
      * @param numQubits Number of qubits
      * @return The complete Grover circuit
      */
-    public static org.jscience.core.technical.backend.quantum.QuantumBackend.QuantumCircuit createGroverCircuit(
-            org.jscience.core.technical.backend.quantum.QuantumBackend backend,
-            org.jscience.core.technical.backend.quantum.QuantumBackend.QuantumCircuit oracle,
+    public static QuantumBackend.QuantumCircuit createGroverCircuit(
+            QuantumBackend backend,
+            QuantumBackend.QuantumCircuit oracle,
             int numQubits) {
         
         // Create full circuit
-        org.jscience.core.technical.backend.quantum.QuantumBackend.QuantumCircuit circuit = backend.createCircuit(numQubits, numQubits);
+        QuantumBackend.QuantumCircuit circuit = backend.createCircuit(numQubits, numQubits);
         
         // 1. Initialization: Hadamard on all qubits
         for (int i = 0; i < numQubits; i++) {

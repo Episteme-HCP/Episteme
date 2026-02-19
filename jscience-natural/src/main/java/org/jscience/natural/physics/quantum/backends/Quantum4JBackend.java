@@ -1,7 +1,7 @@
 package org.jscience.natural.physics.quantum.backends;
 
-import org.jscience.core.technical.backend.quantum.QuantumBackend;
-import org.jscience.core.technical.backend.quantum.QuantumAlgorithmProvider;
+import org.jscience.natural.technical.backend.quantum.QuantumBackend;
+import org.jscience.natural.technical.backend.quantum.QuantumAlgorithmProvider;
 import org.jscience.natural.physics.quantum.QuantumContext;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;

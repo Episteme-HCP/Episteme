@@ -16,7 +16,7 @@ import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
 import org.jscience.core.technical.algorithm.ProviderRegistry;
 
 /**
@@ -67,7 +67,6 @@ public class ComputeContext {
     // RESOURCES (Kept in Context)
     private volatile DistributedContext distributedContext = new LocalDistributedContext();
     private volatile GPUBackend gpuBackend;
-    private volatile QuantumBackend quantumBackend;
 
     public ComputeContext() {
         this(10_000_000); // Default threshold passed to config
@@ -196,15 +195,6 @@ public class ComputeContext {
         return this;
     }
 
-    public QuantumBackend getQuantumBackend() {
-        return quantumBackend;
-    }
-
-    public ComputeContext setQuantumBackend(QuantumBackend quantumBackend) {
-        this.quantumBackend = quantumBackend;
-        return this;
-    }
-
     // ==========================================================
     // PROVIDER REGISTRY DELEGATION
     // ==========================================================
@@ -252,7 +242,7 @@ public class ComputeContext {
         return getLinearAlgebraProvider(builder.build(), ring);
     }
 
-    public org.jscience.core.technical.algorithm.TensorProvider getTensorProvider() {
+    public TensorProvider getTensorProvider() {
         return getTensorBackend(); // Delegate
     }
 

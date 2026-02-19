@@ -24,74 +24,49 @@
 package org.jscience.core.technical.backend.cpu;
 
 import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 
-import com.google.auto.service.AutoService;
-import org.jscience.core.technical.backend.Backend;
-
 /**
- * CPU-based compute backend (default fallback).
+ * Marker interface for CPU-based compute backends.
  * <p>
- * This backend uses pure Java implementations and is always available.
- * It supports parallel operations via Java parallel streams.
+ * All CPU backends (dense linear algebra, sparse, SIMD-enhanced, library-based
+ * such as Colt, EJML, JBlas, Commons Math) must implement this interface.
+ * The concrete default implementation is {@link DefaultCPUBackend}.
+ * </p>
+ * <p>
+ * Note: {@link org.jscience.core.technical.backend.simd.SIMDBackend} extends
+ * {@code CPUBackend} for backends that additionally use SIMD vector intrinsics
+ * (JDK Vector API or Panama FFM).
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({Backend.class, ComputeBackend.class})
-public class CPUBackend implements ComputeBackend {
+public interface CPUBackend extends ComputeBackend {
 
     @Override
-    public String getId() {
+    default String getType() {
         return "cpu";
     }
 
     @Override
-    public String getName() {
-        return "CPU";
+    default HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU;
     }
 
     @Override
-    public String getDescription() {
-        return "Standard CPU processing using multi-core Java implementations.";
-    }
-
-    @Override
-    public boolean isAvailable() {
-        return true; // CPU backend is always available
-    }
-
-    @Override
-    public ExecutionContext createContext() {
-        return new CPUExecutionContext();
-    }
-
-    @Override
-    public boolean supportsParallelOps() {
+    default boolean supportsParallelOps() {
         return Runtime.getRuntime().availableProcessors() > 1;
     }
 
     @Override
-    public boolean supportsFloatingPoint() {
+    default boolean supportsFloatingPoint() {
         return true;
     }
 
     @Override
-    public boolean supportsComplexNumbers() {
+    default boolean supportsComplexNumbers() {
         return true;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0; // Lowest priority (fallback)
-    }
-
-    @Override
-    public HardwareAccelerator getAcceleratorType() {
-        return HardwareAccelerator.CPU;
     }
 }
-

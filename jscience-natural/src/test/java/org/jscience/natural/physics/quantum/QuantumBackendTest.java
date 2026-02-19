@@ -6,7 +6,7 @@
 package org.jscience.natural.physics.quantum;
 
 
-import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.natural.technical.backend.quantum.QuantumBackend;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

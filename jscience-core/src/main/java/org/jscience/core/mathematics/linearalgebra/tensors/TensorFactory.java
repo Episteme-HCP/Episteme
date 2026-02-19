@@ -25,7 +25,7 @@ package org.jscience.core.mathematics.linearalgebra.tensors;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 
-import org.jscience.core.technical.algorithm.TensorProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
 import org.jscience.core.ComputeContext;
 
 import java.util.List;

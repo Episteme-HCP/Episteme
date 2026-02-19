@@ -7,7 +7,8 @@ package org.jscience.natural.physics.quantum;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.core.technical.backend.quantum.QuantumBackend;
+import org.jscience.natural.technical.backend.quantum.QuantumBackend;
+import org.jscience.natural.technical.backend.quantum.QuantumAlgorithmProvider;
 
 /**
  * Represents a Quantum Circuit / Context.

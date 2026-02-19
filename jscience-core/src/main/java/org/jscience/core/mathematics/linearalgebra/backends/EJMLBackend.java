@@ -25,17 +25,29 @@ package org.jscience.core.mathematics.linearalgebra.backends;
 
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
+import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
+import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
+import com.google.auto.service.AutoService;
 
 /**
- * Backend for EJML (Efficient Java Matrix Library).
+ * CPU compute backend for EJML (Efficient Java Matrix Library).
+ * <p>
+ * EJML is a high-performance, pure Java linear algebra library focused on
+ * dense matrices. This backend wraps the EJML linear algebra provider and
+ * integrates it into the JScience backend discovery system.
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class EJMLBackend implements Backend {
+@AutoService({Backend.class, CPUBackend.class})
+public class EJMLBackend implements CPUBackend {
+
     @Override
     public String getType() {
-        return BackendDiscovery.TYPE_MATH;
+        return BackendDiscovery.TYPE_LINEAR_ALGEBRA;
     }
 
     @Override
@@ -69,6 +81,11 @@ public class EJMLBackend implements Backend {
     }
 
     @Override
+    public ExecutionContext createContext() {
+        return new CPUExecutionContext();
+    }
+
+    @Override
     public Object createBackend() {
         if (isAvailable()) {
             return new org.jscience.core.mathematics.linearalgebra.providers.EJMLLinearAlgebraProvider<>();
@@ -76,6 +93,3 @@ public class EJMLBackend implements Backend {
         return null;
     }
 }
-
-
-

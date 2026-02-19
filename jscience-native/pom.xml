@@ -61,6 +61,22 @@
             <version>1.0.0-M1.1</version>
         </dependency>
 
+        <!-- JCuda -->
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcuda</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcublas</artifactId>
+        </dependency>
+
+        <!-- JOCL (OpenCL) -->
+        <dependency>
+            <groupId>org.jocl</groupId>
+            <artifactId>jocl</artifactId>
+        </dependency>
+
         
         <!-- FFTW (JavaCPP) -->
         <dependency>
