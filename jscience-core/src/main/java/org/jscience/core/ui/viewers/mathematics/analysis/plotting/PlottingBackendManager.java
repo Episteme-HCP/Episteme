@@ -42,11 +42,15 @@ public class PlottingBackendManager extends AbstractBackendManager<PlottingBacke
         return INSTANCE;
     }
 
+    public static PlottingBackend staticDefault() {
+        return INSTANCE.managerDefault();
+    }
+
     public static PlottingBackend staticSelect(String name) {
         return INSTANCE.managerSelect(name);
     }
 
-    public static java.util.Collection<PlottingBackend> staticAllBackends() {
+    public static java.util.Collection<PlottingBackend> staticAll() {
         return INSTANCE.managerAll();
     }
 

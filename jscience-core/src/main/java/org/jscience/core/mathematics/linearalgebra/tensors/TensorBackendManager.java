@@ -50,7 +50,21 @@ public class TensorBackendManager extends AbstractBackendManager<TensorBackend> 
     /**
      * Returns the default backend.
      */
-    public static TensorBackend getDefaultBackend() {
+    public static TensorBackend staticDefault() {
         return INSTANCE.managerDefault();
+    }
+
+    /**
+     * Returns all registered backends.
+     */
+    public static java.util.Collection<TensorBackend> staticAll() {
+        return INSTANCE.managerAll();
+    }
+
+    /**
+     * Selects a backend by name or id.
+     */
+    public static TensorBackend staticSelect(String nameOrId) {
+        return INSTANCE.managerSelect(nameOrId);
     }
 }

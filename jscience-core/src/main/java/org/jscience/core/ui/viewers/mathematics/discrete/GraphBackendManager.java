@@ -41,6 +41,10 @@ public class GraphBackendManager extends AbstractBackendManager<GraphBackend> {
         return INSTANCE;
     }
 
+    public static GraphBackend staticDefault() {
+        return INSTANCE.managerDefault();
+    }
+
     private String preferredId = "auto";
 
     private GraphBackendManager() {
@@ -76,7 +80,7 @@ public class GraphBackendManager extends AbstractBackendManager<GraphBackend> {
         return INSTANCE.managerSelect(name);
     }
 
-    public static java.util.Collection<GraphBackend> staticAllBackends() {
+    public static java.util.Collection<GraphBackend> staticAll() {
         return INSTANCE.managerAll();
     }
 

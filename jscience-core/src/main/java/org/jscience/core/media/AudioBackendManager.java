@@ -34,7 +34,7 @@ public class AudioBackendManager extends AbstractBackendManager<AudioBackend> {
 
     // ---- Static convenience methods (matches BackendManager pattern) ----
 
-    public static AudioBackend staticGetDefault() {
+    public static AudioBackend staticDefault() {
         try {
             return getInstance().managerDefault();
         } catch (IllegalStateException e) {
@@ -49,7 +49,7 @@ public class AudioBackendManager extends AbstractBackendManager<AudioBackend> {
         getInstance().managerSetDefault(nameOrId);
     }
 
-    public static java.util.List<AudioBackend> staticGetAll() {
+    public static java.util.List<AudioBackend> staticAll() {
         return new java.util.ArrayList<>(getInstance().managerAll());
     }
 }
