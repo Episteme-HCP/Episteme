@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 
 import org.jscience.core.technical.backend.gpu.GPUBackend;
+import org.jscience.core.technical.backend.gpu.GPUBackend.DeviceInfo;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.mathematics.structures.rings.Ring;
@@ -35,8 +36,8 @@ import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
  * @since 1.2
  */
 @SuppressWarnings({"preview"})
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
-public class CUDABackend implements GPUBackend, NativeBackend, SparseLinearAlgebraProvider<Real> {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, AlgorithmProvider.class, GPUBackend.class})
+public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, SparseLinearAlgebraProvider<Real>, GPUBackend {
 
     private static final Linker LINKER = Linker.nativeLinker();
 
@@ -48,7 +49,7 @@ public class CUDABackend implements GPUBackend, NativeBackend, SparseLinearAlgeb
     private MethodHandle cuDeviceGetCount;
     private MethodHandle cublasDgemm;
 
-    public CUDABackend() {
+    public NativeCUDASparseLinearAlgebraBackend() {
         SymbolLookup cudaLookup = null;
         SymbolLookup cublasLookup = null;
         try {

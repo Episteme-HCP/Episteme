@@ -95,7 +95,8 @@ public class RealMandelbrotTask extends MandelbrotTask {
         mc.compute(() -> {
             org.jscience.core.mathematics.analysis.fractals.MandelbrotProvider provider = new org.jscience.core.mathematics.analysis.fractals.providers.MulticoreMandelbrotProvider();
 
-            this.result = provider.computeReal(rXMin, rXMax, rYMin, rYMax, width, height, maxIterations);
+            int[][] result = provider.compute(
+rXMin, rXMax, rYMin, rYMax, width, height, maxIterations);
             return null;
         });
     }

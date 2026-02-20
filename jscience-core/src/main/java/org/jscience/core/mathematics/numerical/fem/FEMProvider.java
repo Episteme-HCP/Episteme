@@ -20,7 +20,8 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  */
 public interface FEMProvider extends AlgorithmProvider {
 
-    Vector<Real> solvePoisson(Mesh mesh, Function<Vector<Real>, Real> sourceTerm);
+    Vector<Real> solvePoisson(Mesh mesh, org.jscience.core.mathematics.analysis.Function<Vector<Real>, Real> sourceTerm);
+    double[] solvePoisson(Mesh mesh, java.util.function.ToDoubleFunction<double[]> sourceTerm);
 
     @Override
     default String getName() {

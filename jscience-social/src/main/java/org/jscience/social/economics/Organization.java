@@ -121,7 +121,7 @@ public class Organization extends Community implements Property {
      */
     public Organization(String name, OrganizationSector sector) {
         this(UUID.randomUUID().toString(), name, LocalDate.now(), sector);
-        // Note: UUID logic might need to be compliant with Group/SimulationEntity if Group uses String ID.
+        // Note: UUID logic might need to be compliant with PsychologicalGroup/SimulationEntity if PsychologicalGroup uses String ID.
     }
 
     /**

@@ -157,6 +157,21 @@ public class MulticoreFEMProvider implements FEMProvider {
     }
 
     @Override
+    public double[] solvePoisson(Mesh mesh, java.util.function.ToDoubleFunction<double[]> sourceTerm) {
+        // TODO: Implement double precision version using native BLAS/LAPACK via Panama
+        // For now, delegate to Real version (slow)
+        org.jscience.core.mathematics.analysis.Function<Vector<Real>, Real> realSource = v -> {
+            double[] doubleData = new double[v.dimension()];
+            for (int i = 0; i < v.dimension(); i++) doubleData[i] = v.get(i).doubleValue();
+            return Real.of(sourceTerm.applyAsDouble(doubleData));
+        };
+        Vector<Real> realResult = solvePoisson(mesh, realSource);
+        double[] doubleResult = new double[realResult.dimension()];
+        for (int i = 0; i < realResult.dimension(); i++) doubleResult[i] = realResult.get(i).doubleValue();
+        return doubleResult;
+    }
+
+    @Override
     public String getName() {
         return "Multicore FEM";
     }

@@ -37,7 +37,7 @@ import org.jscience.core.util.persistence.Relation;
 import java.util.Objects;
 
 /**
- * Represents a human tribe, which is an organized human group with a distinct name and culture.
+ * Represents a human tribe, which is an organized human PsychologicalGroup with a distinct name and culture.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

@@ -19,7 +19,7 @@ import java.lang.ref.Cleaner;
  * This class should only be used when the CUDA backend is available.
  * </p>
  * <p>
- * <b>Usage:</b> Obtain instances through {@link CUDABackend} rather than
+ * <b>Usage:</b> Obtain instances through {@link NativeCUDABackend} rather than
  * direct instantiation to ensure proper backend initialization.
  * </p>
  *
@@ -57,7 +57,7 @@ public class CUDAStorage implements GPUStorage {
     /**
      * Allocates memory on the GPU.
      * <p>
-     * <b>Note:</b> Prefer using {@link CUDABackend#allocateStorage(int)}
+     * <b>Note:</b> Prefer using {@link NativeCUDABackend#allocateStorage(int)}
      * to ensure proper backend initialization.
      * </p>
      * 

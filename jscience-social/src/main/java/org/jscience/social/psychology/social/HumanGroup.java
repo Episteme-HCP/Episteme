@@ -33,14 +33,14 @@ import org.jscience.core.util.persistence.Persistent;
 import java.util.Objects;
 
 /**
- * Represents a group of human individuals (Homo Sapiens).
+ * Represents a PsychologicalGroup of human individuals (Homo Sapiens).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class HumanGroup extends Group {
+public class HumanGroup extends PsychologicalGroup {
     /**
      * Creates a new HumanGroup object.
      */
@@ -51,7 +51,7 @@ public class HumanGroup extends Group {
     /**
      * Initializes a new HumanGroup instance with a physical location.
      *
-     * @param formalTerritory the physical place or territory associated with this group
+     * @param formalTerritory the physical place or territory associated with this PsychologicalGroup
      * @throws NullPointerException if formalTerritory is null
      */
     public HumanGroup(Place formalTerritory) {

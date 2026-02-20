@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for Family.
+ * Automated baseline test for SociologicalFamily.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -20,7 +20,7 @@ public class FamilyTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(Family.class);
+        assertNotNull(SociologicalFamily.class);
     }
 }
 

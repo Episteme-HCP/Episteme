@@ -73,7 +73,7 @@ public class Society extends Population<Person> {
     private String governmentType;
     
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private List<Group> institutions;
+    private List<SociologicalGroup> institutions;
 
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Language> languages = new HashSet<>();
@@ -136,13 +136,13 @@ public class Society extends Population<Person> {
         this.governmentType = governmentType;
     }
 
-    public void addInstitution(Group institution) {
+    public void addInstitution(SociologicalGroup institution) {
         if (institution != null && !institutions.contains(institution)) {
             institutions.add(institution);
         }
     }
 
-    public List<Group> getInstitutions() {
+    public List<SociologicalGroup> getInstitutions() {
         return Collections.unmodifiableList(institutions);
     }
 

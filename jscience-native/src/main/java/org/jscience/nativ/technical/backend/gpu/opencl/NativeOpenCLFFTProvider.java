@@ -30,9 +30,9 @@ import java.util.logging.Logger;
  * @since 1.2
  */
 @AutoService({FFTProvider.class, AlgorithmProvider.class})
-public class OpenCLFFTProvider implements FFTProvider {
+public class NativeOpenCLFFTProvider implements FFTProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(OpenCLFFTProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLFFTProvider.class.getName());
 
     // Simple DFT kernel for correctness/verification on GPU
     private static final String KERNEL_SOURCE = 
@@ -54,7 +54,7 @@ public class OpenCLFFTProvider implements FFTProvider {
         "    outImag[k] = sumImag;\n" +
         "}\n";
 
-    private final OpenCLBackend backend = new OpenCLBackend();
+    private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
     private boolean initialized = false;
     private cl_program program;
     private cl_kernel kernel;

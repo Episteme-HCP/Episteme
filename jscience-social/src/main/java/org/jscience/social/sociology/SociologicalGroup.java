@@ -40,11 +40,11 @@ import org.jscience.natural.engineering.eventdriven.EventDrivenEngine;
 import org.jscience.natural.engineering.eventdriven.Event;
 
 /**
- * Represents a formal or informal social group of individuals.
+ * Represents a formal or informal social SociologicalGroup of individuals.
  * Refactored to extend Population<Person> to leverage demographic features.
  */
 @Persistent
-public class Group extends Population<Person> {
+public class SociologicalGroup extends Population<Person> {
 
     private static final long serialVersionUID = 2L;
 
@@ -54,11 +54,11 @@ public class Group extends Population<Person> {
     @Attribute
     private GroupKind kind;
 
-    public Group(String name, GroupKind kind) {
+    public SociologicalGroup(String name, GroupKind kind) {
         this(name, kind, null);
     }
 
-    public Group(String name, GroupKind kind, EventDrivenEngine engine) {
+    public SociologicalGroup(String name, GroupKind kind, EventDrivenEngine engine) {
         super(new UUIDIdentification(UUID.randomUUID()), name, HomoSapiens.SPECIES, null, engine);
         this.kind = Objects.requireNonNull(kind, "Kind cannot be null");
     }
@@ -87,7 +87,7 @@ public class Group extends Population<Person> {
 
     @Override
     public void processEvent(Event event) {
-        // Default: handle group-specific events or delegate to population
+        // Default: handle SociologicalGroup-specific events or delegate to population
         super.processEvent(event);
     }
 

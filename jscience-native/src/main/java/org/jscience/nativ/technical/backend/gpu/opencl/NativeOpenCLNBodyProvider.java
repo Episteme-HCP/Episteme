@@ -32,9 +32,9 @@ import static org.jocl.CL.*;
  * @since 1.2
  */
 @AutoService({NBodyProvider.class, AlgorithmProvider.class})
-public class OpenCLNBodyProvider implements NBodyProvider {
+public class NativeOpenCLNBodyProvider implements NBodyProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(OpenCLNBodyProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLNBodyProvider.class.getName());
 
     /** Minimum particle count where GPU N-body outperforms CPU. */
     private static final int GPU_NBODY_THRESHOLD = 500;
@@ -79,7 +79,7 @@ public class OpenCLNBodyProvider implements NBodyProvider {
         "    p[i*4 + 2] += v[i*3 + 2] * dt;\n" +
         "}\n";
 
-    private final OpenCLBackend backend = new OpenCLBackend();
+    private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
     private boolean initialized = false;
     private cl_program program;
     private cl_kernel kernel;

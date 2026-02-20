@@ -31,12 +31,12 @@ import org.jscience.natural.biology.Individual;
 import org.jscience.core.util.identity.Identification;
 import org.jscience.natural.biology.taxonomy.Species;
 import org.jscience.natural.earth.Place;
-import org.jscience.social.psychology.social.Group;
+import org.jscience.social.psychology.social.PsychologicalGroup;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
 /**
- * Represents a primitive or cooperative social group where resources are shared.
+ * Represents a primitive or cooperative social PsychologicalGroup where resources are shared.
  * Suitable for modeling anything from animal social structures to human cooperatives.
  * * @version 1.1
  * @author Silvere Martin-Michiellot
@@ -44,7 +44,7 @@ import org.jscience.core.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Community extends Group implements TaskProcessor {
+public class Community extends PsychologicalGroup implements TaskProcessor {
 
     private static final long serialVersionUID = 1L;
 

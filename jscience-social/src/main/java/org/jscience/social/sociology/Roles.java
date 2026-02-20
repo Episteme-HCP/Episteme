@@ -49,9 +49,9 @@ public final class Roles implements Serializable {
     public final static Role DOCTOR = new Role("Doctor", Role.SERVER);
 
     // Relationship context
-    /** Junior individual in a family structure. */
+    /** Junior individual in a SociologicalFamily structure. */
     public final static Role CHILD = new Role("Child", Role.CLIENT);
-    /** Senior/caregiver individual in a family structure. */
+    /** Senior/caregiver individual in a SociologicalFamily structure. */
     public final static Role PARENT = new Role("Parent", Role.SERVER);
     /** Nearby resident in a social environment. */
     public final static Role NEIGHBOR = new Role("Neighbor", Role.OBSERVER);
@@ -81,7 +81,7 @@ public final class Roles implements Serializable {
     public final static Role DEFENDER = new Role("Defender", Role.CLIENT);
     /** Impartial mediator in a legal conflict. */
     public final static Role JUDGE = new Role("Judge", Role.SUPERVISOR);
-    /** Group of peers providing a collective verdict. */
+    /** SociologicalGroup of peers providing a collective verdict. */
     public final static Role JURY = new Role("Jury", Role.SERVER);
 
     // Education context
@@ -115,7 +115,7 @@ public final class Roles implements Serializable {
     public final static Role MASTER = new Role("Master", Role.CLIENT);
 
     // Political context
-    /** Formal or informal head of a political group. */
+    /** Formal or informal head of a political SociologicalGroup. */
     public final static Role LEADER = new Role("Leader", Role.SUPERVISOR);
     /** Individual adhering to a leader's direction. */
     public final static Role FOLLOWER = new Role("Follower", Role.SERVER);
@@ -139,7 +139,7 @@ public final class Roles implements Serializable {
     // Performance context
     /** Creative participant in an art or performance. */
     public final static Role ARTIST = new Role("Artist", Role.SERVER);
-    /** Group of observers for a performance. */
+    /** SociologicalGroup of observers for a performance. */
     public final static Role AUDIENCE = new Role("Audience", Role.CLIENT);
     /** Individual providing technical support for a show. */
     public final static Role TECHNICIAN = new Role("Technician", Role.SERVER);

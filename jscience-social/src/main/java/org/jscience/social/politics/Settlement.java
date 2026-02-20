@@ -30,7 +30,7 @@ import java.util.Set;
 import org.jscience.natural.biology.Individual;
 import org.jscience.natural.earth.Place;
 import org.jscience.natural.earth.PlaceType;
-import org.jscience.social.psychology.social.Group;
+import org.jscience.social.psychology.social.PsychologicalGroup;
 import org.jscience.core.util.persistence.Persistent;
 
 /**
@@ -47,27 +47,27 @@ public class Settlement extends Place {
 
     private static final long serialVersionUID = 1L;
 
-    private final Group group;
+    private final PsychologicalGroup PsychologicalGroup;
     private final Set<Individual> leaders = new HashSet<>();
 
     /**
      * Initializes a new Settlement.
      *
      * @param name  the name of the settlement
-     * @param group the primary social group occupying the settlement
+     * @param PsychologicalGroup the primary social PsychologicalGroup occupying the settlement
      * @throws NullPointerException if any argument is null
      */
-    public Settlement(String name, Group group) {
+    public Settlement(String name, PsychologicalGroup PsychologicalGroup) {
         super(Objects.requireNonNull(name, "Name cannot be null"), PlaceType.SETTLEMENT);
-        this.group = Objects.requireNonNull(group, "Group cannot be null");
+        this.PsychologicalGroup = Objects.requireNonNull(PsychologicalGroup, "PsychologicalGroup cannot be null");
     }
 
     /**
-     * Returns the social group associated with this settlement.
-     * @return the group
+     * Returns the social PsychologicalGroup associated with this settlement.
+     * @return the PsychologicalGroup
      */
-    public Group getGroup() {
-        return group;
+    public PsychologicalGroup getGroup() {
+        return PsychologicalGroup;
     }
 
     /**
@@ -98,7 +98,7 @@ public class Settlement extends Place {
 
     @Override
     public String toString() {
-        return getName() + " [" + group.getName() + " settlement]";
+        return getName() + " [" + PsychologicalGroup.getName() + " settlement]";
     }
 }
 

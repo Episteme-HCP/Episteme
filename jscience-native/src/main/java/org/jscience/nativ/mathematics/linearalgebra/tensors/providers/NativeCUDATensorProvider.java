@@ -33,7 +33,7 @@ import java.util.Arrays;
  * @since 2.0
  */
 @AutoService(AlgorithmProvider.class)
-public class CUDATensorProvider implements TensorProvider {
+public class NativeCUDATensorProvider implements TensorProvider {
 
     @Override
     public boolean isAvailable() {
@@ -122,7 +122,7 @@ public class CUDATensorProvider implements TensorProvider {
 
     private void validateType(Class<?> type) {
         if (type != Float.class && type != Double.class) {
-            throw new UnsupportedOperationException("CUDATensorProvider only supports Float and Double, got: " + type.getName());
+            throw new UnsupportedOperationException("NativeCUDATensorProvider only supports Float and Double, got: " + type.getName());
         }
     }
 

@@ -41,7 +41,7 @@ import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
 /**
- * Represents a group of individuals from a psychological and social perspective.
+ * Represents a PsychologicalGroup of individuals from a psychological and social perspective.
  * Extends {@link Population} for biological/ecological management.
  * 
  * @author Silvere Martin-Michiellot
@@ -50,11 +50,11 @@ import org.jscience.core.util.persistence.Relation;
  */
 
 @Persistent
-public class Group extends Population<Individual> {
+public class PsychologicalGroup extends Population<Individual> {
 
     private static final long serialVersionUID = 2L;
 
-    /** Individuals designated as leaders or rulers within the group. */
+    /** Individuals designated as leaders or rulers within the PsychologicalGroup. */
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private Set<Individual> leaders;
 
@@ -69,11 +69,11 @@ public class Group extends Population<Individual> {
     /**
      * Default Constructor with ID generation.
      */
-    public Group(String name, Species species, Place territory) {
+    public PsychologicalGroup(String name, Species species, Place territory) {
         this(name, species, territory, null);
     }
 
-    public Group(String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
+    public PsychologicalGroup(String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
         super(new UUIDIdentification(UUID.randomUUID().toString()), name, species, territory, engine);
         this.leaders = new HashSet<>();
         this.relations = new HashMap<>();
@@ -82,11 +82,11 @@ public class Group extends Population<Individual> {
     /**
      * Constructor used by subclasses or for explicit ID.
      */
-    public Group(Identification id, String name, Species species, Place territory) {
+    public PsychologicalGroup(Identification id, String name, Species species, Place territory) {
         this(id, name, species, territory, null);
     }
 
-    public Group(Identification id, String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
+    public PsychologicalGroup(Identification id, String name, Species species, Place territory, org.jscience.natural.engineering.eventdriven.EventDrivenEngine engine) {
         super(id, name, species, territory, engine);
         this.leaders = new HashSet<>();
         this.relations = new HashMap<>();
@@ -95,18 +95,18 @@ public class Group extends Population<Individual> {
     /**
      * Legacy/Convenience constructor.
      */
-    public Group(Species species) {
+    public PsychologicalGroup(Species species) {
         this(null, species, null);
     }
 
     /**
      * Legacy/Convenience constructor.
      */
-    public Group(Species species, Place formalTerritory) {
+    public PsychologicalGroup(Species species, Place formalTerritory) {
         this(null, species, formalTerritory);
     }
 
-    // Group specific methods
+    // PsychologicalGroup specific methods
 
     public Place getFormalTerritory() {
         return getTerritory();
@@ -156,7 +156,7 @@ public class Group extends Population<Individual> {
     }
 
     
-    // Placeholder for Event processing if Group is treated as event-driven
+    // Placeholder for Event processing if PsychologicalGroup is treated as event-driven
     // Inherited from Population now
 }
 

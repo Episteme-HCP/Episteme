@@ -24,7 +24,7 @@
 package org.jscience.social.sociology.loaders;
 
 import org.jscience.social.sociology.DemographicData;
-import org.jscience.social.sociology.Group;
+import org.jscience.social.sociology.SociologicalGroup;
 import org.jscience.social.sociology.Person;
 import org.jscience.core.io.AbstractResourceReader;
 import org.jscience.core.io.MiniCatalog;
@@ -33,14 +33,14 @@ import java.util.*;
 
 /**
  * Resource reader for demographic data models.
- * Uses real Group/Person objects to generate sample data.
+ * Uses real SociologicalGroup/Person objects to generate sample data.
  */
 public final class DemographicResourceReader extends AbstractResourceReader<DemographicData> {
 
     @Override public String getCategory() { return "Sociology"; }
     @Override public String getName() { return "Demographic Resource Reader"; }
     @Override public String getDescription() { return "Loads population structures and census data."; }
-    @Override public String getLongDescription() { return "Supports individual group analysis and aggregated demographic pyramids."; }
+    @Override public String getLongDescription() { return "Supports individual SociologicalGroup analysis and aggregated demographic pyramids."; }
     @Override public String getResourcePath() { return "data/sociology"; }
     @Override public Class<DemographicData> getResourceType() { return DemographicData.class; }
     @Override public String[] getSupportedVersions() { return new String[] {"1.0"}; }
@@ -61,7 +61,7 @@ public final class DemographicResourceReader extends AbstractResourceReader<Demo
         DemographicData dd = new DemographicData();
         dd.setPopulationName("World 2025 (Integrated Sample)");
         
-        Group youth = new Group("Youth Sample", org.jscience.social.sociology.GroupKind.COMMUNITY);
+        SociologicalGroup youth = new SociologicalGroup("Youth Sample", org.jscience.social.sociology.GroupKind.COMMUNITY);
         Random rand = new Random();
         for (int i = 0; i < 100; i++) {
             Person p = new Person("Student " + i, rand.nextBoolean() ? org.jscience.natural.biology.BiologicalSex.MALE : org.jscience.natural.biology.BiologicalSex.FEMALE);

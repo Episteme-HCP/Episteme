@@ -30,15 +30,15 @@ import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
 /**
- * Represents a family unit within the social structure.
- * Extends the basic {@link Group} to model specific familial relationships like parents and children.
+ * Represents a SociologicalFamily unit within the social structure.
+ * Extends the basic {@link SociologicalGroup} to model specific familial relationships like parents and children.
  * * @version 1.2
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Family extends Group {
+public class SociologicalFamily extends SociologicalGroup {
 
     private static final long serialVersionUID = 2L;
 
@@ -52,15 +52,15 @@ public class Family extends Group {
     private final List<Person> children = new ArrayList<>();
 
     /**
-     * Creates a new family with the given family name.
-     * @param familyName the surname or name identifying the family unit
+     * Creates a new SociologicalFamily with the given SociologicalFamily name.
+     * @param familyName the surname or name identifying the SociologicalFamily unit
      */
-    public Family(String familyName) {
-        super(familyName, GroupKind.FAMILY);
+    public SociologicalFamily(String familyName) {
+        super(familyName, GroupKind.SociologicalFamily);
     }
 
     /**
-     * Sets the primary parent of the family.
+     * Sets the primary parent of the SociologicalFamily.
      * @param parent the parent person
      */
     public void setParent1(Person parent) {
@@ -72,7 +72,7 @@ public class Family extends Group {
     }
 
     /**
-     * Sets the secondary parent of the family.
+     * Sets the secondary parent of the SociologicalFamily.
      * @param parent the parent person
      */
     public void setParent2(Person parent) {
@@ -84,7 +84,7 @@ public class Family extends Group {
     }
 
     /**
-     * Adds a child to the family unit.
+     * Adds a child to the SociologicalFamily unit.
      * @param child the child person
      */
     public void addChild(Person child) {
@@ -112,7 +112,7 @@ public class Family extends Group {
     }
 
     /**
-     * Returns an unmodifiable list of children in the family.
+     * Returns an unmodifiable list of children in the SociologicalFamily.
      * @return the children list
      */
     public List<Person> getChildren() {
@@ -131,7 +131,7 @@ public class Family extends Group {
     }
 
     /**
-     * Returns the number of children in this family unit.
+     * Returns the number of children in this SociologicalFamily unit.
      * @return child count
      */
     public int getNumChildren() {

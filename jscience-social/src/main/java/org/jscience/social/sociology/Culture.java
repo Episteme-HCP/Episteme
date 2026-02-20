@@ -42,7 +42,7 @@ import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
 /**
- * Represents the cumulative shared elements of a social group or civilization.
+ * Represents the cumulative shared elements of a social SociologicalGroup or civilization.
  * A culture encompasses values (beliefs), norms (rituals), and societal artifacts,
  * as well as identifying traits like language and technological sophistication.
  * Modernized to implement ComprehensiveIdentification and support dynamic traits and consistent identity.

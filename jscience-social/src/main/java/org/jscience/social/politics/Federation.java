@@ -34,7 +34,7 @@ import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
 /**
- * Represents a group of countries cooperating within a formal union or federation.
+ * Represents a PsychologicalGroup of countries cooperating within a formal union or federation.
  * <p>
  * Countries in a federation may or may not share common geography.
  * Examples include the European Union, United Nations, or a Federal State.

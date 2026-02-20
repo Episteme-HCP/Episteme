@@ -10,7 +10,7 @@ import org.jscience.core.physics.fluids.LatticeBoltzmannProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.nativ.technical.backend.gpu.opencl.OpenCLBackend;
+import org.jscience.nativ.technical.backend.gpu.opencl.NativeOpenCLSparseLinearAlgebraBackend;
 import org.jscience.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 
 import static org.jocl.CL.*;
@@ -26,9 +26,9 @@ import java.util.logging.Logger;
  * @since 1.2
  */
 @AutoService(AlgorithmProvider.class)
-public class OpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider {
+public class NativeOpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(OpenCLLatticeBoltzmannProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLLatticeBoltzmannProvider.class.getName());
     
     private static final String KERNEL_SOURCE = 
     "__kernel void lbm_d2q9(__global double* f, __global double* fNew, __global int* obstacle, int width, int height, double omega) {\n" +
@@ -85,7 +85,7 @@ public class OpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider 
     "    }\n" +
     "}\n";
 
-    private final OpenCLBackend backend = new OpenCLBackend();
+    private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
     private boolean initialized = false;
     private cl_program program;
     private cl_kernel kernel;

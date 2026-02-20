@@ -58,7 +58,7 @@ public class MulticoreMandelbrotProvider implements MandelbrotProvider {
     }
 
     @Override
-    public int[][] computeReal(Real xMin, Real xMax, Real yMin, Real yMax, int width, int height, int maxIterations) {
+    public int[][] compute(Real xMin, Real xMax, Real yMin, Real yMax, int width, int height, int maxIterations) {
         int[][] result = new int[width][height];
         final Real FOUR = Real.of(4.0);
         final Real TWO = Real.of(2.0);

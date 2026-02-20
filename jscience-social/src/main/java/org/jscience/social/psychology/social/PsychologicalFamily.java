@@ -27,34 +27,34 @@ import org.jscience.natural.biology.taxonomy.Species;
 import org.jscience.natural.earth.Place;
 
 /**
- * Represents a nuclear or extended family group.
- * A family is a specialized {@link Group} where members typically share genetic 
+ * Represents a nuclear or extended PsychologicalFamily PsychologicalGroup.
+ * A PsychologicalFamily is a specialized {@link PsychologicalGroup} where members typically share genetic 
  * or formal kinship bonds.
  * * @version 1.1
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Family extends Group {
+public class PsychologicalFamily extends PsychologicalGroup {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new Family for a specific species.
+     * Creates a new PsychologicalFamily for a specific species.
      *
-     * @param species the biological species of the family
+     * @param species the biological species of the PsychologicalFamily
      */
-    public Family(Species species) {
+    public PsychologicalFamily(Species species) {
         super(species);
     }
 
     /**
-     * Creates a new Family with a designated home territory.
+     * Creates a new PsychologicalFamily with a designated home territory.
      *
      * @param species         the biological species
-     * @param formalTerritory the physical site or home associated with the family
+     * @param formalTerritory the physical site or home associated with the PsychologicalFamily
      */
-    public Family(Species species, Place formalTerritory) {
+    public PsychologicalFamily(Species species, Place formalTerritory) {
         super(species, formalTerritory);
     }
 }

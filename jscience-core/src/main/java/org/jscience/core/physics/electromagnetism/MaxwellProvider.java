@@ -19,7 +19,6 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 public interface MaxwellProvider extends AlgorithmProvider {
 
     double[][] computeTensor(Vector4D point);
-
     Real[][] computeTensorReal(Vector4D point);
 
     @Override

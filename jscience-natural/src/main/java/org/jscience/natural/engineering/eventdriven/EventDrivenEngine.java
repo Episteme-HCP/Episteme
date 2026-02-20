@@ -204,10 +204,10 @@ public class EventDrivenEngine implements Runnable {
                 tasks.add(() -> {
                     org.jscience.core.mathematics.numbers.real.Real[] y0 = continuum.getState();
                     int steps = (int) Math.ceil(duration / 0.01);
-                    org.jscience.core.mathematics.numbers.real.Real[] yNew = integrator.solveReal(
+                    org.jscience.core.mathematics.numbers.real.Real[] result = integrator.solve(
                         (timeVal, stateVal) -> continuum.computeDerivatives(timeVal, stateVal),
                         y0, t, tEnd, steps);
-                    continuum.setState(yNew);
+                    continuum.setState(result);
                 });
             }
         }

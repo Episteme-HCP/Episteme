@@ -18,8 +18,7 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 public interface MandelbrotProvider extends AlgorithmProvider {
 
     int[][] compute(double xMin, double xMax, double yMin, double yMax, int width, int height, int maxIterations);
-
-    int[][] computeReal(Real xMin, Real xMax, Real yMin, Real yMax, int width, int height, int maxIterations);
+    int[][] compute(Real xMin, Real xMax, Real yMin, Real yMax, int width, int height, int maxIterations);
 
     @Override
     default String getName() {

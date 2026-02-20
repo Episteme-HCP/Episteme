@@ -29,7 +29,7 @@ import org.jscience.social.history.CounterfactualHistoryRunner;
 import org.jscience.social.history.CounterfactualSimulator;
 import org.jscience.social.history.time.FuzzyTimePoint;
 import org.jscience.social.politics.VotingMethod;
-import org.jscience.social.sociology.Group;
+import org.jscience.social.sociology.SociologicalGroup;
 import org.jscience.social.sociology.GroupKind;
 import org.jscience.social.sociology.Person;
 import org.jscience.social.sociology.Society;
@@ -49,7 +49,7 @@ public class SocialSimulationIntegrationTest {
     public void testFullSimulationPipeline() {
         // 1. Setup Society
         Society society = new Society("Experimental Nations");
-        Group politicalElite = new Group("Elite", GroupKind.ORGANIZATION);
+        SociologicalGroup politicalElite = new SociologicalGroup("Elite", GroupKind.ORGANIZATION);
         
         for (int i = 0; i < 20; i++) {
             Person h = new Person("person-" + i, BiologicalSex.MALE);

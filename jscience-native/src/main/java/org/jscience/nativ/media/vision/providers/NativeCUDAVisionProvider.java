@@ -18,7 +18,7 @@ import com.google.auto.service.AutoService;
  * @since 2.0
  */
 @AutoService(Backend.class)
-public class CUDAVisionProvider implements VisionAlgorithmBackend<Object> {
+public class NativeCUDAVisionProvider implements VisionAlgorithmBackend<Object> {
 
     @Override public String getType() { return "vision"; }
     @Override public String getId() { return "native-cuda-vision"; }
@@ -45,7 +45,7 @@ public class CUDAVisionProvider implements VisionAlgorithmBackend<Object> {
     @Override
     public Object apply(Object image, ImageOp<Object> op) {
         if (!(image instanceof jcuda.driver.CUdeviceptr)) {
-            throw new IllegalArgumentException("Expected CUdeviceptr for CUDAVisionProvider");
+            throw new IllegalArgumentException("Expected CUdeviceptr for NativeCUDAVisionProvider");
         }
         return op.process(image);
     }

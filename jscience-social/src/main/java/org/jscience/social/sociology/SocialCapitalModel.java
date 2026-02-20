@@ -70,22 +70,22 @@ public final class SocialCapitalModel {
     }
 
     /**
-     * Calculates the "Bonding Social Capital" of a person within a specific group.
-     * This is measured as the ratio of ties within the group to the group size.
+     * Calculates the "Bonding Social Capital" of a person within a specific SociologicalGroup.
+     * This is measured as the ratio of ties within the SociologicalGroup to the SociologicalGroup size.
      * 
      * @param person the person to analyze
-     * @param group  the group they belong to
+     * @param SociologicalGroup  the SociologicalGroup they belong to
      * @param network the social network
      * @return internal tie ratio
      */
-    public static Real calculateBondingCapital(Person person, Group group, SocialNetwork network) {
-        if (group == null || group.size() <= 1) return Real.ZERO;
+    public static Real calculateBondingCapital(Person person, SociologicalGroup SociologicalGroup, SocialNetwork network) {
+        if (SociologicalGroup == null || SociologicalGroup.size() <= 1) return Real.ZERO;
         
         long internalTies = network.getNeighbors(person).stream()
-                .filter(neighbor -> group.getMembers().contains(neighbor))
+                .filter(neighbor -> SociologicalGroup.getMembers().contains(neighbor))
                 .count();
         
-        return Real.of(internalTies).divide(Real.of(group.size() - 1));
+        return Real.of(internalTies).divide(Real.of(SociologicalGroup.size() - 1));
     }
 
     /**
@@ -97,7 +97,7 @@ public final class SocialCapitalModel {
      * @param network the social network
      * @return count of external ties
      */
-    public static Real calculateBridgingCapital(Person person, Set<Group> primaryGroups, SocialNetwork network) {
+    public static Real calculateBridgingCapital(Person person, Set<SociologicalGroup> primaryGroups, SocialNetwork network) {
         Set<Person> neighbors = network.getNeighbors(person);
         long externalTies = neighbors.stream()
                 .filter(neighbor -> primaryGroups.stream().noneMatch(g -> g.getMembers().contains(neighbor)))
@@ -107,21 +107,21 @@ public final class SocialCapitalModel {
     }
 
     /**
-     * Estimates "Social Cohesion" of a group.
+     * Estimates "Social Cohesion" of a SociologicalGroup.
      * Average of all internal bonding capital scores.
      * 
-     * @param group the group
+     * @param SociologicalGroup the SociologicalGroup
      * @param network the network
      * @return cohesion index
      */
-    public static Real calculateSocialCohesion(Group group, SocialNetwork network) {
-        if (group == null || group.size() < 2) return Real.ONE;
+    public static Real calculateSocialCohesion(SociologicalGroup SociologicalGroup, SocialNetwork network) {
+        if (SociologicalGroup == null || SociologicalGroup.size() < 2) return Real.ONE;
         
-        Real totalBonding = group.getMembers().stream()
-                .map(p -> calculateBondingCapital(p, group, network))
+        Real totalBonding = SociologicalGroup.getMembers().stream()
+                .map(p -> calculateBondingCapital(p, SociologicalGroup, network))
                 .reduce(Real.ZERO, Real::add);
                 
-        return totalBonding.divide(Real.of(group.size()));
+        return totalBonding.divide(Real.of(SociologicalGroup.size()));
     }
 }
 

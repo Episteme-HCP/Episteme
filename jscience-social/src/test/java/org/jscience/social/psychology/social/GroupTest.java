@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for Group.
+ * Automated baseline test for PsychologicalGroup.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -20,7 +20,7 @@ public class GroupTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(Group.class);
+        assertNotNull(PsychologicalGroup.class);
     }
 }
 

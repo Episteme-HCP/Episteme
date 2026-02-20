@@ -73,6 +73,7 @@ public class MulticoreMaxwellProvider implements MaxwellProvider {
 
     @Override
     public Real[][] computeTensorReal(Vector4D point) {
+        // ... (preserving content)
         Real t = point.ct();
         Real x = point.x();
         Real y = point.y();

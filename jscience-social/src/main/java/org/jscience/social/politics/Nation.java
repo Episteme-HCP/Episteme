@@ -41,7 +41,7 @@ import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Relation;
 
 /**
- * Represents a sovereign nation or organized human group (modern tribe).
+ * Represents a sovereign nation or organized human PsychologicalGroup (modern tribe).
  * A nation is defined by its territory, identity (Culture), and supreme law (Constitution).
  * * @version 1.2
  * @author Silvere Martin-Michiellot

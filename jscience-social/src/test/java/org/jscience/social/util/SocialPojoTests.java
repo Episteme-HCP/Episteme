@@ -56,8 +56,10 @@ public class SocialPojoTests {
     public void testSociologyPojos() {
         PojoTester.testPojo(Person.class);
         PojoTester.testPojo(Human.class);
-        PojoTester.testPojo(Group.class);
-        PojoTester.testPojo(Family.class);
+        PojoTester.testPojo(SociologicalGroup.class);
+        PojoTester.testPojo(SociologicalFamily.class);
+        PojoTester.testPojo(org.jscience.social.psychology.social.PsychologicalGroup.class);
+        PojoTester.testPojo(org.jscience.social.psychology.social.PsychologicalFamily.class);
         PojoTester.testPojo(School.class);
         PojoTester.testPojo(Organization.class);
         PojoTester.testPojo(Religion.class);

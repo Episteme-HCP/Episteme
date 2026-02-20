@@ -48,7 +48,7 @@ public final class DemographicProfileViewer extends AbstractViewer {
         CategoryAxis yAxis = new CategoryAxis();
         
         xAxis.setLabel(I18N.getInstance().get("viewer.demography.axis.population", "Population Count"));
-        yAxis.setLabel(I18N.getInstance().get("viewer.demography.axis.age", "Age Group"));
+        yAxis.setLabel(I18N.getInstance().get("viewer.demography.axis.age", "Age SociologicalGroup"));
 
         chart = new BarChart<>(xAxis, yAxis);
         chart.setTitle(I18N.getInstance().get("viewer.demography.title", "Population Pyramid"));
@@ -68,11 +68,11 @@ public final class DemographicProfileViewer extends AbstractViewer {
         femaleSeries.getData().clear();
         
         List<DemographicData.AgeGroup> groups = data.getConsolidatedGroups(5);
-        for (var group : groups) {
-            String label = group.minAge() + "-" + group.maxAge();
+        for (var SociologicalGroup : groups) {
+            String label = SociologicalGroup.minAge() + "-" + SociologicalGroup.maxAge();
             // Male values are negative to show on the left in a pyramid
-            maleSeries.getData().add(new XYChart.Data<>(-group.maleCount(), label));
-            femaleSeries.getData().add(new XYChart.Data<>(group.femaleCount(), label));
+            maleSeries.getData().add(new XYChart.Data<>(-SociologicalGroup.maleCount(), label));
+            femaleSeries.getData().add(new XYChart.Data<>(SociologicalGroup.femaleCount(), label));
         }
     }
 

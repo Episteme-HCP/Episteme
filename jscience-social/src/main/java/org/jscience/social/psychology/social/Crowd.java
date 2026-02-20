@@ -31,7 +31,7 @@ import org.jscience.natural.biology.taxonomy.Species;
 
 /**
  * Represents a transient gathering of individuals (a crowd) sharing a common physical proximity 
- * and motive, but lacking the structured relations found in a {@link Group}.
+ * and motive, but lacking the structured relations found in a {@link PsychologicalGroup}.
  */
 public class Crowd extends Population<Individual> {
 

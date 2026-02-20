@@ -79,7 +79,7 @@ public class SystematicGeneticBenchmark implements SystematicBenchmark<GeneticAl
     @Override
     public void run() {
         if (currentProvider != null) {
-            currentProvider.solve(fitnessFunction, dimensions, populationSize, generations, mutationRate);
+            currentProvider.solve(fitnessFunction::apply, dimensions, populationSize, generations, mutationRate);
         }
     }
 

@@ -27,7 +27,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
  * Implements epidemiological models such as SIR (Susceptible-Infectious-Recovered)
- * to simulate disease spread within a social group or network.
+ * to simulate disease spread within a social SociologicalGroup or network.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

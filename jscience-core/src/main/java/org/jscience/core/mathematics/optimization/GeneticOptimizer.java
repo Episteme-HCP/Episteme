@@ -61,7 +61,7 @@ public class GeneticOptimizer {
             return fitnessFunction.apply(r).doubleValue();
         };
         
-        double[] result = backend.solve(doubleFitness, dimensions, populationSize, generations, mutationRate);
+        double[] result = backend.solve(doubleFitness::apply, dimensions, populationSize, generations, mutationRate);
         
         Real[] finalResult = new Real[result.length];
         for (int i = 0; i < result.length; i++) {

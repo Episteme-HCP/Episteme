@@ -57,7 +57,7 @@ public class RungeKuttaODEProvider implements ODEProvider {
     }
 
     @Override
-    public Real[] solveReal(BiFunction<Real, Real[], Real[]> f, Real[] y0, Real t0, Real t1, int steps) {
+    public Real[] solve(BiFunction<Real, Real[], Real[]> f, Real[] y0, Real t0, Real t1, int steps) {
         int dim = y0.length;
         Real[] y = y0.clone();
         Real t = t0;

@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.social.sociology.Group;
+import org.jscience.social.psychology.social.PsychologicalGroup;
 import org.jscience.core.util.Positioned;
 import org.jscience.natural.earth.Place;
 import org.jscience.core.util.Commented;
@@ -50,7 +50,7 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<T
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private final Set<Group> groups = new HashSet<>();
+    private final Set<PsychologicalGroup> groups = new HashSet<>();
     private Place place;
     private final TimeCoordinate startingDate;
     private TimeCoordinate endDate;
@@ -66,12 +66,12 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<T
      * @throws NullPointerException if any mandatory argument is null
      * @throws IllegalArgumentException if name is empty or no groups are involved
      */
-    public Conflict(String name, Set<Group> involvedGroups, Place place, TimeCoordinate startingDate) {
+    public Conflict(String name, Set<PsychologicalGroup> involvedGroups, Place place, TimeCoordinate startingDate) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         
         Objects.requireNonNull(involvedGroups, "Groups cannot be null");
-        if (involvedGroups.isEmpty()) throw new IllegalArgumentException("Conflict must involve at least one group.");
+        if (involvedGroups.isEmpty()) throw new IllegalArgumentException("Conflict must involve at least one PsychologicalGroup.");
         this.groups.addAll(involvedGroups);
         
         this.place = Objects.requireNonNull(place, "Place cannot be null");
@@ -96,7 +96,7 @@ public class Conflict implements Named, Commented, Positioned<Place>, Temporal<T
      * Returns an unmodifiable set of participating groups.
      * @return the involved groups
      */
-    public Set<Group> getGroups() {
+    public Set<PsychologicalGroup> getGroups() {
         return Collections.unmodifiableSet(groups);
     }
 

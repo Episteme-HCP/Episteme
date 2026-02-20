@@ -102,8 +102,19 @@ public class MulticoreMonteCarloProvider implements MonteCarloProvider {
 
     @Override
     public double estimatePi(int samples) {
-        long insideCircle = IntStream.range(0, samples)
-            .parallel()
+        return estimatePiParallel(samples, true);
+    }
+
+    @Override
+    public Real estimatePi(int samples, boolean useReal) {
+        return Real.of(estimatePiParallel(samples, true));
+    }
+
+    private double estimatePiParallel(int samples, boolean parallel) {
+        IntStream stream = IntStream.range(0, samples);
+        if (parallel) stream = stream.parallel();
+        
+        long insideCircle = stream
             .filter(i -> {
                 ThreadLocalRandom rng = ThreadLocalRandom.current();
                 double x = rng.nextDouble();
@@ -112,11 +123,6 @@ public class MulticoreMonteCarloProvider implements MonteCarloProvider {
             })
             .count();
         return 4.0 * insideCircle / samples;
-    }
-
-    @Override
-    public Real estimatePiReal(int samples) {
-        return Real.of(estimatePi(samples));
     }
 
     @Override

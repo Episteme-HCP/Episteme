@@ -18,9 +18,8 @@ import java.util.function.Function;
  */
 public interface GeneticAlgorithmProvider extends AlgorithmProvider {
 
-    double[] solve(Function<double[], Double> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate);
-
-    Real[] solveReal(Function<Real[], Real> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate);
+    double[] solve(java.util.function.ToDoubleFunction<double[]> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate);
+    Real[] solve(Function<Real[], Real> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate);
 
     @Override
     default String getName() {

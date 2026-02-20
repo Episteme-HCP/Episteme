@@ -38,16 +38,16 @@ public class MulticoreGeneticAlgorithmProvider implements GeneticAlgorithmProvid
     }
 
     @Override
-    public double[] solve(Function<double[], Double> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate) {
+    public double[] solve(java.util.function.ToDoubleFunction<double[]> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate) {
         // Future: JNI call to native C++/Fortran optimizer
         return getFallback().solve(fitnessFunction, dimensions, populationSize, generations, mutationRate);
     }
 
     @Override
-    public Real[] solveReal(Function<Real[], Real> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate) {
+    public Real[] solve(Function<Real[], Real> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate) {
         if (canUseNative()) {
             // Wrapping and calling native engine via doubles
-            Function<double[], Double> wrapper = d -> {
+            java.util.function.ToDoubleFunction<double[]> wrapper = d -> {
                 Real[] r = new Real[d.length];
                 for (int i = 0; i < d.length; i++) r[i] = Real.of(d[i]);
                 return fitnessFunction.apply(r).doubleValue();
@@ -58,7 +58,7 @@ public class MulticoreGeneticAlgorithmProvider implements GeneticAlgorithmProvid
             for (int i = 0; i < result.length; i++) realResult[i] = Real.of(result[i]);
             return realResult;
         } else {
-            return getFallback().solveReal(fitnessFunction, dimensions, populationSize, generations, mutationRate);
+            return getFallback().solve(fitnessFunction, dimensions, populationSize, generations, mutationRate);
         }
     }
 

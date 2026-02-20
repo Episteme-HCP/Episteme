@@ -57,8 +57,8 @@ public class Process implements Named {
     /** Humidify process. */
     public final static Process HUMIDIFY = new Process("Humidify");
 
-    /** Group process (centralize). */
-    public final static Process GROUP = new Process("Group"); 
+    /** PsychologicalGroup process (centralize). */
+    public final static Process PsychologicalGroup = new Process("PsychologicalGroup"); 
 
     /** Clean process. */
     public final static Process CLEAN = new Process("Clean");

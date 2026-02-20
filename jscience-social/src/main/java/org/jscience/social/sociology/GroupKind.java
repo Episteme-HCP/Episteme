@@ -28,7 +28,7 @@ import org.jscience.core.util.ExtensibleEnum;
 import org.jscience.core.util.persistence.Persistent;
 
 /**
- * An extensible enumeration for social group classifications.
+ * An extensible enumeration for social SociologicalGroup classifications.
  * Modernized to extend ExtensibleEnum.
  *
  * @author Silvere Martin-Michiellot
@@ -40,7 +40,7 @@ public final class GroupKind extends ExtensibleEnum {
 
     private static final long serialVersionUID = 2L;
 
-    public static final GroupKind FAMILY = new GroupKind("FAMILY", true);
+    public static final GroupKind SociologicalFamily = new GroupKind("SociologicalFamily", true);
     public static final GroupKind COMMUNITY = new GroupKind("COMMUNITY", true);
     public static final GroupKind ORGANIZATION = new GroupKind("ORGANIZATION", true);
     public static final GroupKind NATION = new GroupKind("NATION", true);
@@ -54,7 +54,7 @@ public final class GroupKind extends ExtensibleEnum {
     private final boolean builtIn;
 
     static {
-        EnumRegistry.register(GroupKind.class, FAMILY);
+        EnumRegistry.register(GroupKind.class, SociologicalFamily);
         EnumRegistry.register(GroupKind.class, COMMUNITY);
         EnumRegistry.register(GroupKind.class, ORGANIZATION);
         EnumRegistry.register(GroupKind.class, NATION);

@@ -102,8 +102,8 @@ public class SocietySimulation implements Serializable {
         this.network = new SocialNetwork(society.getName() + " Network");
         
         // Initialize agents from society institutions
-        for (Group group : society.getInstitutions()) {
-            for (Person member : group.getMembers()) {
+        for (SociologicalGroup SociologicalGroup : society.getInstitutions()) {
+            for (Person member : SociologicalGroup.getMembers()) {
                 network.addPerson(member);
                 opinions.put(member, Real.of(random.nextDouble() * 2 - 1)); // Random -1 to 1
             }

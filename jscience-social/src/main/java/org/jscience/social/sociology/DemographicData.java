@@ -34,7 +34,7 @@ import org.jscience.core.util.UniversalDataModel;
 
 /**
  * Data model for demographic population structures.
- * Supports representation via individual age-group cohorts or aggregation from social groups.
+ * Supports representation via individual age-SociologicalGroup cohorts or aggregation from social groups.
  * Provides consolidated segments for population pyramid visualizations.
  *
  * @author Silvere Martin-Michiellot
@@ -57,14 +57,14 @@ public final class DemographicData implements UniversalDataModel, Serializable {
     public record AgeGroup(int minAge, int maxAge, long maleCount, long femaleCount) implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        /** Returns the total count for this age group. */
+        /** Returns the total count for this age SociologicalGroup. */
         public long total() {
             return maleCount + femaleCount;
         }
     }
 
     private final List<AgeGroup> manualGroups = new ArrayList<>();
-    private final List<Group> individuals = new ArrayList<>();
+    private final List<SociologicalGroup> individuals = new ArrayList<>();
     private String populationName;
 
     /**
@@ -80,11 +80,11 @@ public final class DemographicData implements UniversalDataModel, Serializable {
     }
 
     /**
-     * Adds a social group to the model for automated aggregation.
-     * @param group the group to add
+     * Adds a social SociologicalGroup to the model for automated aggregation.
+     * @param SociologicalGroup the SociologicalGroup to add
      */
-    public void addGroup(Group group) {
-        individuals.add(Objects.requireNonNull(group, "Group cannot be null"));
+    public void addGroup(SociologicalGroup SociologicalGroup) {
+        individuals.add(Objects.requireNonNull(SociologicalGroup, "SociologicalGroup cannot be null"));
     }
 
     /**
@@ -123,7 +123,7 @@ public final class DemographicData implements UniversalDataModel, Serializable {
         Map<Integer, Long> males = new HashMap<>();
         Map<Integer, Long> females = new HashMap<>();
 
-        for (Group g : individuals) {
+        for (SociologicalGroup g : individuals) {
             for (Person p : g.getMembers()) {
                 int bucket = (p.getAge() / bucketSize) * bucketSize;
                 if (p.getGender() == Gender.MALE) {
@@ -149,7 +149,7 @@ public final class DemographicData implements UniversalDataModel, Serializable {
      */
     public long getTotalPopulation() {
         long total = manualGroups.stream().mapToLong(AgeGroup::total).sum();
-        total += individuals.stream().mapToLong(Group::size).sum();
+        total += individuals.stream().mapToLong(SociologicalGroup::size).sum();
         return total;
     }
 

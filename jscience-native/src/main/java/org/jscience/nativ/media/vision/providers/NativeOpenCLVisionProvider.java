@@ -26,7 +26,7 @@ import com.google.auto.service.AutoService;
  * @since 2.0
  */
 @AutoService(Backend.class)
-public class OpenCLVisionProvider implements VisionAlgorithmBackend<Object> {
+public class NativeOpenCLVisionProvider implements VisionAlgorithmBackend<Object> {
 
     @Override public String getType() { return "vision"; }
     @Override public String getId() { return "native-opencl-vision"; }
@@ -57,7 +57,7 @@ public class OpenCLVisionProvider implements VisionAlgorithmBackend<Object> {
         // 3. Download result (or keep on GPU)
         
         if (!(image instanceof org.jocl.cl_mem)) {
-            throw new IllegalArgumentException("Expected cl_mem for OpenCLVisionProvider");
+            throw new IllegalArgumentException("Expected cl_mem for NativeOpenCLVisionProvider");
         }
         
         return op.process(image);

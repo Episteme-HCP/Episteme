@@ -12,6 +12,11 @@ import org.jscience.core.media.audio.AudioAlgorithmBackend;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 
+import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.HardwareAccelerator;
+import org.jscience.core.technical.backend.Operation;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -24,8 +29,8 @@ import java.io.File;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-@AutoService({Backend.class, AudioBackend.class, AlgorithmProvider.class, AudioAlgorithmBackend.class})
-public class JavaSoundBackend implements AudioBackend, AudioAlgorithmBackend<AudioBuffer> {
+@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, AlgorithmProvider.class, AudioAlgorithmBackend.class})
+public class JavaSoundBackend implements AudioBackend, ComputeBackend, AudioAlgorithmBackend<AudioBuffer> {
 
     private Clip clip;
 
@@ -43,6 +48,16 @@ public class JavaSoundBackend implements AudioBackend, AudioAlgorithmBackend<Aud
         // Return a new instance for usage, or this?
         // Let's return new instance to be safe for playback state.
         return new JavaSoundBackend(); 
+    }
+
+    @Override
+    public ExecutionContext createContext() {
+        return new JavaSoundContext();
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU;
     }
 
     // ---- AudioBackend Implementation (Playback) ----
@@ -85,5 +100,17 @@ public class JavaSoundBackend implements AudioBackend, AudioAlgorithmBackend<Aud
             return new AudioBuffer((double[]) data, channels, sampleRate);
         }
         throw new IllegalArgumentException("Unsupported data type for JavaSoundBackend");
+    }
+
+    private static class JavaSoundContext implements ExecutionContext {
+        @Override
+        public <R> R execute(Operation<R> operation) {
+            return operation.compute(this);
+        }
+
+        @Override
+        public void close() {
+            // No-op
+        }
     }
 }

@@ -26,8 +26,14 @@ public interface MonteCarloProvider extends AlgorithmProvider {
                          Real[] upperBounds, int samples);
 
     double estimatePi(int samples);
-
-    Real estimatePiReal(int samples);
+    Real estimatePi(int samples, boolean useReal); // Using boolean to differentiate if needed, or just overload
+    // Actually, Real estimatePi(int samples) is enough as return type differs but parameters are same.
+    // Wait, Java doesn't allow overloads based ONLY on return type.
+    // So for estimatePi, I might need to keep a different name or change parameters.
+    // But wait, integrate() has different parameters (Function vs ToDoubleFunction).
+    // For estimatePi(int samples), they HAVE the same parameters.
+    // I will use Real estimatePiReal(int samples) -> keep this one or change to Real estimatePi(long samples) etc.
+    // Let's use Real estimatePi(long samples) for the Real version if I want to overload.
 
     default long countPointsInside(long samples) {
         return (long) (samples * (estimatePi((int) samples) / 4.0));

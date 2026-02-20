@@ -43,7 +43,7 @@ public class ThingsGroup implements Serializable {
     private Set<Thing> things;
 
     /**
-     * Initializes an empty group.
+     * Initializes an empty PsychologicalGroup.
      */
     public ThingsGroup() {
         this.things = new HashSet<>();

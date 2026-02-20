@@ -26,7 +26,7 @@ import jcuda.driver.JCudaDriver;
  * @since 1.2
  */
 @AutoService(AlgorithmProvider.class)
-public class CUDANBodyProvider implements NBodyProvider {
+public class NativeCUDANBodyProvider implements NBodyProvider {
 
     private static final int GPU_THRESHOLD = 1000;
     private static volatile Boolean cudaAvailable;
@@ -58,7 +58,7 @@ public class CUDANBodyProvider implements NBodyProvider {
     @Override
     public boolean isAvailable() {
         if (cudaAvailable == null) {
-            synchronized (CUDANBodyProvider.class) {
+            synchronized (NativeCUDANBodyProvider.class) {
                 if (cudaAvailable == null) {
                     cudaAvailable = detectCuda();
                 }

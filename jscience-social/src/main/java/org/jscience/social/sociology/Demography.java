@@ -63,9 +63,9 @@ public final class Demography implements Serializable {
      * Performs a Leslie Matrix projection to estimate the next generation's population.
      * P(t+1) = L * P(t).
      *
-     * @param population current population vector by age group (Real)
-     * @param fertility  fertility rates per age group (Real)
-     * @param survival   survival probabilities per age group (Real)
+     * @param population current population vector by age SociologicalGroup (Real)
+     * @param fertility  fertility rates per age SociologicalGroup (Real)
+     * @param survival   survival probabilities per age SociologicalGroup (Real)
      * @return predicted population vector for the next time step
      */
     public static Vector<Real> projectLeslie(Vector<Real> population, Vector<Real> fertility, Vector<Real> survival) {
