@@ -3,7 +3,7 @@ package org.jscience.core.mathematics.ml.neural.layers;
 import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Attribute;
@@ -38,8 +38,8 @@ public class Linear<T> implements Layer<T> {
             bData[i] = Real.ZERO;
         }
 
-        this.weights = new GraphNode<>((Tensor<T>) TensorFactory.of(wData, inFeatures, outFeatures), true);
-        this.bias = new GraphNode<>((Tensor<T>) TensorFactory.of(bData, outFeatures), true);
+        this.weights = new GraphNode<>((Tensor<T>) Tensor.of(wData, inFeatures, outFeatures), true);
+        this.bias = new GraphNode<>((Tensor<T>) Tensor.zeros(Real.class, outFeatures), true);
     }
 
     @Override

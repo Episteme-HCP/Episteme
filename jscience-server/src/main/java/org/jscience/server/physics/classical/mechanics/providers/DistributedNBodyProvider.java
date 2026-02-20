@@ -1,6 +1,6 @@
 package org.jscience.server.physics.classical.mechanics.providers;
 
-import org.jscience.core.physics.nbody.NBodyProvider;
+import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import com.google.auto.service.AutoService;

@@ -24,6 +24,9 @@
 package org.jscience.core.mathematics.linearalgebra;
 
 import org.jscience.core.mathematics.linearalgebra.tensors.EinsteinSummation;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
+import org.jscience.core.technical.algorithm.OperationContext;
 
 /**
  * Represents a multidimensional array (tensor).
@@ -45,6 +48,22 @@ import org.jscience.core.mathematics.linearalgebra.tensors.EinsteinSummation;
  * @since 1.0
  */
 public interface Tensor<T> extends java.io.Serializable {
+
+    /**
+     * Creates a tensor of zeros with the specified shape.
+     */
+    static <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
+        TensorProvider provider = AlgorithmManager.getRegistry().selectTensorProvider(OperationContext.DEFAULT);
+        return provider.zeros(elementType, shape);
+    }
+
+    /**
+     * Creates a tensor from data.
+     */
+    static <T> Tensor<T> of(T[] data, int... shape) {
+        TensorProvider provider = AlgorithmManager.getRegistry().selectTensorProvider(OperationContext.DEFAULT);
+        return provider.create(data, shape);
+    }
 
     /**
      * Returns the shape of this tensor.

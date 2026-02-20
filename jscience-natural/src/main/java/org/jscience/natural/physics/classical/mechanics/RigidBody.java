@@ -85,7 +85,7 @@ public class RigidBody {
     }
 
     private Vector<Real> createZeroVector() {
-        return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Collections.nCopies(3, Real.ZERO), Reals.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.Vector.of(java.util.Collections.nCopies(3, Real.ZERO), org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     public CollisionShape getCollisionShape() {
@@ -126,7 +126,7 @@ public class RigidBody {
         Real resY = vy.add(qw.multiply(ty)).add(crossY);
         Real resZ = vz.add(qw.multiply(tz)).add(crossZ);
 
-        return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(resX, resY, resZ), Reals.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(resX, resY, resZ), org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     // Placeholder helper
@@ -161,7 +161,7 @@ public class RigidBody {
         }
         
         // Use MatrixFactory
-        return org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, Reals.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.Matrix.of(rows, org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     // Helper for matrix-vector multiplication: M * v
@@ -174,7 +174,7 @@ public class RigidBody {
                 result[i] = result[i].add(mat.get(i, j).multiply(vec.get(j)));
             }
         }
-        return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(result), Reals.getInstance());
+        return org.jscience.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(result), org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     public void integrate(Real dt) {

@@ -158,7 +158,7 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
                 float z = j * cellSize;
                 
                 Real[] mData = sim.getMagnetization(i, j);
-                Vector<Real> m = org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, mData[0], mData[1], mData[2]);
+                Vector<Real> m = org.jscience.core.mathematics.linearalgebra.Vector.of(mData, org.jscience.core.mathematics.sets.Reals.getInstance());
                 float mx = (float) m.get(0).doubleValue();
                 float my = (float) m.get(1).doubleValue();
                 float mz = (float) m.get(2).doubleValue();
@@ -198,8 +198,8 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
             for (int j = 1; j < ny - 1; j++) {
                 Real[] mData = sim.getMagnetization(i, j);
                 org.jscience.core.mathematics.linearalgebra.Vector<Real> m = 
-                    org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, 
-                        mData[0], mData[1], mData[2]);
+                    org.jscience.core.mathematics.linearalgebra.Vector.of(mData, 
+                        org.jscience.core.mathematics.sets.Reals.getInstance());
                 
                 // Simple skyrmion detection: m_core pointing down
                 if (m.get(2).doubleValue() < -0.5) {

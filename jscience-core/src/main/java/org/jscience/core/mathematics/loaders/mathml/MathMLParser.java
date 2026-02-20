@@ -237,7 +237,7 @@ public final class MathMLParser extends DOMParser {
                         .map(o -> (org.jscience.core.mathematics.numbers.integers.Integer)o)
                         .collect(java.util.stream.Collectors.toList()))
                     .collect(java.util.stream.Collectors.toList());
-                return org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix.of(rows, org.jscience.core.mathematics.sets.Integers.getInstance());
+                return org.jscience.core.mathematics.linearalgebra.Matrix.of(rows, org.jscience.core.mathematics.sets.Integers.getInstance());
             } else if (overallType == TYPE_DOUBLE) {
                 List<List<Real>> rows = rowsRaw.stream()
                     .map(row -> row.stream()
@@ -251,7 +251,7 @@ public final class MathMLParser extends DOMParser {
                         .map(o -> o instanceof Complex ? (Complex)o : Complex.of(((Number)o).doubleValue()))
                         .collect(java.util.stream.Collectors.toList()))
                     .collect(java.util.stream.Collectors.toList());
-                return org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix.of(rows, Complex.ZERO.getScalarRing());
+                return org.jscience.core.mathematics.linearalgebra.Matrix.of(rows, Complex.ZERO.getScalarRing());
             }
         }
 

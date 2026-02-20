@@ -26,8 +26,15 @@ package org.jscience.core.mathematics.linearalgebra;
 import org.jscience.core.mathematics.structures.spaces.Module;
 import org.jscience.core.mathematics.structures.rings.Ring;
 
+import java.util.List;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
+import org.jscience.core.technical.algorithm.OperationContext;
+import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.TriangularMatrixStorage;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.TridiagonalMatrixStorage;
+// DiagonalMatrixStorage removed
+// TensorFactory removed
 
 /**
  * Represents a matrix of scalar elements.
@@ -43,6 +50,96 @@ import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
 
     /**
+     * Creates a matrix from a 2D array.
+     */
+    static <E> Matrix<E> of(E[][] data, Ring<E> ring) {
+        int rows = data.length;
+        int cols = rows > 0 ? data[0].length : 0;
+        
+        // Density heuristic
+        int nz = 0;
+        E zero = ring.zero();
+        for (E[] row : data) for (E val : row) if (!val.equals(zero)) nz++;
+        double density = (rows * cols > 0) ? (double) nz / (rows * cols) : 1.0;
+        
+        org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(rows, cols, ring, density);
+        for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) storage.set(i, j, data[i][j]);
+        
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new GenericMatrix<>(storage, provider, ring);
+    }
+
+    /**
+     * Creates a matrix from a 2D list.
+     */
+    static <E> Matrix<E> of(List<List<E>> data, Ring<E> ring) {
+        int rows = data.size();
+        int cols = rows > 0 ? data.get(0).size() : 0;
+        
+        int nz = 0;
+        E zero = ring.zero();
+        for (List<E> row : data) for (E val : row) if (!val.equals(zero)) nz++;
+        double density = (rows * cols > 0) ? (double) nz / (rows * cols) : 1.0;
+        
+        org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(rows, cols, ring, density);
+        for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) storage.set(i, j, data.get(i).get(j));
+        
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new GenericMatrix<>(storage, provider, ring);
+    }
+
+    /**
+     * Creates a triangular matrix from a 2D list.
+     */
+    static <E> Matrix<E> triangular(List<List<E>> data, Ring<E> ring) {
+        int rows = data.size();
+        TriangularMatrixStorage<E> storage = new TriangularMatrixStorage<E>(rows, false, ring.zero());
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j <= i && j < rows; j++) {
+                storage.set(i, j, data.get(i).get(j));
+            }
+        }
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new GenericMatrix<>(storage, provider, ring);
+    }
+
+    /**
+     * Creates a tridiagonal matrix from a 2D list.
+     */
+    static <E> Matrix<E> tridiagonal(List<List<E>> data, Ring<E> ring) {
+        int rows = data.size();
+        TridiagonalMatrixStorage<E> storage = new TridiagonalMatrixStorage<E>(rows, ring.zero());
+        for (int i = 0; i < rows; i++) {
+            for (int j = Math.max(0, i - 1); j <= Math.min(rows - 1, i + 1); j++) {
+                storage.set(i, j, data.get(i).get(j));
+            }
+        }
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new GenericMatrix<>(storage, provider, ring);
+    }
+
+    /**
+     * Creates an identity matrix.
+     */
+    static <E> Matrix<E> identity(int size, Ring<E> ring) {
+        MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(size, size, ring, 0.0);
+        E one = ring.one();
+        for (int i = 0; i < size; i++) storage.set(i, i, one);
+        
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new GenericMatrix<>(storage, provider, ring);
+    }
+
+    /**
+     * Creates a matrix of zeros.
+     */
+    static <E> Matrix<E> zeros(int rows, int cols, Ring<E> ring) {
+        MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(rows, cols, ring, 1.0);
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new GenericMatrix<>(storage, provider, ring);
+    }
+
+    /**
      * Returns the number of rows in this matrix.
      */
     int rows();
@@ -56,6 +153,13 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
      * Returns the element at the specified row and column.
      */
     E get(int row, int col);
+
+    /**
+     * Returns the underlying storage of this matrix.
+     * 
+     * @return the matrix storage
+     */
+    org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> getStorage();
 
     /**
      * Returns the sum of this matrix and another.
@@ -124,15 +228,6 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
      */
     Matrix<E> zero();
 
-    /**
-     * Returns the identity matrix (for square matrices).
-     */
-    Matrix<E> one();
-
-    /**
-     * Returns the underlying storage of this matrix.
-     */
-    MatrixStorage<E> getStorage();
 
     // --- Default implementations for Ring/Module/Group interfaces ---
 
@@ -192,14 +287,14 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
         if (rows() == 0 || cols() == 0) {
             @SuppressWarnings("unchecked")
             Class<E> type = (Class<E>) getScalarRing().zero().getClass();
-            return org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory.zeros(type, rows(), cols());
+            return Tensor.zeros(type, rows(), cols());
         }
 
         E sample = get(0, 0);
         @SuppressWarnings("unchecked")
         Class<E> type = (Class<E>) sample.getClass();
 
-        Tensor<E> t = TensorFactory.zeros(type, rows(), cols());
+        Tensor<E> t = Tensor.zeros(type, rows(), cols());
 
         for (int i = 0; i < rows(); i++) {
             for (int j = 0; j < cols(); j++) {

@@ -26,8 +26,7 @@ package org.jscience.natural.physics.classical.matter.fluids;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.physics.fluids.providers.MulticoreNavierStokesProvider;
-import org.jscience.core.physics.fluids.NavierStokesProvider;
+import org.jscience.natural.physics.classical.matter.fluids.providers.MulticoreNavierStokesProvider;
 
 /**
  * Solves the incompressible Navier-Stokes equations using a backend provider.

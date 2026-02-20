@@ -162,7 +162,7 @@ public class GeneralCirculationModelTask
     public void step(double dt) {
         if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Providers (LBM/NS)
-            org.jscience.core.physics.fluids.NavierStokesProvider nsProvider = new org.jscience.core.physics.fluids.providers.MulticoreNavierStokesProvider();
+            org.jscience.natural.physics.classical.matter.fluids.NavierStokesProvider nsProvider = new org.jscience.natural.physics.classical.matter.fluids.providers.MulticoreNavierStokesProvider();
 
             // Flatten state for NavierStokesProvider (Real[])
             int size = 3 * latBins * longBins;

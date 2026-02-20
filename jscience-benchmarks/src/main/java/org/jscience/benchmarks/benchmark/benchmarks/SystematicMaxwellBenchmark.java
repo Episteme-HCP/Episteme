@@ -2,7 +2,7 @@ package org.jscience.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.core.physics.electromagnetism.MaxwellProvider;
+import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellProvider;
 import org.jscience.core.mathematics.geometry.Vector4D;
 
 import java.util.ServiceLoader;

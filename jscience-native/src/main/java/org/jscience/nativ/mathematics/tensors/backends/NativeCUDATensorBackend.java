@@ -10,7 +10,7 @@ import org.jscience.nativ.mathematics.linearalgebra.tensors.CUDATensor;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;

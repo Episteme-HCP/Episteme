@@ -26,8 +26,8 @@ package org.jscience.server.server.physics.fluid;
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.physics.fluids.LatticeBoltzmannProvider;
-import org.jscience.core.physics.fluids.FluidSimPrimitiveSupport;
+import org.jscience.natural.physics.classical.matter.fluids.LatticeBoltzmannProvider;
+import org.jscience.natural.physics.classical.matter.fluids.providers.FluidSimPrimitiveSupport;
 
 public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask> {
 
@@ -150,7 +150,7 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
 
     private void stepReal() {
         if (this.provider == null) {
-            this.provider = new org.jscience.core.physics.fluids.providers.MulticoreLatticeBoltzmannProvider();
+            this.provider = new org.jscience.natural.physics.classical.matter.fluids.providers.MulticoreLatticeBoltzmannProvider();
         }
         Real omega = Real.ONE.divide(viscosity.multiply(Real.of(3.0)).add(Real.of(0.5)));
 

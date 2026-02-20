@@ -34,7 +34,8 @@ import org.jscience.core.ui.i18n.I18N;
 import org.jscience.core.ui.Parameter;
 import org.jscience.core.ui.NumericParameter;
 import org.jscience.core.ui.BooleanParameter;
-import org.jscience.core.physics.electromagnetism.providers.MulticoreMaxwellProvider;
+import org.jscience.natural.physics.classical.waves.electromagnetism.providers.MulticoreMaxwellProvider;
+import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource;
 
 /**
  * 3D Viewer for Magnetic Fields.
@@ -115,7 +116,7 @@ public class MagneticFieldViewer extends org.jscience.core.ui.AbstractViewer {
     }
 
     private void updateStreamlines() {
-        for (org.jscience.core.physics.electromagnetism.MaxwellSource s : provider.getSources()) {
+        for (MaxwellSource s : provider.getSources()) {
             double[] pos = s.getPosition();
             for (int i=0; i<16; i++) {
                 double a = i * Math.PI * 2 / 16;
@@ -170,7 +171,7 @@ public class MagneticFieldViewer extends org.jscience.core.ui.AbstractViewer {
         // For simplicity in this demo fix, we just append them to root if not present.
         // A better approach would be a dedicated group.
         
-        for (org.jscience.core.physics.electromagnetism.MaxwellSource source : provider.getSources()) {
+        for (MaxwellSource source : provider.getSources()) {
             for (SourceVisualizer v : visualizers) {
                 if (v.supports(source)) {
                     Node node = v.getVisualRepresentation(source);

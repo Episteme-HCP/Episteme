@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.sets.Reals;
 
 @AutoService(Viewer.class)
 public class CrystalStructureApp extends FeaturedAppBase {
@@ -79,7 +80,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
         String type; // "Na", "Cl", "C", "Si"
 
         AtomRecord(double x, double y, double z, String t) {
-            this.position = org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, Real.of(x), Real.of(y), Real.of(z));
+            this.position = Vector.of(java.util.Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
             this.type = t;
         }
     }

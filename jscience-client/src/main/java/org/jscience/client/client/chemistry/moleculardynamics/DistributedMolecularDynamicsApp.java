@@ -40,8 +40,8 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.server.server.proto.*;
-import org.jscience.core.physics.molecular.MolecularDynamicsProvider;
-import org.jscience.core.physics.molecular.providers.MulticoreMolecularDynamicsProvider;
+import org.jscience.natural.physics.classical.matter.molecular.MolecularDynamicsProvider;
+import org.jscience.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider;
 
 import org.jscience.natural.physics.classical.mechanics.Particle;
 import org.jscience.core.mathematics.numbers.real.Real;
@@ -51,6 +51,8 @@ import org.jscience.natural.biology.Protein;
 import org.jscience.natural.chemistry.Atom;
 import org.jscience.natural.chemistry.PeriodicTable;
 import org.jscience.server.server.chemistry.MolecularDynamicsTask;
+import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.sets.Reals;
 
@@ -188,7 +190,7 @@ public class DistributedMolecularDynamicsApp extends Application implements org.
                 Protein.Residue res = new Protein.Residue("UNK", 1);
 
                 for (MolecularDynamicsTask.AtomState state : task.getAtoms()) {
-                    DenseVector<Real> pos = DenseVector.of(
+                    Vector<Real> pos = DenseVector.of(
                             java.util.Arrays.asList(Real.of(state.x), Real.of(state.y), Real.of(state.z)),
                             Reals.getInstance());
                     Atom atom = new Atom(PeriodicTable.getElement("Ar"), pos); // Assume Argon for MD gas

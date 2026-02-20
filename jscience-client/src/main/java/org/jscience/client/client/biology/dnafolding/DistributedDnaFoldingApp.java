@@ -47,7 +47,6 @@ import org.jscience.natural.biology.loaders.PDBWriter;
 import org.jscience.server.server.biology.structure.DnaFoldingTask;
 import org.jscience.natural.chemistry.Atom;
 import org.jscience.natural.chemistry.PeriodicTable;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.server.server.proto.*;
@@ -154,7 +153,7 @@ public class DistributedDnaFoldingApp extends Application implements org.jscienc
                 int resIdx = 1;
                 for (DnaFoldingTask.Point3D pt : task.getFoldedStructure()) {
                     Protein.Residue res = new Protein.Residue("NUC", resIdx++);
-                    DenseVector<Real> pos = DenseVector.of(
+                    org.jscience.core.mathematics.linearalgebra.Vector<Real> pos = org.jscience.core.mathematics.linearalgebra.Vector.of(
                             java.util.Arrays.asList(Real.of(pt.x()), Real.of(pt.y()), Real.of(pt.z())),
                             Reals.getInstance());
                     Atom atom = new Atom(PeriodicTable.getElement("P"), pos);

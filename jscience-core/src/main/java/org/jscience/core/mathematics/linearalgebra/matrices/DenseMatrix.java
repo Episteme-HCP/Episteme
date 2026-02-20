@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.matrices;
 
-import org.jscience.core.ComputeContext;
+import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.core.mathematics.structures.rings.Ring;
@@ -43,15 +43,31 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
     /**
      * Creates a DenseMatrix with automatic storage optimization.
      */
+    public static <E> Matrix<E> of(E[][] data, Ring<E> ring) {
+        return Matrix.of(data, ring);
+    }
+
+    /**
+     * Creates a DenseMatrix with automatic storage optimization.
+     */
+    public static <E> Matrix<E> of(List<List<E>> rows, Ring<E> ring) {
+        return Matrix.of(rows, ring);
+    }
+
+    /**
+     * Creates a DenseMatrix with automatic storage optimization.
+     */
     public DenseMatrix(E[][] data, Ring<E> ring) {
-        this(MatrixFactory.createDenseStorage(data, ring), ring);
+        this(org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry().createStorage(data.length, data.length > 0 ? data[0].length : 0, ring, 1.0), ring);
+        for (int i = 0; i < data.length; i++) for (int j = 0; j < data[i].length; j++) storage.set(i, j, data[i][j]);
     }
 
     /**
      * Creates a DenseMatrix with automatic storage optimization.
      */
     public DenseMatrix(List<List<E>> rows, Ring<E> ring) {
-        this(MatrixFactory.createDenseStorage(rows, ring), ring);
+        this(org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry().createStorage(rows.size(), rows.size() > 0 ? rows.get(0).size() : 0, ring, 1.0), ring);
+        for (int i = 0; i < rows.size(); i++) for (int j = 0; j < rows.get(i).size(); j++) storage.set(i, j, rows.get(i).get(j));
     }
 
     public DenseMatrix(E[] flatData, int rows, int cols, Ring<E> ring) {
@@ -60,7 +76,7 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
 
     // Internal constructor
     protected DenseMatrix(MatrixStorage<E> storage, Ring<E> ring) {
-        super(storage, ComputeContext.current().getDenseLinearAlgebraProvider(ring), ring);
+        super(storage, org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.jscience.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
         this.storage = storage;
         this.ring = ring;
         // Explicit validation: Ensure storage is intended for Dense usage

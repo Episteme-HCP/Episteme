@@ -121,9 +121,10 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         double py = 50.0;
         
         Real one = Real.ONE, zero = Real.ZERO;
-        DenseMatrix<Real> inertia = new DenseMatrix<>(Arrays.asList(
+        List<List<Real>> data = Arrays.asList(
             Arrays.asList(one, zero, zero), Arrays.asList(zero, one, zero), Arrays.asList(zero, zero, one)
-        ), Reals.getInstance());
+        );
+        org.jscience.core.mathematics.linearalgebra.Matrix<Real> inertia = org.jscience.core.mathematics.linearalgebra.Matrix.of(data, Reals.getInstance());
 
         RigidBody rb = new RigidBody(toVector(px, py, 0), Real.of(radius * radius), inertia, null);
         rb.setVelocity(toVector((r.nextDouble() - 0.5) * 10, 0, 0));
@@ -135,7 +136,7 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     }
 
     private Vector<Real> toVector(double x, double y, double z) {
-        return DenseVector.of(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
+        return Vector.of(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
     }
 
     private void update() {

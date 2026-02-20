@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.linearalgebra.vectors;
 
-import org.jscience.core.ComputeContext;
+import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import java.util.List;
@@ -44,13 +44,14 @@ public class DenseVector<E> extends GenericVector<E> {
      * Creates a DenseVector with automatic storage optimization.
      */
     public DenseVector(List<E> elements, Ring<E> ring) {
-        this(VectorFactory.createDenseStorage(elements, ring), ring);
+        this(org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry().createVectorStorage(elements.size(), ring, 1.0), ring);
+        for (int i = 0; i < elements.size(); i++) storage.set(i, elements.get(i));
     }
 
     // Internal constructor using storage directly
     protected DenseVector(org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage,
             Ring<E> ring) {
-        super(storage, ComputeContext.current().getDenseLinearAlgebraProvider(ring), ring);
+        super(storage, org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.jscience.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
         // explicit validation
         if (storage instanceof org.jscience.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
             throw new IllegalArgumentException("Cannot create DenseVector with Sparse storage");
@@ -59,8 +60,8 @@ public class DenseVector<E> extends GenericVector<E> {
 
     // Removed manual createStorage methods in favor of VectorFactory
 
-    public static <E> DenseVector<E> of(List<E> elements, Ring<E> ring) {
-        return new DenseVector<>(elements, ring);
+    public static <E> Vector<E> of(java.util.List<E> elements, Ring<E> ring) {
+        return Vector.of(elements, ring);
     }
 
     public static <E> DenseVector<E> zeros(int dimension, Ring<E> ring) {

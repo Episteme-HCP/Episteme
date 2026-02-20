@@ -26,7 +26,7 @@ package org.jscience.core.mathematics.algebra.groups;
 import org.jscience.core.mathematics.structures.groups.Group;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.complex.Complex;
-import java.util.*;
+// java.util removed
 
 /**
  * The group of 2x2 unitary matrices with determinant 1.
@@ -62,10 +62,7 @@ public class SU2Group implements Group<Matrix<Complex>> {
         data[1][0] = Complex.ZERO;
         data[1][1] = Complex.ONE;
 
-        List<List<Complex>> rows = new ArrayList<>();
-        for (Complex[] rowData : data)
-            rows.add(Arrays.asList(rowData));
-        return org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, org.jscience.core.mathematics.sets.Complexes.getInstance());
+        return Matrix.of(data, org.jscience.core.mathematics.sets.Complexes.getInstance());
     }
 
     @Override
@@ -79,10 +76,7 @@ public class SU2Group implements Group<Matrix<Complex>> {
         result[1][0] = element.get(0, 1).conjugate();
         result[1][1] = element.get(1, 1).conjugate();
 
-        List<List<Complex>> rows = new ArrayList<>();
-        for (Complex[] rowData : result)
-            rows.add(Arrays.asList(rowData));
-        return org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, org.jscience.core.mathematics.sets.Complexes.getInstance());
+        return Matrix.of(result, org.jscience.core.mathematics.sets.Complexes.getInstance());
     }
 
     @Override

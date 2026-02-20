@@ -23,7 +23,6 @@
 
 package org.jscience.core.mathematics.linearalgebra.vectors;
 
-import org.jscience.core.ComputeContext;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -31,7 +30,6 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-// import org.jscience.core.mathematics.linearalgebra.tensors.Tensor; // Removed incorrect import (Tensor is in linearalgebra package)
 import org.jscience.core.mathematics.structures.rings.Ring;
 
 /**
@@ -58,20 +56,19 @@ public class GenericVector<E> implements Vector<E> {
      * Creates a GenericVector with automatic storage selection.
      */
     public GenericVector(java.util.List<E> data, Ring<E> ring) {
-        this(VectorFactory.createAutomaticStorage(data, ring),
-                ComputeContext.current().getDenseLinearAlgebraProvider(ring),
-                ring);
+        int dim = data.size();
+        int nz = 0;
+        E zero = ring.zero();
+        for (E val : data) if (!val.equals(zero)) nz++;
+        double density = (dim > 0) ? (double) nz / dim : 1.0;
+        
+        this.storage = org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry().createVectorStorage(dim, ring, density);
+        for (int i = 0; i < dim; i++) this.storage.set(i, data.get(i));
+        this.provider = org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.jscience.core.technical.algorithm.OperationContext.DEFAULT, ring);
+        this.ring = ring;
     }
 
-    public static <T> GenericVector<T> of(T[] data, Ring<T> ring) {
-        // Default to Dense Storage
-        VectorStorage<T> storage = new DenseVectorStorage<>(data);
-
-        // Select Provider based on Context
-        LinearAlgebraProvider<T> provider = ComputeContext.current().getDenseLinearAlgebraProvider(ring);
-
-        return new GenericVector<>(storage, provider, ring);
-    }
+    // GenericVector relies on Vector.of() for smart instantiation.
 
     // ================= Conversions =================
 
@@ -91,7 +88,7 @@ public class GenericVector<E> implements Vector<E> {
             row[0] = storage.get(i);
             matrixData[i] = row;
         }
-        return GenericMatrix.of(matrixData, ring);
+        return (GenericMatrix<E>) Matrix.of(matrixData, ring);
     }
 
     public Tensor<E> toTensor() {
@@ -101,7 +98,7 @@ public class GenericVector<E> implements Vector<E> {
         for (int i = 0; i < dim; i++) {
             data[i] = get(i);
         }
-        return org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory.of(data, dim);
+        return Tensor.of(data, dimension());
     }
 
     // ================= Vector<E> Implementation =================

@@ -100,13 +100,13 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
                 gData[i][j] = g.get(i, j);
             }
         }
-        org.jscience.core.mathematics.linearalgebra.Matrix<Real> gMatrix = org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory
-                .create(gData, field);
+        org.jscience.core.mathematics.linearalgebra.Matrix<Real> gMatrix = org.jscience.core.mathematics.linearalgebra.Matrix
+                .of(gData, field);
         org.jscience.core.mathematics.linearalgebra.Matrix<Real> gInvMatrix = gMatrix.inverse();
 
         // Convert back to Tensor (g^kl)
         // We really need TensorFactory.of(Matrix) or similar but we can just use set.
-        Tensor<Real> gUp = org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory.zeros(Real.class, dim, dim);
+        Tensor<Real> gUp = Tensor.zeros(Real.class, dim, dim);
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
                 gUp.set(gInvMatrix.get(i, j), i, j);
@@ -126,7 +126,7 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
         // Let's conceptually compute it on fly or store in a [4][4][4] array?
         // Let's store in a Rank 3 tensor dg[k][i][j] = d_k g_ij
 
-        Tensor<Real> dg = org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory.zeros(Real.class, dim, dim, dim);
+        Tensor<Real> dg = Tensor.zeros(Real.class, dim, dim, dim);
 
         for (int k = 0; k < dim; k++) {
             // Perturb coordinates
@@ -152,8 +152,7 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
         }
 
         // 4. Assemble Gamma^k_ij
-        Tensor<Real> gamma = org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory.zeros(Real.class, dim, dim,
-                dim);
+        Tensor<Real> gamma = Tensor.zeros(Real.class, dim, dim, dim);
         Real half = Real.of(0.5);
 
         for (int lambda = 0; lambda < dim; lambda++) { // k in formula

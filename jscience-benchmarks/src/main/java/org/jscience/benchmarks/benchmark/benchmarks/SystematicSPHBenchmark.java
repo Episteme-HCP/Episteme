@@ -27,7 +27,7 @@ import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 
 import com.google.auto.service.AutoService;
 
-import org.jscience.core.physics.fluids.SPHFluidProvider;
+import org.jscience.natural.physics.classical.matter.fluids.SPHFluidProvider;
 
 import java.util.Random;
 

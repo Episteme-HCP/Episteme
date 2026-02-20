@@ -23,9 +23,9 @@
 
 package org.jscience.core.mathematics.linearalgebra.vectors;
 
-import org.jscience.core.ComputeContext;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage;
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
 
 import java.util.List;
 
@@ -43,7 +43,19 @@ public class SparseVector<E> extends GenericVector<E> {
      * Creates a SparseVector with automatic storage selection.
      */
     public SparseVector(List<E> elements, Ring<E> ring) {
-        this(VectorFactory.createSparseStorage(elements, ring), ring);
+        this(createPopulatedSparseStorage(elements, ring), ring);
+    }
+
+    private static <E> org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> createPopulatedSparseStorage(List<E> elements, Ring<E> ring) {
+        int dim = elements.size();
+        org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage = new SparseVectorStorage<>(dim, ring.zero());
+        for (int i = 0; i < dim; i++) {
+            E val = elements.get(i);
+            if (!val.equals(ring.zero())) {
+                storage.set(i, val);
+            }
+        }
+        return storage;
     }
 
     public SparseVector(int dimension, Ring<E> ring) {
@@ -52,7 +64,7 @@ public class SparseVector<E> extends GenericVector<E> {
 
     protected SparseVector(org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage,
             Ring<E> ring) {
-        super(storage, ComputeContext.current().getSparseLinearAlgebraProvider(ring), ring);
+        super(storage, AlgorithmManager.getRegistry().getSparseLinearAlgebraProvider(ring), ring);
         // explicit validation
         if (storage instanceof org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage
                 || storage instanceof org.jscience.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage) {
@@ -64,13 +76,17 @@ public class SparseVector<E> extends GenericVector<E> {
         return new SparseVector<>(elements, ring);
     }
 
+    public static <E> SparseVector<E> of(int dimension, Ring<E> ring) {
+        return new SparseVector<>(AlgorithmManager.getRegistry().createVectorStorage(dimension, ring, 0.0), ring);
+    }
+
     public static <E> SparseVector<E> zeros(int dimension, Ring<E> ring) {
         return new SparseVector<>(new SparseVectorStorage<>(dimension, ring.zero()), ring);
     }
 
     public static SparseVector<org.jscience.core.mathematics.numbers.complex.Complex> valueOf(
             List<org.jscience.core.mathematics.numbers.complex.Complex> elements) {
-        return new SparseVector<>(elements, org.jscience.core.mathematics.numbers.complex.Complex.ZERO);
+        return new SparseVector<>(elements, org.jscience.core.mathematics.sets.Complexes.getInstance());
     }
 
     // Accessor for raw storage if needed by specialized providers

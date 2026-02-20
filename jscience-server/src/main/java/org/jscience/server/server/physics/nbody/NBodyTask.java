@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.physics.nbody.NBodyProvider;
-import org.jscience.core.physics.nbody.providers.MulticoreNBodyProvider;
+import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
+import org.jscience.natural.physics.classical.mechanics.nbody.providers.MulticoreNBodyProvider;
 
 public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
 

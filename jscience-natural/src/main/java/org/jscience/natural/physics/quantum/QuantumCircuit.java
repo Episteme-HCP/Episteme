@@ -29,9 +29,7 @@ package org.jscience.natural.physics.quantum;
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory;
 import org.jscience.core.mathematics.sets.Complexes;
 import java.util.ArrayList;
 
@@ -179,7 +177,7 @@ public class QuantumCircuit {
         for (Complex c : newData)
             dataList.add(c);
 
-        return new BraKet(VectorFactory.create(dataList, Complexes.getInstance()));
+        return new BraKet(Vector.of(dataList, Complexes.getInstance()));
     }
 
     private Matrix<Complex> buildFullOperator(GateApplication app) {
@@ -228,7 +226,7 @@ public class QuantumCircuit {
             }
         }
 
-        return MatrixFactory.create(rows, Complexes.getInstance());
+        return Matrix.of(rows, Complexes.getInstance());
     }
 
 }

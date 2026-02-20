@@ -4,9 +4,8 @@
  */
 package org.jscience.examples.linearalgebra;
 
-import org.jscience.core.ComputeContext;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 
 /**
@@ -34,8 +33,8 @@ public class LinearAlgebraExample {
             }
         }
         
-        Matrix<org.jscience.core.mathematics.numbers.real.Real> A = org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(dataA, org.jscience.core.mathematics.sets.Reals.getInstance());
-        Matrix<org.jscience.core.mathematics.numbers.real.Real> B = org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(dataB, org.jscience.core.mathematics.sets.Reals.getInstance());
+        Matrix<org.jscience.core.mathematics.numbers.real.Real> A = org.jscience.core.mathematics.linearalgebra.Matrix.of(dataA, org.jscience.core.mathematics.sets.Reals.getInstance());
+        Matrix<org.jscience.core.mathematics.numbers.real.Real> B = org.jscience.core.mathematics.linearalgebra.Matrix.of(dataB, org.jscience.core.mathematics.sets.Reals.getInstance());
 
         // 2. Define Contexts to show selection logic
         System.out.println("\n--- Scenario 1: Default Context ---");
@@ -54,7 +53,8 @@ public class LinearAlgebraExample {
 
     private static void runBenchmark(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Matrix<org.jscience.core.mathematics.numbers.real.Real> B, OperationContext ctx) {
         // Select best provider
-        LinearAlgebraProvider<org.jscience.core.mathematics.numbers.real.Real> provider = ComputeContext.current().getLinearAlgebraProvider(ctx, org.jscience.core.mathematics.sets.Reals.getInstance());
+        org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<org.jscience.core.mathematics.numbers.real.Real> provider = 
+                AlgorithmManager.getRegistry().selectLinearAlgebraProvider(ctx, org.jscience.core.mathematics.sets.Reals.getInstance());
         
         System.out.println("Context Hints: " + ctx.getHints());
         System.out.println("Selected Provider: " + provider.getName());

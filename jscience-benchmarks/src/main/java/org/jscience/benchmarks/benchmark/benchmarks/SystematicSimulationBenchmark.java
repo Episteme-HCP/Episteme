@@ -25,7 +25,7 @@ package org.jscience.benchmarks.benchmark.benchmarks;
 
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 
-import org.jscience.core.physics.simulation.SimulationProvider;
+import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import com.google.auto.service.AutoService;
 import java.util.*;
 

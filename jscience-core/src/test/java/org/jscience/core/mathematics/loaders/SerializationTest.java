@@ -6,7 +6,6 @@
 package org.jscience.core.mathematics.loaders;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.layers.ActivationLayer;
 import org.jscience.core.mathematics.ml.neural.layers.Linear;
@@ -34,7 +33,7 @@ public class SerializationTest {
 
         // 2. Prepare test input
         Real[] inputData = {Real.of(1.0), Real.of(2.0), Real.of(3.0)};
-        Tensor<Real> input = TensorFactory.of(inputData, 1, 3);
+        Tensor<Real> input = Tensor.of(inputData, 1, 3);
 
         // 3. Get reference output
         Tensor<Real> referenceOutput = model.forward(input);

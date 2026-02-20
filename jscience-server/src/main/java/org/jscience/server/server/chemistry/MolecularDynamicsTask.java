@@ -170,7 +170,7 @@ public class MolecularDynamicsTask
     }
 
     private void jscienceStep() {
-        org.jscience.core.physics.molecular.MolecularDynamicsProvider provider = new org.jscience.core.physics.molecular.providers.MulticoreMolecularDynamicsProvider();
+        org.jscience.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider = new org.jscience.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider();
 
         int n = numAtoms;
         org.jscience.core.mathematics.numbers.real.Real[] positions = new org.jscience.core.mathematics.numbers.real.Real[n * 3];

@@ -40,7 +40,6 @@ import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedFoxAlgo
 import org.jscience.core.mathematics.linearalgebra.algorithms.Distributed25DAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
 import org.jscience.core.ComputeContext;
@@ -128,8 +127,8 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
         double[][] dataA = generateRandomData(size);
         double[][] dataB = generateRandomData(size);
 
-        A = org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(toReal(dataA), Reals.getInstance());
-        B = org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(toReal(dataB), Reals.getInstance());
+        A = Matrix.of(toReal(dataA), org.jscience.core.mathematics.sets.Reals.getInstance());
+        B = Matrix.of(toReal(dataB), org.jscience.core.mathematics.sets.Reals.getInstance());
 
         // Create tiled versions
         tiledA = new TiledMatrix(A, tileSize, tileSize);

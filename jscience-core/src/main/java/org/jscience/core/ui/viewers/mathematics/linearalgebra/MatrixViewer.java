@@ -31,8 +31,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.ui.Viewer;
 import com.google.auto.service.AutoService;
 import org.jscience.core.ui.AbstractViewer;
@@ -187,7 +187,7 @@ public class MatrixViewer<T> extends AbstractViewer {
                 data[i][j] = Real.of(Math.random() * 100);
             }
         }
-        matrix = MatrixFactory.create(data, Real.ZERO);
+        matrix = Matrix.of(data, Reals.getInstance());
         updateViews();
         infoLabel.setText(rows + "\u00D7" + cols + " " + org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.matrixviewer.info.matrix", "Matrix"));
     }
@@ -200,7 +200,7 @@ public class MatrixViewer<T> extends AbstractViewer {
                 data[i][j] = (i == j) ? Real.ONE : Real.ZERO;
             }
         }
-        matrix = MatrixFactory.create(data, Real.ZERO);
+        matrix = Matrix.of(data, Reals.getInstance());
         rowsSpinner.getValueFactory().setValue(size);
         colsSpinner.getValueFactory().setValue(size);
         updateViews();
@@ -231,7 +231,7 @@ public class MatrixViewer<T> extends AbstractViewer {
                     data[i][j] = matrix.get(i, j).multiply(Real.of(factor));
                 }
             }
-            matrix = MatrixFactory.create(data, Real.ZERO);
+            matrix = Matrix.of(data, Reals.getInstance());
             updateViews();
             infoLabel.setText(matrix.rows() + "\u00D7" + matrix.cols() + " ("
                     + org.jscience.core.ui.i18n.I18N.getInstance().get("viewer.matrixviewer.info.scaled", "Scaled") + " \u00D7" + factor + ")");

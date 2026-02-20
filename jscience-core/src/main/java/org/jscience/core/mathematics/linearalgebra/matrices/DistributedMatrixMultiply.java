@@ -71,7 +71,6 @@ public class DistributedMatrixMultiply {
         // Implementation to merge tiles back into a single matrix if needed
         // For now, return a new GenericMatrix or similar
         // Ideally, we'd have a TiledMatrix that can be used directly for further operations
-        return GenericMatrix.of(new Real[rows][cols], org.jscience.core.mathematics.sets.Reals.getInstance()); // Placeholder
+        return org.jscience.core.mathematics.linearalgebra.Matrix.of(new Real[rows][cols], org.jscience.core.mathematics.sets.Reals.getInstance()); // Placeholder
     }
 }
-

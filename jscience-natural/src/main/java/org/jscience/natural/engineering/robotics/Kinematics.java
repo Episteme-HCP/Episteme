@@ -31,7 +31,6 @@ import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.Units;
 import org.jscience.core.measure.quantity.Angle;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.measure.quantity.Length;
 
 import java.util.ArrayList;
@@ -66,7 +65,7 @@ public class Kinematics {
         Real x = l1.multiply(t1.cos()).add(l2.multiply(t1.add(t2).cos()));
         Real y = l1.multiply(t1.sin()).add(l2.multiply(t1.add(t2).sin()));
 
-        return DenseVector.of(List.of(x, y), Reals.getInstance());
+        return Vector.of(List.of(x, y), Reals.getInstance());
     }
 
     /**
@@ -98,7 +97,7 @@ public class Kinematics {
      * Extracts position vector from a 4x4 transformation matrix.
      */
     public static Vector<Real> getPosition(Matrix<Real> T) {
-        return DenseVector.of(List.of(T.get(0, 3), T.get(1, 3), T.get(2, 3)), Reals.getInstance());
+        return Vector.of(List.of(T.get(0, 3), T.get(1, 3), T.get(2, 3)), Reals.getInstance());
     }
 
     /**

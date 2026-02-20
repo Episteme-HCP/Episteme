@@ -6,7 +6,7 @@
 package org.jscience.nativ.mathematics.tensors.backends;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.cpu.CPUBackend;

@@ -25,7 +25,7 @@ package org.jscience.core.mathematics.linearalgebra.tensors;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
+// TensorProvider is now in the same package
 
 /**
  * Service Provider Interface for tensor implementations.

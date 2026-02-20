@@ -175,8 +175,8 @@ public class Kinematics {
         Real cy = az.multiply(bx).subtract(ax.multiply(bz));
         Real cz = ax.multiply(by).subtract(ay.multiply(bx));
 
-        return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.<Real>create(
-                java.util.Arrays.asList(cx, cy, cz), Real.ZERO);
+        return org.jscience.core.mathematics.linearalgebra.Vector.of(
+                java.util.Arrays.asList(cx, cy, cz), org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     // --- Quantity Convenience Overloads ---

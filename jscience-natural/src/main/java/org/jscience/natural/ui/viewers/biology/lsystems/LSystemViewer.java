@@ -42,19 +42,12 @@ import org.jscience.core.ui.NumericParameter;
 import org.jscience.core.ui.BooleanParameter;
 import org.jscience.core.ui.ChoiceParameter;
 import org.jscience.core.ui.i18n.I18N;
-import org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory;
-import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
-import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Stack;
-import java.util.HashMap;
-import java.text.MessageFormat;
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.sets.Reals;
+import java.util.*;
+import java.text.MessageFormat;
 
 /**
  * Enhanced L-System Visualizer.
@@ -340,7 +333,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
             switch (c) {
                 case 'F': case 'G':
                     Vector<Real> startPos = turtle.position;
-                    Vector<Real> forward = VectorFactory.of(Real.class, Real.of(0), Real.of(-stepLen), Real.of(0));
+                    Vector<Real> forward = Vector.of(Reals.getInstance(), Real.of(0), Real.of(-stepLen), Real.of(0));
                     Vector<Real> move = turtle.orientation.multiply(forward);
                     Vector<Real> endPos = startPos.add(move);
                     
@@ -385,8 +378,8 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         Matrix<Real> orientation;
 
         Turtle3D() {
-            position = VectorFactory.of(Real.class, Real.of(0), Real.of(0), Real.of(0));
-            orientation = MatrixFactory.identity(3, Real.ZERO);
+            position = Vector.of(Reals.getInstance(), Real.of(0), Real.of(0), Real.of(0));
+            orientation = Matrix.identity(3, Reals.getInstance());
         }
 
         Turtle3D(Turtle3D other) {
@@ -413,7 +406,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
                 rotArr[1][0] = Real.ZERO;  rotArr[1][1] = Real.ONE;  rotArr[1][2] = Real.ZERO;
                 rotArr[2][0] = Real.of(-s); rotArr[2][1] = Real.ZERO;  rotArr[2][2] = Real.of(c);
             }
-            orientation = orientation.multiply(GenericMatrix.of(rotArr, Real.ZERO));
+            orientation = orientation.multiply(Matrix.of(rotArr, Reals.getInstance()));
         }
     }
 

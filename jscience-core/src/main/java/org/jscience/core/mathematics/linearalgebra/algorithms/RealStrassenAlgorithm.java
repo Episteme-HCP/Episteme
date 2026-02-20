@@ -2,7 +2,7 @@ package org.jscience.core.mathematics.linearalgebra.algorithms;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
+// MatrixFactory removed
 
 /**
  * Implementation of the Strassen Algorithm for matrix multiplication
@@ -60,6 +60,6 @@ public class RealStrassenAlgorithm {
             }
         }
         
-        return MatrixFactory.create(data, org.jscience.core.mathematics.sets.Reals.getInstance());
+        return Matrix.of(data, org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 }

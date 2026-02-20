@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
-import org.jscience.core.physics.simulation.SimulationProvider;
-import org.jscience.core.physics.simulation.providers.ParallelSimulationProvider;
+import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
+import org.jscience.natural.physics.classical.mechanics.simulation.providers.ParallelSimulationProvider;
 
 /**
  * Run-time core of the event driven simulation engine.

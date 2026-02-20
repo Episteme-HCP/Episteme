@@ -24,12 +24,10 @@
 package org.jscience.natural.chemistry;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.measure.Units;
-import org.jscience.core.physics.molecular.MolecularDynamicsProvider;
-import org.jscience.core.physics.molecular.providers.MulticoreMolecularDynamicsProvider;
-import java.util.Arrays;
+import org.jscience.natural.physics.classical.matter.molecular.MolecularDynamicsProvider;
+import org.jscience.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider;
 
 /**
  * A simple molecular dynamics engine using a spring-mass model.
@@ -119,16 +117,16 @@ public class MolecularDynamics {
         // 4. Unpack
         for (int i = 0; i < numAtoms; i++) {
             Atom a = atoms.get(i);
-            a.setPosition(DenseVector.of(Arrays.asList(
-                    positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]), Real.ZERO));
+            a.setPosition(Vector.of(java.util.Arrays.asList(
+                    positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]), org.jscience.core.mathematics.sets.Reals.getInstance()));
 
-            a.setVelocity(DenseVector.of(Arrays.asList(
-                    velocities[i * 3], velocities[i * 3 + 1], velocities[i * 3 + 2]), Real.ZERO));
+            a.setVelocity(Vector.of(java.util.Arrays.asList(
+                    velocities[i * 3], velocities[i * 3 + 1], velocities[i * 3 + 2]), org.jscience.core.mathematics.sets.Reals.getInstance()));
 
             // Forces might be useful to update too for visualization
             a.clearForce();
-            a.addForce(DenseVector.of(Arrays.asList(
-                    forces[i * 3], forces[i * 3 + 1], forces[i * 3 + 2]), Real.ZERO));
+            a.addForce(Vector.of(java.util.Arrays.asList(
+                    forces[i * 3], forces[i * 3 + 1], forces[i * 3 + 2]), org.jscience.core.mathematics.sets.Reals.getInstance()));
         }
     }
 

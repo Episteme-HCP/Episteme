@@ -63,13 +63,6 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     static {
         MethodHandle dgemm = null;
-        MethodHandle dgemv = null;
-        MethodHandle ddot = null;
-        MethodHandle dnrm2 = null;
-        MethodHandle daxpy = null;
-        MethodHandle dscal = null;
-        
-        MethodHandle dgesv = null;
         MethodHandle dgetrf = null;
         MethodHandle dgetri = null;
         

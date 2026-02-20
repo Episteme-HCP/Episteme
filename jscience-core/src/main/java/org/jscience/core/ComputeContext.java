@@ -16,7 +16,7 @@ import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
 import org.jscience.core.technical.algorithm.ProviderRegistry;
 
 /**

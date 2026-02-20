@@ -55,6 +55,8 @@ public final class OperationContext {
         BATCH
     }
 
+    public static final OperationContext DEFAULT = new OperationContext.Builder().build();
+
     private final long dataSize;
     private final Set<Hint> hints;
     private final int dimensionality;

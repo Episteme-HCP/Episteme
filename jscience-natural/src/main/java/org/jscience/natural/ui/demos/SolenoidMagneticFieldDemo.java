@@ -30,8 +30,8 @@ import javafx.scene.shape.Cylinder;
 import org.jscience.core.ui.AbstractDemo;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer;
-import org.jscience.core.physics.electromagnetism.providers.MulticoreMaxwellProvider;
-import org.jscience.core.physics.electromagnetism.MaxwellSource;
+import org.jscience.natural.physics.classical.waves.electromagnetism.providers.MulticoreMaxwellProvider;
+import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource;
 
 /**
  * Demo for a Magnetic solenoid or rod using the generic viewer.
@@ -55,11 +55,11 @@ public class SolenoidMagneticFieldDemo extends AbstractDemo {
             
         MagneticFieldViewer viewer = new MagneticFieldViewer(provider);
         
-        viewer.addVisualizer(new SourceVisualizer() {
-            @Override public boolean supports(MaxwellSource s) { return true; }
-            @Override public Node getVisualRepresentation(MaxwellSource s) {
-                Cylinder rod = new Cylinder(10, 150);
-                rod.setMaterial(new PhongMaterial(Color.web("#884444")));
+        viewer.addVisualizer(new org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer() {
+            @Override public boolean supports(org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource s) { return true; }
+            @Override public javafx.scene.Node getVisualRepresentation(org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource s) {
+                javafx.scene.shape.Cylinder rod = new javafx.scene.shape.Cylinder(10, 150);
+                rod.setMaterial(new javafx.scene.paint.PhongMaterial(javafx.scene.paint.Color.web("#884444")));
                 return rod;
             }
         });

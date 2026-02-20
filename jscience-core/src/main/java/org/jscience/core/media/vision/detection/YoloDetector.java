@@ -34,7 +34,6 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import org.jscience.core.mathematics.ml.neural.backends.ONNXRuntimeBackend;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 
 /**
  * Wrapper for YOLO (You Only Look Once) Object Detection models.
@@ -107,7 +106,7 @@ public class YoloDetector {
         g.drawImage(img, 0, 0, INPUT_SIZE, INPUT_SIZE, null);
         g.dispose();
 
-        Tensor<Float> inputTensor = TensorFactory.zeros(Float.class, 1, 3, INPUT_SIZE, INPUT_SIZE);
+        Tensor<Float> inputTensor = Tensor.zeros(Float.class, 1, 3, INPUT_SIZE, INPUT_SIZE);
         for (int y = 0; y < INPUT_SIZE; y++) {
             for (int x = 0; x < INPUT_SIZE; x++) {
                 int rgb = resized.getRGB(x, y);

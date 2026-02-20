@@ -11,7 +11,6 @@ import java.lang.foreign.ValueLayout;
 import java.nio.DoubleBuffer;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * A dense vector backed by off-heap native memory.

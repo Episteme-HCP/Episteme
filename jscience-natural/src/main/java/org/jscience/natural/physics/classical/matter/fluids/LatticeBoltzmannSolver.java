@@ -23,7 +23,6 @@
 
 package org.jscience.natural.physics.classical.matter.fluids;
 
-import org.jscience.core.physics.fluids.LatticeBoltzmannProvider;
 import java.util.ServiceLoader;
 
 /**

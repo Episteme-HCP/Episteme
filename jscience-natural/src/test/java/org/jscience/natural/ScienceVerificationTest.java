@@ -39,7 +39,7 @@ import org.jscience.core.mathematics.ml.neural.layers.ActivationLayer;
 import org.jscience.core.mathematics.ml.neural.layers.Sequential;
 import org.jscience.core.mathematics.ml.neural.ActivationFunction;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Mass;
@@ -48,8 +48,8 @@ import org.jscience.core.measure.Quantities;
 import org.jscience.core.measure.Units;
 
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class ScienceVerificationTest {
         vData.add(Real.of(3.0));
         vData.add(Real.of(4.0));
         vData.add(Real.of(0.0));
-        Vector<Real> velocity = VectorFactory.create(vData, Real.ZERO);
+        Vector<Real> velocity = Vector.of(vData, Reals.getInstance());
 
         Quantity<Mass> massQ = Quantities.create(10.0, Units.KILOGRAM);
         Quantity<Energy> ke = Kinematics.kineticEnergy(massQ, velocity);
@@ -126,7 +126,7 @@ public class ScienceVerificationTest {
         inputList.add(Real.of(1.0));
         inputList.add(Real.of(1.0));
         Real[] inputArr = inputList.toArray(new Real[0]);
-        GraphNode<Real> input = new GraphNode<>(TensorFactory.of(inputArr, 1, 3));
+        GraphNode<Real> input = new GraphNode<>(Tensor.of(inputArr, 1, 3));
 
         GraphNode<Real> output = layer.forward(input);
         assertEquals(2, output.getData().shape()[1]);

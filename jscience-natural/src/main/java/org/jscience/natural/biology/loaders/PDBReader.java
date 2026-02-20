@@ -162,7 +162,7 @@ public class PDBReader extends AbstractResourceReader<Protein> {
                     }
 
                     // Atom Creation
-                    org.jscience.core.mathematics.linearalgebra.vectors.DenseVector<org.jscience.core.mathematics.numbers.real.Real> pos = org.jscience.core.mathematics.linearalgebra.vectors.DenseVector
+                    org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> pos = org.jscience.core.mathematics.linearalgebra.Vector
                             .of(java.util.Arrays.asList(org.jscience.core.mathematics.numbers.real.Real.of(x),
                                     org.jscience.core.mathematics.numbers.real.Real.of(y),
                                     org.jscience.core.mathematics.numbers.real.Real.of(z)),

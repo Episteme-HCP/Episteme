@@ -5,7 +5,7 @@ import org.jscience.core.mathematics.ml.neural.layers.Linear;
 import org.jscience.core.mathematics.ml.neural.layers.ReLU;
 import org.jscience.core.mathematics.ml.neural.layers.Sequential;
 import org.jscience.core.mathematics.ml.neural.optimizers.SGD;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,11 +24,11 @@ public class SimpleMLPTest {
         
         // Input [1, 2]
         Real[] xData = {Real.of(0.5), Real.of(-0.5)};
-        GraphNode<Real> X = new GraphNode<>(TensorFactory.of(xData, 1, 2));
+        GraphNode<Real> X = new GraphNode<>(Tensor.of(xData, 1, 2));
         
         // Target [1, 1]
         Real[] yData = {Real.of(1.0)};
-        GraphNode<Real> Y = new GraphNode<>(TensorFactory.of(yData, 1, 1));
+        GraphNode<Real> Y = new GraphNode<>(Tensor.of(yData, 1, 1));
         
         Real initialLoss = null;
         for (int i = 0; i < 20; i++) {

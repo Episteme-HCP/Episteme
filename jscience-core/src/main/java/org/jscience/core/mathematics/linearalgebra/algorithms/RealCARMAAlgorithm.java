@@ -2,7 +2,6 @@ package org.jscience.core.mathematics.linearalgebra.algorithms;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
 
 /**
  * Implementation of the CARMA (Communication-Avoidant Recursive Matrix Multiplication) Algorithm
@@ -54,7 +53,7 @@ public class RealCARMAAlgorithm {
             for (int j = 0; j < cols; j++) data[i][j] = top.get(i, j);
         for (int i = 0; i < bottom.rows(); i++)
             for (int j = 0; j < cols; j++) data[top.rows() + i][j] = bottom.get(i, j);
-        return MatrixFactory.create(data, org.jscience.core.mathematics.sets.Reals.getInstance());
+        return Matrix.of(data, org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
     private static Matrix<Real> combineHorizontal(Matrix<Real> left, Matrix<Real> right) {
@@ -65,6 +64,6 @@ public class RealCARMAAlgorithm {
             for (int j = 0; j < left.cols(); j++) data[i][j] = left.get(i, j);
             for (int j = 0; j < right.cols(); j++) data[i][left.cols() + j] = right.get(i, j);
         }
-        return MatrixFactory.create(data, org.jscience.core.mathematics.sets.Reals.getInstance());
+        return Matrix.of(data, org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 }

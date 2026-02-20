@@ -23,7 +23,7 @@
 
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory;
+import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.real.RealDouble;
@@ -40,8 +40,7 @@ public class LinearAlgebraVerificationTest {
             for (int j = 0; j < 2; j++)
                 realData[i][j] = RealDouble.create(data[i][j]);
 
-        Matrix<Real> m = MatrixFactory.create(realData, org.jscience.core.mathematics.sets.Reals.getInstance(),
-                MatrixFactory.Storage.DENSE);
+        Matrix<Real> m = Matrix.of(realData, org.jscience.core.mathematics.sets.Reals.getInstance());
 
         assertTrue(m instanceof RealDoubleMatrix, "Should be instance of RealDoubleMatrix");
         assertEquals(1.0, m.get(0, 0).doubleValue(), 1e-9, "Element check");
@@ -57,8 +56,7 @@ public class LinearAlgebraVerificationTest {
 
         sparseData[0][0] = RealDouble.create(1.0); // 1% density
 
-        Matrix<Real> m = MatrixFactory.create(sparseData, org.jscience.core.mathematics.sets.Reals.getInstance(),
-                MatrixFactory.Storage.AUTO);
+        Matrix<Real> m = Matrix.of(sparseData, org.jscience.core.mathematics.sets.Reals.getInstance());
         // Assuming SparseMatrix or GenericMatrix with SparseStorage
         // System.out.println("Auto storage class: " + m.getClass().getName());
         assertFalse(m instanceof RealDoubleMatrix, "Should not be RealDoubleMatrix (Sparse)");

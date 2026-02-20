@@ -25,7 +25,6 @@ package org.jscience.natural.physics.astronomy;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory;
 import org.jscience.core.mathematics.sets.Reals;
 import java.util.Arrays;
 
@@ -84,10 +83,9 @@ public class Perturbations {
         // Issue: We don't have easy factory for Vector from here without import.
         // Assuming DenseVector is standard implementation.
 
-        return VectorFactory.create(
+        return Vector.of(
                 Arrays.asList(ax, ay, az),
-                Reals.getInstance(),
-                VectorFactory.Storage.DENSE);
+                Reals.getInstance());
     }
 }
 

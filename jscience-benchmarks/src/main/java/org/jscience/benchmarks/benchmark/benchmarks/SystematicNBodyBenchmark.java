@@ -28,7 +28,7 @@ import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.physics.nbody.NBodyProvider;
+import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
 
 /**
  * A benchmark that systematically tests all available NBodyAlgorithmProviders.
@@ -90,7 +90,7 @@ public class SystematicNBodyBenchmark implements SystematicBenchmark<NBodyProvid
             Real dt = Real.of(3600.0);
             Real G = Real.of(6.67430e-11);
             Real softening = Real.of(1e9);
-            currentProvider.step(masses, positions, velocities, dt, G, softening);
+            currentProvider.stepReal(positions, velocities, masses, N, G, dt, softening);
         }
     }
 

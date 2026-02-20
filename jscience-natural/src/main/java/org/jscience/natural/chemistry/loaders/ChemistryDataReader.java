@@ -262,7 +262,7 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
 
         for (AtomData ad : md.atoms) {
             Element el = PeriodicTable.bySymbol(ad.symbol);
-            org.jscience.core.mathematics.linearalgebra.vectors.DenseVector<org.jscience.core.mathematics.numbers.real.Real> pos = org.jscience.core.mathematics.linearalgebra.vectors.DenseVector
+            org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> pos = org.jscience.core.mathematics.linearalgebra.Vector
                     .of(
                             java.util.Arrays.asList(
                                     org.jscience.core.mathematics.numbers.real.Real.of(ad.x),

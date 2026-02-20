@@ -30,6 +30,7 @@ public final class AlgorithmManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlgorithmManager.class.getName());
     private static final Map<Class<?>, AlgorithmProvider> BEST_PROVIDERS = new ConcurrentHashMap<>();
+    private static final ProviderRegistry REGISTRY = new ProviderRegistry();
 
     private AlgorithmManager() {}
 
@@ -97,6 +98,13 @@ public final class AlgorithmManager {
         P best = available.get(0);
         LOGGER.info("Selected best provider " + best.getName() + " for " + providerClass.getSimpleName() + " (Priority: " + best.getPriority() + ")");
         return best;
+    }
+
+    /**
+     * Returns the provider registry for operational selection.
+     */
+    public static ProviderRegistry getRegistry() {
+        return REGISTRY;
     }
 
     /**

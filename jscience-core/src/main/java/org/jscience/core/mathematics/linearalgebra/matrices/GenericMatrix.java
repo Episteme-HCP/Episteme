@@ -32,6 +32,8 @@ import org.jscience.core.ComputeContext;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
+import org.jscience.core.technical.algorithm.OperationContext;
 
 import java.util.List;
 
@@ -53,9 +55,17 @@ public class GenericMatrix<E> implements Matrix<E> {
      * Creates a GenericMatrix with automatic storage selection.
      */
     public GenericMatrix(E[][] data, Ring<E> ring) {
-        this(MatrixFactory.create(data, ring).getStorage(),
-                MatrixFactory.getStandardProvider(ring),
-                ring);
+        int rows = data.length;
+        int cols = rows > 0 ? data[0].length : 0;
+        int nz = 0;
+        E zero = ring.zero();
+        for (E[] row : data) for (E val : row) if (!val.equals(zero)) nz++;
+        double density = (rows * cols > 0) ? (double) nz / (rows * cols) : 1.0;
+
+        this.storage = AlgorithmManager.getRegistry().createStorage(rows, cols, ring, density);
+        for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) this.storage.set(i, j, data[i][j]);
+        this.provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        this.ring = ring;
     }
 
     @Override
@@ -80,75 +90,7 @@ public class GenericMatrix<E> implements Matrix<E> {
         storage.set(row, col, value);
     }
 
-    // ================= Factory Methods (Replacing MatrixFactory) =================
-
-    /**
-     * Creates a matrix from a 2D array, automatically selecting storage and
-     * provider.
-     */
-    public static <E> GenericMatrix<E> of(E[][] data, Ring<E> ring) {
-        int rows = data.length;
-        int cols = rows > 0 ? data[0].length : 0;
-
-        // Smart Selection Logic
-        MatrixStorage<E> storage;
-        if (isSparse(data, ring)) {
-            storage = new SparseMatrixStorage<>(rows, cols, ring.zero());
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    if (!data[i][j].equals(ring.zero())) {
-                        storage.set(i, j, data[i][j]);
-                    }
-                }
-            }
-        } else {
-            // Default to Dense
-            storage = new DenseMatrixStorage<E>(rows, cols, ring.zero());
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    storage.set(i, j, data[i][j]);
-                }
-            }
-        }
-
-        // Provider Selection (could be enhanced with system properties)
-        LinearAlgebraProvider<E> provider = ComputeContext.current().getDenseLinearAlgebraProvider(ring);
-
-        return new GenericMatrix<E>(storage, provider, ring);
-    }
-
-    /**
-     * Creates a matrix from a List of Lists, automatically selecting storage and
-     * provider.
-     */
-    public static <T> GenericMatrix<T> of(List<List<T>> data, Ring<T> ring) {
-        Matrix<T> m = MatrixFactory.create(data, ring);
-        if (m instanceof GenericMatrix) {
-            return (GenericMatrix<T>) m;
-        }
-        // If MatrixFactory returns something else, wrap it (or extract storage if
-        // possible)
-        return new GenericMatrix<T>(m.getStorage(), MatrixFactory.getStandardProvider(ring), ring);
-    }
-
-    private static <T> boolean isSparse(T[][] data, Ring<T> ring) {
-        // Simple heuristic: > 70% zeros
-        int rows = data.length;
-        int cols = rows > 0 ? data[0].length : 0;
-        if (rows * cols == 0)
-            return false;
-
-        int zeros = 0;
-        T zero = ring.zero();
-
-        for (T[] row : data) {
-            for (T val : row) {
-                if (val.equals(zero))
-                    zeros++;
-            }
-        }
-        return (double) zeros / (rows * cols) > 0.7;
-    }
+    // GenericMatrix relies on Matrix.of() for smart instantiation.
 
     // ================= Matrix<E> Implementation =================
 
@@ -307,7 +249,7 @@ public class GenericMatrix<E> implements Matrix<E> {
         // Identity
         @SuppressWarnings("unchecked")
         E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows(), cols());
-        GenericMatrix<E> m = of(data, ring);
+        GenericMatrix<E> m = (GenericMatrix<E>) Matrix.of(data, ring);
         // Implementation detail: create storage directly.
         return m; // simplified
     }

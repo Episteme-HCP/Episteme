@@ -20,7 +20,7 @@ public class BraKet {
     private final boolean isDual; // True if Bra, False if Ket
 
     public BraKet(Complex... amplitudes) {
-        this(org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(amplitudes), org.jscience.core.mathematics.sets.Complexes.getInstance()), false);
+        this(org.jscience.core.mathematics.linearalgebra.Vector.of(Arrays.asList(amplitudes), org.jscience.core.mathematics.sets.Complexes.getInstance()), false);
     }
 
     public BraKet(Vector<Complex> vector) {
@@ -46,7 +46,7 @@ public class BraKet {
         for (int i = 0; i < stateVector.dimension(); i++) {
             dualData[i] = stateVector.get(i).conjugate();
         }
-        return new BraKet(org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(dualData), org.jscience.core.mathematics.sets.Complexes.getInstance()), !isDual);
+        return new BraKet(org.jscience.core.mathematics.linearalgebra.Vector.of(Arrays.asList(dualData), org.jscience.core.mathematics.sets.Complexes.getInstance()), !isDual);
     }
 
     public Complex dot(BraKet other) {
@@ -74,7 +74,7 @@ public class BraKet {
                 result[i * dim2 + j] = this.stateVector.get(i).multiply(other.stateVector.get(j));
             }
         }
-        return new BraKet(org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(Arrays.asList(result), org.jscience.core.mathematics.sets.Complexes.getInstance()), this.isDual);
+        return new BraKet(org.jscience.core.mathematics.linearalgebra.Vector.of(Arrays.asList(result), org.jscience.core.mathematics.sets.Complexes.getInstance()), this.isDual);
     }
 
     public Vector<Complex> vector() {

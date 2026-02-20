@@ -94,8 +94,8 @@ public interface VectorFunction<F extends Field<F>> extends DifferentiableFuncti
                 }
             }
 
-            Vector<F> pPlus = org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(plusCoords, field);
-            Vector<F> pMinus = org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.create(minusCoords, field);
+            Vector<F> pPlus = Vector.of(plusCoords, field);
+            Vector<F> pMinus = Vector.of(minusCoords, field);
 
             Vector<F> fPlus = evaluate(pPlus);
             Vector<F> fMinus = evaluate(pMinus);
@@ -123,7 +123,7 @@ public interface VectorFunction<F extends Field<F>> extends DifferentiableFuncti
         }
 
         Field<F> resultField = (Field<F>) point.getScalarRing();
-        return org.jscience.core.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, resultField);
+        return Matrix.of(rows, resultField);
     }
 
     /**

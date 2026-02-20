@@ -8,7 +8,6 @@ package org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.nativ.physics.loaders.hdf5.NativeHDF5Reader;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 import java.nio.file.Path;
 
 /**

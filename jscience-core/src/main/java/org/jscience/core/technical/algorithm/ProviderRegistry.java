@@ -1,18 +1,24 @@
 package org.jscience.core.technical.algorithm;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
+import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
+import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
+import org.jscience.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorageFactory;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
+import org.jscience.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.technical.algorithm.AlgorithmManager;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.technical.algorithm.ProviderSelector;
 
 /**
  * Registry and selector for Algorithm Providers.
@@ -21,6 +27,14 @@ import org.jscience.core.technical.algorithm.ProviderSelector;
 public class ProviderRegistry {
 
     private final Map<String, LinearAlgebraProvider<?>> providers = new ConcurrentHashMap<>();
+    private static final List<MatrixStorageFactory> matrixStorageFactories = new ArrayList<>();
+
+    static {
+        try {
+            Class<?> clazz = Class.forName("org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrixStorageFactory");
+            matrixStorageFactories.add((MatrixStorageFactory) clazz.getDeclaredConstructor().newInstance());
+        } catch (Throwable t) {}
+    }
 
     public <E> void register(String name, LinearAlgebraProvider<E> provider) {
         providers.put(name, provider);
@@ -78,5 +92,40 @@ public class ProviderRegistry {
 
         // Fallback to CPU Sparse
         return new CPUSparseLinearAlgebraProvider<E>(ring);
+    }
+
+    /**
+     * Selects a tensor provider based on context.
+     */
+    public TensorProvider selectTensorProvider(OperationContext ctx) {
+        return ProviderSelector.select(TensorProvider.class, ctx);
+    }
+
+    /**
+     * Creates optimal storage based on data and density context.
+     */
+    public <E> MatrixStorage<E> createStorage(int rows, int cols, Ring<E> ring, double density) {
+        if (density < 0.2) {
+            return new SparseMatrixStorage<>(rows, cols, ring.zero());
+        }
+        
+        // Try SPI factories (Native, CUDA, etc.)
+        for (MatrixStorageFactory factory : matrixStorageFactories) {
+            MatrixStorage<E> s = factory.createDense(rows, cols, ring);
+            if (s != null) return s;
+        }
+        
+        return new DenseMatrixStorage<>(rows, cols, ring.zero());
+    }
+
+    /**
+     * Creates optimal vector storage.
+     */
+    public <E> VectorStorage<E> createVectorStorage(int dim, Ring<E> ring, double density) {
+        if (density < 0.2) {
+            return new SparseVectorStorage<E>(dim, ring.zero());
+        }
+        // Native vector storage could be added here similar to matrix
+        return new DenseVectorStorage<E>(dim);
     }
 }

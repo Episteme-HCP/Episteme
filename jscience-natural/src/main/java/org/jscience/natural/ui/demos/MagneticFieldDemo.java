@@ -30,8 +30,8 @@ import javafx.scene.shape.Sphere;
 import org.jscience.core.ui.AbstractDemo;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer;
-import org.jscience.core.physics.electromagnetism.providers.MulticoreMaxwellProvider;
-import org.jscience.core.physics.electromagnetism.MaxwellSource;
+import org.jscience.natural.physics.classical.waves.electromagnetism.providers.MulticoreMaxwellProvider;
+import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource;
 
 /**
  * Demo Provider for Magnetic Field Visualization with physical source bodies.
@@ -64,18 +64,18 @@ public class MagneticFieldDemo extends AbstractDemo {
         MagneticFieldViewer viewer = new MagneticFieldViewer(provider);
         
         // Add a visualizer for the central planet (Globe)
-        viewer.addVisualizer(new SourceVisualizer() {
+        viewer.addVisualizer(new org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer() {
             @Override
-            public boolean supports(MaxwellSource source) {
+            public boolean supports(org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource source) {
                 // If at center, treat as the planet
                 return Math.abs(source.getPosition()[0]) < 1;
             }
 
             @Override
-            public Node getVisualRepresentation(MaxwellSource source) {
-                Sphere earth = new Sphere(80);
-                PhongMaterial mat = new PhongMaterial(Color.web("#224488"));
-                mat.setSpecularColor(Color.WHITE);
+            public javafx.scene.Node getVisualRepresentation(org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource source) {
+                javafx.scene.shape.Sphere earth = new javafx.scene.shape.Sphere(80);
+                javafx.scene.paint.PhongMaterial mat = new javafx.scene.paint.PhongMaterial(javafx.scene.paint.Color.web("#224488"));
+                mat.setSpecularColor(javafx.scene.paint.Color.WHITE);
                 earth.setMaterial(mat);
                 return earth;
             }

@@ -25,9 +25,7 @@ package org.jscience.natural.physics.loaders;
 
 import org.jscience.core.io.AbstractResourceReader;
 import org.jscience.core.io.MiniCatalog;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
 
 import java.time.Instant;
 import java.io.BufferedReader;
@@ -116,10 +114,10 @@ public class HorizonsEphemerisReader extends AbstractResourceReader<List<Horizon
 
     public static class EphemerisPoint {
         public final Instant time;
-        public final DenseVector<Real> position;
-        public final DenseVector<Real> velocity;
+        public final org.jscience.core.mathematics.linearalgebra.Vector<Real> position;
+        public final org.jscience.core.mathematics.linearalgebra.Vector<Real> velocity;
 
-        public EphemerisPoint(Instant time, DenseVector<Real> pos, DenseVector<Real> vel) {
+        public EphemerisPoint(Instant time, org.jscience.core.mathematics.linearalgebra.Vector<Real> pos, org.jscience.core.mathematics.linearalgebra.Vector<Real> vel) {
             this.time = time;
             this.position = pos;
             this.velocity = vel;
@@ -158,11 +156,11 @@ public class HorizonsEphemerisReader extends AbstractResourceReader<List<Horizon
                             double vy = Double.parseDouble(parts[6].trim());
                             double vz = Double.parseDouble(parts[7].trim());
 
-                            DenseVector<Real> pos = DenseVector.of(
-                                    java.util.Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
-                            DenseVector<Real> vel = DenseVector.of(
-                                    java.util.Arrays.asList(Real.of(vx), Real.of(vy), Real.of(vz)),
-                                    Reals.getInstance());
+                            org.jscience.core.mathematics.linearalgebra.Vector<Real> pos = org.jscience.core.mathematics.linearalgebra.Vector.of(
+                                     java.util.Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), org.jscience.core.mathematics.sets.Reals.getInstance());
+                            org.jscience.core.mathematics.linearalgebra.Vector<Real> vel = org.jscience.core.mathematics.linearalgebra.Vector.of(
+                                     java.util.Arrays.asList(Real.of(vx), Real.of(vy), Real.of(vz)),
+                                     org.jscience.core.mathematics.sets.Reals.getInstance());
 
                             double jd = Double.parseDouble(parts[0].trim());
                             double daysSinceUnixEpoch = jd - 2440587.5;

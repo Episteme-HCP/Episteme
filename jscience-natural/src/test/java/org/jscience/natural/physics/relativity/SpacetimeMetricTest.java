@@ -45,8 +45,7 @@ public class SpacetimeMetricTest {
 
                 // Construct diag matrix tensor
                 int dim = 4;
-                Tensor<Real> g = org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory.zeros(Real.class, dim,
-                        dim);
+                Tensor<Real> g = Tensor.zeros(Real.class, dim, dim);
                 g.set(Real.of(-1), 0, 0); // ct
                 g.set(g11, 1, 1); // x
                 g.set(one, 2, 2); // y

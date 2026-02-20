@@ -37,7 +37,6 @@ import org.jscience.core.technical.backend.Operation;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@SuppressWarnings("rawtypes") 
 @AutoService({Backend.class, ComputeBackend.class, SIMDBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class, NativeBackend.class, CPUBackend.class})
 public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 

@@ -25,6 +25,8 @@ package org.jscience.server.server.physics.wave;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
+import org.jscience.natural.physics.classical.waves.WaveProvider;
+import org.jscience.server.server.physics.wave.WaveSimPrimitiveSupport;
 
 
 
@@ -118,7 +120,7 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     public void step() {
         if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Provider
-            org.jscience.core.physics.waves.WaveProvider provider = new org.jscience.core.physics.waves.providers.MulticoreWaveProvider();
+            org.jscience.natural.physics.classical.waves.WaveProvider provider = new org.jscience.natural.physics.classical.waves.providers.MulticoreWaveProvider();
             provider.solve(uReal, uRealPrev, width, height,
                     org.jscience.core.mathematics.numbers.real.Real.of(c),
                     org.jscience.core.mathematics.numbers.real.Real.of(damping));

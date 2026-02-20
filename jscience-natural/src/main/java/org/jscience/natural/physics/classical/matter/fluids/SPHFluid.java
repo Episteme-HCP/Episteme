@@ -42,11 +42,11 @@ public class SPHFluid {
     private final double[] pressures;
     private final double[] forces;
 
-    private org.jscience.core.physics.fluids.SPHFluidProvider provider;
+    private SPHFluidProvider provider;
 
     // Simulation parameters
     private double mass = 1.0; // Particle mass
-    private double restDensity = 1000; // kg/mÃƒâ€šÃ‚Â³ (water)
+    private double restDensity = 1000; // kg/m³ (water)
     private double stiffness = 100; // Pressure stiffness
     private double viscosity = 0.1; // Viscosity coefficient
     private double smoothingRadius = 0.1; // h
@@ -59,10 +59,10 @@ public class SPHFluid {
         this.densities = new double[numParticles];
         this.pressures = new double[numParticles];
         this.forces = new double[numParticles * 3];
-        this.provider = new org.jscience.core.physics.fluids.providers.MulticoreSPHFluidProvider();
+        this.provider = new org.jscience.natural.physics.classical.matter.fluids.providers.MulticoreSPHFluidProvider();
     }
 
-    public void setProvider(org.jscience.core.physics.fluids.SPHFluidProvider provider) {
+    public void setProvider(SPHFluidProvider provider) {
         this.provider = provider;
     }
 
@@ -168,4 +168,3 @@ public class SPHFluid {
         return fluid;
     }
 }
-

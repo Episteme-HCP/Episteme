@@ -31,8 +31,8 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.natural.physics.PhysicalConstants;
 import org.jscience.core.measure.Units;
 
-import org.jscience.core.physics.nbody.NBodyProvider;
-import org.jscience.core.physics.nbody.providers.MulticoreNBodyProvider;
+import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
+import org.jscience.natural.physics.classical.mechanics.nbody.providers.MulticoreNBodyProvider;
 
 /**
  * Direct N-body gravitational simulation (O(nÃ‚Â²)).

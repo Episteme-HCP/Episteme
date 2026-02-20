@@ -50,7 +50,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.mechanics.Kinematics;
 import org.jscience.core.measure.Quantity;
@@ -84,7 +83,7 @@ public class SystemIntegrationTest {
         vData.add(Real.of(3.0));
         vData.add(Real.of(4.0));
         vData.add(Real.of(0.0));
-        Vector<Real> velocity = VectorFactory.create(vData, Real.ZERO);
+        Vector<Real> velocity = Vector.of(vData, org.jscience.core.mathematics.sets.Reals.getInstance());
 
         // 2. Setup Measure Components (Mass)
         Quantity<Mass> mass = Quantities.create(10.0, Units.KILOGRAM);

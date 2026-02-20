@@ -25,7 +25,6 @@ package org.jscience.core.mathematics.analysis;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ public class VectorFunctionTest {
             public Vector<Real> evaluate(Vector<Real> point) {
                 Real x = point.get(0);
                 Real y = point.get(1);
-                return VectorFactory.create(Arrays.asList(
+                return Vector.of(Arrays.asList(
                         x.multiply(x),
                         x.multiply(y)), Reals.getInstance());
             }
@@ -59,7 +58,7 @@ public class VectorFunctionTest {
         // [ 2x 0 ] -> [ 4 0 ]
         // [ y x ] -> [ 3 2 ]
 
-        Vector<Real> point = VectorFactory.create(Arrays.asList(Real.of(2), Real.of(3)), Reals.getInstance());
+        Vector<Real> point = Vector.of(Arrays.asList(Real.of(2), Real.of(3)), Reals.getInstance());
 
         Matrix<Real> J = func.jacobian(point);
 

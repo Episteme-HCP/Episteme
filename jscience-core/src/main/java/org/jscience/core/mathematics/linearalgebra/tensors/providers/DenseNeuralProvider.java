@@ -10,6 +10,7 @@ import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
 
 import java.lang.reflect.Array;
 

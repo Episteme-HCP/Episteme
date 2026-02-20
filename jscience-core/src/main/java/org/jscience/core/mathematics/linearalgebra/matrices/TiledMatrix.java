@@ -88,7 +88,7 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
             for (int j = 0; j < numTileCols; j++) {
                 int rSize = Math.min(tileSize, rows - i * tileSize);
                 int cSize = Math.min(tileSize, cols - j * tileSize);
-                tiles[i][j] = GenericMatrix.of(new Real[rSize][cSize], Reals.getInstance());
+                tiles[i][j] = Matrix.of(new Real[rSize][cSize], Reals.getInstance());
             }
         }
         

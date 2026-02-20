@@ -25,8 +25,15 @@ package org.jscience.core.mathematics.linearalgebra;
 
 import org.jscience.core.mathematics.structures.spaces.Module;
 import org.jscience.core.mathematics.structures.rings.Field;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
+import org.jscience.core.technical.algorithm.OperationContext;
+import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
+import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
+import org.jscience.core.mathematics.linearalgebra.Tensor;
+import org.jscience.core.mathematics.linearalgebra.vectors.SparseVector;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
+// TensorFactory removed
 
 /**
  * Represents a vector in a vector space.
@@ -44,6 +51,48 @@ import org.jscience.core.mathematics.linearalgebra.tensors.TensorFactory;
 public interface Vector<E> extends Module<Vector<E>, E> {
 
     /**
+     * Creates a vector from a list of elements.
+     */
+    static <E> Vector<E> of(java.util.List<E> data, org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
+        int dim = data.size();
+        
+        int nz = 0;
+        E zero = ring.zero();
+        for (E val : data) if (!val.equals(zero)) nz++;
+        double density = (dim > 0) ? (double) nz / dim : 1.0;
+        
+        org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage = AlgorithmManager.getRegistry().createVectorStorage(dim, ring, density);
+        for (int i = 0; i < dim; i++) storage.set(i, data.get(i));
+        
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, provider, ring);
+    }
+
+    /**
+     * Creates a vector from an array of elements.
+     */
+    static <E> Vector<E> of(E[] data, org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
+        return of(java.util.Arrays.asList(data), ring);
+    }
+
+    /**
+     * Creates a vector from a variable number of elements.
+     */
+    @SafeVarargs
+    static <E> Vector<E> of(org.jscience.core.mathematics.structures.rings.Ring<E> ring, E... elements) {
+        return of(java.util.Arrays.asList(elements), ring);
+    }
+
+    /**
+     * Creates a vector of zeros.
+     */
+    static <E> Vector<E> zeros(int dimension, org.jscience.core.mathematics.structures.rings.Ring<E> ring) {
+        VectorStorage<E> storage = AlgorithmManager.getRegistry().createVectorStorage(dimension, ring, 1.0);
+        LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, provider, ring);
+    }
+
+    /**
      * Returns the dimension of this vector.
      * 
      * @return the number of elements in this vector
@@ -58,6 +107,13 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      * @throws IndexOutOfBoundsException if the index is out of range
      */
     E get(int index);
+
+    /**
+     * Returns the underlying storage of this vector.
+     * 
+     * @return the vector storage
+     */
+    org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> getStorage();
 
     /**
      * Returns the sum of this vector and another.
@@ -155,7 +211,6 @@ public interface Vector<E> extends Module<Vector<E>, E> {
         // Assuming E has multiply(), subtract().
         // Since Vector extends Module<..., E>, E likely has these.
         // But we need to CREATE a new Vector.
-        // Using VectorFactory.
 
         try {
             java.lang.reflect.Method mult = u1.getClass().getMethod("multiply", u1.getClass());
@@ -165,9 +220,7 @@ public interface Vector<E> extends Module<Vector<E>, E> {
             E c2 = (E) sub.invoke(mult.invoke(u3, v1), mult.invoke(u1, v3)); // u3v1 - u1v3
             E c3 = (E) sub.invoke(mult.invoke(u1, v2), mult.invoke(u2, v1)); // u1v2 - u2v1
 
-            return org.jscience.core.mathematics.linearalgebra.vectors.VectorFactory.<E>create(
-                    java.util.Arrays.asList(c1, c2, c3),
-                    (org.jscience.core.mathematics.structures.rings.Field<E>) u1.getClass().getField("ZERO").get(null));
+            return Vector.of(java.util.Arrays.asList(c1, c2, c3), getScalarRing());
         } catch (Exception e) {
             throw new UnsupportedOperationException("Cross product requires scalar arithmetic operations.", e);
         }
@@ -258,22 +311,13 @@ public interface Vector<E> extends Module<Vector<E>, E> {
             throw new UnsupportedOperationException("Cannot convert empty vector to tensor (type inference failed)");
         }
 
-        // We need the class of elements for TensorFactory
-        // This assumes the vector is homogeneous and first element is representative
         E sample = get(0);
         Class<E> type = (Class<E>) sample.getClass();
 
-        if (!Field.class.isAssignableFrom(type) && !(sample instanceof Field)) {
-            // If implicit check fails, TensorFactory might complain
-            // but we try anyway as Tensor generics might be erased or relaxed in future
-        }
-
-        Tensor<E> t = TensorFactory.zeros(type, dimension());
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(type, dimension());
         for (int i = 0; i < dimension(); i++) {
-            t.set(get(i), i);
+            elements[i] = get(i);
         }
-        return t;
+        return Tensor.of(elements, dimension());
     }
 }
-
-

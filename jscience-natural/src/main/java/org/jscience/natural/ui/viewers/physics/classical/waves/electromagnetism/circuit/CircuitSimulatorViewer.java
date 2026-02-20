@@ -266,7 +266,7 @@ public class CircuitSimulatorViewer extends org.jscience.core.ui.AbstractViewer 
         }
         try {
             org.jscience.core.mathematics.linearalgebra.Matrix<org.jscience.core.mathematics.numbers.real.Real> G = 
-                org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix.of(reducedG, org.jscience.core.mathematics.numbers.real.Real.ZERO);
+                org.jscience.core.mathematics.linearalgebra.Matrix.of(reducedG, org.jscience.core.mathematics.numbers.real.Real.ZERO);
             org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition lu = 
                 org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition.decompose(G);
             org.jscience.core.mathematics.numbers.real.Real[] solution = lu.solve(reducedI);
