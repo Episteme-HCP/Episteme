@@ -1,5 +1,7 @@
 package org.jscience.core.distributed;
 
+import org.jscience.core.technical.backend.distributed.DistributedContext;
+
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
@@ -16,5 +18,5 @@ public interface DistributedComputingProvider extends AlgorithmProvider {
      * Creates a new distributed execution context.
      * @return a context for submitting distributed tasks.
      */
-    DistributedContext createContext();
+    DistributedContext createDistributedContext();
 }

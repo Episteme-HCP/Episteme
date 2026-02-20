@@ -1,4 +1,4 @@
-package org.jscience.core.technical.algorithm;
+package org.jscience.core.mathematics.analysis.fft;
 
 import org.jscience.core.mathematics.analysis.fft.providers.MulticoreFFTProvider;
 import org.jscience.core.mathematics.analysis.fft.providers.StandardFFTProvider;

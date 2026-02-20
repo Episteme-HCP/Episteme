@@ -8,7 +8,7 @@ package org.jscience.core.mathematics.linearalgebra.algorithms;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.ComputeContext;
 import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import java.util.concurrent.Future;

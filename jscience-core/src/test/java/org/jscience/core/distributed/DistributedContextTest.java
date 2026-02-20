@@ -5,6 +5,7 @@
 
 package org.jscience.core.distributed;
 
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

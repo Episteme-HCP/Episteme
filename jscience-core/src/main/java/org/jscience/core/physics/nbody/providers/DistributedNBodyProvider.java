@@ -45,7 +45,7 @@ public class DistributedNBodyProvider implements NBodyProvider {
 
     @Override
     public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
-        org.jscience.core.distributed.DistributedContext ctx = org.jscience.core.ComputeContext.current().getDistributedContext();
+        org.jscience.core.technical.backend.distributed.DistributedContext ctx = org.jscience.core.ComputeContext.current().getDistributedContext();
         
         int size = ctx.getParallelism();
         // Rank isn't exposed directly on interface? 

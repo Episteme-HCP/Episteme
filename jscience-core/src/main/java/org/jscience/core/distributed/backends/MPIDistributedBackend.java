@@ -3,16 +3,16 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.distributed.providers;
+package org.jscience.core.distributed.backends;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.distributed.DistributedComputingProvider;
-import com.google.auto.service.AutoService;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedBackend;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.MPIDistributedContext;
+import com.google.auto.service.AutoService;
 
 /**
- * MPI Distributed Computing Provider.
+ * MPI Distributed Computing Backend.
  * Wraps MPJ Express for high-performance distributed computing.
  *
  * @author Silvere Martin-Michiellot
@@ -20,11 +20,11 @@ import org.jscience.core.distributed.MPIDistributedContext;
  * @since 1.2
  */
 @AutoService(AlgorithmProvider.class)
-public class MPIComputingProvider implements DistributedComputingProvider {
+public class MPIDistributedBackend implements DistributedBackend {
 
     private boolean available;
 
-    public MPIComputingProvider() {
+    public MPIDistributedBackend() {
         try {
             Class.forName("org.mpjexpress.mpi.MPI");
             available = true;
@@ -39,18 +39,18 @@ public class MPIComputingProvider implements DistributedComputingProvider {
     }
 
     @Override
-    public String getAlgorithmType() {
-        return "Distributed Computing";
-    }
-
-    @Override
     public boolean isAvailable() {
         return available;
     }
 
-    public DistributedContext createContext() {
+    @Override
+    public int getNodeCount() {
+        return available ? Runtime.getRuntime().availableProcessors() : 0;
+    }
+
+    @Override
+    public DistributedContext createDistributedContext() {
         if (!available) throw new UnsupportedOperationException("MPI not available");
-        // Returning existing context implementation
         return new MPIDistributedContext(new String[0]);
     }
 }

@@ -23,6 +23,8 @@
 
 package org.jscience.core.distributed;
 
+import org.jscience.core.technical.backend.distributed.DistributedContext;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Callable;

@@ -4,7 +4,7 @@ import java.nio.DoubleBuffer;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
 import java.math.MathContext;
 import org.jscience.core.mathematics.context.ComputeMode;

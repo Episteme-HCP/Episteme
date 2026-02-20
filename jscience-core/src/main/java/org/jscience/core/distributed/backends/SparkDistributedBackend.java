@@ -3,16 +3,16 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.distributed.providers;
+package org.jscience.core.distributed.backends;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.distributed.DistributedComputingProvider;
-import com.google.auto.service.AutoService;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedBackend;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.SparkDistributedContext;
+import com.google.auto.service.AutoService;
 
 /**
- * Apache Spark Distributed Computing Provider.
+ * Apache Spark Distributed Computing Backend.
  * Wraps Apache Spark for cluster computing.
  *
  * @author Silvere Martin-Michiellot
@@ -20,11 +20,11 @@ import org.jscience.core.distributed.SparkDistributedContext;
  * @since 1.2
  */
 @AutoService(AlgorithmProvider.class)
-public class SparkComputingProvider implements DistributedComputingProvider {
+public class SparkDistributedBackend implements DistributedBackend {
 
     private boolean available;
 
-    public SparkComputingProvider() {
+    public SparkDistributedBackend() {
         try {
             Class.forName("org.apache.spark.SparkContext");
             available = true;
@@ -39,16 +39,17 @@ public class SparkComputingProvider implements DistributedComputingProvider {
     }
 
     @Override
-    public String getAlgorithmType() {
-        return "Distributed Computing";
-    }
-
-    @Override
     public boolean isAvailable() {
         return available;
     }
 
-    public DistributedContext createContext() {
+    @Override
+    public int getNodeCount() {
+        return available ? Runtime.getRuntime().availableProcessors() : 0;
+    }
+
+    @Override
+    public DistributedContext createDistributedContext() {
         if (!available) throw new UnsupportedOperationException("Spark not available");
         return new SparkDistributedContext();
     }

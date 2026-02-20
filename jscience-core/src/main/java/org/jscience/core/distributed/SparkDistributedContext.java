@@ -23,6 +23,8 @@
 
 package org.jscience.core.distributed;
 
+import org.jscience.core.technical.backend.distributed.DistributedContext;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 

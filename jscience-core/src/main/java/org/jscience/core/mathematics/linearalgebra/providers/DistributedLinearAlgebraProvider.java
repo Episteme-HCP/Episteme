@@ -1,7 +1,7 @@
 package org.jscience.core.mathematics.linearalgebra.providers;
 
 import org.jscience.core.distributed.DistributedCompute;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.RemoteDistributedContext;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;

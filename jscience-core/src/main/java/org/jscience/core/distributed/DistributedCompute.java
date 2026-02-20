@@ -23,6 +23,8 @@
 
 package org.jscience.core.distributed;
 
+import org.jscience.core.technical.backend.distributed.DistributedContext;
+
 /**
  * Manager for distributed computing contexts.
  * <p>

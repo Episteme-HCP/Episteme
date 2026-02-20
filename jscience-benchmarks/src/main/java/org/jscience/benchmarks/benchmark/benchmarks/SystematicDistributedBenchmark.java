@@ -3,7 +3,7 @@ package org.jscience.benchmarks.benchmark.benchmarks;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
 import org.jscience.core.distributed.DistributedComputingProvider;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import java.util.concurrent.Future;
 
 /**
@@ -43,7 +43,7 @@ public class SystematicDistributedBenchmark implements SystematicBenchmark<Distr
     @Override
     public void setup() {
         if (provider == null) throw new IllegalStateException("Provider not set");
-        this.context = provider.createContext();
+        this.context = provider.createDistributedContext();
     }
 
     @Override

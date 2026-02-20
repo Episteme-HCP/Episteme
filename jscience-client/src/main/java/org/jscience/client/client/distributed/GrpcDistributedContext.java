@@ -26,7 +26,7 @@ package org.jscience.client.client.distributed;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.server.server.proto.ComputeServiceGrpc;
 import org.jscience.server.server.proto.TaskRequest;
 import org.jscience.server.server.proto.ServerStatus;

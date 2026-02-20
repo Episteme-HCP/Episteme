@@ -8,7 +8,7 @@ package org.jscience.core.mathematics.linearalgebra.algorithms;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 
 /**
  * Implementation of Cannon's Algorithm for distributed matrix multiplication.

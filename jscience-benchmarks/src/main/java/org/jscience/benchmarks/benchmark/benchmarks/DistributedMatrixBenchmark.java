@@ -41,7 +41,7 @@ import org.jscience.core.mathematics.linearalgebra.algorithms.Distributed25DAlgo
 import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.distributed.DistributedContext;
+import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.LocalDistributedContext;
 import org.jscience.core.ComputeContext;
 import org.jscience.core.technical.monitoring.DistributedMonitor;

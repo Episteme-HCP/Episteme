@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.core.distributed;
+package org.jscience.core.technical.backend.distributed;
 
 import java.io.Serializable;
 import java.util.List;
@@ -147,5 +147,3 @@ public interface DistributedContext {
         // No-op by default for single-threaded/local contexts
     }
 }
-
-
