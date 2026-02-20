@@ -1,4 +1,4 @@
-﻿package org.jscience.core.mathematics.analysis.fft.providers;
+package org.jscience.core.mathematics.analysis.fft.providers;
 
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.numbers.complex.Complex;

@@ -1,4 +1,4 @@
-﻿package org.jscience.core.mathematics.ml.providers;
+package org.jscience.core.mathematics.ml.providers;
 
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.ml.MLProvider;

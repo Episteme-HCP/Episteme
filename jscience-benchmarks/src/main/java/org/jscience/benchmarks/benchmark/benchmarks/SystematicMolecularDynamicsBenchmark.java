@@ -1,4 +1,4 @@
-﻿package org.jscience.benchmarks.benchmark.benchmarks;
+package org.jscience.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;

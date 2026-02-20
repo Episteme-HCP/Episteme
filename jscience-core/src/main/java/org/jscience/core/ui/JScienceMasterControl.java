@@ -713,7 +713,7 @@ public class JScienceMasterControl extends Application {
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available graph backends via Manager
         java.util.Collection<org.jscience.core.ui.viewers.mathematics.discrete.GraphBackend> providers = 
-            org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.staticAllBackends();
+            org.jscience.core.ui.viewers.mathematics.discrete.GraphBackendManager.staticAll();
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
@@ -1094,7 +1094,7 @@ public class JScienceMasterControl extends Application {
         
         // 2D Combo
         ComboBox<PlottingBackend> backendBox = new ComboBox<>();
-        List<PlottingBackend> allPlotting = new ArrayList<>(org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.staticAllBackends());
+        List<PlottingBackend> allPlotting = new ArrayList<>(org.jscience.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.staticAll());
         
         backendBox.getItems().addAll(allPlotting.stream()
                 .filter(PlottingBackend::isSupported2D)

@@ -25,10 +25,10 @@ public class JavaCVBackend implements AudioBackend, AlgorithmProvider {
 
     // ---- Backend Implementation ----
 
-    @Override public String getType() { return "audio"; } // Or video? JavaCV is often video.
+    @Override public String getType() { return "video"; }
     @Override public String getId() { return "javacv"; }
     @Override public String getName() { return "JavaCV (FFmpeg)"; }
-    @Override public String getDescription() { return "JavaCV/FFmpeg backend for media processing."; }
+    @Override public String getDescription() { return "JavaCV/FFmpeg backend for media processing (video/audio)."; }
     
     @Override 
     public boolean isAvailable() { 

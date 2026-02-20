@@ -50,10 +50,10 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
 
     // ---- Backend Implementation ----
 
-    @Override public String getType() { return "audio"; }
+    @Override public String getType() { return "video"; }
     @Override public String getId() { return "vlcj"; }
     @Override public String getName() { return "VLCJ (Native VLC)"; }
-    @Override public String getDescription() { return "Bindings to native VLC player."; }
+    @Override public String getDescription() { return "Bindings to native VLC player (video/audio)."; }
     
     @Override 
     public boolean isAvailable() { 

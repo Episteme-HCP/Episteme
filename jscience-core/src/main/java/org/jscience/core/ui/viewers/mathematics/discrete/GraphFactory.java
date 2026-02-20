@@ -74,10 +74,11 @@ public class GraphFactory {
      */
     private static Backend getBackend() {
         if (selectedBackendId != null) {
-             GraphBackend b = GraphBackendManager.staticSelect(selectedBackendId);
-             if (b != null && b.isAvailable()) {
-                return b;
-             }
+            for (GraphBackend b : GraphBackendManager.staticAll()) {
+                if (b.getId().equals(selectedBackendId) && b.isAvailable()) {
+                    return b;
+                }
+            }
         }
         return GraphBackendManager.getInstance().getActiveBackend();
     }
@@ -86,7 +87,7 @@ public class GraphFactory {
      * Returns all discovered graph backend providers.
      */
     public static Collection<GraphBackend> getAvailableBackends() {
-        return GraphBackendManager.staticAllBackends();
+        return GraphBackendManager.staticAll();
     }
 
     /**

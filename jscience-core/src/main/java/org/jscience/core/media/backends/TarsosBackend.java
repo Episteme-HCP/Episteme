@@ -77,6 +77,7 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
 
     @Override
     public double getDuration() {
+        // TarsosDSP doesn't provide easy duration for streaming/raw files without full processing
         return 0; 
     }
 
