@@ -51,8 +51,8 @@ public class GraphViewer extends AbstractViewer {
 
 
     public GraphViewer() {
-        // Discover backend
-        GraphBackend backend = GraphBackendManager.getInstance().getActiveBackend();
+        // Discover backend using standardized static pattern
+        GraphBackend backend = GraphBackendManager.staticDefault();
         
         if (backend != null) {
             activeBackend = backend.createBackend();
