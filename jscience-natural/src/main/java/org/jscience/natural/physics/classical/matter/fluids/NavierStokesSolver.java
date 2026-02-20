@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -26,8 +26,8 @@ package org.jscience.natural.physics.classical.matter.fluids;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.algorithm.physics.MulticoreNavierStokesProvider;
-import org.jscience.core.technical.algorithm.NavierStokesProvider;
+import org.jscience.core.physics.fluids.providers.MulticoreNavierStokesProvider;
+import org.jscience.core.physics.fluids.NavierStokesProvider;
 
 /**
  * Solves the incompressible Navier-Stokes equations using a backend provider.

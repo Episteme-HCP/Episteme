@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -40,8 +40,8 @@ import com.google.protobuf.ByteString;
 import org.jscience.server.server.proto.*;
 import org.jscience.core.ui.ThemeManager;
 
-import org.jscience.core.technical.algorithm.MonteCarloProvider;
-import org.jscience.core.technical.algorithm.montecarlo.MulticoreMonteCarloProvider;
+import org.jscience.core.mathematics.statistics.montecarlo.MonteCarloProvider;
+import org.jscience.core.mathematics.statistics.montecarlo.providers.MulticoreMonteCarloProvider;
 
 import java.io.*;
 import java.util.concurrent.*;

@@ -91,8 +91,8 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
         int n = x.length;
         
         // Try to use optimized FFT if available
-        org.jscience.core.technical.algorithm.FFTProvider provider = 
-            org.jscience.core.technical.algorithm.AlgorithmManager.getProvider(org.jscience.core.technical.algorithm.FFTProvider.class);
+        org.jscience.core.mathematics.analysis.fft.FFTProvider provider = 
+            org.jscience.core.technical.algorithm.AlgorithmManager.getProvider(org.jscience.core.mathematics.analysis.fft.FFTProvider.class);
             
         if (provider != null) {
             double[] real = new double[n];

@@ -60,7 +60,7 @@ public class LatticeBoltzmann implements Serializable {
     // private static final int[] OPP = { 0, 3, 4, 1, 2, 7, 8, 5, 6 }; // Opposite
     // directions
 
-    private org.jscience.core.technical.algorithm.LatticeBoltzmannProvider provider;
+    private org.jscience.core.physics.fluids.LatticeBoltzmannProvider provider;
     private final org.jscience.core.mathematics.numbers.real.Real[][][] fReal;
     private final org.jscience.core.mathematics.numbers.real.Real omega;
     private final org.jscience.core.mathematics.numbers.real.Real zero = org.jscience.core.mathematics.numbers.real.Real.ZERO;
@@ -72,12 +72,12 @@ public class LatticeBoltzmann implements Serializable {
         this.f = new double[nx][ny][9];
         this.fReal = new org.jscience.core.mathematics.numbers.real.Real[nx][ny][9];
         this.obstacle = new boolean[nx][ny];
-        this.provider = new org.jscience.core.technical.algorithm.physics.MulticoreLatticeBoltzmannProvider();
+        this.provider = new org.jscience.core.physics.fluids.providers.MulticoreLatticeBoltzmannProvider();
         this.omega = org.jscience.core.mathematics.numbers.real.Real.of(1.0 / tau);
         initialize();
     }
 
-    public void setProvider(org.jscience.core.technical.algorithm.LatticeBoltzmannProvider provider) {
+    public void setProvider(org.jscience.core.physics.fluids.LatticeBoltzmannProvider provider) {
         this.provider = provider;
     }
 

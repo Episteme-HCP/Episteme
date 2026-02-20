@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -28,7 +28,7 @@ import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
 
 import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.core.technical.algorithm.FFTProvider;
+import org.jscience.core.mathematics.analysis.fft.FFTProvider;
 import java.util.Random;
 
 /**

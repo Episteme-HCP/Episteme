@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -26,7 +26,7 @@ package org.jscience.core.mathematics.statistics.montecarlo;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
-import org.jscience.core.technical.algorithm.MonteCarloProvider;
+import org.jscience.core.mathematics.statistics.montecarlo.MonteCarloProvider;
 
 /**
  * Monte Carlo integration methods.
@@ -93,7 +93,7 @@ public class MonteCarloIntegration {
     public double integrateND(Function<double[], Double> f, double[] lower, double[] upper, int samples) {
         if (provider == null) {
             // Default to multicore provider
-            provider = new org.jscience.core.technical.algorithm.montecarlo.MulticoreMonteCarloProvider();
+            provider = new org.jscience.core.mathematics.statistics.montecarlo.providers.MulticoreMonteCarloProvider();
         }
 
 

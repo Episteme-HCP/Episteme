@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -40,8 +40,8 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.server.server.proto.*;
-import org.jscience.core.technical.algorithm.MolecularDynamicsProvider;
-import org.jscience.core.technical.algorithm.physics.MulticoreMolecularDynamicsProvider;
+import org.jscience.core.physics.molecular.MolecularDynamicsProvider;
+import org.jscience.core.physics.molecular.providers.MulticoreMolecularDynamicsProvider;
 
 import org.jscience.natural.physics.classical.mechanics.Particle;
 import org.jscience.core.mathematics.numbers.real.Real;

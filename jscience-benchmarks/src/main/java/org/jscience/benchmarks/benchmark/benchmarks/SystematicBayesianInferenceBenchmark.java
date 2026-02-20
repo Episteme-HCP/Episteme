@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -27,8 +27,8 @@ import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 
 import com.google.auto.service.AutoService;
 
-import org.jscience.core.technical.algorithm.BayesianInferenceProvider;
-import org.jscience.core.technical.algorithm.BayesianInferenceProvider.BayesNodeData;
+import org.jscience.core.mathematics.statistics.bayesian.BayesianInferenceProvider;
+import org.jscience.core.mathematics.statistics.bayesian.BayesianInferenceProvider.BayesNodeData;
 
 import java.util.*;
 

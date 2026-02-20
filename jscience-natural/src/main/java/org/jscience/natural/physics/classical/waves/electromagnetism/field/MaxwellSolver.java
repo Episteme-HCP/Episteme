@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -26,8 +26,8 @@ package org.jscience.natural.physics.classical.waves.electromagnetism.field;
 import org.jscience.core.mathematics.geometry.Vector4D;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.algorithm.MaxwellProvider;
-import org.jscience.core.technical.algorithm.physics.MulticoreMaxwellProvider;
+import org.jscience.core.physics.electromagnetism.MaxwellProvider;
+import org.jscience.core.physics.electromagnetism.providers.MulticoreMaxwellProvider;
 
 /**
  * Solver for Maxwell's equations.

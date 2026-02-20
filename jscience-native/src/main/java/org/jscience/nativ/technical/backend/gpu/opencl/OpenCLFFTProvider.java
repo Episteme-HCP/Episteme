@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
@@ -8,7 +8,7 @@ package org.jscience.nativ.technical.backend.gpu.opencl;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.algorithm.FFTProvider;
+import org.jscience.core.mathematics.analysis.fft.FFTProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 

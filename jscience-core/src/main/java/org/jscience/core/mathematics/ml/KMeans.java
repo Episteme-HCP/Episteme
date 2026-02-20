@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -24,7 +24,7 @@
 package org.jscience.core.mathematics.ml;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.algorithm.MLProvider;
+import org.jscience.core.mathematics.ml.MLProvider;
 import java.util.ServiceLoader;
 import java.util.Random;
 

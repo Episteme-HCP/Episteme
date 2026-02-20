@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -30,7 +30,7 @@ import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.discrete.Graph;
 import org.jscience.core.mathematics.discrete.generators.ScaleFreeGenerator;
 import org.jscience.core.mathematics.numbers.integers.Natural;
-import org.jscience.core.technical.algorithm.GraphAlgorithmProvider;
+import org.jscience.core.mathematics.discrete.graph.GraphAlgorithmProvider;
 
 /**
  * A benchmark that systematically tests all available GraphAlgorithmProviders.

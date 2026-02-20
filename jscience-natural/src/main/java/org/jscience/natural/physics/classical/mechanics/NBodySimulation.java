@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -31,8 +31,8 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.natural.physics.PhysicalConstants;
 import org.jscience.core.measure.Units;
 
-import org.jscience.core.technical.algorithm.NBodyProvider;
-import org.jscience.core.technical.algorithm.nbody.MulticoreNBodyProvider;
+import org.jscience.core.physics.nbody.NBodyProvider;
+import org.jscience.core.physics.nbody.providers.MulticoreNBodyProvider;
 
 /**
  * Direct N-body gravitational simulation (O(nÃ‚Â²)).

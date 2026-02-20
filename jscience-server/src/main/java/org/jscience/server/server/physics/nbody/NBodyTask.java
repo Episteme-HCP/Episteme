@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.algorithm.NBodyProvider;
-import org.jscience.core.technical.algorithm.nbody.MulticoreNBodyProvider;
+import org.jscience.core.physics.nbody.NBodyProvider;
+import org.jscience.core.physics.nbody.providers.MulticoreNBodyProvider;
 
 public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
 

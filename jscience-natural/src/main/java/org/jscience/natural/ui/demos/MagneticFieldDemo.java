@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -30,8 +30,8 @@ import javafx.scene.shape.Sphere;
 import org.jscience.core.ui.AbstractDemo;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer;
-import org.jscience.core.technical.algorithm.physics.MulticoreMaxwellProvider;
-import org.jscience.core.technical.algorithm.MaxwellSource;
+import org.jscience.core.physics.electromagnetism.providers.MulticoreMaxwellProvider;
+import org.jscience.core.physics.electromagnetism.MaxwellSource;
 
 /**
  * Demo Provider for Magnetic Field Visualization with physical source bodies.

@@ -42,7 +42,7 @@ public class SPHFluid {
     private final double[] pressures;
     private final double[] forces;
 
-    private org.jscience.core.technical.algorithm.SPHFluidProvider provider;
+    private org.jscience.core.physics.fluids.SPHFluidProvider provider;
 
     // Simulation parameters
     private double mass = 1.0; // Particle mass
@@ -59,10 +59,10 @@ public class SPHFluid {
         this.densities = new double[numParticles];
         this.pressures = new double[numParticles];
         this.forces = new double[numParticles * 3];
-        this.provider = new org.jscience.core.technical.algorithm.physics.MulticoreSPHFluidProvider();
+        this.provider = new org.jscience.core.physics.fluids.providers.MulticoreSPHFluidProvider();
     }
 
-    public void setProvider(org.jscience.core.technical.algorithm.SPHFluidProvider provider) {
+    public void setProvider(org.jscience.core.physics.fluids.SPHFluidProvider provider) {
         this.provider = provider;
     }
 

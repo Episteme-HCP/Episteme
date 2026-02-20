@@ -70,11 +70,11 @@ public class BenchmarkRegistry {
                 String type = p.getAlgorithmType();
                 return type.substring(0, 1).toUpperCase() + type.substring(1);
             }
-            @Override public void setup() { if (p instanceof org.jscience.core.technical.algorithm.FFTProvider) { /* Custom setup if needed */ } }
+            @Override public void setup() { if (p instanceof org.jscience.core.mathematics.analysis.fft.FFTProvider) { /* Custom setup if needed */ } }
             @Override public void run() { 
                 // Generic execution test
-                if (p instanceof org.jscience.core.technical.algorithm.FFTProvider) {
-                    ((org.jscience.core.technical.algorithm.FFTProvider)p).transform(new double[1024], new double[1024]);
+                if (p instanceof org.jscience.core.mathematics.analysis.fft.FFTProvider) {
+                    ((org.jscience.core.mathematics.analysis.fft.FFTProvider)p).transform(new double[1024], new double[1024]);
                 }
             }
             @Override public void teardown() {}

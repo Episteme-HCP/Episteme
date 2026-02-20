@@ -39,7 +39,7 @@ public final class AudioSpectrogram {
 
     /**
      * Calculates the magnitude spectrum of a buffer.
-     * Uses the best available {@link org.jscience.core.technical.algorithm.FFTProvider}.
+     * Uses the best available {@link org.jscience.core.mathematics.analysis.fft.FFTProvider}.
      */
     public static double[] calculateSpectrum(double[] buffer, WindowFunction window) {
         int n = buffer.length;
@@ -56,7 +56,7 @@ public final class AudioSpectrogram {
         applyWindow(real, window);
         double[] imag = new double[n]; // Init to 0
 
-        org.jscience.core.technical.algorithm.FFTProvider provider = findProvider();
+        org.jscience.core.mathematics.analysis.fft.FFTProvider provider = findProvider();
         double[][] result = provider.transform(real, imag);
         
         double[] rReal = result[0];
@@ -72,13 +72,13 @@ public final class AudioSpectrogram {
         return magnitude;
     }
 
-    private static org.jscience.core.technical.algorithm.FFTProvider findProvider() {
-        ServiceLoader<org.jscience.core.technical.algorithm.FFTProvider> loader = ServiceLoader.load(org.jscience.core.technical.algorithm.FFTProvider.class);
-        for (org.jscience.core.technical.algorithm.FFTProvider p : loader) {
+    private static org.jscience.core.mathematics.analysis.fft.FFTProvider findProvider() {
+        ServiceLoader<org.jscience.core.mathematics.analysis.fft.FFTProvider> loader = ServiceLoader.load(org.jscience.core.mathematics.analysis.fft.FFTProvider.class);
+        for (org.jscience.core.mathematics.analysis.fft.FFTProvider p : loader) {
             return p;
         }
         // Fallback
-        return new org.jscience.core.technical.algorithm.fft.MulticoreFFTProvider();
+        return new org.jscience.core.mathematics.analysis.fft.providers.MulticoreFFTProvider();
     }
 
     private static void applyWindow(double[] data, WindowFunction type) {

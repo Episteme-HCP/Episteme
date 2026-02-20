@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
-import org.jscience.core.technical.algorithm.SimulationProvider;
-import org.jscience.core.technical.algorithm.simulation.ParallelSimulationProvider;
+import org.jscience.core.physics.simulation.SimulationProvider;
+import org.jscience.core.physics.simulation.providers.ParallelSimulationProvider;
 
 /**
  * Run-time core of the event driven simulation engine.
@@ -196,7 +196,7 @@ public class EventDrivenEngine implements Runnable {
         org.jscience.core.mathematics.numbers.real.Real t = org.jscience.core.mathematics.numbers.real.Real.of(currentTime);
         org.jscience.core.mathematics.numbers.real.Real tEnd = t.add(org.jscience.core.mathematics.numbers.real.Real.of(duration));
         
-        org.jscience.core.technical.algorithm.ODEProvider integrator = new org.jscience.core.technical.algorithm.numerical.RungeKuttaODEProvider();
+        org.jscience.core.mathematics.numerical.ode.ODEProvider integrator = new org.jscience.core.mathematics.numerical.ode.providers.RungeKuttaODEProvider();
         
         List<Runnable> tasks = new ArrayList<>();
         for (SimulationAgent entity : entities.values()) {

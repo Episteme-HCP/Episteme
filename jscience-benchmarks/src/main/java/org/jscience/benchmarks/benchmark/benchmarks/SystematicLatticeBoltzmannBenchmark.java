@@ -1,8 +1,8 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+﻿package org.jscience.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.core.technical.algorithm.LatticeBoltzmannProvider;
+import org.jscience.core.physics.fluids.LatticeBoltzmannProvider;
 
 import java.util.ServiceLoader;
 

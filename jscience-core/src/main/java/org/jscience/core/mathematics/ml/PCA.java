@@ -68,9 +68,9 @@ public class PCA {
         }
         
         // Try to use external MLProvider
-        java.util.ServiceLoader<org.jscience.core.technical.algorithm.MLProvider> loader = 
-            java.util.ServiceLoader.load(org.jscience.core.technical.algorithm.MLProvider.class);
-        org.jscience.core.technical.algorithm.MLProvider provider = loader.findFirst().orElse(null);
+        java.util.ServiceLoader<org.jscience.core.mathematics.ml.MLProvider> loader = 
+            java.util.ServiceLoader.load(org.jscience.core.mathematics.ml.MLProvider.class);
+        org.jscience.core.mathematics.ml.MLProvider provider = loader.findFirst().orElse(null);
         
         if (provider != null && provider.isAvailable()) {
             this.fitData = data;

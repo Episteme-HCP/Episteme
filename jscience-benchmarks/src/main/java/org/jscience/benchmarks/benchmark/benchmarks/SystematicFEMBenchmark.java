@@ -1,8 +1,8 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+﻿package org.jscience.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.core.technical.algorithm.FEMProvider;
+import org.jscience.core.mathematics.numerical.fem.FEMProvider;
 import org.jscience.core.mathematics.analysis.fem.Mesh;
 import org.jscience.core.mathematics.analysis.Function;
 import org.jscience.core.mathematics.linearalgebra.Vector;

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -26,8 +26,8 @@ package org.jscience.core.mathematics.analysis.fem;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.analysis.Function;
-import org.jscience.core.technical.algorithm.FEMProvider;
-import org.jscience.core.technical.algorithm.numerical.MulticoreFEMProvider;
+import org.jscience.core.mathematics.numerical.fem.FEMProvider;
+import org.jscience.core.mathematics.numerical.fem.providers.MulticoreFEMProvider;
 
 /**
  * A simple Finite Element Method solver.

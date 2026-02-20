@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -25,8 +25,8 @@ package org.jscience.core.mathematics.ml;
 
 import org.jscience.core.mathematics.discrete.DirectedWeightedGraph;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.algorithm.BayesianInferenceProvider;
-import org.jscience.core.technical.algorithm.inference.VariableEliminationProvider;
+import org.jscience.core.mathematics.statistics.bayesian.BayesianInferenceProvider;
+import org.jscience.core.mathematics.statistics.bayesian.providers.VariableEliminationProvider;
 import java.util.*;
 
 /**
