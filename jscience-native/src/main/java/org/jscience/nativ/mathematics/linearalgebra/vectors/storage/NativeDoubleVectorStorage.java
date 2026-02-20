@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.vectors;
+package org.jscience.nativ.mathematics.linearalgebra.vectors.storage;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -11,7 +11,7 @@ import java.lang.foreign.ValueLayout;
 import java.nio.DoubleBuffer;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
+import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * A dense vector backed by off-heap native memory.
@@ -20,14 +20,14 @@ import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeVector implements RealDoubleVectorStorage, AutoCloseable {
+public class NativeDoubleVectorStorage implements RealDoubleVectorStorage, AutoCloseable {
 
     private final MemorySegment data;
     private final int dimension;
     private final Arena arena;
     private final boolean ownsArena;
 
-    public NativeVector(int dimension, Arena arena) {
+    public NativeDoubleVectorStorage(int dimension, Arena arena) {
         this.dimension = dimension;
         this.arena = arena;
         this.ownsArena = false;
@@ -35,7 +35,7 @@ public class NativeVector implements RealDoubleVectorStorage, AutoCloseable {
         data.fill((byte) 0);
     }
 
-    public NativeVector(int dimension) {
+    public NativeDoubleVectorStorage(int dimension) {
         this.dimension = dimension;
         this.arena = Arena.ofConfined();
         this.ownsArena = true;
@@ -94,16 +94,16 @@ public class NativeVector implements RealDoubleVectorStorage, AutoCloseable {
     /**
      * Views this vector as a matrix.
      */
-    public NativeMatrix asMatrix(int rows, int cols) {
+    public org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage asMatrix(int rows, int cols) {
         if ((long) rows * cols != dimension) {
             throw new IllegalArgumentException("Dimension mismatch");
         }
-        return new NativeMatrix(data, rows, cols, arena);
+        return new org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(data, rows, cols, arena);
     }
 
     @Override
     public org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<Real> copy() {
-        NativeVector copy = new NativeVector(dimension);
+        NativeDoubleVectorStorage copy = new NativeDoubleVectorStorage(dimension);
         MemorySegment.copy(this.data, 0, copy.data, 0, (long) dimension * Double.BYTES);
         return copy;
     }

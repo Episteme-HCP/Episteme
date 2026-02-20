@@ -2,10 +2,10 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.nativ.technical.backend.quantum;
+package org.jscience.nativ.physics.quantum.backends;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.nativ.util.NativeLibraryLoader;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;
@@ -24,7 +24,7 @@ import java.util.Optional;
  */
 @SuppressWarnings({"preview", "unused", "restricted"})
 @AutoService(AlgorithmProvider.class)
-public class NativeQuantumProvider implements AlgorithmProvider {
+public class NativeQuantumBackend implements AlgorithmProvider {
 
     private static final SymbolLookup LOOKUP;
     private static final boolean IS_AVAILABLE_FLAG;
@@ -82,6 +82,6 @@ public class NativeQuantumProvider implements AlgorithmProvider {
     }
     @Override
     public String getName() {
-        return "Native Quantum Provider (QuEST/Qiskit)";
+        return "Native Quantum Backend (QuEST/Qiskit)";
     }
 }

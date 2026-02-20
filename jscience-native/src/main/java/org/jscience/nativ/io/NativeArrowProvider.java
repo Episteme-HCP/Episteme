@@ -5,7 +5,7 @@
 package org.jscience.nativ.io;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.nativ.util.NativeLibraryLoader;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;

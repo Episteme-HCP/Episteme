@@ -3,13 +3,16 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.tensors.providers;
+package org.jscience.nativ.mathematics.tensors.backends;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
 import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.nativ.mathematics.linearalgebra.tensors.NativeTensor;
-import org.jscience.nativ.util.NativeLibraryLoader;
+import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.Arena;
@@ -19,18 +22,19 @@ import java.lang.foreign.ValueLayout;
 import java.util.Optional;
 
 /**
- * Tensor provider using Project Panama (FFM) for native acceleration.
+ * Native CPU Tensor Backend using Project Panama (FFM) for native acceleration.
  * <p>
  * Attempts to load 'dnnl' (oneDNN) or 'mkl_rt' for acceleration.
  * If not found, it falls back to Java-based off-heap operations (via NativeTensor).
+ * Implements {@link CPUBackend} and {@link NativeBackend}.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(Backend.class)
-public class NativeTensorProvider implements TensorProvider, Backend {
+@AutoService({Backend.class, ComputeBackend.class, CPUBackend.class, NativeBackend.class, TensorProvider.class})
+public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, NativeBackend {
 
     @SuppressWarnings("unused")
     private static final SymbolLookup LOOKUP;
@@ -51,25 +55,30 @@ public class NativeTensorProvider implements TensorProvider, Backend {
             IS_AVAILABLE = false;
         }
     }
-    
-    // Missing Libraries Report:
-    // This backend requires 'dnnl' (oneDNN) or 'mkl_rt' (Intel MKL) dynamic libraries.
-    // Ensure they are installed (e.g., via Apt/Yum) or in java.library.path.
-    // If not found, performance falls back to CPU (or Java Panama FFM raw access).
 
     @Override
-    public String getType() {
-        return "tensor";
+    public boolean isLoaded() {
+        return IS_AVAILABLE;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "dnnl";
     }
 
     @Override
     public String getId() {
-        return "native-tensor";
+        return "native-cpu-tensor";
+    }
+
+    @Override
+    public String getName() {
+        return "Native CPU Tensor Backend (oneDNN)";
     }
 
     @Override
     public String getDescription() {
-        return "Native Tensor Provider using FFM (oneDNN/MKL).";
+        return "Native Tensor Backend using FFM (oneDNN/MKL) on CPU.";
     }
 
     @Override
@@ -78,52 +87,37 @@ public class NativeTensorProvider implements TensorProvider, Backend {
     }
 
     @Override
-    public Object createBackend() {
-        return this;
+    public int getPriority() {
+        return 10; 
+    }
+
+    @Override
+    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+        return new org.jscience.core.technical.backend.cpu.CPUExecutionContext();
     }
 
     @Override
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
-        if (!isAvailable()) {
-            // Should we support off-heap without acceleration?
-            // For now, let's allow it but strictly the provider claims unavailability.
-            // But if selected, it must work.
-        }
-        NativeTensor<T> tensor = new NativeTensor<>(elementType, shape);
-        // Memory is zeroed by default in Arena allocation? 
-        // Arena.allocate docs: "The contents of the allocated memory segment are initialized to zero."
-        // So yes, it is zeroed.
-        return tensor;
+        return new NativeTensor<>(elementType, shape);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
-        // NativeTensor<T> tensor = new NativeTensor<>(elementType, shape);
-        // T one; // Unused
         long size = 1;
         for(int s : shape) size *= s;
 
         if (elementType == Float.class) {
-             // one = elementType.cast(1.0f);
-        } else if (elementType == Double.class) {
-             // one = elementType.cast(1.0d);
-        } else {
-             throw new IllegalArgumentException("Unsupported type: " + elementType);
-        }
-         
-         // Using create which is now optimized
-         if (elementType == Float.class) {
              float[] data = new float[(int)size];
              java.util.Arrays.fill(data, 1.0f);
              return (Tensor<T>) create(toObjectArray(data), shape);
-         } else if (elementType == Double.class) {
+        } else if (elementType == Double.class) {
              double[] data = new double[(int)size];
              java.util.Arrays.fill(data, 1.0d);
              return (Tensor<T>) create(toObjectArray(data), shape);
-         } else {
+        } else {
              throw new IllegalArgumentException("Unsupported type: " + elementType);
-         }
+        }
     }
 
     @Override
@@ -132,7 +126,6 @@ public class NativeTensorProvider implements TensorProvider, Backend {
         Class<T> type = (Class<T>) data.getClass().getComponentType();
         NativeTensor<T> tensor = new NativeTensor<>(type, shape);
         
-        // Populate
         MemorySegment segment = tensor.getSegment();
         if (type == Float.class) {
              for (int i = 0; i < data.length; i++) {
@@ -145,9 +138,7 @@ public class NativeTensorProvider implements TensorProvider, Backend {
         }
         return tensor;
     }
-    
-    
-    // Helper
+
     private Float[] toObjectArray(float[] arr) {
         Float[] res = new Float[arr.length];
         for(int i=0; i<arr.length; i++) res[i] = arr[i];
@@ -157,15 +148,5 @@ public class NativeTensorProvider implements TensorProvider, Backend {
         Double[] res = new Double[arr.length];
         for(int i=0; i<arr.length; i++) res[i] = arr[i];
         return res;
-    }
-
-    @Override
-    public String getName() {
-        return "Native Tensor Provider (oneDNN)";
-    }
-
-    @Override
-    public int getPriority() {
-        return 10; 
     }
 }

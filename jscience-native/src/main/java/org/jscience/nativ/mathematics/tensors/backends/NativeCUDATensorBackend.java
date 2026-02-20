@@ -3,13 +3,17 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.tensors.providers;
+package org.jscience.nativ.mathematics.tensors.backends;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.nativ.mathematics.linearalgebra.tensors.CUDATensor;
+import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.mathematics.linearalgebra.tensors.providers.TensorProvider;
+import org.jscience.core.technical.backend.gpu.GPUBackend;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;
 
 import jcuda.Pointer;
@@ -18,22 +22,48 @@ import jcuda.driver.JCudaDriver;
 import jcuda.runtime.JCuda;
 import jcuda.runtime.cudaMemcpyKind;
 
+import java.nio.DoubleBuffer;
 import java.util.Arrays;
 
 /**
- * CUDA-accelerated Tensor provider.
+ * CUDA-accelerated Tensor Backend.
  * <p>
- * Implements Tensor factory operations using JCuda, producing
+ * Implements Tensor operations using JCuda, producing
  * {@link CUDATensor} instances backed by GPU device memory.
- * Supports Float and Double element types.
+ * Implements {@link GPUBackend} and {@link NativeBackend}.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService(AlgorithmProvider.class)
-public class NativeCUDATensorProvider implements TensorProvider {
+@AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, TensorProvider.class, AlgorithmProvider.class})
+public class NativeCUDATensorBackend implements TensorProvider, GPUBackend, NativeBackend {
+
+    @Override
+    public boolean isLoaded() {
+        return isAvailable();
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "cuda";
+    }
+
+    @Override
+    public String getId() {
+        return "cuda-tensor";
+    }
+
+    @Override
+    public String getName() {
+        return "CUDA GPU Tensor Backend";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Native Tensor Backend using CUDA on GPU.";
+    }
 
     @Override
     public boolean isAvailable() {
@@ -122,7 +152,7 @@ public class NativeCUDATensorProvider implements TensorProvider {
 
     private void validateType(Class<?> type) {
         if (type != Float.class && type != Double.class) {
-            throw new UnsupportedOperationException("NativeCUDATensorProvider only supports Float and Double, got: " + type.getName());
+            throw new UnsupportedOperationException("Only Float and Double supported, got: " + type.getName());
         }
     }
 
@@ -131,27 +161,35 @@ public class NativeCUDATensorProvider implements TensorProvider {
     }
 
     @Override
-    public String getName() {
-        return "CUDA GPU Tensor";
-    }
-
-    @Override
     public int getPriority() {
         return 80;
     }
-
-    /** Minimum tensor element count where CUDA outperforms CPU. */
-    private static final int GPU_TENSOR_THRESHOLD = 1024;
 
     @Override
     public double score(OperationContext context) {
         if (!isAvailable()) return -1;
         double base = getPriority();
-        if (context.getDataSize() < GPU_TENSOR_THRESHOLD) base -= 100;
+        if (context.getDataSize() < 1024) base -= 100;
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
-        if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
-        if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
-        if (context.hasHint(OperationContext.Hint.FLOAT32_OK)) base += 20;
         return base;
     }
+
+    @Override
+    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    }
+
+    @Override
+    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+        return null; // TODO: CUDA Context
+    }
+
+    @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }
+    @Override public void selectDevice(int deviceId) { }
+    @Override public long allocateGPUMemory(long sizeBytes) { return 0; }
+    @Override public void copyToGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) { }
+    @Override public void copyFromGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) { }
+    @Override public void freeGPUMemory(long gpuHandle) { }
+    @Override public void synchronize() { }
+    @Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
 }

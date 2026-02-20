@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.simd;
+package org.jscience.nativ.mathematics.linearalgebra.backends;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -16,8 +16,19 @@ import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.core.technical.backend.simd.SIMDBackend;
 import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
+import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+
+import jdk.incubator.vector.DoubleVector;
+import jdk.incubator.vector.VectorSpecies;
+import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
+import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
+
+import org.jscience.core.technical.backend.ExecutionContext;
+import org.jscience.core.technical.backend.Operation;
 
 /**
  * SIMD-accelerated Linear Algebra Backend for Real numbers using JDK Vector API.
@@ -26,18 +37,9 @@ import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgeb
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-import jdk.incubator.vector.DoubleVector;
-
-import jdk.incubator.vector.VectorSpecies;
-import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
-import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
-
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.Operation;
-
-@SuppressWarnings("rawtypes") // LinearAlgebraProvider.class is a raw type reference (unavoidable in @AutoService)
-@AutoService({Backend.class, ComputeBackend.class, SIMDBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
-public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebraProvider<Real> {
+@SuppressWarnings("rawtypes") 
+@AutoService({Backend.class, ComputeBackend.class, SIMDBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class, NativeBackend.class, CPUBackend.class})
+public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
 
@@ -51,6 +53,26 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
         } catch (Throwable t) {
             return false;
         }
+    }
+    
+    @Override
+    public boolean isLoaded() {
+        return isAvailable();
+    }
+
+    @Override
+    public String getType() {
+        return SIMDBackend.super.getType();
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return SIMDBackend.super.getAcceleratorType();
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "jdk.incubator.vector";
     }
 
     @Override
@@ -77,12 +99,12 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
 
     @Override
     public int getPriority() {
-        return 50;
+        return 90; // Higher than standard CPU, lower than BLAS
     }
 
     @Override
     public String getName() {
-        return "Native SIMD Backend (Vector API)";
+        return "Native SIMD Linear Algebra Backend";
     }
 
     @Override
@@ -172,7 +194,6 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
                 data[i*n + k] = 0;
                 
                 int j = k + 1;
-                // Fix for unaligned start: check if j + length <= n
                 for (; j + species.length() <= n; j += species.length()) {
                     var vRowK = DoubleVector.fromArray(species, data, k*n + j);
                     var vRowI = DoubleVector.fromArray(species, data, i*n + j);
@@ -188,7 +209,6 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, LinearAlgebr
             double sum = 0.0;
             int j = i + 1;
             var vSum = DoubleVector.zero(species);
-            // Fix for unaligned start
             for (; j + species.length() <= n; j += species.length()) {
                  var vA = DoubleVector.fromArray(species, data, i*n + j);
                  var vX = DoubleVector.fromArray(species, x, j);

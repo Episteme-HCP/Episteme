@@ -2,7 +2,7 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.nativ.mathematics.linearalgebra.providers;
+package org.jscience.nativ.mathematics.linearalgebra.backends;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -10,25 +10,60 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import com.google.auto.service.AutoService;
+import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
- * ND4J Linear Algebra Provider (Dense).
+ * ND4J Linear Algebra Backend (Dense).
  * <p>
  * When the ND4J library ({@code org.nd4j:nd4j-native-platform}) is on the classpath,
- * this provider delegates to ND4J's optimized BLAS/LAPACK backends (Native/AVX/CUDA).
+ * this backend delegates to ND4J's optimized BLAS/LAPACK backends (Native/AVX/CUDA).
  * All operations fall back to {@link CPUDenseLinearAlgebraProvider} if ND4J is absent.
+ * Implements {@link NativeBackend}.
  * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @since 1.0
  */
-@AutoService(LinearAlgebraProvider.class)
-public class ND4JLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
+@AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class, AlgorithmProvider.class})
+public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.jscience.nativ.technical.backend.nativ.NativeBackend, org.jscience.core.technical.backend.cpu.CPUBackend {
 
     private final CPUDenseLinearAlgebraProvider<Real> fallback = new CPUDenseLinearAlgebraProvider<>();
 
+    @Override
+    public int getPriority() {
+        return 50; // Lower than NativeCPULinearAlgebraBackend (100)
+    }
+
+    @Override
     public String getName() {
         return "ND4J (Native Wrapper)";
+    }
+    
+    @Override
+    public boolean isLoaded() {
+        return isAvailable();
+    }
+
+    @Override
+    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+        return new org.jscience.core.technical.backend.ExecutionContext() {
+            @Override
+            public <T> T execute(org.jscience.core.technical.backend.Operation<T> operation) {
+                return operation.compute(this);
+            }
+
+            @Override
+            public void close() {
+                // No-op
+            }
+        };
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "nd4j";
     }
 
     @Override
@@ -114,7 +149,6 @@ public class ND4JLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) return fallback.dot(a, b);
-        // dot returns a scalar INDArray
         return Real.of(org.nd4j.linalg.factory.Nd4j.getBlasWrapper().dot(toINDArray(a), toINDArray(b)));
     }
 
@@ -156,18 +190,12 @@ public class ND4JLinearAlgebraProvider implements LinearAlgebraProvider<Real> {
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        // ND4J determinant might be complex to access directly or not available in all versions
-        // In 1.0.0-M1, check for determinant support
-        // fallback to CPU for safety as it's rarely critical in inner loops compared to multiply/solve
         return fallback.determinant(a);
     }
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) return fallback.solve(a, b);
-        // x = A^-1 * b (naive) or use specific solver if available
-        // ND4J Solve.solve(A, b) exists?
-        // Using inverse for now as basic implementation
         return multiply(inverse(a), b);
     }
 

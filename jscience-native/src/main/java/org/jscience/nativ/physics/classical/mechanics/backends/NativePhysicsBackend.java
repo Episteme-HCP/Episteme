@@ -2,10 +2,10 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.nativ.physics;
+package org.jscience.nativ.physics.classical.mechanics.backends;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.nativ.util.NativeLibraryLoader;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;
@@ -25,7 +25,7 @@ import java.util.Optional;
  */
 @SuppressWarnings({"preview", "unused", "restricted"})
 @AutoService(AlgorithmProvider.class)
-public class NativePhysicsProvider implements AlgorithmProvider {
+public class NativePhysicsBackend implements AlgorithmProvider {
 
     private static final SymbolLookup LOOKUP;
     private static final boolean IS_AVAILABLE_FLAG;
@@ -116,6 +116,6 @@ public class NativePhysicsProvider implements AlgorithmProvider {
     }
     @Override
     public String getName() {
-        return "Native Physics Provider (Bullet/Jolt)";
+        return "Native Physics Backend (Bullet/Jolt)";
     }
 }

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.matrices;
+package org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorageFactory;
@@ -30,7 +30,7 @@ import com.google.auto.service.AutoService;
 
 /**
  * Native implementation of MatrixStorageFactory.
- * Creates {@link NativeMatrix} instances for Real numbers.
+ * Creates {@link NativeDoubleMatrixStorage} instances for Real numbers.
  */
 @AutoService(MatrixStorageFactory.class)
 public class NativeMatrixStorageFactory implements MatrixStorageFactory {
@@ -41,13 +41,12 @@ public class NativeMatrixStorageFactory implements MatrixStorageFactory {
         E zero = ring.zero();
         if (zero instanceof org.jscience.core.mathematics.numbers.real.Real) {
             @SuppressWarnings("unchecked")
-            MatrixStorage<E> storage = (MatrixStorage<E>) new NativeMatrix(rows, cols);
+            MatrixStorage<E> storage = (MatrixStorage<E>) new NativeDoubleMatrixStorage(rows, cols);
             return storage;
         }
         
         // Fallback for non-Real types? 
         // Or return null to indicate "cannot handle"?
-        // The implementation contract should probably allow null or we handle it in MatrixFactory.
         // For now, let's return null if we can't handle it, and let MatrixFactory fallback.
         return null;
     }

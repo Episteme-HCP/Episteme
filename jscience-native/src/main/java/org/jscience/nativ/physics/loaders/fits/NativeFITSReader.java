@@ -33,12 +33,12 @@ import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.jscience.core.io.AbstractResourceReader;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
+import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * High-performance FITS reader using Project Panama to call cfitsio.
  */
-public class NativeFITSReader extends AbstractResourceReader<NativeMatrix> implements AutoCloseable {
+public class NativeFITSReader extends AbstractResourceReader<NativeDoubleMatrixStorage> implements AutoCloseable {
 
     private final MemorySegment fitsPtr;
     private final boolean isShared;
@@ -105,7 +105,7 @@ public class NativeFITSReader extends AbstractResourceReader<NativeMatrix> imple
     /**
      * Opens a FITS file and reads the image data.
      */
-    public static NativeMatrix open(String path) throws Exception {
+    public static NativeDoubleMatrixStorage open(String path) throws Exception {
         try (NativeFITSReader reader = new NativeFITSReader()) {
             return reader.load(path);
         }
@@ -114,20 +114,20 @@ public class NativeFITSReader extends AbstractResourceReader<NativeMatrix> imple
     @Override public String getName() { return "Native FITS Reader"; }
     @Override public String getDescription() { return "FITS reader using Panama and cfitsio library."; }
     @Override public String getCategory() { return "I/O / Native / Physics"; }
-    @Override public Class<NativeMatrix> getResourceType() { return NativeMatrix.class; }
+    @Override public Class<NativeDoubleMatrixStorage> getResourceType() { return NativeDoubleMatrixStorage.class; }
     @Override public String getResourcePath() { return null; }
-    @Override public String getLongDescription() { return "High-performance FITS reader leveraging Project Panama and cfitsio for fast, zero-copy data loading from scientific FITS files directly into off-heap NativeMatrix objects."; }
+    @Override public String getLongDescription() { return "High-performance FITS reader leveraging Project Panama and cfitsio for fast, zero-copy data loading from scientific FITS files directly into off-heap NativeDoubleMatrixStorage objects."; }
     @Override public String[] getSupportedVersions() { return new String[] { "4.0" }; }
     @Override public String[] getSupportedExtensions() { return new String[] { ".fits", ".fit" }; }
 
     @Override
-    protected NativeMatrix loadFromSource(String resourceId) throws Exception {
+    protected NativeDoubleMatrixStorage loadFromSource(String resourceId) throws Exception {
         Path path = Paths.get(resourceId);
         try (NativeFITSReader reader = new NativeFITSReader(path)) {
             long naxis1 = reader.readKeyLong("NAXIS1");
             long naxis2 = reader.readKeyLong("NAXIS2");
             
-            NativeMatrix matrix = new NativeMatrix((int) naxis2, (int) naxis1);
+            NativeDoubleMatrixStorage matrix = new NativeDoubleMatrixStorage((int) naxis2, (int) naxis1);
             reader.readImage(1, naxis1 * naxis2, matrix);
             return matrix;
         }
@@ -149,7 +149,7 @@ public class NativeFITSReader extends AbstractResourceReader<NativeMatrix> imple
         }
     }
 
-    public void readImage(long firstElem, long nElem, NativeMatrix matrix) {
+    public void readImage(long firstElem, long nElem, NativeDoubleMatrixStorage matrix) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment status = arena.allocate(ValueLayout.JAVA_INT);
             status.set(ValueLayout.JAVA_INT, 0, 0);

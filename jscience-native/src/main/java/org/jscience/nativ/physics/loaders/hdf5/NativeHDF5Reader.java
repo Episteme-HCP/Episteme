@@ -34,12 +34,12 @@ import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.jscience.core.io.AbstractResourceReader;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
+import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * High-performance HDF5 reader using Panama for zero-copy data transfer.
  */
-public class NativeHDF5Reader extends AbstractResourceReader<NativeMatrix> implements AutoCloseable {
+public class NativeHDF5Reader extends AbstractResourceReader<NativeDoubleMatrixStorage> implements AutoCloseable {
 
     private final long fileId;
     private final boolean isShared;
@@ -120,7 +120,7 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeMatrix> imple
     /**
      * Opens an HDF5 file and reads the dataset named "data".
      */
-    public static NativeMatrix open(String path) throws Exception {
+    public static NativeDoubleMatrixStorage open(String path) throws Exception {
         try (NativeHDF5Reader reader = new NativeHDF5Reader()) {
             return reader.load(path);
         }
@@ -129,14 +129,14 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeMatrix> imple
     @Override public String getName() { return "Native HDF5 Reader"; }
     @Override public String getDescription() { return "HDF5 reader using Panama and native HDF5 library."; }
     @Override public String getCategory() { return "I/O / Native"; }
-    @Override public Class<NativeMatrix> getResourceType() { return NativeMatrix.class; }
+    @Override public Class<NativeDoubleMatrixStorage> getResourceType() { return NativeDoubleMatrixStorage.class; }
     @Override public String getResourcePath() { return null; }
-    @Override public String getLongDescription() { return "High-performance HDF5 reader leveraging Project Panama's Foreign Function & Memory API for zero-copy data transfer from HDF5 files into NativeMatrix objects."; }
+    @Override public String getLongDescription() { return "High-performance HDF5 reader leveraging Project Panama's Foreign Function & Memory API for zero-copy data transfer from HDF5 files into NativeDoubleMatrixStorage objects."; }
     @Override public String[] getSupportedVersions() { return new String[] { "1.10", "1.12" }; }
     @Override public String[] getSupportedExtensions() { return new String[] { ".h5", ".hdf5" }; }
 
     @Override
-    protected NativeMatrix loadFromSource(String resourceId) throws Exception {
+    protected NativeDoubleMatrixStorage loadFromSource(String resourceId) throws Exception {
         Path path = Paths.get(resourceId);
         try (NativeHDF5Reader reader = new NativeHDF5Reader(path)) {
             String datasetName = "data"; // Default
@@ -145,7 +145,7 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeMatrix> imple
                 throw new IOException("Dataset 'data' not found or has wrong dimensionality");
             }
             
-            NativeMatrix matrix = new NativeMatrix((int) dims[0], (int) dims[1]);
+            NativeDoubleMatrixStorage matrix = new NativeDoubleMatrixStorage((int) dims[0], (int) dims[1]);
             reader.readMatrix(datasetName, matrix);
             return matrix;
         }
@@ -178,14 +178,14 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeMatrix> imple
         }
     }
 
-    public void readMatrix(String datasetName, NativeMatrix matrix) {
+    public void readMatrix(String datasetName, NativeDoubleMatrixStorage matrix) {
         readBlock(datasetName, matrix, 0, 0, matrix.rows(), matrix.cols());
     }
 
     /**
      * Reads a block of data from the dataset using hyperslabs.
      */
-    public void readBlock(String datasetName, NativeMatrix matrix, int startRow, int startCol, int rowCount, int colCount) {
+    public void readBlock(String datasetName, NativeDoubleMatrixStorage matrix, int startRow, int startCol, int rowCount, int colCount) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment nameSegment = arena.allocateFrom(datasetName);
             long datasetId = (long) H5D_OPEN.invokeExact(fileId, nameSegment, 0L);

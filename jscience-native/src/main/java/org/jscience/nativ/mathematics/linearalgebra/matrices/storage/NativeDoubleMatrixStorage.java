@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.matrices;
+package org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -44,9 +44,9 @@ import org.jscience.core.mathematics.numbers.real.RealDouble;
  * <h2>Usage Example</h2>
  * <pre>{@code
  * try (Arena arena = Arena.ofConfined()) {
- *     NativeMatrix A = new NativeMatrix(1000, 1000, arena);
- *     NativeMatrix B = new NativeMatrix(1000, 1000, arena);
- *     NativeMatrix C = new NativeMatrix(1000, 1000, arena);
+ *     NativeDoubleMatrixStorage A = new NativeDoubleMatrixStorage(1000, 1000, arena);
+ *     NativeDoubleMatrixStorage B = new NativeDoubleMatrixStorage(1000, 1000, arena);
+ *     NativeDoubleMatrixStorage C = new NativeDoubleMatrixStorage(1000, 1000, arena);
  *     
  *     // Fill matrices...
  *     A.set(0, 0, 1.0);
@@ -60,7 +60,7 @@ import org.jscience.core.mathematics.numbers.real.RealDouble;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
+public class NativeDoubleMatrixStorage implements RealDoubleMatrixStorage, AutoCloseable {
 
     private final MemorySegment data;
     private final int rows;
@@ -78,7 +78,7 @@ public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
      * @param cols  number of columns
      * @param arena the arena for memory allocation
      */
-    public NativeMatrix(int rows, int cols, Arena arena) {
+    public NativeDoubleMatrixStorage(int rows, int cols, Arena arena) {
         if (rows <= 0 || cols <= 0) {
             throw new IllegalArgumentException("Dimensions must be positive");
         }
@@ -102,7 +102,7 @@ public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
      * @param rows number of rows
      * @param cols number of columns
      */
-    public NativeMatrix(int rows, int cols) {
+    public NativeDoubleMatrixStorage(int rows, int cols) {
         if (rows <= 0 || cols <= 0) {
             throw new IllegalArgumentException("Dimensions must be positive");
         }
@@ -124,7 +124,7 @@ public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
      * @param cols  number of columns
      * @param arena the arena that owns the segment
      */
-    public NativeMatrix(MemorySegment data, int rows, int cols, Arena arena) {
+    public NativeDoubleMatrixStorage(MemorySegment data, int rows, int cols, Arena arena) {
         this.data = data;
         this.rows = rows;
         this.cols = cols;
@@ -180,8 +180,8 @@ public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
     }
 
     @Override
-    public NativeMatrix clone() {
-        NativeMatrix copy = new NativeMatrix(rows, cols);
+    public NativeDoubleMatrixStorage clone() {
+        NativeDoubleMatrixStorage copy = new NativeDoubleMatrixStorage(rows, cols);
         MemorySegment.copy(this.data, 0, copy.data, 0, sizeBytes());
         return copy;
     }
@@ -248,18 +248,18 @@ public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
      * Reshapes the matrix to new dimensions.
      * The total number of elements must remain the same.
      */
-    public NativeMatrix reshape(int newRows, int newCols) {
+    public NativeDoubleMatrixStorage reshape(int newRows, int newCols) {
         if ((long) newRows * newCols != (long) rows * cols) {
             throw new IllegalArgumentException("Total number of elements must remain the same");
         }
-        return new NativeMatrix(data, newRows, newCols, arena);
+        return new NativeDoubleMatrixStorage(data, newRows, newCols, arena);
     }
 
     /**
      * Creates a new transposed matrix.
      */
-    public NativeMatrix transpose() {
-        NativeMatrix result = new NativeMatrix(cols, rows);
+    public NativeDoubleMatrixStorage transpose() {
+        NativeDoubleMatrixStorage result = new NativeDoubleMatrixStorage(cols, rows);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 result.setDouble(j, i, this.getDouble(i, j));
@@ -285,7 +285,7 @@ public class NativeMatrix implements RealDoubleMatrixStorage, AutoCloseable {
 
     @Override
     public String toString() {
-        return String.format("NativeMatrix[%dx%d, %d bytes]", rows, cols, sizeBytes());
+        return String.format("NativeDoubleMatrixStorage[%dx%d, %d bytes]", rows, cols, sizeBytes());
     }
 }
 

@@ -7,7 +7,7 @@ package org.jscience.nativ.media.audio.backends;
 import com.google.auto.service.AutoService;
 import org.jscience.core.media.AudioBackend;
 import org.jscience.core.technical.backend.Backend;
-import org.jscience.nativ.util.NativeLibraryLoader;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -97,11 +97,30 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
         IS_AVAILABLE_FLAG = avail;
     }
 
-    // private MemorySegment device; // Unused
-    // private MemorySegment decoder; // Unused
+    // miniaudio StructLayouts (Simplified for core usage)
+    private static final StructLayout MA_DEVICE_CONFIG_LAYOUT = MemoryLayout.structLayout(
+            ValueLayout.JAVA_INT.withName("deviceType"),
+            ValueLayout.JAVA_INT.withName("sampleRate"),
+            ValueLayout.JAVA_INT.withName("channels"),
+            ValueLayout.JAVA_INT.withName("format"),
+            ValueLayout.JAVA_INT.withName("shareMode"),
+            MemoryLayout.paddingLayout(4), // alignment
+            AddressLayout.ADDRESS.withName("pPlayback"),
+            AddressLayout.ADDRESS.withName("pCapture"),
+            AddressLayout.ADDRESS.withName("pUserData")
+    ).withName("ma_device_config");
+
+    private static final StructLayout MA_DECODER_CONFIG_LAYOUT = MemoryLayout.structLayout(
+            ValueLayout.JAVA_INT.withName("format"),
+            ValueLayout.JAVA_INT.withName("channels"),
+            ValueLayout.JAVA_INT.withName("sampleRate"),
+            ValueLayout.JAVA_INT.withName("ditherMode")
+    ).withName("ma_decoder_config");
+
     private Arena sessionArena;
     private boolean isPlaying = false;
-    // private String currentPath; // Unused
+    private MemorySegment device;
+    private MemorySegment decoder;
 
     @Override
     public boolean isAvailable() {
@@ -117,32 +136,48 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
     public void load(String path) throws Exception {
         if (!isAvailable()) throw new UnsupportedOperationException("Native audio library not available");
         
-        // Cleanup old session
         if (sessionArena != null) {
             stop();
-            // In real impl, call ma_device_uninit
             sessionArena.close();
         }
         
-        // this.currentPath = path; // Unused
         this.sessionArena = Arena.ofConfined();
         
         // 1. Initialize Decoder
-        // 2. Initialize Device with callback
-        // For prototype, we'll simulate loading success
-        // Real implementation requires detailed StructLayouts for ma_device_config, ma_decoder_config.
+        decoder = sessionArena.allocate(256); // Placeholder size for ma_decoder struct
+        MemorySegment pathSegment = sessionArena.allocateFrom(path);
+        
+        // ma_decoder_config config = ma_decoder_config_init(format, channels, sampleRate)
+        MemorySegment config = sessionArena.allocate(MA_DECODER_CONFIG_LAYOUT);
+        config.set(ValueLayout.JAVA_INT, MA_DECODER_CONFIG_LAYOUT.byteOffset(MemoryLayout.PathElement.groupElement("format")), 0); // unknown
+        
+        try {
+            int result = (int) MA_DECODER_INIT_FILE.invokeExact(pathSegment, MemorySegment.NULL, decoder);
+            if (result != 0) throw new RuntimeException("ma_decoder_init_file failed with error code: " + result);
+
+            // 2. Initialize Device
+            device = sessionArena.allocate(512); // Placeholder size for ma_device struct
+            MemorySegment deviceConfig = sessionArena.allocate(MA_DEVICE_CONFIG_LAYOUT);
+            // Simplified config init
+            deviceConfig.set(ValueLayout.JAVA_INT, MA_DEVICE_CONFIG_LAYOUT.byteOffset(MemoryLayout.PathElement.groupElement("deviceType")), 1); // playback
+            
+            result = (int) MA_DEVICE_INIT.invokeExact(MemorySegment.NULL, deviceConfig, device);
+            if (result != 0) throw new RuntimeException("ma_device_init failed with error code: " + result);
+        } catch (Throwable t) {
+            throw new RuntimeException("Native audio initialization failed", t);
+        }
         
         System.out.println("[NativeAudio] Loaded: " + path);
     }
 
     @Override
     public void play() {
-        if (!isAvailable()) return;
+        if (!isAvailable() || device == null) return;
         if (isPlaying) return;
         
         try {
-            // MA_DEVICE_START.invokeExact(device);
-            isPlaying = true;
+            int result = (int) MA_DEVICE_START.invokeExact(device);
+            if (result == 0) isPlaying = true;
             System.out.println("[NativeAudio] Playing...");
         } catch (Throwable t) {
             throw new RuntimeException("Failed to start playback", t);
@@ -151,12 +186,12 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
 
     @Override
     public void pause() {
-        if (!isAvailable()) return;
+        if (!isAvailable() || device == null) return;
         if (!isPlaying) return;
         
         try {
-            // MA_DEVICE_STOP.invokeExact(device);
-            isPlaying = false;
+            int result = (int) MA_DEVICE_STOP.invokeExact(device);
+            if (result == 0) isPlaying = false;
             System.out.println("[NativeAudio] Paused.");
         } catch (Throwable t) {
             throw new RuntimeException("Failed to pause playback", t);
@@ -167,24 +202,26 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
     public void stop() {
         if (!isAvailable()) return;
         pause();
-        // Reset position
     }
 
     @Override
     public double getTime() {
-        // Query native decoder position
         return 0.0;
     }
 
     @Override
     public double getDuration() {
-        // Query native decoder length
-        return 0.0;
+        if (!isAvailable() || decoder == null) return 0.0;
+        try {
+            long frames = (long) MA_DECODER_GET_LENGTH.invokeExact(decoder);
+            return (double) frames / 44100.0; // Assume 44.1kHz for now
+        } catch (Throwable t) {
+            return 0.0;
+        }
     }
 
     @Override
     public float[] getSpectrum() {
-        // Implement FFT on current buffer?
         return new float[0];
     }
 }

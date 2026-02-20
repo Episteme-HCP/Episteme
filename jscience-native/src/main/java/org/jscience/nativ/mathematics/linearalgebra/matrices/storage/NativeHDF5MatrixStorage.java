@@ -8,6 +8,7 @@ package org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.nativ.physics.loaders.hdf5.NativeHDF5Reader;
+import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 import java.nio.file.Path;
 
 /**
@@ -66,8 +67,8 @@ public class NativeHDF5MatrixStorage implements org.jscience.core.mathematics.li
     @Override
     public Real get(int row, int col) {
         // For single element access, load a 1x1 block
-        org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix block = 
-            new org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix(1, 1);
+        org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage block = 
+            new org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(1, 1);
         reader.readBlock(datasetName, block, row, col, 1, 1);
         return org.jscience.core.mathematics.numbers.real.RealDouble.of(block.getDouble(0, 0));
     }
@@ -87,8 +88,8 @@ public class NativeHDF5MatrixStorage implements org.jscience.core.mathematics.li
      * @return Matrix containing the loaded block
      */
     public Matrix<Real> loadBlock(int startRow, int startCol, int rowCount, int colCount) {
-        org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix block = 
-            new org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix(rowCount, colCount);
+        org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage block = 
+            new org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(rowCount, colCount);
         reader.readBlock(datasetName, block, startRow, startCol, rowCount, colCount);
         return org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(block);
     }

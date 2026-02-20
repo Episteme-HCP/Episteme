@@ -4,7 +4,7 @@
  */
 package org.jscience.examples.physics;
 
-import org.jscience.nativ.physics.NativePhysicsProvider;
+import org.jscience.nativ.physics.classical.mechanics.backends.NativePhysicsBackend;
 
 /**
  * Demonstrates usage of the Native Physics Provider (Bullet3 / Jolt).
@@ -20,7 +20,7 @@ public class PhysicsSimulationExample {
         System.out.println("==========================================");
 
         // 1. Instantiate Provider
-        NativePhysicsProvider physics = new NativePhysicsProvider();
+        NativePhysicsBackend physics = new NativePhysicsBackend();
         
         System.out.println("Initializing Physics Engine: " + physics.getName());
 

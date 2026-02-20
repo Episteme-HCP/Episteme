@@ -7,11 +7,11 @@ package org.jscience.nativ.physics.loaders.hdf5;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.io.ResourceWriter;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.NativeMatrix;
+import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * Adapter to save Tensors to HDF5 files.
- * Currently supports Rank-2 Tensors (Matrices) by converting to NativeMatrix.
+ * Currently supports Rank-2 Tensors (Matrices) by converting to NativeDoubleMatrixStorage.
  * Future versions will support N-Dimensional arrays directly.
  */
 public class NativeHDF5TensorWriter implements ResourceWriter<Tensor<?>> {
@@ -44,7 +44,7 @@ public class NativeHDF5TensorWriter implements ResourceWriter<Tensor<?>> {
 
     @Override
     public String getLongDescription() {
-        return "Adapter that allows saving org.jscience.core.mathematics.linearalgebra.Tensor objects directly to HDF5 files by converting them to NativeMatrix representations.";
+        return "Adapter that allows saving org.jscience.core.mathematics.linearalgebra.Tensor objects directly to HDF5 files by converting them to NativeDoubleMatrixStorage representations.";
     }
 
     @Override
@@ -66,8 +66,8 @@ public class NativeHDF5TensorWriter implements ResourceWriter<Tensor<?>> {
         int rows = resource.shape()[0];
         int cols = resource.shape()[1];
 
-        // Convert Tensor to NativeMatrix using its own confined arena
-        try (NativeMatrix matrix = new NativeMatrix(rows, cols)) {
+        // Convert Tensor to NativeDoubleMatrixStorage using its own confined arena
+        try (NativeDoubleMatrixStorage matrix = new NativeDoubleMatrixStorage(rows, cols)) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                     Object val = resource.get(i, j);

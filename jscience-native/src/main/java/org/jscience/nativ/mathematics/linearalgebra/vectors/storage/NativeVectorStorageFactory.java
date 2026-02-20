@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.vectors;
+package org.jscience.nativ.mathematics.linearalgebra.vectors.storage;
 
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorageFactory;
@@ -29,7 +29,7 @@ import org.jscience.core.mathematics.structures.rings.Ring;
 
 /**
  * Native implementation of VectorStorageFactory.
- * Creates {@link NativeVector} instances for Real numbers.
+ * Creates {@link NativeDoubleVectorStorage} instances for Real numbers.
  */
 public class NativeVectorStorageFactory implements VectorStorageFactory {
 
@@ -39,7 +39,7 @@ public class NativeVectorStorageFactory implements VectorStorageFactory {
         E zero = ring.zero();
         if (zero instanceof org.jscience.core.mathematics.numbers.real.Real) {
             @SuppressWarnings("unchecked")
-            VectorStorage<E> storage = (VectorStorage<E>) new NativeVector(dimension);
+            VectorStorage<E> storage = (VectorStorage<E>) new NativeDoubleVectorStorage(dimension);
             return storage;
         }
         return null;

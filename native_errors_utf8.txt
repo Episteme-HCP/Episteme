@@ -1,0 +1,84 @@
+﻿mvn : WARNING: A restricted method in java.lang.System has 
+been called
+Au caractère Ligne:1 : 1
++ mvn clean compile -DskipTests -pl jscience-native > 
+native_errors.txt ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING:     A 
+rest...has been called:String) [], RemoteExcepti    on
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: java.lang.System::load has been called by 
+org.fusesource.jansi.internal.JansiLoader in an unnamed 
+module (file:/C:/Program%20Files/Apache/Maven/apache-maven-3
+.9.5/lib/jansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a 
+warning for callers in this module
+WARNING: Restricted methods will be blocked in a future 
+release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe 
+has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called 
+by com.google.common.util.concurrent.AbstractFuture$UnsafeAt
+omicHelper (file:/C:/Program%20Files/Apache/Maven/apache-mav
+en-3.9.5/lib/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers 
+of class com.google.common.util.concurrent.AbstractFuture$Un
+safeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed 
+in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-native >--------------------
+[INFO] Building JScience Native 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jscience-native ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\JScience\jscience-native\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-native ---
+[INFO] Copying 199 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-native ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 51 source files with javac [debug release 25] to target\classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/technical/backend/gpu/opencl/NativeOpenCLSparseLinearAlgebraBackend.java:[45,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/technical/backend/gpu/opencl/NativeOpenCLSparseLinearAlgebraBackend.java:[45,1] Service provider org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/ND4JLinearAlgebraBackend.java:[29,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/vision/backends/NativeCPUVisionBackend.java:[34,1] Service provider org.jscience.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeCPULinearAlgebraBackend.java:[41,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/vision/backends/NativeCUDAVisionBackend.java:[29,1] Service provider org.jscience.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/vision/backends/NativeOpenCLVisionBackend.java:[29,1] Service provider org.jscience.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/technical/backend/gpu/cuda/NativeCUDASparseLinearAlgebraBackend.java:[39,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/technical/backend/gpu/cuda/NativeCUDASparseLinearAlgebraBackend.java:[39,1] Service provider org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[INFO] 9 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/ND4JLinearAlgebraBackend.java:[29,1] ServiceProviders must implement their service provider interface. org.jscience.nativ.mathematics.linearalgebra.backends.ND4JLinearAlgebraBackend does not implement org.jscience.core.technical.backend.ComputeBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/ND4JLinearAlgebraBackend.java:[29,1] ServiceProviders must implement their service provider interface. org.jscience.nativ.mathematics.linearalgebra.backends.ND4JLinearAlgebraBackend does not implement org.jscience.core.technical.backend.ComputeBackend
+[INFO] 2 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  16.991 s
+[INFO] Finished at: 2026-02-20T16:53:43+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project jscience-native: Compilation failure: Compilation failure: 
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/ND4JLinearAlgebraBackend.java:[29,1] ServiceProviders must implement their service provider interface. org.jscience.nativ.mathematics.linearalgebra.backends.ND4JLinearAlgebraBackend does not implement org.jscience.core.technical.backend.ComputeBackend
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/ND4JLinearAlgebraBackend.java:[29,1] ServiceProviders must implement their service provider interface. org.jscience.nativ.mathematics.linearalgebra.backends.ND4JLinearAlgebraBackend does not implement org.jscience.core.technical.backend.ComputeBackend
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
