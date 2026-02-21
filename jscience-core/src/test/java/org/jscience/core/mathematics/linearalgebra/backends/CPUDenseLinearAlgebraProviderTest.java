@@ -24,5 +24,37 @@ public class CPUDenseLinearAlgebraProviderTest {
         // Ensure class is reachable
         assertNotNull(CPUDenseLinearAlgebraProvider.class);
     }
+
+    @Test
+    public void testRealVectorOperations() {
+        org.jscience.core.mathematics.sets.Reals reals = org.jscience.core.mathematics.sets.Reals.getInstance();
+        CPUDenseLinearAlgebraProvider<org.jscience.core.mathematics.numbers.real.Real> provider = new CPUDenseLinearAlgebraProvider<>(reals);
+        
+        // Test Matrix-Vector Multiply
+        double[][] matData = {{1.0, 2.0}, {3.0, 4.0}};
+        org.jscience.core.mathematics.linearalgebra.Matrix<org.jscience.core.mathematics.numbers.real.Real> matrix = 
+            org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(matData);
+            
+        double[] vecData = {1.0, 1.0};
+        org.jscience.core.mathematics.numbers.real.Real[] realVecData = new org.jscience.core.mathematics.numbers.real.Real[2];
+        realVecData[0] = org.jscience.core.mathematics.numbers.real.Real.of(vecData[0]);
+        realVecData[1] = org.jscience.core.mathematics.numbers.real.Real.of(vecData[1]);
+        
+        org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> vector = 
+            new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
+                new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(realVecData), 
+                provider, reals);
+                
+        org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> result = provider.multiply(matrix, vector);
+        
+        assertEquals(3.0, result.get(0).doubleValue(), 1e-9);
+        assertEquals(7.0, result.get(1).doubleValue(), 1e-9);
+
+        // Test Solve
+        // A = [[1, 2], [3, 4]], b = [3, 7] -> x = [1, 1]
+        org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> x = provider.solve(matrix, result);
+        assertEquals(1.0, x.get(0).doubleValue(), 1e-9);
+        assertEquals(1.0, x.get(1).doubleValue(), 1e-9);
+    }
 }
 

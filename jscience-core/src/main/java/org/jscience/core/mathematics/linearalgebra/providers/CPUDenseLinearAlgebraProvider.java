@@ -642,7 +642,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
             
             E[] resArray = (E[]) new Real[rows];
-            for (int i = 0; i < rows; i++) resArray[i] = Real.of(res[i]);
+            for (int i = 0; i < rows; i++) resArray[i] = (E) (Object) Real.of(res[i]);
             return new GenericVector<>(new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
         }
 
@@ -968,7 +968,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
 
             E[] resArray = (E[]) new Real[n];
-            for (int i = 0; i < n; i++) resArray[i] = Real.of(res[i]);
+            for (int i = 0; i < n; i++) resArray[i] = (E) (Object) Real.of(res[i]);
             return new GenericVector<>(new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
         }
 
