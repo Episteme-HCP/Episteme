@@ -126,7 +126,7 @@ public class MolecularDynamicsTask
         list.add(org.jscience.core.mathematics.numbers.real.Real.of(x));
         list.add(org.jscience.core.mathematics.numbers.real.Real.of(y));
         list.add(org.jscience.core.mathematics.numbers.real.Real.of(z));
-        return org.jscience.core.mathematics.linearalgebra.vectors.DenseVector.of(list,
+        return org.jscience.core.mathematics.linearalgebra.Vector.of(list,
                 org.jscience.core.mathematics.sets.Reals.getInstance());
     }
 
