@@ -108,6 +108,13 @@ public class ProviderRegistry {
         if (density < 0.2) {
             return new SparseMatrixStorage<>(rows, cols, ring.zero());
         }
+
+        // Specialized path for Real
+        if (ring.getClass().getName().contains("Reals")) {
+            @SuppressWarnings({"unchecked", "preview", "restricted"})
+            MatrixStorage<E> specialized = (MatrixStorage<E>) (MatrixStorage<?>) new org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage(rows, cols);
+            return specialized;
+        }
         
         // Try SPI factories (Native, CUDA, etc.)
         for (MatrixStorageFactory factory : matrixStorageFactories) {

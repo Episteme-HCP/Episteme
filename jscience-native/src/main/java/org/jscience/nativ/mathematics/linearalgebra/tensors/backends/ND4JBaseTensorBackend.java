@@ -63,7 +63,9 @@ public abstract class ND4JBaseTensorBackend implements TensorBackend {
             throw new IllegalStateException("ND4J backend not available");
         }
         if (supportsGPU()) {
-            return new CUDAExecutionContext();
+            @SuppressWarnings("deprecation")
+            ExecutionContext context = new CUDAExecutionContext();
+            return context;
         }
         return new CPUExecutionContext();
     }

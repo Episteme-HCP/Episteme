@@ -698,14 +698,35 @@ public class MainController {
         
         BarChart<?,?> chart = (BarChart<?,?>) selectedTab.getContent();
         
+        // Finalize labels before export
+        int metricIndex = metricSelector.getSelectionModel().getSelectedIndex();
+        String metricPostfix = switch (metricIndex) {
+            case 0 -> "throughput";
+            case 1 -> "latency";
+            case 2 -> "p99_latency";
+            default -> "results";
+        };
+        
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Chart Image");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Files", "*.png"));
-        fileChooser.setInitialFileName("benchmark_" + selectedTab.getText().toLowerCase().replaceAll("\\s+", "_") + ".png");
+        
+        // Use the requested naming convention: id_chart_de_benchmark_{type} or similar
+        String opName = selectedTab.getText().toLowerCase().replaceAll("\\s+", "_");
+        fileChooser.setInitialFileName("id_chart_de_benchmark_" + opName + "_" + metricPostfix + ".png");
         
         File file = fileChooser.showSaveDialog(exportChartBtn.getScene().getWindow());
         if (file != null) {
-            WritableImage image = chart.snapshot(new javafx.scene.SnapshotParameters(), null);
+            javafx.scene.SnapshotParameters params = new javafx.scene.SnapshotParameters();
+            params.setFill(javafx.scene.paint.Color.web("#2b2b2b")); // Dark background for contrast
+            
+            // Ensure labels are white for visibility on dark background
+            chart.getXAxis().setTickLabelFill(javafx.scene.paint.Color.WHITE);
+            chart.getYAxis().setTickLabelFill(javafx.scene.paint.Color.WHITE);
+            chart.getXAxis().setStyle("-fx-text-fill: white;");
+            chart.getYAxis().setStyle("-fx-text-fill: white;");
+
+            WritableImage image = chart.snapshot(params, null);
             try {
                 ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
                 statusBarLabel.textProperty().unbind();

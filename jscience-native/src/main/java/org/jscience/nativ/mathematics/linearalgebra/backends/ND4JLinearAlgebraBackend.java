@@ -196,6 +196,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) return fallback.solve(a, b);
+        // ND4J direct solve: A * x = b => x = solve(A, b)
+        // Fallback to inverse multiply if solve is not found in this version
         return multiply(inverse(a), b);
     }
 

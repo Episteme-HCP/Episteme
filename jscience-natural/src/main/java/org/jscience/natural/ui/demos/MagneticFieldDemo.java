@@ -24,14 +24,9 @@
 package org.jscience.natural.ui.demos;
 
 import javafx.scene.Node;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Sphere;
 import org.jscience.core.ui.AbstractDemo;
 import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer;
-import org.jscience.natural.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer;
 import org.jscience.natural.physics.classical.waves.electromagnetism.providers.MulticoreMaxwellProvider;
-import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource;
 
 /**
  * Demo Provider for Magnetic Field Visualization with physical source bodies.

@@ -23,7 +23,6 @@
 
 package org.jscience.core.mathematics.linearalgebra.matrices.storage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,53 +34,48 @@ import java.util.List;
  */
 public class DenseMatrixStorage<E> implements MatrixStorage<E> {
 
-    private final List<List<E>> data;
+    private final E[] data;
     private final int rowsCount;
     private final int colsCount;
 
+    @SuppressWarnings("unchecked")
     public DenseMatrixStorage(List<List<E>> data) {
-        this.data = new ArrayList<>();
-        for (List<E> row : data) {
-            this.data.add(new ArrayList<>(row));
-        }
         this.rowsCount = data.size();
         this.colsCount = data.isEmpty() ? 0 : data.get(0).size();
+        this.data = (E[]) new Object[rowsCount * colsCount];
+        for (int i = 0; i < rowsCount; i++) {
+            List<E> row = data.get(i);
+            int rowOffset = i * colsCount;
+            for (int j = 0; j < colsCount; j++) {
+                this.data[rowOffset + j] = row.get(j);
+            }
+        }
     }
 
+    @SuppressWarnings("unchecked")
     public DenseMatrixStorage(int rows, int cols, E initialValue) {
-        this.data = new ArrayList<>(rows);
-        for (int i = 0; i < rows; i++) {
-            List<E> row = new ArrayList<>(cols);
-            for (int j = 0; j < cols; j++) {
-                row.add(initialValue);
-            }
-            this.data.add(row);
-        }
         this.rowsCount = rows;
         this.colsCount = cols;
+        this.data = (E[]) new Object[rows * cols];
+        if (initialValue != null) {
+            java.util.Arrays.fill(this.data, initialValue);
+        }
     }
 
     public DenseMatrixStorage(int rows, int cols, E[] flatData) {
-        this.data = new ArrayList<>(rows);
-        for (int i = 0; i < rows; i++) {
-            List<E> row = new ArrayList<>(cols);
-            for (int j = 0; j < cols; j++) {
-                row.add(flatData[i * cols + j]);
-            }
-            this.data.add(row);
-        }
         this.rowsCount = rows;
         this.colsCount = cols;
+        this.data = flatData;
     }
 
     @Override
     public E get(int row, int col) {
-        return data.get(row).get(col);
+        return data[row * colsCount + col];
     }
 
     @Override
     public void set(int row, int col, E value) {
-        data.get(row).set(col, value);
+        data[row * colsCount + col] = value;
     }
 
     @Override
@@ -96,10 +90,10 @@ public class DenseMatrixStorage<E> implements MatrixStorage<E> {
 
     @Override
     public MatrixStorage<E> clone() {
-        return new DenseMatrixStorage<>(data);
+        return new DenseMatrixStorage<>(rowsCount, colsCount, data.clone());
     }
 
-    public List<List<E>> getData() {
+    public E[] getData() {
         return data;
     }
 }

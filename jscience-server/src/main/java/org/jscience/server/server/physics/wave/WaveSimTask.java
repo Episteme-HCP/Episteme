@@ -25,8 +25,7 @@ package org.jscience.server.server.physics.wave;
 
 import org.jscience.core.distributed.DistributedTask;
 import org.jscience.core.distributed.TaskRegistry;
-import org.jscience.natural.physics.classical.waves.WaveProvider;
-import org.jscience.server.server.physics.wave.WaveSimPrimitiveSupport;
+
 
 
 

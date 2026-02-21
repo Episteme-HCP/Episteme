@@ -22,6 +22,7 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
@@ -49,7 +50,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     // private static final MethodHandle DSCAL_HANDLE;
     
     // LAPACK (via LAPACKE interface)
-    // private static final MethodHandle DGESV_HANDLE;
+    private static final MethodHandle DGESV_HANDLE;
     private static final MethodHandle DGETRF_HANDLE;
     private static final MethodHandle DGETRI_HANDLE;
     
@@ -63,6 +64,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     static {
         MethodHandle dgemm = null;
+        MethodHandle dgesv = null;
         MethodHandle dgetrf = null;
         MethodHandle dgetri = null;
         
@@ -107,6 +109,8 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
                     // LAPACKE
                     dgesv = lookup.find("LAPACKE_dgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                     */
+                    // LAPACKE
+                    dgesv = lookup.find("LAPACKE_dgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                     dgetrf = lookup.find("LAPACKE_dgetrf").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                     dgetri = lookup.find("LAPACKE_dgetri").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
@@ -118,13 +122,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         }
         
         DGEMM_HANDLE = dgemm;
-        // DGEMV_HANDLE = dgemv;
-        // DDOT_HANDLE = ddot;
-        // DNRM2_HANDLE = dnrm2;
-        // DAXPY_HANDLE = daxpy;
-        // DSCAL_HANDLE = dscal;
-        
-        // DGESV_HANDLE = dgesv;
+        DGESV_HANDLE = dgesv;
         DGETRF_HANDLE = dgetrf;
         DGETRI_HANDLE = dgetri;
         
@@ -203,6 +201,15 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             return (int) DGETRI_HANDLE.invokeExact(CblasRowMajor, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
         } catch (Throwable t) {
             throw new RuntimeException("LAPACK dgetri failed", t);
+        }
+    }
+
+    public int dgesv(int n, int nrhs, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv, DoubleBuffer B, int ldb) {
+        if (!AVAILABLE || DGESV_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesv not available");
+        try {
+            return (int) DGESV_HANDLE.invokeExact(CblasRowMajor, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv), MemorySegment.ofBuffer(B), ldb);
+        } catch (Throwable t) {
+            throw new RuntimeException("LAPACK dgesv failed", t);
         }
     }
 
@@ -286,9 +293,38 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { return fallback.multiply(a, b); }
     @Override
-    public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols() && b.dimension() == a.rows()) {
+            int n = a.rows();
+            RealDoubleMatrix adm = (RealDoubleMatrix) a;
+            
+            // Result vector initialized with b
+            RealDoubleMatrix x = RealDoubleMatrix.direct(n, 1);
+            for(int i=0; i<n; i++) x.set(i, 0, b.get(i));
+            
+            // Intermediate matrix for decomposition (A will be overwritten by DGESV)
+            RealDoubleMatrix aDecomp = RealDoubleMatrix.direct(n, n);
+            aDecomp.getBuffer().put(adm.toDoubleArray());
+            aDecomp.getBuffer().position(0);
+            
+            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
+                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+            
+            int info = dgesv(n, 1, aDecomp.getBuffer(), n, ipiv, x.getBuffer(), 1);
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgesv: " + info);
+            if (info > 0) throw new ArithmeticException("Matrix is singular");
+            
+            // Extract vector from result matrix
+            double[] result = new double[n];
+            x.getBuffer().position(0);
+            x.getBuffer().get(result);
+            return RealDoubleVector.of(result);
+        }
+        return fallback.solve(a, b);
+    }
+
     @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return fallback.solve(a, b); }
+    public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) { return fallback.transpose(a); }
     @Override

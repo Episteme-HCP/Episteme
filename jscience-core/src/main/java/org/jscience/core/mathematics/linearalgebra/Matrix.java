@@ -31,6 +31,9 @@ import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorag
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.TriangularMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.TridiagonalMatrixStorage;
 // DiagonalMatrixStorage removed
@@ -52,20 +55,25 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
     /**
      * Creates a matrix from a 2D array.
      */
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     static <E> Matrix<E> of(E[][] data, Ring<E> ring) {
         int rows = data.length;
-        int cols = rows > 0 ? data[0].length : 0;
-        
+        if (rows == 0) return new GenericMatrix<>(new org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(0, 0, ring.zero()), null, ring);
+        int cols = data[0].length;
+
         // Density heuristic
         int nz = 0;
         E zero = ring.zero();
         for (E[] row : data) for (E val : row) if (!val.equals(zero)) nz++;
         double density = (rows * cols > 0) ? (double) nz / (rows * cols) : 1.0;
-        
+
         org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(rows, cols, ring, density);
         for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) storage.set(i, j, data[i][j]);
-        
+
         LinearAlgebraProvider<E> provider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        if (ring instanceof Reals && storage instanceof org.jscience.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) {
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of((org.jscience.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) storage);
+        }
         return new GenericMatrix<>(storage, provider, ring);
     }
 

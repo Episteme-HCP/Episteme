@@ -34,8 +34,7 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
-import org.jscience.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner;
+import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
@@ -179,10 +178,21 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public E dot(Vector<E> a, Vector<E> b) {
         if (a.dimension() != b.dimension()) {
             throw new IllegalArgumentException("Vector dimensions must match");
         }
+        
+        if (field instanceof org.jscience.core.mathematics.sets.Reals) {
+            double sum = 0.0;
+            int dim = a.dimension();
+            for (int i = 0; i < dim; i++) {
+                sum += ((Real) a.get(i)).doubleValue() * ((Real) b.get(i)).doubleValue();
+            }
+            return (E) (Object) Real.of(sum);
+        }
+
         if (a.dimension() < PARALLEL_THRESHOLD) {
             E sum = field.zero();
             for (int i = 0; i < a.dimension(); i++) {
@@ -196,25 +206,34 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     .mapToObj(i -> field.multiply(a.get(i), b.get(i)))
                     .reduce(field.zero(), field::add);
         }
-
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public E norm(Vector<E> a) {
+        if (field instanceof org.jscience.core.mathematics.sets.Reals) {
+            double sumSq = 0.0;
+            int dim = a.dimension();
+            for (int i = 0; i < dim; i++) {
+                double val = ((Real) a.get(i)).doubleValue();
+                sumSq += val * val;
+            }
+            return (E) (Object) Real.of(Math.sqrt(sumSq));
+        }
+
         E dotProduct = dot(a, a);
         if (field instanceof org.jscience.core.mathematics.sets.Reals) {
             org.jscience.core.mathematics.numbers.real.Real r = (org.jscience.core.mathematics.numbers.real.Real) dotProduct;
             double val = r.doubleValue();
-            return (E) org.jscience.core.mathematics.numbers.real.Real.of(Math.sqrt(val));
+            return (E) (Object) org.jscience.core.mathematics.numbers.real.Real.of(Math.sqrt(val));
         }
         if (dotProduct instanceof org.jscience.core.mathematics.numbers.real.RealDouble) {
             org.jscience.core.mathematics.numbers.real.RealDouble rd = (org.jscience.core.mathematics.numbers.real.RealDouble) dotProduct;
-            return (E) org.jscience.core.mathematics.numbers.real.RealDouble.of(Math.sqrt(rd.doubleValue()));
+            return (E) (Object) org.jscience.core.mathematics.numbers.real.RealDouble.of(Math.sqrt(rd.doubleValue()));
         }
         if (dotProduct instanceof org.jscience.core.mathematics.numbers.real.Real) {
             org.jscience.core.mathematics.numbers.real.Real r = (org.jscience.core.mathematics.numbers.real.Real) dotProduct;
-            return (E) org.jscience.core.mathematics.numbers.real.Real.of(Math.sqrt(r.doubleValue()));
+            return (E) (Object) org.jscience.core.mathematics.numbers.real.Real.of(Math.sqrt(r.doubleValue()));
         }
         throw new UnsupportedOperationException("Norm not supported for field: " + field.getClass().getSimpleName());
     }
@@ -222,13 +241,36 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
-            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).add((SIMDRealDoubleMatrix) b);
+        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix") && b.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
+            return a.add(b);
         }
 
         if (a.rows() != b.rows() || a.cols() != b.cols()) {
             throw new IllegalArgumentException("Matrix dimensions must match");
         }
+
+        if (isReal(a) && isReal(b)) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] dataA = toDoubleArray(a);
+            double[] dataB = toDoubleArray(b);
+            double[] resData = new double[rows * cols];
+            
+            if (rows * cols < PARALLEL_THRESHOLD) {
+                for (int i = 0; i < rows * cols; i++) {
+                    resData[i] = dataA[i] + dataB[i];
+                }
+            } else {
+                IntStream.range(0, rows).parallel().forEach(i -> {
+                    int offset = i * cols;
+                    for (int j = 0; j < cols; j++) {
+                        resData[offset + j] = dataA[offset + j] + dataB[offset + j];
+                    }
+                });
+            }
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rows, cols);
+        }
+
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
 
         if (a.rows() * a.cols() < PARALLEL_THRESHOLD) {
@@ -250,13 +292,36 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
-            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).subtract((SIMDRealDoubleMatrix) b);
+        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix") && b.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
+            return a.subtract(b);
         }
 
         if (a.rows() != b.rows() || a.cols() != b.cols()) {
             throw new IllegalArgumentException("Matrix dimensions must match");
         }
+
+        if (isReal(a) && isReal(b)) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] dataA = toDoubleArray(a);
+            double[] dataB = toDoubleArray(b);
+            double[] resData = new double[rows * cols];
+            
+            if (rows * cols < PARALLEL_THRESHOLD) {
+                for (int i = 0; i < rows * cols; i++) {
+                    resData[i] = dataA[i] - dataB[i];
+                }
+            } else {
+                IntStream.range(0, rows).parallel().forEach(i -> {
+                    int offset = i * cols;
+                    for (int j = 0; j < cols; j++) {
+                        resData[offset + j] = dataA[offset + j] - dataB[offset + j];
+                    }
+                });
+            }
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rows, cols);
+        }
+
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
 
         if (a.rows() * a.cols() < PARALLEL_THRESHOLD) {
@@ -278,16 +343,16 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (a.cols() != b.rows()) {
             throw new IllegalArgumentException("Matrix inner dimensions must match");
         }
 
         // SIMD fast path: use hardware-vectorized Strassen/CARMA for RealDouble matrices
-        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
-            return (Matrix<E>) MatrixMultiplicationPlanner.multiply(
-                    (SIMDRealDoubleMatrix) a, (SIMDRealDoubleMatrix) b);
+        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix") && b.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
+            return (Matrix<E>) org.jscience.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply(
+                    (Matrix<Real>) a, (Matrix<Real>) b);
         }
 
         // Generic Strassen for large power-of-two square matrices
@@ -357,12 +422,48 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
     }
 
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     protected Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b) {
+        int rowsA = a.rows();
+        int colsA = a.cols();
+        int colsB = b.cols();
+
+        // Primitive Fast Path for Reals
+        if (isReal(a) && isReal(b)) {
+            double[] dataA = toDoubleArray(a);
+            double[] dataB = toDoubleArray(b);
+            double[] resData = new double[rowsA * colsB];
+
+            long start = System.nanoTime();
+            try {
+                if (rowsA >= 64 && colsA >= 64 && colsB >= 64) {
+                    // Tiled / Blocked multiplication for cache efficiency
+                    tiledMultiply(dataA, dataB, resData, rowsA, colsA, colsB);
+                } else {
+                    // Optimized i-k-j loop for small-to-medium matrices
+                    for (int i = 0; i < rowsA; i++) {
+                        int rowOffsetA = i * colsA;
+                        int rowOffsetC = i * colsB;
+                        for (int k = 0; k < colsA; k++) {
+                            double aik = dataA[rowOffsetA + k];
+                            int rowOffsetB = k * colsB;
+                            for (int j = 0; j < colsB; j++) {
+                                resData[rowOffsetC + j] += aik * dataB[rowOffsetB + j];
+                            }
+                        }
+                    }
+                }
+            } finally {
+                org.jscience.core.util.PerformanceLogger.log("CPU:RealFastMultiply", 
+                    a.rows() + "x" + b.cols(), System.nanoTime() - start);
+            }
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rowsA, colsB);
+        }
+
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), b.cols(), field.zero());
         long start = System.nanoTime();
         try {
             if (a.rows() < 10) {
-                // ... serial loop ...
                 for (int i = 0; i < a.rows(); i++) {
                     for (int j = 0; j < b.cols(); j++) {
                         E sum = field.zero();
@@ -397,11 +498,86 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return new GenericMatrix<>(storage, this, field);
     }
 
+    private boolean isReal(Matrix<E> m) {
+        return m.getScalarRing() instanceof org.jscience.core.mathematics.sets.Reals;
+    }
+
+    private double[] toDoubleArray(Matrix<E> m) {
+        if (m.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
+            try {
+                return (double[]) m.getClass().getMethod("getInternalData").invoke(m);
+            } catch (Exception e) {
+                // Fallback handled below
+            }
+        }
+        if (m instanceof GenericMatrix) {
+            org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> storage = 
+                ((GenericMatrix<E>) m).getStorage();
+            if (storage instanceof org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage) {
+                return ((org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage) storage).getData();
+            }
+        }
+        // Fallback: full copy
+        int r = m.rows();
+        int c = m.cols();
+        double[] data = new double[r * c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                data[i * c + j] = ((Real) m.get(i, j)).doubleValue();
+            }
+        }
+        return data;
+    }
+
+    private void tiledMultiply(double[] A, double[] B, double[] C, int M, int K, int N) {
+        final int BLOCK_SIZE = 64; 
+        IntStream.range(0, (M + BLOCK_SIZE - 1) / BLOCK_SIZE).parallel().forEach(bi -> {
+            int i0 = bi * BLOCK_SIZE;
+            int iMax = Math.min(i0 + BLOCK_SIZE, M);
+            for (int k0 = 0; k0 < K; k0 += BLOCK_SIZE) {
+                int kMax = Math.min(k0 + BLOCK_SIZE, K);
+                for (int j0 = 0; j0 < N; j0 += BLOCK_SIZE) {
+                    int jMax = Math.min(j0 + BLOCK_SIZE, N);
+                    
+                    for (int i = i0; i < iMax; i++) {
+                        int rowA = i * K;
+                        int rowC = i * N;
+                        for (int k = k0; k < kMax; k++) {
+                            double aik = A[rowA + k];
+                            int rowB = k * N;
+                            for (int j = j0; j < jMax; j++) {
+                                C[rowC + j] += aik * B[rowB + j];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public Matrix<E> transpose(Matrix<E> a) {
-        if (a instanceof SIMDRealDoubleMatrix) {
-            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).transpose();
+        if (isReal(a)) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] data = toDoubleArray(a);
+            double[] resData = new double[rows * cols];
+            for (int i = 0; i < rows; i++) {
+                int offsetI = i * cols;
+                for (int j = 0; j < cols; j++) {
+                    resData[j * rows + i] = data[offsetI + j];
+                }
+            }
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, cols, rows);
+        }
+
+        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
+            try {
+                return (Matrix<E>) a.getClass().getMethod("transpose").invoke(a);
+            } catch (Exception e) {
+                // Fallback handled below
+            }
         }
 
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), field.zero());
@@ -414,10 +590,26 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        if (a instanceof SIMDRealDoubleMatrix && scalar instanceof Real) {
-            return (Matrix<E>) ((SIMDRealDoubleMatrix) a).scale(((Real) scalar).doubleValue());
+        if (scalar instanceof Real && isReal(a)) {
+            double s = ((Real) scalar).doubleValue();
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] data = toDoubleArray(a);
+            double[] resData = new double[rows * cols];
+            for (int i = 0; i < rows * cols; i++) {
+                resData[i] = data[i] * s;
+            }
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rows, cols);
+        }
+
+        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix") && scalar instanceof Real) {
+            try {
+                return (Matrix<E>) a.getClass().getMethod("scale", double.class).invoke(a, ((Real) scalar).doubleValue());
+            } catch (Exception e) {
+                // Fallback handled below
+            }
         }
 
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
@@ -430,10 +622,36 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (a instanceof SIMDRealDoubleMatrix) {
-            return (Vector<E>) ((SIMDRealDoubleMatrix) a).multiply((Vector<Real>) b);
+        if (isReal(a) && b.dimension() == a.cols()) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] mat = toDoubleArray(a);
+            double[] vec = new double[cols];
+            for (int i = 0; i < cols; i++) vec[i] = ((Real) b.get(i)).doubleValue();
+            
+            double[] res = new double[rows];
+            for (int i = 0; i < rows; i++) {
+                double sum = 0;
+                int offset = i * cols;
+                for (int j = 0; j < cols; j++) {
+                    sum += mat[offset + j] * vec[j];
+                }
+                res[i] = sum;
+            }
+            
+            E[] resArray = (E[]) new Real[rows];
+            for (int i = 0; i < rows; i++) resArray[i] = Real.of(res[i]);
+            return new GenericVector<>(new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
+        }
+
+        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
+            try {
+                return (Vector<E>) a.getClass().getMethod("multiply", Vector.class).invoke(a, b);
+            } catch (Exception e) {
+                // Fallback handled below
+            }
         }
 
         if (a.cols() != b.dimension()) {
@@ -477,12 +695,66 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public Matrix<E> inverse(Matrix<E> a) {
-        if (a.rows() != a.cols()) {
-            throw new ArithmeticException("Matrix must be square to compute inverse");
+        if (a.rows() != a.cols())
+            throw new ArithmeticException("Must be square");
+        int n = a.rows();
+
+        if (isReal(a)) {
+            double[] data = toDoubleArray(a);
+            double[] aug = new double[n * 2 * n];
+            // Initialize augmented matrix [A | I]
+            for (int i = 0; i < n; i++) {
+                System.arraycopy(data, i * n, aug, i * 2 * n, n);
+                aug[i * 2 * n + n + i] = 1.0;
+            }
+
+            // Gauss-Jordan elimination with partial pivoting
+            int rowSize = 2 * n;
+            for (int k = 0; k < n; k++) {
+                int pivot = k;
+                double maxVal = Math.abs(aug[k * rowSize + k]);
+                for (int i = k + 1; i < n; i++) {
+                    double val = Math.abs(aug[i * rowSize + k]);
+                    if (val > maxVal) {
+                        maxVal = val;
+                        pivot = i;
+                    }
+                }
+
+                if (pivot != k) {
+                    for (int j = k; j < rowSize; j++) {
+                        double temp = aug[k * rowSize + j];
+                        aug[k * rowSize + j] = aug[pivot * rowSize + j];
+                        aug[pivot * rowSize + j] = temp;
+                    }
+                }
+
+                double pivotVal = aug[k * rowSize + k];
+                if (Math.abs(pivotVal) < 1e-18) throw new ArithmeticException("Matrix is singular");
+
+                for (int j = k; j < rowSize; j++) aug[k * rowSize + j] /= pivotVal;
+
+                for (int i = 0; i < n; i++) {
+                    if (i != k) {
+                        double factor = aug[i * rowSize + k];
+                        int offsetI = i * rowSize;
+                        int offsetK = k * rowSize;
+                        for (int j = k; j < rowSize; j++) {
+                            aug[offsetI + j] -= factor * aug[offsetK + j];
+                        }
+                    }
+                }
+            }
+
+            double[] resData = new double[n * n];
+            for (int i = 0; i < n; i++) {
+                System.arraycopy(aug, i * rowSize + n, resData, i * n, n);
+            }
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, n, n);
         }
 
-        int n = a.rows();
         List<List<E>> aug = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             List<E> row = new ArrayList<>();
@@ -495,10 +767,16 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
         for (int col = 0; col < n; col++) {
             int pivotRow = col;
-            for (int i = col + 1; i < n; i++) {
-                if (!aug.get(i).get(col).equals(field.zero())) {
-                    pivotRow = i;
-                    break;
+            if (field instanceof org.jscience.core.mathematics.sets.Reals) {
+                double maxVal = Math
+                        .abs(((org.jscience.core.mathematics.numbers.real.Real) aug.get(col).get(col)).doubleValue());
+                for (int i = col + 1; i < n; i++) {
+                    double val = Math
+                            .abs(((org.jscience.core.mathematics.numbers.real.Real) aug.get(i).get(col)).doubleValue());
+                    if (val > maxVal) {
+                        maxVal = val;
+                        pivotRow = i;
+                    }
                 }
             }
             if (pivotRow != col) {
@@ -506,12 +784,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 aug.set(col, aug.get(pivotRow));
                 aug.set(pivotRow, temp);
             }
+
             E pivot = aug.get(col).get(col);
             if (pivot.equals(field.zero()))
-                throw new ArithmeticException("Matrix is singular");
-            E pivotInv = field.divide(field.one(), pivot);
+                throw new ArithmeticException("Singular matrix");
+
             for (int j = 0; j < 2 * n; j++)
-                aug.get(col).set(j, field.multiply(aug.get(col).get(j), pivotInv));
+                aug.get(col).set(j, field.divide(aug.get(col).get(j), pivot));
 
             for (int i = 0; i < n; i++) {
                 if (i != col) {
@@ -535,18 +814,60 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "preview", "restricted"})
     public E determinant(Matrix<E> a) {
         if (a.rows() != a.cols())
             throw new ArithmeticException("Must be square");
         int n = a.rows();
         if (n == 1)
             return a.get(0, 0);
+
+        if (isReal(a)) {
+            double[] mat = toDoubleArray(a);
+            double det = 1.0;
+            for (int col = 0; col < n; col++) {
+                int pivotRow = col;
+                double maxVal = Math.abs(mat[col * n + col]);
+                for (int i = col + 1; i < n; i++) {
+                    double val = Math.abs(mat[i * n + col]);
+                    if (val > maxVal) {
+                        maxVal = val;
+                        pivotRow = i;
+                    }
+                }
+
+                if (pivotRow != col) {
+                    for (int j = col; j < n; j++) {
+                        double temp = mat[col * n + j];
+                        mat[col * n + j] = mat[pivotRow * n + j];
+                        mat[pivotRow * n + j] = temp;
+                    }
+                    det = -det;
+                }
+
+                double pivot = mat[col * n + col];
+                if (Math.abs(pivot) < 1e-18) return (E) (Object) Real.ZERO;
+
+                det *= pivot;
+                for (int i = col + 1; i < n; i++) {
+                    double factor = mat[i * n + col] / pivot;
+                    int offsetI = i * n;
+                    int offsetCol = col * n;
+                    for (int j = col + 1; j < n; j++) {
+                        mat[offsetI + j] -= factor * mat[offsetCol + j];
+                    }
+                }
+            }
+            return (E) (Object) Real.of(det);
+        }
+
         if (n == 2) {
             return field.add(field.multiply(a.get(0, 0), a.get(1, 1)),
                     field.negate(field.multiply(a.get(0, 1), a.get(1, 0))));
         }
 
         List<List<E>> mat = new ArrayList<>();
+        // ... (remaining generic code)
         for (int i = 0; i < n; i++) {
             List<E> row = new ArrayList<>();
             for (int j = 0; j < n; j++)
@@ -586,11 +907,73 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (a.rows() != a.cols())
             throw new ArithmeticException("Must be square");
         int n = a.rows();
+
+        if (isReal(a)) {
+            double[] mat = toDoubleArray(a);
+            double[] rhs = new double[n];
+            for (int i = 0; i < n; i++) rhs[i] = ((Real) b.get(i)).doubleValue();
+
+            // LU Decomposition (in-place) with Partial Pivoting
+            int[] pivots = new int[n];
+            for (int i = 0; i < n; i++) pivots[i] = i;
+
+            for (int i = 0; i < n; i++) {
+                int maxRow = i;
+                double maxVal = Math.abs(mat[i * n + i]);
+                for (int k = i + 1; k < n; k++) {
+                    double val = Math.abs(mat[k * n + i]);
+                    if (val > maxVal) {
+                        maxVal = val;
+                        maxRow = k;
+                    }
+                }
+
+                // Swap rows
+                if (maxRow != i) {
+                    int tmpP = pivots[i]; pivots[i] = pivots[maxRow]; pivots[maxRow] = tmpP;
+                    for (int k = 0; k < n; k++) {
+                        double tmp = mat[i * n + k];
+                        mat[i * n + k] = mat[maxRow * n + k];
+                        mat[maxRow * n + k] = tmp;
+                    }
+                    double tmpR = rhs[i]; rhs[i] = rhs[maxRow]; rhs[maxRow] = tmpR;
+                }
+
+                double pivotVal = mat[i * n + i];
+                if (Math.abs(pivotVal) < 1e-18) throw new ArithmeticException("Matrix is singular");
+
+                for (int k = i + 1; k < n; k++) {
+                    double factor = mat[k * n + i] / pivotVal;
+                    mat[k * n + i] = factor;
+                    for (int j = i + 1; j < n; j++) {
+                        mat[k * n + j] -= factor * mat[i * n + j];
+                    }
+                    rhs[k] -= factor * rhs[i];
+                }
+            }
+
+            // Back Substitution
+            double[] res = new double[n];
+            for (int i = n - 1; i >= 0; i--) {
+                double sum = 0.0;
+                for (int j = i + 1; j < n; j++) {
+                    sum += mat[i * n + j] * res[j];
+                }
+                res[i] = (rhs[i] - sum) / mat[i * n + i];
+            }
+
+            E[] resArray = (E[]) new Real[n];
+            for (int i = 0; i < n; i++) resArray[i] = Real.of(res[i]);
+            return new GenericVector<>(new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
+        }
+
         List<List<E>> aug = new ArrayList<>();
+        // ... (remaining generic code)
         for (int i = 0; i < n; i++) {
             List<E> row = new ArrayList<>();
             for (int j = 0; j < n; j++)

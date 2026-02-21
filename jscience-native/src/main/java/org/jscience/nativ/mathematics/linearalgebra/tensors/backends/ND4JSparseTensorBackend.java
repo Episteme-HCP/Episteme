@@ -97,7 +97,9 @@ public class ND4JSparseTensorBackend implements TensorBackend {
     @Override
     public ExecutionContext createContext() {
         if (!available) return null;
-        return new CUDAExecutionContext();
+        @SuppressWarnings("deprecation")
+        ExecutionContext context = new CUDAExecutionContext();
+        return context;
     }
 
     @Override
