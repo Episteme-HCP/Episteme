@@ -79,9 +79,20 @@ public class NativeLibraryLoader {
                 for (String path : searchPaths) {
                     if (path == null) continue;
                     try {
-                        java.nio.file.Path fullPath = java.nio.file.Paths.get(path, currentMapped);
+                        // Try base path
+                        java.nio.file.Path basePath = java.nio.file.Paths.get(path);
+                        java.nio.file.Path fullPath = basePath.resolve(currentMapped);
                         if (java.nio.file.Files.exists(fullPath)) {
                             return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
+                        }
+                        
+                        // Try common subdirectories (lib, bin)
+                        String[] subs = {"lib", "bin"};
+                        for (String sub : subs) {
+                            java.nio.file.Path subPath = basePath.resolve(sub).resolve(currentMapped);
+                            if (java.nio.file.Files.exists(subPath)) {
+                                return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
+                            }
                         }
                     } catch (Exception ex) {
                         // continue

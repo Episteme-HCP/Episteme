@@ -25,7 +25,7 @@ jobs:
         cache: maven
 
     - name: Install MPJ to Maven Local
-      run: mvn install:install-file -Dfile=libs/MPJ/lib/mpj.jar -DgroupId=mpi.mpi -DartifactId=mpj -Dversion=0.44 -Dpackaging=jar
+      run: mvn -B install:install-file -Dfile=libs/MPJ/lib/mpj.jar -DgroupId=mpi.mpi -DartifactId=mpj -Dversion=0.44 -Dpackaging=jar
 
     - name: Build with Maven
       # Currently skips tests because they are known to be broken.

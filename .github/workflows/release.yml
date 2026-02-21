@@ -20,7 +20,7 @@ jobs:
           distribution: 'oracle'
           cache: maven
       - name: Install MPJ to Maven Local
-        run: mvn install:install-file -Dfile=libs/MPJ/lib/mpj.jar -DgroupId=mpi.mpi -DartifactId=mpj -Dversion=0.44 -Dpackaging=jar
+        run: mvn -B install:install-file -Dfile=libs/MPJ/lib/mpj.jar -DgroupId=mpi.mpi -DartifactId=mpj -Dversion=0.44 -Dpackaging=jar
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml -DskipTests -Djacoco.skip=true
