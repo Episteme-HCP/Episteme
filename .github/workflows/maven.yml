@@ -33,6 +33,7 @@ jobs:
     - name: Build with Maven
       # Currently skips tests because they are known to be broken.
       # TODO: Re-enable tests once Unit Tests are fixed.
+      shell: bash
       run: mvn -B package -DskipTests -Djacoco.skip=true --file pom.xml
 
     - name: Run Benchmarks (CLI)
