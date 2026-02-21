@@ -13,6 +13,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false # Don't cancel other OS jobs if one fails
+
+    env:
+      MAVEN_OPTS: "-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
 
     steps:
     - uses: actions/checkout@v4
@@ -34,7 +38,7 @@ jobs:
       # Currently skips tests because they are known to be broken.
       # TODO: Re-enable tests once Unit Tests are fixed.
       shell: bash
-      run: mvn -B package -DskipTests -Djacoco.skip=true --file pom.xml
+      run: mvn -B -T 1C package -DskipTests -Djacoco.skip=true --file pom.xml
 
     - name: Run Benchmarks (CLI)
       # Run benchmarks and export JSON. 
