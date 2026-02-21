@@ -155,43 +155,58 @@ public class MainController {
 
     // Helper method to update category statuses
     private void updateCategoryStatuses(TreeItem<BenchmarkItem> root) {
-        if (root == null || root.isLeaf()) return;
+        if (root == null) return;
+        
+        // If it's the root itself (hidden), update children first
+        if (root.getValue() != null && "Root".equals(root.getValue().getName())) {
+            for (TreeItem<BenchmarkItem> child : root.getChildren()) {
+                updateCategoryStatuses(child);
+            }
+            return;
+        }
 
-        boolean anyRunning = false;
-        boolean anyError = false;
-        boolean anySuccess = false;
+        if (root.isLeaf()) return;
+
         int totalChildren = 0;
+        int runningCount = 0;
+        int errorCount = 0;
+        int successCount = 0;
         int readyCount = 0;
         int unavailableCount = 0;
+        int queuedCount = 0;
+        int skippedCount = 0;
 
         for (TreeItem<BenchmarkItem> child : root.getChildren()) {
-            updateCategoryStatuses(child); // Recursive update
+            if (!child.isLeaf()) {
+                updateCategoryStatuses(child); // Recursive update
+            }
             totalChildren++;
             
             String status = child.getValue().statusProperty().get();
             if (status == null) status = "";
             
-            if (status.contains("Running") || status.contains("Initializing") || status.contains("Warming") || status.contains("Measuring") || "Queued".equals(status)) anyRunning = true;
-            else if (status.contains("Error") || status.contains("Skipped")) anyError = true;
-            else if ("Success".equals(status)) anySuccess = true;
-            else if ("Ready".equals(status) || status.isEmpty() || "Queued".equals(status)) readyCount++;
+            if (status.contains("Running") || status.contains("Warming") || status.contains("Measuring")) runningCount++;
+            else if (status.contains("Error")) errorCount++;
+            else if ("Success".equals(status)) successCount++;
+            else if ("Queued".equals(status)) queuedCount++;
+            else if (status.contains("Skipped")) skippedCount++;
+            else if ("Ready".equals(status) || status.isEmpty()) readyCount++;
             else if (status.contains("Unavailable")) unavailableCount++;
         }
 
         if (totalChildren == 0) return;
 
-        String newStatus = "";
-        if (anyRunning) newStatus = "Running...";
-        else if (anyError) newStatus = "Error (Partial)";
-        else if (readyCount + unavailableCount == totalChildren) {
-             if (readyCount > 0) newStatus = "Ready";
-             else newStatus = "Unavailable";
-        }
-        else if (anySuccess && readyCount == 0 && !anyError && unavailableCount == 0) newStatus = "Success"; 
-        else if (anySuccess) newStatus = "Completed"; // Success + Unavailable/Skipped
-        else newStatus = "Ready"; // Fallback
+        String newStatus;
+        if (runningCount > 0) newStatus = "Running (" + runningCount + "/" + totalChildren + ")";
+        else if (queuedCount > 0) newStatus = "Queued (" + queuedCount + ")";
+        else if (errorCount > 0) newStatus = "Error (Partial: " + errorCount + ")";
+        else if (successCount == totalChildren - unavailableCount - skippedCount && successCount > 0) newStatus = "Success";
+        else if (successCount > 0) newStatus = "Completed (" + successCount + "/" + totalChildren + ")";
+        else if (unavailableCount == totalChildren) newStatus = "Unavailable";
+        else newStatus = "Ready";
 
         final String s = newStatus;
+        // Always update the status, even if it's the same, to ensure UI refresh if needed
         Platform.runLater(() -> root.getValue().statusProperty().set(s));
     }
 
@@ -518,6 +533,7 @@ public class MainController {
                 Platform.runLater(() -> {
                     item.statusProperty().set("Skipped (Unavailable)");
                     item.resultProperty().set("N/A");
+                    updateCategoryStatuses(benchmarkTreeTable.getRoot()); // UI update
                 });
                 return;
             }
@@ -526,28 +542,45 @@ public class MainController {
                 Platform.runLater(() -> item.statusProperty().set("Running..."));
                 b.setup();
             
-            // 1. Warmup (Adaptive: ~500ms)
-            Platform.runLater(() -> item.statusProperty().set("Warming up..."));
+            // 1. Warmup (Adaptive: ~500ms, max 1M iterations)
+            Platform.runLater(() -> {
+                item.statusProperty().set("Warming up...");
+                updateCategoryStatuses(benchmarkTreeTable.getRoot());
+            });
             long warmupStart = System.nanoTime();
-            while (System.nanoTime() - warmupStart < 500_000_000L) { // 500ms
+            long warmupIters = 0;
+            final long MAX_WARMUP_TIME_NS = 500_000_000L; // 500ms
+            final long MAX_WARMUP_ITERS = 1_000_000;
+            while (System.nanoTime() - warmupStart < MAX_WARMUP_TIME_NS && warmupIters < MAX_WARMUP_ITERS) { 
                 b.run();
+                warmupIters++;
             }
 
-            // 2. Measure (Adaptive: ~2000ms)
-            Platform.runLater(() -> item.statusProperty().set("Measuring..."));
+            // 2. Measure (Adaptive: ~2000ms, max 5M iterations)
+            Platform.runLater(() -> {
+                item.statusProperty().set("Measuring...");
+                updateCategoryStatuses(benchmarkTreeTable.getRoot());
+            });
             
-            // Garbage Collect before measurement to reduce GC noise during run
             System.gc();
             try { Thread.sleep(100); } catch (InterruptedException e) {}
 
-            // Per-iteration measurement for P99 computation
             java.util.List<Long> iterNanos = new java.util.ArrayList<>();
             long totalStart = System.nanoTime();
-            // Run for at least 2 seconds, recording each iteration
-            while (System.nanoTime() - totalStart < 2_000_000_000L) {
+            long measureIters = 0;
+            final long MAX_MEASURE_TIME_NS = 2_000_000_000L; // 2 seconds
+            final long MAX_MEASURE_ITERS = 5_000_000;
+            final long MAX_SINGLE_ITER_TIME_NS = 10_000_000_000L; // 10 seconds
+            while (System.nanoTime() - totalStart < MAX_MEASURE_TIME_NS && measureIters < MAX_MEASURE_ITERS) {
                 long iterStart = System.nanoTime();
                 b.run();
                 iterNanos.add(System.nanoTime() - iterStart);
+                measureIters++;
+                
+                // Safety: if a single iteration takes more than 10 seconds, abort to avoid stalling
+                if (System.nanoTime() - iterStart > 10_000_000_000L) {
+                    throw new RuntimeException("Benchmark stalled (single iteration > 10s)");
+                }
             }
             long totalEnd = System.nanoTime();
             
@@ -555,12 +588,10 @@ public class MainController {
             double durationSec = (totalEnd - totalStart) / 1_000_000_000.0;
             double opsSec = iterations / durationSec;
             
-            // Compute P99 latency
             java.util.Collections.sort(iterNanos);
             int p99Index = Math.max(0, (int) Math.ceil(iterNanos.size() * 0.99) - 1);
             double p99Ms = iterNanos.get(p99Index) / 1_000_000.0;
             
-            // Smart formatting: more precision for small numbers
             String resultText;
             if (opsSec < 1.0) {
                  resultText = String.format("%.5f ops/s", opsSec);
@@ -576,10 +607,9 @@ public class MainController {
                 item.setScore(opsSec);
                 item.setP99LatencyMs(p99Ms);
                 
-                double val = calculateMetric(item);
-                
-                updateChart(item, val);
+                updateChart(item, calculateMetric(item));
                 addToHistory(item, resultText);
+                updateCategoryStatuses(benchmarkTreeTable.getRoot());
             });
             
             b.teardown();
@@ -598,6 +628,7 @@ public class MainController {
                 Platform.runLater(() -> {
                     item.statusProperty().set("Error");
                     item.resultProperty().set(errorMsg);
+                    updateCategoryStatuses(benchmarkTreeTable.getRoot());
                 });
             }
         }

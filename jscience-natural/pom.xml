@@ -88,6 +88,8 @@
             <groupId>com.github.studygameengines</groupId>
             <artifactId>java-fbx-loader</artifactId>
             <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/fbx_loader/java-fbx-loader-v1.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>

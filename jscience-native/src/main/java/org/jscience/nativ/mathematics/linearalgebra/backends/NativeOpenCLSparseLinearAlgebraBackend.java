@@ -56,6 +56,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     // Kernels
     private static final String KERNEL_SPMV = 
+        "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
         "__kernel void spmv_csr(int num_rows, __global int* ptr, __global int* indices, __global double* values, __global double* x, __global double* y) {\n" +
         "    int row = get_global_id(0);\n" +
         "    if (row < num_rows) {\n" +
@@ -120,7 +121,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public double score(OperationContext context) {
-        if (!isAvailable()) return -1;
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) return -1;
         double base = getPriority();
         if (context.getDataSize() < 100) base -= 100;
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
@@ -149,6 +150,12 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return "opencl";
     }
 
+    private boolean attemptInitialization() {
+        if (isInitialized) return true;
+        start();
+        return isInitialized;
+    }
+
     private synchronized void start() {
         if (isInitialized) return;
         try {
@@ -172,19 +179,28 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             
             isInitialized = true;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize OpenCL Backend", e);
+            isInitialized = false;
+            LOGGER.warning("Failed to initialize OpenCL Backend (Falling back to CPU): " + e.getMessage());
         }
     }
 
     private void initKernels() {
-        // Sparse Program
-        sparseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SPMV}, null, null);
-        clBuildProgram(sparseProgram, 0, null, null, null, null);
+        try {
+            // Sparse Program
+            sparseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SPMV}, null, null);
+            clBuildProgram(sparseProgram, 0, null, null, null, null);
 
-        // Dense Program
-        denseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_DENSE}, null, null);
-        clBuildProgram(denseProgram, 0, null, null, null, null);
-        matMulKernel = clCreateKernel(denseProgram, "matrixMultiply", null);
+            // Dense Program
+            denseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_DENSE}, null, null);
+            clBuildProgram(denseProgram, 0, null, null, null, null);
+            matMulKernel = clCreateKernel(denseProgram, "matrixMultiply", null);
+        } catch (CLException e) {
+            LOGGER.warning("Failed to build OpenCL kernels: " + e.getMessage());
+            if (e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
+                LOGGER.warning("This device might not support double precision (cl_khr_fp64). Falling back to CPU.");
+            }
+            throw e;
+        }
     }
 
     @Override
