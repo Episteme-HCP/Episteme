@@ -32,6 +32,7 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
+import org.jscience.core.technical.algorithm.ProviderSelector;
 
 
 /**
@@ -109,10 +110,10 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     public Matrix<E> add(Matrix<E> other) {
         if (other instanceof GenericMatrix) {
-            // Delegate to provider for potentially optimized operation
-            return provider.add(this, (GenericMatrix<E>) other);
+            return ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT, 
+                p -> ((LinearAlgebraProvider<E>) p).add(this, (GenericMatrix<E>) other));
         }
-        // Fallback manual addition
+        
         // Fallback manual addition
         int rows = rows();
         int cols = cols();
@@ -120,7 +121,6 @@ public class GenericMatrix<E> implements Matrix<E> {
             throw new IllegalArgumentException("Matrix dimensions do not match for addition.");
         }
 
-        // Result storage (default to this matrix's storage type or Dense)
         MatrixStorage<E> resStorage = new DenseMatrixStorage<>(rows, cols, ring.zero());
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -134,7 +134,8 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     public Matrix<E> multiply(Matrix<E> other) {
         if (other instanceof GenericMatrix) {
-            return provider.multiply(this, (GenericMatrix<E>) other);
+            return ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).multiply(this, (GenericMatrix<E>) other));
         }
         
         // Fallback manual multiplication
@@ -161,11 +162,10 @@ public class GenericMatrix<E> implements Matrix<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> transpose() {
-        // Create new storage with transposed dimensions
-        // This relies on provider or manual transpose.
-        // Let's ask provider.
-        return provider.transpose(this);
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).transpose(this));
     }
 
     @Override
@@ -212,19 +212,24 @@ public class GenericMatrix<E> implements Matrix<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E determinant() {
-        return provider.determinant(this);
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).determinant(this));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> inverse() {
-        return provider.inverse(this);
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).inverse(this));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> multiply(Vector<E> vector) {
-        // Delegate to provider which handles GenericVector natively or via interface
-        return provider.multiply(this, vector);
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).multiply(this, vector));
     }
 
     @Override
@@ -257,9 +262,11 @@ public class GenericMatrix<E> implements Matrix<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> scale(E scalar, Matrix<E> element) {
         if (element instanceof GenericMatrix) {
-            return provider.scale(scalar, (GenericMatrix<E>) element);
+            return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).scale(scalar, (GenericMatrix<E>) element));
         }
         return null;
     }

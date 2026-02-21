@@ -59,11 +59,43 @@ public final class ProviderSelector {
         }
 
         P best = providers.stream()
-                .max(Comparator.comparingDouble(p -> ((AlgorithmProvider) p).score(context)))
+                .max(Comparator.comparingDouble(p -> p.score(context)))
                 .orElseThrow();
 
         LOGGER.fine("Selected " + best.getName() + " (score=" + best.score(context) + ") for " + providerClass.getSimpleName());
         return best;
+    }
+
+    /**
+     * Executes an operation using the best available provider, with automatic fallback.
+     * <p>
+     * Iterates through all available providers (sorted by score) and attempts the operation.
+     * If a provider fails, it logs the warning and tries the next best provider.
+     * </p>
+     *
+     * @param <P> the provider type
+     * @param <R> the return type
+     * @param providerClass the interface class of the provider
+     * @param context the operation context
+     * @param operation the operation to execute
+     * @return the result of the operation
+     * @throws RuntimeException if all providers fail
+     */
+    public static <P extends AlgorithmProvider, R> R execute(Class<P> providerClass, OperationContext context, java.util.function.Function<P, R> operation) {
+        List<P> providers = AlgorithmManager.getProviders(providerClass);
+        providers.sort(Comparator.comparingDouble((P p) -> p.score(context)).reversed());
+
+        Throwable lastError = null;
+        for (P provider : providers) {
+            try {
+                return operation.apply(provider);
+            } catch (Throwable t) {
+                LOGGER.warning("Provider " + provider.getName() + " failed: " + t.getMessage() + ". Attempting fallback...");
+                lastError = t;
+            }
+        }
+
+        throw new RuntimeException("All " + providers.size() + " providers for " + providerClass.getSimpleName() + " failed.", lastError);
     }
 
     /**

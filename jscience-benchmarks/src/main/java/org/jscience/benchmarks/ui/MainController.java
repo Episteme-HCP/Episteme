@@ -392,8 +392,13 @@ public class MainController {
                 for (BenchmarkItem item : items) {
                     if (isCancelled()) break;
                     
-                    // Run synchronously to track progress correctly
-                    Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
+                    final int currentCount = count + 1;
+                    final String itemName = item.getName();
+                    Platform.runLater(() -> {
+                        statusBarLabel.setText(String.format("Running [%d/%d]: %s", currentCount, items.size(), itemName));
+                        updateCategoryStatuses(benchmarkTreeTable.getRoot());
+                    });
+                    
                     runBenchmarkItem(item);
                     
                     count++;
@@ -411,7 +416,8 @@ public class MainController {
         task.setOnSucceeded(e -> {
              globalProgressBar.progressProperty().unbind();
              globalProgressBar.setProgress(1.0);
-             statusBarLabel.setText("Suite Completed.");
+             statusBarLabel.setText("Suite Completed (" + items.size() + " items).");
+             Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
         });
         
         task.setOnFailed(e -> {

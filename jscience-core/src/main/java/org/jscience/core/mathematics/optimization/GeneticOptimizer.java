@@ -50,31 +50,27 @@ public class GeneticOptimizer {
      * @return the best individual found
      */
     public static Real[] optimize(Function<Real[], Real> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate) {
-        GeneticAlgorithmProvider backend = findProvider();
-        
-        // Wrap the Real fitness function for the double-based backend
-        Function<double[], Double> doubleFitness = d -> {
-            Real[] r = new Real[d.length];
-            for (int i = 0; i < d.length; i++) {
-                r[i] = Real.of(d[i]);
+        // Use ProviderSelector for centralized execution and fallback
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(GeneticAlgorithmProvider.class, 
+            org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
+            backend -> {
+                // Wrap the Real fitness function for the double-based backend
+                Function<double[], Double> doubleFitness = d -> {
+                    Real[] r = new Real[d.length];
+                    for (int i = 0; i < d.length; i++) {
+                        r[i] = Real.of(d[i]);
+                    }
+                    return fitnessFunction.apply(r).doubleValue();
+                };
+                
+                double[] result = backend.solve(doubleFitness::apply, dimensions, populationSize, generations, mutationRate);
+                
+                Real[] finalResult = new Real[result.length];
+                for (int i = 0; i < result.length; i++) {
+                    finalResult[i] = Real.of(result[i]);
+                }
+                return finalResult;
             }
-            return fitnessFunction.apply(r).doubleValue();
-        };
-        
-        double[] result = backend.solve(doubleFitness::apply, dimensions, populationSize, generations, mutationRate);
-        
-        Real[] finalResult = new Real[result.length];
-        for (int i = 0; i < result.length; i++) {
-            finalResult[i] = Real.of(result[i]);
-        }
-        return finalResult;
-    }
-
-    private static GeneticAlgorithmProvider findProvider() {
-        ServiceLoader<GeneticAlgorithmProvider> loader = ServiceLoader.load(GeneticAlgorithmProvider.class);
-        for (GeneticAlgorithmProvider p : loader) {
-            return p;
-        }
-        return new MulticoreGeneticAlgorithmProvider();
+        );
     }
 }

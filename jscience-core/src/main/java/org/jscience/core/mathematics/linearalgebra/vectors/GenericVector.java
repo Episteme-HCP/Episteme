@@ -120,7 +120,8 @@ public class GenericVector<E> implements Vector<E> {
     @Override
     public Vector<E> add(Vector<E> other) {
         if (other instanceof GenericVector) {
-            return provider.add(this, (GenericVector<E>) other);
+            return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).add(this, (GenericVector<E>) other));
         }
         // Fallback
         if (other.dimension() != dimension())
@@ -140,7 +141,8 @@ public class GenericVector<E> implements Vector<E> {
     @Override
     public Vector<E> subtract(Vector<E> other) {
         if (other instanceof GenericVector) {
-            return provider.subtract(this, (GenericVector<E>) other);
+            return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).subtract(this, (GenericVector<E>) other));
         }
         if (other.dimension() != dimension())
             throw new IllegalArgumentException("Dim mismatch");
@@ -155,7 +157,8 @@ public class GenericVector<E> implements Vector<E> {
 
     @Override
     public Vector<E> multiply(E scalar) {
-        return provider.multiply(this, scalar);
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).multiply(this, scalar));
     }
 
     public Vector<E> scale(E scalar) {
@@ -170,7 +173,8 @@ public class GenericVector<E> implements Vector<E> {
     @Override
     public E dot(Vector<E> other) {
         if (other instanceof GenericVector) {
-            return provider.dot(this, (GenericVector<E>) other);
+            return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).dot(this, (GenericVector<E>) other));
         }
         E sum = ring.zero();
         for (int i = 0; i < dimension(); ++i) {
@@ -181,7 +185,8 @@ public class GenericVector<E> implements Vector<E> {
 
     @Override
     public E norm() {
-        return provider.norm(this);
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).norm(this));
     }
 
     @Override

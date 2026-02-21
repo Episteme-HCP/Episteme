@@ -60,6 +60,14 @@ public class NativeArrowProvider implements AlgorithmProvider {
         IS_AVAILABLE_FLAG = avail;
     }
 
+    public <T> java.util.stream.Stream<T> query(String sql, Class<T> type) {
+        if (!isAvailable()) {
+            throw new IllegalStateException("Apache Arrow native library is not available.");
+        }
+        // Native Arrow implementation logic here...
+        return java.util.stream.Stream.empty();
+    }
+
     @Override
     public boolean isAvailable() {
         return IS_AVAILABLE_FLAG;
@@ -71,7 +79,9 @@ public class NativeArrowProvider implements AlgorithmProvider {
     }
 
     public void importArray(MemorySegment arrayStruct, MemorySegment schemaStruct) {
-        if (!isAvailable()) return;
+        if (!isAvailable()) {
+            throw new IllegalStateException("Apache Arrow native library is not available.");
+        }
         try {
             // int res = (int) ARROW_IMPORT_ARRAY.invokeExact(arrayStruct, schemaStruct);
             // if (res != 0) throw new RuntimeException("Arrow import failed: " + res);

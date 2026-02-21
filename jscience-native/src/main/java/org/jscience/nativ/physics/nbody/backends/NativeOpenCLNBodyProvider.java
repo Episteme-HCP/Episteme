@@ -208,22 +208,61 @@ public class NativeOpenCLNBodyProvider implements NBodyProvider {
 
     @Override
     public void step(double[] positions, double[] velocities, double[] masses, int numBodies, double G, double dt, double softening) {
-        // GPU kernel already does integration if dt > 0.
-        // We reuse computeForces logic but with dt.
         if (!initialized) initialize();
-        // ... (truncated, I'll just skip detailed impl for now or use computeForces)
-        double[] forces = new double[numBodies * 3];
-        computeForces(positions, masses, forces, 1.0, softening);
-        // Sequential integration for now as fallback
-        for (int i = 0; i < numBodies; i++) {
-            int i3 = i * 3;
-            double invM = 1.0 / masses[i];
-            velocities[i3] += forces[i3] * invM * dt;
-            velocities[i3 + 1] += forces[i3 + 1] * invM * dt;
-            velocities[i3 + 2] += forces[i3 + 2] * invM * dt;
-            positions[i3] += velocities[i3] * dt;
-            positions[i3 + 1] += velocities[i3 + 1] * dt;
-            positions[i3 + 2] += velocities[i3 + 2] * dt;
+        
+        // This provider should implement the full step in OpenCL for consistent performance.
+        // For now, if we can't do it in one kernel, we fail or implement it properly.
+        // The current kernel ALREADY does integration if dt > 0.
+        
+        // Refactor: use the kernel integration.
+        int n = masses.length;
+        double[] p = new double[n * 4];
+        double[] v = new double[n * 3];
+        for(int i=0; i<n; i++) {
+            p[i*4+0] = positions[i*3+0];
+            p[i*4+1] = positions[i*3+1];
+            p[i*4+2] = positions[i*3+2];
+            p[i*4+3] = masses[i];
+            v[i*3+0] = velocities[i*3+0];
+            v[i*3+1] = velocities[i*3+1];
+            v[i*3+2] = velocities[i*3+2];
+        }
+
+        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        cl_context context = ctx.getContext();
+        cl_command_queue queue = ctx.getCommandQueue();
+
+        cl_mem memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * p.length, Pointer.to(p), null);
+        cl_mem memV = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * v.length, Pointer.to(v), null);
+        cl_mem memF = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * n * 3, null, null);
+        
+        try {
+            clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memP));
+            clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memV));
+            clSetKernelArg(kernel, 2, Sizeof.cl_mem, Pointer.to(memF));
+            clSetKernelArg(kernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clSetKernelArg(kernel, 4, Sizeof.cl_double, Pointer.to(new double[]{dt}));
+            clSetKernelArg(kernel, 5, Sizeof.cl_double, Pointer.to(new double[]{G}));
+            
+            long[] globalWorkSize = new long[]{n};
+            clEnqueueNDRangeKernel(queue, kernel, 1, null, globalWorkSize, null, 0, null, null);
+            
+            // Read back pos and vel
+            clEnqueueReadBuffer(queue, memP, CL_TRUE, 0, Sizeof.cl_double * p.length, Pointer.to(p), 0, null, null);
+            clEnqueueReadBuffer(queue, memV, CL_TRUE, 0, Sizeof.cl_double * v.length, Pointer.to(v), 0, null, null);
+            
+            for(int i=0; i<n; i++) {
+                positions[i*3+0] = p[i*4+0];
+                positions[i*3+1] = p[i*4+1];
+                positions[i*3+2] = p[i*4+2];
+                velocities[i*3+0] = v[i*3+0];
+                velocities[i*3+1] = v[i*3+1];
+                velocities[i*3+2] = v[i*3+2];
+            }
+        } finally {
+            clReleaseMemObject(memP);
+            clReleaseMemObject(memV);
+            clReleaseMemObject(memF);
         }
     }
 

@@ -46,9 +46,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     private cl_command_queue commandQueue;
     private cl_device_id device;
     private boolean isInitialized = false;
-
-    private final StandardLinearAlgebraProvider<Real> denseFallback = new StandardLinearAlgebraProvider<>();
-    private final CPUSparseLinearAlgebraProvider<Real> sparseFallback = new CPUSparseLinearAlgebraProvider<>(Reals.getInstance());
+    private static Boolean cachedAvailability = null;
 
     private cl_kernel matMulKernel;
     private cl_program sparseProgram;
@@ -121,21 +119,63 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public double score(OperationContext context) {
-        if (!isAvailable() || (!isInitialized && !attemptInitialization())) return -1;
+        if (!isAvailable()) return -1;
+        if (!isInitialized && !attemptInitialization()) return -1;
+        
         double base = getPriority();
-        if (context.getDataSize() < 100) base -= 100;
-        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;
+        if (context.hasHint(OperationContext.Hint.SPARSE)) base += 20;
+        if (context.getDataSize() > 1000) base += 20;
+        
         return base;
     }
 
     @Override
     public boolean isAvailable() {
+        if (cachedAvailability != null) return cachedAvailability;
+        
         try {
             Class.forName("org.jocl.CL");
+            CL.setExceptionsEnabled(true);
+            
             int[] numPlatformsArray = new int[1];
             CL.clGetPlatformIDs(0, null, numPlatformsArray);
-            return numPlatformsArray[0] > 0;
+            if (numPlatformsArray[0] == 0) {
+                cachedAvailability = false;
+                return false;
+            }
+            
+            cl_platform_id[] platforms = new cl_platform_id[numPlatformsArray[0]];
+            CL.clGetPlatformIDs(platforms.length, platforms, null);
+            
+            for (cl_platform_id platform : platforms) {
+                int[] numDevicesArray = new int[1];
+                CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 0, null, numDevicesArray);
+                
+                if (numDevicesArray[0] > 0) {
+                    cl_device_id[] devices = new cl_device_id[numDevicesArray[0]];
+                    CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, devices.length, devices, null);
+                    
+                    for (cl_device_id dev : devices) {
+                        long[] sizeArray = new long[1];
+                        CL.clGetDeviceInfo(dev, CL.CL_DEVICE_EXTENSIONS, 0, null, sizeArray);
+                        byte[] buffer = new byte[(int)sizeArray[0]];
+                        CL.clGetDeviceInfo(dev, CL.CL_DEVICE_EXTENSIONS, buffer.length, Pointer.to(buffer), null);
+                        String extensions = new String(buffer);
+                        
+                        if (extensions.contains("cl_khr_fp64") || extensions.contains("cl_amd_fp64")) {
+                            cachedAvailability = true;
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            LOGGER.warning("OpenCL found but no device supports double precision (cl_khr_fp64/cl_amd_fp64).");
+            cachedAvailability = false;
+            return false;
         } catch (Throwable t) {
+            cachedAvailability = false;
             return false;
         }
     }
@@ -269,40 +309,108 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) return denseFallback.multiply(a, b);
-        try {
-            int m = a.rows(); int k = a.cols(); int n = b.cols();
-            DoubleBuffer da = DoubleBuffer.allocate(m * k);
-            for(int i=0; i<m; i++) for(int j=0; j<k; j++) da.put(a.get(i, j).doubleValue());
-            da.flip();
-            DoubleBuffer db = DoubleBuffer.allocate(k * n);
-            for(int i=0; i<k; i++) for(int j=0; j<n; j++) db.put(b.get(i, j).doubleValue());
-            db.flip();
-            DoubleBuffer dc = DoubleBuffer.allocate(m * n);
-            matrixMultiply(da, db, dc, m, n, k);
-            Real[] res = new Real[m * n];
-            for(int i=0; i<m*n; i++) res[i] = Real.of(dc.get(i));
-            return new org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
-        } catch (Exception e) {
-            return denseFallback.multiply(a, b);
+        if (!isInitialized && !attemptInitialization()) {
+            throw new IllegalStateException("OpenCL Backend not available or failed to initialize.");
         }
+        
+        int m = a.rows(); int k = a.cols(); int n = b.cols();
+        DoubleBuffer da = DoubleBuffer.allocate(m * k);
+        for(int i=0; i<m; i++) for(int j=0; j<k; j++) da.put(a.get(i, j).doubleValue());
+        da.flip();
+        DoubleBuffer db = DoubleBuffer.allocate(k * n);
+        for(int i=0; i<k; i++) for(int j=0; j<n; j++) db.put(b.get(i, j).doubleValue());
+        db.flip();
+        DoubleBuffer dc = DoubleBuffer.allocate(m * n);
+        
+        matrixMultiply(da, db, dc, m, n, k);
+        
+        Real[] res = new Real[m * n];
+        for(int i=0; i<m*n; i++) res[i] = Real.of(dc.get(i));
+        return new org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
     }
 
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return denseFallback.add(a, b); }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return denseFallback.subtract(a, b); }
-    @Override public Matrix<Real> scale(Real s, Matrix<Real> a) { return denseFallback.scale(s, a); }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) { return denseFallback.transpose(a); }
+    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL add not implemented"); }
+    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL subtract not implemented"); }
+    @Override public Matrix<Real> scale(Real s, Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL scale not implemented"); }
+    @Override public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL transpose not implemented"); }
     
-    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> x) {
-        return sparseFallback.multiply(a, x);
+        return multiplyCSR(a, x);
     }
 
-    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return denseFallback.add(a, b); }
-    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return denseFallback.subtract(a, b); }
-    @Override public Vector<Real> multiply(Vector<Real> v, Real s) { return denseFallback.multiply(v, s); }
-    @Override public Real dot(Vector<Real> a, Vector<Real> b) { return denseFallback.dot(a, b); }
-    @Override public Real norm(Vector<Real> a) { return denseFallback.norm(a); }
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { return denseFallback.inverse(a); }
-    @Override public Real determinant(Matrix<Real> a) { return denseFallback.determinant(a); }
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return denseFallback.solve(a, b); }
+    public Vector<Real> multiplyCSR(Matrix<Real> a, Vector<Real> x) {
+        if (!isAvailable()) throw new IllegalStateException("OpenCL not available");
+        if (!isInitialized) start();
+
+        // Extract CSR data from SparseMatrixStorage
+        // Simplified for now: assuming a is already sparse or converting it
+        int rows = a.rows();
+        int cols = a.cols();
+        
+        // This is a placeholder for actual CSR extraction logic
+        // In a real implementation, we would access the storage directly if it's SparseMatrixStorage
+        int[] rowPtr = new int[rows + 1];
+        java.util.List<Integer> colIdxList = new java.util.ArrayList<>();
+        java.util.List<Double> valList = new java.util.ArrayList<>();
+        
+        rowPtr[0] = 0;
+        for (int i = 0; i < rows; i++) {
+            int count = 0;
+            for (int j = 0; j < cols; j++) {
+                Real val = a.get(i, j);
+                if (val.doubleValue() != 0.0) {
+                    colIdxList.add(j);
+                    valList.add(val.doubleValue());
+                    count++;
+                }
+            }
+            rowPtr[i+1] = rowPtr[i] + count;
+        }
+        
+        int nnz = colIdxList.size();
+        int[] colIndices = colIdxList.stream().mapToInt(i -> i).toArray();
+        double[] values = valList.stream().mapToDouble(d -> d).toArray();
+        double[] xData = new double[cols];
+        for (int i = 0; i < cols; i++) xData[i] = x.get(i).doubleValue();
+        double[] yData = new double[rows];
+
+        cl_mem memPtr = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null);
+        cl_mem memInd = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * nnz, Pointer.to(colIndices), null);
+        cl_mem memVal = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * nnz, Pointer.to(values), null);
+        cl_mem memX = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * cols, Pointer.to(xData), null);
+        cl_mem memY = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * rows, null, null);
+
+        cl_kernel spmvKernel = clCreateKernel(sparseProgram, "spmv_csr", null);
+        try {
+            clSetKernelArg(spmvKernel, 0, Sizeof.cl_int, Pointer.to(new int[]{rows}));
+            clSetKernelArg(spmvKernel, 1, Sizeof.cl_mem, Pointer.to(memPtr));
+            clSetKernelArg(spmvKernel, 2, Sizeof.cl_mem, Pointer.to(memInd));
+            clSetKernelArg(spmvKernel, 3, Sizeof.cl_mem, Pointer.to(memVal));
+            clSetKernelArg(spmvKernel, 4, Sizeof.cl_mem, Pointer.to(memX));
+            clSetKernelArg(spmvKernel, 5, Sizeof.cl_mem, Pointer.to(memY));
+
+            long[] globalWorkSize = new long[]{rows};
+            clEnqueueNDRangeKernel(commandQueue, spmvKernel, 1, null, globalWorkSize, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, memY, CL_TRUE, 0, Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
+        } finally {
+            clReleaseKernel(spmvKernel);
+            clReleaseMemObject(memPtr);
+            clReleaseMemObject(memInd);
+            clReleaseMemObject(memVal);
+            clReleaseMemObject(memX);
+            clReleaseMemObject(memY);
+        }
+
+        Real[] res = new Real[rows];
+        for (int i = 0; i < rows; i++) res[i] = Real.of(yData[i]);
+        return new org.jscience.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(res), Reals.getInstance());
+    }
+
+    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL vector add not implemented"); }
+    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL vector subtract not implemented"); }
+    @Override public Vector<Real> multiply(Vector<Real> v, Real s) { throw new UnsupportedOperationException("OpenCL vector scale not implemented"); }
+    @Override public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL dot not implemented"); }
+    @Override public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("OpenCL norm not implemented"); }
+    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL inverse not implemented"); }
+    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL determinant not implemented"); }
+    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL solve not implemented"); }
 }

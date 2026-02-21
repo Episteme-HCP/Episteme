@@ -90,22 +90,13 @@ public class MonteCarloIntegration {
      * @return Estimated integral value
      */
     public double integrateND(Function<double[], Double> f, double[] lower, double[] upper, int samples) {
-        if (provider == null) {
-            // Default to multicore provider
-            provider = new org.jscience.core.mathematics.statistics.montecarlo.providers.MulticoreMonteCarloProvider();
-        }
-
-
-        // Scale bounds from [0,1] back to [lower, upper] required by provider ?
-        // Actually, MonteCarloProvider interface doc says: "Estimates the integral of a
-        // function over a hypercube [0,1]^d."
-        // So we must wrap 'f' to accept [0,1] inputs and map them to [lower, upper].
-
         // Use ToDoubleFunction to avoid boxing
         ToDoubleFunction<double[]> primitiveF = (point) -> f.apply(point);
 
-        double integral = provider.integrate(primitiveF, lower, upper, samples);
-        return integral;
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(MonteCarloProvider.class,
+            org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> p.integrate(primitiveF, lower, upper, samples)
+        );
     }
 
     /**

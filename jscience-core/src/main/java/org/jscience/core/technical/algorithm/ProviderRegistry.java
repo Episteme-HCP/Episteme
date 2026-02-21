@@ -3,7 +3,9 @@ package org.jscience.core.technical.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
@@ -25,6 +27,8 @@ import org.jscience.core.mathematics.structures.rings.Ring;
  * Extracted from ComputeContext.
  */
 public class ProviderRegistry {
+ 
+    private static final Logger LOGGER = Logger.getLogger(ProviderRegistry.class.getName());
 
     private final Map<String, LinearAlgebraProvider<?>> providers = new ConcurrentHashMap<>();
     private static final List<MatrixStorageFactory> matrixStorageFactories = new ArrayList<>();
@@ -67,12 +71,17 @@ public class ProviderRegistry {
                  }
              }
         } catch (Exception e) {
-            // Log?
+            LOGGER.warning("Failed to select best LinearAlgebraProvider: " + e.getMessage());
         }
 
-        // Fallback: CPUDense
-        Field<E> field = (Field<E>) ring;
-        return new CPUDenseLinearAlgebraProvider<E>(field);
+        // Fallback: Pick whatever is available via AlgorithmManager instead of hardcoded new instance
+        try {
+            return AlgorithmManager.getProvider(LinearAlgebraProvider.class);
+        } catch (NoSuchElementException e) {
+            // Last resort
+            Field<E> field = (Field<E>) ring;
+            return new CPUDenseLinearAlgebraProvider<E>(field);
+        }
     }
 
     /**
@@ -90,8 +99,12 @@ public class ProviderRegistry {
             }
         }
 
-        // Fallback to CPU Sparse
-        return new CPUSparseLinearAlgebraProvider<E>(ring);
+        // Fallback to CPU Sparse if discovered
+        try {
+            return (LinearAlgebraProvider<E>) AlgorithmManager.getProvider(SparseLinearAlgebraProvider.class);
+        } catch (NoSuchElementException e) {
+            return new CPUSparseLinearAlgebraProvider<E>(ring);
+        }
     }
 
     /**

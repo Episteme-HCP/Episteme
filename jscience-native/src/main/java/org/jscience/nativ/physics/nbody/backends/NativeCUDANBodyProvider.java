@@ -82,11 +82,13 @@ public class NativeCUDANBodyProvider implements NBodyProvider {
     @Override
     public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int numParticles = masses.length;
-        if (isAvailable() && numParticles >= GPU_THRESHOLD) {
-            computeForcesCUDA(positions, masses, forces, G, softening);
-        } else {
-            computeForcesCPU(positions, masses, forces, G, softening);
+        if (!isAvailable()) {
+            throw new IllegalStateException("CUDA is not available. NativeCUDANBodyProvider cannot execute.");
         }
+        if (numParticles < GPU_THRESHOLD) {
+            throw new IllegalStateException("Problem size " + numParticles + " is below CUDA threshold (" + GPU_THRESHOLD + ").");
+        }
+        computeForcesCUDA(positions, masses, forces, G, softening);
     }
 
     @Override
@@ -105,24 +107,7 @@ public class NativeCUDANBodyProvider implements NBodyProvider {
 
     private void computeForcesCUDA(double[] positions, double[] masses, double[] forces, double G, double softening) {
         // NVRTC dependency missing - CUDA path disabled
-        computeForcesCPU(positions, masses, forces, G, softening);
-    }
-
-    private void computeForcesCPU(double[] positions, double[] masses, double[] forces, double G, double softening) {
-        int n = masses.length;
-        java.util.Arrays.fill(forces, 0);
-        for (int i = 0; i < n; i++) {
-            double xi = positions[i * 3], yi = positions[i * 3 + 1], zi = positions[i * 3 + 2], mi = masses[i];
-            for (int j = i + 1; j < n; j++) {
-                double dx = positions[j * 3] - xi, dy = positions[j * 3 + 1] - yi, dz = positions[j * 3 + 2] - zi;
-                double dist2 = dx * dx + dy * dy + dz * dz + softening * softening;
-                double dist = Math.sqrt(dist2);
-                double f = G * mi * masses[j] / (dist2 * dist);
-                double fx = f * dx, fy = f * dy, fz = f * dz;
-                forces[i * 3] += fx; forces[i * 3 + 1] += fy; forces[i * 3 + 2] += fz;
-                forces[j * 3] -= fx; forces[j * 3 + 1] -= fy; forces[j * 3 + 2] -= fz;
-            }
-        }
+        // Actual CUDA implementation would go here.
     }
 
     @Override

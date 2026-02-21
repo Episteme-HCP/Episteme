@@ -26,25 +26,6 @@ import java.util.stream.IntStream;
 @AutoService(AlgorithmProvider.class)
 public class MulticoreMonteCarloProvider implements MonteCarloProvider {
 
-    private MonteCarloProvider fallback;
-
-    private MonteCarloProvider getFallback() {
-        if (fallback == null) {
-            // Find a provider that is NOT this one
-            for (MonteCarloProvider p : org.jscience.core.technical.algorithm.AlgorithmManager.getProviders(MonteCarloProvider.class)) {
-                if (!(p instanceof MulticoreMonteCarloProvider)) {
-                    fallback = p;
-                    break;
-                }
-            }
-            if (fallback == null) {
-                // Should not happen if at least one other provider is registered
-                fallback = org.jscience.core.technical.algorithm.AlgorithmManager.getProvider(MonteCarloProvider.class);
-            }
-        }
-        return fallback;
-    }
-
     @Override
     public double integrate(ToDoubleFunction<double[]> function, double[] lowerBounds, 
                            double[] upperBounds, int samples) {
@@ -91,8 +72,9 @@ public class MulticoreMonteCarloProvider implements MonteCarloProvider {
             // Native integration call
             return Real.of(integrate(doubleFunc, d_lower, d_upper, samples));
         } else {
-            // Fallback to high-precision Java implementation
-            return getFallback().integrate(function, lowerBounds, upperBounds, samples);
+            // No longer fallback internally. 
+            // The manager should have selected a different provider if native was not suitable.
+            throw new IllegalStateException("High-precision Real integration not optimized for MulticoreMonteCarloProvider. Use a dedicated Real provider.");
         }
     }
 

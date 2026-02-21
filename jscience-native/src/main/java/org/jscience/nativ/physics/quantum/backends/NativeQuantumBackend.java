@@ -72,12 +72,14 @@ public class NativeQuantumBackend implements AlgorithmProvider {
     }
 
     public void runCircuit() {
-        if (!isAvailable()) return;
+        if (!isAvailable()) {
+            throw new IllegalStateException("Native Quantum library (QuEST) is not available.");
+        }
         try {
             // MemorySegment env = (MemorySegment) QUEST_CREATE_ENV.invokeExact();
             // ... apply gates ...
         } catch (Throwable t) {
-            throw new RuntimeException(t);
+            throw new RuntimeException("QuEST execution error", t);
         }
     }
     @Override
