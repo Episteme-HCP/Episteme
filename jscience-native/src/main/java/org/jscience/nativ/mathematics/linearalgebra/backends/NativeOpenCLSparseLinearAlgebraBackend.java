@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.opencl;
+package org.jscience.nativ.mathematics.linearalgebra.backends;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
@@ -17,22 +17,16 @@ import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.gpu.GPUBackend.DeviceInfo;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.Operation;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jocl.*;
 import static org.jocl.CL.*;
 import java.nio.DoubleBuffer;
-import java.util.Arrays;
 import java.util.logging.Logger;
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
-import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 
 /**
  * OpenCL implementation of GPUBackend for cross-platform hardware acceleration,
@@ -45,6 +39,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorSt
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, AlgorithmProvider.class, GPUBackend.class})
 public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, SparseLinearAlgebraProvider<Real>, GPUBackend {
 
+    @SuppressWarnings("unused")
     private static final Logger LOGGER = Logger.getLogger(NativeOpenCLSparseLinearAlgebraBackend.class.getName());
 
     private cl_context context;
@@ -55,10 +50,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     private final StandardLinearAlgebraProvider<Real> denseFallback = new StandardLinearAlgebraProvider<>();
     private final CPUSparseLinearAlgebraProvider<Real> sparseFallback = new CPUSparseLinearAlgebraProvider<>(Reals.getInstance());
 
-    private cl_kernel spmvKernel;
-    private cl_kernel vecAddKernel;
-    private cl_kernel vecSubKernel;
-    private cl_kernel vecScalarMulKernel;
     private cl_kernel matMulKernel;
     private cl_program sparseProgram;
     private cl_program denseProgram;
@@ -174,7 +165,8 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             cl_context_properties contextProperties = new cl_context_properties();
             contextProperties.addProperty(CL.CL_CONTEXT_PLATFORM, platform);
             context = CL.clCreateContext(contextProperties, 1, new cl_device_id[]{device}, null, null, null);
-            commandQueue = CL.clCreateCommandQueue(context, device, 0, null);
+            cl_queue_properties queueProperties = new cl_queue_properties();
+            commandQueue = CL.clCreateCommandQueueWithProperties(context, device, queueProperties, null);
             
             initKernels();
             
@@ -188,14 +180,10 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         // Sparse Program
         sparseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SPMV}, null, null);
         clBuildProgram(sparseProgram, 0, null, null, null, null);
-        spmvKernel = clCreateKernel(sparseProgram, "spmv_csr", null);
 
         // Dense Program
         denseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_DENSE}, null, null);
         clBuildProgram(denseProgram, 0, null, null, null, null);
-        vecAddKernel = clCreateKernel(denseProgram, "vectorAdd", null);
-        vecSubKernel = clCreateKernel(denseProgram, "vectorSubtract", null);
-        vecScalarMulKernel = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
         matMulKernel = clCreateKernel(denseProgram, "matrixMultiply", null);
     }
 
@@ -221,8 +209,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {
         if (!isInitialized) start();
-        // Dispatched via kernels or naive in NativeOpenCLSparseLinearAlgebraBackend
-        // For unification, we use the matMulKernel here
         double[] dataA = new double[m * k]; A.get(dataA); A.rewind();
         double[] dataB = new double[k * n]; B.get(dataB); B.rewind();
         double[] dataC = new double[m * n];
@@ -292,9 +278,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override public Matrix<Real> transpose(Matrix<Real> a) { return denseFallback.transpose(a); }
     
     @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> x) {
-        if (!isAvailable() || a.rows() < 100) return sparseFallback.multiply(a, x);
-        // ... (Simplified transition of multiplyGPU logic from OpenCLLinearAlgebraBackend)
-        return sparseFallback.multiply(a, x); // Fallback for now to avoid massive boilerplate in this write
+        return sparseFallback.multiply(a, x);
     }
 
     @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return denseFallback.add(a, b); }

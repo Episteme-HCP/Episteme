@@ -3,14 +3,13 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.cuda;
+package org.jscience.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.gpu.GPUBackend.DeviceInfo;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.mathematics.structures.rings.Ring;

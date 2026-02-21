@@ -3,18 +3,17 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.cuda;
-
+package org.jscience.nativ.mathematics.linearalgebra.backends;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for NativeCUDABackend.
+ * Automated baseline test for NativeCUDASparseLinearAlgebraBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
 public class NativeCUDASparseLinearAlgebraBackendTest {
 

@@ -3,19 +3,18 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.opencl;
+package org.jscience.nativ.mathematics.linearalgebra.backends;
 
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
-import org.jocl.cl_command_queue;
-import org.jocl.cl_context;
+import org.jocl.*;
 
 /**
- * OpenCL Execution Context.
+ * Execution context for OpenCL operations.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
 public class OpenCLExecutionContext implements ExecutionContext {
 
@@ -37,14 +36,11 @@ public class OpenCLExecutionContext implements ExecutionContext {
 
     @Override
     public <T> T execute(Operation<T> operation) {
-        // Direct execution - allows the operation to define its own logic
-        // using the provided context (even if limited)
         return operation.compute(this);
     }
 
     @Override
     public void close() {
-        // Cleanup if needed (context/queue are shared usually, but per-context
-        // resources should be freed)
+        // Resource management should be handled by the backend
     }
 }

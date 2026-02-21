@@ -23,7 +23,6 @@
 
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.real.RealDouble;

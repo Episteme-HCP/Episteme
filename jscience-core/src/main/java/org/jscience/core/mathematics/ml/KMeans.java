@@ -24,7 +24,6 @@
 package org.jscience.core.mathematics.ml;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.ml.MLProvider;
 import java.util.ServiceLoader;
 import java.util.Random;
 

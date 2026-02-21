@@ -26,7 +26,6 @@ package org.jscience.core.mathematics.statistics.montecarlo;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
-import org.jscience.core.mathematics.statistics.montecarlo.MonteCarloProvider;
 
 /**
  * Monte Carlo integration methods.

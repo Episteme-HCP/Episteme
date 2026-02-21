@@ -158,16 +158,92 @@ public class MulticoreFEMProvider implements FEMProvider {
 
     @Override
     public double[] solvePoisson(Mesh mesh, java.util.function.ToDoubleFunction<double[]> sourceTerm) {
-        // TODO: Implement double precision version using native BLAS/LAPACK via Panama
-        // For now, delegate to Real version (slow)
-        org.jscience.core.mathematics.analysis.Function<Vector<Real>, Real> realSource = v -> {
-            double[] doubleData = new double[v.dimension()];
-            for (int i = 0; i < v.dimension(); i++) doubleData[i] = v.get(i).doubleValue();
-            return Real.of(sourceTerm.applyAsDouble(doubleData));
-        };
-        Vector<Real> realResult = solvePoisson(mesh, realSource);
-        double[] doubleResult = new double[realResult.dimension()];
-        for (int i = 0; i < realResult.dimension(); i++) doubleResult[i] = realResult.get(i).doubleValue();
+        int nNodes = mesh.getNodes().size();
+        mesh.indexNodes();
+
+        double[][] kData = new double[nNodes][nNodes];
+        double[] fData = new double[nNodes];
+
+        // Assemble K and F in double precision
+        for (Element element : mesh.getElements()) {
+            List<Node> nodes = element.getNodes();
+            int nElemNodes = nodes.size();
+
+            for (QuadraturePoint qp : element.getQuadraturePoints()) {
+                Vector<Real> xi = qp.getCoordinates();
+                double weight = qp.getWeight().doubleValue();
+
+                Matrix<Real> J = element.computeJacobian(xi);
+                double detJ = Math.abs(J.determinant().doubleValue());
+                Matrix<Real> invJ = J.inverse();
+
+                Vector<Real> globalPoint = computeGlobalCoordinates(element, xi);
+                double[] globalPointP = new double[globalPoint.dimension()];
+                for (int i = 0; i < globalPointP.length; i++) globalPointP[i] = globalPoint.get(i).doubleValue();
+
+                for (int i = 0; i < nElemNodes; i++) {
+                    int globalI = nodes.get(i).getGlobalIndex();
+                    Vector<Real> gradNi_local = element.getShapeFunctions().get(i).gradient(xi);
+                    Vector<Real> gradNi_global = invJ.transpose().multiply(gradNi_local);
+
+                    double Ni = element.getShapeFunctions().get(i).evaluate(xi).doubleValue();
+                    double fVal = sourceTerm.applyAsDouble(globalPointP);
+                    fData[globalI] += Ni * fVal * detJ * weight;
+
+                    for (int j = 0; j < nElemNodes; j++) {
+                        int globalJ = nodes.get(j).getGlobalIndex();
+                        Vector<Real> gradNj_local = element.getShapeFunctions().get(j).gradient(xi);
+                        Vector<Real> gradNj_global = invJ.transpose().multiply(gradNj_local);
+
+                        double dotProd = 0;
+                        for (int k = 0; k < gradNi_global.dimension(); k++) {
+                            dotProd += gradNi_global.get(k).doubleValue() * gradNj_global.get(k).doubleValue();
+                        }
+                        
+                        kData[globalI][globalJ] += dotProd * detJ * weight;
+                    }
+                }
+            }
+        }
+
+        // Apply BCs
+        int[] fixedNodes = { 0, nNodes - 1 };
+        for (int nodeIdx : fixedNodes) {
+            if (nodeIdx < 0 || nodeIdx >= nNodes) continue;
+            for (int j = 0; j < nNodes; j++) kData[nodeIdx][j] = 0;
+            kData[nodeIdx][nodeIdx] = 1.0;
+            fData[nodeIdx] = 0;
+        }
+
+        // Solve using high-performance provider
+        org.jscience.core.technical.algorithm.OperationContext ctx = 
+            new org.jscience.core.technical.algorithm.OperationContext.Builder()
+                .dataSize((long) nNodes * nNodes)
+                .build();
+        org.jscience.core.mathematics.numbers.real.DoubleField ring = 
+            org.jscience.core.mathematics.numbers.real.DoubleField.INSTANCE;
+        
+        org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider<Double> provider = 
+            org.jscience.core.technical.algorithm.AlgorithmManager.getRegistry()
+            .selectLinearAlgebraProvider(ctx, ring);
+
+        List<List<Double>> kList = new ArrayList<>(nNodes);
+        for (double[] row : kData) {
+            List<Double> rowList = new ArrayList<>(nNodes);
+            for (double v : row) rowList.add(v);
+            kList.add(rowList);
+        }
+        
+        List<Double> fList = new ArrayList<>(nNodes);
+        for (double v : fData) fList.add(v);
+
+        Matrix<Double> K = new org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<>(kList, ring);
+        Vector<Double> F = new org.jscience.core.mathematics.linearalgebra.vectors.DenseVector<>(fList, ring);
+
+        Vector<Double> result = provider.solve(K, F);
+        
+        double[] doubleResult = new double[nNodes];
+        for (int i = 0; i < nNodes; i++) doubleResult[i] = result.get(i);
         return doubleResult;
     }
 

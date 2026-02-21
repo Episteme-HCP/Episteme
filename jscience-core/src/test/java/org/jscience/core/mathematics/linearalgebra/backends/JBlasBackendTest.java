@@ -5,24 +5,21 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.providers.EJMLLinearAlgebraProvider;
-
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for EJMLLinearAlgebraProvider.
+ * Automated baseline test for JBlasBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public class EJMLLinearAlgebraProviderTest {
+public class JBlasBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(EJMLLinearAlgebraProvider.class);
+        assertNotNull(JBlasBackend.class);
     }
 }
-

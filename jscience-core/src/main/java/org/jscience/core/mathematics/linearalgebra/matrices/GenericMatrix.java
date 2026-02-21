@@ -26,8 +26,6 @@ package org.jscience.core.mathematics.linearalgebra.matrices;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
-import org.jscience.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;
-import org.jscience.core.ComputeContext;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
@@ -35,7 +33,6 @@ import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 
-import java.util.List;
 
 /**
  * A generic matrix implementation with smart storage and provider selection.

@@ -10,8 +10,8 @@ import org.jscience.natural.physics.classical.matter.fluids.LatticeBoltzmannProv
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.nativ.technical.backend.gpu.opencl.NativeOpenCLSparseLinearAlgebraBackend;
-import org.jscience.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
+import org.jscience.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.jscience.nativ.mathematics.linearalgebra.backends.OpenCLExecutionContext;
 
 import static org.jocl.CL.*;
 import org.jocl.*;

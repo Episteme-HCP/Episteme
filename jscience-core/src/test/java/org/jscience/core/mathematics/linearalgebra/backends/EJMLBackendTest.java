@@ -5,24 +5,21 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.providers.ColtLinearAlgebraProvider;
-
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for ColtLinearAlgebraProvider.
+ * Automated baseline test for EJMLBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public class ColtLinearAlgebraProviderTest {
+public class EJMLBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(ColtLinearAlgebraProvider.class);
+        assertNotNull(EJMLBackend.class);
     }
 }
-

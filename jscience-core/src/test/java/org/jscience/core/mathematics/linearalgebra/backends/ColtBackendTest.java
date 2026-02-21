@@ -3,24 +3,23 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.opencl;
+package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.nativ.technical.backend.gpu.opencl.NativeOpenCLSparseLinearAlgebraBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for NativeOpenCLSparseLinearAlgebraBackend.
+ * Automated baseline test for ColtBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public class NativeOpenCLSparseLinearAlgebraBackendTest {
+public class ColtBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(NativeOpenCLSparseLinearAlgebraBackend.class);
+        assertNotNull(ColtBackend.class);
     }
 }

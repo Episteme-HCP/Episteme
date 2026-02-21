@@ -11,7 +11,6 @@ import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;

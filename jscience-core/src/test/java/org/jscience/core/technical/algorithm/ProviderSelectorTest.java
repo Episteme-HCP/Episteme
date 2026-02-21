@@ -1,7 +1,6 @@
 package org.jscience.core.technical.algorithm;
 
 import org.jscience.core.technical.algorithm.mocks.TestService;
-import org.jscience.core.technical.algorithm.OperationContext;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

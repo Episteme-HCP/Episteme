@@ -21,8 +21,8 @@ import org.jocl.Pointer;
 import org.jocl.Sizeof;
 
 import static org.jocl.CL.*;
-import org.jscience.nativ.technical.backend.gpu.opencl.NativeOpenCLSparseLinearAlgebraBackend;
-import org.jscience.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
+import org.jscience.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.jscience.nativ.mathematics.linearalgebra.backends.OpenCLExecutionContext;
 
 /**
  * GPU-accelerated N-Body simulation provider using OpenCL.

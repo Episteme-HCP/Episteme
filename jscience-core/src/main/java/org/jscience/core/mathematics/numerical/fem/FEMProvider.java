@@ -5,7 +5,6 @@
 
 package org.jscience.core.mathematics.numerical.fem;
 
-import org.jscience.core.mathematics.analysis.Function;
 import org.jscience.core.mathematics.analysis.fem.Mesh;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;

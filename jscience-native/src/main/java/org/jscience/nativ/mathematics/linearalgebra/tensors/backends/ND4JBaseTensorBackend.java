@@ -10,7 +10,7 @@ import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
+import org.jscience.nativ.mathematics.linearalgebra.backends.CUDAExecutionContext;
 import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
 import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend;
 

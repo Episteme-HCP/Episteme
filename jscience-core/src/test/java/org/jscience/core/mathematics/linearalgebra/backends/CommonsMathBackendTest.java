@@ -5,24 +5,21 @@
 
 package org.jscience.core.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.providers.JBlasLinearAlgebraProvider;
-
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for JBlasLinearAlgebraProvider.
+ * Automated baseline test for CommonsMathBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public class JBlasLinearAlgebraProviderTest {
+public class CommonsMathBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(JBlasLinearAlgebraProvider.class);
+        assertNotNull(CommonsMathBackend.class);
     }
 }
-

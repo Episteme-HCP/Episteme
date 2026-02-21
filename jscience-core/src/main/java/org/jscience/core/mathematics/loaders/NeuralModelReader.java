@@ -6,7 +6,6 @@
 package org.jscience.core.mathematics.loaders;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import org.jscience.core.mathematics.numbers.real.Real;

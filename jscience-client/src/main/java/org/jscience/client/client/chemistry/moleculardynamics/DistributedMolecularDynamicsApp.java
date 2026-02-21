@@ -52,7 +52,6 @@ import org.jscience.natural.chemistry.Atom;
 import org.jscience.natural.chemistry.PeriodicTable;
 import org.jscience.server.server.chemistry.MolecularDynamicsTask;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.core.mathematics.sets.Reals;
 

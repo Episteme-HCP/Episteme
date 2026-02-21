@@ -27,11 +27,7 @@ import org.jscience.core.mathematics.structures.spaces.Module;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
-import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.vectors.SparseVector;
 
 // TensorFactory removed
 

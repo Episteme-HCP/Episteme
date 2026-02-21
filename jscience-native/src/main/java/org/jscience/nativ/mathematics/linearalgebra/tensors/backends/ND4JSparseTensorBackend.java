@@ -11,7 +11,7 @@ import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
+import org.jscience.nativ.mathematics.linearalgebra.backends.CUDAExecutionContext;
 import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUSparseTensorBackend;
 
 /**

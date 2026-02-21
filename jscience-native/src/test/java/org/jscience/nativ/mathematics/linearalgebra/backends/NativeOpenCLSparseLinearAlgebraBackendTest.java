@@ -3,26 +3,23 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.mathematics.linearalgebra.backends;
-
-import org.jscience.core.mathematics.linearalgebra.providers.CommonsMathLinearAlgebraProvider;
+package org.jscience.nativ.mathematics.linearalgebra.backends;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for CommonsMathLinearAlgebraProvider.
+ * Automated baseline test for NativeOpenCLSparseLinearAlgebraBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public class CommonsMathLinearAlgebraProviderTest {
+public class NativeOpenCLSparseLinearAlgebraBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(CommonsMathLinearAlgebraProvider.class);
+        assertNotNull(NativeOpenCLSparseLinearAlgebraBackend.class);
     }
 }
-

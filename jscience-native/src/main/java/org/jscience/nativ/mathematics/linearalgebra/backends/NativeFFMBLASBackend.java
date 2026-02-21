@@ -29,7 +29,6 @@ import java.util.List;
  * Binds to OpenBLAS/MKL for Matrix Operations.
  * Implements {@link CPUBackend} and {@link NativeBackend}.
  */
-@SuppressWarnings("rawtypes") 
 @AutoService({Backend.class, LinearAlgebraProvider.class, AlgorithmProvider.class, CPUBackend.class, NativeBackend.class})
 public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUBackend, NativeBackend {
 

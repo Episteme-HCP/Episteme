@@ -23,6 +23,7 @@
 
 package org.jscience.natural.util;
 
+import org.jscience.natural.util.PojoTester;
 import org.junit.jupiter.api.Test;
 import org.jscience.natural.biology.*;
 import org.jscience.natural.biology.biochemistry.*;

@@ -65,10 +65,12 @@
         <dependency>
             <groupId>org.jcuda</groupId>
             <artifactId>jcuda</artifactId>
+            <version>${jcuda.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jcuda</groupId>
             <artifactId>jcublas</artifactId>
+            <version>${jcuda.version}</version>
         </dependency>
 
         <!-- JOCL (OpenCL) -->

@@ -23,7 +23,6 @@
 
 package org.jscience.core.mathematics.ml.backends;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 import org.jscience.core.technical.backend.ExecutionContext;

@@ -6,13 +6,11 @@
 package org.jscience.core.technical.algorithm.verification;
 
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.numbers.real.RealDouble;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector;
-import org.jscience.core.mathematics.context.MathContext;
 
 import java.util.Random;
 

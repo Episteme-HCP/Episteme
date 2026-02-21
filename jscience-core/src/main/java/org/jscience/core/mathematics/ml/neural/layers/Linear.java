@@ -3,7 +3,6 @@ package org.jscience.core.mathematics.ml.neural.layers;
 import org.jscience.core.mathematics.ml.neural.Layer;
 import org.jscience.core.mathematics.ml.neural.autograd.GraphNode;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.util.persistence.Persistent;
 import org.jscience.core.util.persistence.Attribute;

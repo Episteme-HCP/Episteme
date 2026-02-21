@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.opencl;
+package org.jscience.nativ.mathematics.analysis.fft;
 
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.numbers.complex.Complex;
@@ -11,7 +11,8 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.analysis.fft.FFTProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
-
+import org.jscience.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.jscience.nativ.mathematics.linearalgebra.backends.OpenCLExecutionContext;
 
 import static org.jocl.CL.*;
 import org.jocl.*;
@@ -101,10 +102,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
 
     /**
      * Context-aware scoring that accounts for GPU data transfer overhead.
-     * <p>
-     * GPU FFT is particularly beneficial for large transforms where the
-     * O(N log N) compute gain outweighs the host→device transfer cost.
-     * </p>
      */
     @Override
     public double score(OperationContext context) {
@@ -259,12 +256,11 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
         }
         return out;
     }
+
     @Override
     public double[][][] transform2D(double[][] real, double[][] imag) {
         int rows = real.length;
         int cols = real[0].length;
-
-        // Row-wise 1D FFT
         double[][] rowR = new double[rows][cols];
         double[][] rowI = new double[rows][cols];
         for (int r = 0; r < rows; r++) {
@@ -272,8 +268,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
             rowR[r] = res[0];
             rowI[r] = res[1];
         }
-
-        // Column-wise 1D FFT
         double[][] outR = new double[rows][cols];
         double[][] outI = new double[rows][cols];
         for (int c = 0; c < cols; c++) {
@@ -290,7 +284,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
     public double[][][] inverseTransform2D(double[][] real, double[][] imag) {
         int rows = real.length;
         int cols = real[0].length;
-
         double[][] rowR = new double[rows][cols];
         double[][] rowI = new double[rows][cols];
         for (int r = 0; r < rows; r++) {
@@ -298,7 +291,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
             rowR[r] = res[0];
             rowI[r] = res[1];
         }
-
         double[][] outR = new double[rows][cols];
         double[][] outI = new double[rows][cols];
         for (int c = 0; c < cols; c++) {
@@ -314,8 +306,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
     @Override
     public double[][][][] transform3D(double[][][] real, double[][][] imag) {
         int d0 = real.length, d1 = real[0].length, d2 = real[0][0].length;
-
-        // Apply 2D FFT to each slice along first dimension
         double[][][] outR = new double[d0][d1][d2];
         double[][][] outI = new double[d0][d1][d2];
         for (int i = 0; i < d0; i++) {
@@ -323,8 +313,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
             outR[i] = res[0];
             outI[i] = res[1];
         }
-
-        // FFT along the first dimension
         for (int j = 0; j < d1; j++) {
             for (int k = 0; k < d2; k++) {
                 double[] colR = new double[d0];
@@ -340,7 +328,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
     @Override
     public double[][][][] inverseTransform3D(double[][][] real, double[][][] imag) {
         int d0 = real.length, d1 = real[0].length, d2 = real[0][0].length;
-
         double[][][] outR = new double[d0][d1][d2];
         double[][][] outI = new double[d0][d1][d2];
         for (int i = 0; i < d0; i++) {
@@ -348,7 +335,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
             outR[i] = res[0];
             outI[i] = res[1];
         }
-
         for (int j = 0; j < d1; j++) {
             for (int k = 0; k < d2; k++) {
                 double[] colR = new double[d0];
@@ -393,7 +379,6 @@ public class NativeOpenCLFFTProvider implements FFTProvider {
         return new Real[][][][]{toReal3D(res[0]), toReal3D(res[1])};
     }
 
-    // --- Conversion helpers ---
     private static double[][] toDouble2D(Real[][] a) {
         double[][] r = new double[a.length][];
         for (int i = 0; i < a.length; i++) {

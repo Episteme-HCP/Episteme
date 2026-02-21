@@ -27,7 +27,6 @@ package org.jscience.natural.physics.quantum;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.natural.technical.backend.quantum.QuantumBackend;
-import org.jscience.natural.technical.backend.quantum.QuantumAlgorithmProvider;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;

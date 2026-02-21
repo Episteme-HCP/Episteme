@@ -8,8 +8,8 @@ package org.jscience.natural.technical.backend.quantum;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.technical.backend.ComputeBackend;
-import com.google.auto.service.AutoService;
-import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.mathematics.numbers.complex.Complex;
+import org.jscience.core.technical.backend.ComputeBackend;
 
 /**
  * Hardware interface for quantum computing backends.
