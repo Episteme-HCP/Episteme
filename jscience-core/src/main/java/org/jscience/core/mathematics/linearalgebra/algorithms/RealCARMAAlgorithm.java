@@ -25,7 +25,7 @@ public class RealCARMAAlgorithm {
         }
 
         if (m <= RECURSION_THRESHOLD && n <= RECURSION_THRESHOLD && k <= RECURSION_THRESHOLD) {
-            return A.multiply(B);
+            return standardMultiply(A, B);
         }
 
         if (m >= n && m >= k) {
@@ -65,5 +65,24 @@ public class RealCARMAAlgorithm {
             for (int j = 0; j < right.cols(); j++) data[i][left.cols() + j] = right.get(i, j);
         }
         return Matrix.of(data, org.jscience.core.mathematics.sets.Reals.getInstance());
+    }
+
+    private static Matrix<Real> standardMultiply(Matrix<Real> A, Matrix<Real> B) {
+        int m = A.rows();
+        int k = A.cols();
+        int n = B.cols();
+        Real[][] res = new Real[m][n];
+        org.jscience.core.mathematics.sets.Reals reals = org.jscience.core.mathematics.sets.Reals.getInstance();
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                Real sum = reals.zero();
+                for (int l = 0; l < k; l++) {
+                    sum = reals.add(sum, reals.multiply(A.get(i, l), B.get(l, j)));
+                }
+                res[i][j] = sum;
+            }
+        }
+        return Matrix.of(res, reals);
     }
 }

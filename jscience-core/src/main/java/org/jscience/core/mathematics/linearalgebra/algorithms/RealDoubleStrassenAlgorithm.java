@@ -13,7 +13,7 @@ public class RealDoubleStrassenAlgorithm {
     public static SIMDRealDoubleMatrix multiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
         int n = A.rows();
         if (n <= THRESHOLD) {
-            return (SIMDRealDoubleMatrix) A.multiply(B);
+            return standardMultiply(A, B);
         }
 
         int newSize = n / 2;
@@ -62,5 +62,24 @@ public class RealDoubleStrassenAlgorithm {
         }
         
         return new SIMDRealDoubleMatrix(n, n, combinedData);
+    }
+
+    private static SIMDRealDoubleMatrix standardMultiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
+        int m = A.rows();
+        int k = A.cols();
+        int n = B.cols();
+        double[] aData = A.getInternalData();
+        double[] bData = B.getInternalData();
+        double[] cData = new double[m * n];
+        
+        for (int i = 0; i < m; i++) {
+            for (int l = 0; l < k; l++) {
+                double aik = aData[i * k + l];
+                for (int j = 0; j < n; j++) {
+                    cData[i * n + j] += aik * bData[l * n + j];
+                }
+            }
+        }
+        return new SIMDRealDoubleMatrix(m, n, cData);
     }
 }
