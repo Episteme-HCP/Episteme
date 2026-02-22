@@ -18,7 +18,6 @@ import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.core.technical.backend.simd.SIMDBackend;
-import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
 import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 
@@ -41,8 +40,6 @@ import org.jscience.core.technical.backend.Operation;
 public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
-
-    private final StandardLinearAlgebraProvider<Real> fallback = new StandardLinearAlgebraProvider<>();
 
     @Override
     public boolean isAvailable() {
@@ -118,13 +115,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        try {
-            SIMDRealDoubleMatrix sa = asSIMD(a);
-            SIMDRealDoubleMatrix sb = asSIMD(b);
-            return sa.multiply(sb);
-        } catch (Exception e) {
-            return fallback.multiply(a, b);
-        }
+        SIMDRealDoubleMatrix sa = asSIMD(a);
+        SIMDRealDoubleMatrix sb = asSIMD(b);
+        return sa.multiply(sb);
     }
 
     @Override
@@ -159,7 +152,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if(!(a.getScalarRing() instanceof Reals)) return fallback.solve(a, b);
+        if(!(a.getScalarRing() instanceof Reals)) throw new UnsupportedOperationException("SIMD solve only supports Real field.");
         
         SIMDRealDoubleMatrix simdA = asSIMD(a);
         int n = simdA.rows();
@@ -336,9 +329,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         );
     }
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) { return fallback.inverse(a); }
+    public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("SIMD inverse not implemented yet."); }
     @Override
-    public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
+    public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("SIMD determinant not implemented yet."); }
 
     private SIMDRealDoubleMatrix asSIMD(Matrix<Real> m) {
         if (m instanceof SIMDRealDoubleMatrix) return (SIMDRealDoubleMatrix) m;

@@ -19,7 +19,7 @@ import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 
@@ -42,7 +42,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     private cl_program program;
     private boolean initialized = false;
 
-    private final StandardLinearAlgebraProvider<Real> fallback = new StandardLinearAlgebraProvider<>();
 
     private static final String KERNEL_SOURCE = 
         "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
@@ -99,7 +98,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) return fallback.multiply(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
 
         int m = a.rows();
         int k = a.cols();
@@ -161,25 +160,26 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     @Override public void synchronize() { if (commandQueue != null) clFinish(commandQueue); }
     @Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
 
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return fallback.add(a, b); }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return fallback.subtract(a, b); }
-    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) { return fallback.scale(scalar, a); }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) { return fallback.transpose(a); }
-    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { return fallback.multiply(a, b); }
-    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return fallback.add(a, b); }
-    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return fallback.subtract(a, b); }
-    @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) { return fallback.multiply(vector, scalar); }
-    @Override public Real dot(Vector<Real> a, Vector<Real> b) { return fallback.dot(a, b); }
-    @Override public Real norm(Vector<Real> a) { return fallback.norm(a); }
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { return fallback.inverse(a); }
-    @Override public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return fallback.solve(a, b); }
+    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL add not implemented"); }
+    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL subtract not implemented"); }
+    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL scale not implemented"); }
+    @Override public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL transpose not implemented"); }
+    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL multiply not implemented"); }
+    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL add not implemented"); }
+    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL subtract not implemented"); }
+    @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException("OpenCL multiply not implemented"); }
+    @Override public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL dot not implemented"); }
+    @Override public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("OpenCL norm not implemented"); }
+    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL inverse not implemented"); }
+    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL determinant not implemented"); }
+    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL solve not implemented"); }
 
     @Override public double score(OperationContext context) {
-        if (!isAvailable()) return -1;
+        if (!isAvailable()) return -1.0;
         double base = getPriority();
         if (context.getDataSize() < 256) base -= 200;
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;
+        if (context.hasHint(OperationContext.Hint.MAT_MUL)) base += 20;
         return base;
     }
 

@@ -339,7 +339,8 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL subtract not implemented"); }
     @Override public Matrix<Real> scale(Real s, Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL scale not implemented"); }
     @Override public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL transpose not implemented"); }
-    
+    @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> x) {
         return multiplyCSR(a, x);
     }
 

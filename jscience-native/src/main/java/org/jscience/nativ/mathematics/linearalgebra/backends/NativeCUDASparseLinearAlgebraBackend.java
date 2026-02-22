@@ -24,7 +24,6 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 
 /**
@@ -40,7 +39,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
 
     private static final Linker LINKER = Linker.nativeLinker();
 
-    private final StandardLinearAlgebraProvider<Real> fallback = new StandardLinearAlgebraProvider<>();
 
     private final SymbolLookup cuda;
     private final SymbolLookup cublas;
@@ -204,13 +202,14 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
 
     @Override
     public double score(OperationContext context) {
-        if (!isAvailable()) return -1;
+        if (!isAvailable()) return -1.0;
         double base = getPriority();
         if (context.getDataSize() < 100) base -= 100;
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
         if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
         if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
         if (context.hasHint(OperationContext.Hint.SPARSE)) base += 15;
+        if (context.hasHint(OperationContext.Hint.MAT_MUL)) base += 10;
         return base;
     }
 
@@ -233,45 +232,45 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
     
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        return fallback.add(a, b);
+        throw new UnsupportedOperationException("CUDA Sparse add not implemented");
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        return fallback.subtract(a, b);
+        throw new UnsupportedOperationException("CUDA Sparse subtract not implemented");
     }
     
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        return fallback.scale(scalar, a);
+        throw new UnsupportedOperationException("CUDA Sparse scale not implemented");
     }
     
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        return fallback.transpose(a);
+        throw new UnsupportedOperationException("CUDA Sparse transpose not implemented");
     }
 
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        return fallback.multiply(a, b);
+        throw new UnsupportedOperationException("CUDA Sparse multiply not implemented");
     }
 
     @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return fallback.add(a, b); }
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse add not implemented"); }
     @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return fallback.subtract(a, b); }
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse subtract not implemented"); }
     @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { return fallback.multiply(vector, scalar); }
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException("CUDA Sparse multiply not implemented"); }
     @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) { return fallback.dot(a, b); }
+    public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse dot not implemented"); }
     @Override
-    public Real norm(Vector<Real> a) { return fallback.norm(a); }
+    public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("CUDA Sparse norm not implemented"); }
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) { return fallback.inverse(a); }
+    public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA Sparse inverse not implemented"); }
     @Override
-    public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
+    public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA Sparse determinant not implemented"); }
     @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return fallback.solve(a, b); }
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse solve not implemented"); }
 
     private DoubleBuffer toDoubleBuffer(Matrix<Real> m) {
         int rows = m.rows();

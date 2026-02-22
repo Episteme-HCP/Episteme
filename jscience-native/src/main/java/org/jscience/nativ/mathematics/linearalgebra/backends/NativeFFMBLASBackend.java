@@ -284,6 +284,13 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) score -= 50.0;
         if (context.getDataSize() > 0 && context.getDataSize() < 256) score -= 20.0;
         if (!context.hasHint(OperationContext.Hint.FLOAT32_OK)) score += 10.0;
+        
+        // Granular operation hints
+        if (context.hasHint(OperationContext.Hint.MAT_MUL)) score += 5.0;
+        if (context.hasHint(OperationContext.Hint.MAT_INV)) score += 5.0;
+        if (context.hasHint(OperationContext.Hint.MAT_DET)) score += 5.0;
+        if (context.hasHint(OperationContext.Hint.MAT_SOLVE)) score += 5.0;
+        
         return score;
     }
 
@@ -345,130 +352,106 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
 
     @Override
     public Vector<Double> add(Vector<Double> a, Vector<Double> b) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int n = a.dimension();
-        if (IS_AVAILABLE) {
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                for (int i = 0; i < n; i++) {
-                    segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
-                    segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
-                }
-                try { DAXPY.invokeExact(n, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-                Double[] result = new Double[n];
-                for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-                return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+            for (int i = 0; i < n; i++) {
+                segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
+                segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
             }
+            try { DAXPY.invokeExact(n, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            Double[] result = new Double[n];
+            for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
         }
-        Double[] result = new Double[n];
-        for (int i = 0; i < n; i++) result[i] = a.get(i) + b.get(i);
-        return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
     }
 
     @Override
     public Vector<Double> subtract(Vector<Double> a, Vector<Double> b) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int n = a.dimension();
-        if (IS_AVAILABLE) {
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                for (int i = 0; i < n; i++) {
-                    segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
-                    segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
-                }
-                try { DAXPY.invokeExact(n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-                Double[] result = new Double[n];
-                for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-                return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+            for (int i = 0; i < n; i++) {
+                segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+                segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
             }
+            try { DAXPY.invokeExact(n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            Double[] result = new Double[n];
+            for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
         }
-        Double[] result = new Double[n];
-        for (int i = 0; i < n; i++) result[i] = a.get(i) - b.get(i);
-        return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
     }
 
     @Override
     public Vector<Double> multiply(Vector<Double> vector, Double scalar) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int n = vector.dimension();
-        if (IS_AVAILABLE) {
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                for (int i = 0; i < n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, vector.get(i));
-                try { DSCAL.invokeExact(n, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-                Double[] result = new Double[n];
-                for (int i = 0; i < n; i++) result[i] = segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-                return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)vector.getScalarRing());
-            }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+            for (int i = 0; i < n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, vector.get(i));
+            try { DSCAL.invokeExact(n, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            Double[] result = new Double[n];
+            for (int i = 0; i < n; i++) result[i] = segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)vector.getScalarRing());
         }
-        Double[] result = new Double[n];
-        for (int i = 0; i < n; i++) result[i] = vector.get(i) * scalar;
-        return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)vector.getScalarRing());
     }
 
     @Override
     public Matrix<Double> add(Matrix<Double> a, Matrix<Double> b) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), n = a.cols();
-        if (IS_AVAILABLE) {
-             try (Arena arena = Arena.ofConfined()) {
-                 int len = m * n;
-                 MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-                 MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-                 double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
-                 double[] arrB = ((DenseMatrix<?>)b).toDoubleArray();
-                 MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
-                 MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
-                 try { DAXPY.invokeExact(len, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-                 double[] result = new double[len];
-                 MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
-                 return createDenseMatrix(result, m, n, a);
-             }
+        try (Arena arena = Arena.ofConfined()) {
+            int len = m * n;
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+            double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
+            double[] arrB = ((DenseMatrix<?>)b).toDoubleArray();
+            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
+            MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
+            try { DAXPY.invokeExact(len, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            double[] result = new double[len];
+            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+            return createDenseMatrix(result, m, n, a);
         }
-        Double[][] result = new Double[m][n];
-        for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) result[i][j] = a.get(i, j) + b.get(i, j);
-        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
     }
 
     @Override
     public Matrix<Double> subtract(Matrix<Double> a, Matrix<Double> b) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), n = a.cols();
-        if (IS_AVAILABLE) {
-             try (Arena arena = Arena.ofConfined()) {
-                 int len = m * n;
-                 MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-                 MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-                 double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
-                 double[] arrB = ((DenseMatrix<?>)b).toDoubleArray();
-                 MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
-                 MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
-                 try { DAXPY.invokeExact(len, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-                 double[] result = new double[len];
-                 MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
-                 return createDenseMatrix(result, m, n, a);
-             }
+        try (Arena arena = Arena.ofConfined()) {
+            int len = m * n;
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+            double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
+            double[] arrB = ((DenseMatrix<?>)b).toDoubleArray();
+            MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
+            MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
+            try { DAXPY.invokeExact(len, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            double[] result = new double[len];
+            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+            return createDenseMatrix(result, m, n, a);
         }
-        Double[][] result = new Double[m][n];
-        for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) result[i][j] = a.get(i, j) - b.get(i, j);
-        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
     }
 
     @Override
     public Matrix<Double> scale(Double scalar, Matrix<Double> a) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), n = a.cols();
-        if (IS_AVAILABLE) {
-            try (Arena arena = Arena.ofConfined()) {
-                int len = m * n;
-                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-                double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
-                MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
-                try { DSCAL.invokeExact(len, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-                double[] result = new double[len];
-                MemorySegment.copy(segX, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
-                return createDenseMatrix(result, m, n, a);
-            }
+        try (Arena arena = Arena.ofConfined()) {
+            int len = m * n;
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+            double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
+            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
+            try { DSCAL.invokeExact(len, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            double[] result = new double[len];
+            MemorySegment.copy(segX, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+            return createDenseMatrix(result, m, n, a);
         }
-        Double[][] result = new Double[m][n];
-        for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) result[i][j] = a.get(i, j) * scalar;
-        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
     }
 
     @Override
@@ -495,27 +478,19 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
 
     @Override
     public Vector<Double> multiply(Matrix<Double> a, Vector<Double> b) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), k = a.cols();
-        if (IS_AVAILABLE) {
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * k);
-                for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) segA.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * k + j, a.get(i, j));
-                MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, k);
-                for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
-                MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
-                try { DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, k, 1.0, segA, k, segX, 1, 0.0, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-                Double[] result = new Double[m];
-                for (int i = 0; i < m; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-                return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)b.getScalarRing());
-            }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * k);
+            for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) segA.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * k + j, a.get(i, j));
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, k);
+            for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
+            try { DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, k, 1.0, segA, k, segX, 1, 0.0, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            Double[] result = new Double[m];
+            for (int i = 0; i < m; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)b.getScalarRing());
         }
-        Double[] result = new Double[m];
-        for (int i = 0; i < m; i++) {
-            double sum = 0;
-            for (int j = 0; j < k; j++) sum += a.get(i, j) * b.get(j);
-            result[i] = sum;
-        }
-        return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)b.getScalarRing());
     }
 
     @Override

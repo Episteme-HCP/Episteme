@@ -20,7 +20,6 @@ import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
@@ -54,8 +53,6 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static final int CUBLAS_OP_N = 0;
     private static final int CUDA_MEMCPY_HOST_TO_DEVICE = 1;
     private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
-
-    private final StandardLinearAlgebraProvider<Real> fallback = new StandardLinearAlgebraProvider<>();
 
     static {
         SymbolLookup cuda = null;
@@ -129,7 +126,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!IS_AVAILABLE) return fallback.multiply(a, b);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA not available");
 
         int m = a.rows();
         int k = a.cols();
@@ -235,19 +232,19 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     @Override public void synchronize() { try { CUDA_DEVICE_SYNCHRONIZE.invokeExact(); } catch (Throwable t) {} }
     @Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
 
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return fallback.add(a, b); }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return fallback.subtract(a, b); }
-    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) { return fallback.scale(scalar, a); }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) { return fallback.transpose(a); }
-    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { return fallback.multiply(a, b); }
-    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return fallback.add(a, b); }
-    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return fallback.subtract(a, b); }
-    @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) { return fallback.multiply(vector, scalar); }
-    @Override public Real dot(Vector<Real> a, Vector<Real> b) { return fallback.dot(a, b); }
-    @Override public Real norm(Vector<Real> a) { return fallback.norm(a); }
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { return fallback.inverse(a); }
-    @Override public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { return fallback.solve(a, b); }
+    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("CUDA add not implemented"); }
+    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("CUDA subtract not implemented"); }
+    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) { throw new UnsupportedOperationException("CUDA scale not implemented"); }
+    @Override public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA transpose not implemented"); }
+    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA multiply not implemented"); }
+    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA add not implemented"); }
+    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA subtract not implemented"); }
+    @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException("CUDA multiply not implemented"); }
+    @Override public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA dot not implemented"); }
+    @Override public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("CUDA norm not implemented"); }
+    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA inverse not implemented"); }
+    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA determinant not implemented"); }
+    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA solve not implemented"); }
 
     @Override
     public double score(OperationContext context) {

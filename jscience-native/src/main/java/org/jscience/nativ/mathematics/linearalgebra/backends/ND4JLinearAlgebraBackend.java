@@ -8,7 +8,6 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.core.technical.backend.ComputeBackend;
@@ -29,7 +28,6 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
 @AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class, AlgorithmProvider.class})
 public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.jscience.nativ.technical.backend.nativ.NativeBackend, org.jscience.core.technical.backend.cpu.CPUBackend {
 
-    private final CPUDenseLinearAlgebraProvider<Real> fallback = new CPUDenseLinearAlgebraProvider<>();
 
     @Override
     public int getPriority() {
@@ -83,7 +81,15 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     @Override
     public boolean isCompatible(org.jscience.core.mathematics.structures.rings.Ring<?> ring) {
-        return true; 
+        return ring instanceof org.jscience.core.mathematics.sets.Reals; 
+    }
+
+    @Override
+    public double score(org.jscience.core.technical.algorithm.OperationContext context) {
+        if (!isAvailable()) return -1.0;
+        double score = getPriority();
+        if (context.hasHint(org.jscience.core.technical.algorithm.OperationContext.Hint.DENSE)) score += 10.0;
+        return score;
     }
 
     private org.nd4j.linalg.api.ndarray.INDArray toINDArray(Matrix<Real> m) {
@@ -130,72 +136,72 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     @Override
     public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) return fallback.add(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArrayVector(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) return fallback.subtract(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArrayVector(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        if (!isAvailable()) return fallback.multiply(vector, scalar);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArrayVector(toINDArray(vector).mul(scalar.doubleValue()));
     }
 
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) return fallback.dot(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return Real.of(org.nd4j.linalg.factory.Nd4j.getBlasWrapper().dot(toINDArray(a), toINDArray(b)));
     }
 
     @Override
     public Real norm(Vector<Real> a) {
-        if (!isAvailable()) return fallback.norm(a);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return Real.of(toINDArray(a).norm2Number().doubleValue());
     }
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) return fallback.add(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArray(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) return fallback.subtract(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArray(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) return fallback.multiply(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArray(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        if (!isAvailable()) return fallback.multiply(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArrayVector(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        if (!isAvailable()) return fallback.inverse(a);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArray(org.nd4j.linalg.inverse.InvertMatrix.invert(toINDArray(a), false));
     }
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        return fallback.determinant(a);
+        throw new UnsupportedOperationException("ND4J determinant not implemented yet.");
     }
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (!isAvailable()) return fallback.solve(a, b);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         // ND4J direct solve: A * x = b => x = solve(A, b)
         // Fallback to inverse multiply if solve is not found in this version
         return multiply(inverse(a), b);
@@ -203,13 +209,13 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        if (!isAvailable()) return fallback.transpose(a);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArray(toINDArray(a).transpose());
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        if (!isAvailable()) return fallback.scale(scalar, a);
+        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
         return fromINDArray(toINDArray(a).mul(scalar.doubleValue()));
     }
 }
