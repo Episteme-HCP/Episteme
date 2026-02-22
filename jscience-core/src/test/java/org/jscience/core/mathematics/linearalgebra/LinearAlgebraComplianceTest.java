@@ -237,7 +237,8 @@ public class LinearAlgebraComplianceTest {
         System.out.println(report);
         
         try {
-            Files.writeString(Paths.get("LinearAlgebraComplianceReport.md"), report);
+            Files.createDirectories(Paths.get("../docs"));
+            Files.writeString(Paths.get("../docs", "LinearAlgebraComplianceReport.md"), report);
         } catch (IOException e) {
             e.printStackTrace();
         }
