@@ -86,6 +86,13 @@ public class JScienceMasterControl extends Application {
             // Theme is handled by ThemeManager
             ThemeManager.getInstance().applyTheme(stage.getScene());
 
+            // Apply Episteme Application Icon universally
+            try {
+                stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png")));
+            } catch (Exception e) {
+                System.err.println("Warning: Could not load application icon.");
+            }
+
             this.primaryStage = stage;
             refreshUI();
         } catch (Throwable t) {

@@ -112,6 +112,11 @@ public abstract class FeaturedAppBase extends Application implements App {
         Scene scene = new Scene(rootPane, getDefaultWidth(), getDefaultHeight());
         applyTheme(scene);
 
+        // Load universally applied Episteme icon
+        try {
+            stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png")));
+        } catch (Exception e) {}
+
         stage.setTitle(getAppTitle());
         stage.setScene(scene);
         stage.setOnCloseRequest(e -> {

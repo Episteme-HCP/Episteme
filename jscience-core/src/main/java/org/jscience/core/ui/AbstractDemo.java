@@ -95,6 +95,11 @@ public abstract class AbstractDemo extends Application implements App {
         Scene scene = new Scene(root, 1200, 800);
         ThemeManager.getInstance().applyTheme(scene);
 
+        // Load universally applied Episteme icon
+        try {
+            stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png")));
+        } catch (Exception e) {}
+
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();

@@ -9,4 +9,4 @@ if not exist "jscience-server\target\jscience-server-1.0.0-SNAPSHOT.jar" (
 )
 
 REM Run Server
-java -cp jscience-server\target\jscience-server-1.0.0-SNAPSHOT.jar;jscience-server\target\lib\* org.jscience.server.JscienceServer
+java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -cp jscience-server\target\jscience-server-1.0.0-SNAPSHOT.jar;jscience-server\target\lib\* org.jscience.server.JscienceServer
