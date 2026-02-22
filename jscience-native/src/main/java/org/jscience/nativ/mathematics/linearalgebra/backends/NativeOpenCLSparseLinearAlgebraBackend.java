@@ -14,6 +14,7 @@ import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgeb
 import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
+import org.jscience.core.technical.algorithm.OperationContext.Hint;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
@@ -123,8 +124,13 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         if (!isInitialized && !attemptInitialization()) return -1;
         
         double base = getPriority();
-        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;
-        if (context.hasHint(OperationContext.Hint.SPARSE)) base += 20;
+        if (context.hasHint(Hint.GPU_RESIDENT)) base += 50;
+        if (context.hasHint(Hint.SPARSE)) base += 20;
+        
+        // Granular scoring for OpenCL
+        if (context.hasHint(Hint.MAT_MUL)) base += 10;
+        if (context.hasHint(Hint.MAT_SOLVE)) base -= 30; // Native solver might be slow or less stable
+        
         if (context.getDataSize() > 1000) base += 20;
         
         return base;
@@ -220,7 +226,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             isInitialized = true;
         } catch (Exception e) {
             isInitialized = false;
-            LOGGER.warning("Failed to initialize OpenCL Backend (Falling back to CPU): " + e.getMessage());
+            LOGGER.warning("Failed to initialize OpenCL Backend: " + e.getMessage());
         }
     }
 
@@ -237,7 +243,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         } catch (CLException e) {
             LOGGER.warning("Failed to build OpenCL kernels: " + e.getMessage());
             if (e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
-                LOGGER.warning("This device might not support double precision (cl_khr_fp64). Falling back to CPU.");
+                LOGGER.warning("This device might not support double precision (cl_khr_fp64).");
             }
             throw e;
         }

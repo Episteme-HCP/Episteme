@@ -28,12 +28,13 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.OperationContext;
+import org.jscience.core.technical.algorithm.OperationContext.Hint;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.BackendDiscovery;
 import org.jscience.core.technical.backend.ExecutionContext;
@@ -59,7 +60,6 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static boolean ejmlAvailable = false;
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
     private LinearAlgebraProvider<E> ejmlImpl;
 
     static {
@@ -79,7 +79,6 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @SuppressWarnings("unchecked")
     public EJMLBackend(Field<E> field) {
         this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(this.field);
         
         if (ejmlAvailable && canUseEJML()) {
             try {
@@ -125,6 +124,21 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     }
 
     @Override
+    public double score(OperationContext context) {
+        if (!ejmlAvailable || !canUseEJML()) return -1.0;
+        
+        double score = getPriority();
+        if (context.hasHint(Hint.DENSE)) score += 10.0;
+        if (context.hasHint(Hint.SPARSE)) score -= 50.0; // EJML is dense-optimized
+        
+        // Granular scoring (example: EJML is great at multiplication and inversion)
+        if (context.hasHint(Hint.MAT_MUL)) score += 5.0;
+        if (context.hasHint(Hint.MAT_INV)) score += 5.0;
+        
+        return score;
+    }
+
+    @Override
     public ExecutionContext createContext() {
         return new CPUExecutionContext();
     }
@@ -140,20 +154,26 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
-    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { if (ejmlImpl == null) return cpuProvider.add(a, b); return ejmlImpl.add(a, b); }
-    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { if (ejmlImpl == null) return cpuProvider.subtract(a, b); return ejmlImpl.subtract(a, b); }
-    @Override public Vector<E> multiply(Vector<E> v, E s) { if (ejmlImpl == null) return cpuProvider.multiply(v, s); return ejmlImpl.multiply(v, s); }
-    @Override public E dot(Vector<E> a, Vector<E> b) { if (ejmlImpl == null) return cpuProvider.dot(a, b); return ejmlImpl.dot(a, b); }
-    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { if (ejmlImpl == null) return cpuProvider.add(a, b); return ejmlImpl.add(a, b); }
-    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { if (ejmlImpl == null) return cpuProvider.subtract(a, b); return ejmlImpl.subtract(a, b); }
-    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { if (ejmlImpl == null) return cpuProvider.multiply(a, b); return ejmlImpl.multiply(a, b); }
-    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { if (ejmlImpl == null) return cpuProvider.multiply(a, b); return ejmlImpl.multiply(a, b); }
-    @Override public Matrix<E> inverse(Matrix<E> a) { if (ejmlImpl == null) return cpuProvider.inverse(a); return ejmlImpl.inverse(a); }
-    @Override public E determinant(Matrix<E> a) { if (ejmlImpl == null) return cpuProvider.determinant(a); return ejmlImpl.determinant(a); }
-    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { if (ejmlImpl == null) return cpuProvider.solve(a, b); return ejmlImpl.solve(a, b); }
-    @Override public Matrix<E> transpose(Matrix<E> a) { if (ejmlImpl == null) return cpuProvider.transpose(a); return ejmlImpl.transpose(a); }
-    @Override public Matrix<E> scale(E s, Matrix<E> a) { if (ejmlImpl == null) return cpuProvider.scale(s, a); return ejmlImpl.scale(s, a); }
-    @Override public E norm(Vector<E> a) { if (ejmlImpl == null) return cpuProvider.norm(a); return ejmlImpl.norm(a); }
+    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.add(a, b); }
+    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.subtract(a, b); }
+    @Override public Vector<E> multiply(Vector<E> v, E s) { checkEjml(); return ejmlImpl.multiply(v, s); }
+    @Override public E dot(Vector<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.dot(a, b); }
+    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { checkEjml(); return ejmlImpl.add(a, b); }
+    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { checkEjml(); return ejmlImpl.subtract(a, b); }
+    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { checkEjml(); return ejmlImpl.multiply(a, b); }
+    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.multiply(a, b); }
+    @Override public Matrix<E> inverse(Matrix<E> a) { checkEjml(); return ejmlImpl.inverse(a); }
+    @Override public E determinant(Matrix<E> a) { checkEjml(); return ejmlImpl.determinant(a); }
+    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.solve(a, b); }
+    @Override public Matrix<E> transpose(Matrix<E> a) { checkEjml(); return ejmlImpl.transpose(a); }
+    @Override public Matrix<E> scale(E s, Matrix<E> a) { checkEjml(); return ejmlImpl.scale(s, a); }
+    @Override public E norm(Vector<E> a) { checkEjml(); return ejmlImpl.norm(a); }
+
+    private void checkEjml() {
+        if (ejmlImpl == null) {
+            throw new IllegalStateException("EJML implementation not available for this field or environment.");
+        }
+    }
 
     /**
      * Inner implementation class that touches EJML types.

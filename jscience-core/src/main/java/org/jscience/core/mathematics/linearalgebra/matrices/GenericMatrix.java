@@ -32,6 +32,7 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
+import org.jscience.core.technical.algorithm.OperationContext.Hint;
 import org.jscience.core.technical.algorithm.ProviderSelector;
 
 
@@ -110,7 +111,11 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     public Matrix<E> add(Matrix<E> other) {
         if (other instanceof GenericMatrix) {
-            return ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT, 
+            OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_ADD)
+                .build();
+            return ProviderSelector.execute(LinearAlgebraProvider.class, ctx, 
                 p -> ((LinearAlgebraProvider<E>) p).add(this, (GenericMatrix<E>) other));
         }
         
@@ -164,7 +169,11 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> transpose() {
-        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_TRANSPOSE)
+                .build();
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).transpose(this));
     }
 
@@ -214,21 +223,33 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     @SuppressWarnings("unchecked")
     public E determinant() {
-        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_DET)
+                .build();
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).determinant(this));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> inverse() {
-        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_INV)
+                .build();
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).inverse(this));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> multiply(Vector<E> vector) {
-        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_MUL)
+                .build();
+        return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).multiply(this, vector));
     }
 
@@ -265,7 +286,11 @@ public class GenericMatrix<E> implements Matrix<E> {
     @SuppressWarnings("unchecked")
     public Matrix<E> scale(E scalar, Matrix<E> element) {
         if (element instanceof GenericMatrix) {
-            return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+            OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) element.rows() * element.cols())
+                .addHint(Hint.MAT_SCALE)
+                .build();
+            return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
                 p -> ((LinearAlgebraProvider<E>) p).scale(scalar, (GenericMatrix<E>) element));
         }
         return null;

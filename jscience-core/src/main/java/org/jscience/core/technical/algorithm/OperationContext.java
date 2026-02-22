@@ -52,7 +52,21 @@ public final class OperationContext {
         /** Single-precision is acceptable */
         FLOAT32_OK,
         /** Operation will be repeated many times (amortize setup) */
-        BATCH
+        BATCH,
+        /** Matrix Multiplication */
+        MAT_MUL,
+        /** Matrix Division / Solve */
+        MAT_DIV,
+        /** Matrix Inversion */
+        MAT_INV,
+        /** Matrix Determinant */
+        MAT_DET,
+        /** Matrix/Vector Solve */
+        MAT_SOLVE,
+        /** Matrix Transpose */
+        MAT_TRANSPOSE,
+        /** Matrix Scaling */
+        MAT_SCALE
     }
 
     public static final OperationContext DEFAULT = new OperationContext.Builder().build();
