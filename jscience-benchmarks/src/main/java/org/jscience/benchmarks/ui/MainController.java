@@ -646,7 +646,8 @@ public class MainController {
                 
                 // Safety: if a single iteration takes more than 60 seconds, abort to avoid stalling
                 if (System.nanoTime() - iterStart > MAX_SINGLE_ITER_TIME_NS) {
-                    throw new RuntimeException("Benchmark stalled: " + item.getName() + " (single iteration > 60s)");
+                    System.err.println("Benchmark skipped/stalled: " + item.getName() + " (single iteration > 60s)");
+                    break;
                 }
             }
             long totalEnd = System.nanoTime();

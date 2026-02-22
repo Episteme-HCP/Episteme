@@ -170,6 +170,12 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Matrix<E> scale(E s, Matrix<E> a) { checkEjml(); return ejmlImpl.scale(s, a); }
     @Override public E norm(Vector<E> a) { checkEjml(); return ejmlImpl.norm(a); }
 
+    @Override public QRResult<E> qr(Matrix<E> a) { checkEjml(); return ejmlImpl.qr(a); }
+    @Override public SVDResult<E> svd(Matrix<E> a) { checkEjml(); return ejmlImpl.svd(a); }
+    @Override public EigenResult<E> eigen(Matrix<E> a) { checkEjml(); return ejmlImpl.eigen(a); }
+    @Override public LUResult<E> lu(Matrix<E> a) { checkEjml(); return ejmlImpl.lu(a); }
+    @Override public CholeskyResult<E> cholesky(Matrix<E> a) { checkEjml(); return ejmlImpl.cholesky(a); }
+
     private void checkEjml() {
         if (ejmlImpl == null) {
             throw new UnsupportedOperationException("EJML implementation not available for this field or environment.");

@@ -33,8 +33,8 @@ import java.util.ArrayList;
 /**
  * QR Decomposition: A = QR where Q is orthogonal, R is upper triangular.
  * <p>
- * Uses Gram-Schmidt orthogonalization. Essential for least squares and
- * eigenvalues.
+ * Uses Householder reflections for maximum numerical stability.
+ * Essential for least squares and eigenvalues.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -52,82 +52,97 @@ public class QRDecomposition {
     }
 
     /**
-     * Computes QR decomposition using Gram-Schmidt.
+     * Computes QR decomposition using Householder reflections.
      */
     public static QRDecomposition decompose(Matrix<Real> matrix) {
         int m = matrix.rows();
         int n = matrix.cols();
 
-        Real[][] q = new Real[m][n];
-        Real[][] r = new Real[n][n];
-
-        // Gram-Schmidt orthogonalization
-        for (int j = 0; j < n; j++) {
-            // Get column j
-            Real[] v = new Real[m];
-            for (int i = 0; i < m; i++) {
-                v[i] = matrix.get(i, j);
-            }
-
-            // Subtract projections on previous columns
-            for (int k = 0; k < j; k++) {
-                r[k][j] = Real.ZERO;
-                for (int i = 0; i < m; i++) {
-                    r[k][j] = r[k][j].add(q[i][k].multiply(v[i]));
-                }
-                for (int i = 0; i < m; i++) {
-                    v[i] = v[i].subtract(r[k][j].multiply(q[i][k]));
-                }
-            }
-
-            // Compute norm
-            r[j][j] = Real.ZERO;
-            for (int i = 0; i < m; i++) {
-                r[j][j] = r[j][j].add(v[i].multiply(v[i]));
-            }
-            r[j][j] = r[j][j].sqrt();
-
-            // Normalize
-            if (r[j][j].compareTo(Real.of(1e-10)) > 0) {
-                for (int i = 0; i < m; i++) {
-                    q[i][j] = v[i].divide(r[j][j]);
-                }
-            } else {
-                for (int i = 0; i < m; i++) {
-                    q[i][j] = Real.ZERO;
-                }
-            }
-
-            // Fill rest of R row with zeros
-            for (int k = j + 1; k < n; k++) {
-                r[j][k] = Real.ZERO;
-            }
-        }
-
-        // Convert to matrices
-        List<List<Real>> qRows = new ArrayList<>();
-        List<List<Real>> rRows = new ArrayList<>();
-
+        Real[][] A = new Real[m][n];
         for (int i = 0; i < m; i++) {
-            List<Real> row = new ArrayList<>();
             for (int j = 0; j < n; j++) {
-                row.add(q[i][j]);
+                A[i][j] = matrix.get(i, j);
             }
-            qRows.add(row);
         }
 
-        for (int i = 0; i < n; i++) {
-            List<Real> row = new ArrayList<>();
-            for (int j = 0; j < n; j++) {
-                row.add(r[i][j]);
+        Real[][] Q = new Real[m][m];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < m; j++) {
+                Q[i][j] = (i == j) ? Real.ONE : Real.ZERO;
             }
-            rRows.add(row);
         }
 
-        Matrix<Real> Q = DenseMatrix.of(qRows, Reals.getInstance());
-        Matrix<Real> R = DenseMatrix.of(rRows, Reals.getInstance());
+        // Householder QR
+        for (int k = 0; k < Math.min(m, n); k++) {
+            // Compute norm of column k from row k down
+            Real norm = Real.ZERO;
+            for (int i = k; i < m; i++) {
+                norm = norm.add(A[i][k].multiply(A[i][k]));
+            }
+            norm = norm.sqrt();
 
-        return new QRDecomposition(Q, R);
+            if (norm.isZero()) continue;
+
+            // Compute reflection vector v
+            // v = a - sign(a1) * ||a|| * e1
+            Real a1 = A[k][k];
+            Real alpha = (a1.compareTo(Real.ZERO) >= 0) ? norm.negate() : norm;
+            
+            Real[] v = new Real[m - k];
+            v[0] = A[k][k].subtract(alpha);
+            for (int i = 1; i < v.length; i++) {
+                v[i] = A[k + i][k];
+            }
+
+            // Normalize v
+            Real vNorm = Real.ZERO;
+            for (Real val : v) vNorm = vNorm.add(val.multiply(val));
+            vNorm = vNorm.sqrt();
+            if (vNorm.isZero()) continue;
+            for (int i = 0; i < v.length; i++) v[i] = v[i].divide(vNorm);
+
+            // Apply reflection to A: A = (I - 2vv^T)A = A - 2v(v^T A)
+            for (int j = k; j < n; j++) {
+                Real vDotA = Real.ZERO;
+                for (int i = 0; i < v.length; i++) {
+                    vDotA = vDotA.add(v[i].multiply(A[k + i][j]));
+                }
+                Real twoVDotA = vDotA.add(vDotA);
+                for (int i = 0; i < v.length; i++) {
+                    A[k + i][j] = A[k + i][j].subtract(twoVDotA.multiply(v[i]));
+                }
+            }
+
+            // Apply reflection to Q: Q = Q(I - 2vv^T) = Q - 2(Qv)v^T
+            for (int i = 0; i < m; i++) {
+                Real qDotV = Real.ZERO;
+                for (int j = 0; j < v.length; j++) {
+                    qDotV = qDotV.add(Q[i][k + j].multiply(v[j]));
+                }
+                Real twoQDotV = qDotV.add(qDotV);
+                for (int j = 0; j < v.length; j++) {
+                    Q[i][k + j] = Q[i][k + j].subtract(twoQDotV.multiply(v[j]));
+                }
+            }
+        }
+
+        // A now contains R, but due to floating point precision, lower triangle might have noise
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < Math.min(i, n); j++) {
+                A[i][j] = Real.ZERO;
+            }
+        }
+        return new QRDecomposition(createMatrix(Q), createMatrix(A));
+    }
+
+    private static Matrix<Real> createMatrix(Real[][] data) {
+        List<List<Real>> rows = new ArrayList<>();
+        for (Real[] row : data) {
+            List<Real> rowList = new ArrayList<>();
+            for (Real val : row) rowList.add(val);
+            rows.add(rowList);
+        }
+        return DenseMatrix.of(rows, Reals.getInstance());
     }
 
     public Matrix<Real> getQ() {
@@ -138,19 +153,18 @@ public class QRDecomposition {
         return R;
     }
 
-    /**
-     * Solves least squares problem: min ||Ax - b||Ã¢â€šâ€š
-     */
     public Real[] solveLeastSquares(Real[] b) {
-        int n = R.rows();
+        int m = Q.rows();
+        int n = R.cols();
 
         // Compute Q^T * b
-        Real[] qtb = new Real[n];
-        for (int i = 0; i < n; i++) {
-            qtb[i] = Real.ZERO;
-            for (int j = 0; j < b.length; j++) {
-                qtb[i] = qtb[i].add(Q.get(j, i).multiply(b[j]));
+        Real[] qtb = new Real[m];
+        for (int i = 0; i < m; i++) {
+            Real sum = Real.ZERO;
+            for (int j = 0; j < m; j++) {
+                sum = sum.add(Q.get(j, i).multiply(b[j]));
             }
+            qtb[i] = sum;
         }
 
         // Back substitution on R
@@ -160,11 +174,14 @@ public class QRDecomposition {
             for (int j = i + 1; j < n; j++) {
                 sum = sum.subtract(R.get(i, j).multiply(x[j]));
             }
-            x[i] = sum.divide(R.get(i, i));
+            Real rii = R.get(i, i);
+            if (rii.abs().compareTo(Real.of(1e-15)) < 0) {
+                x[i] = Real.ZERO; // Singular
+            } else {
+                x[i] = sum.divide(rii);
+            }
         }
 
         return x;
     }
 }
-
-

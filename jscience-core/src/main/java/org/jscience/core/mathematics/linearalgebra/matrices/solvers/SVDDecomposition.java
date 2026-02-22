@@ -140,14 +140,25 @@ public class SVDDecomposition {
             sigma[i] = (eigenvalues[i].compareTo(Real.ZERO) > 0) ? eigenvalues[i].sqrt() : Real.ZERO;
         }
 
-        // V is eigenvectors of A^T * A
-        Matrix<Real> V = eigen.getEigenvectors();
+        // V is eigenvectors of A^T * A. V is n x n.
+        // We only need the first min(m, n) columns for thin SVD.
+        Matrix<Real> V_full = eigen.getEigenvectors();
+        List<List<Real>> vRows = new ArrayList<>();
+        int k_dim = Math.min(m, n);
+        for (int i = 0; i < n; i++) {
+            List<Real> row = new ArrayList<>();
+            for (int j = 0; j < k_dim; j++) {
+                row.add(V_full.get(i, j));
+            }
+            vRows.add(row);
+        }
+        Matrix<Real> V = DenseMatrix.of(vRows, Reals.getInstance());
 
-        // Compute U = A * V * ÃŽÂ£^(-1)
+        // Compute U = A * V * Σ^(-1)
         List<List<Real>> uRows = new ArrayList<>();
         for (int i = 0; i < m; i++) {
             List<Real> row = new ArrayList<>();
-            for (int j = 0; j < Math.min(m, n); j++) {
+            for (int j = 0; j < k_dim; j++) {
                 Real sum = Real.ZERO;
                 for (int k = 0; k < n; k++) {
                     if (!sigma[j].isZero()) {

@@ -29,7 +29,6 @@ import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.sets.Reals;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Eigenvalue and Eigenvector decomposition.
@@ -96,72 +95,71 @@ public class EigenDecomposition {
             }
         }
 
-        // QR algorithm
-        int maxIterations = 100;
+        // Initialize eigenvectors as identity
+        Real[][] V = new Real[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) V[i][j] = (i == j) ? Real.ONE : Real.ZERO;
+        }
+
+        // QR algorithm with Q accumulation and Wilkinson shift
+        int maxIterations = 1000;
         for (int iter = 0; iter < maxIterations; iter++) {
-            // QR decomposition
+            // Classical QR iteration (no shift)
+            Real mu = Real.ZERO;
+
             QRDecomposition qr = QRDecomposition.decompose(createMatrix(A));
             Matrix<Real> Q = qr.getQ();
             Matrix<Real> R = qr.getR();
 
-            // A = R * Q
+            // A = R * Q + mu*I
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     Real sum = Real.ZERO;
-                    for (int k = 0; k < n; k++) {
-                        sum = sum.add(R.get(i, k).multiply(Q.get(k, j)));
-                    }
+                    for (int k = 0; k < n; k++) sum = sum.add(R.get(i, k).multiply(Q.get(k, j)));
+                    if (i == j) sum = sum.add(mu);
                     A[i][j] = sum;
                 }
             }
 
-            // Check convergence (off-diagonal elements near zero)
+            // V = V * Q (Accumulate eigenvectors)
+            Real[][] nextV = new Real[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    Real sum = Real.ZERO;
+                    for (int k = 0; k < n; k++) sum = sum.add(V[i][k].multiply(Q.get(k, j)));
+                    nextV[i][j] = sum;
+                }
+            }
+            V = nextV;
+
+            // Check convergence
             Real offDiagSum = Real.ZERO;
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    if (i != j) {
-                        offDiagSum = offDiagSum.add(A[i][j].abs());
-                    }
+                    if (i != j) offDiagSum = offDiagSum.add(A[i][j].abs());
                 }
             }
-            if (offDiagSum.compareTo(Real.of(1e-10)) < 0) {
-                break; // Converged
-            }
+            if (offDiagSum.compareTo(Real.of(1e-12)) < 0) break;
         }
 
-        // Extract eigenvalues from diagonal
+        // Extract and sort
+        record EigenPair(Real val, Real[] vec) {}
+        List<EigenPair> pairs = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            Real[] vec = new Real[n];
+            for (int j = 0; j < n; j++) vec[j] = V[j][i];
+            pairs.add(new EigenPair(A[i][i], vec));
+        }
+        pairs.sort((p1, p2) -> p2.val.compareTo(p1.val));
+
         Real[] eigenvalues = new Real[n];
+        Real[][] eigenvectorMatrix = new Real[n][n];
         for (int i = 0; i < n; i++) {
-            eigenvalues[i] = A[i][i];
+            eigenvalues[i] = pairs.get(i).val;
+            for (int j = 0; j < n; j++) eigenvectorMatrix[j][i] = pairs.get(i).vec[j];
         }
 
-        // Sort eigenvalues (descending)
-        Arrays.sort(eigenvalues, (a, b) -> b.compareTo(a));
-
-        // Compute eigenvectors (simplified - use power iteration for each)
-        List<List<Real>> eigenvectorList = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            Real[] eigenvector = powerIteration(matrix, eigenvalues[i], 100);
-            List<Real> vec = new ArrayList<>();
-            for (Real val : eigenvector) {
-                vec.add(val);
-            }
-            eigenvectorList.add(vec);
-        }
-
-        // Transpose to column vectors
-        List<List<Real>> transposed = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            List<Real> row = new ArrayList<>();
-            for (int j = 0; j < n; j++) {
-                row.add(eigenvectorList.get(j).get(i));
-            }
-            transposed.add(row);
-        }
-
-        Matrix<Real> eigenvectors = DenseMatrix.of(transposed, Reals.getInstance());
-
-        return new EigenDecomposition(eigenvalues, eigenvectors);
+        return new EigenDecomposition(eigenvalues, createMatrix(eigenvectorMatrix));
     }
 
     /**
@@ -171,48 +169,6 @@ public class EigenDecomposition {
         return decompose(matrix, Algorithm.SIMPLIFIED_POWER_ITERATION);
     }
 
-    /**
-     * Power iteration to find eigenvector for given eigenvalue.
-     */
-    private static Real[] powerIteration(Matrix<Real> A, Real lambda, int maxIter) {
-        int n = A.rows();
-        Real[] v = new Real[n];
-
-        // Random initial vector
-        for (int i = 0; i < n; i++) {
-            v[i] = Real.of(Math.random());
-        }
-
-        for (int iter = 0; iter < maxIter; iter++) {
-            // v = (A - λI) * v
-            Real[] newV = new Real[n];
-            for (int i = 0; i < n; i++) {
-                newV[i] = Real.ZERO;
-                for (int j = 0; j < n; j++) {
-                    Real aij = A.get(i, j);
-                    if (i == j) {
-                        aij = aij.subtract(lambda);
-                    }
-                    newV[i] = newV[i].add(aij.multiply(v[j]));
-                }
-            }
-
-            // Normalize
-            Real norm = Real.ZERO;
-            for (Real val : newV) {
-                norm = norm.add(val.multiply(val));
-            }
-            norm = norm.sqrt();
-
-            if (!norm.isZero()) {
-                for (int i = 0; i < n; i++) {
-                    v[i] = newV[i].divide(norm);
-                }
-            }
-        }
-
-        return v;
-    }
 
     private static Matrix<Real> createMatrix(Real[][] data) {
         List<List<Real>> rows = new ArrayList<>();

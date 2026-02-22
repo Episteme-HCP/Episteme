@@ -12,6 +12,10 @@ import com.google.auto.service.AutoService;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.inverse.InvertMatrix;
 
 /**
  * ND4J Linear Algebra Backend (Dense).
@@ -92,46 +96,38 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         return score;
     }
 
-    private org.nd4j.linalg.api.ndarray.INDArray toINDArray(Matrix<Real> m) {
+    private INDArray toINDArray(Matrix<Real> m) {
+        if (m instanceof RealDoubleMatrix) {
+            RealDoubleMatrix rdm = (RealDoubleMatrix) m;
+            return Nd4j.create(rdm.toDoubleArray(), new int[]{m.rows(), m.cols()});
+        }
         double[][] data = new double[m.rows()][m.cols()];
         for(int r=0; r<m.rows(); r++) {
             for(int c=0; c<m.cols(); c++) {
                 data[r][c] = m.get(r,c).doubleValue();
             }
         }
-        return org.nd4j.linalg.factory.Nd4j.create(data);
+        return Nd4j.create(data);
     }
 
-    private Matrix<Real> fromINDArray(org.nd4j.linalg.api.ndarray.INDArray arr) {
+    private Matrix<Real> fromINDArray(INDArray arr) {
         int rows = (int) arr.rows();
         int cols = (int) arr.columns();
-        org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Real> storage = 
-            new org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, Real.ZERO);
-        for(int r=0; r<rows; r++) {
-            for(int c=0; c<cols; c++) {
-                storage.set(r, c, Real.of(arr.getDouble(r, c)));
-            }
-        }
-        return new org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage, this, org.jscience.core.mathematics.sets.Reals.getInstance());
+        double[] data = arr.data().asDouble(); // Direct access if possible, or copy
+        return RealDoubleMatrix.of(data, rows, cols);
     }
 
-    private org.nd4j.linalg.api.ndarray.INDArray toINDArray(Vector<Real> v) {
+    private INDArray toINDArray(Vector<Real> v) {
         double[] data = new double[v.dimension()];
         for(int i=0; i<v.dimension(); i++) {
             data[i] = v.get(i).doubleValue();
         }
-        return org.nd4j.linalg.factory.Nd4j.create(data, new int[]{v.dimension(), 1}); // Column vector
+        return Nd4j.create(data, new int[]{v.dimension(), 1}); // Column vector
     }
 
-    private Vector<Real> fromINDArrayVector(org.nd4j.linalg.api.ndarray.INDArray arr) {
-        int dim = (int) arr.length();
-        Real[] data = new Real[dim];
-        for(int i=0; i<dim; i++) {
-            data[i] = Real.of(arr.getDouble(i));
-        }
-        return new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
-            new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), 
-            this, org.jscience.core.mathematics.sets.Reals.getInstance());
+    private Vector<Real> fromINDArrayVector(INDArray arr) {
+        double[] data = arr.data().asDouble();
+        return org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
     }
 
     @Override
@@ -191,7 +187,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
-        return fromINDArray(org.nd4j.linalg.inverse.InvertMatrix.invert(toINDArray(a), false));
+        return fromINDArray(InvertMatrix.invert(toINDArray(a), false));
     }
 
     @Override
