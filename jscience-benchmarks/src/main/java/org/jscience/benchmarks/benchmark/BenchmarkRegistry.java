@@ -107,7 +107,7 @@ public class BenchmarkRegistry {
                     
                     list.add(new RunnableBenchmark() {
                         @Override public String getId() { return base.getIdPrefix() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
-                        @Override public String getName() { return base.getNameBase(); }
+                        @Override public String getName() { return base.getNameBase() + " (" + p.getName() + ")"; }
                         @Override public String getAlgorithmProvider() { return p.getName(); }
                         @Override public String getDescription() { return base.getDescription(); }
                         @Override public String getDomain() { return base.getDomain(); }

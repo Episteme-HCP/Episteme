@@ -107,6 +107,7 @@ public class StandardFFTProvider implements FFTProvider {
         Complex w = Complex.ONE;
 
         for (int k = 0; k < n / 2; k++) {
+            if ((k & 0x3FF) == 0) org.jscience.core.ComputeContext.checkCurrentCancelled();
             Complex wr = w.multiply(r[k]);
             y[k] = q[k].add(wr);
             y[k + n / 2] = q[k].subtract(wr);
@@ -150,12 +151,14 @@ public class StandardFFTProvider implements FFTProvider {
 
         // 1. Transform rows
         for (int i = 0; i < rows; i++) {
+            org.jscience.core.ComputeContext.checkCurrentCancelled();
             data[i] = computeFFT(data[i], inverse);
         }
 
         // 2. Transform columns
         Complex[] colData = new Complex[rows];
         for (int j = 0; j < cols; j++) {
+            org.jscience.core.ComputeContext.checkCurrentCancelled();
             for (int i = 0; i < rows; i++) colData[i] = data[i][j];
             Complex[] transformedCol = computeFFT(colData, inverse);
             for (int i = 0; i < rows; i++) data[i][j] = transformedCol[i];

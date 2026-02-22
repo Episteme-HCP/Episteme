@@ -35,6 +35,7 @@ import java.util.Map;
 public record BenchmarkResult(
         String benchmarkId,
         String benchmarkName,
+        String provider,
         String domain,
         long timestamp,
         long totalTimeMillis,
@@ -48,6 +49,7 @@ public record BenchmarkResult(
     public BenchmarkResult(
             String benchmarkId,
             String benchmarkName,
+            String provider,
             String domain,
             long totalTimeMillis,
             long iterations,
@@ -55,7 +57,7 @@ public record BenchmarkResult(
             double operationsPerSecond,
             long memoryUsedBytes,
             Map<String, Object> extraMetrics) {
-        this(benchmarkId, benchmarkName, domain, System.currentTimeMillis(), totalTimeMillis, iterations,
+        this(benchmarkId, benchmarkName, provider, domain, System.currentTimeMillis(), totalTimeMillis, iterations,
                 averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes, 
                 generateEnvInfo(), extraMetrics);
     }
@@ -69,8 +71,8 @@ public record BenchmarkResult(
     }
 
     public String toSummaryString() {
-        return String.format("%-30s | %-15s | %10.3f ms/op | %10.0f ops/sec | %6d MB",
-                benchmarkName, domain, averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes / (1024 * 1024));
+        return String.format("%-40s | %-20s | %10.3f ms/op | %10.0f ops/sec | %6d MB",
+                benchmarkName, provider, averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes / (1024 * 1024));
     }
 }
 

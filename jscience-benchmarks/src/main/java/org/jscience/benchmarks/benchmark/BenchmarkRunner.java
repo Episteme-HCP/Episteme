@@ -47,13 +47,13 @@ public class BenchmarkRunner {
 
     public void runAll(String filter) {
         System.out.println(I18N.getInstance().get("benchmark.suite.starting"));
-        System.out.printf("%-30s | %-15s | %-13s | %-13s | %-9s%n",
+        System.out.printf("%-40s | %-20s | %-13s | %-13s | %-9s%n",
                 I18N.getInstance().get("benchmark.header.name"),
-                I18N.getInstance().get("benchmark.header.domain"),
+                I18N.getInstance().get("benchmark.header.provider", "Provider"),
                 I18N.getInstance().get("benchmark.header.time"),
                 I18N.getInstance().get("benchmark.header.ops"),
                 I18N.getInstance().get("benchmark.header.mem"));
-        System.out.println("-".repeat(90));
+        System.out.println("-".repeat(110));
 
         org.jscience.core.technical.monitoring.DistributedMonitor monitor = 
                 org.jscience.core.technical.monitoring.DistributedMonitor.getInstance();
@@ -108,7 +108,7 @@ public class BenchmarkRunner {
                 long memUsed = totalMem / TRIALS;
 
                 BenchmarkResult res = new BenchmarkResult(
-                        b.getId(), b.getName(), b.getDomain(), durationNs / 1_000_000, iterations, avgMs, opsSec, memUsed,
+                        b.getId(), b.getName(), b.getAlgorithmProvider(), b.getDomain(), durationNs / 1_000_000, iterations, avgMs, opsSec, memUsed,
                         java.util.Collections.emptyMap());
 
                 results.add(res);
