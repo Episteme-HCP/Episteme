@@ -28,7 +28,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
@@ -59,7 +58,6 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
 
     private static boolean commonsAvailable = false;
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
     private LinearAlgebraProvider<E> commonsImpl;
 
     static {
@@ -78,7 +76,6 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
     @SuppressWarnings("unchecked")
     public CommonsMathBackend(Field<E> field) {
         this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(this.field);
         
         if (commonsAvailable && canUseCommons()) {
             try {
@@ -139,20 +136,26 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
-    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { if (commonsImpl == null) return cpuProvider.add(a, b); return commonsImpl.add(a, b); }
-    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { if (commonsImpl == null) return cpuProvider.subtract(a, b); return commonsImpl.subtract(a, b); }
-    @Override public Vector<E> multiply(Vector<E> v, E s) { if (commonsImpl == null) return cpuProvider.multiply(v, s); return commonsImpl.multiply(v, s); }
-    @Override public E dot(Vector<E> a, Vector<E> b) { if (commonsImpl == null) return cpuProvider.dot(a, b); return commonsImpl.dot(a, b); }
-    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { if (commonsImpl == null) return cpuProvider.add(a, b); return commonsImpl.add(a, b); }
-    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { if (commonsImpl == null) return cpuProvider.subtract(a, b); return commonsImpl.subtract(a, b); }
-    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { if (commonsImpl == null) return cpuProvider.multiply(a, b); return commonsImpl.multiply(a, b); }
-    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { if (commonsImpl == null) return cpuProvider.multiply(a, b); return commonsImpl.multiply(a, b); }
-    @Override public Matrix<E> inverse(Matrix<E> a) { if (commonsImpl == null) return cpuProvider.inverse(a); return commonsImpl.inverse(a); }
-    @Override public E determinant(Matrix<E> a) { if (commonsImpl == null) return cpuProvider.determinant(a); return commonsImpl.determinant(a); }
-    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { if (commonsImpl == null) return cpuProvider.solve(a, b); return commonsImpl.solve(a, b); }
-    @Override public Matrix<E> transpose(Matrix<E> a) { if (commonsImpl == null) return cpuProvider.transpose(a); return commonsImpl.transpose(a); }
-    @Override public Matrix<E> scale(E s, Matrix<E> a) { if (commonsImpl == null) return cpuProvider.scale(s, a); return commonsImpl.scale(s, a); }
-    @Override public E norm(Vector<E> a) { if (commonsImpl == null) return cpuProvider.norm(a); return commonsImpl.norm(a); }
+    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkCommons(); return commonsImpl.add(a, b); }
+    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { checkCommons(); return commonsImpl.subtract(a, b); }
+    @Override public Vector<E> multiply(Vector<E> v, E s) { checkCommons(); return commonsImpl.multiply(v, s); }
+    @Override public E dot(Vector<E> a, Vector<E> b) { checkCommons(); return commonsImpl.dot(a, b); }
+    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { checkCommons(); return commonsImpl.add(a, b); }
+    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { checkCommons(); return commonsImpl.subtract(a, b); }
+    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { checkCommons(); return commonsImpl.multiply(a, b); }
+    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { checkCommons(); return commonsImpl.multiply(a, b); }
+    @Override public Matrix<E> inverse(Matrix<E> a) { checkCommons(); return commonsImpl.inverse(a); }
+    @Override public E determinant(Matrix<E> a) { checkCommons(); return commonsImpl.determinant(a); }
+    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { checkCommons(); return commonsImpl.solve(a, b); }
+    @Override public Matrix<E> transpose(Matrix<E> a) { checkCommons(); return commonsImpl.transpose(a); }
+    @Override public Matrix<E> scale(E s, Matrix<E> a) { checkCommons(); return commonsImpl.scale(s, a); }
+    @Override public E norm(Vector<E> a) { checkCommons(); return commonsImpl.norm(a); }
+
+    private void checkCommons() {
+        if (commonsImpl == null) {
+            throw new UnsupportedOperationException("Commons Math implementation not available for this field or environment.");
+        }
+    }
 
     /**
      * Inner implementation class that touches Commons Math types.

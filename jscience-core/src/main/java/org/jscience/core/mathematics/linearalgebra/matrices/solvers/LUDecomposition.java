@@ -197,6 +197,10 @@ public class LUDecomposition {
 
         return x;
     }
+
+    public int[] getPermutation() {
+        return permutation;
+    }
 }
 
 

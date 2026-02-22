@@ -40,11 +40,13 @@ public class QiskitBackend implements QuantumBackend, QuantumAlgorithmProvider {
 
     @Override
     public Map<String, Integer> execute(QuantumBackend.QuantumCircuit circuit) {
+        if (!isAvailable()) throw new UnsupportedOperationException("Qiskit not available");
         return executeSimulator(circuit, 1024).getCounts();
     }
 
     @Override
     public QuantumBackend.QuantumResult executeSimulator(QuantumBackend.QuantumCircuit circuit, int shots) {
+        if (!isAvailable()) throw new UnsupportedOperationException("Qiskit not available");
         Map<String, Integer> results = new HashMap<>();
         try {
             String qasm = circuit.toQASM();
@@ -53,7 +55,7 @@ public class QiskitBackend implements QuantumBackend, QuantumAlgorithmProvider {
  
             File runnerScript = new File("tools/qiskit_runner.py");
             if (!runnerScript.exists()) {
-                return new SimpleQuantumResult(results, 0);
+                throw new UnsupportedOperationException("Qiskit runner script (tools/qiskit_runner.py) missing");
             }
  
             ProcessBuilder pb = new ProcessBuilder("python", runnerScript.getAbsolutePath(), qasmFile.toAbsolutePath().toString());
@@ -78,9 +80,14 @@ public class QiskitBackend implements QuantumBackend, QuantumAlgorithmProvider {
                         results.put(key, val);
                     }
                 }
+            } else {
+                 throw new RuntimeException("Qiskit runner output invalid: " + json);
             }
             Files.deleteIfExists(qasmFile);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { 
+            if (e instanceof UnsupportedOperationException) throw (UnsupportedOperationException)e;
+            throw new RuntimeException("Qiskit execution failed", e); 
+        }
         return new SimpleQuantumResult(results, 0);
     }
 

@@ -7,6 +7,7 @@ package org.jscience.nativ.mathematics.linearalgebra.backends;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.results.*;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
@@ -48,11 +49,15 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     private static MethodHandle DAXPY;
     private static MethodHandle DNRM2;
     private static MethodHandle DSCAL;
+    private static MethodHandle DOMATCOPY;
     
     // LAPACK Method Handles
     private static MethodHandle DGESV;
     private static MethodHandle DGETRF;
     private static MethodHandle DGETRI;
+    private static MethodHandle DGEQRF;
+    private static MethodHandle DORGQR;
+    private static MethodHandle DGESVD;
     
     private static final int LAPACK_ROW_MAJOR = 101;
 
@@ -111,6 +116,16 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                 );
                 DGEMV = LINKER.downcallHandle(LOOKUP.find("cblas_dgemv").orElseThrow(), dgemvDesc);
 
+                Optional<MemorySegment> domatcopyAddr = LOOKUP.find("cblas_domatcopy");
+                if (domatcopyAddr.isPresent()) {
+                    FunctionDescriptor domatcopyDesc = FunctionDescriptor.ofVoid(
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG,
+                            ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_LONG,
+                            AddressLayout.ADDRESS, ValueLayout.JAVA_LONG
+                    );
+                    DOMATCOPY = LINKER.downcallHandle(domatcopyAddr.get(), domatcopyDesc);
+                }
+
                 // LAPACK
                 Optional<MemorySegment> dgesvAddr = LOOKUP.find("LAPACKE_dgesv");
                 if (dgesvAddr.isPresent()) {
@@ -138,6 +153,38 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                             AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
                     );
                     DGETRI = LINKER.downcallHandle(dgetriAddr.get(), dgetriDesc);
+                }
+
+                // QR Decomposition
+                Optional<MemorySegment> dgeqrfAddr = LOOKUP.find("LAPACKE_dgeqrf");
+                if (dgeqrfAddr.isPresent()) {
+                    FunctionDescriptor dgeqrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+                    );
+                    DGEQRF = LINKER.downcallHandle(dgeqrfAddr.get(), dgeqrfDesc);
+                }
+
+                Optional<MemorySegment> dorgqrAddr = LOOKUP.find("LAPACKE_dorgqr");
+                if (dorgqrAddr.isPresent()) {
+                    FunctionDescriptor dorgqrDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+                    );
+                    DORGQR = LINKER.downcallHandle(dorgqrAddr.get(), dorgqrDesc);
+                }
+
+                // Singular Value Decomposition
+                Optional<MemorySegment> dgesvdAddr = LOOKUP.find("LAPACKE_dgesvd");
+                if (dgesvdAddr.isPresent()) {
+                    FunctionDescriptor dgesvdDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, 
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, 
+                            ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, 
+                            ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                            AddressLayout.ADDRESS
+                    );
+                    DGESVD = LINKER.downcallHandle(dgesvdAddr.get(), dgesvdDesc);
                 }
 
                 available = true;
@@ -170,10 +217,10 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             int len = (int) ((long) n * n);
             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
             double[] arrA = toDoubleArray(A);
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
             
             MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-            for(int i=0; i<n; i++) segB.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
+            for(int i=0; i<n; i++) segB.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i, b.get(i).doubleValue());
             
             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
             
@@ -181,7 +228,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             if (info != 0) throw new ArithmeticException("Linear solve failed (singular matrix). Info: " + info);
             
             double[] result = new double[n];
-            MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0, result, 0, n);
+            MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
             
             List<org.jscience.core.mathematics.numbers.real.Real> list = new ArrayList<>(n);
             for(double v : result) list.add(org.jscience.core.mathematics.numbers.real.Real.of(v));
@@ -199,11 +246,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
          try (Arena arena = Arena.ofConfined()) {
              int len = (int) ((long) n * n);
-             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) len);
              double[] arrA = toDoubleArray(A);
-             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
+             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
              
-             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
              
              int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
              if (info != 0) throw new ArithmeticException("LU Factorization failed. Info: " + info);
@@ -212,7 +259,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
              if (info != 0) throw new ArithmeticException("Inverse failed. Info: " + info);
              
              double[] result = new double[n * n];
-             MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0, result, 0, n * n);
+             MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0L, result, 0, (int) ( (long) n * n ) );
              
              org.jscience.core.mathematics.numbers.real.Real[][] resObj = new org.jscience.core.mathematics.numbers.real.Real[n][n];
              for(int i=0; i<n; i++) {
@@ -234,19 +281,19 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
          try (Arena arena = Arena.ofConfined()) {
              int len = (int) ((long) n * n);
-             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) len);
              double[] arrA = toDoubleArray(A);
-             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
+             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
              
-             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
              
              int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
              if (info > 0) return org.jscience.core.mathematics.numbers.real.Real.ZERO; // Singular
              
              double det = 1.0;
              for(int i=0; i<n; i++) {
-                 det *= segA.getAtIndex(ValueLayout.JAVA_DOUBLE, i * n + i);
-                 int pivot = segIpiv.getAtIndex(ValueLayout.JAVA_INT, i);
+                 det *= segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + i);
+                 int pivot = segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long) i);
                  if (pivot != i + 1) det = -det;
              }
              return org.jscience.core.mathematics.numbers.real.Real.of(det);
@@ -263,6 +310,108 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     @Override
     public String getName() {
         return "Native BLAS Provider (FFM)";
+    }
+
+    @Override
+    public QRResult<org.jscience.core.mathematics.numbers.real.Real> qr(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
+        if (!IS_AVAILABLE || DGEQRF == null || DORGQR == null) {
+            throw new UnsupportedOperationException("Native LAPACK QR not available");
+        }
+        int m = a.rows();
+        int n = a.cols();
+        int k = Math.min(m, n);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+            double[] arrA = toDoubleArray(a);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
+
+            MemorySegment tau = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
+
+            // 1. Factorize
+            int info = (int) DGEQRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, tau);
+            if (info != 0) throw new RuntimeException("DGEQRF failed with info: " + info);
+
+            // 2. Extract R (upper triangular part)
+            double[] rData = new double[k * n];
+            for (int i = 0; i < k; i++) {
+                for (int j = i; j < n; j++) {
+                    rData[i * n + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
+                }
+            }
+            Matrix<org.jscience.core.mathematics.numbers.real.Real> R = createDenseMatrix(rData, k, n, a);
+
+            // 3. Extract Q (orthogonal matrix)
+            // dorgqr overwrites the matrix with Q. We use k because we want the economy QR (m x k).
+            info = (int) DORGQR.invokeExact(LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
+            if (info != 0) throw new RuntimeException("DORGQR failed with info: " + info);
+
+            double[] qData = new double[m * k];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < k; j++) {
+                    qData[i * k + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
+                }
+            }
+            Matrix<org.jscience.core.mathematics.numbers.real.Real> Q = createDenseMatrix(qData, m, k, a);
+
+            return new QRResult<>(Q, R);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    @Override
+    public SVDResult<org.jscience.core.mathematics.numbers.real.Real> svd(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
+        if (!IS_AVAILABLE || DGESVD == null) {
+            throw new UnsupportedOperationException("Native LAPACK SVD not available");
+        }
+        int m = a.rows();
+        int n = a.cols();
+        int k = Math.min(m, n);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+            double[] arrA = toDoubleArray(a);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
+
+            MemorySegment s = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
+            MemorySegment u = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * m);
+            MemorySegment vt = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+            MemorySegment superb = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) Math.max(1, k - 1));
+
+            // jobu = 'A' (full U), jobvt = 'A' (full V^T)
+            int info = (int) DGESVD.invokeExact(LAPACK_ROW_MAJOR, (byte) 'A', (byte) 'A', m, n, segA, n, s, u, m, vt, n, superb);
+            if (info != 0) throw new RuntimeException("DGESVD failed with info: " + info);
+
+            // Extract S as a vector
+            double[] sData = new double[k];
+            MemorySegment.copy(s, ValueLayout.JAVA_DOUBLE, 0L, sData, 0, k);
+            List<org.jscience.core.mathematics.numbers.real.Real> sList = new ArrayList<>(k);
+            for (double v : sData) sList.add(org.jscience.core.mathematics.numbers.real.Real.of(v));
+            Vector<org.jscience.core.mathematics.numbers.real.Real> S = new DenseVector<>(sList, (Ring<org.jscience.core.mathematics.numbers.real.Real>) a.getScalarRing());
+
+            // Extract U
+            double[] uData = new double[m * m];
+            MemorySegment.copy(u, ValueLayout.JAVA_DOUBLE, 0L, uData, 0, m * m);
+            Matrix<org.jscience.core.mathematics.numbers.real.Real> U = createDenseMatrix(uData, m, m, a);
+
+            // Extract V (input Vt is V transpose)
+            double[] vtData = new double[n * n];
+            MemorySegment.copy(vt, ValueLayout.JAVA_DOUBLE, 0L, vtData, 0, n * n);
+
+            // We return V, so we transpose Vt (in row-major, VT[j*n + i] is V[i*n + j])
+            org.jscience.core.mathematics.numbers.real.Real[][] vObj = new org.jscience.core.mathematics.numbers.real.Real[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    vObj[i][j] = org.jscience.core.mathematics.numbers.real.Real.of(vtData[j * n + i]);
+                }
+            }
+            Matrix<org.jscience.core.mathematics.numbers.real.Real> V = new DenseMatrix<>(vObj, (Ring<org.jscience.core.mathematics.numbers.real.Real>) a.getScalarRing());
+
+            return new SVDResult<>(U, S, V);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
     }
 
     @Override
@@ -307,14 +456,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
         try (Arena arena = Arena.ofConfined()) {
             int lenA = m * k;
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, lenA);
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) lenA);
             double[] arrA = toDoubleArray(A);
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, lenA));
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, lenA));
 
             int lenB = k * n;
-            MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, lenB);
+            MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) lenB);
             double[] arrB = toDoubleArray(B);
-            MemorySegment.copy(arrB, 0, segB, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrB.length, lenB));
+            MemorySegment.copy(arrB, 0, segB, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrB.length, lenB));
 
             MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
 
@@ -326,7 +475,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             }
 
             double[] result = new double[m * n];
-            MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, result, 0, m * n);
+            MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0L, result, 0, (int) ( (long) m * n ) );
             return createDenseMatrix(result, m, n, A);
         }
     }
@@ -415,11 +564,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
             double[] arrA = toDoubleArray(a);
             double[] arrB = toDoubleArray(b);
-            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
-            MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrB.length, len));
+            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
+            MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrB.length, len));
             try { DAXPY.invokeExact(len, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             double[] result = new double[len];
-            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0L, result, 0, len);
             return createDenseMatrix(result, m, n, a);
         }
     }
@@ -434,11 +583,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
             double[] arrA = toDoubleArray(a);
             double[] arrB = toDoubleArray(b);
-            MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrB.length, len));
-            MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
+            MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrB.length, len));
+            MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
             try { DAXPY.invokeExact(len, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             double[] result = new double[len];
-            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0L, result, 0, len);
             return createDenseMatrix(result, m, n, a);
         }
     }
@@ -451,24 +600,36 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             int len = m * n;
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
             double[] arrA = toDoubleArray(a);
-            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
+            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
             try { DSCAL.invokeExact(len, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             double[] result = new double[len];
-            MemorySegment.copy(segX, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
+            MemorySegment.copy(segX, ValueLayout.JAVA_DOUBLE, 0L, result, 0, len);
             return createDenseMatrix(result, m, n, a);
         }
     }
 
     @Override
     public Matrix<org.jscience.core.mathematics.numbers.real.Real> transpose(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
-        int m = a.rows(), n = a.cols();
-        org.jscience.core.mathematics.numbers.real.Real[][] result = new org.jscience.core.mathematics.numbers.real.Real[n][m];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                result[j][i] = a.get(i, j);
+        if (IS_AVAILABLE && DOMATCOPY != null) {
+            int m = a.rows(), n = a.cols();
+            try (Arena arena = Arena.ofConfined()) {
+                int len = m * n;
+                MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long)len);
+                double[] arrA = toDoubleArray(a);
+                MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int)arrA.length);
+                
+                MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+                
+                // CblasTrans = 112
+                try { DOMATCOPY.invokeExact(CblasRowMajor, 112, (long)m, (long)n, 1.0, segA, (long)n, segB, (long)m); } catch (Throwable e) { throw new RuntimeException(e); }
+                
+                double[] result = new double[len];
+                MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, len);
+                return createDenseMatrix(result, n, m, a);
             }
         }
-        return new DenseMatrix<>(result, (Ring<org.jscience.core.mathematics.numbers.real.Real>) a.getScalarRing());
+        
+        throw new UnsupportedOperationException("Native transpose (domatcopy) not available or backend not loaded");
     }
 
     private Matrix<org.jscience.core.mathematics.numbers.real.Real> createDenseMatrix(double[] data, int rows, int cols, Matrix<org.jscience.core.mathematics.numbers.real.Real> reference) {
@@ -487,21 +648,20 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
         int m = a.rows(), k = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int lenA = m * k;
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, lenA);
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) lenA);
             double[] arrA = toDoubleArray(a);
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, lenA));
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, lenA));
             
-            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, k);
-            for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
-            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
+            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
+            for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i, b.get(i).doubleValue());
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m);
             try { DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, k, 1.0, segA, k, segX, 1, 0.0, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[m];
-            for (int i = 0; i < m; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            for (int i = 0; i < m; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i));
             return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)b.getScalarRing());
         }
     }
 
-    @SuppressWarnings("unchecked")
     private double[] toDoubleArray(Matrix<org.jscience.core.mathematics.numbers.real.Real> matrix) {
         Object mObj = matrix;
         if (mObj instanceof org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {

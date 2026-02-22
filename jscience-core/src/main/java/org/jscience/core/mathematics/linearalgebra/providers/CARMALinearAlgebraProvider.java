@@ -19,11 +19,9 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Intended for benchmarking and comparison purposes.
  */
 @AutoService(LinearAlgebraProvider.class)
-public class CARMALinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> extends CPUDenseLinearAlgebraProvider<E> {
+public class CARMALinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> implements LinearAlgebraProvider<E> {
 
-    @SuppressWarnings("unchecked")
     public CARMALinearAlgebraProvider() {
-        super((org.jscience.core.mathematics.structures.rings.Field<E>) Reals.getInstance());
     }
 
     @Override
@@ -49,7 +47,7 @@ public class CARMALinearAlgebraProvider<E extends org.jscience.core.mathematics.
              return (Matrix<E>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
         }
 
-        return super.multiply(a, b);
+        return LinearAlgebraProvider.super.multiply(a, b);
     }
     
     @Override

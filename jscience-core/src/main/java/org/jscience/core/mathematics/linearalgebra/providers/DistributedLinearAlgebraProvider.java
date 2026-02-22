@@ -25,15 +25,10 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  */
 public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-    // Fallback provider for local or small operations
-    private final CPUDenseLinearAlgebraProvider<E> localProvider;
-
     public DistributedLinearAlgebraProvider() {
-        this(null);
     }
     
     public DistributedLinearAlgebraProvider(Ring<E> ring) {
-        this.localProvider = new CPUDenseLinearAlgebraProvider<>((org.jscience.core.mathematics.structures.rings.Field<E>) ring);
     }
 
     @Override
@@ -83,73 +78,8 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
             }
         }
         
-        return localProvider.multiply(a, b);
+        return LinearAlgebraProvider.super.multiply(a, b);
     }
 
-    // --- Delegation to Local Provider for non-distributed ops ---
-
-    @Override
-    public Vector<E> add(Vector<E> a, Vector<E> b) {
-        return localProvider.add(a, b);
-    }
-
-    @Override
-    public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        return localProvider.subtract(a, b);
-    }
-
-    @Override
-    public Vector<E> multiply(Vector<E> vector, E scalar) {
-        return localProvider.multiply(vector, scalar);
-    }
-
-    @Override
-    public E dot(Vector<E> a, Vector<E> b) {
-        return localProvider.dot(a, b);
-    }
-
-    @Override
-    public E norm(Vector<E> a) {
-        return localProvider.norm(a);
-    }
-
-    @Override
-    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        return localProvider.add(a, b);
-    }
-
-    @Override
-    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        return localProvider.subtract(a, b);
-    }
-
-    @Override
-    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        return localProvider.multiply(a, b);
-    }
-
-    @Override
-    public Matrix<E> inverse(Matrix<E> a) {
-        return localProvider.inverse(a);
-    }
-
-    @Override
-    public E determinant(Matrix<E> a) {
-        return localProvider.determinant(a);
-    }
-
-    @Override
-    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return localProvider.solve(a, b);
-    }
-
-    @Override
-    public Matrix<E> transpose(Matrix<E> a) {
-        return localProvider.transpose(a);
-    }
-
-    @Override
-    public Matrix<E> scale(E scalar, Matrix<E> a) {
-        return localProvider.scale(scalar, a);
-    }
+    // All other methods are handled by LinearAlgebraProvider's default UnsupportedOperationException
 }

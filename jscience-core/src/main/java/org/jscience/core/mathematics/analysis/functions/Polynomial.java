@@ -159,17 +159,9 @@ public class Polynomial<R> {
      * Multiplies two polynomials.
      */
     public Polynomial<R> multiply(Polynomial<R> other) {
-        int newDegree = this.degree() + other.degree();
-        List<R> result = new ArrayList<>(Collections.nCopies(newDegree + 1, ring.zero()));
-
-        for (int i = 0; i <= this.degree(); i++) {
-            for (int j = 0; j <= other.degree(); j++) {
-                R product = ring.multiply(this.getCoefficient(i), other.getCoefficient(j));
-                result.set(i + j, ring.add(result.get(i + j), product));
-            }
-        }
-
-        return new Polynomial<>(result, ring);
+        List<R> productCoeffs = org.jscience.core.mathematics.analysis.functions.algorithms.KaratsubaOptimizer.multiply(
+            this.coefficients, other.coefficients, ring);
+        return new Polynomial<>(productCoeffs, ring);
     }
 
     /**

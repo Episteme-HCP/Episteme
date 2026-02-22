@@ -19,11 +19,9 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Intended for benchmarking and comparison purposes.
  */
 @AutoService(LinearAlgebraProvider.class)
-public class StrassenLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> extends CPUDenseLinearAlgebraProvider<E> {
+public class StrassenLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> implements LinearAlgebraProvider<E> {
 
-    @SuppressWarnings("unchecked")
     public StrassenLinearAlgebraProvider() {
-        super((org.jscience.core.mathematics.structures.rings.Field<E>) Reals.getInstance());
     }
 
     @Override
@@ -49,11 +47,7 @@ public class StrassenLinearAlgebraProvider<E extends org.jscience.core.mathemati
              return (Matrix<E>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
         }
 
-        // Fallback for non-Real fields where Strassen might not be implemented generic enough or needs Ring vs Field check
-        // RealStrassen is for Real. For generic E, we don't have a generic Strassen implementation exposed as utility yet
-        // (CPUDense has strassenRecursive but it's internal).
-        // For benchmarking we care about Real.
-        return super.multiply(a, b);
+        return LinearAlgebraProvider.super.multiply(a, b);
     }
 
     @Override

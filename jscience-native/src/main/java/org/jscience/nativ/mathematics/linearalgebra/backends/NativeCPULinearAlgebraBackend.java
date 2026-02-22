@@ -23,7 +23,7 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
@@ -215,7 +215,6 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     // --- LinearAlgebraProvider Implementation (Merged logic) ---
 
-    private final CPUDenseLinearAlgebraProvider<Real> fallback = new CPUDenseLinearAlgebraProvider<>();
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
@@ -238,7 +237,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             dgemm(m, n, k, aBuf, k, bBuf, n, cdm.getBuffer(), n, 1.0, 0.0);
             return cdm;
         }
-        return fallback.multiply(a, b);
+        throw new UnsupportedOperationException("Native multiply not available for these arguments or backend not loaded");
     }
 
     @Override
@@ -264,7 +263,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             
             return res;
         }
-        return fallback.inverse(a);
+        throw new UnsupportedOperationException("Native inverse not available for these arguments or backend not loaded");
     }
 
     private DoubleBuffer ensureDirect(RealDoubleMatrix m) {
@@ -276,22 +275,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         return direct;
     }
 
-    @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return fallback.add(a, b); }
-    @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return fallback.subtract(a, b); }
-    @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { return fallback.multiply(vector, scalar); }
-    @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) { return fallback.dot(a, b); }
-    @Override
-    public Real norm(Vector<Real> a) { return fallback.norm(a); }
-    @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return fallback.add(a, b); }
-    @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return fallback.subtract(a, b); }
-    @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { return fallback.multiply(a, b); }
+    // Other methods default to UnsupportedOperationException
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols() && b.dimension() == a.rows()) {
@@ -320,13 +304,8 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             x.getBuffer().get(result);
             return RealDoubleVector.of(result);
         }
-        return fallback.solve(a, b);
+        throw new UnsupportedOperationException("Native solve not available for these arguments or backend not loaded");
     }
 
-    @Override
-    public Real determinant(Matrix<Real> a) { return fallback.determinant(a); }
-    @Override
-    public Matrix<Real> transpose(Matrix<Real> a) { return fallback.transpose(a); }
-    @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) { return fallback.scale(scalar, a); }
+    // Other methods default to UnsupportedOperationException
 }

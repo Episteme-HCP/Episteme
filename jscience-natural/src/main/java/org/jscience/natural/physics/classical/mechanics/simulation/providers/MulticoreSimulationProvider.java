@@ -23,7 +23,6 @@ import java.util.List;
 @AutoService(AlgorithmProvider.class)
 public class MulticoreSimulationProvider implements SimulationProvider {
 
-    private final ParallelSimulationProvider fallback = new ParallelSimulationProvider();
 
     @Override
     public String getName() {
@@ -37,6 +36,6 @@ public class MulticoreSimulationProvider implements SimulationProvider {
 
     @Override
     public void parallelExecute(List<Runnable> tasks, int parallelism) {
-        fallback.parallelExecute(tasks, parallelism);
+        throw new UnsupportedOperationException("Native multicore simulation kernel not implemented yet");
     }
 }

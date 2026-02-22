@@ -36,7 +36,7 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
 
@@ -51,13 +51,12 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({LinearAlgebraProvider.class, org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
-public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> implements org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E> {
+@AutoService({SparseLinearAlgebraProvider.class, AlgorithmProvider.class})
+public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
 
     protected final Ring<E> ring;
 
     public CPUSparseLinearAlgebraProvider(Ring<E> ring) {
-        super(ring instanceof Field ? (Field<E>) ring : null);
         this.ring = ring;
     }
 
@@ -70,7 +69,6 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
      * Public no-arg constructor required by ServiceLoader.
      */
     public CPUSparseLinearAlgebraProvider() {
-        super(null);
         this.ring = null;
     }
 
@@ -81,7 +79,7 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         if (a instanceof SparseMatrix && b instanceof SparseMatrix) {
             return addSparse((SparseMatrix<E>) a, (SparseMatrix<E>) b);
         }
-        return super.add(a, b);
+        return SparseLinearAlgebraProvider.super.add(a, b);
     }
 
     /**
@@ -209,7 +207,7 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         if (a instanceof SparseMatrix && b instanceof SparseMatrix) {
             return multiplySparse((SparseMatrix<E>) a, (SparseMatrix<E>) b);
         }
-        return super.multiply(a, b);
+        return SparseLinearAlgebraProvider.super.multiply(a, b);
     }
 
     /**

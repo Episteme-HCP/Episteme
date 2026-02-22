@@ -5,6 +5,7 @@
 
 package org.jscience.core.mathematics.linearalgebra;
 
+import org.jscience.core.mathematics.linearalgebra.solvers.*;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
@@ -55,22 +56,85 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
     }
 
     // --- Vector Operations ---
-    Vector<E> add(Vector<E> a, Vector<E> b);
-    Vector<E> subtract(Vector<E> a, Vector<E> b);
-    Vector<E> multiply(Vector<E> vector, E scalar);
-    E dot(Vector<E> a, Vector<E> b);
-    E norm(Vector<E> a);
+    default Vector<E> add(Vector<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException("add not supported by " + getName());
+    }
+    default Vector<E> subtract(Vector<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException("subtract not supported by " + getName());
+    }
+    default Vector<E> multiply(Vector<E> vector, E scalar) {
+        throw new UnsupportedOperationException("multiply not supported by " + getName());
+    }
+    default E dot(Vector<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException("dot not supported by " + getName());
+    }
+    default E norm(Vector<E> a) {
+        throw new UnsupportedOperationException("norm not supported by " + getName());
+    }
 
     // --- Matrix Operations ---
-    Matrix<E> add(Matrix<E> a, Matrix<E> b);
-    Matrix<E> subtract(Matrix<E> a, Matrix<E> b);
-    Matrix<E> multiply(Matrix<E> a, Matrix<E> b);
-    Vector<E> multiply(Matrix<E> a, Vector<E> b);
-    Matrix<E> inverse(Matrix<E> a);
-    E determinant(Matrix<E> a);
-    Vector<E> solve(Matrix<E> a, Vector<E> b);
-    Matrix<E> transpose(Matrix<E> a);
-    Matrix<E> scale(E scalar, Matrix<E> a);
+    default Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        throw new UnsupportedOperationException("add not supported by " + getName());
+    }
+    default Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        throw new UnsupportedOperationException("subtract not supported by " + getName());
+    }
+    default Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
+        throw new UnsupportedOperationException("multiply not supported by " + getName());
+    }
+    default Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException("multiply not supported by " + getName());
+    }
+    default Matrix<E> inverse(Matrix<E> a) {
+        throw new UnsupportedOperationException("inverse not supported by " + getName());
+    }
+    default E determinant(Matrix<E> a) {
+        throw new UnsupportedOperationException("determinant not supported by " + getName());
+    }
+    default Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException("solve not supported by " + getName());
+    }
+    default Matrix<E> transpose(Matrix<E> a) {
+        throw new UnsupportedOperationException("transpose not supported by " + getName());
+    }
+    default Matrix<E> scale(E scalar, Matrix<E> a) {
+        throw new UnsupportedOperationException("scale not supported by " + getName());
+    }
+
+    /**
+     * Computes the QR decomposition of the specified matrix.
+     */
+    default QRResult<E> qr(Matrix<E> a) {
+        throw new UnsupportedOperationException("QR decomposition not supported by " + getName());
+    }
+
+    /**
+     * Computes the Singular Value Decomposition (SVD) of the specified matrix.
+     */
+    default SVDResult<E> svd(Matrix<E> a) {
+        throw new UnsupportedOperationException("SVD decomposition not supported by " + getName());
+    }
+
+    /**
+     * Computes the eigenvalue decomposition of the specified matrix.
+     */
+    default EigenResult<E> eigen(Matrix<E> a) {
+        throw new UnsupportedOperationException("Eigenvalue decomposition not supported by " + getName());
+    }
+
+    /**
+     * Computes the LU decomposition of the specified matrix.
+     */
+    default LUResult<E> lu(Matrix<E> a) {
+        throw new UnsupportedOperationException("LU decomposition not supported by " + getName());
+    }
+
+    /**
+     * Computes the Cholesky decomposition of the specified matrix.
+     */
+    default CholeskyResult<E> cholesky(Matrix<E> a) {
+        throw new UnsupportedOperationException("Cholesky decomposition not supported by " + getName());
+    }
 
     @Override
     default String getName() {

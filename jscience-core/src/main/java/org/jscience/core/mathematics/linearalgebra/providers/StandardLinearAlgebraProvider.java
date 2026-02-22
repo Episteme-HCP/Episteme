@@ -14,16 +14,10 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Linear Algebra Provider that forces the use of the Standard (Naive/Recursive) algorithm.
  * Intended for benchmarking and comparison purposes.
  */
-@SuppressWarnings("rawtypes")
 @AutoService(LinearAlgebraProvider.class)
-public class StandardLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> extends CPUDenseLinearAlgebraProvider<E> {
+public class StandardLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> implements LinearAlgebraProvider<E> {
 
-    @SuppressWarnings("unchecked")
     public StandardLinearAlgebraProvider() {
-        super((org.jscience.core.mathematics.structures.rings.Field<E>) Reals.getInstance());
-        // Note: Field casting is a bit hacky here because CPUDense is generic but we mostly use it for Reals in benchmarks.
-        // For strict correctness we should probably have a generic constructor, but ServiceLoader uses no-arg.
-        // Given benchmarking usage on Reals, this defaults to Reals.
     }
 
     @Override
@@ -36,8 +30,9 @@ public class StandardLinearAlgebraProvider<E extends org.jscience.core.mathemati
         if (a.cols() != b.rows()) {
             throw new IllegalArgumentException("Matrix inner dimensions must match");
         }
-        // Force standard multiply (O(n^3) or parallelized O(n^3)) without Strassen/CARMA
-        return standardMultiply(a, b);
+        // Force standard multiply (O(n^3)) via static utility
+        // Note: We need a field. Matrix should have it (getScalarRing).
+        return CPUDenseLinearAlgebraProvider.standardMultiply(a, b, (org.jscience.core.mathematics.structures.rings.Field<E>) a.getScalarRing(), this);
     }
     
     @Override

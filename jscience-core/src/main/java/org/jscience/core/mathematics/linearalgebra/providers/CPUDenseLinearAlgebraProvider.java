@@ -30,16 +30,22 @@ import java.util.stream.IntStream;
 import org.jscience.core.mathematics.structures.rings.Field;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.solvers.*;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;
+import org.jscience.core.mathematics.sets.Reals;
 
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.QRDecomposition;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition;
 
 /**
  * 
@@ -383,7 +389,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return strassenRecursive(a, b);
         }
 
-        return standardMultiply(a, b);
+        return standardMultiply(a, b, field, this);
     }
 
     private boolean isSquarePowerOfTwo(Matrix<E> m) {
@@ -394,7 +400,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         org.jscience.core.ComputeContext.checkCurrentCancelled();
         int n = A.rows();
         if (n <= 64) {
-            return standardMultiply(A, B);
+            return standardMultiply(A, B, field, this);
         }
 
         int newSize = n / 2;
@@ -446,7 +452,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @SuppressWarnings({"unchecked", "preview", "restricted"})
-    protected Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b) {
+    public static <E> Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b, Field<E> field, LinearAlgebraProvider<E> provider) {
         int rowsA = a.rows();
         int colsA = a.cols();
         int colsB = b.cols();
@@ -461,7 +467,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             try {
                 if (rowsA >= 64 && colsA >= 64 && colsB >= 64) {
                     // Tiled / Blocked multiplication for cache efficiency
-                    tiledMultiply(dataA, dataB, resData, rowsA, colsA, colsB);
+                    staticTiledMultiply(dataA, dataB, resData, rowsA, colsA, colsB);
                 } else {
                     // Optimized i-k-j loop for small-to-medium matrices
                     for (int i = 0; i < rowsA; i++) {
@@ -521,14 +527,20 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
             org.jscience.core.util.PerformanceLogger.log("CPU:GenericMultiply", context, System.nanoTime() - start);
         }
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<>(storage, provider, field);
     }
 
-    private boolean isReal(Matrix<E> m) {
-        return m.getScalarRing() instanceof org.jscience.core.mathematics.sets.Reals;
+    private static boolean isReal(Matrix<?> m) {
+        return m.getScalarRing() instanceof org.jscience.core.mathematics.sets.Reals || m instanceof org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
     }
 
-    private double[] toDoubleArray(Matrix<E> m) {
+    private static double[] toDoubleArray(Matrix<?> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        double[] data = new double[rows * cols];
+        if (m instanceof org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            return ((org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) m).toDoubleArray();
+        }
         if (m.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
             try {
                 return (double[]) m.getClass().getMethod("getInternalData").invoke(m);
@@ -537,25 +549,27 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
         }
         if (m instanceof GenericMatrix) {
-            org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> storage = 
-                ((GenericMatrix<E>) m).getStorage();
+            org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<?> storage = 
+                ((GenericMatrix<?>) m).getStorage();
             if (storage instanceof org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage) {
                 return ((org.jscience.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage) storage).getData();
             }
         }
         // Fallback: full copy
-        int r = m.rows();
-        int c = m.cols();
-        double[] data = new double[r * c];
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                data[i * c + j] = ((Real) m.get(i, j)).doubleValue();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Object val = m.get(i, j);
+                if (val instanceof Real) {
+                    data[i * cols + j] = ((Real) val).doubleValue();
+                } else if (val instanceof Number) {
+                    data[i * cols + j] = ((Number) val).doubleValue();
+                }
             }
         }
         return data;
     }
 
-    private void tiledMultiply(double[] A, double[] B, double[] C, int M, int K, int N) {
+    private static void staticTiledMultiply(double[] A, double[] B, double[] C, int M, int K, int N) {
         final int BLOCK_SIZE = 64; 
         org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
         IntStream.range(0, (M + BLOCK_SIZE - 1) / BLOCK_SIZE).parallel().forEach(bi -> {
@@ -941,7 +955,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (a.rows() != a.cols())
             throw new ArithmeticException("Must be square");
@@ -1001,7 +1014,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 res[i] = (rhs[i] - sum) / mat[i * n + i];
             }
 
-            E[] resArray = (E[]) new Real[n];
+            @SuppressWarnings("unchecked")
+            E[] resArray = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
             for (int i = 0; i < n; i++) resArray[i] = (E) (Object) Real.of(res[i]);
             return new GenericVector<>(new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
         }
@@ -1077,6 +1091,58 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @Override
     public int getPriority() {
         return 50; // Default priority
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public QRResult<E> qr(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            QRDecomposition decomp = QRDecomposition.decompose((Matrix<Real>) a);
+            return new QRResult<E>((Matrix<E>) decomp.getQ(), (Matrix<E>) decomp.getR());
+        }
+        return LinearAlgebraProvider.super.qr(a);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public SVDResult<E> svd(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            SVDDecomposition decomp = SVDDecomposition.decompose((Matrix<Real>) a);
+            Real[] sigmas = decomp.getSingularValues();
+            List<Real> sList = new ArrayList<>(sigmas.length);
+            for (Real r : sigmas) sList.add(r);
+            Vector<Real> S = org.jscience.core.mathematics.linearalgebra.vectors.DenseVector.of(sList, (Field<Real>) a.getScalarRing());
+            return new SVDResult<E>((Matrix<E>) decomp.getU(), (Vector<E>) S, (Matrix<E>) decomp.getV());
+        }
+        return LinearAlgebraProvider.super.svd(a);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public EigenResult<E> eigen(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            EigenDecomposition decomp = EigenDecomposition.decompose((Matrix<Real>) a);
+            Real[] values = decomp.getEigenvalues();
+            List<Real> vList = new ArrayList<>(values.length);
+            for (Real r : values) vList.add(r);
+            Vector<Real> D = org.jscience.core.mathematics.linearalgebra.vectors.DenseVector.of(vList, (Field<Real>) a.getScalarRing());
+            return new EigenResult<E>((Matrix<E>) decomp.getEigenvectors(), (Vector<E>) D);
+        }
+        return LinearAlgebraProvider.super.eigen(a);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public LUResult<E> lu(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            LUDecomposition decomp = LUDecomposition.decompose((Matrix<Real>) a);
+            int[] perm = decomp.getPermutation();
+            List<Real> pList = new ArrayList<>(perm.length);
+            for (int i : perm) pList.add(Real.of(i));
+            Vector<Real> P = org.jscience.core.mathematics.linearalgebra.vectors.DenseVector.of(pList, (Field<Real>) a.getScalarRing());
+            return new LUResult<E>((Matrix<E>) decomp.getL(), (Matrix<E>) decomp.getU(), (Vector<E>) P);
+        }
+        return LinearAlgebraProvider.super.lu(a);
     }
 }
 

@@ -28,7 +28,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
@@ -59,7 +58,6 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static boolean coltAvailable = false;
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
     private LinearAlgebraProvider<E> coltImpl;
 
     static {
@@ -78,7 +76,6 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @SuppressWarnings("unchecked")
     public ColtBackend(Field<E> field) {
         this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(this.field);
         
         if (coltAvailable && canUseColt()) {
             try {
@@ -139,20 +136,26 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
-    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { if (coltImpl == null) return cpuProvider.add(a, b); return coltImpl.add(a, b); }
-    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { if (coltImpl == null) return cpuProvider.subtract(a, b); return coltImpl.subtract(a, b); }
-    @Override public Vector<E> multiply(Vector<E> vector, E scalar) { if (coltImpl == null) return cpuProvider.multiply(vector, scalar); return coltImpl.multiply(vector, scalar); }
-    @Override public E dot(Vector<E> a, Vector<E> b) { if (coltImpl == null) return cpuProvider.dot(a, b); return coltImpl.dot(a, b); }
-    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { if (coltImpl == null) return cpuProvider.add(a, b); return coltImpl.add(a, b); }
-    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { if (coltImpl == null) return cpuProvider.subtract(a, b); return coltImpl.subtract(a, b); }
-    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { if (coltImpl == null) return cpuProvider.multiply(a, b); return coltImpl.multiply(a, b); }
-    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { if (coltImpl == null) return cpuProvider.multiply(a, b); return coltImpl.multiply(a, b); }
-    @Override public Matrix<E> inverse(Matrix<E> a) { if (coltImpl == null) return cpuProvider.inverse(a); return coltImpl.inverse(a); }
-    @Override public E determinant(Matrix<E> a) { if (coltImpl == null) return cpuProvider.determinant(a); return coltImpl.determinant(a); }
-    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { if (coltImpl == null) return cpuProvider.solve(a, b); return coltImpl.solve(a, b); }
-    @Override public Matrix<E> transpose(Matrix<E> a) { if (coltImpl == null) return cpuProvider.transpose(a); return coltImpl.transpose(a); }
-    @Override public Matrix<E> scale(E scalar, Matrix<E> a) { if (coltImpl == null) return cpuProvider.scale(scalar, a); return coltImpl.scale(scalar, a); }
-    @Override public E norm(Vector<E> a) { if (coltImpl == null) return cpuProvider.norm(a); return coltImpl.norm(a); }
+    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkColt(); return coltImpl.add(a, b); }
+    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { checkColt(); return coltImpl.subtract(a, b); }
+    @Override public Vector<E> multiply(Vector<E> vector, E scalar) { checkColt(); return coltImpl.multiply(vector, scalar); }
+    @Override public E dot(Vector<E> a, Vector<E> b) { checkColt(); return coltImpl.dot(a, b); }
+    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { checkColt(); return coltImpl.add(a, b); }
+    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { checkColt(); return coltImpl.subtract(a, b); }
+    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { checkColt(); return coltImpl.multiply(a, b); }
+    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { checkColt(); return coltImpl.multiply(a, b); }
+    @Override public Matrix<E> inverse(Matrix<E> a) { checkColt(); return coltImpl.inverse(a); }
+    @Override public E determinant(Matrix<E> a) { checkColt(); return coltImpl.determinant(a); }
+    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { checkColt(); return coltImpl.solve(a, b); }
+    @Override public Matrix<E> transpose(Matrix<E> a) { checkColt(); return coltImpl.transpose(a); }
+    @Override public Matrix<E> scale(E scalar, Matrix<E> a) { checkColt(); return coltImpl.scale(scalar, a); }
+    @Override public E norm(Vector<E> a) { checkColt(); return coltImpl.norm(a); }
+
+    private void checkColt() {
+        if (coltImpl == null) {
+            throw new UnsupportedOperationException("Colt implementation not available for this field or environment.");
+        }
+    }
 
     /**
      * Inner implementation class that touches Colt types.

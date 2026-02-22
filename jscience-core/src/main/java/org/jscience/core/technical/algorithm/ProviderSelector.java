@@ -52,6 +52,13 @@ public final class ProviderSelector {
      * @throws NoSuchElementException if no provider is available
      */
     public static <P extends AlgorithmProvider> P select(Class<P> providerClass, OperationContext context) {
+        return select(providerClass, context, null);
+    }
+
+    /**
+     * Selects the best provider for the given operation context, with an optional filter.
+     */
+    public static <P extends AlgorithmProvider> P select(Class<P> providerClass, OperationContext context, java.util.function.Predicate<P> filter) {
         List<P> providers = AlgorithmManager.getProviders(providerClass);
 
         if (providers.isEmpty()) {
@@ -59,8 +66,9 @@ public final class ProviderSelector {
         }
 
         P best = providers.stream()
+                .filter(p -> filter == null || filter.test(p))
                 .max(Comparator.comparingDouble(p -> p.score(context)))
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchElementException("No provider satisfying filter for: " + providerClass.getSimpleName()));
 
         LOGGER.fine("Selected " + best.getName() + " (score=" + best.score(context) + ") for " + providerClass.getSimpleName());
         return best;

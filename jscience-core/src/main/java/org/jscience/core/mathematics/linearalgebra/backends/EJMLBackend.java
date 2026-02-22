@@ -55,7 +55,6 @@ import java.lang.reflect.Constructor;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
@@ -172,7 +171,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private void checkEjml() {
         if (ejmlImpl == null) {
-            throw new IllegalStateException("EJML implementation not available for this field or environment.");
+            throw new UnsupportedOperationException("EJML implementation not available for this field or environment.");
         }
     }
 

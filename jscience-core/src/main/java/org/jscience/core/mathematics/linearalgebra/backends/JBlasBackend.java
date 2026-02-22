@@ -28,7 +28,6 @@ import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
@@ -60,7 +59,6 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static boolean jblasAvailable = false;
     private final Field<E> field;
-    private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
     private LinearAlgebraProvider<E> jblasImpl;
 
     static {
@@ -80,7 +78,6 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @SuppressWarnings("unchecked")
     public JBlasBackend(Field<E> field) {
         this.field = (field != null) ? field : (Field<E>) org.jscience.core.mathematics.sets.Reals.getInstance();
-        this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(this.field);
         
         if (jblasAvailable && canUseJBlas()) {
             try {
@@ -141,20 +138,26 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
-    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { if (jblasImpl == null) return cpuProvider.add(a, b); return jblasImpl.add(a, b); }
-    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { if (jblasImpl == null) return cpuProvider.subtract(a, b); return jblasImpl.subtract(a, b); }
-    @Override public Vector<E> multiply(Vector<E> vector, E scalar) { if (jblasImpl == null) return cpuProvider.multiply(vector, scalar); return jblasImpl.multiply(vector, scalar); }
-    @Override public E dot(Vector<E> a, Vector<E> b) { if (jblasImpl == null) return cpuProvider.dot(a, b); return jblasImpl.dot(a, b); }
-    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { if (jblasImpl == null) return cpuProvider.add(a, b); return jblasImpl.add(a, b); }
-    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { if (jblasImpl == null) return cpuProvider.subtract(a, b); return jblasImpl.subtract(a, b); }
-    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { if (jblasImpl == null) return cpuProvider.multiply(a, b); return jblasImpl.multiply(a, b); }
-    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { if (jblasImpl == null) return cpuProvider.multiply(a, b); return jblasImpl.multiply(a, b); }
-    @Override public Matrix<E> inverse(Matrix<E> a) { if (jblasImpl == null) return cpuProvider.inverse(a); return jblasImpl.inverse(a); }
-    @Override public E determinant(Matrix<E> a) { return cpuProvider.determinant(a); }
-    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { if (jblasImpl == null) return cpuProvider.solve(a, b); return jblasImpl.solve(a, b); }
-    @Override public Matrix<E> transpose(Matrix<E> a) { if (jblasImpl == null) return cpuProvider.transpose(a); return jblasImpl.transpose(a); }
-    @Override public Matrix<E> scale(E scalar, Matrix<E> a) { if (jblasImpl == null) return cpuProvider.scale(scalar, a); return jblasImpl.scale(scalar, a); }
-    @Override public E norm(Vector<E> a) { if (jblasImpl == null) return cpuProvider.norm(a); return jblasImpl.norm(a); }
+    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.add(a, b); }
+    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.subtract(a, b); }
+    @Override public Vector<E> multiply(Vector<E> vector, E scalar) { checkJBlas(); return jblasImpl.multiply(vector, scalar); }
+    @Override public E dot(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.dot(a, b); }
+    @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { checkJBlas(); return jblasImpl.add(a, b); }
+    @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { checkJBlas(); return jblasImpl.subtract(a, b); }
+    @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { checkJBlas(); return jblasImpl.multiply(a, b); }
+    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.multiply(a, b); }
+    @Override public Matrix<E> inverse(Matrix<E> a) { checkJBlas(); return jblasImpl.inverse(a); }
+    @Override public E determinant(Matrix<E> a) { checkJBlas(); return jblasImpl.determinant(a); }
+    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.solve(a, b); }
+    @Override public Matrix<E> transpose(Matrix<E> a) { checkJBlas(); return jblasImpl.transpose(a); }
+    @Override public Matrix<E> scale(E scalar, Matrix<E> a) { checkJBlas(); return jblasImpl.scale(scalar, a); }
+    @Override public E norm(Vector<E> a) { checkJBlas(); return jblasImpl.norm(a); }
+
+    private void checkJBlas() {
+        if (jblasImpl == null) {
+            throw new UnsupportedOperationException("JBlas implementation not available for this field or environment.");
+        }
+    }
 
     /**
      * Inner implementation class that touches JBlas types.
