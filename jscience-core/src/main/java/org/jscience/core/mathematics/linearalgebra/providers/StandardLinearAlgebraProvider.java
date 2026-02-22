@@ -14,6 +14,7 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Linear Algebra Provider that forces the use of the Standard (Naive/Recursive) algorithm.
  * Intended for benchmarking and comparison purposes.
  */
+@SuppressWarnings("rawtypes")
 @AutoService(LinearAlgebraProvider.class)
 public class StandardLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> extends CPUDenseLinearAlgebraProvider<E> {
 

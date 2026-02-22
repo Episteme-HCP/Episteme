@@ -22,7 +22,8 @@ import java.util.Random;
 public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
     private static final int SIZE = 500; // Inversion is O(N^3) and expensive
-    private RealDoubleMatrix A;
+    private static final int POOL_SIZE = 10;
+    private RealDoubleMatrix[] matricesA;
     private LinearAlgebraProvider<Real> currentProvider;
 
     @Override public String getId() { return getIdPrefix(); }
@@ -44,20 +45,23 @@ public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlg
 
     @Override
     public void setup() {
-        // Generate a random INVERTIBLE matrix (diagonally dominant)
+        matricesA = new RealDoubleMatrix[POOL_SIZE];
         Random r = new Random(42);
-        double[][] data = new double[SIZE][SIZE];
-        for (int i = 0; i < SIZE; i++) {
-            double sum = 0;
-            for (int j = 0; j < SIZE; j++) {
-                if (i != j) {
-                    data[i][j] = r.nextDouble();
-                    sum += Math.abs(data[i][j]);
+        
+        for (int p = 0; p < POOL_SIZE; p++) {
+            double[][] data = new double[SIZE][SIZE];
+            for (int i = 0; i < SIZE; i++) {
+                double sum = 0;
+                for (int j = 0; j < SIZE; j++) {
+                    if (i != j) {
+                        data[i][j] = r.nextDouble();
+                        sum += Math.abs(data[i][j]);
+                    }
                 }
+                data[i][i] = sum + 1.0 + r.nextDouble(); // Ensure dominant diagonal
             }
-            data[i][i] = sum + 1.0 + r.nextDouble(); // Ensure dominant diagonal
+            matricesA[p] = RealDoubleMatrix.of(data);
         }
-        A = RealDoubleMatrix.of(data);
     }
 
     @Override
@@ -68,17 +72,19 @@ public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlg
     @Override
     public void run() {
         if (currentProvider != null) {
-            currentProvider.inverse(A);
+            for (int i = 0; i < POOL_SIZE; i++) {
+                currentProvider.inverse(matricesA[i]);
+            }
         }
     }
 
     @Override
     public void teardown() {
-        A = null;
+        matricesA = null;
     }
 
     @Override
     public int getSuggestedIterations() {
-        return 20;
+        return 2; // Each iteration now does 10 inversions
     }
 }

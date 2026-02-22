@@ -24,8 +24,9 @@ public class SystematicSparseMatrixBenchmark implements SystematicBenchmark<Spar
 
     private static final int SIZE = 1000;
     private static final double SPARSITY = 0.05; // 5% non-zero elements
-    private SparseMatrix<Real> A;
-    private SparseMatrix<Real> B;
+    private static final int POOL_SIZE = 10;
+    private SparseMatrix<Real>[] matricesA;
+    private SparseMatrix<Real>[] matricesB;
     private SparseLinearAlgebraProvider<Real> currentProvider;
 
     @Override public String getId() { return getIdPrefix(); }
@@ -46,27 +47,29 @@ public class SystematicSparseMatrixBenchmark implements SystematicBenchmark<Spar
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setup() {
-        // Create sparse matrices
-        // We use the default/current provider for creation, but execution will use the injected provider
-        // Assuming creation isn't the bottleneck or is handled by the provider implicitly if we used factories
-        
-        Reals ring = Reals.getInstance();
-        A = SparseMatrix.zeros(SIZE, SIZE, ring);
-        B = SparseMatrix.zeros(SIZE, SIZE, ring);
-        
+        matricesA = new SparseMatrix[POOL_SIZE];
+        matricesB = new SparseMatrix[POOL_SIZE];
         Random r = new Random(42);
-        for (int i = 0; i < SIZE; i++) {
-            for (int k = 0; k < SIZE * SPARSITY; k++) {
-                int j = r.nextInt(SIZE);
-                A.set(i, j, Real.of(r.nextDouble()));
+        Reals ring = Reals.getInstance();
+        
+        for (int p = 0; p < POOL_SIZE; p++) {
+            SparseMatrix<Real> a = SparseMatrix.zeros(SIZE, SIZE, ring);
+            SparseMatrix<Real> b = SparseMatrix.zeros(SIZE, SIZE, ring);
+            
+            for (int i = 0; i < SIZE; i++) {
+                for (int k = 0; k < SIZE * SPARSITY; k++) {
+                    a.set(i, r.nextInt(SIZE), Real.of(r.nextDouble()));
+                }
             }
-        }
-        for (int i = 0; i < SIZE; i++) {
-            for (int k = 0; k < SIZE * SPARSITY; k++) {
-                int j = r.nextInt(SIZE);
-                B.set(i, j, Real.of(r.nextDouble()));
+            for (int i = 0; i < SIZE; i++) {
+                for (int k = 0; k < SIZE * SPARSITY; k++) {
+                    b.set(i, r.nextInt(SIZE), Real.of(r.nextDouble()));
+                }
             }
+            matricesA[p] = a;
+            matricesB[p] = b;
         }
     }
 
@@ -81,18 +84,20 @@ public class SystematicSparseMatrixBenchmark implements SystematicBenchmark<Spar
     @Override
     public void run() {
         if (currentProvider != null) {
-            currentProvider.multiply(A, B);
+            for (int i = 0; i < POOL_SIZE; i++) {
+                currentProvider.multiply(matricesA[i], matricesB[i]);
+            }
         }
     }
 
     @Override
     public void teardown() {
-        A = null;
-        B = null;
+        matricesA = null;
+        matricesB = null;
     }
 
     @Override
     public int getSuggestedIterations() {
-        return 50;
+        return 5; // Each iteration now does 10 multiplications
     }
 }

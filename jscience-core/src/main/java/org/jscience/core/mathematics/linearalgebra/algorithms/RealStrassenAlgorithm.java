@@ -13,8 +13,16 @@ public class RealStrassenAlgorithm {
     private static final int THRESHOLD = 64;
 
     public static Matrix<Real> multiply(Matrix<Real> A, Matrix<Real> B) {
-        int n = A.rows();
-        if (n <= THRESHOLD) {
+        org.jscience.core.ComputeContext.checkCurrentCancelled();
+        int m = A.rows();
+        int k = A.cols();
+        int n = B.cols();
+        
+        if (m <= THRESHOLD || k <= THRESHOLD || n <= THRESHOLD || m != k || k != n || (m & (m - 1)) != 0) {
+            // Padding or direct call for non-square/non-power-of-two
+            if (m != k || k != n || (m & (m - 1)) != 0) {
+                 return padAndMultiply(A, B);
+            }
             return standardMultiply(A, B);
         }
 
@@ -61,6 +69,32 @@ public class RealStrassenAlgorithm {
         }
         
         return Matrix.of(data, org.jscience.core.mathematics.sets.Reals.getInstance());
+    }
+
+    private static Matrix<Real> padAndMultiply(Matrix<Real> A, Matrix<Real> B) {
+        int m = A.rows(), k = A.cols(), n = B.cols();
+        int max = Math.max(m, Math.max(k, n));
+        int p = 1;
+        while (p < max) p <<= 1;
+        
+        if (p < THRESHOLD) return standardMultiply(A, B);
+
+        // Simple padding for now. A better way would be dynamic peeling.
+        Real[][] aPadded = new Real[p][p];
+        Real[][] bPadded = new Real[p][p];
+        Real zero = org.jscience.core.mathematics.numbers.real.Real.ZERO;
+        
+        for(int i=0; i<p; i++) {
+            for(int j=0; j<p; j++) {
+                aPadded[i][j] = (i < m && j < k) ? A.get(i, j) : zero;
+                bPadded[i][j] = (i < k && j < n) ? B.get(i, j) : zero;
+            }
+        }
+        
+        Matrix<Real> resPadded = multiply(Matrix.of(aPadded, org.jscience.core.mathematics.sets.Reals.getInstance()),
+                                          Matrix.of(bPadded, org.jscience.core.mathematics.sets.Reals.getInstance()));
+        
+        return resPadded.getSubMatrix(0, m, 0, n);
     }
 
     private static Matrix<Real> standardMultiply(Matrix<Real> A, Matrix<Real> B) {

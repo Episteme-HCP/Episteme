@@ -91,9 +91,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new GenericVector<>(
                     new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, field);
         } else {
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             return IntStream.range(0, a.dimension())
                     .parallel()
-                    .mapToObj(i -> field.add(a.get(i), b.get(i)))
+                    .mapToObj(i -> {
+                        if (i % 512 == 0) ctx.checkCancelled();
+                        return field.add(a.get(i), b.get(i));
+                    })
                     .collect(Collectors.collectingAndThen(
                             Collectors.toList(),
                             list -> {
@@ -122,9 +126,11 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
                     field);
         } else {
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             return IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
+                        if (i % 512 == 0) ctx.checkCancelled();
                         E negB = field.negate(b.get(i));
                         return field.add(a.get(i), negB);
                     })
@@ -161,9 +167,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new GenericVector<>(
                     new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, field);
         } else {
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             return IntStream.range(0, vector.dimension())
                     .parallel()
-                    .mapToObj(i -> field.multiply(vector.get(i), scalar))
+                    .mapToObj(i -> {
+                        if (i % 512 == 0) ctx.checkCancelled();
+                        return field.multiply(vector.get(i), scalar);
+                    })
                     .collect(Collectors.collectingAndThen(
                             Collectors.toList(),
                             list -> {
@@ -201,9 +211,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
             return sum;
         } else {
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             return IntStream.range(0, a.dimension())
                     .parallel()
-                    .mapToObj(i -> field.multiply(a.get(i), b.get(i)))
+                    .mapToObj(i -> {
+                        if (i % 512 == 0) ctx.checkCancelled();
+                        return field.multiply(a.get(i), b.get(i));
+                    })
                     .reduce(field.zero(), field::add);
         }
     }
@@ -261,7 +275,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     resData[i] = dataA[i] + dataB[i];
                 }
             } else {
+                org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
                 IntStream.range(0, rows).parallel().forEach(i -> {
+                    ctx.checkCancelled();
                     int offset = i * cols;
                     for (int j = 0; j < cols; j++) {
                         resData[offset + j] = dataA[offset + j] + dataB[offset + j];
@@ -280,7 +296,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 }
             }
         } else {
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
+                ctx.checkCancelled();
                 for (int j = 0; j < a.cols(); j++) {
                     storage.set(i, j, field.add(a.get(i, j), b.get(i, j)));
                 }
@@ -312,7 +330,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     resData[i] = dataA[i] - dataB[i];
                 }
             } else {
+                org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
                 IntStream.range(0, rows).parallel().forEach(i -> {
+                    ctx.checkCancelled();
                     int offset = i * cols;
                     for (int j = 0; j < cols; j++) {
                         resData[offset + j] = dataA[offset + j] - dataB[offset + j];
@@ -332,7 +352,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 }
             }
         } else {
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
+                ctx.checkCancelled();
                 for (int j = 0; j < a.cols(); j++) {
                     E negB = field.negate(b.get(i, j));
                     storage.set(i, j, field.add(a.get(i, j), negB));
@@ -369,6 +391,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     private Matrix<E> strassenRecursive(Matrix<E> A, Matrix<E> B) {
+        org.jscience.core.ComputeContext.checkCurrentCancelled();
         int n = A.rows();
         if (n <= 64) {
             return standardMultiply(A, B);
@@ -442,6 +465,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 } else {
                     // Optimized i-k-j loop for small-to-medium matrices
                     for (int i = 0; i < rowsA; i++) {
+                        if (i % 64 == 0) org.jscience.core.ComputeContext.checkCurrentCancelled();
                         int rowOffsetA = i * colsA;
                         int rowOffsetC = i * colsB;
                         for (int k = 0; k < colsA; k++) {
@@ -475,7 +499,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     }
                 }
             } else {
+                org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
                 IntStream.range(0, a.rows()).parallel().forEach(i -> {
+                    if (i % 64 == 0) ctx.checkCancelled();
                     for (int j = 0; j < b.cols(); j++) {
                         E sum = field.zero();
                         for (int k = 0; k < a.cols(); k++) {
@@ -531,7 +557,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     private void tiledMultiply(double[] A, double[] B, double[] C, int M, int K, int N) {
         final int BLOCK_SIZE = 64; 
+        org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
         IntStream.range(0, (M + BLOCK_SIZE - 1) / BLOCK_SIZE).parallel().forEach(bi -> {
+            ctx.checkCancelled();
             int i0 = bi * BLOCK_SIZE;
             int iMax = Math.min(i0 + BLOCK_SIZE, M);
             for (int k0 = 0; k0 < K; k0 += BLOCK_SIZE) {
@@ -581,7 +609,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), field.zero());
+        org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
+            ctx.checkCancelled();
             for (int j = 0; j < a.cols(); j++) {
                 storage.set(j, i, a.get(i, j));
             }
@@ -613,7 +643,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
+        org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
+            ctx.checkCancelled();
             for (int j = 0; j < a.cols(); j++) {
                 storage.set(i, j, field.multiply(a.get(i, j), scalar));
             }
@@ -672,9 +704,11 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
                     field);
         } else {
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             return IntStream.range(0, a.rows())
                     .parallel()
                     .mapToObj(i -> {
+                        if (i % 64 == 0) ctx.checkCancelled();
                         E sum = field.zero();
                         for (int j = 0; j < a.cols(); j++) {
                             E product = field.multiply(a.get(i, j), b.get(j));

@@ -34,6 +34,7 @@ public class MainController {
     @FXML private Label benchmarkSelectionLabel;
     @FXML private Button runSelectedBtn;
     @FXML private Button runAllBtn;
+    @FXML private Button stopBtn;
     @FXML private Label analyticsLabel;
     @FXML private Label historyTitleLabel;
 
@@ -74,6 +75,8 @@ public class MainController {
     private boolean isProcessingQueue = false;
     private final Object executionLock = new Object();
     private ResourceBundle resources;
+    private Task<Void> mainTask;
+    private volatile org.jscience.core.ComputeContext activeComputeContext;
 
     private javafx.stage.Stage primaryStage;
     @FXML private EnvironmentController environmentViewController;
@@ -105,6 +108,7 @@ public class MainController {
             benchmarkSelectionLabel.setText(resources.getString("lbl.benchmark_selection"));
             runSelectedBtn.setText(resources.getString("btn.run_selected"));
             runAllBtn.setText(resources.getString("btn.run_all"));
+            if (stopBtn != null) stopBtn.setText(resources.getString("btn.stop"));
             
             // Columns
             nameColumn.setText(resources.getString("col.name"));
@@ -175,6 +179,7 @@ public class MainController {
         int unavailableCount = 0;
         int queuedCount = 0;
         int skippedCount = 0;
+        int canceledCount = 0;
 
         for (TreeItem<BenchmarkItem> child : root.getChildren()) {
             if (!child.isLeaf()) {
@@ -190,6 +195,7 @@ public class MainController {
             else if ("Success".equals(status)) successCount++;
             else if ("Queued".equals(status)) queuedCount++;
             else if (status.contains("Skipped")) skippedCount++;
+            else if (status.contains("Canceled")) canceledCount++;
             else if ("Ready".equals(status) || status.isEmpty()) readyCount++;
             else if (status.contains("Unavailable")) unavailableCount++;
         }
@@ -199,6 +205,7 @@ public class MainController {
         String newStatus;
         if (runningCount > 0) newStatus = "Running (" + runningCount + "/" + totalChildren + ")";
         else if (queuedCount > 0) newStatus = "Queued (" + queuedCount + ")";
+        else if (canceledCount > 0) newStatus = "Canceled (" + canceledCount + "/" + totalChildren + ")";
         else if (errorCount > 0) newStatus = "Error (Partial: " + errorCount + ")";
         else if (successCount == totalChildren - unavailableCount - skippedCount && successCount > 0) newStatus = "Success";
         else if (successCount > 0) newStatus = "Completed (" + successCount + "/" + totalChildren + ")";
@@ -372,9 +379,13 @@ public class MainController {
     }
     
     private void runBenchmarkSuite(List<BenchmarkItem> items) {
-         Task<Void> task = new Task<>() {
+         if (mainTask != null && mainTask.isRunning()) return;
+         
+         mainTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
+                activeComputeContext = org.jscience.core.ComputeContext.current();
+                activeComputeContext.setCancelled(false);
                 for (BenchmarkItem item : items) {
                      Platform.runLater(() -> {
                          // Only queue available benchmarks
@@ -411,23 +422,71 @@ public class MainController {
             }
         };
         
-        globalProgressBar.progressProperty().bind(task.progressProperty());
+        globalProgressBar.progressProperty().bind(mainTask.progressProperty());
         
-        task.setOnSucceeded(e -> {
+        mainTask.setOnSucceeded(e -> {
              globalProgressBar.progressProperty().unbind();
              globalProgressBar.setProgress(1.0);
              statusBarLabel.setText("Suite Completed (" + items.size() + " items).");
              Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
         });
         
-        task.setOnFailed(e -> {
+        mainTask.setOnFailed(e -> {
              globalProgressBar.progressProperty().unbind();
              globalProgressBar.setProgress(0);
-             statusBarLabel.setText("Suite Failed: " + task.getException().getMessage());
-             task.getException().printStackTrace();
+             statusBarLabel.setText("Suite Failed: " + mainTask.getException().getMessage());
+             mainTask.getException().printStackTrace();
+             Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
+        });
+
+        mainTask.setOnCancelled(e -> {
+             globalProgressBar.progressProperty().unbind();
+             // Progress bar remains at current state or we can reset it
+             statusBarLabel.setText("Operation stopped by user.");
+             Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
         });
         
-        new Thread(task).start();
+        new Thread(mainTask).start();
+    }
+
+    @FXML
+    private void handleStop() {
+        if (mainTask != null && mainTask.isRunning()) {
+            mainTask.cancel();
+            
+            if (activeComputeContext != null) {
+                activeComputeContext.setCancelled(true);
+            }
+            
+            // Immediately update UI to show cancellation of queued items
+            synchronized (benchmarkQueue) {
+                benchmarkQueue.clear();
+                isProcessingQueue = false;
+            }
+            
+            statusBarLabel.setText("Operation stopped by user.");
+            
+            // Mark items as canceled in the UI
+            Platform.runLater(() -> {
+                globalProgressBar.progressProperty().unbind();
+                markPendingAsCanceled(benchmarkTreeTable.getRoot());
+                updateCategoryStatuses(benchmarkTreeTable.getRoot());
+            });
+        }
+    }
+
+    private void markPendingAsCanceled(TreeItem<BenchmarkItem> root) {
+        if (root == null) return;
+        BenchmarkItem item = root.getValue();
+        if (item != null) {
+            String status = item.statusProperty().get();
+            if ("Queued".equals(status) || (status != null && status.startsWith("Running"))) {
+                item.statusProperty().set("Canceled");
+            }
+        }
+        for (TreeItem<BenchmarkItem> child : root.getChildren()) {
+            markPendingAsCanceled(child);
+        }
     }
 
     @FXML
@@ -558,6 +617,7 @@ public class MainController {
             final long MAX_WARMUP_TIME_NS = 500_000_000L; // 500ms
             final long MAX_WARMUP_ITERS = 1_000_000;
             while (System.nanoTime() - warmupStart < MAX_WARMUP_TIME_NS && warmupIters < MAX_WARMUP_ITERS) { 
+                if (mainTask != null && mainTask.isCancelled()) throw new RuntimeException("Canceled");
                 b.run();
                 warmupIters++;
             }
@@ -576,16 +636,17 @@ public class MainController {
             long measureIters = 0;
             final long MAX_MEASURE_TIME_NS = 2_000_000_000L; // 2 seconds
             final long MAX_MEASURE_ITERS = 5_000_000;
-            final long MAX_SINGLE_ITER_TIME_NS = 10_000_000_000L; // 10 seconds
+            final long MAX_SINGLE_ITER_TIME_NS = 60_000_000_000L; // 60 seconds
             while (System.nanoTime() - totalStart < MAX_MEASURE_TIME_NS && measureIters < MAX_MEASURE_ITERS) {
+                if (mainTask != null && mainTask.isCancelled()) throw new RuntimeException("Canceled");
                 long iterStart = System.nanoTime();
                 b.run();
                 iterNanos.add(System.nanoTime() - iterStart);
                 measureIters++;
                 
-                // Safety: if a single iteration takes more than 10 seconds, abort to avoid stalling
-                if (System.nanoTime() - iterStart > 10_000_000_000L) {
-                    throw new RuntimeException("Benchmark stalled (single iteration > 10s)");
+                // Safety: if a single iteration takes more than 60 seconds, abort to avoid stalling
+                if (System.nanoTime() - iterStart > MAX_SINGLE_ITER_TIME_NS) {
+                    throw new RuntimeException("Benchmark stalled: " + item.getName() + " (single iteration > 60s)");
                 }
             }
             long totalEnd = System.nanoTime();
@@ -628,6 +689,11 @@ public class MainController {
                  Platform.runLater(() -> {
                     item.statusProperty().set("Skipped");
                     item.resultProperty().set("Skipped (Lib Missing)");
+                 });
+            } else if (e instanceof org.jscience.core.technical.algorithm.OperationCancelledException || "Canceled".equals(errorMsg)) {
+                 Platform.runLater(() -> {
+                    item.statusProperty().set("Canceled");
+                    item.resultProperty().set("Stopped");
                  });
             } else {
                 e.printStackTrace();

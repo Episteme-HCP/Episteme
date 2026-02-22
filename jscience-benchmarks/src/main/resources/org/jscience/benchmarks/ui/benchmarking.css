@@ -88,6 +88,19 @@
     -fx-background-color: #0086f0;
 }
 
+.action-button-danger {
+    -fx-background-color: #d83b01;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20 8 20;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.action-button-danger:hover {
+    -fx-background-color: #ef4444;
+}
+
 /* Tables */
 .benchmark-tree, .table-view {
     -fx-background-color: transparent;

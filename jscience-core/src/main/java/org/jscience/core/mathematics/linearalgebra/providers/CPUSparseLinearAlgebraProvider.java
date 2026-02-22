@@ -144,7 +144,9 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
             }
         } else {
             // Parallel execution per row
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             IntStream.range(0, rows).parallel().forEach(row -> {
+                ctx.checkCancelled();
                 // Populate from A
                 for (int i = aRowPtrs[row]; i < aRowPtrs[row + 1]; i++) {
                     rowMaps.get(row).put(aCols[i], (E) aVals[i]);
@@ -247,7 +249,9 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
             }
         } else {
             // Parallel
+            org.jscience.core.ComputeContext ctx = org.jscience.core.ComputeContext.current();
             IntStream.range(0, resultRows).parallel().forEach(i -> {
+                ctx.checkCancelled();
                 computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals, r);
             });
         }

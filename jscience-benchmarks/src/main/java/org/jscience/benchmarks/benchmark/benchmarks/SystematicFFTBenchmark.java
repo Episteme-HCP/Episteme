@@ -41,7 +41,8 @@ import java.util.Random;
 public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> {
 
     private static final int SIZE = 4096;
-    private Complex[] data;
+    private static final int POOL_SIZE = 10;
+    private Complex[][] dataPool;
     private FFTProvider currentProvider;
 
     @Override public String getId() { return getIdPrefix(); }
@@ -62,7 +63,11 @@ public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> 
 
     @Override
     public void setup() {
-        data = generateData(SIZE);
+        dataPool = new Complex[POOL_SIZE][];
+        Random r = new Random(42);
+        for (int i = 0; i < POOL_SIZE; i++) {
+            dataPool[i] = generateData(SIZE, r);
+        }
     }
 
     @Override
@@ -73,22 +78,23 @@ public class SystematicFFTBenchmark implements SystematicBenchmark<FFTProvider> 
     @Override
     public void run() {
         if (currentProvider != null) {
-            currentProvider.transformComplex(data);
+            for (int i = 0; i < POOL_SIZE; i++) {
+                currentProvider.transformComplex(dataPool[i]);
+            }
         }
     }
 
     @Override
     public void teardown() {
-        data = null;
+        dataPool = null;
     }
 
     @Override
     public int getSuggestedIterations() {
-        return 1000; // FFT is faster, more iterations needed for precision
+        return 100; // Each iteration now does 10 FFTs
     }
 
-    private Complex[] generateData(int n) {
-        Random r = new Random(42);
+    private Complex[] generateData(int n, Random r) {
         Complex[] d = new Complex[n];
         for (int i = 0; i < n; i++)
             d[i] = Complex.of(r.nextDouble(), r.nextDouble());

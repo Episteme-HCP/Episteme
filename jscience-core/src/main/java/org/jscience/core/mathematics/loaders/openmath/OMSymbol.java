@@ -69,6 +69,7 @@ public class OMSymbol extends OMObject {
      *
      * @deprecated use the getCd method instead.
      */
+    @Deprecated
     public String getCD() {
         return getCd();
     }

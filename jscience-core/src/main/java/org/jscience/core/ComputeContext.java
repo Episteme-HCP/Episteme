@@ -67,6 +67,7 @@ public class ComputeContext {
     // RESOURCES (Kept in Context)
     private volatile DistributedContext distributedContext = new LocalDistributedContext();
     private volatile GPUBackend gpuBackend;
+    private volatile boolean cancelled = false;
 
     public ComputeContext() {
         this(10_000_000); // Default threshold passed to config
@@ -193,6 +194,32 @@ public class ComputeContext {
     public ComputeContext setGPUBackend(GPUBackend gpuBackend) {
         this.gpuBackend = gpuBackend;
         return this;
+    }
+
+    // ==========================================================
+    // CANCELLATION SUPPORT
+    // ==========================================================
+
+    /** Returns true if the current context has been cancelled. */
+    public boolean isCancelled() { return cancelled; }
+
+    /** Sets the cancellation state for this context. */
+    public void setCancelled(boolean cancelled) { this.cancelled = cancelled; }
+
+    /** 
+     * Convenience method to check for cancellation and throw an exception.
+     * Often used in deep loops or recursive algorithms.
+     * @throws org.jscience.core.technical.algorithm.OperationCancelledException if cancelled
+     */
+    public void checkCancelled() {
+        if (cancelled) {
+            throw new org.jscience.core.technical.algorithm.OperationCancelledException();
+        }
+    }
+    
+    /** Static helper to check cancellation on the current thread-local context. */
+    public static void checkCurrentCancelled() {
+        current().checkCancelled();
     }
 
     // ==========================================================

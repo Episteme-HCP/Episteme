@@ -109,11 +109,12 @@ public class GenericMatrix<E> implements Matrix<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> add(Matrix<E> other) {
         if (other instanceof GenericMatrix) {
             OperationContext ctx = new OperationContext.Builder()
                 .dataSize((long) this.rows() * this.cols())
-                .addHint(Hint.MAT_ADD)
+                .addHint(org.jscience.core.technical.algorithm.OperationContext.Hint.MAT_ADD)
                 .build();
             return ProviderSelector.execute(LinearAlgebraProvider.class, ctx, 
                 p -> ((LinearAlgebraProvider<E>) p).add(this, (GenericMatrix<E>) other));
@@ -137,9 +138,14 @@ public class GenericMatrix<E> implements Matrix<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> other) {
         if (other instanceof GenericMatrix) {
-            return ProviderSelector.execute(LinearAlgebraProvider.class, OperationContext.DEFAULT,
+            OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * other.cols())
+                .addHint(org.jscience.core.technical.algorithm.OperationContext.Hint.MAT_MUL)
+                .build();
+            return ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
                 p -> ((LinearAlgebraProvider<E>) p).multiply(this, (GenericMatrix<E>) other));
         }
         

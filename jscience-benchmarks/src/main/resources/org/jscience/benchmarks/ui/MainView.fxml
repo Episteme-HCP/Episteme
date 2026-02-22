@@ -32,6 +32,7 @@
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="runSelectedBtn" text="RUN SELECTED" onAction="#handleRunSelected" styleClass="action-button-primary" />
                         <Button fx:id="runAllBtn" text="RUN ALL" onAction="#handleRunAll" styleClass="action-button-primary" />
+                        <Button fx:id="stopBtn" text="STOP" onAction="#handleStop" styleClass="action-button-danger" />
                     </HBox>
                     
                     <TreeTableView fx:id="benchmarkTreeTable" VBox.vgrow="ALWAYS" styleClass="benchmark-tree">

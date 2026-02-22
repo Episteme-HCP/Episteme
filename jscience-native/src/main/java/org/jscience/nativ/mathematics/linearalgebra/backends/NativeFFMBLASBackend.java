@@ -30,7 +30,7 @@ import java.util.List;
  * Implements {@link CPUBackend} and {@link NativeBackend}.
  */
 @AutoService({Backend.class, LinearAlgebraProvider.class, AlgorithmProvider.class, CPUBackend.class, NativeBackend.class})
-public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUBackend, NativeBackend {
+public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
 
     private static final SymbolLookup LOOKUP;
     private static final boolean IS_AVAILABLE;
@@ -159,7 +159,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
     }
 
     @Override
-    public Vector<Double> solve(Matrix<Double> A, Vector<Double> b) {
+    public Vector<org.jscience.core.mathematics.numbers.real.Real> solve(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE || DGESV == null) throw new UnsupportedOperationException("Native LAPACK dgesv not available");
         
         int n = A.rows();
@@ -167,12 +167,13 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
         if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
-            double[] arrA = ((DenseMatrix<?>)A).toDoubleArray();
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, arrA.length);
+            int len = (int) ((long) n * n);
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+            double[] arrA = toDoubleArray(A);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
             
             MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-            for(int i=0; i<n; i++) segB.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+            for(int i=0; i<n; i++) segB.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
             
             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
             
@@ -182,24 +183,25 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
             double[] result = new double[n];
             MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0, result, 0, n);
             
-            List<Double> list = new ArrayList<>(n);
-            for(double v : result) list.add(v);
-            return new DenseVector<>(list, (Ring<Double>) A.getScalarRing());
+            List<org.jscience.core.mathematics.numbers.real.Real> list = new ArrayList<>(n);
+            for(double v : result) list.add(org.jscience.core.mathematics.numbers.real.Real.of(v));
+            return new DenseVector<>(list, (Ring<org.jscience.core.mathematics.numbers.real.Real>) A.getScalarRing());
         } catch (Throwable e) {
              throw new RuntimeException(e);
         }
     }
     
     @Override
-    public Matrix<Double> inverse(Matrix<Double> A) {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> inverse(Matrix<org.jscience.core.mathematics.numbers.real.Real> A) {
          if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) throw new UnsupportedOperationException("Native LAPACK inverse not available");
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
          try (Arena arena = Arena.ofConfined()) {
-             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
-             double[] arrA = ((DenseMatrix<?>)A).toDoubleArray();
-             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, arrA.length);
+             int len = (int) ((long) n * n);
+             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+             double[] arrA = toDoubleArray(A);
+             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
              
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
              
@@ -212,33 +214,34 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
              double[] result = new double[n * n];
              MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0, result, 0, n * n);
              
-             Double[][] resObj = new Double[n][n];
+             org.jscience.core.mathematics.numbers.real.Real[][] resObj = new org.jscience.core.mathematics.numbers.real.Real[n][n];
              for(int i=0; i<n; i++) {
                  for(int j=0; j<n; j++) {
-                     resObj[i][j] = result[i*n + j];
+                     resObj[i][j] = org.jscience.core.mathematics.numbers.real.Real.of(result[i*n + j]);
                  }
              }
-             return new DenseMatrix<>(resObj, (Ring<Double>) A.getScalarRing());
+             return new DenseMatrix<>(resObj, (Ring<org.jscience.core.mathematics.numbers.real.Real>) A.getScalarRing());
          } catch (Throwable e) {
              throw new RuntimeException(e);
          }
     }
 
     @Override
-    public Double determinant(Matrix<Double> A) {
+    public org.jscience.core.mathematics.numbers.real.Real determinant(Matrix<org.jscience.core.mathematics.numbers.real.Real> A) {
          if (!IS_AVAILABLE || DGETRF == null) throw new UnsupportedOperationException("Native LAPACK determinant not available");
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
          try (Arena arena = Arena.ofConfined()) {
-             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
-             double[] arrA = ((DenseMatrix<?>)A).toDoubleArray();
-             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, arrA.length);
+             int len = (int) ((long) n * n);
+             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
+             double[] arrA = toDoubleArray(A);
+             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
              
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
              
              int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
-             if (info > 0) return 0.0; // Singular
+             if (info > 0) return org.jscience.core.mathematics.numbers.real.Real.ZERO; // Singular
              
              double det = 1.0;
              for(int i=0; i<n; i++) {
@@ -246,7 +249,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
                  int pivot = segIpiv.getAtIndex(ValueLayout.JAVA_INT, i);
                  if (pivot != i + 1) det = -det;
              }
-             return det;
+             return org.jscience.core.mathematics.numbers.real.Real.of(det);
          } catch (Throwable e) {
              throw new RuntimeException(e);
          }
@@ -274,7 +277,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring.zero() instanceof Double || ring.zero().getClass().getSimpleName().equals("Real");
+        return ring.zero() instanceof org.jscience.core.mathematics.numbers.real.Real;
     }
 
     @Override
@@ -295,7 +298,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
     }
 
     @Override
-    public Matrix<Double> multiply(Matrix<Double> A, Matrix<Double> B) {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> multiply(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Matrix<org.jscience.core.mathematics.numbers.real.Real> B) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = A.rows();
         int k = A.cols();
@@ -303,13 +306,15 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
         if (k != B.rows()) throw new IllegalArgumentException("Matrix dimensions mismatch");
 
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * k);
-            double[] arrA = ((DenseMatrix<?>)A).toDoubleArray();
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, arrA.length);
+            int lenA = m * k;
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, lenA);
+            double[] arrA = toDoubleArray(A);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, lenA));
 
-            MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k * n);
-            double[] arrB = ((DenseMatrix<?>)B).toDoubleArray();
-            MemorySegment.copy(arrB, 0, segB, ValueLayout.JAVA_DOUBLE, 0, arrB.length);
+            int lenB = k * n;
+            MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, lenB);
+            double[] arrB = toDoubleArray(B);
+            MemorySegment.copy(arrB, 0, segB, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrB.length, lenB));
 
             MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
 
@@ -327,91 +332,91 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
     }
 
     @Override
-    public Double dot(Vector<Double> a, Vector<Double> b) {
+    public org.jscience.core.mathematics.numbers.real.Real dot(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
          if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-             for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
+             for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i).doubleValue());
              MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-             for(int i=0; i<n; i++) segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
-             try { return (double) DDOT.invokeExact(n, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+             for(int i=0; i<n; i++) segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
+             try { return org.jscience.core.mathematics.numbers.real.Real.of((double) DDOT.invokeExact(n, segX, 1, segY, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
          }
     }
     
     @Override
-    public Double norm(Vector<Double> a) {
+    public org.jscience.core.mathematics.numbers.real.Real norm(Vector<org.jscience.core.mathematics.numbers.real.Real> a) {
          if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-             for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
-             try { return (double) DNRM2.invokeExact(n, segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+             for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i).doubleValue());
+             try { return org.jscience.core.mathematics.numbers.real.Real.of((double) DNRM2.invokeExact(n, segX, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
          }
     }
 
     @Override
-    public Vector<Double> add(Vector<Double> a, Vector<Double> b) {
+    public Vector<org.jscience.core.mathematics.numbers.real.Real> add(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
             for (int i = 0; i < n; i++) {
-                segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
-                segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+                segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i).doubleValue());
+                segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
             }
             try { DAXPY.invokeExact(n, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            Double[] result = new Double[n];
-            for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
+            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[n];
+            for (int i = 0; i < n; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)a.getScalarRing());
         }
     }
 
     @Override
-    public Vector<Double> subtract(Vector<Double> a, Vector<Double> b) {
+    public Vector<org.jscience.core.mathematics.numbers.real.Real> subtract(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
             for (int i = 0; i < n; i++) {
-                segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
-                segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i));
+                segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
+                segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i).doubleValue());
             }
             try { DAXPY.invokeExact(n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            Double[] result = new Double[n];
-            for (int i = 0; i < n; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)a.getScalarRing());
+            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[n];
+            for (int i = 0; i < n; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)a.getScalarRing());
         }
     }
 
     @Override
-    public Vector<Double> multiply(Vector<Double> vector, Double scalar) {
+    public Vector<org.jscience.core.mathematics.numbers.real.Real> multiply(Vector<org.jscience.core.mathematics.numbers.real.Real> vector, org.jscience.core.mathematics.numbers.real.Real scalar) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int n = vector.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-            for (int i = 0; i < n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, vector.get(i));
+            for (int i = 0; i < n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, vector.get(i).doubleValue());
             try { DSCAL.invokeExact(n, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            Double[] result = new Double[n];
-            for (int i = 0; i < n; i++) result[i] = segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)vector.getScalarRing());
+            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[n];
+            for (int i = 0; i < n; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)vector.getScalarRing());
         }
     }
 
     @Override
-    public Matrix<Double> add(Matrix<Double> a, Matrix<Double> b) {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> add(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Matrix<org.jscience.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-            double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
-            double[] arrB = ((DenseMatrix<?>)b).toDoubleArray();
-            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
-            MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
+            double[] arrA = toDoubleArray(a);
+            double[] arrB = toDoubleArray(b);
+            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
+            MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrB.length, len));
             try { DAXPY.invokeExact(len, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             double[] result = new double[len];
             MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
@@ -420,17 +425,17 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
     }
 
     @Override
-    public Matrix<Double> subtract(Matrix<Double> a, Matrix<Double> b) {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> subtract(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Matrix<org.jscience.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-            double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
-            double[] arrB = ((DenseMatrix<?>)b).toDoubleArray();
-            MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
-            MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0, len);
+            double[] arrA = toDoubleArray(a);
+            double[] arrB = toDoubleArray(b);
+            MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrB.length, len));
+            MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
             try { DAXPY.invokeExact(len, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             double[] result = new double[len];
             MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
@@ -439,14 +444,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
     }
 
     @Override
-    public Matrix<Double> scale(Double scalar, Matrix<Double> a) {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> scale(org.jscience.core.mathematics.numbers.real.Real scalar, Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-            double[] arrA = ((DenseMatrix<?>)a).toDoubleArray();
-            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, len);
+            double[] arrA = toDoubleArray(a);
+            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, len));
             try { DSCAL.invokeExact(len, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             double[] result = new double[len];
             MemorySegment.copy(segX, ValueLayout.JAVA_DOUBLE, 0, result, 0, len);
@@ -455,41 +460,64 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Double>, CPUB
     }
 
     @Override
-    public Matrix<Double> transpose(Matrix<Double> a) {
+    public Matrix<org.jscience.core.mathematics.numbers.real.Real> transpose(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
         int m = a.rows(), n = a.cols();
-        Double[][] result = new Double[n][m];
+        org.jscience.core.mathematics.numbers.real.Real[][] result = new org.jscience.core.mathematics.numbers.real.Real[n][m];
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 result[j][i] = a.get(i, j);
             }
         }
-        return new DenseMatrix<>(result, (Ring<Double>) a.getScalarRing());
+        return new DenseMatrix<>(result, (Ring<org.jscience.core.mathematics.numbers.real.Real>) a.getScalarRing());
     }
 
-    private Matrix<Double> createDenseMatrix(double[] data, int rows, int cols, Matrix<Double> reference) {
-        Double[][] resObj = new Double[rows][cols];
+    private Matrix<org.jscience.core.mathematics.numbers.real.Real> createDenseMatrix(double[] data, int rows, int cols, Matrix<org.jscience.core.mathematics.numbers.real.Real> reference) {
+        org.jscience.core.mathematics.numbers.real.Real[][] resObj = new org.jscience.core.mathematics.numbers.real.Real[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                resObj[i][j] = data[i * cols + j];
+                resObj[i][j] = org.jscience.core.mathematics.numbers.real.Real.of(data[i * cols + j]);
             }
         }
-        return new DenseMatrix<>(resObj, (Ring<Double>) reference.getScalarRing());
+        return new DenseMatrix<>(resObj, (Ring<org.jscience.core.mathematics.numbers.real.Real>) reference.getScalarRing());
     }
 
     @Override
-    public Vector<Double> multiply(Matrix<Double> a, Vector<Double> b) {
+    public Vector<org.jscience.core.mathematics.numbers.real.Real> multiply(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
         int m = a.rows(), k = a.cols();
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * k);
-            for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) segA.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * k + j, a.get(i, j));
+            int lenA = m * k;
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, lenA);
+            double[] arrA = toDoubleArray(a);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0, Math.min(arrA.length, lenA));
+            
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, k);
-            for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i));
+            for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
             try { DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, k, 1.0, segA, k, segX, 1, 0.0, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            Double[] result = new Double[m];
-            for (int i = 0; i < m; i++) result[i] = segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<Double>)b.getScalarRing());
+            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[m];
+            for (int i = 0; i < m; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)b.getScalarRing());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private double[] toDoubleArray(Matrix<org.jscience.core.mathematics.numbers.real.Real> matrix) {
+        Object mObj = matrix;
+        if (mObj instanceof org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            return ((org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) mObj).toDoubleArray();
+        } else if (matrix instanceof org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix) {
+            return ((org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<?>) matrix).toDoubleArray();
+        } else {
+             int rows = matrix.rows();
+             int cols = matrix.cols();
+             double[] result = new double[rows * cols];
+             for (int i = 0; i < rows; i++) {
+                 for (int j = 0; j < cols; j++) {
+                     result[i * cols + j] = matrix.get(i, j).doubleValue();
+                 }
+             }
+             return result;
         }
     }
 

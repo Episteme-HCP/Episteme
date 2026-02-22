@@ -14,6 +14,7 @@ public class RealDoubleCARMAAlgorithm {
     private static final int RECURSION_THRESHOLD = 256; // Higher threshold for SIMD
 
     public static SIMDRealDoubleMatrix multiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
+        org.jscience.core.ComputeContext.checkCurrentCancelled();
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();

@@ -42,8 +42,9 @@ import java.util.Random;
 public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
     private static final int SIZE = 1024;
-    private RealDoubleMatrix A;
-    private RealDoubleMatrix B;
+    private static final int POOL_SIZE = 1;
+    private RealDoubleMatrix[] matricesA;
+    private RealDoubleMatrix[] matricesB;
     private LinearAlgebraProvider<Real> currentProvider;
 
     @Override public String getId() { return getIdPrefix(); }
@@ -65,10 +66,13 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
 
     @Override
     public void setup() {
-        double[][] dataA = generateData(SIZE);
-        double[][] dataB = generateData(SIZE);
-        A = RealDoubleMatrix.of(dataA);
-        B = RealDoubleMatrix.of(dataB);
+        matricesA = new RealDoubleMatrix[POOL_SIZE];
+        matricesB = new RealDoubleMatrix[POOL_SIZE];
+        Random r = new Random(42);
+        for (int i = 0; i < POOL_SIZE; i++) {
+            matricesA[i] = RealDoubleMatrix.of(generateData(SIZE, r));
+            matricesB[i] = RealDoubleMatrix.of(generateData(SIZE, r));
+        }
     }
 
     @Override
@@ -80,23 +84,24 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
     @Override
     public void run() {
         if (currentProvider != null) {
-            currentProvider.multiply(A, B);
+            for (int i = 0; i < POOL_SIZE; i++) {
+                currentProvider.multiply(matricesA[i], matricesB[i]);
+            }
         }
     }
 
     @Override
     public void teardown() {
-        A = null;
-        B = null;
+        matricesA = null;
+        matricesB = null;
     }
 
     @Override
     public int getSuggestedIterations() {
-        return 100;
+        return 5; // Each iteration now does 10 multiplications
     }
 
-    private double[][] generateData(int n) {
-        Random r = new Random(42);
+    private double[][] generateData(int n, Random r) {
         double[][] d = new double[n][n];
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)

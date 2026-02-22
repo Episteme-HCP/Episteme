@@ -16,6 +16,7 @@ public class RealCARMAAlgorithm {
     private static final int RECURSION_THRESHOLD = 64;
 
     public static Matrix<Real> multiply(Matrix<Real> A, Matrix<Real> B) {
+        org.jscience.core.ComputeContext.checkCurrentCancelled();
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();

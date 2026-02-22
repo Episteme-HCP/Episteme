@@ -73,17 +73,31 @@ public class BenchmarkRunner {
                 for (int i = 0; i < 3; i++)
                     b.run();
 
-                // Measurement
-                long start = System.nanoTime();
-                long startMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                // Measurement (Robust 5 trials x ITERS_PER_TRIAL)
+                final int TRIALS = 5;
+                final int ITERS_PER_TRIAL = Math.max(1, b.getSuggestedIterations() / TRIALS);
+                final int totalIterations = TRIALS * ITERS_PER_TRIAL;
+                
+                long totalNs = 0;
+                long totalMem = 0;
 
-                int iterations = b.getSuggestedIterations();
-                for (int i = 0; i < iterations; i++) {
-                    b.run();
+                for (int t = 0; t < TRIALS; t++) {
+                    long trialStart = System.nanoTime();
+                    long trialStartMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    
+                    for (int i = 0; i < ITERS_PER_TRIAL; i++) {
+                        b.run();
+                    }
+                    
+                    long trialEnd = System.nanoTime();
+                    long trialEndMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    
+                    totalNs += (trialEnd - trialStart);
+                    totalMem += Math.max(0, trialEndMem - trialStartMem);
                 }
 
-                long end = System.nanoTime();
-                long durationNs = end - start;
+                long durationNs = totalNs;
+                int iterations = totalIterations;
                 
                 // Record to Monitor
                 monitor.recordExecution(b.getId(), b.getDomain(), durationNs / iterations);
@@ -91,7 +105,7 @@ public class BenchmarkRunner {
                 long endMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
                 double avgMs = (durationNs / 1_000_000.0) / iterations;
                 double opsSec = (iterations * 1_000_000_000.0) / durationNs;
-                long memUsed = Math.max(0, endMem - startMem);
+                long memUsed = totalMem / TRIALS;
 
                 BenchmarkResult res = new BenchmarkResult(
                         b.getId(), b.getName(), b.getDomain(), durationNs / 1_000_000, iterations, avgMs, opsSec, memUsed,

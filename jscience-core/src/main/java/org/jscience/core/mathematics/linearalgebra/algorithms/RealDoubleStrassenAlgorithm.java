@@ -11,8 +11,15 @@ public class RealDoubleStrassenAlgorithm {
     private static final int THRESHOLD = 256;
 
     public static SIMDRealDoubleMatrix multiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
-        int n = A.rows();
-        if (n <= THRESHOLD) {
+        org.jscience.core.ComputeContext.checkCurrentCancelled();
+        int m = A.rows();
+        int k = A.cols();
+        int n = B.cols();
+        
+        if (m <= THRESHOLD || k <= THRESHOLD || n <= THRESHOLD || m != k || k != n || (m & (m - 1)) != 0) {
+            if (m != k || k != n || (m & (m - 1)) != 0) {
+                 return padAndMultiply(A, B);
+            }
             return standardMultiply(A, B);
         }
 
@@ -62,6 +69,32 @@ public class RealDoubleStrassenAlgorithm {
         }
         
         return new SIMDRealDoubleMatrix(n, n, combinedData);
+    }
+
+    private static SIMDRealDoubleMatrix padAndMultiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
+        int m = A.rows(), k = A.cols(), n = B.cols();
+        int max = Math.max(m, Math.max(k, n));
+        int p = 1;
+        while (p < max) p <<= 1;
+        
+        if (p < THRESHOLD) return standardMultiply(A, B);
+
+        SIMDRealDoubleMatrix aPadded = new SIMDRealDoubleMatrix(p, p);
+        SIMDRealDoubleMatrix bPadded = new SIMDRealDoubleMatrix(p, p);
+        
+        for(int i=0; i<m; i++) {
+            for(int j=0; j<k; j++) {
+                aPadded.set(i, j, A.get(i, j).doubleValue());
+            }
+        }
+        for(int i=0; i<k; i++) {
+            for(int j=0; j<n; j++) {
+                bPadded.set(i, j, B.get(i, j).doubleValue());
+            }
+        }
+        
+        SIMDRealDoubleMatrix resPadded = multiply(aPadded, bPadded);
+        return (SIMDRealDoubleMatrix) resPadded.getSubMatrix(0, m, 0, n);
     }
 
     private static SIMDRealDoubleMatrix standardMultiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {

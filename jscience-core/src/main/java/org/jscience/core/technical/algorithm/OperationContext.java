@@ -66,7 +66,11 @@ public final class OperationContext {
         /** Matrix Transpose */
         MAT_TRANSPOSE,
         /** Matrix Scaling */
-        MAT_SCALE
+        MAT_SCALE,
+        /** Matrix Addition */
+        MAT_ADD,
+        /** Matrix Subtraction */
+        MAT_SUBTRACT
     }
 
     public static final OperationContext DEFAULT = new OperationContext.Builder().build();
@@ -74,6 +78,7 @@ public final class OperationContext {
     private final long dataSize;
     private final Set<Hint> hints;
     private final int dimensionality;
+    private volatile boolean cancelled = false;
 
     private OperationContext(Builder builder) {
         this.dataSize = builder.dataSize;
@@ -92,6 +97,12 @@ public final class OperationContext {
 
     /** Dimensionality of the data (e.g., rows for matrix). */
     public int getDimensionality() { return dimensionality; }
+
+    /** Returns true if this operation has been cancelled. */
+    public boolean isCancelled() { return cancelled; }
+
+    /** Sets the cancellation state of this operation. */
+    public void setCancelled(boolean cancelled) { this.cancelled = cancelled; }
 
     public static class Builder {
         private long dataSize = 0;

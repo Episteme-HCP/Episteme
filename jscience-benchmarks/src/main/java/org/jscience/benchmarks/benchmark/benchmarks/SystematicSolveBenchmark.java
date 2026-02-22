@@ -23,8 +23,9 @@ import java.util.Random;
 public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
     private static final int SIZE = 800;
-    private RealDoubleMatrix A;
-    private RealDoubleVector B;
+    private static final int POOL_SIZE = 10;
+    private RealDoubleMatrix[] matricesA;
+    private RealDoubleVector[] vectorsB;
     private LinearAlgebraProvider<Real> currentProvider;
 
     @Override public String getId() { return getIdPrefix(); }
@@ -46,24 +47,28 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
 
     @Override
     public void setup() {
-        // Generate a random INVERTIBLE matrix (diagonally dominant)
+        matricesA = new RealDoubleMatrix[POOL_SIZE];
+        vectorsB = new RealDoubleVector[POOL_SIZE];
         Random r = new Random(42);
-        double[][] dataA = new double[SIZE][SIZE];
-        for (int i = 0; i < SIZE; i++) {
-            double sum = 0;
-            for (int j = 0; j < SIZE; j++) {
-                if (i != j) {
-                    dataA[i][j] = r.nextDouble();
-                    sum += Math.abs(dataA[i][j]);
-                }
-            }
-            dataA[i][i] = sum + 1.0 + r.nextDouble(); // Ensure dominant diagonal
-        }
-        A = RealDoubleMatrix.of(dataA);
         
-        double[] dataB = new double[SIZE];
-        for (int i=0; i<SIZE; i++) dataB[i] = r.nextDouble();
-        B = RealDoubleVector.of(dataB);
+        for (int p = 0; p < POOL_SIZE; p++) {
+            double[][] dataA = new double[SIZE][SIZE];
+            for (int i = 0; i < SIZE; i++) {
+                double sum = 0;
+                for (int j = 0; j < SIZE; j++) {
+                    if (i != j) {
+                        dataA[i][j] = r.nextDouble();
+                        sum += Math.abs(dataA[i][j]);
+                    }
+                }
+                dataA[i][i] = sum + 1.0 + r.nextDouble(); // Ensure dominant diagonal
+            }
+            matricesA[p] = RealDoubleMatrix.of(dataA);
+            
+            double[] dataB = new double[SIZE];
+            for (int i = 0; i < SIZE; i++) dataB[i] = r.nextDouble();
+            vectorsB[p] = RealDoubleVector.of(dataB);
+        }
     }
 
     @Override
@@ -74,18 +79,20 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
     @Override
     public void run() {
         if (currentProvider != null) {
-            currentProvider.solve(A, B);
+            for (int i = 0; i < POOL_SIZE; i++) {
+                currentProvider.solve(matricesA[i], vectorsB[i]);
+            }
         }
     }
 
     @Override
     public void teardown() {
-        A = null;
-        B = null;
+        matricesA = null;
+        vectorsB = null;
     }
 
     @Override
     public int getSuggestedIterations() {
-        return 50;
+        return 5; // Each iteration now does 10 solves
     }
 }
