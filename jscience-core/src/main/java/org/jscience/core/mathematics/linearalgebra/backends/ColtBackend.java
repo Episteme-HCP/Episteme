@@ -26,6 +26,7 @@ package org.jscience.core.mathematics.linearalgebra.backends;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
@@ -274,7 +275,13 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
         @Override @SuppressWarnings("unchecked")
         public E norm(Vector<E> a) {
-            return (E) Real.of(Math.sqrt(toColtVector(a).zDotProduct(toColtVector(a))));
+            return (E) org.jscience.core.mathematics.numbers.real.Real.of(Math.sqrt(toColtVector(a).zDotProduct(toColtVector(a))));
         }
+
+        @Override public QRResult<E> qr(Matrix<E> a) { throw new UnsupportedOperationException(); }
+        @Override public SVDResult<E> svd(Matrix<E> a) { throw new UnsupportedOperationException(); }
+        @Override public EigenResult<E> eigen(Matrix<E> a) { throw new UnsupportedOperationException(); }
+        @Override public LUResult<E> lu(Matrix<E> a) { throw new UnsupportedOperationException(); }
+        @Override public CholeskyResult<E> cholesky(Matrix<E> a) { throw new UnsupportedOperationException(); }
     }
 }

@@ -5,7 +5,7 @@
 
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.solvers.*;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 

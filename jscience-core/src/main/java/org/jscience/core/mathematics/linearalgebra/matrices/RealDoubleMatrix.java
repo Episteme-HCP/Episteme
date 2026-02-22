@@ -152,7 +152,18 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
      * Optimized matrix multiplication (GEMM).
      */
     public RealDoubleMatrix multiply(RealDoubleMatrix other) {
-        return (RealDoubleMatrix) provider.multiply(this, other);
+        Matrix<Real> result = provider.multiply(this, other);
+        if (result instanceof RealDoubleMatrix) {
+            return (RealDoubleMatrix) result;
+        }
+        // Conversion if provider returned a GenericMatrix or other type
+        double[][] data = new double[result.rows()][result.cols()];
+        for (int i = 0; i < result.rows(); i++) {
+            for (int j = 0; j < result.cols(); j++) {
+                data[i][j] = result.get(i, j).doubleValue();
+            }
+        }
+        return RealDoubleMatrix.of(data);
     }
 
     @Override

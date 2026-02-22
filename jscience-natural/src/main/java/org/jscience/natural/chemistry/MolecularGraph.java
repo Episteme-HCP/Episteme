@@ -72,9 +72,11 @@ public class MolecularGraph implements Graph<Atom> {
     public Map<Atom, List<Bond>> getConnections() {
         Map<Atom, List<Bond>> connections = new HashMap<>();
         for (Atom a : atoms) {
+            org.jscience.core.ComputeContext.checkCurrentCancelled();
             connections.put(a, new ArrayList<>());
         }
         for (Bond b : bonds) {
+            org.jscience.core.ComputeContext.checkCurrentCancelled();
             connections.get(b.source).add(b);
             connections.get(b.target).add(b);
         }
@@ -94,6 +96,7 @@ public class MolecularGraph implements Graph<Atom> {
     public String getFormula() {
         Map<String, Integer> counts = new HashMap<>();
         for (Atom a : atoms) {
+            org.jscience.core.ComputeContext.checkCurrentCancelled();
             counts.put(a.getElement().getSymbol(), counts.getOrDefault(a.getElement().getSymbol(), 0) + 1);
         }
         // Improve ordering: C first, H second, then alphabetical

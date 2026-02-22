@@ -3,20 +3,19 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.mathematics.linearalgebra.solvers;
+package org.jscience.core.mathematics.linearalgebra.matrices.solvers;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 
 /**
- * Result of a Singular Value Decomposition (SVD).
+ * Result of an Eigenvalue Decomposition.
  * <p>
- * A = U * S * V^T
+ * A * V = V * diag(D)
  * </p>
  *
  * @param <E> the element type
- * @param U   the left singular vectors
- * @param S   the singular values (as a vector)
- * @param V   the right singular vectors
+ * @param V   the eigenvectors (as columns)
+ * @param D   the eigenvalues (as a vector)
  */
-public record SVDResult<E>(Matrix<E> U, Vector<E> S, Matrix<E> V) {}
+public record EigenResult<E>(Matrix<E> V, Vector<E> D) {}

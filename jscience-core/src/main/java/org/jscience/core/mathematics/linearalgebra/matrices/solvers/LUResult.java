@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.core.mathematics.linearalgebra.solvers;
+package org.jscience.core.mathematics.linearalgebra.matrices.solvers;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;

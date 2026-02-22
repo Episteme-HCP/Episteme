@@ -7,7 +7,7 @@ package org.jscience.nativ.mathematics.linearalgebra.backends;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.results.*;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
@@ -208,6 +208,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     @Override
     public Vector<org.jscience.core.mathematics.numbers.real.Real> solve(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE || DGESV == null) throw new UnsupportedOperationException("Native LAPACK dgesv not available");
+        org.jscience.core.ComputeContext.checkCurrentCancelled();
         
         int n = A.rows();
         if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");

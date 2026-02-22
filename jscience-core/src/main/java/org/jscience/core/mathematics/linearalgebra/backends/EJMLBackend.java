@@ -26,6 +26,7 @@ package org.jscience.core.mathematics.linearalgebra.backends;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
@@ -241,6 +242,121 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public Matrix<E> transpose(Matrix<E> a) { return fromEjmlMatrix(toEjmlMatrix(a).transpose()); }
         @Override public Matrix<E> scale(E s, Matrix<E> a) { return fromEjmlMatrix(toEjmlMatrix(a).scale(((Real) s).doubleValue())); }
         @Override @SuppressWarnings("unchecked")
-        public E norm(Vector<E> a) { return (E) Real.of(toEjmlVector(a).normF()); }
+        public E norm(Vector<E> a) { return (E) org.jscience.core.mathematics.numbers.real.Real.of(toEjmlVector(a).normF()); }
+
+        @Override
+        public QRResult<E> qr(Matrix<E> a) {
+            org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
+            org.ejml.interfaces.decomposition.QRDecomposition<org.ejml.data.DMatrixRMaj> qr = 
+                org.ejml.dense.row.factory.DecompositionFactory_DDRM.qr(ma.getNumRows(), ma.getNumCols());
+            qr.decompose(ma.getDDRM());
+            
+            org.ejml.data.DMatrixRMaj Q = new org.ejml.data.DMatrixRMaj(ma.getNumRows(), ma.getNumRows());
+            org.ejml.data.DMatrixRMaj R = new org.ejml.data.DMatrixRMaj(ma.getNumRows(), ma.getNumCols());
+            qr.getQ(Q, false);
+            qr.getR(R, false);
+            
+            return new QRResult<E>(
+                fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(Q)),
+                fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(R))
+            );
+        }
+
+        @Override
+        public SVDResult<E> svd(Matrix<E> a) {
+            org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
+            org.ejml.interfaces.decomposition.SingularValueDecomposition_F64<org.ejml.data.DMatrixRMaj> svd = 
+                org.ejml.dense.row.factory.DecompositionFactory_DDRM.svd(ma.getNumRows(), ma.getNumCols(), true, true, false);
+            svd.decompose(ma.getDDRM());
+            
+            org.ejml.data.DMatrixRMaj U = new org.ejml.data.DMatrixRMaj(ma.getNumRows(), ma.getNumRows());
+            org.ejml.data.DMatrixRMaj V = new org.ejml.data.DMatrixRMaj(ma.getNumCols(), ma.getNumCols());
+            svd.getU(U, false);
+            svd.getV(V, false);
+            double[] singleton = svd.getSingularValues();
+            
+            @SuppressWarnings("unchecked")
+            E[] sData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), singleton.length);
+            for(int i=0; i<singleton.length; i++) sData[i] = (E) org.jscience.core.mathematics.numbers.real.Real.of(singleton[i]);
+            Vector<E> S = new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
+                new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(sData), this, field);
+                
+            return new SVDResult<E>(fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(U)), S, fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(V)));
+        }
+
+        @Override
+        public EigenResult<E> eigen(Matrix<E> a) {
+            org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
+            org.ejml.interfaces.decomposition.EigenDecomposition_F64<org.ejml.data.DMatrixRMaj> evd = 
+                org.ejml.dense.row.factory.DecompositionFactory_DDRM.eig(ma.getNumRows(), true);
+            evd.decompose(ma.getDDRM());
+            
+            org.ejml.data.DMatrixRMaj Vmat = org.ejml.dense.row.EigenOps_DDRM.createMatrixV(evd);
+            org.ejml.data.DMatrixRMaj Dmat = org.ejml.dense.row.EigenOps_DDRM.createMatrixD(evd);
+            
+            // Extract eigenvalues as a vector
+            int size = Dmat.getNumRows();
+            E[] dData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), size);
+            for(int i=0; i<size; i++) dData[i] = (E) org.jscience.core.mathematics.numbers.real.Real.of(Dmat.get(i, i));
+            Vector<E> D = new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
+                new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(dData), this, field);
+                
+            return new EigenResult<E>(fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(Vmat)), D);
+        }
+
+        @Override
+        public LUResult<E> lu(Matrix<E> a) {
+            org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
+            
+            var luDecomp = org.ejml.dense.row.factory.DecompositionFactory_DDRM.lu(ma.getNumRows(), ma.getNumCols());
+            luDecomp.decompose(ma.getDDRM());
+            
+            org.ejml.data.DMatrixRMaj Lmat = new org.ejml.data.DMatrixRMaj(ma.getNumRows(), ma.getNumCols());
+            org.ejml.data.DMatrixRMaj Umat = new org.ejml.data.DMatrixRMaj(ma.getNumRows(), ma.getNumCols());
+            
+            // Try direct getters first, then fallback to combined matrix
+            try {
+                // Some versions have these direct methods
+                java.lang.reflect.Method getLower = luDecomp.getClass().getMethod("getLower", org.ejml.data.DMatrixRMaj.class);
+                java.lang.reflect.Method getUpper = luDecomp.getClass().getMethod("getUpper", org.ejml.data.DMatrixRMaj.class);
+                getLower.invoke(luDecomp, Lmat);
+                getUpper.invoke(luDecomp, Umat);
+            } catch (Exception e) {
+                // Fallback to combined LU matrix if direct getters are missing
+                try {
+                     org.ejml.data.DMatrixRMaj combined = null;
+                     try {
+                         combined = (org.ejml.data.DMatrixRMaj) luDecomp.getClass().getMethod("getLU").invoke(luDecomp);
+                     } catch (Exception e2) {
+                         combined = (org.ejml.data.DMatrixRMaj) luDecomp.getClass().getMethod("getMatrix").invoke(luDecomp);
+                     }
+                     org.ejml.dense.row.SpecializedOps_DDRM.copyTriangle(combined, Lmat, true);
+                     org.ejml.dense.row.SpecializedOps_DDRM.copyTriangle(combined, Umat, false);
+                     for(int i=0; i<ma.getNumRows(); i++) Lmat.set(i, i, 1.0);
+                } catch (Exception e3) {
+                     throw new RuntimeException("Could not extract LU factors from EJML decomposition", e3);
+                }
+            }
+            
+            int[] pivotArr = luDecomp.getRowPivotV(null);
+            @SuppressWarnings("unchecked")
+            E[] pData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), pivotArr.length);
+            for(int i=0; i<pivotArr.length; i++) pData[i] = (E) org.jscience.core.mathematics.numbers.real.Real.of(pivotArr[i]);
+            Vector<E> P = new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
+                new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(pData), this, field);
+                
+            return new LUResult<E>(fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(Lmat)), fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(Umat)), P);
+        }
+
+        @Override
+        public CholeskyResult<E> cholesky(Matrix<E> a) {
+            org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
+            org.ejml.interfaces.decomposition.CholeskyDecomposition_F64<org.ejml.data.DMatrixRMaj> chol = 
+                org.ejml.dense.row.factory.DecompositionFactory_DDRM.chol(ma.getNumRows(), true);
+            chol.decompose(ma.getDDRM());
+            org.ejml.data.DMatrixRMaj L = new org.ejml.data.DMatrixRMaj(ma.getNumRows(), ma.getNumRows());
+            chol.getT(L);
+            return new CholeskyResult<E>(fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(L)));
+        }
     }
 }

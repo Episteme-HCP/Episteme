@@ -5,7 +5,7 @@
 
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.solvers.*;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.algorithm.ProviderSelector;
 
@@ -93,6 +93,21 @@ public final class Decomposition {
         OperationContext ctx = createContext(matrix);
         return ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
                 p -> ((LinearAlgebraProvider<E>) p).cholesky(matrix));
+    }
+
+    /**
+     * Solves the linear system AX = B using the most appropriate decomposition.
+     *
+     * @param <E> the element type
+     * @param a   the coefficient matrix A
+     * @param b   the right-hand side vector B
+     * @return the solution vector X
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        OperationContext ctx = createContext(a);
+        return ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+                p -> ((LinearAlgebraProvider<E>) p).solve(a, b));
     }
 
     private static OperationContext createContext(Matrix<?> matrix) {

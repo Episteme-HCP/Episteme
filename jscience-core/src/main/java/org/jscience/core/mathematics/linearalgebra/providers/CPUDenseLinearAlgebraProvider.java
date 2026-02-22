@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
 import org.jscience.core.mathematics.structures.rings.Field;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.solvers.*;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -45,7 +45,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.QRDecomposition;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 
 /**
  * 
