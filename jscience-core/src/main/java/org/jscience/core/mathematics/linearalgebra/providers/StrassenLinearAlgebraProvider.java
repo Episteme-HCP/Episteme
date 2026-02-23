@@ -6,11 +6,11 @@
 package org.jscience.core.mathematics.linearalgebra.providers;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
+import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.algorithms.RealDoubleStrassenAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.RealStrassenAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 
@@ -48,6 +48,16 @@ public class StrassenLinearAlgebraProvider<E extends org.jscience.core.mathemati
         }
 
         return LinearAlgebraProvider.super.multiply(a, b);
+    }
+
+    @Override
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        return new CPUDenseLinearAlgebraProvider<E>().solve(a, b);
+    }
+
+    @Override
+    public Matrix<E> inverse(Matrix<E> a) {
+        return new CPUDenseLinearAlgebraProvider<E>().inverse(a);
     }
 
     @Override

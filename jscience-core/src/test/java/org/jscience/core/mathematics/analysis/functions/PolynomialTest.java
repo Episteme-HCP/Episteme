@@ -7,11 +7,7 @@ package org.jscience.core.mathematics.analysis.functions;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.mathematics.numbers.real.Real;
-import java.util.Arrays;
-import java.util.List;
-
+ 
 /**
  * Automated baseline test for Polynomial.
  * 

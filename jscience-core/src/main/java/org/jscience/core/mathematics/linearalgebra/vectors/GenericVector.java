@@ -118,6 +118,7 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> add(Vector<E> other) {
         if (other instanceof GenericVector) {
             return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
@@ -139,6 +140,7 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> subtract(Vector<E> other) {
         if (other instanceof GenericVector) {
             return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
@@ -156,6 +158,7 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> multiply(E scalar) {
         return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
             p -> ((LinearAlgebraProvider<E>) p).multiply(this, scalar));
@@ -171,6 +174,7 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E dot(Vector<E> other) {
         if (other instanceof GenericVector) {
             return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
@@ -184,6 +188,7 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E norm() {
         return org.jscience.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.jscience.core.technical.algorithm.OperationContext.DEFAULT,
             p -> ((LinearAlgebraProvider<E>) p).norm(this));

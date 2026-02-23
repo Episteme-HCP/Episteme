@@ -329,7 +329,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         );
     }
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("SIMD inverse not implemented yet."); }
+    public Matrix<Real> inverse(Matrix<Real> a) { 
+        return new org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Real>().inverse(a); 
+    }
     @Override
     public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("SIMD determinant not implemented yet."); }
 

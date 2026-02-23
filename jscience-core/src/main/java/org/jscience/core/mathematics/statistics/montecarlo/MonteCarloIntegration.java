@@ -45,12 +45,7 @@ import java.util.function.ToDoubleFunction;
 public class MonteCarloIntegration {
 
     private final Random random;
-    private MonteCarloProvider provider;
-
-    public void setProvider(MonteCarloProvider p) {
-        this.provider = p;
-    }
-
+ 
     public MonteCarloIntegration() {
         this.random = new Random();
     }

@@ -10,9 +10,9 @@ import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.mathematics.context.MathContext;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.algorithm.OperationContext.Hint;
 import org.jscience.core.technical.backend.Backend;
@@ -122,6 +122,10 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     public double score(OperationContext context) {
         if (!isAvailable()) return -1;
         if (!isInitialized && !attemptInitialization()) return -1;
+        if (MathContext.getCurrent().getRealPrecision() == MathContext.RealPrecision.EXACT) {
+            return -1.0; // Hardware Float/Double cannot handle Arbitrary Precision MathContext
+        }
+
         
         double base = getPriority();
         if (context.hasHint(Hint.GPU_RESIDENT)) base += 50;
@@ -420,4 +424,29 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL inverse not implemented"); }
     @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL determinant not implemented"); }
     @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL solve not implemented"); }
+
+    @Override
+    public LUResult<Real> lu(Matrix<Real> a) {
+        throw new UnsupportedOperationException("OpenCL LU decomposition requires CLBlast/clMAGMA integration.");
+    }
+
+    @Override
+    public QRResult<Real> qr(Matrix<Real> a) {
+        throw new UnsupportedOperationException("OpenCL QR decomposition requires CLBlast/clMAGMA integration.");
+    }
+
+    @Override
+    public CholeskyResult<Real> cholesky(Matrix<Real> a) {
+        throw new UnsupportedOperationException("OpenCL Cholesky decomposition requires CLBlast/clMAGMA integration.");
+    }
+
+    @Override
+    public SVDResult<Real> svd(Matrix<Real> a) {
+        throw new UnsupportedOperationException("OpenCL SVD requires CLBlast/clMAGMA integration.");
+    }
+
+    @Override
+    public EigenResult<Real> eigen(Matrix<Real> a) {
+        throw new UnsupportedOperationException("OpenCL Eigen decomposition requires CLBlast/clMAGMA integration.");
+    }
 }

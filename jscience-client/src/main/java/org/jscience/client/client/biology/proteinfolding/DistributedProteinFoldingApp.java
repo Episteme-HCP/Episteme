@@ -78,6 +78,7 @@ public class DistributedProteinFoldingApp extends Application implements org.jsc
 
     @Override
     public void start(Stage primaryStage) {
+        try { primaryStage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png"))); } catch (Exception e) {}
         primaryStage.setTitle(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedproteinfoldingapp.title", "ðŸ§¬ JScience - Distributed Protein Folding (HP Model)"));
 
         StackPane root = new StackPane();

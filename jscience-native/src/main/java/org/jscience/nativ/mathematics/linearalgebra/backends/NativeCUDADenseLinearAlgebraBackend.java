@@ -12,9 +12,11 @@ import java.nio.DoubleBuffer;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Ring;
+import org.jscience.core.mathematics.context.MathContext;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
@@ -57,11 +59,20 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     static {
         SymbolLookup cuda = null;
         SymbolLookup cublas = null;
+        SymbolLookup cusolver = null;
         boolean available = false;
 
         try {
             cuda = NativeLibraryLoader.loadLibrary("cuda");
             cublas = NativeLibraryLoader.loadLibrary("cublas");
+            try {
+                cusolver = NativeLibraryLoader.loadLibrary("cusolver");
+                if (cusolver != null) {
+                    // Ready for Phase 3 cuSOLVER methods
+                }
+            } catch (Throwable t) {
+                // optional: if missing, decomposition fails but matmul (cublas) still works
+            }
 
             // CUDA Runtime Memory Management
             CUDA_MALLOC = LINKER.downcallHandle(
@@ -247,8 +258,36 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA solve not implemented"); }
 
     @Override
+    public LUResult<Real> lu(Matrix<Real> a) {
+        throw new UnsupportedOperationException("CUDA LU decomposition requires full cuSOLVER DGETRF binding.");
+    }
+
+    @Override
+    public QRResult<Real> qr(Matrix<Real> a) {
+        throw new UnsupportedOperationException("CUDA QR decomposition requires full cuSOLVER DGEQRF binding.");
+    }
+
+    @Override
+    public CholeskyResult<Real> cholesky(Matrix<Real> a) {
+        throw new UnsupportedOperationException("CUDA Cholesky decomposition requires full cuSOLVER DPOTRF binding.");
+    }
+
+    @Override
+    public SVDResult<Real> svd(Matrix<Real> a) {
+        throw new UnsupportedOperationException("CUDA SVD requires full cuSOLVER DGESVD binding.");
+    }
+
+    @Override
+    public EigenResult<Real> eigen(Matrix<Real> a) {
+        throw new UnsupportedOperationException("CUDA Eigen decomposition requires full cuSOLVER DSYEVD binding.");
+    }
+
+    @Override
     public double score(OperationContext context) {
         if (!IS_AVAILABLE) return -1;
+        if (MathContext.getCurrent().getRealPrecision() == MathContext.RealPrecision.EXACT) {
+            return -1.0; // Hardware Float/Double cannot handle Arbitrary Precision MathContext
+        }
         double base = getPriority();
         if (context.getDataSize() < 256) base -= 200; // Prefer CPU for small matrices
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;

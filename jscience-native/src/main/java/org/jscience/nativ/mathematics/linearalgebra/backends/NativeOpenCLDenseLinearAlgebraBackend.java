@@ -19,7 +19,6 @@ import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 

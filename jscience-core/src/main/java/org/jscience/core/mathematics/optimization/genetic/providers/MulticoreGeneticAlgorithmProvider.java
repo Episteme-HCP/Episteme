@@ -5,7 +5,6 @@ import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
  
 /**
  * Native multicore Genetic Algorithm provider.

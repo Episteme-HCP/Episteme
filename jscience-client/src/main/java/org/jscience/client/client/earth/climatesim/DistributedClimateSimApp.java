@@ -73,6 +73,7 @@ public class DistributedClimateSimApp extends Application implements org.jscienc
 
     @Override
     public void start(Stage stage) {
+        try { stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png"))); } catch (Exception e) {}
         stage.setTitle(org.jscience.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedclimatesimapp.title", "ðŸŒ General Circulation Model (GCM) - JScience Grid"));
         mapCanvas = new Canvas(WIDTH, HEIGHT);
         gc = mapCanvas.getGraphicsContext2D();

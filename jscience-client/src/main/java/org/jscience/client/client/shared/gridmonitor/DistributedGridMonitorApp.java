@@ -63,6 +63,7 @@ public class DistributedGridMonitorApp extends Application implements org.jscien
 
     @Override
     public void start(Stage primaryStage) {
+        try { primaryStage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png"))); } catch (Exception e) {}
         channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
 

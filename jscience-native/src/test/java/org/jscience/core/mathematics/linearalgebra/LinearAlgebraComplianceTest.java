@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LinearAlgebraComplianceTest {
 
     private static final double TOLERANCE = 1e-8;
-    private static final int SIZE = 20;
+    private static final int SIZE = 50;
 
     private static class ComplianceResult {
         String providerName;
@@ -31,11 +31,19 @@ public class LinearAlgebraComplianceTest {
     @Test
     public void generateComplianceReport() {
         @SuppressWarnings("unchecked")
-        List<LinearAlgebraProvider<Real>> providers = AlgorithmManager.getProviders(LinearAlgebraProvider.class)
+        List<LinearAlgebraProvider<Real>> rawProviders = AlgorithmManager.getProviders(LinearAlgebraProvider.class)
                 .stream()
                 .filter(p -> p.isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance()))
                 .map(p -> (LinearAlgebraProvider<Real>) p)
                 .toList();
+                
+        List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (LinearAlgebraProvider<Real> p : rawProviders) {
+            if (seen.add(p.getName())) {
+                providers.add(p);
+            }
+        }
 
         List<ComplianceResult> results = new ArrayList<>();
 
@@ -43,6 +51,47 @@ public class LinearAlgebraComplianceTest {
             ComplianceResult res = new ComplianceResult();
             res.providerName = provider.getName();
             
+            testOperation(res, "Transpose", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(SIZE, SIZE, rand);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                Matrix<Real> result = provider.transpose(a);
+                SimpleMatrix expected = new SimpleMatrix(aData).transpose();
+                verifyMatrix(expected, result, TOLERANCE);
+            });
+
+            testOperation(res, "Add", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(SIZE, SIZE, rand);
+                double[][] bData = randomData(SIZE, SIZE, rand);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                RealDoubleMatrix b = RealDoubleMatrix.of(bData);
+                Matrix<Real> result = provider.add(a, b);
+                SimpleMatrix expected = new SimpleMatrix(aData).plus(new SimpleMatrix(bData));
+                verifyMatrix(expected, result, TOLERANCE);
+            });
+
+            testOperation(res, "Subtract", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(SIZE, SIZE, rand);
+                double[][] bData = randomData(SIZE, SIZE, rand);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                RealDoubleMatrix b = RealDoubleMatrix.of(bData);
+                Matrix<Real> result = provider.subtract(a, b);
+                SimpleMatrix expected = new SimpleMatrix(aData).minus(new SimpleMatrix(bData));
+                verifyMatrix(expected, result, TOLERANCE);
+            });
+
+            testOperation(res, "Scale", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(SIZE, SIZE, rand);
+                double scale = 3.14159;
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                Matrix<Real> result = provider.scale(Real.of(scale), a);
+                SimpleMatrix expected = new SimpleMatrix(aData).scale(scale);
+                verifyMatrix(expected, result, TOLERANCE);
+            });
+
             testOperation(res, "Multiply", () -> {
                 Random rand = new Random(42);
                 double[][] aData = randomData(SIZE, SIZE, rand);
@@ -81,7 +130,7 @@ public class LinearAlgebraComplianceTest {
 
             testOperation(res, "SVD", () -> {
                 Random rand = new Random(42);
-                double[][] aData = randomData(15, 10, rand);
+                double[][] aData = randomData(50, 40, rand);
                 RealDoubleMatrix a = RealDoubleMatrix.of(aData);
                 SVDResult<Real> result = provider.svd(a);
                 verifySVD(a, result);
@@ -100,7 +149,7 @@ public class LinearAlgebraComplianceTest {
 
             testOperation(res, "Eigen", () -> {
                 Random rand = new Random(42);
-                double[][] aData = randomData(10, 10, rand);
+                double[][] aData = randomData(SIZE, SIZE, rand);
                 // Symmetric for easier verification
                 SimpleMatrix mat = new SimpleMatrix(aData);
                 SimpleMatrix sym = mat.plus(mat.transpose());
@@ -191,7 +240,13 @@ public class LinearAlgebraComplianceTest {
     private double[][] randomData(int rows, int cols, Random rand) {
         double[][] data = new double[rows][cols];
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) data[i][j] = rand.nextDouble() * 2 - 1;
+            for (int j = 0; j < cols; j++) {
+                if (rand.nextDouble() < 0.2) {
+                    data[i][j] = 0.0;
+                } else {
+                    data[i][j] = rand.nextDouble() * 2 - 1;
+                }
+            }
         }
         return data;
     }

@@ -89,6 +89,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
     @Override
     public void start(Stage stage) {
+        try { stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png"))); } catch (Exception e) {}
         String host = getParameters().getNamed().getOrDefault("host", "localhost");
         int port = Integer.parseInt(getParameters().getNamed().getOrDefault("port", "50051"));
 

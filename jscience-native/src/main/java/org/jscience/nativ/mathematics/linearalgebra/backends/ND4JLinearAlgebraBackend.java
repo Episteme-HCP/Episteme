@@ -78,7 +78,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         try {
             Class.forName("org.nd4j.linalg.factory.Nd4j");
             return true;
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable t) {
             return false;
         }
     }

@@ -3,8 +3,6 @@ import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.numbers.real.RealDouble;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.technical.algorithm.ProviderSelector;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

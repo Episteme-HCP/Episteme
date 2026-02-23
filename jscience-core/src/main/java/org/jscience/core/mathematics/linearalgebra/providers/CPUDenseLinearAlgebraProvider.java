@@ -45,7 +45,7 @@ import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.QRDecomposition;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
+
 
 /**
  * 

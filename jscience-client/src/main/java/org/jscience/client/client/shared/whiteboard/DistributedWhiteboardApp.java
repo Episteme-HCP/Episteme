@@ -67,6 +67,7 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
 
     @Override
     public void start(Stage primaryStage) {
+        try { primaryStage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png"))); } catch (Exception e) {}
         // Connect to server
         String host = getParameters().getNamed().getOrDefault("host", "localhost");
         int port = Integer.parseInt(getParameters().getNamed().getOrDefault("port", "50051"));

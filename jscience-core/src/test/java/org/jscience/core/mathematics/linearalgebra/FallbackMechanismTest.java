@@ -5,12 +5,9 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.algorithm.ProviderSelector;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.List;
 
 public class FallbackMechanismTest {
 
@@ -32,14 +29,15 @@ public class FallbackMechanismTest {
                 .build();
                 
         // Test inversion: Strassen should fail (UOE), and CPUDense should take over.
-        Matrix<Real> inv = ProviderSelector.execute(LinearAlgebraProvider.class, ctx, (LinearAlgebraProvider p) -> {
+        @SuppressWarnings("unchecked")
+        Matrix<Real> inv = (Matrix<Real>) ProviderSelector.execute(LinearAlgebraProvider.class, ctx, (LinearAlgebraProvider p) -> {
             if (p instanceof StrassenLinearAlgebraProvider) {
                 // This will throw UOE because we refactored it to stop extending CPUDense 
                 // and it doesn't override inverse()
-                return (Matrix<Real>) p.inverse(A);
+                return p.inverse(A);
             }
             // Other providers might handle it
-            return (Matrix<Real>) p.inverse(A);
+            return p.inverse(A);
         });
         
         assertNotNull(inv);
@@ -62,13 +60,14 @@ public class FallbackMechanismTest {
                 .build();
         
         // Exclude Strassen and CARMA, force something else
-        LinearAlgebraProvider provider = ProviderSelector.select(LinearAlgebraProvider.class, ctx, 
+        @SuppressWarnings("unchecked")
+        LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) ProviderSelector.select(LinearAlgebraProvider.class, ctx, 
             (LinearAlgebraProvider p) -> !p.getName().contains("Strassen") && !p.getName().contains("CARMA"));
             
         assertFalse(provider.getName().contains("Strassen"));
         assertFalse(provider.getName().contains("CARMA"));
         
-        Matrix<Real> C = (Matrix<Real>) provider.multiply(A, B);
+        Matrix<Real> C = provider.multiply(A, B);
         assertNotNull(C);
     }
 }
