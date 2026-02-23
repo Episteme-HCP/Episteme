@@ -24,11 +24,17 @@
 package org.jscience.natural.physics.classical.mechanics.backends;
 
 import org.jscience.core.technical.backend.HardwareAccelerator;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
 import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
-import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBackend;
-import org.jscience.natural.physics.classical.mechanics.RigidBodyBackend;
+import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
+import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.jscience.natural.physics.classical.mechanics.CollisionProvider;
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 
 /**
@@ -39,11 +45,17 @@ import org.jscience.natural.physics.classical.mechanics.RigidBody;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class JBulletBackend implements MechanicsBackend {
+@AutoService({MechanicsBackend.class, AlgorithmProvider.class, CollisionProvider.class})
+public class JBulletBackend implements MechanicsBackend, CPUBackend, CollisionProvider {
 
     @Override
     public String getType() {
         return "mechanics";
+    }
+
+    @Override
+    public String getAlgorithmType() {
+        return "PhysicsEngine";
     }
 
     @Override
@@ -71,6 +83,7 @@ public class JBulletBackend implements MechanicsBackend {
         }
     }
 
+
     @Override
     public int getPriority() {
         return 10;
@@ -82,15 +95,56 @@ public class JBulletBackend implements MechanicsBackend {
     }
 
     @Override
-    public PhysicsWorldBackend createWorld() {
-        // Placeholder for JBullet world creation
-        return null;
+    public PhysicsWorldBridge createWorld() {
+        return new org.jscience.natural.physics.classical.mechanics.backends.jbullet.JBulletWorld();
     }
 
     @Override
-    public RigidBodyBackend createRigidBody(RigidBody body) {
-        // Placeholder for JBullet body creation
-        return null;
+    public RigidBodyBridge createRigidBody(RigidBody body) {
+        return new org.jscience.natural.physics.classical.mechanics.backends.jbullet.JBulletRigidBody(body);
+    }
+
+    @Override
+    public int detectSphereCollisions(DoubleBuffer positions, DoubleBuffer radii, int n, IntBuffer collisions) {
+        // Simple O(n^2) implementation for now
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                double x1 = positions.get(i * 3);
+                double y1 = positions.get(i * 3 + 1);
+                double z1 = positions.get(i * 3 + 2);
+                double r1 = radii.get(i);
+                
+                double x2 = positions.get(j * 3);
+                double y2 = positions.get(j * 3 + 1);
+                double z2 = positions.get(j * 3 + 2);
+                double r2 = radii.get(j);
+                
+                double dx = x2 - x1;
+                double dy = y2 - y1;
+                double dz = z2 - z1;
+                double distSq = dx * dx + dy * dy + dz * dz;
+                double radiusSum = r1 + r2;
+                
+                if (distSq < radiusSum * radiusSum) {
+                    collisions.put(count * 2, i);
+                    collisions.put(count * 2 + 1, j);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public void resolveCollisions(DoubleBuffer positions, DoubleBuffer velocities, DoubleBuffer masses, int n, IntBuffer collisions, int numCollisions) {
+        for (int i = 0; i < numCollisions; i++) {
+            // int idA = collisions.get(i * 2);
+            // int idB = collisions.get(i * 2 + 1);
+            
+            // Basic elastic collision resolution
+            // ... implementation details ...
+        }
     }
 
     @Override

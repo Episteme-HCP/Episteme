@@ -24,11 +24,17 @@
 package org.jscience.natural.physics.classical.mechanics.backends;
 
 import org.jscience.core.technical.backend.HardwareAccelerator;
+import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
 import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
-import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBackend;
-import org.jscience.natural.physics.classical.mechanics.RigidBodyBackend;
+import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
+import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.jscience.natural.physics.classical.mechanics.CollisionProvider;
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 
 /**
@@ -39,11 +45,17 @@ import org.jscience.natural.physics.classical.mechanics.RigidBody;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ODEBackend implements MechanicsBackend {
+@AutoService({MechanicsBackend.class, AlgorithmProvider.class, CollisionProvider.class})
+public class ODEBackend implements MechanicsBackend, CPUBackend, CollisionProvider {
 
     @Override
     public String getType() {
         return "mechanics";
+    }
+
+    @Override
+    public String getAlgorithmType() {
+        return "PhysicsEngine";
     }
 
     @Override
@@ -73,7 +85,7 @@ public class ODEBackend implements MechanicsBackend {
 
     @Override
     public int getPriority() {
-        return 20;
+        return 10;
     }
 
     @Override
@@ -82,15 +94,24 @@ public class ODEBackend implements MechanicsBackend {
     }
 
     @Override
-    public PhysicsWorldBackend createWorld() {
-        // Placeholder for ODE world creation
-        return null;
+    public PhysicsWorldBridge createWorld() {
+        return new org.jscience.natural.physics.classical.mechanics.backends.ode.ODEWorld();
     }
 
     @Override
-    public RigidBodyBackend createRigidBody(RigidBody body) {
-        // Placeholder for ODE body creation
-        return null;
+    public RigidBodyBridge createRigidBody(RigidBody body) {
+        return null; // Created by world.addRigidBody
+    }
+
+    @Override
+    public int detectSphereCollisions(DoubleBuffer positions, DoubleBuffer radii, int n, IntBuffer collisions) {
+        // Placeholder for ODE-specific optimized collision detection
+        return 0;
+    }
+
+    @Override
+    public void resolveCollisions(DoubleBuffer positions, DoubleBuffer velocities, DoubleBuffer masses, int n, IntBuffer collisions, int numCollisions) {
+        // Placeholder for ODE-specific collision resolution
     }
 
     @Override

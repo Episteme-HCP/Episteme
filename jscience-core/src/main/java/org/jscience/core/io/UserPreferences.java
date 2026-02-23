@@ -44,6 +44,7 @@ public class UserPreferences {
     public static final String KEY_MOLECULAR_BACKEND = "backend.molecular";
     public static final String KEY_QUANTUM_BACKEND = "backend.quantum";
     public static final String KEY_MATH_BACKEND = "backend.math";
+    public static final String KEY_AUTO_TUNING_MODE = "compute.autotuning.mode";
     
     // UI preference keys
     public static final String KEY_LANGUAGE = "ui.language";
@@ -264,6 +265,16 @@ public class UserPreferences {
             map.put(key, properties.getProperty(key));
         }
         return map;
+    }
+
+    /** Gets the auto-tuning mode (ON, OFF, AUTO). */
+    public String getAutoTuningMode() {
+        return get(KEY_AUTO_TUNING_MODE, "AUTO");
+    }
+
+    /** Sets the auto-tuning mode. */
+    public void setAutoTuningMode(String mode) {
+        set(KEY_AUTO_TUNING_MODE, mode);
     }
 }
 

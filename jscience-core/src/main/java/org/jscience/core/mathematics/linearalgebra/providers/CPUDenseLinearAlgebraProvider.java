@@ -72,6 +72,11 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    public String getEnvironmentInfo() {
+        return "CPU (Standard JVM)";
+    }
+
+    @Override
     public String getName() {
         return "JScience CPU (Dense)";
     }
@@ -1143,6 +1148,16 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new LUResult<E>((Matrix<E>) decomp.getL(), (Matrix<E>) decomp.getU(), (Vector<E>) P);
         }
         return LinearAlgebraProvider.super.lu(a);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            CholeskyDecomposition decomp = CholeskyDecomposition.decompose((Matrix<Real>) a);
+            return new CholeskyResult<E>((Matrix<E>) decomp.getL());
+        }
+        return LinearAlgebraProvider.super.cholesky(a);
     }
 }
 

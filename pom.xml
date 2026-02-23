@@ -363,6 +363,12 @@
         <version>20101010</version>
         <optional>true</optional>
       </dependency>
+      <!-- ODE4J Physics -->
+      <dependency>
+        <groupId>org.ode4j</groupId>
+        <artifactId>core</artifactId>
+        <version>0.5.4</version>
+      </dependency>
       <!-- HDF5 (High-Performance IO) -->
       <dependency>
         <groupId>io.jhdf</groupId>
@@ -410,6 +416,17 @@
             <artifactId>openblas</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.google.auto.service</groupId>
+        <artifactId>auto-service-annotations</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.auto.service</groupId>
+        <artifactId>auto-service</artifactId>
+        <version>1.1.1</version>
+        <optional>true</optional>
       </dependency>
     </dependencies>
   </dependencyManagement>

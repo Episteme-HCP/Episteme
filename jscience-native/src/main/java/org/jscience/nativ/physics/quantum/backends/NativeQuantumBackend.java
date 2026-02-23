@@ -6,11 +6,16 @@ package org.jscience.nativ.physics.quantum.backends;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.Optional;
+
+import org.jscience.natural.technical.backend.quantum.QuantumBackend;
+import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 
 /**
  * Native Quantum Provider using Panama FFM bindings for QuEST or Qiskit Aer.
@@ -23,8 +28,8 @@ import java.util.Optional;
  * @since 1.2
  */
 @SuppressWarnings({"preview", "unused", "restricted"})
-@AutoService(AlgorithmProvider.class)
-public class NativeQuantumBackend implements AlgorithmProvider {
+@AutoService({AlgorithmProvider.class, QuantumBackend.class, ComputeBackend.class, Backend.class, NativeBackend.class})
+public class NativeQuantumBackend implements NativeBackend, QuantumBackend, AlgorithmProvider {
 
     private static final SymbolLookup LOOKUP;
     private static final boolean IS_AVAILABLE_FLAG;
@@ -67,8 +72,58 @@ public class NativeQuantumBackend implements AlgorithmProvider {
     }
 
     @Override
+    public boolean isLoaded() {
+        return IS_AVAILABLE_FLAG;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "QuEST";
+    }
+
+    @Override
+    public QuantumCircuit createCircuit(int numQubits, int numClassicalBits) {
+        return null; // Impl needed
+    }
+
+    @Override
+    public QuantumResult executeSimulator(QuantumCircuit circuit, int shots) {
+        return null; // Impl needed
+    }
+
+    @Override
+    public QuantumResult executeHardware(QuantumCircuit circuit, int shots, String backend) {
+        return null; // Impl needed
+    }
+
+    @Override
+    public String[] getAvailableBackends() {
+        return new String[] {"quest_simulator"};
+    }
+
+    @Override
+    public java.util.Map<String, Object> getBackendInfo(String backendName) {
+        return java.util.Map.of();
+    }
+
+    @Override
     public String getAlgorithmType() {
         return "Quantum Simulation (QuEST/Aer)";
+    }
+
+    @Override
+    public int getPriority() {
+        return 90; // High priority for native quantum
+    }
+
+    @Override
+    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.jscience.core.technical.backend.HardwareAccelerator.QUANTUM;
+    }
+
+    @Override
+    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+        return null; // Quantum backends often manage their own context or use a dummy
     }
 
     public void runCircuit() {

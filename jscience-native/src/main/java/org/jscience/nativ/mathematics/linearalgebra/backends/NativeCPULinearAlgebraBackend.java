@@ -25,14 +25,15 @@ import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.AutoTuningManager;
+import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
- * Native BLAS/LAPACK backend using OpenBLAS or Intel MKL via Panama FFM.
+ * Standalone Native Linear Algebra backend using bundled jscience_native library.
  * <p>
- * Provides both low-level BLAS operations (dgemm, dgemv, etc.) and
- * high-level {@link LinearAlgebraProvider} operations for {@link Real} elements.
- * Implements {@link CPUBackend} and {@link NativeBackend}.
+ * Provides a subset of BLAS operations without requiring external high-performance libraries.
+ * For optimized performance using external BLAS/LAPACK, use {@link NativeFFMBLASBackend}.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -72,10 +73,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
         try {
             Linker linker = NativeLibraryLoader.getLinker();
-            Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("openblas", java.lang.foreign.Arena.global());
-            if (lookupOpt.isEmpty()) {
-                lookupOpt = NativeLibraryLoader.loadLibrary("mkl_rt", java.lang.foreign.Arena.global());
-            }
+            Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("jscience_native", java.lang.foreign.Arena.global());
             
             if (lookupOpt.isPresent()) {
                 SymbolLookup lookup = lookupOpt.get();
@@ -136,7 +134,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public String getNativeLibraryName() {
-        return "openblas";
+        return "jscience_native";
     }
 
     @Override
@@ -145,8 +143,19 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     }
 
     @Override
+    public String getEnvironmentInfo() {
+        return AVAILABLE ? "CPU (Native/Panama)" : "N/A";
+    }
+
+    @Override
     public String getName() {
         return "Native CPU/BLAS Linear Algebra Backend";
+    }
+
+    @Override
+    public double score(OperationContext context) {
+        if (!AVAILABLE) return -1.0;
+        return AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());
     }
 
     @Override
@@ -305,6 +314,89 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             return RealDoubleVector.of(result);
         }
         throw new UnsupportedOperationException("Native solve not available for these arguments or backend not loaded");
+    }
+
+    @Override
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
+        if (AVAILABLE && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
+            double[] ad = ((RealDoubleVector) a).toDoubleArray();
+            double[] bd = ((RealDoubleVector) b).toDoubleArray();
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+            return RealDoubleVector.of(rd);
+        }
+        return LinearAlgebraProvider.super.add(a, b);
+    }
+
+    @Override
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
+        if (AVAILABLE && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
+            double[] ad = ((RealDoubleVector) a).toDoubleArray();
+            double[] bd = ((RealDoubleVector) b).toDoubleArray();
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+            return RealDoubleVector.of(rd);
+        }
+        return LinearAlgebraProvider.super.subtract(a, b);
+    }
+
+    @Override
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
+            double[] bd = ((RealDoubleMatrix) b).toDoubleArray();
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+            return RealDoubleMatrix.of(rd, rows, cols);
+        }
+        return LinearAlgebraProvider.super.add(a, b);
+    }
+
+    @Override
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
+            double[] bd = ((RealDoubleMatrix) b).toDoubleArray();
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+            return RealDoubleMatrix.of(rd, rows, cols);
+        }
+        return LinearAlgebraProvider.super.subtract(a, b);
+    }
+
+    @Override
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double s = scalar.doubleValue();
+            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
+            return RealDoubleMatrix.of(rd, rows, cols);
+        }
+        return LinearAlgebraProvider.super.scale(scalar, a);
+    }
+
+    @Override
+    public Matrix<Real> transpose(Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    rd[j * rows + i] = ad[i * cols + j];
+                }
+            }
+            return RealDoubleMatrix.of(rd, cols, rows);
+        }
+        return LinearAlgebraProvider.super.transpose(a);
     }
 
     // Other methods default to UnsupportedOperationException

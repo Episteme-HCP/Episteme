@@ -25,6 +25,7 @@ package org.jscience.core.mathematics.algebra.algebras;
 
 import org.jscience.core.mathematics.structures.rings.Semiring;
 import org.jscience.core.mathematics.structures.sets.FiniteSet;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
 
 /**
  * Boolean algebra - a special algebraic structure for logic operations.
@@ -131,6 +132,10 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
         return add(a, b); // Boolean operation is OR
     }
 
+    private static BooleanAlgebraProvider provider() {
+        return AlgorithmManager.getReferenceProvider(BooleanAlgebraProvider.class);
+    }
+
     @Override
     public Boolean add(Boolean a, Boolean b) {
         return or(a, b);
@@ -204,7 +209,7 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * @return a Ã¢Ë†Â§ b
      */
     public Boolean and(Boolean a, Boolean b) {
-        return a && b;
+        return provider().and(a, b);
     }
 
     /**
@@ -226,7 +231,7 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * @return a Ã¢Ë†Â¨ b
      */
     public Boolean or(Boolean a, Boolean b) {
-        return a || b;
+        return provider().or(a, b);
     }
 
     /**
@@ -236,7 +241,7 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * @return Ã‚Â¬a
      */
     public Boolean not(Boolean a) {
-        return !a;
+        return provider().not(a);
     }
 
     /**
@@ -250,7 +255,7 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * @return a Ã¢Å â€¢ b
      */
     public Boolean xor(Boolean a, Boolean b) {
-        return a ^ b;
+        return provider().xor(a, b);
     }
 
     /**

@@ -5,6 +5,9 @@
 
 package org.jscience.core.technical.algorithm;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -31,6 +34,24 @@ public final class AlgorithmManager {
     private static final Logger LOGGER = Logger.getLogger(AlgorithmManager.class.getName());
     private static final Map<Class<?>, AlgorithmProvider> BEST_PROVIDERS = new ConcurrentHashMap<>();
     private static final ProviderRegistry REGISTRY = new ProviderRegistry();
+
+    static {
+        AutoTuningManager.loadResults();
+        
+        // Trigger benchmark if no results found
+        Path path = Paths.get(System.getProperty("user.home"), ".jscience", "benchmarks.json");
+        if (!Files.exists(path)) {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(5000); // Wait for system to stabilize
+                    BenchmarkRunner.runAll();
+                    AutoTuningManager.loadResults();
+                } catch (Exception e) {
+                    LOGGER.warning("Auto-benchmark failed: " + e.getMessage());
+                }
+            }, "JScience-AutoBenchmark").start();
+        }
+    }
 
     private AlgorithmManager() {}
 
@@ -98,6 +119,28 @@ public final class AlgorithmManager {
         P best = available.get(0);
         LOGGER.info("Selected best provider " + best.getName() + " for " + providerClass.getSimpleName() + " (Priority: " + best.getPriority() + ")");
         return best;
+    }
+
+    /**
+     * Finds and returns the reference (baseline) provider for the given interface.
+     * <p>
+     * The reference provider is defined as the available provider with the lowest priority.
+     * </p>
+     * 
+     * @param <P> the provider type
+     * @param providerClass the interface class of the provider
+     * @return the reference provider
+     * @throws NoSuchElementException if no provider is available
+     */
+    public static <P extends AlgorithmProvider> P getReferenceProvider(Class<P> providerClass) {
+        List<P> available = getProviders(providerClass);
+
+        if (available.isEmpty()) {
+            throw new NoSuchElementException("No available provider found for: " + providerClass.getSimpleName());
+        }
+
+        // Return the one with lowest priority (likely the standard JVM implementation)
+        return available.get(available.size() - 1);
     }
 
     /**

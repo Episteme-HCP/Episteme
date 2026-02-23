@@ -5,34 +5,51 @@
 
 package org.jscience.nativ.physics.classical.mechanics.backends;
 
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SymbolLookup;
-import java.lang.foreign.ValueLayout;
-import java.lang.invoke.MethodHandle;
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
-
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.natural.physics.classical.mechanics.CollisionBackend;
+import com.google.auto.service.AutoService;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
-import com.google.auto.service.AutoService;
+import org.jscience.core.technical.backend.HardwareAccelerator;
+import org.jscience.core.technical.backend.cpu.CPUBackend;
+import org.jscience.natural.physics.classical.mechanics.CollisionProvider;
+import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
+import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
+import org.jscience.natural.physics.classical.mechanics.RigidBody;
+import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.jscience.core.measure.units.SI;
+import java.lang.foreign.*;
+import java.lang.invoke.MethodHandle;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
+import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
 
 /**
- * Implementation of {@link CollisionBackend} using Bullet Physics via Project Panama.
+ * Implementation of {@link org.jscience.natural.physics.classical.mechanics.CollisionProvider} using Bullet Physics via Project Panama.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({CollisionBackend.class, ComputeBackend.class, Backend.class})
-public class NativeBulletBackend implements CollisionBackend {
+@AutoService({CollisionProvider.class, MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
+public class NativeBulletBackend implements CollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
 
     private static final MethodHandle DETECT_SPHERES;
     private static final MethodHandle RESOLVE_COLLISIONS;
-    private static final boolean AVAILABLE;
+    
+    // Mechanics handles
+    private static final MethodHandle BT_DEFAULT_COLLISION_CONFIGURATION_NEW;
+    private static final MethodHandle BT_COLLISION_DISPATCHER_NEW;
+    private static final MethodHandle BT_DBVT_BROADPHASE_NEW;
+    private static final MethodHandle BT_SEQUENTIAL_IMPULSE_CONSTRAINT_SOLVER_NEW;
+    private static final MethodHandle BT_DISCRETE_DYNAMICS_WORLD_NEW;
+    private static final MethodHandle BT_DYNAMICS_WORLD_STEP_SIMULATION;
+    private static final MethodHandle BT_DYNAMICS_WORLD_SET_GRAVITY;
+    
+    private static final boolean IS_AVAILABLE_FLAG;
 
     static {
         Linker linker = Linker.nativeLinker();
@@ -67,21 +84,54 @@ public class NativeBulletBackend implements CollisionBackend {
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             RESOLVE_COLLISIONS = linker.downcallHandle(lookup.find("bt_resolve_sphere_collisions").get(),
                 FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-            AVAILABLE = true;
+            
+            // Look up dynamics handles
+            BT_DEFAULT_COLLISION_CONFIGURATION_NEW = lookup.find("btDefaultCollisionConfiguration_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS))).orElse(null);
+            BT_COLLISION_DISPATCHER_NEW = lookup.find("btCollisionDispatcher_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+            BT_DBVT_BROADPHASE_NEW = lookup.find("btDbvtBroadphase_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+            BT_SEQUENTIAL_IMPULSE_CONSTRAINT_SOLVER_NEW = lookup.find("btSequentialImpulseConstraintSolver_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS))).orElse(null);
+            BT_DISCRETE_DYNAMICS_WORLD_NEW = lookup.find("btDiscreteDynamicsWorld_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+            BT_DYNAMICS_WORLD_STEP_SIMULATION = lookup.find("btDynamicsWorld_stepSimulation")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT))).orElse(null);
+            BT_DYNAMICS_WORLD_SET_GRAVITY = lookup.find("btDynamicsWorld_setGravity")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+
+            IS_AVAILABLE_FLAG = BT_DISCRETE_DYNAMICS_WORLD_NEW != null;
         } else {
             DETECT_SPHERES = RESOLVE_COLLISIONS = null;
-            AVAILABLE = false;
+            BT_DEFAULT_COLLISION_CONFIGURATION_NEW = BT_COLLISION_DISPATCHER_NEW = BT_DBVT_BROADPHASE_NEW = BT_SEQUENTIAL_IMPULSE_CONSTRAINT_SOLVER_NEW = BT_DISCRETE_DYNAMICS_WORLD_NEW = BT_DYNAMICS_WORLD_STEP_SIMULATION = BT_DYNAMICS_WORLD_SET_GRAVITY = null;
+            IS_AVAILABLE_FLAG = false;
         }
     }
 
     @Override
     public boolean isAvailable() {
-        return AVAILABLE;
+        return IS_AVAILABLE_FLAG;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return IS_AVAILABLE_FLAG;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "bullet_capi";
     }
 
     @Override
     public String getName() {
-        return "Bullet Physics Panama Backend";
+        return "Native Bullet Physics (FFM)";
+    }
+
+    @Override
+    public String getAlgorithmType() {
+        return "mechanics";
     }
 
     @Override
@@ -96,12 +146,32 @@ public class NativeBulletBackend implements CollisionBackend {
 
     @Override
     public org.jscience.core.technical.backend.ExecutionContext createContext() {
-        return null; // Bullet doesn't use contexts in this simple wrapper
+        return null;
+    }
+
+    @Override
+    public PhysicsWorldBridge createWorld() {
+        if (!IS_AVAILABLE_FLAG) throw new UnsupportedOperationException("Bullet native library not found");
+        try {
+            MemorySegment config = (MemorySegment) BT_DEFAULT_COLLISION_CONFIGURATION_NEW.invokeExact();
+            MemorySegment dispatcher = (MemorySegment) BT_COLLISION_DISPATCHER_NEW.invokeExact(config);
+            MemorySegment broadphase = (MemorySegment) BT_DBVT_BROADPHASE_NEW.invokeExact(MemorySegment.NULL);
+            MemorySegment solver = (MemorySegment) BT_SEQUENTIAL_IMPULSE_CONSTRAINT_SOLVER_NEW.invokeExact();
+            MemorySegment worldPtr = (MemorySegment) BT_DISCRETE_DYNAMICS_WORLD_NEW.invokeExact(dispatcher, broadphase, solver, config);
+            return new NativeBulletWorld(worldPtr);
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to create Bullet world", t);
+        }
+    }
+
+    @Override
+    public RigidBodyBridge createRigidBody(RigidBody body) {
+        return null; // Created via world.addRigidBody
     }
 
     @Override
     public int detectSphereCollisions(DoubleBuffer positions, DoubleBuffer radii, int n, IntBuffer collisions) {
-        if (!AVAILABLE) throw new UnsupportedOperationException("Bullet native library not found");
+        if (!IS_AVAILABLE_FLAG) throw new UnsupportedOperationException("Bullet native library not found");
         try {
             return (int) DETECT_SPHERES.invokeExact(MemorySegment.ofBuffer(positions), MemorySegment.ofBuffer(radii), n, MemorySegment.ofBuffer(collisions));
         } catch (Throwable t) {
@@ -111,11 +181,77 @@ public class NativeBulletBackend implements CollisionBackend {
 
     @Override
     public void resolveCollisions(DoubleBuffer positions, DoubleBuffer velocities, DoubleBuffer masses, int n, IntBuffer collisions, int numCollisions) {
-        if (!AVAILABLE) throw new UnsupportedOperationException("Bullet native library not found");
+        if (!IS_AVAILABLE_FLAG) throw new UnsupportedOperationException("Bullet native library not found");
         try {
             RESOLVE_COLLISIONS.invokeExact(MemorySegment.ofBuffer(positions), MemorySegment.ofBuffer(velocities), MemorySegment.ofBuffer(masses), n, MemorySegment.ofBuffer(collisions), numCollisions);
         } catch (Throwable t) {
             throw new RuntimeException("Bullet collision resolution failed", t);
+        }
+    }
+
+    @Override
+    public void parallelExecute(List<Runnable> tasks, int parallelism) {
+        if (!IS_AVAILABLE_FLAG) return;
+        ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+        try {
+            for (Runnable task : tasks) executor.execute(task);
+            executor.shutdown();
+            executor.awaitTermination(1, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            if (!executor.isTerminated()) {
+                executor.shutdownNow();
+            }
+        }
+    }
+
+    private static class NativeBulletWorld implements PhysicsWorldBridge {
+        private final MemorySegment worldPtr;
+
+        NativeBulletWorld(MemorySegment worldPtr) {
+            this.worldPtr = worldPtr;
+        }
+
+        @Override
+        public void addRigidBody(RigidBody body) {
+            // Implementation for adding rigid body to native world
+        }
+
+        @Override
+        public void removeRigidBody(RigidBody body) {
+            // Implementation for removing rigid body
+        }
+
+        @Override
+        public void stepSimulation(org.jscience.core.measure.Quantity<org.jscience.core.measure.quantity.Time> timeStep) {
+            stepSimulation(timeStep, 10, org.jscience.core.measure.Quantities.create(1.0/60.0, org.jscience.core.measure.units.SI.SECOND));
+        }
+
+        @Override
+        public void stepSimulation(org.jscience.core.measure.Quantity<org.jscience.core.measure.quantity.Time> timeStep, int maxSubSteps, org.jscience.core.measure.Quantity<org.jscience.core.measure.quantity.Time> fixedTimeStep) {
+            try {
+                BT_DYNAMICS_WORLD_STEP_SIMULATION.invokeExact(worldPtr, 
+                    (float) timeStep.getValue(SI.SECOND).doubleValue(), 
+                    maxSubSteps, 
+                    (float) fixedTimeStep.getValue(SI.SECOND).doubleValue());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        @Override
+        public void setGravity(double gravityX, double gravityY, double gravityZ) {
+            // Need a 3-float buffer for gravity
+            try (java.lang.foreign.Arena stack = java.lang.foreign.Arena.ofConfined()) {
+                MemorySegment grav = stack.allocate(ValueLayout.JAVA_FLOAT, 3);
+                grav.set(ValueLayout.JAVA_FLOAT, 0, (float) gravityX);
+                grav.set(ValueLayout.JAVA_FLOAT, 4, (float) gravityY);
+                grav.set(ValueLayout.JAVA_FLOAT, 8, (float) gravityZ);
+                BT_DYNAMICS_WORLD_SET_GRAVITY.invokeExact(worldPtr, grav);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 }

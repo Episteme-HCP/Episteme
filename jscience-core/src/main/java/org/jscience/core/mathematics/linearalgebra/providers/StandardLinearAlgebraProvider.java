@@ -6,7 +6,6 @@
 package org.jscience.core.mathematics.linearalgebra.providers;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 
@@ -15,9 +14,15 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Intended for benchmarking and comparison purposes.
  */
 @AutoService(LinearAlgebraProvider.class)
-public class StandardLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> implements LinearAlgebraProvider<E> {
+public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
     public StandardLinearAlgebraProvider() {
+        super(null);
+    }
+
+    @Override
+    public String getEnvironmentInfo() {
+        return "CPU (Standard)";
     }
 
     @Override
@@ -31,20 +36,9 @@ public class StandardLinearAlgebraProvider<E extends org.jscience.core.mathemati
             throw new IllegalArgumentException("Matrix inner dimensions must match");
         }
         // Force standard multiply (O(n^3)) via static utility
-        // Note: We need a field. Matrix should have it (getScalarRing).
-        return CPUDenseLinearAlgebraProvider.standardMultiply(a, b, (org.jscience.core.mathematics.structures.rings.Field<E>) a.getScalarRing(), this);
+        return CPUDenseLinearAlgebraProvider.standardMultiply(a, b, field, this);
     }
     
-    @Override
-    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return new CPUDenseLinearAlgebraProvider<E>().solve(a, b);
-    }
-
-    @Override
-    public Matrix<E> inverse(Matrix<E> a) {
-        return new CPUDenseLinearAlgebraProvider<E>().inverse(a);
-    }
-
     @Override
     public int getPriority() {
         return -10; // Low priority so it's not picked automatically as default

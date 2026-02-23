@@ -6,7 +6,6 @@
 package org.jscience.core.mathematics.linearalgebra.providers;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.algorithms.RealDoubleStrassenAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.RealStrassenAlgorithm;
@@ -19,9 +18,15 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Intended for benchmarking and comparison purposes.
  */
 @AutoService(LinearAlgebraProvider.class)
-public class StrassenLinearAlgebraProvider<E extends org.jscience.core.mathematics.structures.rings.Field<E>> implements LinearAlgebraProvider<E> {
+public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
     public StrassenLinearAlgebraProvider() {
+        super(null);
+    }
+
+    @Override
+    public String getEnvironmentInfo() {
+        return "CPU (Strassen)";
     }
 
     @Override
@@ -47,19 +52,9 @@ public class StrassenLinearAlgebraProvider<E extends org.jscience.core.mathemati
              return (Matrix<E>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
         }
 
-        return LinearAlgebraProvider.super.multiply(a, b);
+        return super.multiply(a, b);
     }
-
-    @Override
-    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return new CPUDenseLinearAlgebraProvider<E>().solve(a, b);
-    }
-
-    @Override
-    public Matrix<E> inverse(Matrix<E> a) {
-        return new CPUDenseLinearAlgebraProvider<E>().inverse(a);
-    }
-
+    
     @Override
     public int getPriority() {
         return -10;

@@ -395,18 +395,29 @@ public class JScienceMasterControl extends Application {
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
         gpuVal.getStyleClass().add(JScience.isGpuAvailable() ? "status-connected" : "status-disconnected");
 
+        // --- Auto-Tuning Mode ---
+        ComboBox<org.jscience.core.technical.algorithm.AutoTuningManager.Mode> tuningBox = new ComboBox<>();
+        tuningBox.getItems().addAll(org.jscience.core.technical.algorithm.AutoTuningManager.Mode.values());
+        tuningBox.setValue(org.jscience.core.technical.algorithm.AutoTuningManager.getMode());
+        tuningBox.setOnAction(e -> {
+            PREFS.setAutoTuningMode(tuningBox.getValue().name());
+        });
+        VBox tuningInfo = createInfoBox(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning Mode"),
+                i18n.get("mastercontrol.computing.desc.autotuning", "ON (Force Tuning), OFF (Standard Priorities), AUTO (Learning)"));
+
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
-        grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")),
+        grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning")), tuningBox, tuningInfo);
+        grid.addRow(2, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")),
                 floatBox,
                 floatInfo);
-        grid.addRow(2, createHeaderLabel(i18n.get("mastercontrol.computing.int_precision", "Integer Precision")),
+        grid.addRow(3, createHeaderLabel(i18n.get("mastercontrol.computing.int_precision", "Integer Precision")),
                 intBox,
                 intInfo);
-        grid.addRow(3, createHeaderLabel(i18n.get("mastercontrol.computing.gpu", "GPU Support")), gpuVal);
-        grid.addRow(4, createHeaderLabel(i18n.get("mastercontrol.computing.precision", "Decimal Precision")),
+        grid.addRow(4, createHeaderLabel(i18n.get("mastercontrol.computing.gpu", "GPU Support")), gpuVal);
+        grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.precision", "Decimal Precision")),
                 precSpinner,
                 precInfo);
-        grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.rounding", "Rounding Mode")), roundBox,
+        grid.addRow(6, createHeaderLabel(i18n.get("mastercontrol.computing.rounding", "Rounding Mode")), roundBox,
                 roundInfo);
         
         // Linear Algebra provider selection is handled transparently by Factory/ComputeMode

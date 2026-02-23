@@ -3,48 +3,44 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 package org.jscience.examples.physics;
-
-import org.jscience.nativ.physics.classical.mechanics.backends.NativePhysicsBackend;
-
+ 
+import org.jscience.core.measure.Quantities;
+import org.jscience.core.measure.units.SI;
+import org.jscience.natural.physics.classical.mechanics.MechanicsFactory;
+import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
+ 
 /**
- * Demonstrates usage of the Native Physics Provider (Bullet3 / Jolt).
+ * Demonstrates usage of the standardized Physics Simulation API.
  * <p>
- * This example shows how to handle optional native dependencies gracefully.
+ * This example shows how to use the MechanicsFactory to create a physics world
+ * and run a simulation loop.
  * </p>
  */
 public class PhysicsSimulationExample {
-
+ 
     public static void main(String[] args) {
         System.out.println("==========================================");
-        System.out.println("   JScience Native Physics Simulation");
+        System.out.println("      JScience Physics Simulation");
         System.out.println("==========================================");
-
-        // 1. Instantiate Provider
-        NativePhysicsBackend physics = new NativePhysicsBackend();
+ 
+        // 1. Create a World via Factory (will pick the best available backend)
+        PhysicsWorldBridge world = MechanicsFactory.createWorld();
         
-        System.out.println("Initializing Physics Engine: " + physics.getName());
-
-        // 2. Check Availability
-        if (!physics.isAvailable()) {
-            System.err.println("\n[ERROR] Native Physics Engine NOT available.");
-            System.err.println("Reason: Native libraries (Bullet3C.dll or JoltC.dll) not found in libs/ directory.");
-            System.err.println("Action: Please download Bullet3 or Jolt Physics C-API wrappers and place them in:");
-            System.err.println("        " + System.getProperty("user.dir") + "\\libs\\");
+        if (world == null) {
+            System.err.println("\n[ERROR] No physics backend available.");
             return;
         }
-
-        // 3. Initialize Simulation
+ 
+        System.out.println("Physics World Initialized.");
+ 
         try {
-            physics.init();
-            System.out.println("Engine Initialized Successfully.");
-            
-            // 4. Run Simulation Loop
+            // 2. Run Simulation Loop (100 steps)
             System.out.println("Starting Simulation Loop (100 steps)...");
             long start = System.nanoTime();
             
-            float deltaTime = 1.0f / 60.0f;
+            var timeStep = Quantities.create(1.0/60.0, SI.SECOND);
             for (int i = 0; i < 100; i++) {
-                physics.step(deltaTime);
+                world.stepSimulation(timeStep);
                 if (i % 10 == 0) {
                     System.out.print(".");
                 }
@@ -57,8 +53,6 @@ public class PhysicsSimulationExample {
         } catch (Exception e) {
             System.err.println("Simulation failed: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            physics.close();
         }
     }
 }

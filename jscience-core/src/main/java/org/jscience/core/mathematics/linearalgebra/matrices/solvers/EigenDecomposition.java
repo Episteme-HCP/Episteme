@@ -310,19 +310,19 @@ public class EigenDecomposition {
                             p = x * H[i][k] + y * H[i][k + 1];
                             if (notlast) {
                                 p += z * H[i][k + 2];
-                                H[i][k + 2] -= p;
+                                H[i][k + 2] -= p * r;
                             }
                             H[i][k] -= p;
-                            H[i][k + 1] -= p;
+                            H[i][k + 1] -= p * q;
                         }
                         for (int i = 0; i < n; i++) {
                             p = x * V[i][k] + y * V[i][k + 1];
                             if (notlast) {
                                 p += z * V[i][k + 2];
-                                V[i][k + 2] -= p;
+                                V[i][k + 2] -= p * r;
                             }
                             V[i][k] -= p;
-                            V[i][k + 1] -= p;
+                            V[i][k + 1] -= p * q;
                         }
                     }
                 }

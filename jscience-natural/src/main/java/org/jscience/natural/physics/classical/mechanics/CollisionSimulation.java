@@ -56,7 +56,7 @@ public class CollisionSimulation {
         this(null);
     }
 
-    public CollisionSimulation(CollisionBackend backend) {
+    public CollisionSimulation(CollisionProvider backend) {
         // backend unused in current implementation
     }
 

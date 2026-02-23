@@ -11,11 +11,12 @@ import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.AutoTuningManager;
+import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
-import org.jscience.core.technical.algorithm.OperationContext;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
 
@@ -309,6 +310,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
+    public String getEnvironmentInfo() {
+        return IS_AVAILABLE ? "CPU (FFM/BLAS)" : "N/A";
+    }
+
+    @Override
     public String getName() {
         return "Native BLAS Provider (FFM)";
     }
@@ -433,7 +439,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     @Override
     public double score(OperationContext context) {
         if (!IS_AVAILABLE) return -1.0;
-        double score = getPriority();
+        double score = AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) score -= 50.0;
         if (context.getDataSize() > 0 && context.getDataSize() < 256) score -= 20.0;
         if (!context.hasHint(OperationContext.Hint.FLOAT32_OK)) score += 10.0;
@@ -449,7 +455,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Matrix<org.jscience.core.mathematics.numbers.real.Real> multiply(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Matrix<org.jscience.core.mathematics.numbers.real.Real> B) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(A, B);
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();
@@ -483,7 +489,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public org.jscience.core.mathematics.numbers.real.Real dot(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
-         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.dot(a, b);
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -496,7 +502,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     
     @Override
     public org.jscience.core.mathematics.numbers.real.Real norm(Vector<org.jscience.core.mathematics.numbers.real.Real> a) {
-         if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.norm(a);
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -507,7 +513,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Vector<org.jscience.core.mathematics.numbers.real.Real> add(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.add(a, b);
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -525,7 +531,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Vector<org.jscience.core.mathematics.numbers.real.Real> subtract(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.subtract(a, b);
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -543,7 +549,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Vector<org.jscience.core.mathematics.numbers.real.Real> multiply(Vector<org.jscience.core.mathematics.numbers.real.Real> vector, org.jscience.core.mathematics.numbers.real.Real scalar) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(vector, scalar);
         int n = vector.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -557,7 +563,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Matrix<org.jscience.core.mathematics.numbers.real.Real> add(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Matrix<org.jscience.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.add(a, b);
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
@@ -576,7 +582,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Matrix<org.jscience.core.mathematics.numbers.real.Real> subtract(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Matrix<org.jscience.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.subtract(a, b);
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
@@ -595,7 +601,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Matrix<org.jscience.core.mathematics.numbers.real.Real> scale(org.jscience.core.mathematics.numbers.real.Real scalar, Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.scale(scalar, a);
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
@@ -630,7 +636,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             }
         }
         
-        throw new UnsupportedOperationException("Native transpose (domatcopy) not available or backend not loaded");
+        return LinearAlgebraProvider.super.transpose(a);
     }
 
     private Matrix<org.jscience.core.mathematics.numbers.real.Real> createDenseMatrix(double[] data, int rows, int cols, Matrix<org.jscience.core.mathematics.numbers.real.Real> reference) {
@@ -645,7 +651,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Vector<org.jscience.core.mathematics.numbers.real.Real> multiply(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native BLAS not available");
+        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(a, b);
         int m = a.rows(), k = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int lenA = m * k;

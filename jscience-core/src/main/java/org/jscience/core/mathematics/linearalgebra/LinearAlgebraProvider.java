@@ -8,6 +8,10 @@ package org.jscience.core.mathematics.linearalgebra;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.AutoTuningManager;
+import org.jscience.core.technical.algorithm.AlgorithmManager;
+import org.jscience.core.technical.algorithm.OperationContext;
+
 
 /**
  * Service provider interface for linear algebra operations.
@@ -55,85 +59,102 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
         // No-op by default
     }
 
+    @SuppressWarnings("unchecked")
+    default LinearAlgebraProvider<E> fallback() {
+        return (LinearAlgebraProvider<E>) AlgorithmManager.getReferenceProvider(LinearAlgebraProvider.class);
+    }
+
     // --- Vector Operations ---
     default Vector<E> add(Vector<E> a, Vector<E> b) {
-        throw new UnsupportedOperationException("add not supported by " + getName());
+        return fallback().add(a, b);
     }
     default Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        throw new UnsupportedOperationException("subtract not supported by " + getName());
+        return fallback().subtract(a, b);
     }
     default Vector<E> multiply(Vector<E> vector, E scalar) {
-        throw new UnsupportedOperationException("multiply not supported by " + getName());
+        return fallback().multiply(vector, scalar);
     }
     default E dot(Vector<E> a, Vector<E> b) {
-        throw new UnsupportedOperationException("dot not supported by " + getName());
+        return fallback().dot(a, b);
     }
     default E norm(Vector<E> a) {
-        throw new UnsupportedOperationException("norm not supported by " + getName());
+        return fallback().norm(a);
     }
 
     // --- Matrix Operations ---
     default Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        throw new UnsupportedOperationException("add not supported by " + getName());
+        return fallback().add(a, b);
     }
     default Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        throw new UnsupportedOperationException("subtract not supported by " + getName());
+        return fallback().subtract(a, b);
     }
     default Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        throw new UnsupportedOperationException("multiply not supported by " + getName());
+        return fallback().multiply(a, b);
     }
     default Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        throw new UnsupportedOperationException("multiply not supported by " + getName());
+        return fallback().multiply(a, b);
     }
     default Matrix<E> inverse(Matrix<E> a) {
-        throw new UnsupportedOperationException("inverse not supported by " + getName());
+        return fallback().inverse(a);
     }
     default E determinant(Matrix<E> a) {
-        throw new UnsupportedOperationException("determinant not supported by " + getName());
+        return fallback().determinant(a);
     }
     default Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        throw new UnsupportedOperationException("solve not supported by " + getName());
+        return fallback().solve(a, b);
     }
     default Matrix<E> transpose(Matrix<E> a) {
-        throw new UnsupportedOperationException("transpose not supported by " + getName());
+        return fallback().transpose(a);
     }
     default Matrix<E> scale(E scalar, Matrix<E> a) {
-        throw new UnsupportedOperationException("scale not supported by " + getName());
+        return fallback().scale(scalar, a);
     }
 
     /**
      * Computes the QR decomposition of the specified matrix.
      */
     default QRResult<E> qr(Matrix<E> a) {
-        throw new UnsupportedOperationException("QR decomposition not supported by " + getName());
+        return fallback().qr(a);
     }
 
     /**
      * Computes the Singular Value Decomposition (SVD) of the specified matrix.
      */
     default SVDResult<E> svd(Matrix<E> a) {
-        throw new UnsupportedOperationException("SVD decomposition not supported by " + getName());
+        return fallback().svd(a);
     }
 
     /**
      * Computes the eigenvalue decomposition of the specified matrix.
      */
     default EigenResult<E> eigen(Matrix<E> a) {
-        throw new UnsupportedOperationException("Eigenvalue decomposition not supported by " + getName());
+        return fallback().eigen(a);
     }
 
     /**
      * Computes the LU decomposition of the specified matrix.
      */
     default LUResult<E> lu(Matrix<E> a) {
-        throw new UnsupportedOperationException("LU decomposition not supported by " + getName());
+        return fallback().lu(a);
     }
 
     /**
      * Computes the Cholesky decomposition of the specified matrix.
      */
     default CholeskyResult<E> cholesky(Matrix<E> a) {
-        throw new UnsupportedOperationException("Cholesky decomposition not supported by " + getName());
+        return fallback().cholesky(a);
+    }
+
+    @Override
+    default double score(OperationContext context) {
+        return AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());
+    }
+
+    /**
+     * Returns a string describing the execution environment (e.g., "CPU (AVX2)", "GPU (CUDA 12.0)").
+     */
+    default String getEnvironmentInfo() {
+        return "Generic JVM";
     }
 
     @Override

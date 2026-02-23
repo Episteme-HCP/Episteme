@@ -23,49 +23,51 @@
 
 package org.jscience.natural.physics.classical.mechanics;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.backend.ComputeBackend;
-
 /**
- * Service Provider Interface for Physics Engines.
+ * Backend representation of a RigidBody.
  * <p>
- * This interface abstracts the using physics simulation engine (e.g. Bullet, JBullet, ODE).
- * Use {@code ServiceLoader} or {@code PhysicsBackendDiscovery} to obtain an instance.
+ * This interface bridges the high-level JScience {@code RigidBody} state 
+ * to the low-level physics engine representation (e.g. {@code btRigidBody}).
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface MechanicsBackend extends ComputeBackend, AlgorithmProvider {
-
-    /**
-     * Creates a new physics world (simulation environment).
-     * 
-     * @return a new PhysicsWorld instance
-     */
-    PhysicsWorldBridge createWorld();
-
-    /**
-     * Creates a backend representation for a RigidBody.
-     * 
-     * @param body the JScience RigidBody definition
-     * @return the backend implementation
-     */
-    RigidBodyBridge createRigidBody(RigidBody body);
+public interface RigidBodyBridge {
     
-    @Override
-    default String getAlgorithmType() {
-        return "PhysicsEngine";
-    }
+    /**
+     * Syncs the backend state from the JScience object.
+     * Called before simulation step.
+     */
+    void pushState();
 
-    @Override
-    default boolean isAvailable() {
-        return true;
-    }
+    /**
+     * Syncs the JScience object from the backend state.
+     * Called after simulation step.
+     */
+    void pullState();
+    
+    /**
+     * Apply a central force to the body.
+     * 
+     * @param x force x
+     * @param y force y
+     * @param z force z
+     */
+    void applyCentralForce(double x, double y, double z);
+    
+    /**
+     * Apply a central impulse to the body.
+     * 
+     * @param x impulse x
+     * @param y impulse y
+     * @param z impulse z
+     */
+    void applyCentralImpulse(double x, double y, double z);
 
-    @Override
-    default int getPriority() {
-        return 0;
-    }
+    /**
+     * Destroys native resources associated with this body.
+     */
+    void destroy();
 }

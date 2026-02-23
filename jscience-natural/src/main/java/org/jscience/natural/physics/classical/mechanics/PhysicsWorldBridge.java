@@ -23,49 +23,54 @@
 
 package org.jscience.natural.physics.classical.mechanics;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.backend.ComputeBackend;
+import org.jscience.core.measure.Quantity;
+import org.jscience.core.measure.quantity.Time;
 
 /**
- * Service Provider Interface for Physics Engines.
- * <p>
- * This interface abstracts the using physics simulation engine (e.g. Bullet, JBullet, ODE).
- * Use {@code ServiceLoader} or {@code PhysicsBackendDiscovery} to obtain an instance.
- * </p>
+ * Represents a physics simulation environment (Scene/World).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface MechanicsBackend extends ComputeBackend, AlgorithmProvider {
+public interface PhysicsWorldBridge {
 
     /**
-     * Creates a new physics world (simulation environment).
+     * Adds a rigid body to the simulation.
      * 
-     * @return a new PhysicsWorld instance
+     * @param body the body to add
      */
-    PhysicsWorldBridge createWorld();
+    void addRigidBody(RigidBody body);
 
     /**
-     * Creates a backend representation for a RigidBody.
+     * Removes a rigid body from the simulation.
      * 
-     * @param body the JScience RigidBody definition
-     * @return the backend implementation
+     * @param body the body to remove
      */
-    RigidBodyBridge createRigidBody(RigidBody body);
-    
-    @Override
-    default String getAlgorithmType() {
-        return "PhysicsEngine";
-    }
+    void removeRigidBody(RigidBody body);
 
-    @Override
-    default boolean isAvailable() {
-        return true;
-    }
+    /**
+     * Steps the simulation forward in time.
+     * 
+     * @param timeStep the amount of time to simulate
+     */
+    void stepSimulation(Quantity<Time> timeStep);
 
-    @Override
-    default int getPriority() {
-        return 0;
-    }
+    /**
+     * Steps the simulation with fixed time steps and max substeps.
+     * 
+     * @param timeStep the amount of time to simulate
+     * @param maxSubSteps maximum number of internal substeps
+     * @param fixedTimeStep the internal fixed time step
+     */
+    void stepSimulation(Quantity<Time> timeStep, int maxSubSteps, Quantity<Time> fixedTimeStep);
+
+    /**
+     * Sets the gravity vector for the world.
+     * 
+     * @param gravityX gravity in X
+     * @param gravityY gravity in Y
+     * @param gravityZ gravity in Z
+     */
+    void setGravity(double gravityX, double gravityY, double gravityZ);
 }

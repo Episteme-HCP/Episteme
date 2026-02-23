@@ -11,13 +11,12 @@ import java.nio.DoubleBuffer;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.context.MathContext;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.algorithm.AutoTuningManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
@@ -125,6 +124,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public boolean isLoaded() { return IS_AVAILABLE; }
+
+    @Override
+    public String getEnvironmentInfo() {
+        return IS_AVAILABLE ? "GPU (CUDA)" : "N/A";
+    }
 
     @Override
     public String getName() { return "Native CUDA Dense Backend"; }
@@ -243,52 +247,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     @Override public void synchronize() { try { CUDA_DEVICE_SYNCHRONIZE.invokeExact(); } catch (Throwable t) {} }
     @Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
 
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("CUDA add not implemented"); }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("CUDA subtract not implemented"); }
-    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) { throw new UnsupportedOperationException("CUDA scale not implemented"); }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA transpose not implemented"); }
-    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA multiply not implemented"); }
-    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA add not implemented"); }
-    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA subtract not implemented"); }
-    @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException("CUDA multiply not implemented"); }
-    @Override public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA dot not implemented"); }
-    @Override public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("CUDA norm not implemented"); }
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA inverse not implemented"); }
-    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA determinant not implemented"); }
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA solve not implemented"); }
-
-    @Override
-    public LUResult<Real> lu(Matrix<Real> a) {
-        throw new UnsupportedOperationException("CUDA LU decomposition requires full cuSOLVER DGETRF binding.");
-    }
-
-    @Override
-    public QRResult<Real> qr(Matrix<Real> a) {
-        throw new UnsupportedOperationException("CUDA QR decomposition requires full cuSOLVER DGEQRF binding.");
-    }
-
-    @Override
-    public CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        throw new UnsupportedOperationException("CUDA Cholesky decomposition requires full cuSOLVER DPOTRF binding.");
-    }
-
-    @Override
-    public SVDResult<Real> svd(Matrix<Real> a) {
-        throw new UnsupportedOperationException("CUDA SVD requires full cuSOLVER DGESVD binding.");
-    }
-
-    @Override
-    public EigenResult<Real> eigen(Matrix<Real> a) {
-        throw new UnsupportedOperationException("CUDA Eigen decomposition requires full cuSOLVER DSYEVD binding.");
-    }
-
     @Override
     public double score(OperationContext context) {
         if (!IS_AVAILABLE) return -1;
         if (MathContext.getCurrent().getRealPrecision() == MathContext.RealPrecision.EXACT) {
             return -1.0; // Hardware Float/Double cannot handle Arbitrary Precision MathContext
         }
-        double base = getPriority();
+        double base = AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());
         if (context.getDataSize() < 256) base -= 200; // Prefer CPU for small matrices
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;
         return base;

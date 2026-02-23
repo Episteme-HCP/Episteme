@@ -96,6 +96,17 @@
             <artifactId>auto-service</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- JBullet Physics -->
+        <dependency>
+            <groupId>cz.advel.jbullet</groupId>
+            <artifactId>jbullet</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ode4j</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

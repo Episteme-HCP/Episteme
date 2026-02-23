@@ -25,6 +25,7 @@ public class LinearAlgebraComplianceTest {
 
     private static class ComplianceResult {
         String providerName;
+        String environment;
         Map<String, String> status = new LinkedHashMap<>();
     }
 
@@ -50,6 +51,7 @@ public class LinearAlgebraComplianceTest {
         for (LinearAlgebraProvider<Real> provider : providers) {
             ComplianceResult res = new ComplianceResult();
             res.providerName = provider.getName();
+            res.environment = provider.getEnvironmentInfo();
             
             testOperation(res, "Transpose", () -> {
                 Random rand = new Random(42);
@@ -275,12 +277,12 @@ public class LinearAlgebraComplianceTest {
         
         Set<String> ops = results.get(0).status.keySet();
         
-        sb.append("| Provider |");
+        sb.append("| Provider | Environment |");
         for (String op : ops) sb.append(" ").append(op).append(" |");
-        sb.append("\n| --- |").append(" --- |".repeat(ops.size())).append("\n");
+        sb.append("\n| --- | --- |").append(" --- |".repeat(ops.size())).append("\n");
 
         for (ComplianceResult res : results) {
-            sb.append("| ").append(res.providerName).append(" |");
+            sb.append("| ").append(res.providerName).append(" | ").append(res.environment).append(" |");
             for (String op : ops) {
                 sb.append(" ").append(res.status.get(op)).append(" |");
             }
