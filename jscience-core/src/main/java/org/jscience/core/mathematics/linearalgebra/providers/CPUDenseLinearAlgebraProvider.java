@@ -1021,7 +1021,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
             @SuppressWarnings("unchecked")
             E[] resArray = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            for (int i = 0; i < n; i++) resArray[i] = (E) (Object) Real.of(res[i]);
+            for (int i = 0; i < n; i++) resArray[i] = (E)(Object) Real.of(res[i]);
             return new GenericVector<>(new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
         }
 

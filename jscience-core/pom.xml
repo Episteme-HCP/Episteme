@@ -36,6 +36,22 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
 
+        <!-- VLCJ for Video/Audio Native Backend -->
+        <dependency>
+            <groupId>uk.co.caprica</groupId>
+            <artifactId>vlcj</artifactId>
+            <version>4.8.2</version>
+        </dependency>
+
+        <!-- MPJ Express for MPI Distributed Backend -->
+        <dependency>
+            <groupId>org.mpjexpress</groupId>
+            <artifactId>mpj</artifactId>
+            <version>0.44</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/MPJ/lib/mpj.jar</systemPath>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

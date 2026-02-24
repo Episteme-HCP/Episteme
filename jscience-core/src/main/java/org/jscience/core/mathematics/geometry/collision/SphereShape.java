@@ -39,6 +39,8 @@ public class SphereShape implements CollisionShape {
     @Override
     public Vector<Real>[] getAABB() {
         Vector<Real> offset = Vector.of(Arrays.asList(radius, radius, radius), Reals.getInstance());
-        return new Vector[]{offset.negate(), offset};
+        @SuppressWarnings("unchecked")
+        Vector<Real>[] result = new Vector[]{offset.negate(), offset};
+        return result;
     }
 }

@@ -34,7 +34,6 @@ import java.util.stream.IntStream;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.SparseMatrix;
-import org.jscience.core.mathematics.structures.rings.Field;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;

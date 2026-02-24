@@ -73,14 +73,31 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         return "linear algebra";
     }
 
+    private static final boolean IS_AVAILABLE;
+    static {
+        boolean[] avail = {false};
+        Thread t = new Thread(() -> {
+            try {
+                Class.forName("org.nd4j.linalg.factory.Nd4j");
+                org.nd4j.linalg.factory.Nd4j.create(1).add(1);
+                avail[0] = true;
+            } catch (Throwable th) {
+                // Ignore
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+        try {
+            t.join(3000); // 3 seconds timeout for ND4J init
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        IS_AVAILABLE = avail[0];
+    }
+
     @Override
     public boolean isAvailable() {
-        try {
-            Class.forName("org.nd4j.linalg.factory.Nd4j");
-            return true;
-        } catch (Throwable t) {
-            return false;
-        }
+        return IS_AVAILABLE;
     }
 
     @Override
@@ -198,9 +215,13 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
-        // ND4J direct solve: A * x = b => x = solve(A, b)
-        // Fallback to inverse multiply if solve is not found in this version
-        return multiply(inverse(a), b);
+        // Optimize to avoid intermediate array copies during inversion and multiplication
+        INDArray arrA = toINDArray(a);
+        INDArray arrB = toINDArray(b);
+
+        INDArray invA = InvertMatrix.invert(arrA, false);
+        INDArray result = invA.mmul(arrB);
+        return fromINDArrayVector(result);
     }
 
     @Override

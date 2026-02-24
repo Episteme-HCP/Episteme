@@ -101,8 +101,6 @@ public class BenchmarkRunner {
                 
                 // Record to Monitor
                 monitor.recordExecution(b.getId(), b.getDomain(), durationNs / iterations);
-
-                long endMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
                 double avgMs = (durationNs / 1_000_000.0) / iterations;
                 double opsSec = (iterations * 1_000_000_000.0) / durationNs;
                 long memUsed = totalMem / TRIALS;

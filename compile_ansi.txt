@@ -1,0 +1,94 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/jansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.jscience:jscience-core:jar:1.0.0-SNAPSHOT
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service-annotations:jar -> version ${auto-service.version} vs 1.1.1 @ org.jscience:jscience-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\JScience\pom.xml, line 420, column 19
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service:jar -> version ${auto-service.version} vs 1.1.1 @ org.jscience:jscience-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\JScience\pom.xml, line 425, column 19
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.jscience:jscience-natural:jar:1.0.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.systemPath' for com.github.studygameengines:java-fbx-loader:jar should not point at files within the project directory, ${project.basedir}/lib/fbx_loader/java-fbx-loader-v1.0.jar will be unresolvable by dependent projects @ line 92, column 25
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.jscience:jscience-parent:pom:1.0.0-SNAPSHOT
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service-annotations:jar -> version ${auto-service.version} vs 1.1.1 @ line 420, column 19
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service:jar -> version ${auto-service.version} vs 1.1.1 @ line 425, column 19
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-native >--------------------
+[INFO] Building JScience Native 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The POM for org.jscience:jscience-natural:jar:1.0.0-SNAPSHOT is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-native ---
+[INFO] Copying 199 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-native ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 53 source files with javac [debug release 25] to target\classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeFFMBLASBackend.java:[34,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/ND4JLinearAlgebraBackend.java:[32,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeCUDASparseLinearAlgebraBackend.java:[37,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeCUDASparseLinearAlgebraBackend.java:[37,1] Service provider org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeOpenCLDenseLinearAlgebraBackend.java:[35,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeSIMDLinearAlgebraBackend.java:[39,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/vision/backends/NativeCPUVisionBackend.java:[34,1] Service provider org.jscience.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeCPULinearAlgebraBackend.java:[43,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/vision/backends/NativeCUDAVisionBackend.java:[29,1] Service provider org.jscience.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeOpenCLSparseLinearAlgebraBackend.java:[40,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeOpenCLSparseLinearAlgebraBackend.java:[40,1] Service provider org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/vision/backends/NativeOpenCLVisionBackend.java:[29,1] Service provider org.jscience.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/mathematics/linearalgebra/backends/NativeCUDADenseLinearAlgebraBackend.java:[38,1] Service provider org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[INFO] 13 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeBulletBackend.java:[36,8] org.jscience.nativ.physics.classical.mechanics.backends.NativeBulletBackend is not abstract and does not override abstract method resolveCollisions(java.nio.DoubleBuffer,java.nio.DoubleBuffer,java.nio.DoubleBuffer,int,java.nio.IntBuffer,int) in org.jscience.natural.physics.classical.mechanics.CollisionProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeBulletBackend.java:[170,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeBulletBackend.java:[180,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeODEBackend.java:[33,8] org.jscience.nativ.physics.classical.mechanics.backends.NativeODEBackend is not abstract and does not override abstract method resolveCollisions(java.nio.DoubleBuffer,java.nio.DoubleBuffer,java.nio.DoubleBuffer,int,java.nio.IntBuffer,int) in org.jscience.natural.physics.classical.mechanics.CollisionProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeODEBackend.java:[81,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeODEBackend.java:[86,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeGenesisBackend.java:[33,8] org.jscience.nativ.physics.classical.mechanics.backends.NativeGenesisBackend is not abstract and does not override abstract method resolveCollisions(java.nio.DoubleBuffer,java.nio.DoubleBuffer,java.nio.DoubleBuffer,int,java.nio.IntBuffer,int) in org.jscience.natural.physics.classical.mechanics.CollisionProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeGenesisBackend.java:[81,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeGenesisBackend.java:[86,5] method does not override or implement a method from a supertype
+[INFO] 9 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  18.811 s
+[INFO] Finished at: 2026-02-24T00:03:58+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project jscience-native: Compilation failure: Compilation failure: 
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeBulletBackend.java:[36,8] org.jscience.nativ.physics.classical.mechanics.backends.NativeBulletBackend is not abstract and does not override abstract method resolveCollisions(java.nio.DoubleBuffer,java.nio.DoubleBuffer,java.nio.DoubleBuffer,int,java.nio.IntBuffer,int) in org.jscience.natural.physics.classical.mechanics.CollisionProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeBulletBackend.java:[170,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeBulletBackend.java:[180,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeODEBackend.java:[33,8] org.jscience.nativ.physics.classical.mechanics.backends.NativeODEBackend is not abstract and does not override abstract method resolveCollisions(java.nio.DoubleBuffer,java.nio.DoubleBuffer,java.nio.DoubleBuffer,int,java.nio.IntBuffer,int) in org.jscience.natural.physics.classical.mechanics.CollisionProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeODEBackend.java:[81,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeODEBackend.java:[86,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeGenesisBackend.java:[33,8] org.jscience.nativ.physics.classical.mechanics.backends.NativeGenesisBackend is not abstract and does not override abstract method resolveCollisions(java.nio.DoubleBuffer,java.nio.DoubleBuffer,java.nio.DoubleBuffer,int,java.nio.IntBuffer,int) in org.jscience.natural.physics.classical.mechanics.CollisionProvider
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeGenesisBackend.java:[81,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-native/src/main/java/org/jscience/nativ/physics/classical/mechanics/backends/NativeGenesisBackend.java:[86,5] method does not override or implement a method from a supertype
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

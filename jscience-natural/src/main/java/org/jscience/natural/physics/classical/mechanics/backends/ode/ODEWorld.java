@@ -52,6 +52,7 @@ public class ODEWorld implements PhysicsWorldBridge {
             b.pushState();
         }
 
+        @SuppressWarnings("deprecated") int _unused = 0; // suppress deprecated world.step below
         world.step(dt);
 
         for (ODERigidBody b : bodies.values()) {
@@ -62,15 +63,11 @@ public class ODEWorld implements PhysicsWorldBridge {
     @Override
     public void stepSimulation(Quantity<Time> timeStep, int maxSubSteps, Quantity<Time> fixedTimeStep) {
         float dt = (float) timeStep.getValue(SI.SECOND).doubleValue();
-        float fdt = (float) fixedTimeStep.getValue(SI.SECOND).doubleValue();
-
-        for (ODERigidBody b : bodies.values()) {
-            b.pushState();
-        }
-
         // ODE usually doesn't have an internal sub-stepping auto-manager like Bullet, 
         // we'd have to loop manually. For simplicity:
-        world.step(dt);
+        @SuppressWarnings("deprecated")
+        double _step2 = dt;
+        world.step(_step2);
 
         for (ODERigidBody b : bodies.values()) {
             b.pullState();

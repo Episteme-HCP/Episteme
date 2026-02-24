@@ -4,7 +4,6 @@
  */
 package org.jscience.natural.physics.classical.mechanics.backends;
 
-import org.jscience.core.technical.backend.HardwareAccelerator;
 import com.google.auto.service.AutoService;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.cpu.CPUBackend;
@@ -12,8 +11,7 @@ import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
 import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
 import org.jscience.natural.physics.classical.mechanics.CollisionProvider;
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
+import java.lang.foreign.MemorySegment;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 
 /**
@@ -76,13 +74,13 @@ public class GenesisBackend implements MechanicsBackend, CPUBackend, CollisionPr
     }
 
     @Override
-    public int detectSphereCollisions(DoubleBuffer positions, DoubleBuffer radii, int n, IntBuffer collisions) {
+    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
         // Placeholder for Genesis-specific optimized collision detection
         return 0;
     }
 
     @Override
-    public void resolveCollisions(DoubleBuffer positions, DoubleBuffer velocities, DoubleBuffer masses, int n, IntBuffer collisions, int numCollisions) {
+    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
         // Placeholder for Genesis-specific collision resolution
     }
 

@@ -3,7 +3,6 @@ package org.jscience.core.mathematics.linearalgebra;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.junit.jupiter.api.Test;
 import org.ejml.simple.SimpleMatrix;
 
@@ -31,12 +30,29 @@ public class LinearAlgebraComplianceTest {
 
     @Test
     public void generateComplianceReport() {
-        @SuppressWarnings("unchecked")
-        List<LinearAlgebraProvider<Real>> rawProviders = AlgorithmManager.getProviders(LinearAlgebraProvider.class)
-                .stream()
-                .filter(p -> p.isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance()))
-                .map(p -> (LinearAlgebraProvider<Real>) p)
-                .toList();
+        List<LinearAlgebraProvider<Real>> rawProviders = new ArrayList<>();
+        @SuppressWarnings("rawtypes")
+        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
+        for (LinearAlgebraProvider<?> p : loader) {
+            if (p.isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
+                @SuppressWarnings("unchecked")
+                LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
+                rawProviders.add(typed);
+            }
+        }
+        try {
+            for (org.jscience.core.technical.backend.Backend backend : org.jscience.core.technical.backend.BackendDiscovery.getInstance().getProviders()) {
+                for (org.jscience.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
+                    if (ap instanceof LinearAlgebraProvider<?> p) {
+                        if (p.isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
+                            @SuppressWarnings("unchecked")
+                            LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
+                            rawProviders.add(typed);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {}
                 
         List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
         Set<String> seen = new HashSet<>();
@@ -295,7 +311,7 @@ public class LinearAlgebraComplianceTest {
         
         try {
             Files.createDirectories(Paths.get("../docs"));
-            Files.writeString(Paths.get("../docs", "LinearAlgebraComplianceReport.md"), report);
+            Files.writeString(Paths.get("../docs", "LINEAR_ALGEBRA_COMPLIANCE_REPORT.md"), report);
         } catch (IOException e) {
             e.printStackTrace();
         }

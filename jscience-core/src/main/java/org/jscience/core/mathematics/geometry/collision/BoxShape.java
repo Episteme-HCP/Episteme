@@ -39,6 +39,8 @@ public class BoxShape implements CollisionShape {
     public Vector<Real>[] getAABB() {
         Vector<Real> min = halfExtents.negate();
         Vector<Real> max = halfExtents;
-        return new Vector[]{min, max};
+        @SuppressWarnings("unchecked")
+        Vector<Real>[] result = new Vector[]{min, max};
+        return result;
     }
 }

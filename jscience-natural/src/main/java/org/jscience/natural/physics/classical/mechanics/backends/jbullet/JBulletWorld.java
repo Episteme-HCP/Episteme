@@ -10,11 +10,9 @@ import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import com.bulletphysics.linearmath.Transform;
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Time;
 import org.jscience.core.measure.units.SI;
-import org.jscience.core.measure.Quantities;
 import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 

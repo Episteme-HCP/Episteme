@@ -31,7 +31,6 @@ import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorag
 import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.linearalgebra.matrices.storage.TriangularMatrixStorage;

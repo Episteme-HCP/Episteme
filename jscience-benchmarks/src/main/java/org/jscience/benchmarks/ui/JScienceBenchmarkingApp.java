@@ -62,11 +62,11 @@ public class JScienceBenchmarkingApp extends Application {
                         scene.setFill(Color.TRANSPARENT);
 
                         try {
-                            javafx.scene.image.Image icon = new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png"));
+                            javafx.scene.image.Image icon = new javafx.scene.image.Image(org.jscience.core.ui.i18n.I18N.class.getResourceAsStream("/org/jscience/core/ui/icon.png"));
                             splashStage.getIcons().add(icon);
                             primaryStage.getIcons().add(icon);
                         } catch (Exception ex) {
-                            // Icon missing, continue
+                            ex.printStackTrace();
                         }
 
                         primaryStage.setTitle("JScience Benchmarking Suite");

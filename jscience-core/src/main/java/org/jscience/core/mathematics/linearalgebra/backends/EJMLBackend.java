@@ -283,7 +283,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             
             @SuppressWarnings("unchecked")
             E[] sData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), singleton.length);
-            for(int i=0; i<singleton.length; i++) sData[i] = (E) org.jscience.core.mathematics.numbers.real.Real.of(singleton[i]);
+            for(int i=0; i<singleton.length; i++) sData[i] = (E)(Object) org.jscience.core.mathematics.numbers.real.Real.of(singleton[i]);
             Vector<E> S = new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
                 new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(sData), this, field);
                 
@@ -302,8 +302,9 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             
             // Extract eigenvalues as a vector
             int size = Dmat.getNumRows();
+            @SuppressWarnings("unchecked")
             E[] dData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), size);
-            for(int i=0; i<size; i++) dData[i] = (E) org.jscience.core.mathematics.numbers.real.Real.of(Dmat.get(i, i));
+            for(int i=0; i<size; i++) dData[i] = (E)(Object) org.jscience.core.mathematics.numbers.real.Real.of(Dmat.get(i, i));
             Vector<E> D = new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
                 new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(dData), this, field);
                 
@@ -347,7 +348,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             int[] pivotArr = luDecomp.getRowPivotV(null);
             @SuppressWarnings("unchecked")
             E[] pData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), pivotArr.length);
-            for(int i=0; i<pivotArr.length; i++) pData[i] = (E) org.jscience.core.mathematics.numbers.real.Real.of(pivotArr[i]);
+            for(int i=0; i<pivotArr.length; i++) pData[i] = (E)(Object) org.jscience.core.mathematics.numbers.real.Real.of(pivotArr[i]);
             Vector<E> P = new org.jscience.core.mathematics.linearalgebra.vectors.GenericVector<>(
                 new org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(pData), this, field);
                 

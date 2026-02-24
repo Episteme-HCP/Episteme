@@ -10,7 +10,6 @@ import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix
 import org.jscience.core.mathematics.linearalgebra.algorithms.RealDoubleCARMAAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.algorithms.RealCARMAAlgorithm;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 

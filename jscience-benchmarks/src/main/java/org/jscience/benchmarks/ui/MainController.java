@@ -175,7 +175,6 @@ public class MainController {
         int runningCount = 0;
         int errorCount = 0;
         int successCount = 0;
-        int readyCount = 0;
         int unavailableCount = 0;
         int queuedCount = 0;
         int skippedCount = 0;
@@ -196,7 +195,7 @@ public class MainController {
             else if ("Queued".equals(status)) queuedCount++;
             else if (status.contains("Skipped")) skippedCount++;
             else if (status.contains("Canceled")) canceledCount++;
-            else if ("Ready".equals(status) || status.isEmpty()) readyCount++;
+            else if ("Ready".equals(status) || status.isEmpty()) { /* ready: no counter needed */ }
             else if (status.contains("Unavailable")) unavailableCount++;
         }
 

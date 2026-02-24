@@ -4,7 +4,6 @@ import org.jscience.core.distributed.DistributedCompute;
 import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.RemoteDistributedContext;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
 import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.jscience.core.mathematics.numbers.real.Real;

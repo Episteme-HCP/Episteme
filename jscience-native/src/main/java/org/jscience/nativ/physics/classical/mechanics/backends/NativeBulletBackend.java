@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
 import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
 
 /**
@@ -170,20 +168,20 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
     }
 
     @Override
-    public int detectSphereCollisions(DoubleBuffer positions, DoubleBuffer radii, int n, IntBuffer collisions) {
+    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
         if (!IS_AVAILABLE_FLAG) throw new UnsupportedOperationException("Bullet native library not found");
         try {
-            return (int) DETECT_SPHERES.invokeExact(MemorySegment.ofBuffer(positions), MemorySegment.ofBuffer(radii), n, MemorySegment.ofBuffer(collisions));
+            return (int) DETECT_SPHERES.invokeExact(positions, radii, n, collisions);
         } catch (Throwable t) {
             throw new RuntimeException("Bullet collision detection failed", t);
         }
     }
 
     @Override
-    public void resolveCollisions(DoubleBuffer positions, DoubleBuffer velocities, DoubleBuffer masses, int n, IntBuffer collisions, int numCollisions) {
+    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
         if (!IS_AVAILABLE_FLAG) throw new UnsupportedOperationException("Bullet native library not found");
         try {
-            RESOLVE_COLLISIONS.invokeExact(MemorySegment.ofBuffer(positions), MemorySegment.ofBuffer(velocities), MemorySegment.ofBuffer(masses), n, MemorySegment.ofBuffer(collisions), numCollisions);
+            RESOLVE_COLLISIONS.invokeExact(positions, velocities, masses, n, collisions, numCollisions);
         } catch (Throwable t) {
             throw new RuntimeException("Bullet collision resolution failed", t);
         }

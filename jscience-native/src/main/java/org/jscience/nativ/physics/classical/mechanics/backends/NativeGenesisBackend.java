@@ -18,8 +18,7 @@ import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
 import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
+import java.lang.foreign.MemorySegment;
 import java.util.List;
 
 /**
@@ -71,7 +70,7 @@ public class NativeGenesisBackend implements CollisionProvider, MechanicsBackend
 
     @Override
     public PhysicsWorldBridge createWorld() {
-        return null; // TODO: Implement NativeGenesisWorld
+        return new org.jscience.nativ.physics.classical.mechanics.backends.genesis.NativeGenesisWorld();
     }
 
     @Override
@@ -80,12 +79,12 @@ public class NativeGenesisBackend implements CollisionProvider, MechanicsBackend
     }
 
     @Override
-    public int detectSphereCollisions(DoubleBuffer positions, DoubleBuffer radii, int n, IntBuffer collisions) {
+    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
         return 0;
     }
 
     @Override
-    public void resolveCollisions(DoubleBuffer positions, DoubleBuffer velocities, DoubleBuffer masses, int n, IntBuffer collisions, int numCollisions) {
+    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
         // Native resolution
     }
 

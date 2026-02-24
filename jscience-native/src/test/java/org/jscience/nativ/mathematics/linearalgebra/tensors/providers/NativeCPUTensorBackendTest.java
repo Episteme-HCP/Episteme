@@ -7,6 +7,7 @@ package org.jscience.nativ.mathematics.linearalgebra.tensors.providers;
 
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.nativ.mathematics.linearalgebra.tensors.NativeTensor;
+import org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend;
 import org.junit.jupiter.api.Test;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -17,9 +18,9 @@ class NativeCPUTensorBackendTest {
 
     @Test
     void testProviderMetadata() {
-        org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend provider = new org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend();
-        assertEquals("native-tensor", provider.getId());
-        assertEquals("tensor", provider.getType());
+        NativeCPUTensorBackend provider = new NativeCPUTensorBackend();
+        assertEquals("native-cpu-tensor", provider.getId());
+        assertEquals("cpu", provider.getType());
         assertNotNull(provider.getDescription());
     }
 
@@ -27,14 +28,14 @@ class NativeCPUTensorBackendTest {
     void testIsAvailableDefaultsToFalseOrTrueDependingOnEnvironment() {
         // We can't strictly assert true or false without knowing if DNNL is installed.
         // But we can assert it returns a boolean safely.
-        org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend provider = new org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend();
+        NativeCPUTensorBackend provider = new NativeCPUTensorBackend();
         provider.isAvailable();
         // Just ensure no exception
     }
 
     @Test
     void testCreateTensorFloat() {
-        org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend provider = new org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend();
+        NativeCPUTensorBackend provider = new NativeCPUTensorBackend();
         Float[] data = {1.0f, 2.0f, 3.0f, 4.0f};
         Tensor<Float> tensor = provider.create(data, 2, 2);
         
@@ -50,7 +51,7 @@ class NativeCPUTensorBackendTest {
 
     @Test
     void testCreateTensorDouble() {
-        org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend provider = new org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend();
+        NativeCPUTensorBackend provider = new NativeCPUTensorBackend();
         Double[] data = {1.0, 2.0, 3.0, 4.0};
         Tensor<Double> tensor = provider.create(data, 2, 2);
         
@@ -61,7 +62,7 @@ class NativeCPUTensorBackendTest {
 
     @Test
     void testAddTensor() {
-        org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend provider = new org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend();
+        NativeCPUTensorBackend provider = new NativeCPUTensorBackend();
         Float[] d1 = {1.0f, 2.0f};
         Float[] d2 = {10.0f, 20.0f};
         
@@ -76,7 +77,7 @@ class NativeCPUTensorBackendTest {
 
     @Test
     void testSumTensor() {
-        org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend provider = new org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend();
+        NativeCPUTensorBackend provider = new NativeCPUTensorBackend();
         Float[] d1 = {1.0f, 2.0f, 3.0f, 4.0f};
         Tensor<Float> t1 = provider.create(d1, 4);
         
@@ -87,7 +88,7 @@ class NativeCPUTensorBackendTest {
     @Test
     void testMemoryLayout() {
         // Verify off-heap storage works
-        org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend provider = new org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend();
+        NativeCPUTensorBackend provider = new NativeCPUTensorBackend();
         Float[] data = {123.456f};
         NativeTensor<Float> tensor = (NativeTensor<Float>) provider.create(data, 1);
         
