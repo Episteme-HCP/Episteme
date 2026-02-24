@@ -14,6 +14,7 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import org.jscience.benchmarks.benchmark.BenchmarkRegistry;
+import org.jscience.core.ui.i18n.I18N;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -720,68 +721,70 @@ public class MainController {
     }
 
     private void updateChart(BenchmarkItem item, double value) {
-        String operationName = item.getName(); // e.g. "Matrix Multiplication"
-        String barLabel = item.getLibrary();   // e.g. "JScience", "EJML"
-        if (!"Standard".equals(item.getProvider())) {
-            barLabel += " (" + item.getProvider() + ")";
-        }
-        String color = getLibraryColor(item.getLibrary());
+        // Group by CATEGORY (domain) — one chart per category
+        String category = item.getDomain();
+        if (category == null || category.isBlank()) category = "General";
 
-        getOrCreateOperationChart(operationName);
-        XYChart.Series<String, Number> series = domainSeriesMap.get(operationName);
-        
-        // Check if bar already exists for this label
+        // X-axis bar label = benchmark name + library (+ provider if non-standard)
+        String barLabel = item.getName();
+        String lib = item.getLibrary();
+        if (lib != null && !lib.isBlank()) barLabel += "\n" + lib;
+        if (item.getProvider() != null && !"Standard".equals(item.getProvider()))
+            barLabel += " (" + item.getProvider() + ")";
+        String color = getLibraryColor(item.getLibrary() != null ? item.getLibrary() : "Default");
+
+        getOrCreateOperationChart(category);
+        XYChart.Series<String, Number> series = domainSeriesMap.get(category);
+
+        // Update existing bar if already present for this benchmark
         for (XYChart.Data<String, Number> d : series.getData()) {
             if (d.getXValue().equals(barLabel)) {
                 d.setYValue(value);
                 return;
             }
         }
-        
+
         XYChart.Data<String, Number> data = new XYChart.Data<>(barLabel, value);
         series.getData().add(data);
-        
-        // Apply library-specific color
+
         final String barColor = color;
         data.nodeProperty().addListener((obs, oldNode, newNode) -> {
-            if (newNode != null) {
-                newNode.setStyle("-fx-bar-fill: " + barColor + ";");
-            }
+            if (newNode != null) newNode.setStyle("-fx-bar-fill: " + barColor + ";");
         });
     }
     
-    private BarChart<String, Number> getOrCreateOperationChart(String operationName) {
-        if (domainChartMap.containsKey(operationName)) {
-            return domainChartMap.get(operationName);
+    private BarChart<String, Number> getOrCreateOperationChart(String category) {
+        if (domainChartMap.containsKey(category)) {
+            return domainChartMap.get(category);
         }
-        
-        // Create new chart for this operation
+
+        // Create one chart per category
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Library / Provider");
-        xAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE); 
+        xAxis.setLabel(I18N.getInstance().get("benchmark.chart.xaxis", "Benchmark / Library"));
+        xAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE);
         xAxis.setStyle("-fx-tick-label-fill: white; -fx-text-fill: white;");
 
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Ops/Sec");
+        yAxis.setLabel(I18N.getInstance().get("benchmark.chart.yaxis"));
         yAxis.setTickLabelFill(javafx.scene.paint.Color.WHITE);
         yAxis.setStyle("-fx-tick-label-fill: white; -fx-text-fill: white;");
-        
+
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle(operationName);
+        chart.setTitle(category);
         chart.setAnimated(false);
         chart.setLegendVisible(false);
-        
+
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName(operationName);
+        series.setName(category);
         chart.getData().add(series);
-        
-        Tab tab = new Tab(operationName);
+
+        Tab tab = new Tab(category);
         tab.setContent(chart);
         visualizationTabPane.getTabs().add(tab);
-        
-        domainSeriesMap.put(operationName, series);
-        domainChartMap.put(operationName, chart);
-        
+
+        domainSeriesMap.put(category, series);
+        domainChartMap.put(category, chart);
+
         return chart;
     }
 
