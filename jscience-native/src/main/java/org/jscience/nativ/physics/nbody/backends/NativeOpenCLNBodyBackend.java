@@ -267,9 +267,8 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend {
 
             initialized = true;
         } catch (Exception e) {
-            String msg = "OpenCL NBody Init Failed: " + e.getMessage();
-            LOGGER.severe(msg);
-            throw new RuntimeException(msg, e);
+            LOGGER.warning("OpenCL NBody init failed (device may lack fp64 support): " + e.getMessage());
+            initialized = false;
         }
     }
 
