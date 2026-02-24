@@ -105,34 +105,61 @@ public class JBulletBackend implements MechanicsBackend, CPUBackend, CollisionPr
 
     @Override
     public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
-        // Simple O(n^2) implementation for now
-        int count = 0;
-        java.nio.DoubleBuffer posBuf = positions.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        if (n == 0) return 0;
+        java.nio.DoubleBuffer posBuf  = positions.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
         java.nio.DoubleBuffer radiiBuf = radii.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        java.nio.IntBuffer collBuf = collisions.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-        
+        java.nio.IntBuffer    collBuf  = collisions.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+
+        // --- Spatial Hash O(n) collision detection ---
+        // Find max radius to determine cell size
+        double maxR = 0;
+        for (int i = 0; i < n; i++) { double r = radiiBuf.get(i); if (r > maxR) maxR = r; }
+        final double cellSize = maxR * 2.0;
+        if (cellSize == 0) return 0;
+
+        // Build hash map: cell key -> list of body indices
+        java.util.HashMap<Long, java.util.List<Integer>> grid = new java.util.HashMap<>(n * 2);
         for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                double x1 = posBuf.get(i * 3);
-                double y1 = posBuf.get(i * 3 + 1);
-                double z1 = posBuf.get(i * 3 + 2);
-                double r1 = radiiBuf.get(i);
-                
-                double x2 = posBuf.get(j * 3);
-                double y2 = posBuf.get(j * 3 + 1);
-                double z2 = posBuf.get(j * 3 + 2);
-                double r2 = radiiBuf.get(j);
-                
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-                double dz = z2 - z1;
-                double distSq = dx * dx + dy * dy + dz * dz;
-                double radiusSum = r1 + r2;
-                
-                if (distSq < radiusSum * radiusSum) {
-                    collBuf.put(count * 2, i);
-                    collBuf.put(count * 2 + 1, j);
-                    count++;
+            long cx = (long) Math.floor(posBuf.get(i * 3)     / cellSize);
+            long cy = (long) Math.floor(posBuf.get(i * 3 + 1) / cellSize);
+            long cz = (long) Math.floor(posBuf.get(i * 3 + 2) / cellSize);
+            long key = cx * 73856093L ^ cy * 19349663L ^ cz * 83492791L;
+            grid.computeIfAbsent(key, k -> new java.util.ArrayList<>()).add(i);
+        }
+
+        // For each body, check against 27 neighbouring cells (including own)
+        int count = 0;
+        java.util.HashSet<Long> checkedPairs = new java.util.HashSet<>(n * 4);
+        for (int i = 0; i < n; i++) {
+            double x1 = posBuf.get(i * 3), y1 = posBuf.get(i * 3 + 1), z1 = posBuf.get(i * 3 + 2);
+            double r1 = radiiBuf.get(i);
+            long bx = (long) Math.floor(x1 / cellSize);
+            long by = (long) Math.floor(y1 / cellSize);
+            long bz = (long) Math.floor(z1 / cellSize);
+
+            for (long nx = bx - 1; nx <= bx + 1; nx++) {
+                for (long ny = by - 1; ny <= by + 1; ny++) {
+                    for (long nz = bz - 1; nz <= bz + 1; nz++) {
+                        long nkey = nx * 73856093L ^ ny * 19349663L ^ nz * 83492791L;
+                        java.util.List<Integer> cell = grid.get(nkey);
+                        if (cell == null) continue;
+                        for (int j : cell) {
+                            if (j <= i) continue; // each pair once
+                            // Dedup across multi-cell overlaps
+                            long pairKey = ((long) i << 32) | (j & 0xFFFFFFFFL);
+                            if (!checkedPairs.add(pairKey)) continue;
+
+                            double x2 = posBuf.get(j * 3), y2 = posBuf.get(j * 3 + 1), z2 = posBuf.get(j * 3 + 2);
+                            double r2 = radiiBuf.get(j);
+                            double dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
+                            double radiusSum = r1 + r2;
+                            if (dx*dx + dy*dy + dz*dz < radiusSum * radiusSum) {
+                                collBuf.put(count * 2, i);
+                                collBuf.put(count * 2 + 1, j);
+                                count++;
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -64,6 +64,15 @@ public interface MechanicsBackend extends ComputeBackend, AlgorithmProvider {
         return true;
     }
 
+    /**
+     * Returns a quality score for this backend on the current hardware.
+     * Higher is better. Used by ProviderSelector to rank backends.
+     * Override to provide hardware-specific scoring.
+     */
+    default int score() {
+        return getPriority();
+    }
+
     @Override
     default int getPriority() {
         return 0;

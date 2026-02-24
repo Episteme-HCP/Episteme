@@ -46,6 +46,13 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
     private static final MethodHandle BT_DISCRETE_DYNAMICS_WORLD_NEW;
     private static final MethodHandle BT_DYNAMICS_WORLD_STEP_SIMULATION;
     private static final MethodHandle BT_DYNAMICS_WORLD_SET_GRAVITY;
+    // RigidBody lifecycle handles
+    private static final MethodHandle BT_SPHERE_SHAPE_NEW;               // (float radius) -> ptr
+    private static final MethodHandle BT_DEFAULT_MOTION_STATE_NEW;        // (float[16] transform) -> ptr
+    private static final MethodHandle BT_RIGID_BODY_NEW;                  // (float mass, motionState, shape, float[3] inertia) -> ptr
+    private static final MethodHandle BT_DYNAMICS_WORLD_ADD_RIGID_BODY;   // (world, body) -> void
+    private static final MethodHandle BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY;// (world, body) -> void
+    private static final MethodHandle BT_COLLISION_SHAPE_CALCULATE_INERTIA;// (shape, float mass, float[3] out) -> void
     
     private static final boolean IS_AVAILABLE_FLAG;
 
@@ -99,10 +106,24 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
             BT_DYNAMICS_WORLD_SET_GRAVITY = lookup.find("btDynamicsWorld_setGravity")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
 
+            BT_SPHERE_SHAPE_NEW = lookup.find("btSphereShape_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT))).orElse(null);
+            BT_DEFAULT_MOTION_STATE_NEW = lookup.find("btDefaultMotionState_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+            BT_RIGID_BODY_NEW = lookup.find("btRigidBody_new")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+            BT_DYNAMICS_WORLD_ADD_RIGID_BODY = lookup.find("btDynamicsWorld_addRigidBody")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+            BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY = lookup.find("btDynamicsWorld_removeRigidBody")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+            BT_COLLISION_SHAPE_CALCULATE_INERTIA = lookup.find("btCollisionShape_calculateLocalInertia")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS))).orElse(null);
+
             IS_AVAILABLE_FLAG = BT_DISCRETE_DYNAMICS_WORLD_NEW != null;
         } else {
             DETECT_SPHERES = RESOLVE_COLLISIONS = null;
             BT_DEFAULT_COLLISION_CONFIGURATION_NEW = BT_COLLISION_DISPATCHER_NEW = BT_DBVT_BROADPHASE_NEW = BT_SEQUENTIAL_IMPULSE_CONSTRAINT_SOLVER_NEW = BT_DISCRETE_DYNAMICS_WORLD_NEW = BT_DYNAMICS_WORLD_STEP_SIMULATION = BT_DYNAMICS_WORLD_SET_GRAVITY = null;
+            BT_SPHERE_SHAPE_NEW = BT_DEFAULT_MOTION_STATE_NEW = BT_RIGID_BODY_NEW = BT_DYNAMICS_WORLD_ADD_RIGID_BODY = BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY = BT_COLLISION_SHAPE_CALCULATE_INERTIA = null;
             IS_AVAILABLE_FLAG = false;
         }
     }
@@ -206,6 +227,9 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
 
     private static class NativeBulletWorld implements PhysicsWorldBridge {
         private final MemorySegment worldPtr;
+        /** Maps RigidBody identity -> native btRigidBody pointer (global arena). */
+        private final java.util.IdentityHashMap<RigidBody, MemorySegment> bodyPtrs = new java.util.IdentityHashMap<>();
+        private final java.lang.foreign.Arena bodyArena = java.lang.foreign.Arena.ofAuto();
 
         NativeBulletWorld(MemorySegment worldPtr) {
             this.worldPtr = worldPtr;
@@ -213,12 +237,48 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
 
         @Override
         public void addRigidBody(RigidBody body) {
-            // Implementation for adding rigid body to native world
+            if (BT_RIGID_BODY_NEW == null || BT_SPHERE_SHAPE_NEW == null) return;
+            try {
+                // Create a unit sphere shape  
+                MemorySegment shape = (MemorySegment) BT_SPHERE_SHAPE_NEW.invokeExact(1.0f);
+
+                // Compute local inertia
+                float mass = 1.0f;
+                MemorySegment inertia = bodyArena.allocate(ValueLayout.JAVA_FLOAT, 3);
+                if (BT_COLLISION_SHAPE_CALCULATE_INERTIA != null)
+                    BT_COLLISION_SHAPE_CALCULATE_INERTIA.invokeExact(shape, mass, inertia);
+
+                // Identity transform (column-major 4x4)
+                MemorySegment transform = bodyArena.allocate(ValueLayout.JAVA_FLOAT, 16);
+                for (int i = 0; i < 16; i++) transform.setAtIndex(ValueLayout.JAVA_FLOAT, i, (i % 5 == 0) ? 1.0f : 0.0f);
+                org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> pos = body.getPosition();
+                if (pos != null && pos.dimension() >= 3) {
+                    transform.setAtIndex(ValueLayout.JAVA_FLOAT, 12, (float) pos.get(0).doubleValue());
+                    transform.setAtIndex(ValueLayout.JAVA_FLOAT, 13, (float) pos.get(1).doubleValue());
+                    transform.setAtIndex(ValueLayout.JAVA_FLOAT, 14, (float) pos.get(2).doubleValue());
+                }
+
+                MemorySegment motionState = (MemorySegment) BT_DEFAULT_MOTION_STATE_NEW.invokeExact(transform);
+                MemorySegment rbPtr = (MemorySegment) BT_RIGID_BODY_NEW.invokeExact(mass, motionState, shape, inertia);
+                bodyPtrs.put(body, rbPtr);
+                if (BT_DYNAMICS_WORLD_ADD_RIGID_BODY != null)
+                    BT_DYNAMICS_WORLD_ADD_RIGID_BODY.invokeExact(worldPtr, rbPtr);
+            } catch (Throwable t) {
+                java.util.logging.Logger.getLogger(NativeBulletBackend.class.getName())
+                    .warning("[NativeBulletWorld] addRigidBody failed: " + t.getMessage());
+            }
         }
 
         @Override
         public void removeRigidBody(RigidBody body) {
-            // Implementation for removing rigid body
+            MemorySegment rbPtr = bodyPtrs.remove(body);
+            if (rbPtr == null || BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY == null) return;
+            try {
+                BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY.invokeExact(worldPtr, rbPtr);
+            } catch (Throwable t) {
+                java.util.logging.Logger.getLogger(NativeBulletBackend.class.getName())
+                    .warning("[NativeBulletWorld] removeRigidBody failed: " + t.getMessage());
+            }
         }
 
         @Override
