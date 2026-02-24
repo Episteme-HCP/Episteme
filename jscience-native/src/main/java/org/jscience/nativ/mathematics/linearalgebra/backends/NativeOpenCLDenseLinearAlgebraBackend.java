@@ -11,6 +11,9 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Ring;
@@ -23,6 +26,7 @@ import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 
 import java.nio.DoubleBuffer;
+import java.util.Arrays;
 
 /**
  * OpenCL implementation of Dense Linear Algebra Provider.
@@ -38,22 +42,34 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     private cl_context context;
     private cl_command_queue commandQueue;
     private cl_kernel matMulKernel;
+    private cl_kernel vecAddKernel;
+    private cl_kernel vecSubKernel;
+    private cl_kernel vecScaleKernel;
+    private cl_kernel vecDotPartialKernel;
     private cl_program program;
     private boolean initialized = false;
 
-
-    private static final String KERNEL_SOURCE = 
+    private static final String KERNEL_SOURCE =
         "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
         "__kernel void matrixMultiply(__global const double *a, __global const double *b, __global double *c, const int m, const int n, const int k) {\n" +
-        "    int row = get_global_id(1);\n" +
-        "    int col = get_global_id(0);\n" +
+        "    int row = get_global_id(1); int col = get_global_id(0);\n" +
         "    if (row < m && col < n) {\n" +
         "        double sum = 0.0;\n" +
-        "        for (int i = 0; i < k; i++) {\n" +
-        "            sum += a[row * k + i] * b[i * n + col];\n" +
-        "        }\n" +
-        "        c[row * n + col] = sum;\n" +
+        "        for (int i = 0; i < k; i++) sum += a[row*k+i] * b[i*n+col];\n" +
+        "        c[row*n+col] = sum;\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void vec_add(__global const double *a, __global const double *b, __global double *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) c[i] = a[i] + b[i];\n" +
+        "}\n" +
+        "__kernel void vec_sub(__global const double *a, __global const double *b, __global double *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) c[i] = a[i] - b[i];\n" +
+        "}\n" +
+        "__kernel void vec_scale(__global const double *a, const double s, __global double *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) c[i] = a[i] * s;\n" +
+        "}\n" +
+        "__kernel void vec_dot_partial(__global const double *a, __global const double *b, __global double *out, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) out[i] = a[i] * b[i];\n" +
         "}\n";
 
     private synchronized void init() {
@@ -82,6 +98,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
             program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE}, null, null);
             clBuildProgram(program, 0, null, null, null, null);
             matMulKernel = clCreateKernel(program, "matrixMultiply", null);
+            vecAddKernel = clCreateKernel(program, "vec_add", null);
+            vecSubKernel = clCreateKernel(program, "vec_sub", null);
+            vecScaleKernel = clCreateKernel(program, "vec_scale", null);
+            vecDotPartialKernel = clCreateKernel(program, "vec_dot_partial", null);
 
             initialized = true;
         } catch (Exception e) {
@@ -159,19 +179,138 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     @Override public void synchronize() { if (commandQueue != null) clFinish(commandQueue); }
     @Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
 
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL add not implemented"); }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL subtract not implemented"); }
-    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL scale not implemented"); }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL transpose not implemented"); }
-    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL multiply not implemented"); }
-    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL add not implemented"); }
-    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL subtract not implemented"); }
-    @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException("OpenCL multiply not implemented"); }
-    @Override public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL dot not implemented"); }
-    @Override public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("OpenCL norm not implemented"); }
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL inverse not implemented"); }
-    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL determinant not implemented"); }
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL solve not implemented"); }
+    /** Matrix add via element-wise OpenCL. */
+    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecAddKernel, a.rows(), a.cols());
+    }
+    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecSubKernel, a.rows(), a.cols());
+    }
+    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        return fromDoubleArray(scaleVec(toDoubleArray(a), scalar.doubleValue()), a.rows(), a.cols());
+    }
+    @Override public Matrix<Real> transpose(Matrix<Real> a) {
+        // Pure Java transpose — not memory-bound enough to warrant a kernel
+        int r = a.rows(), c = a.cols();
+        double[] src = toDoubleArray(a);
+        double[] dst = new double[r * c];
+        for (int i = 0; i < r; i++) for (int j = 0; j < c; j++) dst[j * r + i] = src[i * c + j];
+        return fromDoubleArray(dst, c, r);
+    }
+    @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        // Mv = A * (b as column matrix) — reuse GPU matmul kernel
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        double[] av = toDoubleArray(a), bv = toDoubleVec(b);
+        double[] result = matVecMul(av, bv, a.rows(), a.cols());
+        return toRealVector(result);
+    }
+    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecAddKernel));
+    }
+    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecSubKernel));
+    }
+    @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        return toRealVector(scaleVec(toDoubleVec(vector), scalar.doubleValue()));
+    }
+    @Override public Real dot(Vector<Real> a, Vector<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        double[] products = vecOp(toDoubleVec(a), toDoubleVec(b), vecDotPartialKernel);
+        double sum = 0; for (double v : products) sum += v;
+        return Real.of(sum);
+    }
+    @Override public Real norm(Vector<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        double[] av = toDoubleVec(a);
+        double[] sq = scaleVecElementWise(av, av); // a[i]*a[i] via dot kernel
+        double sum = 0; for (double v : sq) sum += v;
+        return Real.of(Math.sqrt(sum));
+    }
+    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for matrix inverse"); }
+    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for determinant"); }
+    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for solve"); }
+    @Override public EigenResult<Real> eigen(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for eigendecomposition"); }
+    @Override public SVDResult<Real> svd(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for SVD"); }
+    @Override public LUResult<Real> lu(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for LU decomposition"); }
+
+    // ---- helpers ----
+
+    private Matrix<Real> elementWiseVec(double[] a, double[] b, cl_kernel k, int rows, int cols) {
+        return fromDoubleArray(vecOp(a, b, k), rows, cols);
+    }
+
+    private double[] vecOp(double[] a, double[] b, cl_kernel k) {
+        int n = a.length;
+        double[] result = new double[n];
+        cl_mem mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+        cl_mem mB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(b), null);
+        cl_mem mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+        try {
+            clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mA));
+            clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(mB));
+            clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mC));
+            clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(commandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+        } finally { clReleaseMemObject(mA); clReleaseMemObject(mB); clReleaseMemObject(mC); }
+        return result;
+    }
+
+    private double[] scaleVec(double[] a, double s) {
+        int n = a.length;
+        double[] result = new double[n];
+        cl_mem mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+        cl_mem mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+        try {
+            clSetKernelArg(vecScaleKernel, 0, Sizeof.cl_mem, Pointer.to(mA));
+            clSetKernelArg(vecScaleKernel, 1, Sizeof.cl_double, Pointer.to(new double[]{s}));
+            clSetKernelArg(vecScaleKernel, 2, Sizeof.cl_mem, Pointer.to(mC));
+            clSetKernelArg(vecScaleKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(commandQueue, vecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+        } finally { clReleaseMemObject(mA); clReleaseMemObject(mC); }
+        return result;
+    }
+
+    private double[] scaleVecElementWise(double[] a, double[] b) {
+        return vecOp(a, b, vecDotPartialKernel);
+    }
+
+    private double[] toDoubleVec(Vector<Real> v) {
+        double[] d = new double[v.dimension()];
+        for (int i = 0; i < d.length; i++) d[i] = v.get(i).doubleValue();
+        return d;
+    }
+
+    private Vector<Real> toRealVector(double[] d) {
+        return org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
+    }
+
+    private double[] matVecMul(double[] a, double[] b, int rows, int cols) {
+        // Mv = treat b as nx1 matrix and use GPU matmul
+        double[] bMat = b; // already a flat column
+        double[] c = new double[rows];
+        cl_mem mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * rows * cols, Pointer.to(a), null);
+        cl_mem mB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * cols, Pointer.to(bMat), null);
+        cl_mem mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * rows, null, null);
+        try {
+            clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(mA));
+            clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(mB));
+            clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(mC));
+            clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{rows}));
+            clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{1}));
+            clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{cols}));
+            clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, new long[]{1, rows}, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * rows, Pointer.to(c), 0, null, null);
+        } finally { clReleaseMemObject(mA); clReleaseMemObject(mB); clReleaseMemObject(mC); }
+        return c;
+    }
 
     @Override public double score(OperationContext context) {
         if (!isAvailable()) return -1.0;
