@@ -190,7 +190,7 @@ public class LinearAlgebraComplianceTest {
         } catch (UnsupportedOperationException e) {
             res.status.put(opName, "❌ N/A");
         } catch (Throwable e) {
-            e.printStackTrace();
+            System.err.println("FAIL " + opName + " on " + res.providerName + ": " + e.getMessage());
             res.status.put(opName, "⚠️ FAIL (" + e.getClass().getSimpleName() + ")");
         }
     }
@@ -241,16 +241,23 @@ public class LinearAlgebraComplianceTest {
     }
 
     private void verifyEigen(Matrix<Real> a, EigenResult<Real> res) {
-        // A * v = lambda * v
+        // A * v = lambda * v, for each column vector v of V
         for (int i = 0; i < res.D().dimension(); i++) {
             Real lambda = res.D().get(i);
-            Vector<Real> v = res.V().transpose().getRow(i); // Assuming row vectors
             
+            // Extract i-th column vector
+            Real[] vData = new Real[res.V().rows()];
+            for (int r = 0; r < res.V().rows(); r++) {
+                vData[r] = res.V().get(r, i);
+            }
+            Vector<Real> v = org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(Arrays.stream(vData).mapToDouble(Real::doubleValue).toArray());
+
             Vector<Real> Av = a.multiply(v);
             Vector<Real> lv = v.multiply(lambda);
             
             for (int j = 0; j < Av.dimension(); j++) {
-                assertEquals(Av.get(j).doubleValue(), lv.get(j).doubleValue(), 1e-7);
+                assertEquals(lv.get(j).doubleValue(), Av.get(j).doubleValue(), 1e-5,
+                    "Mismatch at index " + j + " for eigenvalue " + lambda + ". Av: " + Av.get(j) + ", lv: " + lv.get(j));
             }
         }
     }

@@ -304,14 +304,7 @@ public class HartreeFockSCFMethod extends SCFMethod {
     }
     
     private Matrix<Real> getEigenvectors(EigenDecomposition eig) {
-        // Reflection or assumption of API. 
-        // Based on Step 333, EigenDecomposition constructor took Matrix<Real> eigenvectors.
-        // It likely exposes it.
-        // We'll return Identity if we can't access, to ensure compilation.
-        // PROPER IMPLEMENTATION:
-        // return eig.getEigenvectors(); 
-        // Reverting to robust fallback for blind coding:
-        return createIdentityMatrix(eig.spectralRadius().intValue()); // Dummy usage
+        return eig.getEigenvectors(); 
     }
 
     private int calculateElectronCount() {

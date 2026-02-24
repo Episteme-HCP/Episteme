@@ -190,8 +190,6 @@
             <groupId>org.mpjexpress</groupId>
             <artifactId>mpj</artifactId>
             <version>0.44</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/MPJ/lib/mpj.jar</systemPath>
         </dependency>
     </dependencies>
 
@@ -214,6 +212,28 @@
                         <goals>
                             <goal>detect</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Install Local MPJ Dependency -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <id>install-mpj</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.basedir}/../libs/MPJ/lib/mpj.jar</file>
+                            <groupId>org.mpjexpress</groupId>
+                            <artifactId>mpj</artifactId>
+                            <version>0.44</version>
+                            <packaging>jar</packaging>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

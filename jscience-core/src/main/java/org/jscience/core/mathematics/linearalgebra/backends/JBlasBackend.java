@@ -227,10 +227,15 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override @SuppressWarnings("unchecked")
         public E norm(Vector<E> a) { return (E) org.jscience.core.mathematics.numbers.real.Real.of(toJBlasVector(a).norm2()); }
 
-        @Override public QRResult<E> qr(Matrix<E> a) { throw new UnsupportedOperationException(); }
-        @Override public SVDResult<E> svd(Matrix<E> a) { throw new UnsupportedOperationException(); }
-        @Override public EigenResult<E> eigen(Matrix<E> a) { throw new UnsupportedOperationException(); }
-        @Override public LUResult<E> lu(Matrix<E> a) { throw new UnsupportedOperationException(); }
-        @Override public CholeskyResult<E> cholesky(Matrix<E> a) { throw new UnsupportedOperationException(); }
+        @SuppressWarnings("unchecked")
+        @Override public QRResult<E> qr(Matrix<E> a) { return ((LinearAlgebraProvider<E>) org.jscience.core.technical.algorithm.AlgorithmManager.getReferenceProvider(LinearAlgebraProvider.class)).qr(a); }
+        @SuppressWarnings("unchecked")
+        @Override public SVDResult<E> svd(Matrix<E> a) { return ((LinearAlgebraProvider<E>) org.jscience.core.technical.algorithm.AlgorithmManager.getReferenceProvider(LinearAlgebraProvider.class)).svd(a); }
+        @SuppressWarnings("unchecked")
+        @Override public EigenResult<E> eigen(Matrix<E> a) { return ((LinearAlgebraProvider<E>) org.jscience.core.technical.algorithm.AlgorithmManager.getReferenceProvider(LinearAlgebraProvider.class)).eigen(a); }
+        @SuppressWarnings("unchecked")
+        @Override public LUResult<E> lu(Matrix<E> a) { return ((LinearAlgebraProvider<E>) org.jscience.core.technical.algorithm.AlgorithmManager.getReferenceProvider(LinearAlgebraProvider.class)).lu(a); }
+        @SuppressWarnings("unchecked")
+        @Override public CholeskyResult<E> cholesky(Matrix<E> a) { return ((LinearAlgebraProvider<E>) org.jscience.core.technical.algorithm.AlgorithmManager.getReferenceProvider(LinearAlgebraProvider.class)).cholesky(a); }
     }
 }

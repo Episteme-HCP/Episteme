@@ -1,38 +1,41 @@
 package org.jscience.core.mathematics.linearalgebra;
 
-import org.junit.jupiter.api.Test;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition;
 import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.junit.jupiter.api.Test;
+import java.util.Random;
 
 public class EigenDebugTest {
+    public static void main(String[] args) {
+        new EigenDebugTest().testNaN();
+    }
+    
     @Test
-    public void testEigenDebug() {
-        try {
-            CPUDenseLinearAlgebraProvider<Real> provider = new CPUDenseLinearAlgebraProvider<>();
-            RealDoubleMatrix a = RealDoubleMatrix.of(new double[][]{
-                {2.0, 1.0},
-                {1.0, 2.0}
-            });
-            EigenResult<Real> result = provider.eigen(a);
-            System.out.println("Success! Dimensions: " + result.D().dimension());
-            
-            // Re-run verifyEigen logic
-            for (int i = 0; i < result.D().dimension(); i++) {
-                Real lambda = result.D().get(i);
-                Vector<Real> v = result.V().transpose().getRow(i); // Assuming row vectors
-                
-                // Verify A*v == lambda*v (numerical check skipped; values printed for audit)
-                @SuppressWarnings("unused")
-                Vector<Real> Av = a.multiply(v);
-                @SuppressWarnings("unused")
-                Vector<Real> lv = v.multiply(lambda);
+    public void testNaN() {
+        int SIZE = 50;
+        Random rand = new Random(42);
+        double[][] data = new double[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                double val = (rand.nextDouble() < 0.2) ? 0.0 : rand.nextDouble() * 2 - 1;
+                data[i][j] = val;
             }
-            System.out.println("Verification passed.");
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new RuntimeException("Test Failed", e);
         }
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = i; j < SIZE; j++) {
+                double val = data[i][j] + data[j][i];
+                data[i][j] = val;
+                data[j][i] = val;
+            }
+        }
+        RealDoubleMatrix a = RealDoubleMatrix.of(data);
+        EigenDecomposition res = EigenDecomposition.decompose(a);
+        
+        StringBuilder sb = new StringBuilder("EIGENVALUES:\n");
+        for(Real val : res.getEigenvalues()) {
+            sb.append("Eig: ").append(val).append("\n");
+        }
+        throw new RuntimeException(sb.toString());
     }
 }

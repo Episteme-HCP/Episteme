@@ -53,7 +53,7 @@ public class ExactVsApproximateTest {
             a = b;
             b = temp;
         }
-        return b;
+        return a;
     }
 
     /**
@@ -126,7 +126,7 @@ public class ExactVsApproximateTest {
         Natural huge = Natural.of(Long.MAX_VALUE);
         Natural hugeSquared = huge.multiply(huge);
         assertNotNull(hugeSquared);
-        assertTrue(hugeSquared.toString().length() > 38);
+        assertTrue(hugeSquared.toString().length() >= 38);
 
         // Approx square
         Real approxHuge = Real.of(Long.MAX_VALUE);

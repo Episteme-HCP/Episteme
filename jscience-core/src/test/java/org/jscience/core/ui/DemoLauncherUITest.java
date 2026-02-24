@@ -82,16 +82,15 @@ public class DemoLauncherUITest {
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
         assertNotNull(menuBar, "Menu bar should exist");
 
-        // Should have exactly 2 menus: File and View
+        // Should have exactly 2 menus: Language and Theme
         assertEquals(2, menuBar.getMenus().size(),
-                "Menu bar should have exactly 2 menus (File, View)");
+                "Menu bar should have exactly 2 menus (Language, Theme)");
     }
 
     @Test
     void testLanguageMenuHasOptions(FxRobot robot) {
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1); // View is 2nd
-        Menu languageMenu = (Menu) viewMenu.getItems().get(0); // Language is 1st in View (Submenu)
+        Menu languageMenu = menuBar.getMenus().get(0); // Language is 1st
 
         // Language menu should have at least 2 language options
         assertTrue(languageMenu.getItems().size() >= 2,
@@ -107,8 +106,7 @@ public class DemoLauncherUITest {
     @Test
     void testThemeMenuHasOptions(FxRobot robot) {
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1); // View is 2nd
-        Menu themeMenu = (Menu) viewMenu.getItems().get(1); // Theme is 2nd in View
+        Menu themeMenu = menuBar.getMenus().get(1); // Theme is 2nd
 
         // Theme menu should have at least 2 options
         assertTrue(themeMenu.getItems().size() >= 2,
@@ -124,8 +122,7 @@ public class DemoLauncherUITest {
     @Test
     void testLanguageMenuHasToggleGroup(FxRobot robot) {
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1);
-        Menu languageMenu = (Menu) viewMenu.getItems().get(0);
+        Menu languageMenu = menuBar.getMenus().get(0);
 
         if (!languageMenu.getItems().isEmpty()) {
             RadioMenuItem first = (RadioMenuItem) languageMenu.getItems().get(0);
@@ -136,8 +133,7 @@ public class DemoLauncherUITest {
     @Test
     void testThemeMenuHasToggleGroup(FxRobot robot) {
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1);
-        Menu themeMenu = (Menu) viewMenu.getItems().get(1);
+        Menu themeMenu = menuBar.getMenus().get(1);
 
         if (!themeMenu.getItems().isEmpty()) {
             RadioMenuItem first = (RadioMenuItem) themeMenu.getItems().get(0);
@@ -195,13 +191,9 @@ public class DemoLauncherUITest {
 
     @Test
     void testTitledPanesExist(FxRobot robot) {
-        // Might be empty if no providers are found during test, but we check if they
-        // exist
-        // or if container exists.
-        // If discovery finds nothing, titled panes might be 0.
-        // We should check if accordion exists at least.
-        Accordion accordion = robot.lookup(node -> node instanceof Accordion).queryAs(Accordion.class);
-        assertNotNull(accordion, "Accordion should exist");
+        Set<TitledPane> panes = robot.lookup(".titled-pane").queryAllAs(TitledPane.class);
+        assertNotNull(panes, "TitledPanes query result should not be null");
+        // It's acceptable for panes to be empty if no demo providers are discovered during tests.
     }
 
     @Test

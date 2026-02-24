@@ -41,42 +41,41 @@ public class DistributedCARMAAlgorithm {
         DistributedContext ctx = ComputeContext.current().getDistributedContext();
         int p = ctx.getParallelism();
 
-        TiledMatrix C = new TiledMatrix(A, A.getTileSize(), A.getTileSize());
+        TiledMatrix C = new TiledMatrix(A.rows(), B.cols(), A.getTileSize());
         
         System.out.println("[CARMA] Executing on " + p + " processors.");
         
-        carmaRecursive(A, B, C, p, ctx);
+        int m = A.getNumTileRows();
+        int k = A.getNumTileCols();
+        int n = B.getNumTileCols();
+        
+        carmaRecursive(A, 0, 0, B, 0, 0, C, 0, 0, m, k, n, p, ctx);
         
         return C;
     }
 
-    private static void carmaRecursive(TiledMatrix A, TiledMatrix B, TiledMatrix C, int p, DistributedContext ctx) {
+    private static void carmaRecursive(TiledMatrix A, int aRow, int aCol,
+                                       TiledMatrix B, int bRow, int bCol, 
+                                       TiledMatrix C, int cRow, int cCol, 
+                                       int m, int k, int n,
+                                       int p, DistributedContext ctx) {
         if (p <= 1) {
             // Base case: Local multiplication
-            standardMultiply(A, B, C);
+            standardMultiply(A, aRow, aCol, B, bRow, bCol, C, cRow, cCol, m, k, n);
             return;
         }
-
-        int m = A.getNumTileRows();
-        int k = A.getNumTileCols();
-        int n = B.getNumTileCols();
 
         // Find the largest dimension to split
         if (k >= m && k >= n) {
             // Split k - summation split
             int kHalf = k / 2;
-            TiledMatrix A1 = A.getSubTiledMatrix(0, m, 0, kHalf);
-            TiledMatrix A2 = A.getSubTiledMatrix(0, m, kHalf, k);
-            TiledMatrix B1 = B.getSubTiledMatrix(0, kHalf, 0, n);
-            TiledMatrix B2 = B.getSubTiledMatrix(kHalf, k, 0, n);
 
-            // Parallel summation
             Future<?> f1 = ctx.submit(() -> {
-                carmaRecursive(A1, B1, C, p / 2, ctx);
+                carmaRecursive(A, aRow, aCol, B, bRow, bCol, C, cRow, cCol, m, kHalf, n, p / 2, ctx);
                 return null;
             });
             Future<?> f2 = ctx.submit(() -> {
-                carmaRecursive(A2, B2, C, p - p / 2, ctx);
+                carmaRecursive(A, aRow, aCol + kHalf, B, bRow + kHalf, bCol, C, cRow, cCol, m, k - kHalf, n, p - p / 2, ctx);
                 return null;
             });
             
@@ -85,17 +84,13 @@ public class DistributedCARMAAlgorithm {
         } else if (m >= k && m >= n) {
             // Split m - row split
             int mHalf = m / 2;
-            TiledMatrix A1 = A.getSubTiledMatrix(0, mHalf, 0, k);
-            TiledMatrix A2 = A.getSubTiledMatrix(mHalf, m, 0, k);
-            TiledMatrix C1 = C.getSubTiledMatrix(0, mHalf, 0, n);
-            TiledMatrix C2 = C.getSubTiledMatrix(mHalf, m, 0, n);
 
             Future<?> f1 = ctx.submit(() -> {
-                carmaRecursive(A1, B, C1, p / 2, ctx);
+                carmaRecursive(A, aRow, aCol, B, bRow, bCol, C, cRow, cCol, mHalf, k, n, p / 2, ctx);
                 return null;
             });
             Future<?> f2 = ctx.submit(() -> {
-                carmaRecursive(A2, B, C2, p - p / 2, ctx);
+                carmaRecursive(A, aRow + mHalf, aCol, B, bRow, bCol, C, cRow + mHalf, cCol, m - mHalf, k, n, p - p / 2, ctx);
                 return null;
             });
             
@@ -104,17 +99,13 @@ public class DistributedCARMAAlgorithm {
         } else {
             // Split n - column split
             int nHalf = n / 2;
-            TiledMatrix B1 = B.getSubTiledMatrix(0, k, 0, nHalf);
-            TiledMatrix B2 = B.getSubTiledMatrix(0, k, nHalf, n);
-            TiledMatrix C1 = C.getSubTiledMatrix(0, m, 0, nHalf);
-            TiledMatrix C2 = C.getSubTiledMatrix(0, m, nHalf, n);
 
             Future<?> f1 = ctx.submit(() -> {
-                carmaRecursive(A, B1, C1, p / 2, ctx);
+                carmaRecursive(A, aRow, aCol, B, bRow, bCol, C, cRow, cCol, m, k, nHalf, p / 2, ctx);
                 return null;
             });
             Future<?> f2 = ctx.submit(() -> {
-                carmaRecursive(A, B2, C2, p - p / 2, ctx);
+                carmaRecursive(A, aRow, aCol, B, bRow, bCol + nHalf, C, cRow, cCol + nHalf, m, k, n - nHalf, p - p / 2, ctx);
                 return null;
             });
             
@@ -122,26 +113,25 @@ public class DistributedCARMAAlgorithm {
         }
     }
 
-    private static void standardMultiply(TiledMatrix A, TiledMatrix B, TiledMatrix C) {
-        int m = A.getNumTileRows();
-        int k = A.getNumTileCols();
-        int n = B.getNumTileCols();
-        
+    private static void standardMultiply(TiledMatrix A, int aRow, int aCol,
+                                         TiledMatrix B, int bRow, int bCol,
+                                         TiledMatrix C, int cRow, int cCol,
+                                         int m, int k, int n) {
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 Matrix<Real> sum = null;
                 for (int l = 0; l < k; l++) {
-                    Matrix<Real> aTile = A.getTile(i, l);
-                    Matrix<Real> bTile = B.getTile(l, j);
+                    Matrix<Real> aTile = A.getTile(aRow + i, aCol + l);
+                    Matrix<Real> bTile = B.getTile(bRow + l, bCol + j);
                     Matrix<Real> prod = aTile.multiply(bTile);
                     if (sum == null) sum = prod;
                     else sum = sum.add(prod);
                 }
                 
                 synchronized (C) {
-                    Matrix<Real> current = C.getTile(i, j);
-                    if (current == null) C.setTile(i, j, sum);
-                    else C.setTile(i, j, current.add(sum));
+                    Matrix<Real> current = C.getTile(cRow + i, cCol + j);
+                    if (current == null) C.setTile(cRow + i, cCol + j, sum);
+                    else C.setTile(cRow + i, cCol + j, current.add(sum));
                 }
             }
         }

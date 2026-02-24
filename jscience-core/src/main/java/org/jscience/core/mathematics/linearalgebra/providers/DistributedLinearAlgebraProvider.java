@@ -10,6 +10,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.sets.Reals;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import com.google.auto.service.AutoService;
 
 /**
  * Linear algebra provider that delegates to distributed algorithms when appropriate.
@@ -22,6 +23,7 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
+@AutoService(LinearAlgebraProvider.class)
 public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     public DistributedLinearAlgebraProvider() {

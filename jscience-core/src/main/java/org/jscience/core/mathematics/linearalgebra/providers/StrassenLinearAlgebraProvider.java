@@ -47,6 +47,19 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
                     (SIMDRealDoubleMatrix) a, (SIMDRealDoubleMatrix) b);
         }
         
+        // Fast path for RealDoubleMatrix: Avoid boxing GC storm
+        if (a instanceof org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix && b instanceof org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rda = (org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) a;
+            org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rdb = (org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) b;
+            SIMDRealDoubleMatrix simda = new SIMDRealDoubleMatrix(a.rows(), a.cols(), rda.toDoubleArray());
+            SIMDRealDoubleMatrix simdb = new SIMDRealDoubleMatrix(b.rows(), b.cols(), rdb.toDoubleArray());
+            
+            SIMDRealDoubleMatrix res = RealDoubleStrassenAlgorithm.multiply(simda, simdb);
+            // Convert back to RealDoubleMatrix to preserve expected contract or just return as SIMD? 
+            // The provider expects Matrix<E> so returning SIMD is fine, they both implement Matrix.
+            return (Matrix<E>) res;
+        }
+        
         // Generic path (if E is Real)
         if (a.get(0,0) instanceof Real) {
              return (Matrix<E>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
