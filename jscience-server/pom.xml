@@ -187,9 +187,11 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>mpi.mpi</groupId>
+            <groupId>org.mpjexpress</groupId>
             <artifactId>mpj</artifactId>
             <version>0.44</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/MPJ/lib/mpj.jar</systemPath>
         </dependency>
     </dependencies>
 

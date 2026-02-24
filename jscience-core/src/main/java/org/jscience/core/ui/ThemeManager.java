@@ -76,13 +76,13 @@ public class ThemeManager {
 
         scene.getStylesheets().clear();
         // Always load main.css as base if available
-        java.net.URL mainCss = ThemeManager.class.getResource("/org/jscience/ui/main.css");
+        java.net.URL mainCss = ThemeManager.class.getResource("/org/jscience/core/ui/main.css");
         if (mainCss != null) {
             scene.getStylesheets().add(mainCss.toExternalForm());
         }
 
         // Load theme.css (Custom styles including the Orange Banner)
-        java.net.URL themeCss = ThemeManager.class.getResource("/org/jscience/ui/theme.css");
+        java.net.URL themeCss = ThemeManager.class.getResource("/org/jscience/core/ui/theme.css");
         if (themeCss != null) {
             scene.getStylesheets().add(themeCss.toExternalForm());
         }
@@ -91,7 +91,7 @@ public class ThemeManager {
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_CASPIAN);
         } else if ("HighContrast".equalsIgnoreCase(currentTheme) || "High Contrast".equalsIgnoreCase(currentTheme)) {
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
-             java.net.URL hcCss = ThemeManager.class.getResource("/org/jscience/ui/high-contrast.css");
+             java.net.URL hcCss = ThemeManager.class.getResource("/org/jscience/core/ui/high-contrast.css");
              if (hcCss != null) {
                  scene.getStylesheets().add(hcCss.toExternalForm());
              }

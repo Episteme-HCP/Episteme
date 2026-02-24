@@ -46,7 +46,7 @@ import java.util.Optional;
 public class CountryCodesReader extends AbstractResourceReader<CountryCode> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CountryCodesReader.class);
-    private static final String RESOURCE_PATH = "/org/jscience/politics/countries.json";
+    private static final String RESOURCE_PATH = "/org/jscience/social/politics/countries.json";
     
     private static CountryCodesReader instance;
     private final ObjectMapper mapper = new ObjectMapper();

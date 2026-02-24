@@ -51,8 +51,8 @@ public class I18N {
         // Auto-register all known bundles
         addBundle(CORE_BUNDLE_BASE);
         // Try to load additional bundles (they may not be on classpath depending on module)
-        tryAddBundle("org.jscience.core.ui.i18n.messages_natural");
-        tryAddBundle("org.jscience.core.ui.i18n.messages_social");
+        tryAddBundle("org.jscience.natural.ui.i18n.messages_natural");
+        tryAddBundle("org.jscience.social.ui.i18n.messages_social");
         tryAddBundle("org.jscience.core.client.ui.i18n.messages_client");
         tryAddBundle("org.jscience.core.server.ui.i18n.messages_server");
         tryAddBundle("org.jscience.core.apps.ui.i18n.messages_apps");

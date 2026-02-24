@@ -57,7 +57,7 @@ import org.jscience.core.io.MiniCatalog;
 public class WorldBankReader extends AbstractResourceReader<Country> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorldBankReader.class);
-    private static final String RESOURCE_PATH = "/org/jscience/politics/worldbank-fallback.json";
+    private static final String RESOURCE_PATH = "/org/jscience/social/politics/worldbank-fallback.json";
     private static final String WB_API_BASE = "https://api.worldbank.org/v2";
     private static final int PER_PAGE = 500; // Max allowed by API
 

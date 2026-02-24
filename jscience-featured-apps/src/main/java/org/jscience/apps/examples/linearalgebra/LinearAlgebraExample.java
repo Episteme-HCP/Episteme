@@ -2,7 +2,7 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.examples.linearalgebra;
+package org.jscience.apps.examples.linearalgebra;
 
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.technical.algorithm.AlgorithmManager;

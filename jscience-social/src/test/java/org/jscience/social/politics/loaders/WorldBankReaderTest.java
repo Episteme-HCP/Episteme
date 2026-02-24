@@ -260,7 +260,7 @@ class WorldBankReaderTest {
 
     @Test
     void testGetResourcePath() {
-        assertEquals("/org/jscience/politics/worldbank-fallback.json", loader.getResourcePath());
+        assertEquals("/org/jscience/social/politics/worldbank-fallback.json", loader.getResourcePath());
     }
 
     @Test

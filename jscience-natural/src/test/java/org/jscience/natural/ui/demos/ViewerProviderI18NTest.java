@@ -156,7 +156,7 @@ public class ViewerProviderI18NTest {
     class I18NPropertyFileParity {
 
         private static final String[] LANGUAGES = { "en", "fr", "es", "de", "zh" };
-        private static final String RESOURCE_PATH = "/org/jscience/ui/i18n/messages_natural_%s.properties";
+        private static final String RESOURCE_PATH = "/org/jscience/natural/ui/i18n/messages_natural_%s.properties";
 
         @Test
         void allLanguageFilesExist() {

@@ -53,7 +53,7 @@ public class IconLoader {
     public static Node getIcon(String name, int size) {
         try {
             // Load SVG from resources
-            String path = "/org/jscience/ui/icons/" + name + ".svg";
+            String path = "/org/jscience/core/ui/icons/" + name + ".svg";
             InputStream is = IconLoader.class.getResourceAsStream(path);
             if (is == null) {
                 System.err.println("Icon not found: " + path);

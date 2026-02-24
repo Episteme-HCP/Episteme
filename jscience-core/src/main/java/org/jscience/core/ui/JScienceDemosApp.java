@@ -53,9 +53,9 @@ public class JScienceDemosApp extends Application {
     private void buildUI() {
         BorderPane root = new BorderPane();
 
-        cssResource = getClass().getResource("/org/jscience/ui/theme.css");
+        cssResource = getClass().getResource("/org/jscience/core/ui/theme.css");
         if (cssResource == null) {
-            cssResource = getClass().getResource("/org/jscience/ui/style.css");
+            cssResource = getClass().getResource("/org/jscience/core/ui/style.css");
         }
 
         if (cssResource == null) {
