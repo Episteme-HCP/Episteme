@@ -328,7 +328,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
             for (int j = 0; j < n; j++)
                 vFlat[i * n + j] = eigenvectors[i][j];
         Matrix<Real> V = RealDoubleMatrix.of(vFlat, n, n);
-        return new EigenResult<>(D, V);
+        return new EigenResult<Real>(D, V);
     }
 
     /**
