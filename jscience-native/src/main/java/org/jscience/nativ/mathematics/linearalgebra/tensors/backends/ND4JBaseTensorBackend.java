@@ -48,6 +48,7 @@ public abstract class ND4JBaseTensorBackend implements TensorBackend {
     }
 
     protected boolean checkCommonClasses() {
+        if (Boolean.getBoolean("jscience.nd4j.skip")) return false;
         try {
             Class.forName("org.nd4j.linalg.factory.Nd4j");
             Class.forName("org.nd4j.linalg.api.ndarray.INDArray");

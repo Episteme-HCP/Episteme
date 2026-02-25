@@ -123,24 +123,6 @@
             </exclusions>
         </dependency>
 
-        <!-- JCUDA (optional) -->
-        <dependency>
-            <groupId>org.jcuda</groupId>
-            <artifactId>jcuda</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.jcuda</groupId>
-            <artifactId>jcublas</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <!--
-        <dependency>
-            <groupId>org.jcuda</groupId>
-            <artifactId>jcuda-nvrtc</artifactId>
-        </dependency>
-        -->
-
         <!-- JOCL (OpenCL) -->
         <dependency>
             <groupId>org.jocl</groupId>
@@ -394,4 +376,27 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>jcuda-support</id>
+            <activation>
+                <os>
+                    <family>!mac</family>
+                </os>
+            </activation>
+            <dependencies>
+                <!-- JCUDA (optional, skipped on macOS) -->
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda</artifactId>
+                    <optional>true</optional>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcublas</artifactId>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

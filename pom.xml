@@ -466,6 +466,9 @@
           <version>3.2.5</version>
           <configuration>
             <argLine>@{argLine} --enable-preview --add-modules jdk.incubator.vector -Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+            <systemPropertyVariables>
+              <jscience.benchmark.skip>true</jscience.benchmark.skip>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
         <plugin>

@@ -104,6 +104,12 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
             vecDotPartialKernel = clCreateKernel(program, "vec_dot_partial", null);
 
             initialized = true;
+        } catch (org.jocl.CLException e) {
+            initialized = false;
+            // Similar to Sparse, if we get build failure log warning
+            if (e.getMessage() != null && e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
+                System.err.println("WARNING: OpenCL Dense backend device might not support double precision. Init aborted.");
+            }
         } catch (Exception e) {
             initialized = false;
         }

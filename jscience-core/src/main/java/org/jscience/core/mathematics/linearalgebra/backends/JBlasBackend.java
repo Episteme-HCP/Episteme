@@ -63,12 +63,16 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     private LinearAlgebraProvider<E> jblasImpl;
 
     static {
-        try {
-            Class.forName("org.jblas.DoubleMatrix");
-            Class.forName("org.jblas.Solve");
-            jblasAvailable = true;
-        } catch (Throwable t) {
+        if (Boolean.getBoolean("jscience.jblas.skip")) {
             jblasAvailable = false;
+        } else {
+            try {
+                Class.forName("org.jblas.DoubleMatrix");
+                Class.forName("org.jblas.Solve");
+                jblasAvailable = true;
+            } catch (Throwable t) {
+                jblasAvailable = false;
+            }
         }
     }
 

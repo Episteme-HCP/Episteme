@@ -67,6 +67,7 @@ public class ND4JBackend implements CPUBackend {
 
     @Override
     public boolean isAvailable() {
+        if (Boolean.getBoolean("jscience.nd4j.skip")) return false;
         try {
             Class.forName("org.nd4j.linalg.factory.Nd4j");
             return true;

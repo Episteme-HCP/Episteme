@@ -76,24 +76,16 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     private static final boolean IS_AVAILABLE;
     static {
-        boolean[] avail = {false};
-        Thread t = new Thread(() -> {
+        boolean avail = false;
+        if (!Boolean.getBoolean("jscience.nd4j.skip")) {
             try {
                 Class.forName("org.nd4j.linalg.factory.Nd4j");
-                org.nd4j.linalg.factory.Nd4j.create(1).add(1);
-                avail[0] = true;
+                avail = true;
             } catch (Throwable th) {
-                // Ignore
+                // Not available
             }
-        });
-        t.setDaemon(true);
-        t.start();
-        try {
-            t.join(10000); // 10 seconds timeout for ND4J init
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
-        IS_AVAILABLE = avail[0];
+        IS_AVAILABLE = avail;
     }
 
     @Override
@@ -168,13 +160,16 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
-        return Real.of(org.nd4j.linalg.factory.Nd4j.getBlasWrapper().dot(toINDArray(a), toINDArray(b)));
+        if (!isAvailable()) return LinearAlgebraProvider.super.dot(a, b);
+        // Ensure both are column vectors for dot product
+        INDArray arrA = toINDArray(a);
+        INDArray arrB = toINDArray(b);
+        return Real.of(org.nd4j.linalg.factory.Nd4j.getBlasWrapper().dot(arrA, arrB));
     }
 
     @Override
     public Real norm(Vector<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.norm(a);
         return Real.of(toINDArray(a).norm2Number().doubleValue());
     }
 

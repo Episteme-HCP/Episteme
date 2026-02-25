@@ -21,6 +21,7 @@ public class BenchmarkRunner {
     private static final int ITERATIONS = 2; // Reduced for speed
 
     public static void runAll() {
+        if (Boolean.getBoolean("jscience.benchmark.skip")) return;
         logger.info("Starting Linear Algebra Auto-Benchmark...");
         @SuppressWarnings({ "unchecked", "rawtypes" })
         List<LinearAlgebraProvider<Real>> providers = (List) AlgorithmManager.getProviders(LinearAlgebraProvider.class);

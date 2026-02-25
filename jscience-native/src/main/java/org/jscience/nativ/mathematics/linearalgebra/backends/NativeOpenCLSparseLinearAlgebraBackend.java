@@ -245,11 +245,13 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             clBuildProgram(denseProgram, 0, null, null, null, null);
             matMulKernel = clCreateKernel(denseProgram, "matrixMultiply", null);
         } catch (CLException e) {
-            LOGGER.warning("Failed to build OpenCL kernels: " + e.getMessage());
-            if (e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
-                LOGGER.warning("This device might not support double precision (cl_khr_fp64).");
+            if (e.getMessage() != null && e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
+                LOGGER.warning("This OpenCL device might not support double precision (cl_khr_fp64/cl_amd_fp64) or build failed. Initialization aborted.");
+            } else {
+                LOGGER.warning("Failed to build OpenCL kernels: " + e.getMessage());
             }
-            throw e;
+            // Do not throw; let initialization fail gracefully so fallback occurs.
+            isInitialized = false;
         }
     }
 
@@ -319,8 +321,8 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!isInitialized && !attemptInitialization()) {
-            throw new IllegalStateException("OpenCL Backend not available or failed to initialize.");
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            return org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, b);
         }
         
         int m = a.rows(); int k = a.cols(); int n = b.cols();
@@ -349,8 +351,9 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     public Vector<Real> multiplyCSR(Matrix<Real> a, Vector<Real> x) {
-        if (!isAvailable()) throw new IllegalStateException("OpenCL not available");
-        if (!isInitialized) start();
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            return org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, x);
+        }
 
         // Extract CSR data from SparseMatrixStorage
         // Simplified for now: assuming a is already sparse or converting it

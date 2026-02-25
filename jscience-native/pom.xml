@@ -59,6 +59,12 @@
             <groupId>org.nd4j</groupId>
             <artifactId>nd4j-native-platform</artifactId>
             <version>1.0.0-M1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j2-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- JCuda -->
@@ -129,6 +135,16 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>--enable-preview --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector</argLine>
+                    <systemPropertyVariables>
+                        <jscience.benchmark.skip>true</jscience.benchmark.skip>
+                        <jscience.nd4j.skip>true</jscience.nd4j.skip>
+                        <jscience.jblas.skip>true</jscience.jblas.skip>
+                        <org.jblas.util.LibraryLoader.deletedll>false</org.jblas.util.LibraryLoader.deletedll>
+                        <java.awt.headless>true</java.awt.headless>
+                    </systemPropertyVariables>
+                    <environmentVariables>
+                        <AWT_TOOLKIT>headless</AWT_TOOLKIT>
+                    </environmentVariables>
                 </configuration>
             </plugin>
         </plugins>

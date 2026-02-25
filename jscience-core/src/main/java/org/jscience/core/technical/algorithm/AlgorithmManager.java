@@ -37,10 +37,18 @@ public final class AlgorithmManager {
 
     static {
         AutoTuningManager.loadResults();
-        
+        // Detect if running in a test environment
+        boolean isTest = false;
+        try {
+            Class.forName("org.junit.jupiter.api.Test");
+            isTest = true;
+        } catch (ClassNotFoundException e) {
+            // Not a test environment
+        }
+
         // Trigger benchmark if no results found
         Path path = Paths.get(System.getProperty("user.home"), ".jscience", "benchmarks.json");
-        if (!Files.exists(path)) {
+        if (!Files.exists(path) && !Boolean.getBoolean("jscience.benchmark.skip") && !isTest) {
             new Thread(() -> {
                 try {
                     Thread.sleep(5000); // Wait for system to stabilize
