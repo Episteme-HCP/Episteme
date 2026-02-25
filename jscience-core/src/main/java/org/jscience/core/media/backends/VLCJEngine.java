@@ -55,10 +55,12 @@ public class VLCJEngine implements AudioEngine {
 
     public VLCJEngine() {
         try {
-            factory = new MediaPlayerFactory();
-            mediaPlayer = factory.mediaPlayers().newMediaPlayer();
+            if (isAvailable()) {
+                factory = new MediaPlayerFactory();
+                mediaPlayer = factory.mediaPlayers().newMediaPlayer();
+            }
         } catch (Throwable t) {
-            System.err.println("[VLCJ] Load faled: " + t.getMessage());
+            // Silently suppress during discovery
         }
     }
 

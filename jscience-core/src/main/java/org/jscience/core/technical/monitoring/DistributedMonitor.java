@@ -17,28 +17,43 @@ import java.util.concurrent.TimeUnit;
  */
 public class DistributedMonitor {
 
-    private static final DistributedMonitor INSTANCE = new DistributedMonitor();
+    private static volatile DistributedMonitor INSTANCE;
     
-    private final PrometheusMeterRegistry registry;
+    private PrometheusMeterRegistry registry;
     private Javalin app;
     private boolean started = false;
+    private boolean available = false;
 
     private DistributedMonitor() {
-        this.registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
-        
-        // Add common JVM/System metrics
         try {
+            this.registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+            
+            // Add common JVM/System metrics
             new JvmMemoryMetrics().bindTo(registry);
             new JvmThreadMetrics().bindTo(registry);
             new ProcessorMetrics().bindTo(registry);
-        } catch (Exception e) {
-            System.err.println("[MONITOR] Failed to bind JVM metrics: " + e.getMessage());
+            
+            registry.config().commonTags("application", "JScience");
+            available = true;
+        } catch (Throwable t) {
+            // Prometheus/Micrometer not on classpath — degrade gracefully
+            available = false;
         }
-        
-        registry.config().commonTags("application", "JScience");
     }
 
     public static DistributedMonitor getInstance() {
+        if (INSTANCE == null) {
+            synchronized (DistributedMonitor.class) {
+                if (INSTANCE == null) {
+                    try {
+                        INSTANCE = new DistributedMonitor();
+                    } catch (Throwable t) {
+                        // Completely unavailable — create a no-op instance
+                        INSTANCE = new DistributedMonitor();
+                    }
+                }
+            }
+        }
         return INSTANCE;
     }
 
@@ -46,11 +61,15 @@ public class DistributedMonitor {
         return registry;
     }
 
+    public boolean isAvailable() {
+        return available;
+    }
+
     /**
      * Starts the metrics server on port 7070.
      */
     public synchronized void startServer() {
-        if (started) return;
+        if (started || !available) return;
         
         // Silence Jetty noise on some platforms (e.g. SO_REUSEPORT issue on Windows)
         System.setProperty("org.slf4j.simpleLogger.log.org.eclipse.jetty", "warn");
@@ -64,14 +83,14 @@ public class DistributedMonitor {
             
             started = true;
             System.out.println("[MONITOR] Metrics server started at http://localhost:7070/metrics");
-        } catch (Exception e) {
-            System.err.println("[MONITOR] Failed to start metrics server: " + e.getMessage());
+        } catch (Throwable t) {
+            // Javalin or Jetty not available
         }
     }
 
     public synchronized void stopServer() {
         if (app != null) {
-            app.stop();
+            try { app.stop(); } catch (Throwable t) { /* ignore */ }
             started = false;
         }
     }
@@ -79,6 +98,7 @@ public class DistributedMonitor {
     // --- Metric Helpers ---
 
     public void recordExecution(String benchmarkId, String domain, long durationNs) {
+        if (!available) return;
         Timer.builder("benchmark.execution.time")
              .tag("id", benchmarkId)
              .tag("domain", domain)
@@ -93,6 +113,7 @@ public class DistributedMonitor {
     }
 
     public void recordDistributedTask(String taskId, String node, long latencyNs) {
+        if (!available) return;
         Timer.builder("distributed.task.latency")
              .tag("taskId", taskId)
              .tag("node", node)

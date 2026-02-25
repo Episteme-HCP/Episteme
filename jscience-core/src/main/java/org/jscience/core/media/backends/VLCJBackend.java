@@ -43,7 +43,7 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
                 factory = new MediaPlayerFactory();
                 mediaPlayer = factory.mediaPlayers().newMediaPlayer();
             } catch (Throwable t) {
-                System.err.println("[VLCJ] Load failed: " + t.getMessage());
+                // Silently suppress during discovery
             }
         }
     }
