@@ -48,6 +48,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     private cl_kernel vecDotPartialKernel;
     private cl_program program;
     private boolean initialized = false;
+    private boolean initAttempted = false;
 
     private static final String KERNEL_SOURCE =
         "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
@@ -73,7 +74,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         "}\n";
 
     private synchronized void init() {
-        if (initialized) return;
+        if (initAttempted) return;
+        initAttempted = true;
         try {
             setExceptionsEnabled(true);
             int[] numPlatformsArray = new int[1];
@@ -115,7 +117,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         }
     }
 
-    @Override public boolean isAvailable() { if (!initialized) init(); return initialized; }
+    @Override public boolean isAvailable() { if (!initAttempted) init(); return initialized; }
     @Override public boolean isLoaded() { return initialized; }
     @Override public String getName() { return "Native OpenCL Dense Backend"; }
     @Override public int getPriority() { return 105; }
