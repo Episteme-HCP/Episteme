@@ -74,6 +74,12 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         try {
             Linker linker = NativeLibraryLoader.getLinker();
             Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("jscience_native", java.lang.foreign.Arena.global());
+            if (lookupOpt.isEmpty()) {
+                lookupOpt = NativeLibraryLoader.loadLibrary("openblas", java.lang.foreign.Arena.global());
+                if (lookupOpt.isEmpty()) {
+                    lookupOpt = NativeLibraryLoader.loadLibrary("mkl_rt", java.lang.foreign.Arena.global());
+                }
+            }
             
             if (lookupOpt.isPresent()) {
                 SymbolLookup lookup = lookupOpt.get();

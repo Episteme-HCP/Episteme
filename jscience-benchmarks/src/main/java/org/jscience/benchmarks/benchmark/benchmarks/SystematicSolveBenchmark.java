@@ -42,7 +42,7 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
 
     @Override
     public String getDomain() {
-        return "Linear Algebra (Dense)";
+        return "Linear System Solve";
     }
 
     @Override

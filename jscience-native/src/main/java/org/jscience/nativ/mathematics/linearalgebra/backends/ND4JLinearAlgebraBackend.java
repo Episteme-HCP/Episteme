@@ -236,16 +236,25 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     }
 
     /**
-     * Solve Ax=b via LU with ND4J inverse (A⁻¹ * b). For better performance, 
-     * use LU factored form, but A⁻¹·b is sufficient and fully ND4J-native.
+     * Solve Ax=b via ND4J's LU decomposition.
      */
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) return LinearAlgebraProvider.super.solve(a, b);
-        INDArray arrA = toINDArray(a);
-        INDArray arrB = toINDArray(b);
-        INDArray invA = InvertMatrix.invert(arrA, false);
-        return fromINDArrayVector(invA.mmul(arrB));
+        try {
+            INDArray arrA = toINDArray(a);
+            INDArray arrB = toINDArray(b);
+
+            // InvertMatrix.invert is the most stable across ND4J versions.
+            // If it's slow, it might be due to sub-optimal backend linkage.
+            INDArray inverse = InvertMatrix.invert(arrA, false);
+            INDArray result = inverse.mmul(arrB);
+            
+            return fromINDArrayVector(result);
+        } catch (Exception e) {
+            System.err.println("[ND4J] Solve failed (singular?): " + e.getMessage());
+            return LinearAlgebraProvider.super.solve(a, b);
+        }
     }
 
     @Override

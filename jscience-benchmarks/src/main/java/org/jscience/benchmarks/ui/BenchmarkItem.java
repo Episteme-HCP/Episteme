@@ -33,8 +33,14 @@ public class BenchmarkItem {
 
     // Main Constructor
     public BenchmarkItem(String name, String domain, String backend, String provider, String description, RunnableBenchmark benchmark) {
-        // Sanitize name: remove (CPU), (Wrapper)
-        String cleanName = name.replace("(CPU)", "").replace("(Wrapper)", "").trim();
+        // Sanitize name: remove parenthesized suffixes (CPU, Wrapper, Native, etc.)
+        // Robust cleaning for nested parentheses: Matrix Inversion (ND4J (CPU)) -> Matrix Inversion
+        String cleanName = name;
+        while (cleanName.contains("(") && cleanName.contains(")")) {
+            String next = cleanName.replaceAll("\\s*\\([^()]*\\)", "").trim();
+            if (next.equals(cleanName)) break; // Stop if no progress (unbalanced)
+            cleanName = next;
+        }
         this.name = new SimpleStringProperty(cleanName);
         this.domain = new SimpleStringProperty(domain);
         this.status = new SimpleStringProperty(benchmark != null ? "Ready" : "");
@@ -133,14 +139,20 @@ public class BenchmarkItem {
             }
         }
         
-        // Fallback: clean the full name
-        String cleaned = fullName.replaceAll("\\s*\\([^)]*\\)", "") // Remove parenthesized keys
-                                 .replace("JScience", "")
-                                 .replace("Native", "")
-                                 .replace("CPU", "")
-                                 .replace("GPU", "")
-                                 .replaceAll("\\s+", " ")
-                                 .trim();
+        // Fallback: clean the full name recursively
+        String cleaned = fullName;
+        while (cleaned.contains("(") && cleaned.contains(")")) {
+            String next = cleaned.replaceAll("\\s*\\([^()]*\\)", "").trim();
+            if (next.equals(cleaned)) break;
+            cleaned = next;
+        }
+        
+        cleaned = cleaned.replace("JScience", "")
+                         .replace("Native", "")
+                         .replace("CPU", "")
+                         .replace("GPU", "")
+                         .replaceAll("\\s+", " ")
+                         .trim();
         if (!cleaned.isEmpty()) return cleaned;
         
         return "Standard";

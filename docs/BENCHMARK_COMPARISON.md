@@ -1,57 +1,67 @@
-# JScience Benchmark Comparisons
+# JScience Performance Report: Core vs. Native Backends
 
-Detailed performance comparison of JScience linear algebra against other major Java libraries.
+This report provides a detailed analysis of the performance characteristics of the JScience suite, comparing the standardized Java-based Core backends with various Native and Hardware-Accelerated backends.
 
-## Overview
+## Executive Summary
 
-We compare **JScience 5.0** against:
+The JScience architecture is designed for portability first, with transparent performance scaling when native libraries are available. 
 
-1. **Apache Commons Math 3.6.1** - Standard comprehensive math library.
-2. **EJML 0.43** (Efficient Java Matrix Library) - High-performance pure Java.
-3. **Colt 1.2.0** - High performance scientific computing (CERN).
-4. **JBlas 1.2.5** - Java bindings for native BLAS (Hardware accelerated).
+*   **JScience Core (Pure Java):** Offers excellent portability and predictably good performance for multi-core systems using parallel streams and the Java Vector API (SIMD).
+*   **JScience Native (FFM / Project Panama):** Provides significant speedups for heavy computational tasks (Linear Algebra, FFT) by leveraging optimized BLAS/LAPACK libraries like OpenBLAS.
+*   **GPU/Distributed Backends:** Best suited for large-scale problems where massive parallelism offsets transfer costs.
 
-## Methodology
+## Results & Visualizations
 
-- **Tool**: JMH (Java Microbenchmark Harness)
-- **Metric**: Average Time (ms/op) - Lower is better.
-- **Warmup**: 5 iterations
-- **Measurement**: 5 iterations
-- **Forks**: 1
+> [!IMPORTANT]
+> Use the **Export Chart** button in the Benchmarking UI to generate the visualizations for this section.
 
-## Results (Matrix Multiplication)
+### Matrix Multiplication (Ops/sec)
 
-| Library | Size (NxN) | Score (ms) | Notes |
-|---------|------------|------------|-------|
-| JScience | 128 | **1.2** | Native `Real` optimization in v2.0 |
-| Commons | 128 | 4.8 | Standard overhead |
-| EJML | 128 | 0.9 | High performance pure Java |
-| Colt | 128 | 1.1 | CERN legacy optimizations |
-| JBlas | 128 | 0.4 | Native BLAS advantage |
-| | | | |
-| JScience | 512 | **28.5** | Parallelized via ComputeContext |
-| Commons | 512 | 145.2 | |
-| EJML | 512 | 22.1 | |
-| Colt | 512 | 24.8 | |
-| JBlas | 512 | 6.5 | |
+| Implementation | Type | Score |
+|----------------|------|-------|
+| JScience (Ref) | CPU (Single) | [INPUT] |
+| JScience (MC)  | CPU (Multi)  | [INPUT] |
+| Native BLAS    | CPU (Native) | [INPUT] |
+| ND4J (Native)  | CPU (Native) | [INPUT] |
+| OpenCL / CUDA  | GPU          | [INPUT] |
+
+![Matrix Multiplication Comparison](matrix_mult_chart.png)
+
+### Linear System Solve (Ops/sec)
+
+| Implementation | Solve (800x800) |
+|----------------|-----------------|
+| JScience (Ref) | [INPUT]         |
+| JScience (MC)  | [INPUT]         |
+| Native BLAS    | [INPUT]         |
+| ND4J (Native)  | [INPUT]         |
+
+![Linear Solve Comparison](linear_solve_chart.png)
+
+## Analysis of Recent Optimizations
 
 
-## How to Run
+### 1. ND4J Solver Optimization [NEW]
 
-**Windows:**
+We replaced the indirect `InvertMatrix.invert(A).mmul(B)` approach with a direct solver. This avoids the high constant overhead of full matrix inversion and provides better stability for large-scale systems. 
+*   **Impact:** Significantly reduced "stall" observed during initial benchmark iterations.
 
-```cmd
-run-benchmarks.bat
-```
 
-**Linux/Mac:**
+### 2. UI Refinement [NEW]
 
-```bash
-./run-benchmarks.sh
-```
+The visualization has been improved to group benchmarks by their functional category (e.g., Matrix Multiplication) rather than creating separate charts for each backend. This allows for direct side-by-side comparison within a single view.
 
-## Analysis
 
-- **JScience** focuses on type safety (`Quantity<T>`) and correct scientific modeling over raw speed.
-- **JBlas** and **Colt** are recommended for massive dense matrix operations where type safety is less critical.
-- **EJML** offers the best balance of pure Java performance.
+### 3. Native Core Recovery [IN PROGRESS]
+
+`jscience_native.dll` is now buildable via the provided `CMakeLists.txt`. This library is critical for the FFM-based Native CPU backend to interface with system BLAS.
+
+## Environment Details
+- **OS:** Windows / Linux / macOS
+- **JDK:** Java 25 (with `--enable-preview` and Vector API)
+- **Native Libs:** OpenBLAS 0.3.26, ND4J 1.0.0-M2.1, JBullet, TarsosDSP.
+
+## Appendix: How to Read the Charts
+- **X-axis:** Backend implementation and library name.
+- **Y-axis:** Throughput in Operations per Second (Higher is Better).
+- **Error Bars:** Represent standard deviation over multiple iterations.

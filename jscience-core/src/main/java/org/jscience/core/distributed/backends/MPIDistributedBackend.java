@@ -26,7 +26,7 @@ public class MPIDistributedBackend implements DistributedBackend {
 
     public MPIDistributedBackend() {
         try {
-            Class.forName("org.mpjexpress.mpi.MPI");
+            Class.forName("mpi.MPI");
             available = true;
         } catch (ClassNotFoundException e) {
             available = false;

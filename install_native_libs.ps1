@@ -9,7 +9,7 @@ param(
     [ValidateSet("All", "MPJ", "HDF5", "FFTW", "Bullet", "OpenBLAS")]
     [string[]]$Libraries = @("All"),
     
-    [string]$InstallDir = "C:\JScience-Native"
+    [string]$InstallDir = (Join-Path $PSScriptRoot "libs")
 )
 
 $ErrorActionPreference = "Stop"

@@ -7,6 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.core.ui.i18n.I18N;
+import java.io.File;
 
 
 /**
@@ -62,11 +63,51 @@ public class JScienceBenchmarkingApp extends Application {
                         scene.setFill(Color.TRANSPARENT);
 
                         try {
-                            javafx.scene.image.Image icon = new javafx.scene.image.Image(org.jscience.core.ui.i18n.I18N.class.getResourceAsStream("/org/jscience/core/ui/icon.png"));
-                            splashStage.getIcons().add(icon);
-                            primaryStage.getIcons().add(icon);
+                            // Try multiple paths for robustness
+                            String[] paths = {
+                                "/org/jscience/core/ui/icon.png",
+                                "/org/jscience/benchmarks/ui/icon.png",
+                                "/jscienceicon.png",
+                                "/icon.png"
+                            };
+                            
+                            javafx.scene.image.Image icon = null;
+                            for (String path : paths) {
+                                try (java.io.InputStream is = JScienceBenchmarkingApp.class.getResourceAsStream(path)) {
+                                    if (is != null) {
+                                        icon = new javafx.scene.image.Image(is);
+                                        System.out.println("[INFO] Loaded icon from resource: " + path);
+                                        break;
+                                    }
+                                } catch (Exception e) {}
+                            }
+
+                            // Last resort: check direct file paths and standard project locations
+                            if (icon == null) {
+                                String[] filePaths = {
+                                    "jscience-core/src/main/resources/org/jscience/core/ui/icon.png",
+                                    "jscience-benchmarks/src/main/resources/org/jscience/benchmarks/ui/icon.png",
+                                    "jscience-old-v1/src/org/jscience/jscienceicon.png",
+                                    "libs/jscienceicon.png"
+                                };
+                                for (String fp : filePaths) {
+                                    File iconFile = new File(fp);
+                                    if (iconFile.exists()) {
+                                        icon = new javafx.scene.image.Image(iconFile.toURI().toString());
+                                        System.out.println("[INFO] Loaded icon from file: " + iconFile.getAbsolutePath());
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (icon != null) {
+                                splashStage.getIcons().add(icon);
+                                primaryStage.getIcons().add(icon);
+                            } else {
+                                System.err.println("[WARNING] Could not find icon.png in resources or disk. UI may lack branding.");
+                            }
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            System.err.println("[ERROR] Failed to load application icon: " + ex.getMessage());
                         }
 
                         primaryStage.setTitle("JScience Benchmarking Suite");

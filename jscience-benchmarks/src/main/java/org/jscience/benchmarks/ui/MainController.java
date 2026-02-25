@@ -74,12 +74,14 @@ public class MainController {
 
     private final ObservableList<BenchmarkRunSummary> historyList = FXCollections.observableArrayList();
     private final org.jscience.benchmarks.persistence.BenchmarkResultService resultService = new org.jscience.benchmarks.persistence.BenchmarkResultService();
-    private final java.util.Queue<BenchmarkItem> benchmarkQueue = new java.util.LinkedList<>();
-    private boolean isProcessingQueue = false;
+    private final java.util.concurrent.ConcurrentLinkedQueue<BenchmarkItem> benchmarkQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private int selectedCount = 0;
+    private int completedCount = 0;
     private final Object executionLock = new Object();
     private ResourceBundle resources;
     private Task<Void> mainTask;
     private volatile org.jscience.core.ComputeContext activeComputeContext;
+    private boolean isProcessingQueue = false;
 
     private javafx.stage.Stage primaryStage;
     @FXML private EnvironmentController environmentViewController;
@@ -183,6 +185,7 @@ public class MainController {
         int skippedCount = 0;
         int canceledCount = 0;
 
+        int readyCount = 0;
         for (TreeItem<BenchmarkItem> child : root.getChildren()) {
             if (!child.isLeaf()) {
                 updateCategoryStatuses(child); // Recursive update
@@ -198,14 +201,18 @@ public class MainController {
             else if ("Queued".equals(status)) queuedCount++;
             else if (status.contains("Skipped")) skippedCount++;
             else if (status.contains("Canceled")) canceledCount++;
-            else if ("Ready".equals(status) || status.isEmpty()) { /* ready: no counter needed */ }
+            else if ("Ready".equals(status) || status.isEmpty()) readyCount++;
             else if (status.contains("Unavailable")) unavailableCount++;
         }
 
         if (totalChildren == 0) return;
 
+        int totalToRun = totalChildren - readyCount - unavailableCount;
+        int finishedCount = successCount + errorCount + skippedCount + canceledCount;
+        int currentProgress = finishedCount + runningCount;
+
         String newStatus;
-        if (runningCount > 0) newStatus = "Running (" + runningCount + "/" + totalChildren + ")";
+        if (runningCount > 0) newStatus = "Running (" + currentProgress + "/" + totalToRun + ")";
         else if (queuedCount > 0) newStatus = "Queued (" + queuedCount + ")";
         else if (canceledCount > 0) newStatus = "Canceled (" + canceledCount + "/" + totalChildren + ")";
         else if (errorCount > 0) newStatus = "Error (Partial: " + errorCount + ")";
@@ -396,45 +403,60 @@ public class MainController {
     }
     
     private void runBenchmarkSuite(List<BenchmarkItem> items) {
-         if (mainTask != null && mainTask.isRunning()) return;
-         
-         mainTask = new Task<>() {
+        // Clear previous results for newly selected items
+        for (BenchmarkItem item : items) {
+            Platform.runLater(() -> {
+                if (item.getBenchmark() != null && item.getBenchmark().isAvailable()) {
+                    item.statusProperty().set("Queued");
+                    item.resultProperty().set("");
+                    item.setScore(0);
+                } else {
+                    item.statusProperty().set("Unavailable");
+                }
+            });
+            benchmarkQueue.add(item);
+        }
+        
+        selectedCount += items.size();
+
+        if (mainTask != null && mainTask.isRunning()) {
+            // Already running, items added to thread-safe queue will be picked up
+            return;
+        }
+
+        mainTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 activeComputeContext = org.jscience.core.ComputeContext.current();
                 activeComputeContext.setCancelled(false);
-                for (BenchmarkItem item : items) {
-                     Platform.runLater(() -> {
-                         // Only queue available benchmarks
-                         if (item.getBenchmark() != null && item.getBenchmark().isAvailable()) {
-                             item.statusProperty().set("Queued");
-                             item.resultProperty().set("");
-                             item.setScore(0);
-                         } else {
-                             item.statusProperty().set("Unavailable"); // Ensure status is clear
-                         }
-                     });
-                }
                 
-                int count = 0;
-                for (BenchmarkItem item : items) {
+                while (!benchmarkQueue.isEmpty()) {
                     if (isCancelled()) break;
                     
-                    final int currentCount = count + 1;
+                    BenchmarkItem item = benchmarkQueue.poll();
+                    if (item == null) continue;
+                    if (item.getBenchmark() == null || !item.getBenchmark().isAvailable()) {
+                        completedCount++;
+                        updateProgress(completedCount, selectedCount);
+                        continue;
+                    }
+
+                    final int currentProgressCount = completedCount + 1;
                     final String itemName = item.getName();
+                    
                     Platform.runLater(() -> {
-                        statusBarLabel.setText(String.format("Running [%d/%d]: %s", currentCount, items.size(), itemName));
+                        statusBarLabel.setText(String.format("Running [%d/%d]: %s", currentProgressCount, selectedCount, itemName));
                         updateCategoryStatuses(benchmarkTreeTable.getRoot());
                     });
                     
                     runBenchmarkItem(item);
                     
-                    count++;
-                    updateProgress(count, items.size());
+                    completedCount++;
+                    updateProgress(completedCount, selectedCount);
                     Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
                 }
-                // Ensure progress is 100% at the end
-                updateProgress(items.size(), items.size());
+                
+                updateProgress(selectedCount, selectedCount);
                 return null;
             }
         };
@@ -444,8 +466,13 @@ public class MainController {
         mainTask.setOnSucceeded(e -> {
              globalProgressBar.progressProperty().unbind();
              globalProgressBar.setProgress(1.0);
-             statusBarLabel.setText("Suite Completed (" + items.size() + " items).");
+             statusBarLabel.setText("Suite Completed (" + completedCount + " items).");
              Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
+             if (benchmarkQueue.isEmpty()) {
+                 selectedCount = 0;
+                 completedCount = 0;
+                 isProcessingQueue = false;
+             }
         });
         
         mainTask.setOnFailed(e -> {
@@ -454,13 +481,14 @@ public class MainController {
              statusBarLabel.setText("Suite Failed: " + mainTask.getException().getMessage());
              mainTask.getException().printStackTrace();
              Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
+             isProcessingQueue = false;
         });
 
         mainTask.setOnCancelled(e -> {
              globalProgressBar.progressProperty().unbind();
-             // Progress bar remains at current state or we can reset it
              statusBarLabel.setText("Operation stopped by user.");
              Platform.runLater(() -> updateCategoryStatuses(benchmarkTreeTable.getRoot()));
+             isProcessingQueue = false;
         });
         
         new Thread(mainTask).start();
@@ -738,8 +766,9 @@ public class MainController {
     }
 
     private void updateChart(BenchmarkItem item, double value) {
-        // Group by CATEGORY (domain) — one chart per category
+        // Group by operation category (domain is set by SystematicBenchmark to specific op type)
         String category = item.getDomain();
+        if (category == null || category.isBlank()) category = item.getName();
         if (category == null || category.isBlank()) category = "General";
 
         // X-axis bar label = benchmark name + library (+ provider if non-standard)

@@ -39,16 +39,16 @@ import java.nio.DoubleBuffer;
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class, GPUBackend.class})
 public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
 
-    private cl_context context;
-    private cl_command_queue commandQueue;
-    private cl_kernel matMulKernel;
-    private cl_kernel vecAddKernel;
-    private cl_kernel vecSubKernel;
-    private cl_kernel vecScaleKernel;
-    private cl_kernel vecDotPartialKernel;
-    private cl_program program;
-    private boolean initialized = false;
-    private boolean initAttempted = false;
+    private static cl_context context;
+    private static cl_command_queue commandQueue;
+    private static cl_kernel matMulKernel;
+    private static cl_kernel vecAddKernel;
+    private static cl_kernel vecSubKernel;
+    private static cl_kernel vecScaleKernel;
+    private static cl_kernel vecDotPartialKernel;
+    private static cl_program program;
+    private static volatile boolean initialized = false;
+    private static volatile boolean initAttempted = false;
 
     private static final String KERNEL_SOURCE =
         "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
@@ -73,7 +73,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         "    int i = get_global_id(0); if (i < n) out[i] = a[i] * b[i];\n" +
         "}\n";
 
-    private synchronized void init() {
+    private static synchronized void init() {
         if (initAttempted) return;
         initAttempted = true;
         try {
@@ -108,7 +108,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
             initialized = true;
         } catch (org.jocl.CLException e) {
             initialized = false;
-            // Similar to Sparse, if we get build failure log warning
             if (e.getMessage() != null && e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
                 System.err.println("WARNING: OpenCL Dense backend device might not support double precision. Init aborted.");
             }

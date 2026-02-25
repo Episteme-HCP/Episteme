@@ -400,6 +400,18 @@
         <version>0.3.26-${javacpp.version}</version>
         <classifier>linux-x86_64</classifier>
       </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>openblas</artifactId>
+        <version>0.3.26-${javacpp.version}</version>
+        <classifier>macosx-x86_64</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>openblas</artifactId>
+        <version>0.3.26-${javacpp.version}</version>
+        <classifier>macosx-arm64</classifier>
+      </dependency>
       
       <!-- ND4J Exclusions to prevent version conflict -->
       <dependency>

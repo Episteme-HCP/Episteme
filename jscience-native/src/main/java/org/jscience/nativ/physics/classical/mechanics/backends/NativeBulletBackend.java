@@ -16,10 +16,12 @@ import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import org.jscience.core.measure.units.SI;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -61,28 +63,8 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
         SymbolLookup lookup = null;
         java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
 
-        // 1. Try standard library path
-        try {
-            lookup = SymbolLookup.libraryLookup("bullet_capi", arena);
-        } catch (Throwable t) {
-            // 2. Try explicit path: libs/Bullet3DLL/libbulletc.dll
-            java.nio.file.Path libPath = java.nio.file.Path.of("libs", "Bullet3DLL", "libbulletc.dll");
-            if (java.nio.file.Files.exists(libPath)) {
-                try {
-                    lookup = SymbolLookup.libraryLookup(libPath, arena);
-                } catch (Throwable t2) {
-                     // ignore
-                }
-            } else {
-                 // 3. Try root fallback (just in case)
-                 java.nio.file.Path rootPath = java.nio.file.Path.of("libbulletc.dll");
-                 if (java.nio.file.Files.exists(rootPath)) {
-                     try {
-                         lookup = SymbolLookup.libraryLookup(rootPath, arena);
-                     } catch (Throwable t3) {}
-                 }
-            }
-        }
+        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("bullet_capi", arena);
+        lookup = lib.orElse(null);
 
         if (lookup != null && lookup.find("bt_detect_sphere_collisions").isPresent()) {
             DETECT_SPHERES = linker.downcallHandle(lookup.find("bt_detect_sphere_collisions").get(),

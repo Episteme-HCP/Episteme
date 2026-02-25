@@ -24,6 +24,8 @@
 package org.jscience.nativ.physics.loaders.hdf5;
 
 import java.io.IOException;
+import java.util.Optional;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
@@ -59,9 +61,10 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeDoubleMatrixS
 
     static {
         Linker linker = Linker.nativeLinker();
-        SymbolLookup lookup = SymbolLookup.libraryLookup("hdf5", Arena.global());
+        Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("hdf5", Arena.global());
+        SymbolLookup lookup = lookupOpt.orElse(null);
         
-        if (lookup.find("H5Fopen").isPresent()) {
+        if (lookup != null && lookup.find("H5Fopen").isPresent()) {
             H5F_OPEN = linker.downcallHandle(lookup.find("H5Fopen").get(), 
                 FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             H5F_CLOSE = linker.downcallHandle(lookup.find("H5Fclose").get(),

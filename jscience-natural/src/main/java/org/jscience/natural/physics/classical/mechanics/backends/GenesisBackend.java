@@ -38,12 +38,14 @@ public class GenesisBackend implements MechanicsBackend, CPUBackend, CollisionPr
 
     @Override
     public boolean isAvailable() {
-        // Since this is a native backend, we check for the GenesisC library.
-        // On Windows, this would be GenesisC.dll.
-        String libName = System.mapLibraryName("GenesisC");
-        // We check common paths or just assume it's available if the native backend can load it.
-        // For simplicity in this SPI, we check if the library exists in common locations.
-        return java.nio.file.Files.exists(java.nio.file.Paths.get("libs", libName)) ||
+        // Genesis wraps Bullet via libbulletc
+        String libName = "libbulletc.dll"; 
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("linux")) libName = "libbulletc.so";
+        else if (os.contains("mac")) libName = "libbulletc.dylib";
+
+        return java.nio.file.Files.exists(java.nio.file.Paths.get("libs", "Bullet3DLL", libName)) ||
+               java.nio.file.Files.exists(java.nio.file.Paths.get("libs", libName)) ||
                java.nio.file.Files.exists(java.nio.file.Paths.get("native", libName)) ||
                java.nio.file.Files.exists(java.nio.file.Paths.get(libName));
     }

@@ -23,6 +23,8 @@
 
 package org.jscience.nativ.physics.loaders.hdf5;
 
+import java.util.Optional;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
@@ -61,9 +63,10 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
 
     static {
         Linker linker = Linker.nativeLinker();
-        SymbolLookup lookup = SymbolLookup.libraryLookup("hdf5", Arena.global());
+        Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("hdf5", Arena.global());
+        SymbolLookup lookup = lookupOpt.orElse(null);
         
-        if (lookup.find("H5Fcreate").isPresent()) {
+        if (lookup != null && lookup.find("H5Fcreate").isPresent()) {
             H5F_CREATE = linker.downcallHandle(lookup.find("H5Fcreate").get(), 
                 FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
             H5F_CLOSE = linker.downcallHandle(lookup.find("H5Fclose").get(),

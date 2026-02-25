@@ -2,7 +2,7 @@
 # Focuses on BLAS/LAPACK and performance counters
 
 param(
-    [string]$InstallDir = "C:\JScience-Benchmark-Native"
+    [string]$InstallDir = (Join-Path $PSScriptRoot "libs")
 )
 
 Write-Host "=== JScience HPC Benchmark Dependencies Installer (Windows) ===" -ForegroundColor Cyan

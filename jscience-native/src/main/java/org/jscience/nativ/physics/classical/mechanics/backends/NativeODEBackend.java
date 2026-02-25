@@ -18,8 +18,10 @@ import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
 import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 
-import java.lang.foreign.MemorySegment;
+import java.lang.foreign.*;
 import java.util.List;
+import java.util.Optional;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
  * Native implementation of {@link MechanicsBackend} for ODE (Open Dynamics Engine).
@@ -31,6 +33,15 @@ import java.util.List;
  */
 @AutoService({CollisionProvider.class, MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
 public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
+ 
+    private static final boolean IS_AVAILABLE;
+    private static final SymbolLookup LOOKUP;
+ 
+    static {
+        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("ode", Arena.global());
+        IS_AVAILABLE = lib.isPresent();
+        LOOKUP = lib.orElse(null);
+    }
 
     @Override
     public String getId() {
@@ -49,13 +60,13 @@ public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CP
 
     @Override
     public boolean isAvailable() {
-        return false; // Placeholder
+        return IS_AVAILABLE;
     }
 
 
     @Override
     public boolean isLoaded() {
-        return false;
+        return IS_AVAILABLE;
     }
 
     @Override

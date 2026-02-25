@@ -20,6 +20,9 @@ import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 
 import java.lang.foreign.MemorySegment;
 import java.util.List;
+import java.util.Optional;
+import java.lang.foreign.SymbolLookup;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
  * Native implementation of {@link MechanicsBackend} for Genesis.
@@ -47,15 +50,25 @@ public class NativeGenesisBackend implements CollisionProvider, MechanicsBackend
         return "Native high-performance Genesis physics engine (Project Panama).";
     }
 
+    private static final boolean IS_ENABLED;
+
+    static {
+        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("GenesisC", java.lang.foreign.Arena.global());
+        if (lib.isEmpty()) {
+            lib = NativeLibraryLoader.loadLibrary("libbulletc", java.lang.foreign.Arena.global());
+        }
+        IS_ENABLED = lib.isPresent();
+    }
+
     @Override
     public boolean isAvailable() {
-        return false; // Placeholder
+        return IS_ENABLED;
     }
 
 
     @Override
     public boolean isLoaded() {
-        return false;
+        return IS_ENABLED;
     }
 
     @Override
