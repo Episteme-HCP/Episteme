@@ -29,7 +29,7 @@ public class FallbackMechanismTest {
                 .build();
                 
         // Test inversion: Strassen should fail (UOE), and CPUDense should take over.
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         Matrix<Real> inv = (Matrix<Real>) ProviderSelector.execute(LinearAlgebraProvider.class, ctx, (LinearAlgebraProvider p) -> {
             if (p instanceof StrassenLinearAlgebraProvider) {
                 // This will throw UOE because we refactored it to stop extending CPUDense 
@@ -60,7 +60,7 @@ public class FallbackMechanismTest {
                 .build();
         
         // Exclude Strassen and CARMA, force something else
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) ProviderSelector.select(LinearAlgebraProvider.class, ctx, 
             (LinearAlgebraProvider p) -> !p.getName().contains("Strassen") && !p.getName().contains("CARMA"));
             

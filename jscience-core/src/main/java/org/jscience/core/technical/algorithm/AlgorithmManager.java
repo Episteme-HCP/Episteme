@@ -163,7 +163,6 @@ public final class AlgorithmManager {
      * @param current the current provider attempting to fall back
      * @return the next provider in priority order, or the reference provider if no better option exists
      */
-    @SuppressWarnings("unchecked")
     public static <P extends AlgorithmProvider> P getNextProvider(Class<P> providerClass, AlgorithmProvider current) {
         List<P> available = getProviders(providerClass);
         int index = -1;

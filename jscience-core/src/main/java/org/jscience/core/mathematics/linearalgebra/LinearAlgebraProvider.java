@@ -9,7 +9,6 @@ import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.structures.rings.Ring;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.AutoTuningManager;
-import org.jscience.core.technical.algorithm.AlgorithmManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 
 

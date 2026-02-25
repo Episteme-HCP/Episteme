@@ -25,8 +25,8 @@ import org.jscience.core.technical.backend.gpu.GPUBackend;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 
+
 import java.nio.DoubleBuffer;
-import java.util.Arrays;
 
 /**
  * OpenCL implementation of Dense Linear Algebra Provider.

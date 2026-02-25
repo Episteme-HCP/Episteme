@@ -7,8 +7,6 @@ package org.jscience.nativ.physics.classical.mechanics.backends.ode;
 
 import org.jscience.core.measure.Quantity;
 import org.jscience.core.measure.quantity.Time;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.jscience.natural.physics.classical.mechanics.RigidBody;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
