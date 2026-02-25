@@ -8,9 +8,9 @@ for %%a in (%*) do (
     if "%%a"=="--shaded" set USE_SHADED_JAR=true
     if "%%a"=="-jar" set USE_SHADED_JAR=true
 )
-set JAR_PATH=jscience-benchmarks\target\jscience-benchmarks.jar
+set JAR_PATH=jscience-benchmarks\target\jscience-benchmarks-1.0.0-SNAPSHOT.jar
 set LIB_DIR=launchers\lib
-set DEPENDENCY_DIR=jscience-benchmarks\target\dependency
+set DEPENDENCY_DIR=jscience-benchmarks\target\lib
 set MODULE_PATH=jscience-benchmarks\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes;jscience-native\target\classes;jscience-client\target\classes;jscience-server\target\classes
 
 rem --- Add Native JARs to Classpath ---
@@ -53,7 +53,7 @@ if defined USE_SHADED_JAR (
         pause
         exit /b 1
     )
-    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Djava.library.path="libs/native" -jar "%JAR_PATH%" %*
+    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Djava.library.path="libs/native" -cp "%JAR_PATH%;%DEPENDENCY_DIR%\*" %APP_CLASS% %*
 ) else (
     echo [INFO] Running latest compiled classes - Dev Mode. Use --shaded to force JAR.
     if not exist "jscience-benchmarks\target\classes" (
