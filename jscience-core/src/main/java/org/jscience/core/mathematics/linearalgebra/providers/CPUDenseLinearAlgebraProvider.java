@@ -382,13 +382,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Matrix inner dimensions must match");
         }
 
-        // Favor MatrixMultiplicationPlanner for Real types as it is highly optimized (CARMA/Strassen index-based)
-        if (a.getScalarRing() instanceof org.jscience.core.mathematics.sets.Reals) {
-             return (Matrix<E>) org.jscience.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply(
-                     (Matrix<org.jscience.core.mathematics.numbers.real.Real>) a, 
-                     (Matrix<org.jscience.core.mathematics.numbers.real.Real>) b);
-        }
-
         // Generic Strassen for large power-of-two square matrices
         if (a.rows() >= 512 && a.cols() >= 512 && b.cols() >= 512
                 && isSquarePowerOfTwo(a) && isSquarePowerOfTwo(b) && a.rows() == b.rows()) {

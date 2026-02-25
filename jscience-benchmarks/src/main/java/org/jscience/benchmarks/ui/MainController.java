@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -11,6 +12,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jscience.benchmarks.benchmark.RunnableBenchmark;
 import org.jscience.benchmarks.benchmark.BenchmarkRegistry;
@@ -230,6 +232,15 @@ public class MainController {
         benchmarkTreeTable.setColumnResizePolicy(TreeTableView.UNCONSTRAINED_RESIZE_POLICY);
         benchmarkTreeTable.getSelectionModel().setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE);
         
+        // Set loading placeholder with spinning indicator
+        ProgressIndicator spinner = new ProgressIndicator();
+        spinner.setMaxSize(40, 40);
+        Label loadingLabel = new Label(resources != null ? resources.getString("msg.loading_providers") : "Loading providers...");
+        loadingLabel.setStyle("-fx-text-fill: #aaaaaa;");
+        VBox loadingBox = new VBox(10, spinner, loadingLabel);
+        loadingBox.setAlignment(Pos.CENTER);
+        benchmarkTreeTable.setPlaceholder(loadingBox);
+        
         benchmarkTreeTable.setRowFactory(tv -> {
             TreeTableRow<BenchmarkItem> row = new TreeTableRow<>();
             row.setOnMouseClicked(event -> {
@@ -271,12 +282,18 @@ public class MainController {
 
         task.setOnSucceeded(e -> {
             benchmarkTreeTable.setRoot(task.getValue());
+            if (task.getValue() == null || task.getValue().getChildren().isEmpty()) {
+                String noProviders = resources != null ? resources.getString("msg.no_providers") : "No providers found.";
+                benchmarkTreeTable.setPlaceholder(new Label(noProviders));
+            }
             initializeDomainTabs(task.getValue());
             updateCategoryStatuses(task.getValue());
         });
 
         task.setOnFailed(e -> {
-            statusBarLabel.setText("Discovery Failed: " + task.getException().getMessage());
+            String msg = resources != null ? resources.getString("msg.discoveryFailed") : "Discovery Failed: {0}";
+            statusBarLabel.setText(msg.replace("{0}", String.valueOf(task.getException().getMessage())));
+            benchmarkTreeTable.setPlaceholder(new Label(msg.replace("{0}", String.valueOf(task.getException().getMessage()))));
             task.getException().printStackTrace();
         });
 

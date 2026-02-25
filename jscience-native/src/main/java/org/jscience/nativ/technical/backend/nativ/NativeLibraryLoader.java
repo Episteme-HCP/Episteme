@@ -63,7 +63,7 @@ public class NativeLibraryLoader {
                 return Optional.of(SymbolLookup.libraryLookup(variant, arena));
             } catch (Exception e) {
                 // 2. Try common and custom search paths
-                String[] searchPaths = {
+        String[] searchPaths = {
                     "/usr/local/lib/",
                     "/usr/lib/",
                     "C:\\Windows\\System32\\",
@@ -72,6 +72,7 @@ public class NativeLibraryLoader {
                     System.getProperty("user.dir"),
                     System.getProperty("user.dir") + java.io.File.separator + "libs",
                     System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + libName,
+                    System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "OpenBLAS",
                     System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "native",
                     System.getProperty("user.dir") + java.io.File.separator + "native"
                 };
