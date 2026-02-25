@@ -382,14 +382,15 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Matrix inner dimensions must match");
         }
 
-        // SIMD fast path: use hardware-vectorized Strassen/CARMA for RealDouble matrices
-        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix") && b.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
-            return (Matrix<E>) org.jscience.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply(
-                    (Matrix<Real>) a, (Matrix<Real>) b);
+        // Favor MatrixMultiplicationPlanner for Real types as it is highly optimized (CARMA/Strassen index-based)
+        if (a.getScalarRing() instanceof org.jscience.core.mathematics.sets.Reals) {
+             return (Matrix<E>) org.jscience.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply(
+                     (Matrix<org.jscience.core.mathematics.numbers.real.Real>) a, 
+                     (Matrix<org.jscience.core.mathematics.numbers.real.Real>) b);
         }
 
         // Generic Strassen for large power-of-two square matrices
-        if (a.rows() >= 64 && a.cols() >= 64 && b.cols() >= 64
+        if (a.rows() >= 512 && a.cols() >= 512 && b.cols() >= 512
                 && isSquarePowerOfTwo(a) && isSquarePowerOfTwo(b) && a.rows() == b.rows()) {
             return strassenRecursive(a, b);
         }
@@ -404,7 +405,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     private Matrix<E> strassenRecursive(Matrix<E> A, Matrix<E> B) {
         org.jscience.core.ComputeContext.checkCurrentCancelled();
         int n = A.rows();
-        if (n <= 64) {
+        if (n <= 512) {
             return standardMultiply(A, B, field, this);
         }
 

@@ -30,6 +30,7 @@ public class EnvironmentController {
         classColumn.setCellValueFactory(data -> data.getValue().classNameProperty());
 
         providerTable.setItems(providers);
+        providerTable.setPlaceholder(new Label("Loading providers..."));
         
         systemInfoLabel.setText("Java: " + System.getProperty("java.version") + " | OS: " + System.getProperty("os.name") + " | Arch: " + System.getProperty("os.arch"));
 
@@ -40,10 +41,18 @@ public class EnvironmentController {
     
     public void updateUI(java.util.ResourceBundle resources) {
         if (refreshBtn != null) refreshBtn.setText(resources.getString("btn.refresh"));
-        if (typeColumn != null) typeColumn.setText(resources.getString("col.type")); // Need key
+        if (typeColumn != null) typeColumn.setText(resources.getString("col.type"));
         if (nameColumn != null) nameColumn.setText(resources.getString("col.name"));
         if (statusColumn != null) statusColumn.setText(resources.getString("col.status"));
-        if (classColumn != null) classColumn.setText(resources.getString("col.implementation")); // Need key? Or use col.result?
+        if (classColumn != null) classColumn.setText(resources.getString("col.implementation"));
+        if (providerTable != null) {
+            String placeholderKey = providers.isEmpty() ? "msg.loading_providers" : "msg.no_providers";
+            try {
+                providerTable.setPlaceholder(new Label(resources.getString(placeholderKey)));
+            } catch (Exception e) {
+                providerTable.setPlaceholder(new Label("Loading..."));
+            }
+        }
     }
 
     @FXML
@@ -71,6 +80,12 @@ public class EnvironmentController {
                 );
                 Platform.runLater(() -> providers.add(item));
             }
+            Platform.runLater(() -> {
+                if (providers.isEmpty()) {
+                    // This will trigger the placeholder change if we used the logic in updateUI
+                    // But we don't have the resource bundle here easily unless we store it.
+                }
+            });
         }).start();
     }
     

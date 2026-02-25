@@ -59,9 +59,15 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
         // No-op by default
     }
 
+    /**
+     * Returns a fallback provider for this instance.
+     * <p>
+     * Defaults to the next-best available provider in priority order.
+     * </p>
+     */
     @SuppressWarnings("unchecked")
     default LinearAlgebraProvider<E> fallback() {
-        return (LinearAlgebraProvider<E>) AlgorithmManager.getReferenceProvider(LinearAlgebraProvider.class);
+        return (LinearAlgebraProvider<E>) org.jscience.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, this);
     }
 
     // --- Vector Operations ---

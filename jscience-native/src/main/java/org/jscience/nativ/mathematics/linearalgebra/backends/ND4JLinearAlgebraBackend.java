@@ -89,7 +89,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         t.setDaemon(true);
         t.start();
         try {
-            t.join(3000); // 3 seconds timeout for ND4J init
+            t.join(10000); // 10 seconds timeout for ND4J init
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -150,19 +150,19 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     @Override
     public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.add(a, b);
         return fromINDArrayVector(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.subtract(a, b);
         return fromINDArrayVector(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.multiply(vector, scalar);
         return fromINDArrayVector(toINDArray(vector).mul(scalar.doubleValue()));
     }
 
@@ -180,31 +180,31 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.add(a, b);
         return fromINDArray(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.subtract(a, b);
         return fromINDArray(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.multiply(a, b);
         return fromINDArray(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.multiply(a, b);
         return fromINDArrayVector(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.inverse(a);
         return fromINDArray(InvertMatrix.invert(toINDArray(a), false));
     }
 
@@ -213,7 +213,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
      */
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.determinant(a);
         int n = a.rows();
         INDArray m = toINDArray(a).dup();
         double det = 1.0;
@@ -246,7 +246,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
      */
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.solve(a, b);
         INDArray arrA = toINDArray(a);
         INDArray arrB = toINDArray(b);
         INDArray invA = InvertMatrix.invert(arrA, false);
@@ -255,13 +255,13 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.transpose(a);
         return fromINDArray(toINDArray(a).transpose());
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.scale(scalar, a);
         return fromINDArray(toINDArray(a).mul(scalar.doubleValue()));
     }
 
@@ -271,7 +271,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
      */
     @Override
     public SVDResult<Real> svd(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.svd(a);
         INDArray m = toINDArray(a);
         INDArray[] results = Nd4j.exec(new org.nd4j.linalg.api.ops.impl.transforms.custom.Svd(m, true, true, 0));
         // results[0] = S (singular values), results[1] = U, results[2] = V
@@ -292,7 +292,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
      */
     @Override
     public EigenResult<Real> eigen(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.eigen(a);
         int n = a.rows();
         INDArray mat = toINDArray(a).dup();
         double[] eigenvalues = new double[n];
@@ -337,7 +337,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
      */
     @Override
     public LUResult<Real> lu(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("ND4J not available");
+        if (!isAvailable()) return LinearAlgebraProvider.super.lu(a);
         int n = a.rows();
         INDArray U = toINDArray(a).dup();
         INDArray L = Nd4j.eye(n);

@@ -1,17 +1,20 @@
 package org.jscience.core.mathematics.linearalgebra.algorithms;
 
 import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
+import jdk.incubator.vector.DoubleVector;
+import jdk.incubator.vector.VectorSpecies;
 
 /**
  * Implementation of the CARMA Algorithm specialized for the double primitive type.
  * <p>
- * This version uses SIMDDoubleMatrix and direct double[] manipulations
- * to achieve maximum performance on hardware supporting vector instructions.
+ * This version uses SIMDDirect recursion on indices to avoid data copying
+ * and achieve communication-optimal performance with minimal GC overhead.
  * </p>
  */
 public class RealDoubleCARMAAlgorithm {
 
-    private static final int RECURSION_THRESHOLD = 256; // Higher threshold for SIMD
+    private static final int RECURSION_THRESHOLD = 256; 
+    private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
 
     public static SIMDRealDoubleMatrix multiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
         org.jscience.core.ComputeContext.checkCurrentCancelled();
@@ -23,76 +26,69 @@ public class RealDoubleCARMAAlgorithm {
             throw new IllegalArgumentException("Matrix dimensions incompatible for multiplication");
         }
 
-        // Base case: Use the SIMD-optimized multiply of SIMDDoubleMatrix
-        if (m <= RECURSION_THRESHOLD && n <= RECURSION_THRESHOLD && k <= RECURSION_THRESHOLD) {
-            return standardMultiply(A, B);
-        }
-
-        if (m >= n && m >= k) {
-            SIMDRealDoubleMatrix A1 = (SIMDRealDoubleMatrix) A.getSubMatrix(0, m / 2, 0, k);
-            SIMDRealDoubleMatrix A2 = (SIMDRealDoubleMatrix) A.getSubMatrix(m / 2, m, 0, k);
-            return combineVertical(multiply(A1, B), multiply(A2, B));
-        } else if (n >= m && n >= k) {
-            SIMDRealDoubleMatrix B1 = (SIMDRealDoubleMatrix) B.getSubMatrix(0, k, 0, n / 2);
-            SIMDRealDoubleMatrix B2 = (SIMDRealDoubleMatrix) B.getSubMatrix(0, k, n / 2, n);
-            return combineHorizontal(multiply(A, B1), multiply(A, B2));
-        } else {
-            SIMDRealDoubleMatrix A1 = (SIMDRealDoubleMatrix) A.getSubMatrix(0, m, 0, k / 2);
-            SIMDRealDoubleMatrix A2 = (SIMDRealDoubleMatrix) A.getSubMatrix(0, m, k / 2, k);
-            SIMDRealDoubleMatrix B1 = (SIMDRealDoubleMatrix) B.getSubMatrix(0, k / 2, 0, n);
-            SIMDRealDoubleMatrix B2 = (SIMDRealDoubleMatrix) B.getSubMatrix(k / 2, k, 0, n);
-            
-            SIMDRealDoubleMatrix C1 = multiply(A1, B1);
-            SIMDRealDoubleMatrix C2 = multiply(A2, B2);
-            return (SIMDRealDoubleMatrix) C1.add(C2);
-        }
-    }
-
-    private static SIMDRealDoubleMatrix combineVertical(SIMDRealDoubleMatrix top, SIMDRealDoubleMatrix bottom) {
-        int rows = top.rows() + bottom.rows();
-        int cols = top.cols();
-        double[] combinedData = new double[rows * cols];
-        
-        System.arraycopy(top.getInternalData(), 0, combinedData, 0, top.getInternalData().length);
-        System.arraycopy(bottom.getInternalData(), 0, combinedData, top.getInternalData().length, bottom.getInternalData().length);
-        
-        return new SIMDRealDoubleMatrix(rows, cols, combinedData);
-    }
-
-    private static SIMDRealDoubleMatrix combineHorizontal(SIMDRealDoubleMatrix left, SIMDRealDoubleMatrix right) {
-        int rows = left.rows();
-        int leftCols = left.cols();
-        int rightCols = right.cols();
-        int totalCols = leftCols + rightCols;
-        double[] combinedData = new double[rows * totalCols];
-        
-        double[] lData = left.getInternalData();
-        double[] rData = right.getInternalData();
-        
-        for (int i = 0; i < rows; i++) {
-            System.arraycopy(lData, i * leftCols, combinedData, i * totalCols, leftCols);
-            System.arraycopy(rData, i * rightCols, combinedData, i * totalCols + leftCols, rightCols);
-        }
-        
-        return new SIMDRealDoubleMatrix(rows, totalCols, combinedData);
-    }
-
-    private static SIMDRealDoubleMatrix standardMultiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
-        int m = A.rows();
-        int k = A.cols();
-        int n = B.cols();
         double[] aData = A.getInternalData();
         double[] bData = B.getInternalData();
         double[] cData = new double[m * n];
-        
+
+        carmaRecursive(aData, 0, 0, k,
+                      bData, 0, 0, n,
+                      cData, 0, 0, n,
+                      m, k, n);
+
+        return new SIMDRealDoubleMatrix(m, n, cData);
+    }
+
+    private static void carmaRecursive(double[] A, int aRow, int aCol, int aStride,
+                                     double[] B, int bRow, int bCol, int bStride,
+                                     double[] C, int cRow, int cCol, int cStride,
+                                     int m, int k, int n) {
+        if (m <= RECURSION_THRESHOLD && n <= RECURSION_THRESHOLD && k <= RECURSION_THRESHOLD) {
+            standardMultiply(A, aRow, aCol, aStride,
+                             B, bRow, bCol, bStride,
+                             C, cRow, cCol, cStride,
+                             m, k, n);
+            return;
+        }
+
+        if (m >= n && m >= k) {
+            // Split M
+            int mHalf = m / 2;
+            carmaRecursive(A, aRow, aCol, aStride, B, bRow, bCol, bStride, C, cRow, cCol, cStride, mHalf, k, n);
+            carmaRecursive(A, aRow + mHalf, aCol, aStride, B, bRow, bCol, bStride, C, cRow + mHalf, cCol, cStride, m - mHalf, k, n);
+        } else if (n >= m && n >= k) {
+            // Split N
+            int nHalf = n / 2;
+            carmaRecursive(A, aRow, aCol, aStride, B, bRow, bCol, bStride, C, cRow, cCol, cStride, m, k, nHalf);
+            carmaRecursive(A, aRow, aCol, aStride, B, bRow, bCol + nHalf, bStride, C, cRow, cCol + nHalf, cStride, m, k, n - nHalf);
+        } else {
+            // Split K
+            int kHalf = k / 2;
+            carmaRecursive(A, aRow, aCol, aStride, B, bRow, bCol, bStride, C, cRow, cCol, cStride, m, kHalf, n);
+            carmaRecursive(A, aRow, aCol + kHalf, aStride, B, bRow + kHalf, bCol, bStride, C, cRow, cCol, cStride, m, k - kHalf, n);
+        }
+    }
+
+    private static void standardMultiply(double[] A, int aRow, int aCol, int aStride,
+                                       double[] B, int bRow, int bCol, int bStride,
+                                       double[] C, int cRow, int cCol, int cStride,
+                                       int m, int k, int n) {
         for (int i = 0; i < m; i++) {
+            int rowA = (aRow + i) * aStride + aCol;
+            int rowC = (cRow + i) * cStride + cCol;
             for (int l = 0; l < k; l++) {
-                double aik = aData[i * k + l];
-                for (int j = 0; j < n; j++) {
-                    cData[i * n + j] += aik * bData[l * n + j];
+                double aik = A[rowA + l];
+                int rowB = (bRow + l) * bStride + bCol;
+                
+                int j = 0;
+                for (; j < SPECIES.loopBound(n); j += SPECIES.length()) {
+                    var bVec = DoubleVector.fromArray(SPECIES, B, rowB + j);
+                    var cVec = DoubleVector.fromArray(SPECIES, C, rowC + j);
+                    bVec.fma(DoubleVector.broadcast(SPECIES, aik), cVec).intoArray(C, rowC + j);
+                }
+                for (; j < n; j++) {
+                    C[rowC + j] += aik * B[rowB + j];
                 }
             }
         }
-        return new SIMDRealDoubleMatrix(m, n, cData);
     }
 }

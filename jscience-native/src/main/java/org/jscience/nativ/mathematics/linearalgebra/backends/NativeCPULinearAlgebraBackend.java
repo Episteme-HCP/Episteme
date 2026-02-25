@@ -246,7 +246,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             dgemm(m, n, k, aBuf, k, bBuf, n, cdm.getBuffer(), n, 1.0, 0.0);
             return cdm;
         }
-        throw new UnsupportedOperationException("Native multiply not available for these arguments or backend not loaded");
+        return LinearAlgebraProvider.super.multiply(a, b);
     }
 
     @Override
@@ -272,7 +272,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             
             return res;
         }
-        throw new UnsupportedOperationException("Native inverse not available for these arguments or backend not loaded");
+        return LinearAlgebraProvider.super.inverse(a);
     }
 
     private DoubleBuffer ensureDirect(RealDoubleMatrix m) {
@@ -313,7 +313,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             x.getBuffer().get(result);
             return RealDoubleVector.of(result);
         }
-        throw new UnsupportedOperationException("Native solve not available for these arguments or backend not loaded");
+        return LinearAlgebraProvider.super.solve(a, b);
     }
 
     @Override

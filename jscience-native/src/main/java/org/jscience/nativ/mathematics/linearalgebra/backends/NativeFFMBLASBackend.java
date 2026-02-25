@@ -128,7 +128,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                 }
 
                 // LAPACK
-                Optional<MemorySegment> dgesvAddr = LOOKUP.find("LAPACKE_dgesv");
+                Optional<MemorySegment> dgesvAddr = LOOKUP.find("LAPACKE_dgesv").or(() -> LOOKUP.find("dgesv"));
                 if (dgesvAddr.isPresent()) {
                     FunctionDescriptor dgesvDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -138,7 +138,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                     DGESV = LINKER.downcallHandle(dgesvAddr.get(), dgesvDesc);
                 }
 
-                Optional<MemorySegment> dgetrfAddr = LOOKUP.find("LAPACKE_dgetrf");
+                Optional<MemorySegment> dgetrfAddr = LOOKUP.find("LAPACKE_dgetrf").or(() -> LOOKUP.find("dgetrf"));
                 if (dgetrfAddr.isPresent()) {
                     FunctionDescriptor dgetrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -147,7 +147,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                     DGETRF = LINKER.downcallHandle(dgetrfAddr.get(), dgetrfDesc);
                 }
                 
-                Optional<MemorySegment> dgetriAddr = LOOKUP.find("LAPACKE_dgetri");
+                Optional<MemorySegment> dgetriAddr = LOOKUP.find("LAPACKE_dgetri").or(() -> LOOKUP.find("dgetri"));
                 if (dgetriAddr.isPresent()) {
                     FunctionDescriptor dgetriDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -208,7 +208,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public Vector<org.jscience.core.mathematics.numbers.real.Real> solve(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE || DGESV == null) throw new UnsupportedOperationException("Native LAPACK dgesv not available");
+        if (!IS_AVAILABLE || DGESV == null) return LinearAlgebraProvider.super.solve(A, b);
         org.jscience.core.ComputeContext.checkCurrentCancelled();
         
         int n = A.rows();
@@ -242,7 +242,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     
     @Override
     public Matrix<org.jscience.core.mathematics.numbers.real.Real> inverse(Matrix<org.jscience.core.mathematics.numbers.real.Real> A) {
-         if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) throw new UnsupportedOperationException("Native LAPACK inverse not available");
+         if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) return LinearAlgebraProvider.super.inverse(A);
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
@@ -277,7 +277,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public org.jscience.core.mathematics.numbers.real.Real determinant(Matrix<org.jscience.core.mathematics.numbers.real.Real> A) {
-         if (!IS_AVAILABLE || DGETRF == null) throw new UnsupportedOperationException("Native LAPACK determinant not available");
+         if (!IS_AVAILABLE || DGETRF == null) return LinearAlgebraProvider.super.determinant(A);
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
@@ -322,7 +322,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     @Override
     public QRResult<org.jscience.core.mathematics.numbers.real.Real> qr(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE || DGEQRF == null || DORGQR == null) {
-            throw new UnsupportedOperationException("Native LAPACK QR not available");
+            return LinearAlgebraProvider.super.qr(a);
         }
         int m = a.rows();
         int n = a.cols();
@@ -370,7 +370,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     @Override
     public SVDResult<org.jscience.core.mathematics.numbers.real.Real> svd(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE || DGESVD == null) {
-            throw new UnsupportedOperationException("Native LAPACK SVD not available");
+            return LinearAlgebraProvider.super.svd(a);
         }
         int m = a.rows();
         int n = a.cols();

@@ -144,6 +144,38 @@ public final class AlgorithmManager {
     }
 
     /**
+     * Finds and returns the next-best available provider after the given one.
+     * <p>
+     * Useful for chained fallbacks where a provider is available but an operation 
+     * is not supported or fails.
+     * </p>
+     * 
+     * @param <P> the provider type
+     * @param providerClass the interface class of the provider
+     * @param current the current provider attempting to fall back
+     * @return the next provider in priority order, or the reference provider if no better option exists
+     */
+    @SuppressWarnings("unchecked")
+    public static <P extends AlgorithmProvider> P getNextProvider(Class<P> providerClass, AlgorithmProvider current) {
+        List<P> available = getProviders(providerClass);
+        int index = -1;
+        for (int i = 0; i < available.size(); i++) {
+            // Check identity or name since some providers might be wrapped
+            if (available.get(i) == current || available.get(i).getName().equals(current.getName())) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index >= 0 && index < available.size() - 1) {
+            return available.get(index + 1);
+        }
+
+        // If not found or last, return the absolute reference provider
+        return getReferenceProvider(providerClass);
+    }
+
+    /**
      * Returns the provider registry for operational selection.
      */
     public static ProviderRegistry getRegistry() {
