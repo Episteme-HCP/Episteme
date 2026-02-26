@@ -93,6 +93,18 @@
             <classifier>windows-x86_64</classifier>
         </dependency>
         
+        <!-- JCuda -->
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcuda</artifactId>
+            <version>${jcuda.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jcuda</groupId>
+            <artifactId>jcublas</artifactId>
+            <version>${jcuda.version}</version>
+        </dependency>
+
         <!-- AutoService for SPI generation -->
         <dependency>
             <groupId>com.google.auto.service</groupId>
@@ -147,43 +159,6 @@
     </build>
 
     <profiles>
-        <!-- JCuda profile: auto-activates on Windows and Linux only -->
-        <profile>
-            <id>cuda-windows</id>
-            <activation>
-                <os><family>windows</family></os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcuda</artifactId>
-                    <version>${jcuda.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcublas</artifactId>
-                    <version>${jcuda.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>cuda-linux</id>
-            <activation>
-                <os><family>unix</family><name>Linux</name></os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcuda</artifactId>
-                    <version>${jcuda.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcublas</artifactId>
-                    <version>${jcuda.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
         <!-- Profile for systems with OpenBLAS installed -->
         <profile>
             <id>openblas</id>
