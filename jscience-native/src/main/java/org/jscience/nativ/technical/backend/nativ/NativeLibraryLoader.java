@@ -96,13 +96,8 @@ public class NativeLibraryLoader {
                 "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1\\bin\\",
                 System.getProperty("user.dir"),
                 System.getProperty("user.dir") + java.io.File.separator + "libs",
-                System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + libName,
-                System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + libName.toUpperCase(),
-                System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "OpenBLAS",
-                System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "VLC",
-                System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "Bullet3DLL",
-                System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "Arrow",
-                System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + "native"
+                System.getProperty("user.dir") + java.io.File.separator + "launchers" + java.io.File.separator + "libs" + java.io.File.separator + "libs",
+                System.getProperty("user.dir") + java.io.File.separator + "native"
             };
 
             for (String path : searchPaths) {

@@ -1,7 +1,6 @@
 package org.jscience.nativ.technical.backend.nativ;
 
 import org.junit.jupiter.api.Test;
-import java.lang.foreign.SymbolLookup;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NativeLibraryLoaderTest {
