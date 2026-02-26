@@ -60,6 +60,7 @@ public class NativeLibraryLoader {
             } else if (libName.equals("cublas")) {
                 variants.add("cublas64_13");
                 variants.add("cublas64_12");
+                variants.add("cublas64_013"); // Some versions use 013
                 variants.add("cublas64_11");
                 variants.add("cublas64_10");
             } else if (libName.equals("cusolver")) {
@@ -67,9 +68,12 @@ public class NativeLibraryLoader {
                 variants.add("cusolver64_12");
                 variants.add("cusolver64_11");
             } else if (libName.equals("cudart")) {
+                variants.add("cudart64_13");
                 variants.add("cudart64_130");
                 variants.add("cudart64_120");
                 variants.add("cudart64_110");
+            } else if (libName.equals("sndfile")) {
+                variants.add("libsndfile-1");
             }
         }
 
@@ -106,7 +110,10 @@ public class NativeLibraryLoader {
             for (String path : searchPaths) {
                 if (path == null) continue;
                 Optional<SymbolLookup> found = tryLoadFromDirectory(java.nio.file.Paths.get(path), currentMapped, arena);
-                if (found.isPresent()) return found;
+                if (found.isPresent()) {
+                    System.out.println("[INFO] NativeLibraryLoader: Successfully loaded " + variant + " from " + path);
+                    return found;
+                }
             }
             
             // 3. Scan subdirectories of "libs" if specific one wasn't there
@@ -116,19 +123,23 @@ public class NativeLibraryLoader {
                 if (subDirs != null) {
                     for (java.io.File sub : subDirs) {
                         Optional<SymbolLookup> found = tryLoadFromDirectory(sub.toPath(), currentMapped, arena);
-                        if (found.isPresent()) return found;
+                        if (found.isPresent()) {
+                            System.out.println("[INFO] NativeLibraryLoader: Successfully loaded " + variant + " from subdirectory: " + sub.getName());
+                            return found;
+                        }
                     }
                 }
             }
         }
         
-        System.err.println("[WARNING] Could not find native library " + libName + " in any searched location.");
+        System.err.println("[WARNING] Could not find or load native library " + libName + " (tried variants: " + variants + ")");
         return Optional.empty();
     }
 
     private static Optional<SymbolLookup> tryLoadFromDirectory(java.nio.file.Path basePath, String mappedName, Arena arena) {
+        java.nio.file.Path fullPath = null;
         try {
-            java.nio.file.Path fullPath = basePath.resolve(mappedName).toAbsolutePath();
+            fullPath = basePath.resolve(mappedName).toAbsolutePath();
             if (java.nio.file.Files.exists(fullPath)) {
                 System.out.println("[DEBUG] NativeLibraryLoader: Attempting libraryLookup on: " + fullPath);
                 return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
@@ -137,14 +148,18 @@ public class NativeLibraryLoader {
             // Try common subdirectories (lib, bin)
             String[] subs = {"lib", "bin"};
             for (String sub : subs) {
-                java.nio.file.Path subPath = basePath.resolve(sub).resolve(mappedName);
+                java.nio.file.Path subPath = basePath.resolve(sub).resolve(mappedName).toAbsolutePath();
                 if (java.nio.file.Files.exists(subPath)) {
-                    System.out.println("[DEBUG] NativeLibraryLoader: Found candidate at " + subPath.toAbsolutePath());
+                    fullPath = subPath; // for logging in catch
+                    System.out.println("[DEBUG] NativeLibraryLoader: Found candidate at " + subPath);
                     return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
                 }
             }
-        } catch (Exception e) {
-            System.err.println("[DEBUG] NativeLibraryLoader: Error loading from " + basePath + ": " + e.getMessage());
+        } catch (Throwable t) {
+            System.err.println("[ERROR] NativeLibraryLoader: Failed to load " + mappedName + " from " + (fullPath != null ? fullPath : basePath) + ": " + t.getMessage());
+            if (t.getCause() != null) {
+                System.err.println("  Cause: " + t.getCause().getMessage());
+            }
         }
         return Optional.empty();
     }

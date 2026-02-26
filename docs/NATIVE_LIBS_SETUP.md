@@ -1,85 +1,128 @@
 # JScience Native Library Setup Guide
 
-JScience uses high-performance native backends for linear algebra, physics simulation, and data processing. This guide provides instructions for acquiring and configuring these libraries across Windows, Linux, and macOS.
-
-## 1. Directory Structure
-
-For a portable installation, place all native libraries in the project's root `libs/` directory.
-
-### Minimal `libs/` Checklist (Windows)
-
-| Component | Required DLLs |
-| :--- | :--- |
-| **Linear Algebra** | `libopenblas.dll` (or `mkl_rt.dll`) |
-| **FFT** | `libfftw3-3.dll`, `libfftw3f-3.dll`, `libfftw3l-3.dll` |
-| **Data I/O** | `arrow.dll`, `parquet.dll`, `hdf5.dll` (+ wrappers) |
-| **Physics** | `libbulletc.dll`, `ode.dll` |
-| **Quantum** | `quest.dll` |
-| **Multimedia** | `libvlc.dll`, `libvlccore.dll` |
-| **Runtime** | `msvcp140*.dll`, `vcruntime140*.dll`, `concrt140.dll` |
+JScience utilizes high-performance native backends for computation, physics, audio, and data I/O. This guide provides comprehensive instructions for acquiring, installing, and configuring these libraries across Windows, Linux, and macOS.
 
 ---
 
-## 2. Installation Guides
+## 🚀 Quick Start: The `libs/` Directory
 
-### [OpenBLAS](https://github.com/xianyi/OpenBLAS/releases) (Linear Algebra)
+JScience is configured to look for native libraries in the project's root `libs/` directory. For a portable installation, place all relevant `.dll` (Windows), `.so` (Linux), or `.dylib` (macOS) files in this folder.
 
-- **Windows**: Download the `.zip` from GitHub Releases and extract the DLL.
-- **Linux**: `sudo apt install libopenblas-dev` (Debian/Ubuntu) or `sudo dnf install openblas-devel` (Fedora).
-- **macOS**: `brew install openblas`.
-
-### [Apache Arrow](https://arrow.apache.org/install/) (Columnar Data)
-
-- **Easiest Path (All OS)**: `pip install pyarrow`. Locate `arrow.dll` (Win), `libarrow.so` (Linux), or `libarrow.dylib` (macOS) in your Python `site-packages/pyarrow`.
-- **Windows (vcpkg)**: `vcpkg install arrow`.
-- **macOS**: `brew install apache-arrow`.
-- **Linux**: Use the official Apache APT/YUM repositories.
-
-### [HDF5](https://www.hdfgroup.org/downloads/hdf5/) (Scientific Data)
-
-- **Windows**: Download the `.msi` or `.zip` installer from The HDF Group.
-- **Linux**: `sudo apt install libhdf5-dev`.
-- **macOS**: `brew install hdf5`.
-
-### [FFTW3](http://www.fftw.org/download.html) (Fast Fourier Transform)
-
-- **Windows**: Download pre-compiled 64-bit DLLs from the official site.
-- **Linux/macOS**: Standard package managers (`fftw3`).
-
-### [QuEST](https://github.com/QuEST-Kit/QuEST) (Quantum Simulation)
-
-1. Clone the repository and build from source using CMake:
-   ```bash
-   mkdir build; cd build; cmake ..; cmake --build . --config Release
-   ```
-2. Copy the resulting binary to `libs/quest`.
-
-### [VLC Media Player](https://www.videolan.org/vlc/) (Multimedia)
-
-- **Setup**: Install the official VLC application. JScience will detect it automatically via `vlcj`.
-- **Bundling**: Copy `libvlc` and `libvlccore` to `libs/`.
-
-### [CUDA](https://developer.nvidia.com/cuda-downloads) (GPU Acceleration)
-
-1. Install the CUDA Toolkit from NVIDIA.
-2. Ensure `BIN` directory is in `PATH`.
-3. (Optional) Copy `cudart64_*.dll` and `cublas64_*.dll` to `libs/` for portability.
+**JVM Argument:**
+`-Djava.library.path=libs` (This is handled automatically by the provided launchers).
 
 ---
 
-## 3. Configuration & Paths
+## 🛠️ Library Directory & Installation Methods
 
-### JVM Argument
-Ensure the native library path is set when running the application:
-`-Djava.library.path=libs`
+### 1. Linear Algebra & Deep Learning (BLAS/LAPACK/oneDNN)
 
-### Launcher Scripts
-The provides scripts in the `launchers/` directory handle path resolution automatically using relative paths.
+| Library | Purpose | Download / Installation |
+| :--- | :--- | :--- |
+| **OpenBLAS** | CPU Acceleration | **Win**: [Releases](https://github.com/OpenMathLib/OpenBLAS/releases) (copy `libopenblas.dll`) <br> **Lin**: `sudo apt install libopenblas-dev` <br> **Mac**: `brew install openblas` |
+| **Intel MKL** | Optimal CPU Perf | **Win/Lin/Mac**: Part of [Intel oneAPI Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html) <br> **Pip**: `pip install mkl` |
+| **oneDNN** (dnnl) | Deep Learning | **Win/Lin/Mac**: [GitHub Releases](https://github.com/oneapi-src/oneDNN/releases) (Download binary release for your OS) |
+
+### 2. GPU Acceleration (CUDA & OpenCL)
+
+> [!IMPORTANT]
+> CUDA requires an NVIDIA GPU and matching drivers.
+
+| Component | Purpose | Installation Method |
+| :--- | :--- | :--- |
+| **CUDA Toolkit** | Core GPU Support | **Win/Lin**: [NVIDIA CUDA Downloads](https://developer.nvidia.com/cuda-downloads) <br> **Requirement**: Ensure `cublas64_13.dll` (or current version) is in your path or `libs/`. |
+| **cuBLAS / cuSPARSE** | Linear Algebra | Included in the CUDA Toolkit. Copy `cublas64_*.dll`, `cusparse64_*.dll` to `libs/`. |
+| **OpenCL** | Heterogeneous Computing | **Win**: Included with GPU Drivers. <br> **Lin**: `sudo apt install intel-opencl-icd` or `nvidia-opencl-icd-libopencl1` <br> **Mac**: Built-in (Deprecated by Apple, but still available). |
+
+### 3. Physics & Mechanics (Bullet, ODE)
+
+| Library | Purpose | Installation Method |
+| :--- | :--- | :--- |
+| **Bullet Physics** | Rigid Body & Collision | **All**: [BulletSharpPInvoke (libbulletc)](https://github.com/AndresTraks/BulletSharpPInvoke) <br> Compile `libbulletc` from source using CMake if binaries are not available for your platform. |
+| **ODE** (Open Dynamics) | Articulated Dynamics | **Win**: [BitBucket Downloads](https://bitbucket.org/odedevs/ode/downloads/) (Look for `ode-*.tar.gz`) <br> **Lin**: `sudo apt install libode-dev` <br> **Mac**: `brew install ode` |
+
+### 4. Audio & Multimedia (MiniAudio, PortAudio, VLC)
+
+| Library | Purpose | Installation Method |
+| :--- | :--- | :--- |
+| **MiniAudio** | Low-latency Audio | **All**: [miniaud.io](https://miniaud.io/) <br> JScience uses a native wrapper. Ensure `miniaudio.dll` is present in `libs/`. |
+| **PortAudio** | Cross-platform Audio | **Win**: [Official Site](http://www.portaudio.com/download.html) <br> **Lin**: `sudo apt install libportaudio2` <br> **Mac**: `brew install portaudio` |
+| **VLC (libvlc)** | Media Playback | **Win**: Install [VLC Media Player](https://www.videolan.org/vlc/) and copy `libvlc.dll`, `libvlccore.dll` and the `plugins/` folder. <br> **Lin**: `sudo apt install libvlc-dev` <br> **Mac**: `brew install --cask vlc` |
+| **mpg123** | MP3 Decoding | **Win**: [mpg123.org](https://mpg123.de/download/win64/) <br> **Lin**: `sudo apt install libmpg123-dev` <br> **Mac**: `brew install mpg123` |
+
+### 5. Data Formats (Arrow, HDF5, FITS)
+
+| Format | Purpose | Installation Method |
+| :--- | :--- | :--- |
+| **Apache Arrow** | Columnar Data | **Win**: `vcpkg install arrow` <br> **Lin**: `sudo apt install libarrow-dev` <br> **Mac**: `brew install apache-arrow` |
+| **HDF5** | Large Data Arrays | **Win**: [HDF Group Downloads](https://www.hdfgroup.org/downloads/hdf5/) <br> **Lin**: `sudo apt install libhdf5-dev` <br> **Mac**: `brew install hdf5` |
+| **CFITSIO** (FITS) | Scientific Images | **Win**: [NASA HEASARC](https://heasarc.gsfc.nasa.gov/fitsio/) <br> **Lin**: `sudo apt install libcfitsio-dev` <br> **Mac**: `brew install cfitsio` |
+
+### 6. Quantum & Parallelism (QuEST, MPJ, HDFS)
+
+| Library | Purpose | Installation Method |
+| :--- | :--- | :--- |
+| **QuEST** | Quantum Simulation | **All**: [GitHub](https://github.com/quest-kit/QuEST) <br> Clone and compile using CMake: `cmake -D GPUACCEL=OFF ..` |
+| **MPJ Express** | Message Passing (MPI) | **All**: [MPJ Express Site](http://mpj-express.org/) <br> Download the TAR/ZIP, unpack, and set `MPJ_HOME`. |
+| **HDFS Native** | Hadoop IO | **Lin**: Part of Hadoop Distro (`libhadoop.so`). <br> **Win**: Requires community builds of `winutils.exe` and `hadoop.dll` (e.g., [cdarlint/winutils](https://github.com/cdarlint/winutils)). |
 
 ---
 
-## 4. Verification
+## 🖥️ Platform-Specific Notes
 
-Run the verification tool to check if all backends are correctly detected:
+### Windows (Visual C++ Redistributable)
+Most native libraries require the **Visual C++ Redistributable for Visual Studio 2015-2022**.
+- **Download**: [Official Microsoft Links](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+
+### Linux (LD_LIBRARY_PATH)
+On Linux, ensure `libs/` is added to your library path if using system-installed dependencies:
+`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./libs`
+
+### macOS (Permissions)
+Due to Gatekeeper, you may need to manually allow unsigned `.dylib` files:
+`xattr -d com.apple.quarantine libs/*.dylib`
+
+---
+
+## 📦 Missing Dependency Checklist (Troubleshooting)
+
+If a library is present but fails to load (`UnsatisfiedLinkError`), it is often missing one of these transitive dependencies. Ensure these are also in your `libs/` folder or system path:
+
+### For `libsndfile.dll` (Audio)
+- [ ] `libFLAC.dll`
+- [ ] `libvorbis.dll`
+- [ ] `libvorbisenc.dll`
+- [ ] `libogg.dll`
+- [ ] `libopus.dll`
+- [ ] `libmp3lame.dll`
+
+### For `arrow.dll` / `parquet.dll` (Data I/O)
+- [ ] `zlib1.dll` (or `zlib.dll`)
+- [ ] `lz4.dll`
+- [ ] `zstd.dll`
+- [ ] `snappy.dll`
+- [ ] `libbrotlicommon.dll` / `libbrotlidec.dll`
+- [ ] `libutf8proc.dll`
+
+### For `libvlc.dll` (Multimedia)
+- [ ] `plugins/` directory (Must be adjacent to the DLLs)
+
+### For `QuEST.dll` (Quantum)
+- [ ] `libgcc_s_seh-1.dll` (If compiled with GCC/MinGW)
+- [ ] `libstdc++-6.dll`
+- [ ] `libwinpthread-1.dll`
+
+---
+
+## ✅ Verification Tools
+
+To verify that JScience can successfully find and load your native components, use the following launcher:
 - **Windows**: `.\launchers\run-verify.bat`
 - **Linux/macOS**: `./launchers/run-verify.sh`
+
+---
+
+## ❓ Troubleshooting
+
+- **`UnsatisfiedLinkError`**: This usually means a dependency of the library is missing (e.g., missing `libgfortran` for OpenBLAS). Use `ldd` (Linux), `Dependencies` (Windows), or `otool -L` (macOS) to check for missing transitive dependencies.
+- **Wrong Architecture**: Ensure you are using **64-bit (x64)** libraries. JScience does not support 32-bit (x86) backends.
