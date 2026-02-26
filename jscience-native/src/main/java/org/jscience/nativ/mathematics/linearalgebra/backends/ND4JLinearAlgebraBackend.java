@@ -247,6 +247,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
             // InvertMatrix.invert is the most stable across ND4J versions.
             // If it's slow, it might be due to sub-optimal backend linkage.
+            // We use this for now to fix the compilation error.
             INDArray inverse = InvertMatrix.invert(arrA, false);
             INDArray result = inverse.mmul(arrB);
             

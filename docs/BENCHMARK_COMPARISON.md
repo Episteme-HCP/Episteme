@@ -15,28 +15,41 @@ The JScience architecture is designed for portability first, with transparent pe
 > [!IMPORTANT]
 > Use the **Export Chart** button in the Benchmarking UI to generate the visualizations for this section.
 
-### Matrix Multiplication (Ops/sec)
+### Matrix Multiplication (Ops/sec, 1024x1024)
 
 | Implementation | Type | Score |
 |----------------|------|-------|
-| JScience (Ref) | CPU (Single) | [INPUT] |
-| JScience (MC)  | CPU (Multi)  | [INPUT] |
-| Native BLAS    | CPU (Native) | [INPUT] |
-| ND4J (Native)  | CPU (Native) | [INPUT] |
-| OpenCL / CUDA  | GPU          | [INPUT] |
+| JScience (Ref) | CPU (Single) | 0.282 |
+| JScience (MC)  | CPU (Multi-Standard) | 1.142 |
+| JScience (MC)  | CPU (Multi-Strassen) | 1.686 |
+| Native BLAS (FFM) | CPU (Native/FFM) | **5.948** |
+| EJML           | CPU (Java/Optimized) | 1.422 |
+| JBlas (Native) | CPU (Native/JNI) | 0.482 |
 
-![Matrix Multiplication Comparison](matrix_mult_chart.png)
+![Matrix Multiplication Comparison](benchmarksresults/id_chart_de_benchmark_matrix_multiplication_throughput.png)
 
-### Linear System Solve (Ops/sec)
+### Linear System Solve (Ops/sec, 800x800)
 
-| Implementation | Solve (800x800) |
+| Implementation | Solve Score |
 |----------------|-----------------|
-| JScience (Ref) | [INPUT]         |
-| JScience (MC)  | [INPUT]         |
-| Native BLAS    | [INPUT]         |
-| ND4J (Native)  | [INPUT]         |
+| JScience (Ref) | 0.357 |
+| JScience (MC)  | 0.525 |
+| Native BLAS (FFM) | **1.494** |
+| EJML           | 0.392 |
+| JBlas (Native) | 0.627 |
 
-![Linear Solve Comparison](linear_solve_chart.png)
+![Linear Solve Comparison](benchmarksresults/id_chart_de_benchmark_linear_system_solve_throughput.png)
+
+### Matrix Inversion (Ops/sec, 500x500)
+
+| Implementation | Inversion Score |
+|----------------|-----------------|
+| JScience (Ref) | 0.251 |
+| JScience (MC)  | 0.333 |
+| Native BLAS (FFM) | **0.480** |
+| EJML           | 0.341 |
+
+![Matrix Inversion Comparison](benchmarksresults/id_chart_de_benchmark_matrix_inversion_throughput.png)
 
 ## Analysis of Recent Optimizations
 

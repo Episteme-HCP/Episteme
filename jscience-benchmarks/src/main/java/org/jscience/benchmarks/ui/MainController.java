@@ -94,7 +94,7 @@ public class MainController {
 
     private void updateUI(Locale locale) {
         try {
-            resources = ResourceBundle.getBundle("org.jscience.benchmarks.ui.messages", locale);
+            resources = ResourceBundle.getBundle("org.jscience.benchmarks.i18n.messages-benchmark", locale);
             
             // Header
             mainTitleLabel.setText(resources.getString("app.title"));

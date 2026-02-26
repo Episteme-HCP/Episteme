@@ -1,0 +1,1131 @@
+{
+  "metadata": {
+    "os_name": "Windows 11",
+    "os_arch": "amd64",
+    "java_version": "25",
+    "processors": 4,
+    "timestamp": "2026-02-26T02:02:11.2740688"
+  },
+  "results": [
+    {
+      "name": "Distributed Matrix Mult",
+      "backend": "Multicore",
+      "provider": "Standard",
+      "library": "JScience",
+      "domain": "Linear Algebra",
+      "status": "SUCCESS",
+      "ops_per_sec": 2.8669,
+      "p99_ms": 774.5110
+    },
+    {
+      "name": "HDF5 Read",
+      "backend": "Multicore",
+      "provider": "Bytedeco",
+      "library": "JScience Native",
+      "domain": "Input/Output",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "HDF5 Write",
+      "backend": "Multicore",
+      "provider": "Bytedeco",
+      "library": "JScience Native",
+      "domain": "Input/Output",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Virtual Thread Agents",
+      "backend": "Multicore",
+      "provider": "Loom",
+      "library": "JScience",
+      "domain": "AI / Multi-Agent Systems",
+      "status": "SUCCESS",
+      "ops_per_sec": 131.9279,
+      "p99_ms": 88.9407
+    },
+    {
+      "name": "Audio Processing Throughput",
+      "backend": "Multicore",
+      "provider": "Standard JavaSound",
+      "library": "JScience",
+      "domain": "Audio Processing",
+      "status": "SUCCESS",
+      "ops_per_sec": 5701810.4450,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Audio Processing Throughput",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience Native",
+      "domain": "Audio Processing",
+      "status": "SUCCESS",
+      "ops_per_sec": 6828540.3536,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Systematic FFT",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Signal Processing",
+      "status": "SUCCESS",
+      "ops_per_sec": 14.3242,
+      "p99_ms": 134.8203
+    },
+    {
+      "name": "Systematic FFT",
+      "backend": "Multicore",
+      "provider": "Reference",
+      "library": "JScience",
+      "domain": "Signal Processing",
+      "status": "SUCCESS",
+      "ops_per_sec": 8.3386,
+      "p99_ms": 217.7319
+    },
+    {
+      "name": "Systematic FFT",
+      "backend": "Monocore",
+      "provider": "FFTW3",
+      "library": "FFTW3",
+      "domain": "Signal Processing",
+      "status": "SUCCESS",
+      "ops_per_sec": 233.4134,
+      "p99_ms": 9.3277
+    },
+    {
+      "name": "Systematic FFT",
+      "backend": "OpenCL",
+      "provider": "DFT GPU",
+      "library": "JScience Native",
+      "domain": "Signal Processing",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Monocore",
+      "provider": "Colt",
+      "library": "Colt",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.2689,
+      "p99_ms": 3719.1643
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Monocore",
+      "provider": "Commons Math",
+      "library": "Commons Math",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.2995,
+      "p99_ms": 3339.1222
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Monocore",
+      "provider": "EJML",
+      "library": "EJML",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.3410,
+      "p99_ms": 2932.5677
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "CPU (Native)",
+      "provider": "JBlas",
+      "library": "JBlas",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.0494,
+      "p99_ms": 20247.9990
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "CARMA",
+      "library": "JScience",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.4169,
+      "p99_ms": 2398.6523
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "Dense",
+      "library": "JScience",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.1508,
+      "p99_ms": 6632.2880
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "LocalDistributedContext",
+      "library": "JScience",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.5410,
+      "p99_ms": 1942.6809
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "Standard",
+      "library": "JScience",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.3332,
+      "p99_ms": 3000.7499
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "Strassen",
+      "library": "JScience",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.2511,
+      "p99_ms": 3982.9426
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Monocore",
+      "provider": "ND4J",
+      "library": "ND4J",
+      "domain": "Matrix Inversion",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "/BLAS Linear Algebra Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.7554,
+      "p99_ms": 1492.1778
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "CUDA",
+      "provider": "CUDA Dense Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Inversion",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "CUDA",
+      "provider": "Panama/CUDA Backend",
+      "library": "JScience",
+      "domain": "Matrix Inversion",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "FFM",
+      "library": "JScience Native",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.4796,
+      "p99_ms": 2084.9518
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "OpenCL",
+      "provider": "OpenCL Dense Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Inversion",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "OpenCL",
+      "provider": "OpenCL Sparse Linear Algebra Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Inversion",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Inversion",
+      "backend": "Multicore",
+      "provider": "SIMD",
+      "library": "JScience Native",
+      "domain": "Matrix Inversion",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.2827,
+      "p99_ms": 3537.6407
+    },
+    {
+      "name": "Lattice Boltzmann",
+      "backend": "OpenCL",
+      "provider": "LBM GPU",
+      "library": "JScience Native",
+      "domain": "Computational Fluid Dynamics",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "ML: K-Means + PCA",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Machine Learning",
+      "status": "SUCCESS",
+      "ops_per_sec": 81.7086,
+      "p99_ms": 21.0848
+    },
+    {
+      "name": "Systematic Mandelbrot Generation",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Visualization",
+      "status": "SUCCESS",
+      "ops_per_sec": 5.3467,
+      "p99_ms": 250.3854
+    },
+    {
+      "name": "Map Backend Discovery",
+      "backend": "Multicore",
+      "provider": "MapBackend",
+      "library": "JScience",
+      "domain": "Social / Geography",
+      "status": "SUCCESS",
+      "ops_per_sec": 680.6621,
+      "p99_ms": 6.8763
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Monocore",
+      "provider": "Colt",
+      "library": "Colt",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.0627,
+      "p99_ms": 15942.9634
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Monocore",
+      "provider": "Commons Math",
+      "library": "Commons Math",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.6310,
+      "p99_ms": 1782.7229
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Monocore",
+      "provider": "EJML",
+      "library": "EJML",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 1.4216,
+      "p99_ms": 901.2866
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "CPU (Native)",
+      "provider": "JBlas",
+      "library": "JBlas",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.4818,
+      "p99_ms": 2075.3450
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "CARMA",
+      "library": "JScience",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.0264,
+      "p99_ms": 37878.0693
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "Dense",
+      "library": "JScience",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.4666,
+      "p99_ms": 2143.3549
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "LocalDistributedContext",
+      "library": "JScience",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 5.4490,
+      "p99_ms": 319.2707
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "Standard",
+      "library": "JScience",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 1.1424,
+      "p99_ms": 973.1313
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "Strassen",
+      "library": "JScience",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 1.6863,
+      "p99_ms": 687.8973
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Monocore",
+      "provider": "ND4J",
+      "library": "ND4J",
+      "domain": "Matrix Multiplication",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "/BLAS Linear Algebra Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 1.2454,
+      "p99_ms": 939.8915
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "CUDA",
+      "provider": "CUDA Dense Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Multiplication",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "CUDA",
+      "provider": "Panama/CUDA Backend",
+      "library": "JScience",
+      "domain": "Matrix Multiplication",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "FFM",
+      "library": "JScience Native",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 5.9479,
+      "p99_ms": 249.7282
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "OpenCL",
+      "provider": "OpenCL Dense Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Multiplication",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "OpenCL",
+      "provider": "OpenCL Sparse Linear Algebra Backend",
+      "library": "JScience Native",
+      "domain": "Matrix Multiplication",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "SIMD",
+      "library": "JScience Native",
+      "domain": "Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.9420,
+      "p99_ms": 1068.8012
+    },
+    {
+      "name": "Systematic N-Body",
+      "backend": "OpenCL",
+      "provider": "N^2) GPU",
+      "library": "JScience Native",
+      "domain": "Physics",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Systematic Parallel Simulation",
+      "backend": "Multicore",
+      "provider": "ForkJoin",
+      "library": "JScience",
+      "domain": "Parallel Computing",
+      "status": "SUCCESS",
+      "ops_per_sec": 274.9978,
+      "p99_ms": 7.7395
+    },
+    {
+      "name": "Systematic Parallel Simulation",
+      "backend": "Multicore",
+      "provider": "FFM",
+      "library": "JScience Native",
+      "domain": "Parallel Computing",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Systematic Parallel Simulation",
+      "backend": "Multicore",
+      "provider": "Genesis",
+      "library": "JScience Native",
+      "domain": "Parallel Computing",
+      "status": "SUCCESS",
+      "ops_per_sec": 6835587.9633,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Systematic Parallel Simulation",
+      "backend": "Multicore",
+      "provider": "ODE",
+      "library": "JScience Native",
+      "domain": "Parallel Computing",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Systematic Parallel Simulation",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience Native",
+      "domain": "Parallel Computing",
+      "status": "SUCCESS",
+      "ops_per_sec": 335.8043,
+      "p99_ms": 11.8785
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Monocore",
+      "provider": "Colt",
+      "library": "Colt",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.1894,
+      "p99_ms": 5280.6140
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Monocore",
+      "provider": "Commons Math",
+      "library": "Commons Math",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.2979,
+      "p99_ms": 3356.2908
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Monocore",
+      "provider": "EJML",
+      "library": "EJML",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.3919,
+      "p99_ms": 2551.3990
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "CPU (Native)",
+      "provider": "JBlas",
+      "library": "JBlas",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.6272,
+      "p99_ms": 1702.4182
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "CARMA",
+      "library": "JScience",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.2803,
+      "p99_ms": 3566.9945
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "Dense",
+      "library": "JScience",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.5848,
+      "p99_ms": 1765.8173
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "LocalDistributedContext",
+      "library": "JScience",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.8085,
+      "p99_ms": 1278.2996
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "Standard",
+      "library": "JScience",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.5252,
+      "p99_ms": 2052.0120
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "Strassen",
+      "library": "JScience",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.3572,
+      "p99_ms": 2799.8255
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Monocore",
+      "provider": "ND4J",
+      "library": "ND4J",
+      "domain": "Linear System Solve",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "/BLAS Linear Algebra Backend",
+      "library": "JScience Native",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.6621,
+      "p99_ms": 1697.4563
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "CUDA",
+      "provider": "CUDA Dense Backend",
+      "library": "JScience Native",
+      "domain": "Linear System Solve",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "CUDA",
+      "provider": "Panama/CUDA Backend",
+      "library": "JScience",
+      "domain": "Linear System Solve",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "FFM",
+      "library": "JScience Native",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 1.4943,
+      "p99_ms": 721.0197
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "OpenCL",
+      "provider": "OpenCL Dense Backend",
+      "library": "JScience Native",
+      "domain": "Linear System Solve",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "OpenCL",
+      "provider": "OpenCL Sparse Linear Algebra Backend",
+      "library": "JScience Native",
+      "domain": "Linear System Solve",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Linear System Solve",
+      "backend": "Multicore",
+      "provider": "SIMD",
+      "library": "JScience Native",
+      "domain": "Linear System Solve",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.6330,
+      "p99_ms": 1794.1524
+    },
+    {
+      "name": "Sparse Matrix Multiplication",
+      "backend": "Multicore",
+      "provider": "Sparse",
+      "library": "JScience",
+      "domain": "Sparse Matrix Multiplication",
+      "status": "SUCCESS",
+      "ops_per_sec": 0.0430,
+      "p99_ms": 23230.2591
+    },
+    {
+      "name": "Sparse Matrix Multiplication",
+      "backend": "CUDA",
+      "provider": "Panama/CUDA Backend",
+      "library": "JScience",
+      "domain": "Sparse Matrix Multiplication",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Sparse Matrix Multiplication",
+      "backend": "OpenCL",
+      "provider": "OpenCL Sparse Linear Algebra Backend",
+      "library": "JScience Native",
+      "domain": "Sparse Matrix Multiplication",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Tensor Hadamard Product",
+      "backend": "Multicore",
+      "provider": "oneDNN",
+      "library": "JScience Native",
+      "domain": "Deep Learning (Tensor)",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Tensor Hadamard Product",
+      "backend": "CUDA",
+      "provider": "CUDA Tensor Backend",
+      "library": "JScience",
+      "domain": "Deep Learning (Tensor)",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Computer Vision Throughput",
+      "backend": "Multicore",
+      "provider": "Java AWT Vision Backend",
+      "library": "JScience",
+      "domain": "Computer Vision",
+      "status": "SUCCESS",
+      "ops_per_sec": 8655477.2689,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Computer Vision Throughput",
+      "backend": "Multicore",
+      "provider": "FFM",
+      "library": "JScience Native",
+      "domain": "Computer Vision",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Computer Vision Throughput",
+      "backend": "CUDA",
+      "provider": "CUDA Vision Backend",
+      "library": "JScience",
+      "domain": "Computer Vision",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Computer Vision Throughput",
+      "backend": "OpenCL",
+      "provider": "OpenCL Vision Backend",
+      "library": "JScience",
+      "domain": "Computer Vision",
+      "status": "SUCCESS",
+      "ops_per_sec": 9454051.1092,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Distributed Computing",
+      "backend": "Distributed",
+      "provider": "MPJ Express",
+      "library": "MPJ Express",
+      "domain": "Distributed Computing",
+      "status": "SUCCESS",
+      "ops_per_sec": 4383269.1233,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Distributed Computing",
+      "backend": "Distributed",
+      "provider": "Apache Spark",
+      "library": "Apache Spark",
+      "domain": "Distributed Computing",
+      "status": "SUCCESS",
+      "ops_per_sec": 6704182.5000,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Boolean Algebra",
+      "backend": "Multicore",
+      "provider": "Standard JVM Boolean Algebra",
+      "library": "JScience",
+      "domain": "Boolean Algebra",
+      "status": "SUCCESS",
+      "ops_per_sec": 11008210.0000,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Graph Algorithm",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Graph Algorithm",
+      "status": "SUCCESS",
+      "ops_per_sec": 10850970.4575,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Graph Algorithm",
+      "backend": "Multicore",
+      "provider": "Louvain",
+      "library": "JScience",
+      "domain": "Graph Algorithm",
+      "status": "SUCCESS",
+      "ops_per_sec": 10354634.4823,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Neural Operations",
+      "backend": "Multicore",
+      "provider": "Dense Neural",
+      "library": "JScience",
+      "domain": "Neural Operations",
+      "status": "SUCCESS",
+      "ops_per_sec": 10258689.0410,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Finite Element Method",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Finite Element Method",
+      "status": "SUCCESS",
+      "ops_per_sec": 10361447.5624,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "ODE Solver",
+      "backend": "Multicore",
+      "provider": "ODE Provider",
+      "library": "JScience",
+      "domain": "ODE Solver",
+      "status": "SUCCESS",
+      "ops_per_sec": 9094765.0368,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Genetic Algorithm",
+      "backend": "Multicore",
+      "provider": "SIMD",
+      "library": "JScience Native",
+      "domain": "Genetic Algorithm",
+      "status": "SUCCESS",
+      "ops_per_sec": 9119271.5440,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Bayesian Inference",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience Native",
+      "domain": "Bayesian Inference",
+      "status": "SUCCESS",
+      "ops_per_sec": 10205726.9897,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Fuzzy logic",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience Native",
+      "domain": "Fuzzy logic",
+      "status": "SUCCESS",
+      "ops_per_sec": 10404560.4798,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Bayesian Inference",
+      "backend": "Multicore",
+      "provider": "Variable Elimination",
+      "library": "JScience",
+      "domain": "Bayesian Inference",
+      "status": "SUCCESS",
+      "ops_per_sec": 10329957.1516,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Monte Carlo Simulation",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience Native",
+      "domain": "Monte Carlo Simulation",
+      "status": "SUCCESS",
+      "ops_per_sec": 10396753.0000,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Audio/Video Engine",
+      "backend": "Monocore",
+      "provider": "JavaCV",
+      "library": "JavaCV",
+      "domain": "Audio/Video Engine",
+      "status": "SUCCESS",
+      "ops_per_sec": 10805456.0000,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Audio/Video Engine",
+      "backend": "Monocore",
+      "provider": "Minim",
+      "library": "Minim",
+      "domain": "Audio/Video Engine",
+      "status": "SUCCESS",
+      "ops_per_sec": 10305698.3999,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Audio/Video Engine",
+      "backend": "Monocore",
+      "provider": "TarsosDSP",
+      "library": "TarsosDSP",
+      "domain": "Audio/Video Engine",
+      "status": "SUCCESS",
+      "ops_per_sec": 6558475.1721,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Audio/Video Engine",
+      "backend": "Monocore",
+      "provider": "VLCJ",
+      "library": "VLCJ",
+      "domain": "Audio/Video Engine",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Audio/Video Engine",
+      "backend": "Monocore",
+      "provider": "VLCJ",
+      "library": "VLCJ",
+      "domain": "Audio/Video Engine",
+      "status": "SUCCESS",
+      "ops_per_sec": 5249785.2375,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Lattice Boltzmann",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Lattice Boltzmann",
+      "status": "SUCCESS",
+      "ops_per_sec": 11652602.9174,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Navier-Stokes",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Navier-Stokes",
+      "status": "SUCCESS",
+      "ops_per_sec": 7873468.1063,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "SPH Fluid Dynamics",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "SPH Fluid Dynamics",
+      "status": "SUCCESS",
+      "ops_per_sec": 9488165.5256,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Molecular Dynamics",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Molecular Dynamics",
+      "status": "SUCCESS",
+      "ops_per_sec": 11192648.5000,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "PhysicsEngine",
+      "backend": "Multicore",
+      "provider": "JBullet",
+      "library": "JScience",
+      "domain": "PhysicsEngine",
+      "status": "SUCCESS",
+      "ops_per_sec": 10392022.8635,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "PhysicsEngine",
+      "backend": "Multicore",
+      "provider": "Open Dynamics Engine",
+      "library": "JScience",
+      "domain": "PhysicsEngine",
+      "status": "SUCCESS",
+      "ops_per_sec": 5818210.1950,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "N-Body Simulation",
+      "backend": "Distributed",
+      "provider": "MPJ Express",
+      "library": "MPJ Express",
+      "domain": "N-Body Simulation",
+      "status": "SUCCESS",
+      "ops_per_sec": 7419004.6290,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "N-Body Simulation",
+      "backend": "Multicore",
+      "provider": "SIMD",
+      "library": "JScience Native",
+      "domain": "N-Body Simulation",
+      "status": "SUCCESS",
+      "ops_per_sec": 9636774.0000,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Maxwell Equations",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Maxwell Equations",
+      "status": "SUCCESS",
+      "ops_per_sec": 6840059.6241,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Wave Equation",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Wave Equation",
+      "status": "SUCCESS",
+      "ops_per_sec": 9248391.0376,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Self-Consistent Field",
+      "backend": "Multicore",
+      "provider": "Multicore",
+      "library": "JScience",
+      "domain": "Self-Consistent Field",
+      "status": "SUCCESS",
+      "ops_per_sec": 11476776.0598,
+      "p99_ms": 0.0001
+    },
+    {
+      "name": "Zero-Copy Data",
+      "backend": "Multicore",
+      "provider": "C Data Interface",
+      "library": "JScience Native",
+      "domain": "Zero-Copy Data (Arrow)",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Mechanics",
+      "backend": "CUDA",
+      "provider": "GPU/CUDA",
+      "library": "JScience",
+      "domain": "Mechanics",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    },
+    {
+      "name": "Quantum Simulation",
+      "backend": "Multicore",
+      "provider": "QuEST/Qiskit",
+      "library": "JScience Native",
+      "domain": "Quantum Simulation (QuEST/Aer)",
+      "status": "SKIPPED",
+      "ops_per_sec": 0.0000,
+      "p99_ms": 0.0000
+    }
+  ]
+}
