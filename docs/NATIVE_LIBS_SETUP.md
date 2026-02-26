@@ -95,22 +95,45 @@ If a library is present but fails to load (`UnsatisfiedLinkError`), it is often 
 - [ ] `libogg.dll`
 - [ ] `libopus.dll`
 - [ ] `libmp3lame.dll`
+- [ ] `libmpg123.dll` (Optional, for MP3 decode)
 
 ### For `arrow.dll` / `parquet.dll` (Data I/O)
 - [ ] `zlib1.dll` (or `zlib.dll`)
 - [ ] `lz4.dll`
 - [ ] `zstd.dll`
 - [ ] `snappy.dll`
-- [ ] `libbrotlicommon.dll` / `libbrotlidec.dll`
+- [ ] `libbrotlicommon.dll`
+- [ ] `libbrotlidec.dll`
 - [ ] `libutf8proc.dll`
 
 ### For `libvlc.dll` (Multimedia)
 - [ ] `plugins/` directory (Must be adjacent to the DLLs)
 
-### For `QuEST.dll` (Quantum)
-- [ ] `libgcc_s_seh-1.dll` (If compiled with GCC/MinGW)
+### For `QuEST.dll` / `Bullet` / `ODE` (Scientific)
+- [ ] `libgcc_s_seh-1.dll`
 - [ ] `libstdc++-6.dll`
 - [ ] `libwinpthread-1.dll`
+
+---
+
+## 🔍 Harvesting from Local System (Recommended)
+
+Before downloading from the web, you can often find these missing DLLs in other software installed on your machine. This ensures internal compatibility.
+
+### 📍 Likely Search Paths:
+| Software | Path to Check | Potential DLLs Found |
+| :--- | :--- | :--- |
+| **VLC Media Player** | `C:\Program Files\VideoLAN\VLC` | `plugins/` directory, `libvlccore.dll` |
+| **Git (MinGW)** | `C:\Program Files\Git\mingw64\bin` | `zlib1.dll`, `libgcc_s_seh-1.dll`, `libstdc++-6.dll` |
+| **Git (Bin)** | `C:\Program Files\Git\usr\bin` | `libiconv.dll`, `liblzma.dll` |
+| **MSYS2 / MinGW** | `C:\msys64\mingw64\bin` | `libvorbis.dll`, `libFLAC.dll`, `libogg.dll` |
+| **Ananconda / Miniconda**| `...\Anaconda3\Library\bin` | `arrow.dll`, `snappy.dll`, `zstd.dll`, `lz4.dll` |
+
+### 🛠️ Step-by-Step Repatriation:
+1. Locate the software directory (e.g., VLC or Git).
+2. Search for the missing `.dll` files listed in the checklist above.
+3. **Copy (don't move)** the files into the JScience `libs/` folder.
+4. For VLC, copy the entire `plugins/` folder into `libs/`.
 
 ---
 
