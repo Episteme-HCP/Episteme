@@ -128,9 +128,9 @@ public class NativeLibraryLoader {
 
     private static Optional<SymbolLookup> tryLoadFromDirectory(java.nio.file.Path basePath, String mappedName, Arena arena) {
         try {
-            java.nio.file.Path fullPath = basePath.resolve(mappedName);
+            java.nio.file.Path fullPath = basePath.resolve(mappedName).toAbsolutePath();
             if (java.nio.file.Files.exists(fullPath)) {
-                System.out.println("[DEBUG] NativeLibraryLoader: Found candidate at " + fullPath.toAbsolutePath());
+                System.out.println("[DEBUG] NativeLibraryLoader: Attempting libraryLookup on: " + fullPath);
                 return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
             }
             
