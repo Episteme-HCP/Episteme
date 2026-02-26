@@ -63,8 +63,9 @@ public class I18N {
         try {
             ResourceBundle.getBundle(bundleBase, currentLocale, new Utf8Control());
             addBundle(bundleBase);
+            System.out.println("[DEBUG] I18N: Successfully auto-registered bundle: " + bundleBase);
         } catch (MissingResourceException e) {
-            // Bundle not available, skip
+            System.out.println("[DEBUG] I18N: Bundle not found on classpath: " + bundleBase);
         }
     }
 
@@ -169,6 +170,7 @@ public class I18N {
                 }
             }
         }
+        System.out.println("[DEBUG] I18N: Missing key '" + key + "' in any of: " + bundleBases);
         // Return key as fallback
         return markIfTest(key);
     }

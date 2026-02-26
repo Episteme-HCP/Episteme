@@ -5,14 +5,15 @@
         </encoder>
     </appender>
 
-    <!-- ELK Stack Appender -->
+    <!-- ELK Stack Appender (Disabled due to missing dependency)
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>logstash:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
+    -->
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
-        <appender-ref ref="LOGSTASH" />
+        <!-- <appender-ref ref="LOGSTASH" /> -->
     </root>
 </configuration>

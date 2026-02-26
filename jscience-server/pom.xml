@@ -228,7 +228,7 @@
                             <goal>install-file</goal>
                         </goals>
                         <configuration>
-                            <file>${project.basedir}/../libs/MPJ/lib/mpj.jar</file>
+                            <file>${project.basedir}/../libs/mpj.jar</file>
                             <groupId>org.mpjexpress</groupId>
                             <artifactId>mpj</artifactId>
                             <version>0.44</version>

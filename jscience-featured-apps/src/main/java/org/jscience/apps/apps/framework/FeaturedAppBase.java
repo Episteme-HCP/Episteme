@@ -112,10 +112,31 @@ public abstract class FeaturedAppBase extends Application implements App {
         Scene scene = new Scene(rootPane, getDefaultWidth(), getDefaultHeight());
         applyTheme(scene);
 
-        // Load universally applied Episteme icon (Apps variation)
+        // Load universally applied Episteme        // Set application icon
         try {
-            stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/apps/icon.png")));
-        } catch (Exception e) {}
+            String iconPath = "/org/jscience/apps/icon.png";
+            java.net.URL iconUrl = getClass().getResource(iconPath);
+            System.out.println("[DEBUG] FeaturedAppBase: Attempting to load icon from " + iconPath);
+            if (iconUrl != null) {
+                System.out.println("[DEBUG] FeaturedAppBase: Found icon at " + iconUrl.toExternalForm());
+                Image icon = new Image(iconUrl.toExternalForm());
+                stage.getIcons().add(icon);
+            } else {
+                System.out.println("[WARNING] FeaturedAppBase: Icon not found at " + iconPath);
+                // Try fallback
+                iconPath = "/org/jscience/core/ui/icon.png";
+                iconUrl = getClass().getResource(iconPath);
+                if (iconUrl != null) {
+                    System.out.println("[DEBUG] FeaturedAppBase: Found fallback icon at " + iconUrl.toExternalForm());
+                    stage.getIcons().add(new Image(iconUrl.toExternalForm()));
+                } else {
+                    System.out.println("[ERROR] FeaturedAppBase: Fallback icon ALSO not found at " + iconPath);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] FeaturedAppBase: Unexpected error during icon loading: " + e.getMessage());
+            e.printStackTrace();
+        }
 
         stage.setTitle(getAppTitle());
         stage.setScene(scene);

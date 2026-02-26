@@ -36,28 +36,33 @@ public final class AlgorithmManager {
     private static final ProviderRegistry REGISTRY = new ProviderRegistry();
 
     static {
-        AutoTuningManager.loadResults();
-        // Detect if running in a test environment
-        boolean isTest = false;
         try {
-            Class.forName("org.junit.jupiter.api.Test");
-            isTest = true;
-        } catch (ClassNotFoundException e) {
-            // Not a test environment
-        }
+            AutoTuningManager.loadResults();
+            // Detect if running in a test environment
+            boolean isTest = false;
+            try {
+                Class.forName("org.junit.jupiter.api.Test");
+                isTest = true;
+            } catch (ClassNotFoundException e) {
+                // Not a test environment
+            }
 
-        // Trigger benchmark if no results found
-        Path path = Paths.get(System.getProperty("user.home"), ".jscience", "benchmarks.json");
-        if (!Files.exists(path) && !Boolean.getBoolean("jscience.benchmark.skip") && !isTest) {
-            new Thread(() -> {
-                try {
-                    Thread.sleep(5000); // Wait for system to stabilize
-                    BenchmarkRunner.runAll();
-                    AutoTuningManager.loadResults();
-                } catch (Exception e) {
-                    LOGGER.warning("Auto-benchmark failed: " + e.getMessage());
-                }
-            }, "JScience-AutoBenchmark").start();
+            // Trigger benchmark if no results found
+            Path path = Paths.get(System.getProperty("user.home"), ".jscience", "benchmarks.json");
+            if (!Files.exists(path) && !Boolean.getBoolean("jscience.benchmark.skip") && !isTest) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(5000); // Wait for system to stabilize
+                        BenchmarkRunner.runAll();
+                        AutoTuningManager.loadResults();
+                    } catch (Exception e) {
+                        LOGGER.warning("Auto-benchmark failed: " + e.getMessage());
+                    }
+                }, "JScience-AutoBenchmark").start();
+            }
+        } catch (Throwable t) {
+            System.err.println("[CRITICAL] AlgorithmManager static init failed: " + t.getMessage());
+            t.printStackTrace();
         }
     }
 
