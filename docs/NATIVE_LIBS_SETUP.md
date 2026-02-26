@@ -1,62 +1,78 @@
 # JScience Native Library Setup Guide
 
-This guide describes how to set up the native libraries required for full hardware acceleration.
+JScience uses high-performance native backends for linear algebra, physics simulation, and data processing. This guide provides instructions for acquiring and configuring these libraries across Windows, Linux, and macOS.
 
-## Minimal `libs/` Directory Checklist
+## 1. Directory Structure
 
-After cleanup, your `libs/` folder should contain **only** these files:
+For a portable installation, place all native libraries in the project's root `libs/` directory.
 
+### Minimal `libs/` Checklist (Windows)
 | Component | Required DLLs |
 | :--- | :--- |
-| **HDF5** | `hdf5.dll`, `hdf5_cpp.dll`, `hdf5_hl.dll`, `hdf5_hl_cpp.dll`, `hdf5_java.dll`, `hdf5_tools.dll` |
-| **OpenBLAS** | `libopenblas.dll` |
-| **FFTW3** | `libfftw3-3.dll`, `libfftw3f-3.dll`, `libfftw3l-3.dll` |
-| **Bullet3** | `libbulletc.dll` |
-| **ODE** | `ode.dll` |
-| **Tarsos** | `libsndfile.dll` |
+| **Linear Algebra** | `libopenblas.dll` (or `mkl_rt.dll`) |
+| **FFT** | `libfftw3-3.dll`, `libfftw3f-3.dll`, `libfftw3l-3.dll` |
+| **Data I/O** | `arrow.dll`, `parquet.dll`, `hdf5.dll` (+ wrappers) |
+| **Physics** | `libbulletc.dll`, `ode.dll` |
+| **Quantum** | `quest.dll` |
+| **Multimedia** | `libvlc.dll`, `libvlccore.dll`, `plugins/` |
 | **Runtime** | `msvcp140*.dll`, `vcruntime140*.dll`, `concrt140.dll` |
 
 ---
 
-## Setting up Missing Libraries
+## 2. Installation Guides
 
-### 1. Apache Arrow (`arrow.dll`, `arrow_io.dll`)
-> [!IMPORTANT]
-> The NuGet and Java source packages in your `dl/` folder do **not** contain the native DLLs.
+### [OpenBLAS](https://github.com/xianyi/OpenBLAS/releases) (Linear Algebra)
+- **Windows**: Download the `.zip` from GitHub Releases and extract the DLL.
+- **Linux**: `sudo apt install libopenblas-dev` (Debian/Ubuntu) or `sudo dnf install openblas-devel` (Fedora).
+- **macOS**: `brew install openblas`.
 
-**Easiest Setup:**
-1. Open PowerShell and run: `pip install pyarrow`
-2. Locate the `pyarrow` folder in your Python installation (e.g., `C:\Users\<User>\AppData\Local\Programs\Python\Python31x\Lib\site-packages\pyarrow`).
-3. Copy `arrow.dll` and `arrow_io.dll` into `JScience/libs/`.
+### [Apache Arrow](https://arrow.apache.org/install/) (Columnar Data)
+- **Easiest Path (All OS)**: `pip install pyarrow`. Locate `arrow.dll` (Win), `libarrow.so` (Linux), or `libarrow.dylib` (macOS) in your Python `site-packages/pyarrow`.
+- **Windows (vcpkg)**: `vcpkg install arrow`.
+- **macOS**: `brew install apache-arrow`.
+- **Linux**: Use the official Apache APT/YUM repositories.
 
----
+### [HDF5](https://www.hdfgroup.org/downloads/hdf5/) (Scientific Data)
+- **Windows**: Download the `.msi` or `.zip` installer from The HDF Group.
+- **Linux**: `sudo apt install libhdf5-dev`.
+- **macOS**: `brew install hdf5`.
 
-### 2. CUDA Acceleration
-1. Run the installer you downloaded: `cuda_13.1.1_windows.exe`.
-3. (Optional) To make the project portable, copy `cudart64_*.dll` and `cublas64_*.dll` from `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.x\bin` to `JScience/libs/`.
+### [FFTW3](http://www.fftw.org/download.html) (Fast Fourier Transform)
+- **Windows**: Download pre-compiled 64-bit DLLs from the official site.
+- **Linux/macOS**: Standard package managers (`fftw3`).
 
----
-
-### 3. VLC Media Player
-
-1. Install `vlc-3.0.23-win64.exe`.
-2. JScience (via vlcj) will detect the installation automatically.
-3. If you want to bundle it, copy `libvlc.dll`, `libvlccore.dll` and the `plugins/` folder to `libs/`.
-
----
-
-### 4. QuEST (`quest.dll`)
-1. Extract `QuEST-main.zip`.
-2. Open a terminal in the folder and run:
-   ```powershell
-   mkdir build; cd build
-   cmake .. -G "Visual Studio 17 2022" -A x64
-   cmake --build . --config Release
+### [QuEST](https://github.com/QuEST-Kit/QuEST) (Quantum Simulation)
+1. Clone the repository and build from source using CMake:
+   ```bash
+   mkdir build; cd build; cmake ..; cmake --build . --config Release
    ```
-3. Copy `Release\QuEST.dll` to `JScience/libs/quest.dll`.
+2. Copy the resulting binary to `libs/quest`.
+
+### [VLC Media Player](https://www.videolan.org/vlc/) (Multimedia)
+- **Setup**: Install the official VLC application. JScience will detect it automatically via `vlcj`.
+- **Bundling**: Copy `libvlc`, `libvlccore`, and the `plugins/` folder to `libs/`.
+- **Cleanup**: Delete non-essential plugin subfolders like `lua`, `gui`, `visualization`, and `skins2` to save ~100MB.
+
+### [CUDA](https://developer.nvidia.com/cuda-downloads) (GPU Acceleration)
+1. Install the CUDA Toolkit from NVIDIA.
+2. Ensure `BIN` directory is in `PATH`.
+3. (Optional) Copy `cudart64_*.dll` and `cublas64_*.dll` to `libs/` for portability.
 
 ---
 
-## Troubleshooting
-- **Path**: Ensure `c:\Silvere\Encours\Developpement\JScience\libs` is in your application library path.
-- **Architecture**: All DLLs must be **64-bit**.
+## 3. Configuration & Paths
+
+### JVM Argument
+Ensure the native library path is set when running the application:
+`-Djava.library.path=libs`
+
+### Launcher Scripts
+The provides scripts in the `launchers/` directory handle path resolution automatically using relative paths.
+
+---
+
+## 4. Verification
+
+Run the verification tool to check if all backends are correctly detected:
+- **Windows**: `.\launchers\run-verify.bat`
+- **Linux/macOS**: `./launchers/run-verify.sh`
