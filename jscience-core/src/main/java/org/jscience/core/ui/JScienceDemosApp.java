@@ -47,9 +47,9 @@ public class JScienceDemosApp extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
 
-        // Apply Branded Sigma Icon
+        // Apply Branded Sigma Icon (Demos variation)
         try {
-            primaryStage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/icon.png")));
+            primaryStage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/jscience/core/ui/demo_icon.png")));
         } catch (Exception e) {
             logger.warn("Could not load application icon: " + e.getMessage());
         }

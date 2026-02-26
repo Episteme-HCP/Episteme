@@ -84,12 +84,16 @@ public class NativeLibraryLoader {
             }
 
             // 2. Try custom search paths
+            String cudaPath = System.getenv("CUDA_PATH");
             String[] searchPaths = {
                 "/usr/local/lib/",
                 "/usr/lib/",
                 "C:\\Windows\\System32\\",
                 System.getenv("NATIVE_ROOT"),
+                cudaPath != null ? cudaPath + java.io.File.separator + "bin" : null,
                 "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.0\\bin\\",
+                "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\\bin\\",
+                "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1\\bin\\",
                 System.getProperty("user.dir"),
                 System.getProperty("user.dir") + java.io.File.separator + "libs",
                 System.getProperty("user.dir") + java.io.File.separator + "libs" + java.io.File.separator + libName,

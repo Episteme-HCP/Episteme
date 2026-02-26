@@ -7,6 +7,7 @@ This guide provides instructions for acquiring and setting up the native librari
 Some high-performance backends require external native binaries (`.dll` on Windows) that are not bundled by default due to size or licensing.
 
 ### 1. Apache Arrow (`arrow.dll`)
++
 Required for high-speed columnar data processing and Arrow-based linear algebra.
 
 **Option A: Download Official Binaries**
