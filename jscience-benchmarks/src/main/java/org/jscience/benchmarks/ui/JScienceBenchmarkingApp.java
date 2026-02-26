@@ -63,10 +63,10 @@ public class JScienceBenchmarkingApp extends Application {
                         scene.setFill(Color.TRANSPARENT);
 
                         try {
-                            // Try multiple paths for robustness
+                            // Try multiple paths for robustness - prioritizing local premium assets
                             String[] paths = {
-                                "/org/jscience/core/ui/icon.png",
                                 "/org/jscience/benchmarks/ui/icon.png",
+                                "/org/jscience/core/ui/icon.png",
                                 "/jscienceicon.png",
                                 "/icon.png"
                             };

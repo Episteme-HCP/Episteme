@@ -25,6 +25,14 @@
             
             <!-- Tab 1: Execution Control -->
             <Tab fx:id="executionTab" text="EXECUTION">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image>
+                            <javafx.scene.image.Image url="@execution_icon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+
                 <VBox spacing="10">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
                     <HBox spacing="10" alignment="CENTER_LEFT">
@@ -54,6 +62,14 @@
 
             <!-- Tab 2: Visualization -->
             <Tab fx:id="visualizationTab" text="VISUALIZATION">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image>
+                            <javafx.scene.image.Image url="@visualization_icon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+
                 <VBox spacing="20">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
                     <HBox spacing="20" alignment="CENTER_LEFT">
@@ -73,11 +89,27 @@
 
             <!-- Tab 3: Environment -->
             <Tab fx:id="environmentTab" text="ENVIRONMENT" styleClass="tab">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image>
+                            <javafx.scene.image.Image url="@environment_icon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+
                 <fx:include fx:id="environmentView" source="EnvironmentView.fxml"/>
             </Tab>
 
             <!-- Tab 4: History & Reports -->
             <Tab fx:id="historyTab" text="HISTORY">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image>
+                            <javafx.scene.image.Image url="@history_icon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+
                 <VBox spacing="10">
                     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
                     <HBox spacing="10" alignment="CENTER_LEFT">

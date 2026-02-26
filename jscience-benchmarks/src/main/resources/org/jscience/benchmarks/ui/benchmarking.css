@@ -50,6 +50,10 @@
     -fx-text-fill: #ffffff;
 }
 
+.main-tab-pane .tab .tab-container {
+    -fx-spacing: 10;
+}
+
 /* Buttons */
 .action-button-primary {
     -fx-background-color: #0078d4;
