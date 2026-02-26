@@ -26,6 +26,19 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
     private MediaPlayer mediaPlayer;
     private static Boolean availableCache = null;
 
+    static {
+        try {
+            // Attempt to discover VLC native libraries in the project's libs directory
+            String libsDir = System.getProperty("user.dir") + java.io.File.separator + "libs";
+            System.setProperty("jna.library.path", System.getProperty("jna.library.path", "") + java.io.File.pathSeparator + libsDir);
+            
+            // vlcj 4.x discovery
+            new uk.co.caprica.vlcj.discovery.NativeDiscovery().discover();
+        } catch (Throwable t) {
+            // Discovery might fail if vlcj is not on classpath, but we check that in isAvailable
+        }
+    }
+
     public VLCJBackend() {
         // Constructor logic if needed, but createBackend calls constructor.
         // We should initialize heavy resources only if this is the actual backend instance,

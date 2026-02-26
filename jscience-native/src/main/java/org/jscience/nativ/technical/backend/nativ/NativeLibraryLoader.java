@@ -74,6 +74,8 @@ public class NativeLibraryLoader {
                 variants.add("cudart64_110");
             } else if (libName.equals("sndfile")) {
                 variants.add("libsndfile-1");
+            } else if (libName.equals("vlc")) {
+                variants.add("libvlccore"); // Load core before wrapper
             }
         }
 
