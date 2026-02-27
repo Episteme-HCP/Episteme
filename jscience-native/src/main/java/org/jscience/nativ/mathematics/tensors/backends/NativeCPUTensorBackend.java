@@ -37,10 +37,12 @@ import java.util.Optional;
 public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, NativeBackend {
 
     @SuppressWarnings("unused")
-    private static final SymbolLookup LOOKUP;
-    private static final boolean IS_AVAILABLE;
+    private static SymbolLookup LOOKUP;
+    private static boolean IS_AVAILABLE = false;
+    private static boolean IS_INITIALIZED = false;
 
-    static {
+    private static synchronized void ensureInitialized() {
+        if (IS_INITIALIZED) return;
         // Try to load oneDNN or MKL
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("dnnl", Arena.global());
         if (lib.isEmpty()) {
@@ -54,10 +56,12 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
             LOOKUP = null;
             IS_AVAILABLE = false;
         }
+        IS_INITIALIZED = true;
     }
 
     @Override
     public boolean isLoaded() {
+        ensureInitialized();
         return IS_AVAILABLE;
     }
 
@@ -83,6 +87,7 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
 
     @Override
     public boolean isAvailable() {
+        ensureInitialized();
         return IS_AVAILABLE;
     }
 

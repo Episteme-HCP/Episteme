@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * @since 1.1
  */
 @AutoService({SimulationProvider.class, AlgorithmProvider.class})
-public class NativeSimulationProvider implements SimulationProvider, CPUBackend, NativeBackend {
+public class NativeSimulationBackend implements SimulationProvider, CPUBackend, NativeBackend {
 
     @Override
     public String getName() {

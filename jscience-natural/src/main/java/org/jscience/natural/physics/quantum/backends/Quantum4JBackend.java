@@ -1,8 +1,12 @@
 package org.jscience.natural.physics.quantum.backends;
 
+import com.google.auto.service.AutoService;
 import org.jscience.natural.technical.backend.quantum.QuantumBackend;
 import org.jscience.natural.technical.backend.quantum.QuantumAlgorithmProvider;
 import org.jscience.natural.physics.quantum.QuantumContext;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -14,6 +18,7 @@ import java.util.HashMap;
 /**
  * Quantum4J backend implementation for JScience.
  */
+@AutoService({AlgorithmProvider.class, QuantumBackend.class, ComputeBackend.class, Backend.class})
 public class Quantum4JBackend implements QuantumBackend, QuantumAlgorithmProvider {
 
     @Override public String getId() { return "quantum4j"; }

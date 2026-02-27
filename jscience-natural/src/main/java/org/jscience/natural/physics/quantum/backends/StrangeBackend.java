@@ -1,6 +1,9 @@
 package org.jscience.natural.physics.quantum.backends;
 
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.core.technical.backend.Backend;
+import org.jscience.core.technical.backend.ComputeBackend;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +31,7 @@ import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 /**
  * Quantum Backend implementation using the Strange pure Java library.
  */
-@AutoService(QuantumBackend.class)
+@AutoService({AlgorithmProvider.class, QuantumBackend.class, ComputeBackend.class, Backend.class})
 public class StrangeBackend implements QuantumBackend, QuantumAlgorithmProvider {
 
     @Override public String getName() { return "Strange (Local)"; }
