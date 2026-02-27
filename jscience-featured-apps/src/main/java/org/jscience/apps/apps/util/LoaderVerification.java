@@ -30,5 +30,17 @@ public class LoaderVerification {
             }
         }
         System.out.println("==========================================");
+
+        System.out.println("=== Algorithm Provider Discovery ===");
+        java.util.ServiceLoader<org.jscience.core.technical.algorithm.AlgorithmProvider> pLoader = 
+            java.util.ServiceLoader.load(org.jscience.core.technical.algorithm.AlgorithmProvider.class);
+        int pCount = 0;
+        for (org.jscience.core.technical.algorithm.AlgorithmProvider p : pLoader) {
+            pCount++;
+            System.out.println(String.format("[%d] %s: %s (Available: %b)", 
+                pCount, p.getAlgorithmType(), p.getName(), p.isAvailable()));
+        }
+        System.out.println("Total providers discovered: " + pCount);
+        System.out.println("==========================================");
     }
 }

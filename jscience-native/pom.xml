@@ -93,17 +93,6 @@
             <classifier>windows-x86_64</classifier>
         </dependency>
         
-        <!-- JCuda -->
-        <dependency>
-            <groupId>org.jcuda</groupId>
-            <artifactId>jcuda</artifactId>
-            <version>${jcuda.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jcuda</groupId>
-            <artifactId>jcublas</artifactId>
-            <version>${jcuda.version}</version>
-        </dependency>
 
         <!-- AutoService for SPI generation -->
         <dependency>
@@ -159,6 +148,48 @@
     </build>
 
     <profiles>
+        <!-- JCuda profiles for supported architectures -->
+        <profile>
+            <id>jcuda-x86_64</id>
+            <activation>
+                <os>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcublas</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jcuda-windows-x86_64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcublas</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
         <!-- Profile for systems with OpenBLAS installed -->
         <profile>
             <id>openblas</id>

@@ -107,14 +107,9 @@ public class NativeLibraryLoader {
 
         for (String variant : variants) {
             String currentMapped = System.mapLibraryName(variant);
-            System.out.println("[DEBUG] NativeLibraryLoader: Attempting to load " + variant + " (mapped: " + currentMapped + ")");
-            System.out.flush();
             
-            // 1. Try system lookup first
             try {
                 SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
-                System.out.println("[INFO] NativeLibraryLoader: Successfully loaded " + variant + " from system paths.");
-                System.out.flush();
                 return Optional.of(lookup);
             } catch (Exception e) {
                 // System.out.println("[DEBUG] NativeLibraryLoader: System load failed for " + variant + ": " + e.getMessage());
@@ -145,8 +140,6 @@ public class NativeLibraryLoader {
                 if (path == null || path.isEmpty()) continue; // Ensure path is not null or empty
                 Optional<SymbolLookup> found = tryLoadFromDirectory(java.nio.file.Paths.get(path), currentMapped, arena);
                 if (found.isPresent()) {
-                    System.out.println("[INFO] NativeLibraryLoader: Successfully loaded " + variant + " from " + path);
-                    System.out.flush();
                     return found;
                 }
             }
@@ -178,8 +171,6 @@ public class NativeLibraryLoader {
         try {
             fullPath = basePath.resolve(mappedName).toAbsolutePath();
             if (java.nio.file.Files.exists(fullPath)) {
-                System.out.println("[DEBUG] NativeLibraryLoader: Attempting libraryLookup on: " + fullPath);
-                System.out.flush();
                 return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
             }
             
@@ -189,8 +180,6 @@ public class NativeLibraryLoader {
                 java.nio.file.Path subPath = basePath.resolve(sub).resolve(mappedName).toAbsolutePath();
                 if (java.nio.file.Files.exists(subPath)) {
                     fullPath = subPath; // for logging in catch
-                    System.out.println("[DEBUG] NativeLibraryLoader: Found candidate at " + subPath);
-                    System.out.flush();
                     return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
                 }
             }
