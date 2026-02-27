@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 import java.util.ServiceLoader;
 
@@ -57,6 +58,7 @@ public class EnvironmentController {
 
     @FXML
     private void handleRefresh() {
+        NativeLibraryLoader.clearCache();
         refreshProviders();
     }
 

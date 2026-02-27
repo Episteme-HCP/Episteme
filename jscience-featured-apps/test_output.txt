@@ -1,0 +1,135 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/jansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.jscience:jscience-featured-apps:jar:1.0.0-SNAPSHOT
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service-annotations:jar -> version ${auto-service.version} vs 1.1.1 @ org.jscience:jscience-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\JScience\pom.xml, line 433, column 19
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service:jar -> version ${auto-service.version} vs 1.1.1 @ org.jscience:jscience-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\JScience\pom.xml, line 438, column 19
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] ----------------< org.jscience:jscience-featured-apps >-----------------
+[INFO] Building JScience Featured Apps 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The POM for org.jscience:jscience-natural:jar:1.0.0-SNAPSHOT is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-featured-apps ---
+[INFO] Copying 4 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-featured-apps ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-featured-apps ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-featured-apps\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-featured-apps ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ jscience-featured-apps ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+WARNING: Using incubator modules: jdk.incubator.vector
+[INFO] Running org.jscience.apps.apps.util.RunLoaderVerification
+WARNING: A restricted method in java.lang.foreign.SymbolLookup has been called
+WARNING: java.lang.foreign.SymbolLookup::libraryLookup has been called by org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader in an unnamed module (file:/C:/Users/silve/.m2/repository/org/jscience/jscience-native/1.0.0-SNAPSHOT/jscience-native-1.0.0-SNAPSHOT.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+USER.DIR: C:\Silvere\Encours\Developpement\JScience\jscience-featured-apps
+=== JScience Native Loader Verification ===
+Working Directory: C:\Silvere\Encours\Developpement\JScience\jscience-featured-apps
+NATIVE_ROOT: null
+java.library.path: C:\Program Files\Java\jdk-25\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin\x64;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\usr\bin;;C:\ProgramData\chocolatey\bin;C:\JScience-Native\HDF5\bin\;C:\Program Files\Microsoft SQL Server\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2025.4.1\;C:\Program Files\CMake\bin;C:\Users\silve\scoop\shims;C:\Users\silve\AppData\Local\Programs\Python\Launcher\;C:\Users\silve\AppData\Local\Microsoft\WindowsApps;C:\Users\silve\AppData\Local\Programs\Antigravity\bin;C:\Program Files\Apache\Maven\apache-maven-3.9.5\bin;C:\Program Files\Git\usr\bin;;C:\JScience-Native\FFTW3;C:\JScience-Native\OpenBLAS\bin;C:\JScience-Native\MPJ\bin;C:\JScience-Native\HDF5\bin;C:\Users\silve\.dotnet\tools;c:\Users\silve\.antigravity\extensions\ms-python.debugpy-2025.18.0-win32-x64\bundled\scripts\noConfigScripts;.
+Checking openblas... [DEBUG] NativeLibraryLoader: Attempting to load openblas (mapped: openblas.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libopenblas (mapped: libopenblas.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libopenblas-3 (mapped: libopenblas-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load openblas-3 (mapped: openblas-3.dll)
+[WARNING] Could not find or load native library openblas (tried variants: [openblas, libopenblas, libopenblas-3, openblas-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking fftw3... [DEBUG] NativeLibraryLoader: Attempting to load fftw3 (mapped: fftw3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libfftw3 (mapped: libfftw3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libfftw3-3 (mapped: libfftw3-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load fftw3-3 (mapped: fftw3-3.dll)
+[WARNING] Could not find or load native library fftw3 (tried variants: [fftw3, libfftw3, libfftw3-3, fftw3-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking hdf5... [DEBUG] NativeLibraryLoader: Attempting to load hdf5 (mapped: hdf5.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libhdf5 (mapped: libhdf5.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libhdf5-3 (mapped: libhdf5-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load hdf5-3 (mapped: hdf5-3.dll)
+[WARNING] Could not find or load native library hdf5 (tried variants: [hdf5, libhdf5, libhdf5-3, hdf5-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking libbulletc... [DEBUG] NativeLibraryLoader: Attempting to load libbulletc (mapped: libbulletc.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load liblibbulletc (mapped: liblibbulletc.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load liblibbulletc-3 (mapped: liblibbulletc-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libbulletc-3 (mapped: libbulletc-3.dll)
+[WARNING] Could not find or load native library libbulletc (tried variants: [libbulletc, liblibbulletc, liblibbulletc-3, libbulletc-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking ode... [DEBUG] NativeLibraryLoader: Attempting to load ode (mapped: ode.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libode (mapped: libode.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libode-3 (mapped: libode-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load ode-3 (mapped: ode-3.dll)
+[WARNING] Could not find or load native library ode (tried variants: [ode, libode, libode-3, ode-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking libsndfile... [DEBUG] NativeLibraryLoader: Attempting to load libsndfile (mapped: libsndfile.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load liblibsndfile (mapped: liblibsndfile.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load liblibsndfile-3 (mapped: liblibsndfile-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libsndfile-3 (mapped: libsndfile-3.dll)
+[WARNING] Could not find or load native library libsndfile (tried variants: [libsndfile, liblibsndfile, liblibsndfile-3, libsndfile-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking arrow... (pre-loading parquet) [DEBUG] NativeLibraryLoader: Attempting to load parquet (mapped: parquet.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libparquet (mapped: libparquet.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libparquet-3 (mapped: libparquet-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load parquet-3 (mapped: parquet-3.dll)
+[WARNING] Could not find or load native library parquet (tried variants: [parquet, libparquet, libparquet-3, parquet-3])
+[DEBUG] NativeLibraryLoader: Attempting to load arrow (mapped: arrow.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libarrow (mapped: libarrow.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libarrow-3 (mapped: libarrow-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load arrow-3 (mapped: arrow-3.dll)
+[WARNING] Could not find or load native library arrow (tried variants: [arrow, libarrow, libarrow-3, arrow-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking QuEST... [DEBUG] NativeLibraryLoader: Attempting to load QuEST (mapped: QuEST.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libQuEST (mapped: libQuEST.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libQuEST-3 (mapped: libQuEST-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load QuEST-3 (mapped: QuEST-3.dll)
+[WARNING] Could not find or load native library QuEST (tried variants: [QuEST, libQuEST, libQuEST-3, QuEST-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking libvlc... [DEBUG] NativeLibraryLoader: Attempting to load libvlc (mapped: libvlc.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load liblibvlc (mapped: liblibvlc.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load liblibvlc-3 (mapped: liblibvlc-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libvlc-3 (mapped: libvlc-3.dll)
+[WARNING] Could not find or load native library libvlc (tried variants: [libvlc, liblibvlc, liblibvlc-3, libvlc-3])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+Checking cuda... [DEBUG] NativeLibraryLoader: Attempting to load cuda (mapped: cuda.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libcuda (mapped: libcuda.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load libcuda-3 (mapped: libcuda-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load cuda-3 (mapped: cuda-3.dll)
+[DEBUG] NativeLibraryLoader: Attempting to load nvcuda (mapped: nvcuda.dll)
+[WARNING] Could not find or load native library cuda (tried variants: [cuda, libcuda, libcuda-3, cuda-3, nvcuda])
+MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
+==========================================
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.474 s -- in org.jscience.apps.apps.util.RunLoaderVerification
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  16.237 s
+[INFO] Finished at: 2026-02-27T01:47:51+01:00
+[INFO] ------------------------------------------------------------------------

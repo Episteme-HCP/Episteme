@@ -8,8 +8,10 @@ public class LoaderVerification {
     public static void main(String[] args) {
         System.out.println("=== JScience Native Loader Verification ===");
         System.out.println("Working Directory: " + System.getProperty("user.dir"));
+        System.out.println("NATIVE_ROOT: " + System.getenv("NATIVE_ROOT"));
+        System.out.println("java.library.path: " + System.getProperty("java.library.path"));
         
-        String[] libs = {"openblas", "fftw3", "hdf5", "bullet_capi", "ode", "libsndfile", "arrow", "QuEST", "libvlc", "cuda"};
+        String[] libs = {"openblas", "fftw3", "hdf5", "libbulletc", "ode", "libsndfile", "arrow", "QuEST", "libvlc", "cuda"};
         
         for (String lib : libs) {
             System.out.print("Checking " + lib + "... ");

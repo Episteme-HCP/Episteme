@@ -29,11 +29,25 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
     static {
         try {
             // Attempt to discover VLC native libraries in the project's libs directory
-            String libsDir = System.getProperty("user.dir") + java.io.File.separator + "libs";
-            System.setProperty("jna.library.path", System.getProperty("jna.library.path", "") + java.io.File.pathSeparator + libsDir);
+            java.nio.file.Path current = java.nio.file.Paths.get(System.getProperty("user.dir"));
+            java.nio.file.Path libsDir = null;
+            while (current != null) {
+                java.nio.file.Path libs = current.resolve("libs");
+                if (java.nio.file.Files.exists(libs) && java.nio.file.Files.isDirectory(libs)) {
+                    libsDir = libs.toAbsolutePath();
+                    break;
+                }
+                current = current.getParent();
+            }
+
+            if (libsDir != null) {
+                System.setProperty("jna.library.path", System.getProperty("jna.library.path", "") + java.io.File.pathSeparator + libsDir);
+                System.out.println("[INFO] VLCJBackend: Discovered libs directory at " + libsDir);
+                System.out.flush();
+            }
             
             // vlcj 4.x discovery
-            new uk.co.caprica.vlcj.discovery.NativeDiscovery().discover();
+            new uk.co.caprica.vlcj.factory.discovery.NativeDiscovery().discover();
         } catch (Throwable t) {
             // Discovery might fail if vlcj is not on classpath, but we check that in isAvailable
         }

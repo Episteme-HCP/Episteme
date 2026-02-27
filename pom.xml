@@ -84,6 +84,7 @@
     <javacpp.version>1.5.10</javacpp.version>
     <openblas.version>0.3.26-${javacpp.version}</openblas.version>
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
+    <argLine></argLine>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -477,7 +478,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.2.5</version>
           <configuration>
-            <argLine>@{argLine} --enable-preview --add-modules jdk.incubator.vector -Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+            <argLine>${argLine} --enable-preview --add-modules jdk.incubator.vector -Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
             <systemPropertyVariables>
               <jscience.benchmark.skip>true</jscience.benchmark.skip>
             </systemPropertyVariables>
