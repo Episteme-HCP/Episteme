@@ -31,7 +31,6 @@ import org.jscience.core.mathematics.structures.rings.Field;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
 import org.jscience.core.mathematics.linearalgebra.matrices.GenericMatrix;
@@ -53,7 +52,7 @@ import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUDecomposit
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({LinearAlgebraProvider.class, AlgorithmProvider.class})
+@AutoService({LinearAlgebraProvider.class})
 public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     protected final Field<E> field;

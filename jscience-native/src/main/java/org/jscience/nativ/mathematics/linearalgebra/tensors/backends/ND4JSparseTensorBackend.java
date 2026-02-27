@@ -25,7 +25,7 @@ import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUSparseTen
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService(TensorBackend.class)
+@AutoService({TensorBackend.class})
 public class ND4JSparseTensorBackend implements TensorBackend {
 
     private static boolean available = false;

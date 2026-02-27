@@ -23,7 +23,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService(LinearAlgebraProvider.class)
+@AutoService({LinearAlgebraProvider.class})
 public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     public DistributedLinearAlgebraProvider() {

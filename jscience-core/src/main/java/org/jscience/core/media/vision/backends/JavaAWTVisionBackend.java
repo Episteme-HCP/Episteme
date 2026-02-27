@@ -8,7 +8,6 @@ package org.jscience.core.media.vision.backends;
 import org.jscience.core.media.vision.VisionAlgorithmBackend;
 import org.jscience.core.media.vision.ImageOp;
 import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import com.google.auto.service.AutoService;
 import java.awt.image.BufferedImage;
 
@@ -18,7 +17,7 @@ import java.awt.image.BufferedImage;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-@AutoService({Backend.class, AlgorithmProvider.class, VisionAlgorithmBackend.class})
+@AutoService({Backend.class, VisionAlgorithmBackend.class})
 public class JavaAWTVisionBackend implements VisionAlgorithmBackend<BufferedImage> {
 
     @Override

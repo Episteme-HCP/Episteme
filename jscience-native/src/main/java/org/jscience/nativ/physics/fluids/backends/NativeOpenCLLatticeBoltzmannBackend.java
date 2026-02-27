@@ -8,7 +8,6 @@ package org.jscience.nativ.physics.fluids.backends;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.matter.fluids.LatticeBoltzmannProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
 import org.jscience.nativ.mathematics.linearalgebra.backends.OpenCLExecutionContext;
@@ -31,7 +30,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({LatticeBoltzmannProvider.class, AlgorithmProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
+@AutoService({LatticeBoltzmannProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
 public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProvider, GPUBackend {
 
     private static final Logger LOGGER = Logger.getLogger(NativeOpenCLLatticeBoltzmannBackend.class.getName());

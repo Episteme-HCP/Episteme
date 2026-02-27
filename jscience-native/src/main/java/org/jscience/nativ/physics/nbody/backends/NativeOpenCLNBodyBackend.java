@@ -8,7 +8,6 @@ package org.jscience.nativ.physics.nbody.backends;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 
 import java.util.logging.Logger;
@@ -42,7 +41,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({NBodyProvider.class, AlgorithmProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
+@AutoService({NBodyProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
 public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend {
 
     // ------------------------------------------------------------------ //

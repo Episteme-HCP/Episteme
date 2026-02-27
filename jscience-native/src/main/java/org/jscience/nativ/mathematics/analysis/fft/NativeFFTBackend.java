@@ -16,7 +16,6 @@ import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.analysis.fft.FFTProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 
 import org.jscience.core.technical.backend.Backend;
@@ -31,7 +30,7 @@ import org.jscience.core.technical.backend.cpu.CPUBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({FFTProvider.class, AlgorithmProvider.class, ComputeBackend.class, CPUBackend.class, Backend.class, NativeBackend.class})
+@AutoService({FFTProvider.class, ComputeBackend.class, CPUBackend.class, Backend.class, NativeBackend.class})
 public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend {
 
     private static MethodHandle DPLAN_R2C_1D;

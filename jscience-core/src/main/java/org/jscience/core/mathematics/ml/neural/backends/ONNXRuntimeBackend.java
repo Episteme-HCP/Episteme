@@ -22,6 +22,7 @@
  */
 package org.jscience.core.mathematics.ml.neural.backends;
 
+import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.technical.backend.Backend;
 import java.nio.file.Path;
@@ -38,6 +39,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
+@AutoService({Backend.class})
 public class ONNXRuntimeBackend implements Backend {
 
     @Override

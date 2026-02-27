@@ -24,7 +24,6 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.AutoTuningManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
@@ -40,7 +39,7 @@ import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({ComputeBackend.class, NativeBackend.class, AlgorithmProvider.class, LinearAlgebraProvider.class})
+@AutoService({ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class})
 public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;

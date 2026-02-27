@@ -25,7 +25,6 @@ package org.jscience.natural.physics.classical.mechanics.backends;
 
 import org.jscience.core.technical.backend.HardwareAccelerator;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
@@ -44,7 +43,7 @@ import org.jscience.natural.physics.classical.mechanics.RigidBody;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({MechanicsBackend.class, AlgorithmProvider.class, CollisionProvider.class})
+@AutoService({MechanicsBackend.class, CollisionProvider.class})
 public class ODEBackend implements MechanicsBackend, CPUBackend, CollisionProvider {
 
     @Override

@@ -8,7 +8,6 @@ package org.jscience.core.mathematics.statistics.bayesian.providers;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.statistics.bayesian.BayesianInferenceProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.*;
 
 /**
@@ -18,7 +17,7 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(AlgorithmProvider.class)
+@AutoService()
 public class VariableEliminationProvider implements BayesianInferenceProvider {
 
     @Override

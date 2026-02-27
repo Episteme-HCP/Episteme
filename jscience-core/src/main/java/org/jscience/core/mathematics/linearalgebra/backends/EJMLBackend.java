@@ -33,7 +33,6 @@ import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.structures.rings.Field;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.algorithm.OperationContext.Hint;
 import org.jscience.core.technical.backend.Backend;
@@ -56,7 +55,7 @@ import java.lang.reflect.Constructor;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
+@AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
 public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static boolean ejmlAvailable = false;

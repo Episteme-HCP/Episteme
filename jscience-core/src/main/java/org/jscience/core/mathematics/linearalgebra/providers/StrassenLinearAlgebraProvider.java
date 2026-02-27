@@ -17,7 +17,7 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Linear Algebra Provider that forces the use of the Strassen algorithm.
  * Intended for benchmarking and comparison purposes.
  */
-@AutoService(LinearAlgebraProvider.class)
+@AutoService({LinearAlgebraProvider.class})
 public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
     public StrassenLinearAlgebraProvider() {

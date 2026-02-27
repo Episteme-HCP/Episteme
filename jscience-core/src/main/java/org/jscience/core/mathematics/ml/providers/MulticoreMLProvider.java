@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
  * Multicore Java implementation of ML algorithms using Parallel Streams.
  * Optimized for multi-threaded execution.
  */
-@AutoService(MLProvider.class)
+@AutoService({MLProvider.class})
 public class MulticoreMLProvider implements MLProvider {
 
     @Override

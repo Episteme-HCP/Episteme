@@ -5,7 +5,6 @@
 package org.jscience.natural.physics.classical.mechanics.backends;
 
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
 import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
@@ -19,7 +18,7 @@ import org.jscience.natural.physics.classical.mechanics.RigidBody;
  * High-performance backend specialized for robotics and many-body systems.
  * Uses JDK Vector API (SIMD) for acceleration - no native libraries required.
  */
-@AutoService({AlgorithmProvider.class, MechanicsBackend.class, CollisionProvider.class})
+@AutoService({MechanicsBackend.class, CollisionProvider.class})
 public class GenesisBackend implements MechanicsBackend, CPUBackend, CollisionProvider {
 
     @Override

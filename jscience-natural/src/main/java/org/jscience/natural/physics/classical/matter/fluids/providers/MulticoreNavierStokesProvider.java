@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.matter.fluids.NavierStokesProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Multicore implementation of Navier-Stokes provider.
@@ -18,7 +17,7 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(AlgorithmProvider.class)
+@AutoService()
 public class MulticoreNavierStokesProvider implements NavierStokesProvider {
 
     private static final Logger LOGGER = Logger.getLogger(MulticoreNavierStokesProvider.class.getName());

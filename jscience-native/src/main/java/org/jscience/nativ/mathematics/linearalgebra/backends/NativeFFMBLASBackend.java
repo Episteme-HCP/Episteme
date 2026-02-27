@@ -10,7 +10,6 @@ import org.jscience.core.mathematics.linearalgebra.Vector;
 import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.AutoTuningManager;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.core.technical.backend.Backend;
@@ -31,7 +30,7 @@ import java.util.List;
  * Binds to OpenBLAS/MKL for Matrix Operations.
  * Implements {@link CPUBackend} and {@link NativeBackend}.
  */
-@AutoService({Backend.class, LinearAlgebraProvider.class, AlgorithmProvider.class, CPUBackend.class, NativeBackend.class})
+@AutoService({Backend.class, LinearAlgebraProvider.class, CPUBackend.class, NativeBackend.class})
 public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
 
     private static final SymbolLookup LOOKUP;

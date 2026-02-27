@@ -8,7 +8,6 @@ import com.google.auto.service.AutoService;
 import org.jscience.core.media.audio.AudioBuffer;
 import org.jscience.core.media.audio.AudioOp;
 import org.jscience.core.media.audio.AudioAlgorithmBackend;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 import org.jscience.core.technical.backend.ComputeBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
@@ -20,7 +19,7 @@ import java.util.stream.IntStream;
 /**
  * High-performance AudioBackend using Java Parallel Streams.
  */
-@AutoService({Backend.class, ComputeBackend.class, AlgorithmProvider.class, AudioAlgorithmBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, AudioAlgorithmBackend.class})
 public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBackend<AudioBuffer> {
 
 

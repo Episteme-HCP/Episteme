@@ -22,7 +22,7 @@ import java.util.Optional;
  * @since 1.2
  */
 @SuppressWarnings({"preview", "unused"})
-@AutoService(Backend.class)
+@AutoService({Backend.class})
 public class NativeAudioBackend implements AudioBackend { // Removed redundant Backend interface
 
     private static final SymbolLookup LOOKUP;

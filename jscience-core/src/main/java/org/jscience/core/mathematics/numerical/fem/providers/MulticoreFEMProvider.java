@@ -19,7 +19,6 @@ import org.jscience.core.mathematics.analysis.fem.Node;
 import org.jscience.core.mathematics.analysis.fem.QuadraturePoint;
 import org.jscience.core.mathematics.numerical.fem.FEMProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Multicore implementation of FEMProvider.
@@ -28,7 +27,7 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService(AlgorithmProvider.class)
+@AutoService()
 public class MulticoreFEMProvider implements FEMProvider {
 
     @Override

@@ -16,7 +16,7 @@ import org.jscience.core.technical.backend.HardwareAccelerator;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService(TensorBackend.class)
+@AutoService({TensorBackend.class})
 public class ND4JCUDATensorBackend extends ND4JBaseTensorBackend {
 
     @Override

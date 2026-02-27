@@ -8,7 +8,6 @@ package org.jscience.core.mathematics.analysis.fft.providers;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.analysis.fft.FFTProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -21,7 +20,7 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({FFTProvider.class, AlgorithmProvider.class})
+@AutoService({FFTProvider.class})
 public class MulticoreFFTProvider implements FFTProvider {
 
     @Override

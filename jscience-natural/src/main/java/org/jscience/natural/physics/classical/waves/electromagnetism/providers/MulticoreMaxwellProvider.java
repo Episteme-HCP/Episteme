@@ -10,7 +10,6 @@ import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellProvider;
 import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellSource;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(AlgorithmProvider.class)
+@AutoService()
 public class MulticoreMaxwellProvider implements MaxwellProvider {
 
     private final List<MaxwellSource> sources = new ArrayList<>();

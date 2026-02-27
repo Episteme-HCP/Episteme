@@ -12,7 +12,6 @@ import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Parallel implementation of the SimulationProvider.
@@ -21,7 +20,7 @@ import org.jscience.core.technical.algorithm.AlgorithmProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({SimulationProvider.class, AlgorithmProvider.class})
+@AutoService({SimulationProvider.class})
 public class ParallelSimulationProvider implements SimulationProvider {
 
     @Override

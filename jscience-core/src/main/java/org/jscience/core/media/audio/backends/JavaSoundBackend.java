@@ -9,7 +9,6 @@ import org.jscience.core.media.AudioBackend;
 import org.jscience.core.media.audio.AudioBuffer;
 import org.jscience.core.media.audio.AudioOp;
 import org.jscience.core.media.audio.AudioAlgorithmBackend;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.Backend;
 
 import org.jscience.core.technical.backend.ComputeBackend;
@@ -29,7 +28,7 @@ import java.io.File;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, AlgorithmProvider.class, AudioAlgorithmBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, AudioAlgorithmBackend.class})
 public class JavaSoundBackend implements AudioBackend, ComputeBackend, AudioAlgorithmBackend<AudioBuffer> {
 
     private Clip clip;

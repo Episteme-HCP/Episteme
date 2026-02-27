@@ -13,7 +13,7 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Linear Algebra Provider that forces the use of the Standard (Naive/Recursive) algorithm.
  * Intended for benchmarking and comparison purposes.
  */
-@AutoService(LinearAlgebraProvider.class)
+@AutoService({LinearAlgebraProvider.class})
 public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
     public StandardLinearAlgebraProvider() {

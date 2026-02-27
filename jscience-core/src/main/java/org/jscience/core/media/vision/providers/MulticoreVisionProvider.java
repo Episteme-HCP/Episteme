@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService(Backend.class)
+@AutoService({Backend.class})
 public class MulticoreVisionProvider implements VisionAlgorithmBackend<BufferedImage> {
 
     @Override public String getType() { return "vision"; }

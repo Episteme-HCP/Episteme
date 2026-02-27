@@ -8,7 +8,6 @@ package org.jscience.natural.physics.quantum.scf.providers;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.quantum.scf.SCFProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.stream.IntStream;
 
 /**
@@ -19,7 +18,7 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(AlgorithmProvider.class)
+@AutoService()
 public class MulticoreSCFProvider implements SCFProvider {
 
     @Override

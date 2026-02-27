@@ -9,7 +9,6 @@ import com.google.auto.service.AutoService;
 import org.jscience.core.mathematics.numbers.complex.Complex;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.core.mathematics.analysis.fft.FFTProvider;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import org.jscience.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
 import org.jscience.nativ.mathematics.linearalgebra.backends.OpenCLExecutionContext;
@@ -36,7 +35,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({FFTProvider.class, AlgorithmProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
+@AutoService({FFTProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
 public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend {
 
     private static final Logger LOGGER = Logger.getLogger(NativeOpenCLFFTBackend.class.getName());

@@ -7,7 +7,6 @@ package org.jscience.nativ.physics.classical.mechanics.simulation.providers;
 
 import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.backend.cpu.CPUBackend;
 import org.jscience.core.technical.backend.ExecutionContext;
 import org.jscience.core.technical.backend.Operation;
@@ -26,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({SimulationProvider.class, AlgorithmProvider.class})
+@AutoService({SimulationProvider.class})
 public class NativeSimulationBackend implements SimulationProvider, CPUBackend, NativeBackend {
 
     @Override

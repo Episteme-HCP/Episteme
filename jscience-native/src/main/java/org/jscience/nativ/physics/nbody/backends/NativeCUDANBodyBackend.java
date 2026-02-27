@@ -7,7 +7,6 @@ package org.jscience.nativ.physics.nbody.backends;
 
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.technical.algorithm.OperationContext;
 import com.google.auto.service.AutoService;
 import jcuda.driver.JCudaDriver;
@@ -30,7 +29,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({AlgorithmProvider.class, ComputeBackend.class, GPUBackend.class, Backend.class})
+@AutoService({ComputeBackend.class, GPUBackend.class, Backend.class})
 public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend {
 
     private static final int GPU_THRESHOLD = 1000;

@@ -17,7 +17,7 @@ import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Linear Algebra Provider that forces the use of the CARMA algorithm.
  * Intended for benchmarking and comparison purposes.
  */
-@AutoService(LinearAlgebraProvider.class)
+@AutoService({LinearAlgebraProvider.class})
 public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
     public CARMALinearAlgebraProvider() {

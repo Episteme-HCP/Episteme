@@ -14,7 +14,6 @@ import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import com.google.auto.service.AutoService;
 import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -31,7 +30,7 @@ import org.nd4j.linalg.inverse.InvertMatrix;
  * @author Silvere Martin-Michiellot
  * @since 1.0
  */
-@AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class, AlgorithmProvider.class})
+@AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class})
 public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.jscience.nativ.technical.backend.nativ.NativeBackend, org.jscience.core.technical.backend.cpu.CPUBackend {
 
     @Override

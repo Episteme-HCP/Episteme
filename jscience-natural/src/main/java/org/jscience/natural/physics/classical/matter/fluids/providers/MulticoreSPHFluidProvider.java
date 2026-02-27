@@ -8,7 +8,6 @@ package org.jscience.natural.physics.classical.matter.fluids.providers;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.matter.fluids.SPHFluidProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import java.util.stream.IntStream;
 import java.util.Arrays;
 
@@ -19,7 +18,7 @@ import java.util.Arrays;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(AlgorithmProvider.class)
+@AutoService()
 public class MulticoreSPHFluidProvider implements SPHFluidProvider {
 
     @Override
