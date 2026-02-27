@@ -72,7 +72,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
         try {
             Linker linker = NativeLibraryLoader.getLinker();
-            Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("jscience_native", java.lang.foreign.Arena.global());
+            Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("jscience-jni", java.lang.foreign.Arena.global());
             if (lookupOpt.isEmpty()) {
                 lookupOpt = NativeLibraryLoader.loadLibrary("openblas", java.lang.foreign.Arena.global());
                 if (lookupOpt.isEmpty()) {
@@ -139,7 +139,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public String getNativeLibraryName() {
-        return "jscience_native";
+        return "jscience-jni";
     }
 
     @Override

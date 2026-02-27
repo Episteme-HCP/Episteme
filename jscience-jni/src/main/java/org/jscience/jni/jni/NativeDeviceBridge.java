@@ -35,7 +35,7 @@ public class NativeDeviceBridge {
 
     static {
         try {
-            System.loadLibrary("jscience_native");
+            System.loadLibrary("jscience-jni");
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Native library 'jscience_native' failed to load.\n" + e);
         }

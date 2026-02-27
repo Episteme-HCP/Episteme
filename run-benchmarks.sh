@@ -20,9 +20,32 @@ do
 done
 
 # Native Library Path Setup
-# Assuming standard paths or user-defined LD_LIBRARY_PATH
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LIBS_DIR="${SCRIPT_DIR}/libs"
+
+# Project libs directory (ODE, QuEST, oneDNN, lz4, etc.)
+if [ -d "$LIBS_DIR" ]; then
+    echo "[INFO] Adding libs/ to library path..."
+    export LD_LIBRARY_PATH="${LIBS_DIR}:${LD_LIBRARY_PATH}"
+    export DYLD_LIBRARY_PATH="${LIBS_DIR}:${DYLD_LIBRARY_PATH}"
+fi
+
+# Standard system paths
 if [ -d "/usr/local/lib" ]; then
     export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+fi
+
+# VLC (Linux)
+if [ -d "/usr/lib/vlc" ]; then
+    echo "[INFO] Adding VLC to library path..."
+    export LD_LIBRARY_PATH="/usr/lib/vlc:$LD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/usr/lib/vlc/plugins"
+fi
+# VLC (macOS via Homebrew)
+if [ -d "/Applications/VLC.app/Contents/MacOS/lib" ]; then
+    echo "[INFO] Adding VLC (macOS) to library path..."
+    export DYLD_LIBRARY_PATH="/Applications/VLC.app/Contents/MacOS/lib:$DYLD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/Applications/VLC.app/Contents/MacOS/plugins"
 fi
 
 echo "=========================================="

@@ -28,6 +28,20 @@ echo ==========================================
 
 rem --- Native Libraries Setup ---
 set "NATIVE_ROOT=C:\JScience-Native"
+set "LIBS_DIR=%~dp0libs"
+
+rem --- VLC ---
+if exist "C:\Program Files\VideoLAN\VLC" (
+    echo [INFO] Adding VLC to PATH...
+    set "PATH=C:\Program Files\VideoLAN\VLC;%PATH%"
+    set "VLC_PLUGIN_PATH=C:\Program Files\VideoLAN\VLC\plugins"
+)
+
+rem --- Project libs directory (ODE, QuEST, oneDNN, lz4, etc.) ---
+if exist "%LIBS_DIR%" (
+    echo [INFO] Adding libs/ to PATH...
+    set "PATH=%LIBS_DIR%;%PATH%"
+)
 
 if exist "%NATIVE_ROOT%\OpenBLAS\bin" (
     echo [INFO] Adding OpenBLAS to PATH...
