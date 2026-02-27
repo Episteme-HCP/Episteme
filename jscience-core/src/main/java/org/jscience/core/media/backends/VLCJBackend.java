@@ -42,6 +42,13 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
 
             if (libsDir != null) {
                 System.setProperty("jna.library.path", System.getProperty("jna.library.path", "") + java.io.File.pathSeparator + libsDir);
+                
+                java.nio.file.Path plugins = libsDir.resolve("plugins");
+                if (java.nio.file.Files.exists(plugins)) {
+                    System.setProperty("VLC_PLUGIN_PATH", plugins.toAbsolutePath().toString());
+                    System.out.println("[INFO] VLCJBackend: Set VLC_PLUGIN_PATH to " + plugins);
+                }
+                
                 System.out.println("[INFO] VLCJBackend: Discovered libs directory at " + libsDir);
                 System.out.flush();
             }

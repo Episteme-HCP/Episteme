@@ -62,9 +62,15 @@ public class EnvironmentController {
         refreshProviders();
     }
 
+    private Thread refreshThread = null;
+
     private void refreshProviders() {
+        if (refreshThread != null && refreshThread.isAlive()) {
+            return; // Already refreshing
+        }
+        
         providers.clear();
-        new Thread(() -> {
+        refreshThread = new Thread(() -> {
             ServiceLoader<AlgorithmProvider> loader = ServiceLoader.load(AlgorithmProvider.class);
             for (AlgorithmProvider p : loader) {
                 String type = p.getAlgorithmType();
@@ -82,13 +88,10 @@ public class EnvironmentController {
                 );
                 Platform.runLater(() -> providers.add(item));
             }
-            Platform.runLater(() -> {
-                if (providers.isEmpty()) {
-                    // This will trigger the placeholder change if we used the logic in updateUI
-                    // But we don't have the resource bundle here easily unless we store it.
-                }
-            });
-        }).start();
+        });
+        refreshThread.setDaemon(true);
+        refreshThread.setName("ProviderDiscoveryThread");
+        refreshThread.start();
     }
     
     public static class ProviderItem {

@@ -37,49 +37,65 @@ import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 @AutoService({AlgorithmProvider.class, QuantumBackend.class, ComputeBackend.class, Backend.class, NativeBackend.class})
 public class NativeQuantumBackend implements NativeBackend, QuantumBackend, AlgorithmProvider {
 
-    private static final SymbolLookup LOOKUP;
-    private static final boolean IS_AVAILABLE_FLAG;
+    private static SymbolLookup LOOKUP;
+    private static boolean IS_INITIALIZED = false;
 
     private static MethodHandle QUEST_CREATE_ENV;
     private static MethodHandle QUEST_CREATE_QUREG;
+    private static MethodHandle QUEST_HADAMARD;
+    private static MethodHandle QUEST_CONTROLLED_NOT;
     private static MethodHandle QUEST_APPLY_PAULI_X;
     private static MethodHandle QUEST_MEASURE;
 
-    static {
-        // Try 'QuEST' libraries
+    private static synchronized void ensureInitialized() {
+        if (IS_INITIALIZED) return; // Check IS_INITIALIZED instead of LOOKUP
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("QuEST", Arena.global());
-        
-        boolean avail = false;
         if (lib.isPresent()) {
             LOOKUP = lib.get();
             try {
-                Linker linker = Linker.nativeLinker();
+                Linker linker = NativeLibraryLoader.getLinker();
                 
-                // QuESTEnv createQuESTEnv();
-                QUEST_CREATE_ENV = linker.downcallHandle(
-                        LOOKUP.find("createQuESTEnv").orElseThrow(),
-                        FunctionDescriptor.of(ValueLayout.ADDRESS) // Returns struct by value or pointer depending on ABI... usually struct content is returned in registers for small structs, otherwise pointer. Assuming pointer for opaque env.
-                );
-
-                avail = true;
-            } catch (Throwable t) {
-                avail = false;
+                QUEST_CREATE_ENV = NativeLibraryLoader.findSymbol(LOOKUP, "createQuESTEnv", "createQuESTEnv@0", "_createQuESTEnv")
+                    .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.of(ValueLayout.ADDRESS)))
+                    .orElse(null);
+                    
+                QUEST_CREATE_QUREG = NativeLibraryLoader.findSymbol(LOOKUP, "createQureg", "createQureg@8", "_createQureg")
+                    .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)))
+                    .orElse(null);
+                    
+                QUEST_HADAMARD = NativeLibraryLoader.findSymbol(LOOKUP, "hadamard", "hadamard@8", "_hadamard")
+                    .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT)))
+                    .orElse(null);
+                    
+                QUEST_CONTROLLED_NOT = NativeLibraryLoader.findSymbol(LOOKUP, "controlledNot", "controlledNot@12", "_controlledNot")
+                    .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)))
+                    .orElse(null);
+                    
+                QUEST_MEASURE = NativeLibraryLoader.findSymbol(LOOKUP, "measure", "measure@8", "_measure")
+                    .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)))
+                    .orElse(null);
+                
+                if (QUEST_CREATE_ENV == null) {
+                    System.err.println("[WARNING] NativeQuantumBackend: QuEST loaded but critical symbols not found. Marking as unavailable.");
+                    LOOKUP = null; 
+                }
+            } catch (Exception e) {
+                System.err.println("[ERROR] NativeQuantumBackend: Failed to bind QuEST symbols: " + e.getMessage());
+                LOOKUP = null;
             }
-        } else {
-            LOOKUP = null;
-            avail = false;
         }
-        IS_AVAILABLE_FLAG = avail;
+        IS_INITIALIZED = true;
     }
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE_FLAG;
+        ensureInitialized();
+        return LOOKUP != null;
     }
 
     @Override
     public boolean isLoaded() {
-        return IS_AVAILABLE_FLAG;
+        return isAvailable();
     }
 
     @Override

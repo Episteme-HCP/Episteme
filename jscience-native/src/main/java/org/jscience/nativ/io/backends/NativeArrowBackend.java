@@ -27,37 +27,36 @@ import java.util.Optional;
 @AutoService({AlgorithmProvider.class, ComputeBackend.class, NativeBackend.class, Backend.class})
 public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, NativeBackend {
 
-    private static final SymbolLookup LOOKUP;
-    private static final boolean IS_AVAILABLE_FLAG;
+    private static SymbolLookup LOOKUP;
+    private static boolean IS_AVAILABLE_FLAG = false;
 
     private static MethodHandle ARROW_IMPORT_ARRAY;
     private static MethodHandle ARROW_EXPORT_ARRAY;
 
-    static {
+    private static synchronized void ensureInitialized() {
+        if (IS_AVAILABLE_FLAG) return;
+
         // Look for Arrow C library (e.g. libarrow.so or specific C-Data-Interface wrapper)
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("arrow", Arena.global());
         
-        boolean avail = false;
         if (lib.isPresent()) {
             LOOKUP = lib.get();
             try {
                 Linker linker = Linker.nativeLinker();
                 
-                // int ArrowArrayImport(struct ArrowArray* array, struct ArrowSchema* schema);
-                ARROW_IMPORT_ARRAY = linker.downcallHandle(
-                        LOOKUP.find("ArrowArrayImport").orElseThrow(),
-                        FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-                );
-                
-                avail = true;
+                // Try to find ArrowArrayImport with robust discovery
+                Optional<MemorySegment> importSym = NativeLibraryLoader.findSymbol(LOOKUP, "ArrowArrayImport");
+                if (importSym.isPresent()) {
+                    ARROW_IMPORT_ARRAY = linker.downcallHandle(
+                            importSym.get(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                    );
+                    IS_AVAILABLE_FLAG = true;
+                }
             } catch (Throwable t) {
-                avail = false;
+                IS_AVAILABLE_FLAG = false;
             }
-        } else {
-            LOOKUP = null;
-            avail = false;
         }
-        IS_AVAILABLE_FLAG = avail;
     }
 
     @Override
@@ -90,6 +89,7 @@ public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, Na
 
     @Override
     public boolean isAvailable() {
+        ensureInitialized();
         return IS_AVAILABLE_FLAG;
     }
 

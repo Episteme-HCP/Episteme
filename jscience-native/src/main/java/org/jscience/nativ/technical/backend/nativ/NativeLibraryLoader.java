@@ -40,6 +40,28 @@ public class NativeLibraryLoader {
         return null;
     }
 
+    private static final java.util.Set<String> PRELOADED_RUNTIMES = new java.util.HashSet<>();
+
+    /**
+     * Pre-loads common runtime dependencies found in the libs directory.
+     */
+    private static void preloadRuntimes(java.nio.file.Path libsDir, Arena arena) {
+        if (libsDir == null || !java.nio.file.Files.exists(libsDir)) return;
+        String[] runtimes = {"libwinpthread-1", "libgcc_s_seh-1", "libstdc++-6", "zlib1", "msvcp140", "vcruntime140"};
+        for (String rt : runtimes) {
+            if (PRELOADED_RUNTIMES.contains(rt)) continue;
+            try {
+                // Try to load from the libs root directly
+                String mapped = System.mapLibraryName(rt);
+                java.nio.file.Path rtPath = libsDir.resolve(mapped).toAbsolutePath();
+                if (java.nio.file.Files.exists(rtPath)) {
+                    SymbolLookup.libraryLookup(rtPath, arena);
+                    PRELOADED_RUNTIMES.add(rt);
+                }
+            } catch (Throwable ignored) {}
+        }
+    }
+
     /**
      * Loads a native library by name using a global arena.
      * 
@@ -82,28 +104,35 @@ public class NativeLibraryLoader {
                 variants.add("cublas64_12");
                 variants.add("cublas64_013");
                 variants.add("cublas64_11");
-                variants.add("cublas64_10"); // Keep existing
+                variants.add("cublas64_10"); 
             } else if (libName.equals("cusolver")) {
                 variants.add("cusolver64_13");
                 variants.add("cusolver64_12");
-                variants.add("cusolver64_11"); // Keep existing
+                variants.add("cusolver64_11"); 
             } else if (libName.equals("cudart")) {
                 variants.add("cudart64_130");
                 variants.add("cudart64_120");
-                variants.add("cudart64_13"); // Keep existing
-                variants.add("cudart64_110"); // Keep existing
+                variants.add("cudart64_13"); 
+                variants.add("cudart64_110"); 
             } else if (libName.equals("sndfile")) {
                 variants.add("libsndfile-1");
             } else if (libName.equals("vlc")) {
-                variants.add("libvlc"); // Added
-                variants.add("libvlccore"); // Keep existing
-            } else if (libName.equals("dnnl")) { // Added
+                variants.add("libvlc"); 
+                variants.add("libvlccore"); 
+            } else if (libName.equals("dnnl")) {
                 variants.add("libdnnl");
                 variants.add("mkldnn");
+            } else if (libName.equals("arrow")) {
+                variants.add("parquet");
+                variants.add("arrow_dataset");
+                variants.add("arrow_acero");
             }
         }
 
         java.nio.file.Path discoveredLibs = findLibsDirectory();
+        if (discoveredLibs != null) {
+            preloadRuntimes(discoveredLibs, arena);
+        }
 
         for (String variant : variants) {
             String currentMapped = System.mapLibraryName(variant);
@@ -118,33 +147,26 @@ public class NativeLibraryLoader {
             // 2. Try custom search paths
             String cudaPath = System.getenv("CUDA_PATH");
             List<String> searchPaths = new ArrayList<>();
-            // Common system paths (kept for robustness, though system lookup should cover)
             searchPaths.add("/usr/local/lib/");
             searchPaths.add("/usr/lib/");
             searchPaths.add("C:\\Windows\\System32\\");
             
-            // Environment variables
             if (System.getenv("NATIVE_ROOT") != null) searchPaths.add(System.getenv("NATIVE_ROOT"));
             if (cudaPath != null) searchPaths.add(cudaPath + java.io.File.separator + "bin");
             
-            // Discovered libs directory
             if (discoveredLibs != null) searchPaths.add(discoveredLibs.toString());
 
-            // Current working directory and its 'libs' subdirectory
             searchPaths.add(System.getProperty("user.dir"));
             searchPaths.add(System.getProperty("user.dir") + java.io.File.separator + "libs");
             
-            // Removed specific CUDA versions and launchers/libs/libs as they are less generic or covered by CUDA_PATH/discoveredLibs
-
             for (String path : searchPaths) {
-                if (path == null || path.isEmpty()) continue; // Ensure path is not null or empty
+                if (path == null || path.isEmpty()) continue; 
                 Optional<SymbolLookup> found = tryLoadFromDirectory(java.nio.file.Paths.get(path), currentMapped, arena);
                 if (found.isPresent()) {
                     return found;
                 }
             }
             
-            // 3. Scan subdirectories of discovered libs
             if (discoveredLibs != null && java.nio.file.Files.isDirectory(discoveredLibs)) {
                 java.io.File[] subDirs = discoveredLibs.toFile().listFiles(java.io.File::isDirectory);
                 if (subDirs != null) {
@@ -174,12 +196,11 @@ public class NativeLibraryLoader {
                 return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
             }
             
-            // Try common subdirectories (lib, bin)
             String[] subs = {"lib", "bin"};
             for (String sub : subs) {
                 java.nio.file.Path subPath = basePath.resolve(sub).resolve(mappedName).toAbsolutePath();
                 if (java.nio.file.Files.exists(subPath)) {
-                    fullPath = subPath; // for logging in catch
+                    fullPath = subPath; 
                     return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
                 }
             }
@@ -193,9 +214,6 @@ public class NativeLibraryLoader {
         return Optional.empty();
     }
 
-    /**
-     * Looks up a symbol in the given lookup or system loader.
-     */
     public static Optional<SymbolLookup> getSystemLookup() {
          return Optional.of(SymbolLookup.loaderLookup());
     }
@@ -204,9 +222,18 @@ public class NativeLibraryLoader {
         return LINKER;
     }
 
-    /**
-     * Clears the failure cache, allowing libraries to be retried.
-     */
+    public static Optional<MemorySegment> findSymbol(SymbolLookup lookup, String... names) {
+        if (lookup == null) return Optional.empty();
+        for (String name : names) {
+            Optional<MemorySegment> segment = lookup.find(name);
+            if (segment.isPresent()) return segment;
+
+            segment = lookup.find("_" + name);
+            if (segment.isPresent()) return segment;
+        }
+        return Optional.empty();
+    }
+
     public static void clearCache() {
         FAILED_LIBS.clear();
         System.out.println("[INFO] NativeLibraryLoader: Failure cache cleared.");

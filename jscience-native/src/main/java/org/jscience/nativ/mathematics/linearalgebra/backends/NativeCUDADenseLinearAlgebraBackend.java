@@ -8,6 +8,7 @@ package org.jscience.nativ.mathematics.linearalgebra.backends;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
+import java.util.Optional;
 
 import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.jscience.core.mathematics.linearalgebra.Matrix;
@@ -38,7 +39,7 @@ import com.google.auto.service.AutoService;
 @AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
 
-    private static final boolean IS_AVAILABLE;
+    private static boolean IS_AVAILABLE = false;
     private static final Linker LINKER = NativeLibraryLoader.getLinker();
 
     // CUDA/cuBLAS Handles
@@ -55,22 +56,26 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static final int CUDA_MEMCPY_HOST_TO_DEVICE = 1;
     private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
 
-    static {
+    private static synchronized void ensureInitialized() {
+        if (IS_AVAILABLE) return;
+
         SymbolLookup cuda = null;
         SymbolLookup cublas = null;
         SymbolLookup cusolver = null;
-        boolean available = false;
 
-        try {
-            cuda = NativeLibraryLoader.loadLibrary("cuda");
-            cublas = NativeLibraryLoader.loadLibrary("cublas");
+        try (Arena arena = Arena.ofConfined()) { // Test loading
+            Optional<SymbolLookup> cudaOpt = NativeLibraryLoader.loadLibrary("cuda", Arena.global());
+            Optional<SymbolLookup> cublasOpt = NativeLibraryLoader.loadLibrary("cublas", Arena.global());
+            
+            if (cudaOpt.isEmpty() || cublasOpt.isEmpty()) return;
+            
+            cuda = cudaOpt.get();
+            cublas = cublasOpt.get();
+            
             try {
-                cusolver = NativeLibraryLoader.loadLibrary("cusolver");
-                if (cusolver != null) {
-                    // Ready for Phase 3 cuSOLVER methods
-                }
+                cusolver = NativeLibraryLoader.loadLibrary("cusolver", Arena.global()).orElse(null);
             } catch (Throwable t) {
-                // optional: if missing, decomposition fails but matmul (cublas) still works
+                // optional
             }
 
             // CUDA Runtime Memory Management
@@ -111,16 +116,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 )
             );
 
-            available = true;
+            IS_AVAILABLE = true;
         } catch (Throwable t) {
-            available = false;
+            IS_AVAILABLE = false;
         }
-
-        IS_AVAILABLE = available;
     }
 
     @Override
-    public boolean isAvailable() { return IS_AVAILABLE; }
+    public boolean isAvailable() { ensureInitialized(); return IS_AVAILABLE; }
 
     @Override
     public boolean isLoaded() { return IS_AVAILABLE; }

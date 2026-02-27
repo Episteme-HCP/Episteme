@@ -20,8 +20,6 @@ import org.jscience.nativ.technical.backend.nativ.NativeBackend;
 
 import java.lang.foreign.MemorySegment;
 import java.util.List;
-import java.util.Optional;
-import java.lang.foreign.SymbolLookup;
 import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
@@ -50,25 +48,16 @@ public class NativeGenesisBackend implements CollisionProvider, MechanicsBackend
         return "Native high-performance Genesis physics engine (Project Panama).";
     }
 
-    private static final boolean IS_ENABLED;
-
-    static {
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("GenesisC", java.lang.foreign.Arena.global());
-        if (lib.isEmpty()) {
-            lib = NativeLibraryLoader.loadLibrary("libbulletc", java.lang.foreign.Arena.global());
-        }
-        IS_ENABLED = lib.isPresent();
-    }
-
     @Override
     public boolean isAvailable() {
-        return IS_ENABLED;
+        return NativeLibraryLoader.loadLibrary("GenesisC", java.lang.foreign.Arena.global()).isPresent() ||
+               NativeLibraryLoader.loadLibrary("libbulletc", java.lang.foreign.Arena.global()).isPresent();
     }
 
 
     @Override
     public boolean isLoaded() {
-        return IS_ENABLED;
+        return isAvailable();
     }
 
     @Override
