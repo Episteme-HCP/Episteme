@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 import org.jscience.core.mathematics.numbers.real.Real;
 import org.jscience.natural.physics.classical.matter.molecular.MolecularDynamicsProvider;
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Multicore implementation of MolecularDynamicsProvider.
@@ -17,7 +18,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService()
+@AutoService(AlgorithmProvider.class)
 public class MulticoreMolecularDynamicsProvider implements MolecularDynamicsProvider {
 
     @Override

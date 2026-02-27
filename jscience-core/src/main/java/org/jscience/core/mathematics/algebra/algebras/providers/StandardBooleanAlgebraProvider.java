@@ -5,13 +5,14 @@
 package org.jscience.core.mathematics.algebra.algebras.providers;
 
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 import org.jscience.core.mathematics.algebra.algebras.BooleanAlgebraProvider;
 
 /**
  * Standard JVM implementation of Boolean Algebra.
  */
-@AutoService()
+@AutoService(AlgorithmProvider.class)
 public class StandardBooleanAlgebraProvider implements BooleanAlgebraProvider {
 
     @Override

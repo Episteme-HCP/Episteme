@@ -9,6 +9,7 @@ import org.jscience.core.technical.backend.distributed.DistributedBackend;
 import org.jscience.core.technical.backend.distributed.DistributedContext;
 import org.jscience.core.distributed.MPIDistributedContext;
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * MPI Distributed Computing Backend.
@@ -18,7 +19,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService()
+@AutoService(AlgorithmProvider.class)
 public class MPIDistributedBackend implements DistributedBackend {
 
     private boolean available;

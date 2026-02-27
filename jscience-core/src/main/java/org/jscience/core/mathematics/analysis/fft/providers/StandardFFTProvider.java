@@ -8,7 +8,7 @@ import org.jscience.core.mathematics.analysis.fft.FFTProvider;
 /**
  * Standard single-threaded implementation of FFTProvider.
  */
-@AutoService({FFTProvider.class, org.jscience.core.technical.algorithm.})
+@AutoService({FFTProvider.class, org.jscience.core.technical.algorithm.AlgorithmProvider.class})
 public class StandardFFTProvider implements FFTProvider {
 
     public String getName() {

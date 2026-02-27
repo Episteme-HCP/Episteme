@@ -9,6 +9,7 @@ import org.jscience.core.mathematics.linearalgebra.Tensor;
 import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.core.mathematics.numbers.real.Real;
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
 
 import java.lang.reflect.Array;
@@ -25,7 +26,7 @@ import java.lang.reflect.Array;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService()
+@AutoService(AlgorithmProvider.class)
 public class DenseNeuralProvider implements TensorProvider {
 
     @Override

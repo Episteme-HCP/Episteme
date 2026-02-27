@@ -7,6 +7,7 @@ package org.jscience.natural.physics.classical.mechanics.nbody.providers;
 
 import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 
 /**
@@ -16,7 +17,7 @@ import org.jscience.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService()
+@AutoService(AlgorithmProvider.class)
 public class MulticoreNBodyProvider implements NBodyProvider {
 
     @Override

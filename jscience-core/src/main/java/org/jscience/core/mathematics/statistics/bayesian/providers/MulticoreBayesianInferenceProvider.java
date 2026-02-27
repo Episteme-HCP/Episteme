@@ -7,6 +7,7 @@ package org.jscience.core.mathematics.statistics.bayesian.providers;
 
 import org.jscience.core.mathematics.statistics.bayesian.BayesianInferenceProvider;
 import com.google.auto.service.AutoService;
+import org.jscience.core.technical.algorithm.AlgorithmProvider;
 import org.jscience.core.mathematics.numbers.real.Real;
 import java.util.Map;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService()
+@AutoService(AlgorithmProvider.class)
 public class MulticoreBayesianInferenceProvider implements BayesianInferenceProvider {
 
     @Override
