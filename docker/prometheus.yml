@@ -1,4 +1,4 @@
-# Prometheus Configuration for JScience Grid
+# Prometheus Configuration for Episteme Grid
 
 global:
   scrape_interval: 15s
@@ -9,7 +9,7 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  - job_name: "jscience-server"
+  - job_name: "episteme-server"
     static_configs:
       - targets: ["server:8080"]
     metrics_path: "/metrics"

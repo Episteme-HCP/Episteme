@@ -24,4 +24,4 @@ z _ a n a t o m y _ s o u r c e /
 !libs/mpj.jar
 !libs/MPJ/lib/*.jar
 !launchers/packaged/**/*.jar
-!jscience-natural/lib/fbx_loader/*.jar
+!episteme-natural/lib/fbx_loader/*.jar

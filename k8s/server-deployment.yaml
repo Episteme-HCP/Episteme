@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jscience-server
-  namespace: jscience
+  name: episteme-server
+  namespace: episteme
   labels:
-    app: jscience-server
+    app: episteme-server
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: jscience-server
+      app: episteme-server
   template:
     metadata:
       labels:
-        app: jscience-server
+        app: episteme-server
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9090"
     spec:
       containers:
         - name: server
-          image: jscience/server:latest
+          image: episteme/server:latest
           ports:
             - containerPort: 50051
               name: grpc
@@ -32,11 +32,11 @@ spec:
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: jscience-secrets
+                  name: episteme-secrets
                   key: JWT_SECRET
           envFrom:
             - configMapRef:
-                name: jscience-config
+                name: episteme-config
           resources:
             requests:
               cpu: "500m"
@@ -60,11 +60,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: jscience-server
-  namespace: jscience
+  name: episteme-server
+  namespace: episteme
 spec:
   selector:
-    app: jscience-server
+    app: episteme-server
   ports:
     - name: grpc
       port: 50051
@@ -80,11 +80,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: jscience-server-lb
-  namespace: jscience
+  name: episteme-server-lb
+  namespace: episteme
 spec:
   selector:
-    app: jscience-server
+    app: episteme-server
   ports:
     - name: grpc
       port: 50051

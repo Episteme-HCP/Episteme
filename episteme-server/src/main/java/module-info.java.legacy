@@ -1,0 +1,38 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+/**
+ * Episteme Server module providing coordinator and RPC infrastructure.
+ */
+module org.episteme.server {
+    requires transitive org.episteme.core;
+    requires transitive org.episteme.natural;
+    requires transitive org.episteme.social;
+    requires org.episteme.database;
+
+    // Spring Boot & Cloud
+    requires spring.boot;
+    requires spring.boot.autoconfigure;
+    requires spring.context;
+    requires spring.web;
+    requires spring.data.jpa;
+
+    // gRPC
+    requires grpc.api;
+    requires grpc.stub;
+    requires com.google.protobuf;
+
+    // AWS
+    requires software.amazon.awssdk.services.s3;
+    requires software.amazon.awssdk.core;
+
+    // Utils
+    requires io.jsonwebtoken.api;
+    requires com.github.benmanes.caffeine;
+    
+    exports org.episteme.server;
+    // Open for Spring reflection
+    opens org.episteme.server to spring.core, spring.beans, spring.context;
+}

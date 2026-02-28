@@ -1,0 +1,24 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+/**
+ * Episteme Client module providing client-side interfaces and distributed tasks.
+ */
+module org.episteme.client {
+    requires transitive org.episteme.core;
+    requires transitive org.episteme.natural;
+    requires transitive org.episteme.social;
+    
+    exports org.episteme.client.client;
+    exports org.episteme.client.client.biology;
+    exports org.episteme.client.client.chemistry;
+    exports org.episteme.client.client.distributed;
+    exports org.episteme.client.client.earth;
+    exports org.episteme.client.client.mathematics;
+    exports org.episteme.client.client.physics;
+    exports org.episteme.client.client.politics;
+    exports org.episteme.client.client.shared;
+    exports org.episteme.client.client.util;
+}

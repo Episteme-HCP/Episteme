@@ -1,4 +1,4 @@
-# JScience Grid - Docker Compose Configuration
+# Episteme Grid - Docker Compose Configuration
 # Spins up 1 Server + 5 Workers + Monitoring Stack (Prometheus/Grafana)
 
 version: "3.8"
@@ -7,9 +7,9 @@ services:
   # ===== Database (PostgreSQL) =====
   postgres:
     image: postgres:16
-    container_name: jscience-postgres
+    container_name: episteme-postgres
     environment:
-      POSTGRES_DB: jscience
+      POSTGRES_DB: episteme
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: SecureP@ssw0rd123!
     ports:
@@ -17,17 +17,17 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d jscience"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d episteme"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - jscience-grid
+      - episteme-grid
 
   # ===== Secrets Management (Vault) =====
   vault:
     image: hashicorp/vault:1.13
-    container_name: jscience-vault
+    container_name: episteme-vault
     ports:
       - "8200:8200"
     environment:
@@ -35,14 +35,14 @@ services:
     cap_add:
       - IPC_LOCK
     networks:
-      - jscience-grid
+      - episteme-grid
 
-  # ===== JScience Server =====
+  # ===== Episteme Server =====
   server:
     build:
       context: .
       dockerfile: docker/Dockerfile.server
-    container_name: jscience-server
+    container_name: episteme-server
     ports:
       - "50051:50051" # gRPC port
       - "8080:8080" # Metrics endpoint (future)
@@ -50,19 +50,19 @@ services:
       - DISCOVERY=true
       - PORT=50051
     networks:
-      - jscience-grid
+      - episteme-grid
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "50051"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # ===== JScience Workers (5 instances) =====
+  # ===== Episteme Workers (5 instances) =====
   worker-1:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    container_name: jscience-worker-1
+    container_name: episteme-worker-1
     depends_on:
       server:
         condition: service_healthy
@@ -70,13 +70,13 @@ services:
       - SERVER_HOST=server
       - SERVER_PORT=50051
     networks:
-      - jscience-grid
+      - episteme-grid
 
   worker-2:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    container_name: jscience-worker-2
+    container_name: episteme-worker-2
     depends_on:
       server:
         condition: service_healthy
@@ -84,13 +84,13 @@ services:
       - SERVER_HOST=server
       - SERVER_PORT=50051
     networks:
-      - jscience-grid
+      - episteme-grid
 
   worker-3:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    container_name: jscience-worker-3
+    container_name: episteme-worker-3
     depends_on:
       server:
         condition: service_healthy
@@ -98,13 +98,13 @@ services:
       - SERVER_HOST=server
       - SERVER_PORT=50051
     networks:
-      - jscience-grid
+      - episteme-grid
 
   worker-4:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    container_name: jscience-worker-4
+    container_name: episteme-worker-4
     depends_on:
       server:
         condition: service_healthy
@@ -112,13 +112,13 @@ services:
       - SERVER_HOST=server
       - SERVER_PORT=50051
     networks:
-      - jscience-grid
+      - episteme-grid
 
   worker-5:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    container_name: jscience-worker-5
+    container_name: episteme-worker-5
     depends_on:
       server:
         condition: service_healthy
@@ -126,12 +126,12 @@ services:
       - SERVER_HOST=server
       - SERVER_PORT=50051
     networks:
-      - jscience-grid
+      - episteme-grid
 
   # ===== Monitoring Stack =====
   prometheus:
     image: prom/prometheus:v2.47.0
-    container_name: jscience-prometheus
+    container_name: episteme-prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -141,25 +141,25 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
     networks:
-      - jscience-grid
+      - episteme-grid
 
   grafana:
     image: grafana/grafana:10.0.0
-    container_name: jscience-grafana
+    container_name: episteme-grafana
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=jscience
+      - GF_SECURITY_ADMIN_PASSWORD=episteme
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
-      - jscience-grid
+      - episteme-grid
 
 networks:
-  jscience-grid:
+  episteme-grid:
     driver: bridge
 
 volumes:

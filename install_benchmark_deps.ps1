@@ -1,11 +1,11 @@
-# JScience HPC - Benchmark Dependencies Installer (Windows)
+# Episteme HPC - Benchmark Dependencies Installer (Windows)
 # Focuses on BLAS/LAPACK and performance counters
 
 param(
     [string]$InstallDir = (Join-Path $PSScriptRoot "libs")
 )
 
-Write-Host "=== JScience HPC Benchmark Dependencies Installer (Windows) ===" -ForegroundColor Cyan
+Write-Host "=== Episteme HPC Benchmark Dependencies Installer (Windows) ===" -ForegroundColor Cyan
 
 if (!(Test-Path $InstallDir)) {
     New-Item -ItemType Directory -Path $InstallDir | Out-Null

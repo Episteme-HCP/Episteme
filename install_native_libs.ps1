@@ -1,4 +1,4 @@
-# JScience HPC - Native Libraries Auto-Installer
+# Episteme HPC - Native Libraries Auto-Installer
 # PowerShell script to download and install required native libraries
 # Usage: .\install_native_libs.ps1 [[-Libraries] <String[]>] [-InstallDir <String>]
 # Example: .\install_native_libs.ps1 -Libraries HDF5, OpenBLAS
@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptDir = $PSScriptRoot
 
-Write-Host "=== JScience HPC Native Libraries Installer ===" -ForegroundColor Cyan
+Write-Host "=== Episteme HPC Native Libraries Installer ===" -ForegroundColor Cyan
 Write-Host "Installation Directory: $InstallDir" -ForegroundColor Yellow
 Write-Host "Selected Libraries: $($Libraries -join ', ')" -ForegroundColor Yellow
 Write-Host "Script Directory: $ScriptDir" -ForegroundColor White

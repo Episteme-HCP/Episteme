@@ -1,0 +1,130 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Episteme Core module providing fundamental math and physics infrastructure.
+ */
+module org.episteme.core {
+    requires java.base;
+    requires transitive java.logging;
+    requires java.desktop;
+    requires java.naming;
+    requires java.sql;
+    requires java.management;
+    requires transitive java.xml;
+    requires java.compiler; // For FunctionCompiler
+    requires java.prefs;    // For ThemeManager
+    // requires static jdk.incubator.vector;
+
+    // Optional/External dependencies
+    requires static javafx.controls;
+    requires static javafx.graphics;
+    // requires static spark.core_2.13;
+    requires static com.fasterxml.jackson.databind;
+    requires static org.slf4j;
+    requires transitive java.measure;
+    requires transitive tech.units.indriya;
+    requires static colt;
+    requires static jblas;
+    requires static ejml.all;
+    requires static nd4j.api;
+    requires static jcuda;
+    requires static jcublas;
+    requires static jocl;
+    requires static uk.co.caprica.vlcj;
+    requires static minim;
+    requires static org.bytedeco.javacv;
+    requires static TarsosDSP.core;
+    requires static TarsosDSP.jvm;
+    requires static io.javalin;
+    requires static org.jfree.jfreechart;
+    requires static org.knowm.xchart;
+    requires static jzy3d.api;
+    requires static xercesImpl;
+
+    exports org.episteme.core;
+    exports org.episteme.core.mathematics;
+    exports org.episteme.core.mathematics.numbers;
+    exports org.episteme.core.mathematics.numbers.real;
+    exports org.episteme.core.mathematics.numbers.complex;
+    exports org.episteme.core.mathematics.geometry;
+    exports org.episteme.core.mathematics.geometry.volume;
+    exports org.episteme.core.mathematics.analysis;
+    exports org.episteme.core.mathematics.analysis.transform;
+    exports org.episteme.core.mathematics.analysis.ode;
+    exports org.episteme.core.mathematics.analysis.chaos;
+    exports org.episteme.core.mathematics.discrete;
+    exports org.episteme.core.mathematics.discrete.graph;
+    exports org.episteme.core.mathematics.topology;
+    exports org.episteme.core.mathematics.linearalgebra;
+    exports org.episteme.core.mathematics.linearalgebra.algorithms;
+    exports org.episteme.core.mathematics.linearalgebra.matrices;
+    exports org.episteme.core.mathematics.linearalgebra.matrices.solvers;
+    exports org.episteme.core.mathematics.linearalgebra.matrices.storage;
+    exports org.episteme.core.mathematics.linearalgebra.vectors;
+    exports org.episteme.core.mathematics.linearalgebra.vectors.storage;
+    exports org.episteme.core.mathematics.linearalgebra.backends;
+    exports org.episteme.core.mathematics.sets;
+    exports org.episteme.core.mathematics.structures;
+    exports org.episteme.core.mathematics.structures.rings;
+    exports org.episteme.core.mathematics.context;
+    exports org.episteme.core.mathematics.linearalgebra.tensors;
+    exports org.episteme.core.mathematics.linearalgebra.tensors.backends;
+    exports org.episteme.core.mathematics.loaders.mathml;
+    exports org.episteme.core.mathematics.loaders.mathml.beans;
+    exports org.w3c.dom.mathml;
+    exports org.episteme.core.measure;
+    exports org.episteme.core.measure.quantity;
+    exports org.episteme.core.measure.units;
+    exports org.episteme.core.measure.metrology;
+    exports org.episteme.core.measure.converters;
+    exports org.episteme.core.measure.adapters;
+    exports org.episteme.core.technical.backend;
+    exports org.episteme.core.technical.backend.algorithms;
+    exports org.episteme.core.technical.backend.gpu;
+    exports org.episteme.core.technical.backend.math;
+    exports org.episteme.core.technical.backend.physics;
+    exports org.episteme.core.technical.native_lib;
+    exports org.episteme.core.io;
+    exports org.episteme.core.io.properties;
+    exports org.episteme.core.io.cache;
+    exports org.episteme.core.methodology;
+    exports org.episteme.core.device;
+    exports org.episteme.core.device.sim;
+    exports org.episteme.core.distributed;
+    exports org.episteme.core.quantum;
+    exports org.episteme.core.ui;
+    exports org.episteme.core.ui.i18n;
+    exports org.episteme.core.ui.api;
+    exports org.episteme.core.ui.theme;
+    exports org.episteme.core.ui.demos;
+    exports org.episteme.core.ui.viewers.mathematics;
+    exports org.episteme.core.ui.viewers.mathematics.analysis.chaos;
+    exports org.episteme.core.ui.viewers.mathematics.analysis.plotting;
+    exports org.episteme.core.ui.viewers.mathematics.analysis.plotting.backends;
+
+    exports org.episteme.core.util;
+    exports org.episteme.core.util.identity;
+    exports org.episteme.core.util.persistence;
+}
+

@@ -1,7 +1,7 @@
-# JScience HPC - Native Libraries Verification Script
+# Episteme HPC - Native Libraries Verification Script
 # Checks environment variables, local paths, and path visibility
 
-Write-Host "=== JScience Native Library Verification ===" -ForegroundColor Cyan
+Write-Host "=== Episteme Native Library Verification ===" -ForegroundColor Cyan
 Write-Host ""
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path

@@ -1,0 +1,44 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+/**
+ * Episteme Natural Sciences module.
+ */
+module org.episteme.natural {
+    requires transitive org.episteme.core;
+    requires java.desktop;
+    requires java.xml;
+    requires jakarta.xml.bind;
+    requires com.fasterxml.jackson.databind;
+    requires static javafx.controls;
+    requires static javafx.graphics;
+    requires java.net.http;
+    requires org.slf4j;
+
+    exports org.episteme.natural;
+    exports org.episteme.natural.biology;
+    exports org.episteme.natural.biology.biochemistry;
+    exports org.episteme.natural.biology.cell;
+    exports org.episteme.natural.biology.ecology;
+    exports org.episteme.natural.biology.evolution;
+    exports org.episteme.natural.biology.genealogy;
+    exports org.episteme.natural.biology.genetics;
+    exports org.episteme.natural.biology.taxonomy;
+    exports org.episteme.natural.biology.loaders;
+    exports org.episteme.natural.chemistry;
+    exports org.episteme.natural.chemistry.electrochemistry;
+    exports org.episteme.natural.chemistry.thermochemistry;
+    exports org.episteme.natural.chemistry.loaders;
+    exports org.episteme.natural.earth.coordinates;
+    exports org.episteme.natural.physics;
+    exports org.episteme.natural.physics.astronomy;
+    exports org.episteme.natural.physics.loaders;
+    exports org.episteme.natural.computing;
+    exports org.episteme.natural.environment;
+    exports org.episteme.natural.medicine;
+    exports org.episteme.natural.engineering;
+    exports org.episteme.natural.device;
+
+}

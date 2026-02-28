@@ -5,7 +5,7 @@ variable "region" {
 
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket for data lake"
-  default     = "jscience-datalake-prod"
+  default     = "episteme-datalake-prod"
 }
 
 variable "db_password" {

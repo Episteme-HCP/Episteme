@@ -1,0 +1,30 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+/**
+ * Episteme Social module providing social sciences (Economics, Sociology, etc.) infrastructure.
+ */
+module org.episteme.social {
+    requires transitive org.episteme.core;
+    requires transitive org.episteme.natural;
+    
+    requires com.fasterxml.jackson.databind;
+    requires io.github.resilience4j.ratelimiter;
+
+    exports org.episteme.social.architecture;
+    exports org.episteme.social.arts;
+    exports org.episteme.social.economics;
+    exports org.episteme.social.geography;
+    exports org.episteme.social.history;
+    exports org.episteme.social.law;
+    exports org.episteme.social.linguistics;
+    exports org.episteme.social.medicine;
+    exports org.episteme.social.philosophy;
+    exports org.episteme.social.politics;
+    exports org.episteme.social.psychology;
+    exports org.episteme.social.sociology;
+    exports org.episteme.social.sports;
+    exports org.episteme.social.ui;
+}

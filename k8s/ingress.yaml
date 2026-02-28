@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jscience-ingress
-  namespace: jscience
+  name: episteme-ingress
+  namespace: episteme
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -11,32 +11,32 @@ metadata:
 spec:
   tls:
     - hosts:
-        - api.jscience.io
-        - dashboard.jscience.io
-        - grafana.jscience.io
-      secretName: jscience-tls
+        - api.episteme.io
+        - dashboard.episteme.io
+        - grafana.episteme.io
+      secretName: episteme-tls
   rules:
-    - host: api.jscience.io
+    - host: api.episteme.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: jscience-server
+                name: episteme-server
                 port:
                   number: 8080
-    - host: dashboard.jscience.io
+    - host: dashboard.episteme.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: jscience-dashboard
+                name: episteme-dashboard
                 port:
                   number: 3000
-    - host: grafana.jscience.io
+    - host: grafana.episteme.io
       http:
         paths:
           - path: /
@@ -50,12 +50,12 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: jscience-network-policy
-  namespace: jscience
+  name: episteme-network-policy
+  namespace: episteme
 spec:
   podSelector:
     matchLabels:
-      app: jscience-server
+      app: episteme-server
   policyTypes:
     - Ingress
     - Egress
@@ -63,7 +63,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app: jscience-worker
+              app: episteme-worker
         - podSelector:
             matchLabels:
               app: prometheus

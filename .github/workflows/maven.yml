@@ -1,4 +1,4 @@
-name: JScience CI
+name: Episteme CI
 
 on:
   push:
@@ -48,8 +48,8 @@ jobs:
       continue-on-error: true
       run: |
         java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED \
-        -cp "jscience-benchmarks/target/jscience-benchmarks-1.0.0-SNAPSHOT.jar:jscience-benchmarks/target/lib/*" \
-        org.jscience.benchmarks.cli.BenchmarkCLI --run-all --export-file benchmark-results.json
+        -cp "episteme-benchmarks/target/episteme-benchmarks-1.0.0-SNAPSHOT.jar:episteme-benchmarks/target/lib/*" \
+        org.episteme.benchmarks.cli.BenchmarkCLI --run-all --export-file benchmark-results.json
 
     - name: Upload Benchmark Results
       uses: actions/upload-artifact@v4

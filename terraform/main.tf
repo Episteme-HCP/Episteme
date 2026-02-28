@@ -5,7 +5,7 @@ provider "aws" {
 # VPC
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  name   = "jscience-vpc"
+  name   = "episteme-vpc"
   cidr   = "10.0.0.0/16"
 
   azs             = ["${var.region}a", "${var.region}b", "${var.region}c"]
@@ -18,7 +18,7 @@ module "vpc" {
 # EKS Cluster
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = "jscience-cluster"
+  cluster_name    = "episteme-cluster"
   cluster_version = "1.27"
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = module.vpc.private_subnets
@@ -40,15 +40,15 @@ module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 5.0"
 
-  identifier = "jscience-db"
+  identifier = "episteme-db"
 
   engine            = "postgres"
   engine_version    = "14"
   instance_class    = "db.t3.medium"
   allocated_storage = 20
 
-  db_name  = "jscience"
-  username = "jscience_admin"
+  db_name  = "episteme"
+  username = "episteme_admin"
   port     = 5432
 
   subnet_ids             = module.vpc.private_subnets
@@ -58,6 +58,6 @@ module "db" {
 }
 
 # S3 Bucket (for Large Data)
-resource "aws_s3_bucket" "jscience_data" {
+resource "aws_s3_bucket" "episteme_data" {
   bucket = var.s3_bucket_name
 }
