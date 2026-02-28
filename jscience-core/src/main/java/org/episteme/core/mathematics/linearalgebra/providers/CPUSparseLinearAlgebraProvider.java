@@ -1,0 +1,276 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+
+
+
+package org.episteme.core.mathematics.linearalgebra.providers;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.IntStream;
+
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import com.google.auto.service.AutoService;
+
+/**
+ * Linear Algebra Provider for Sparse Matrices (CPU).
+ * <p>
+ * Optimized for SparseMatrix implementations.
+ * Uses CSR-based algorithms that only process non-zero elements.
+ * </p>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+@AutoService({SparseLinearAlgebraProvider.class})
+public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
+
+    protected final Ring<E> ring;
+
+    public CPUSparseLinearAlgebraProvider(Ring<E> ring) {
+        this.ring = ring;
+    }
+
+    @Override
+    public String getName() {
+        return "Episteme CPU (Sparse)";
+    }
+
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     */
+    public CPUSparseLinearAlgebraProvider() {
+        this.ring = null;
+    }
+
+    private static final int PARALLEL_THRESHOLD = 500; // Lower threshold for sparse logic overhead
+
+    @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        if (a instanceof SparseMatrix && b instanceof SparseMatrix) {
+            return addSparse((SparseMatrix<E>) a, (SparseMatrix<E>) b);
+        }
+        return SparseLinearAlgebraProvider.super.add(a, b);
+    }
+
+    /**
+     * Efficient sparse matrix addition using CSR format.
+     */
+    @SuppressWarnings("unchecked")
+    private SparseMatrix<E> addSparse(SparseMatrix<E> a, SparseMatrix<E> b) {
+        if (a.rows() != b.rows() || a.cols() != b.cols()) {
+            throw new IllegalArgumentException(
+                    "Matrix dimensions must match: " + a.rows() + "x" + a.cols() +
+                            " vs " + b.rows() + "x" + b.cols());
+        }
+        
+        // Fix for NPE: Use ring from input matrix if this.ring is null (ServiceLoader instance)
+        Ring<E> r = (this.ring != null) ? this.ring : a.getField();
+
+        int rows = a.rows();
+        int cols = a.cols();
+
+        // Use TreeMap to store results sorted by column, for each row
+        List<TreeMap<Integer, E>> rowMaps = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            rowMaps.add(new TreeMap<>());
+        }
+
+        // Add elements from a (using CSR accessors)
+        Object[] aVals = a.getValues();
+        int[] aCols = a.getColIndices();
+        int[] aRowPtrs = a.getRowPointers();
+
+        // Add elements from b
+        Object[] bVals = b.getValues();
+        int[] bCols = b.getColIndices();
+        int[] bRowPtrs = b.getRowPointers();
+
+        // Build maps for each row
+        if (rows < PARALLEL_THRESHOLD) {
+            for (int row = 0; row < rows; row++) {
+                // Populate from A
+                for (int i = aRowPtrs[row]; i < aRowPtrs[row + 1]; i++) {
+                    rowMaps.get(row).put(aCols[i], (E) aVals[i]);
+                }
+                // Update from B
+                TreeMap<Integer, E> rowMap = rowMaps.get(row);
+                for (int i = bRowPtrs[row]; i < bRowPtrs[row + 1]; i++) {
+                    int col = bCols[i];
+                    E bVal = (E) bVals[i];
+                    E existing = rowMap.get(col);
+                    if (existing != null) {
+                        E sum = r.add(existing, bVal);
+                        if (!sum.equals(r.zero())) {
+                            rowMap.put(col, sum);
+                        } else {
+                            rowMap.remove(col);
+                        }
+                    } else {
+                        rowMap.put(col, bVal);
+                    }
+                }
+            }
+        } else {
+            // Parallel execution per row
+            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+            IntStream.range(0, rows).parallel().forEach(row -> {
+                ctx.checkCancelled();
+                // Populate from A
+                for (int i = aRowPtrs[row]; i < aRowPtrs[row + 1]; i++) {
+                    rowMaps.get(row).put(aCols[i], (E) aVals[i]);
+                }
+                // Update from B
+                TreeMap<Integer, E> rowMap = rowMaps.get(row);
+                for (int i = bRowPtrs[row]; i < bRowPtrs[row + 1]; i++) {
+                    int col = bCols[i];
+                    E bVal = (E) bVals[i];
+                    E existing = rowMap.get(col);
+                    
+                    if (existing != null) {
+                        E sum = r.add(existing, bVal);
+                        if (!sum.equals(r.zero())) {
+                            rowMap.put(col, sum);
+                        } else {
+                            rowMap.remove(col);
+                        }
+                    } else {
+                        rowMap.put(col, bVal);
+                    }
+                }
+            });
+        }
+
+        // Build CSR format result
+        return buildCSRFromMaps(rowMaps, rows, cols, r);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void computeRowMultiplication(int i, TreeMap<Integer, E> rowMap,
+            int[] aRowPtrs, int[] aCols, Object[] aVals,
+            int[] bRowPtrs, int[] bCols, Object[] bVals, Ring<E> r) {
+
+        for (int aIdx = aRowPtrs[i]; aIdx < aRowPtrs[i + 1]; aIdx++) {
+            int k = aCols[aIdx];
+            E aVal = (E) aVals[aIdx];
+
+            // Multiply A(i,k) by each non-zero in row k of B
+            for (int bIdx = bRowPtrs[k]; bIdx < bRowPtrs[k + 1]; bIdx++) {
+                int j = bCols[bIdx];
+                E bVal = (E) bVals[bIdx];
+                E product = r.multiply(aVal, bVal);
+
+                E existing = rowMap.get(j);
+                if (existing != null) {
+                    rowMap.put(j, r.add(existing, product));
+                } else {
+                    rowMap.put(j, product);
+                }
+            }
+        }
+
+        // Remove zeros
+        rowMap.entrySet().removeIf(e -> e.getValue().equals(r.zero()));
+    }
+
+    @Override
+    public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
+        if (a instanceof SparseMatrix && b instanceof SparseMatrix) {
+            return multiplySparse((SparseMatrix<E>) a, (SparseMatrix<E>) b);
+        }
+        return SparseLinearAlgebraProvider.super.multiply(a, b);
+    }
+
+    /**
+     * Efficient sparse matrix multiplication using CSR format.
+     */
+    private SparseMatrix<E> multiplySparse(SparseMatrix<E> a, SparseMatrix<E> b) {
+        if (a.cols() != b.rows()) {
+            throw new IllegalArgumentException(
+                    "Matrix dimensions incompatible for multiplication: " +
+                            a.rows() + "x" + a.cols() + " * " + b.rows() + "x" + b.cols());
+        }
+        
+        // Fix for NPE: Use ring from input matrix
+        Ring<E> r = (this.ring != null) ? this.ring : a.getField();
+
+        int resultRows = a.rows();
+        int resultCols = b.cols();
+
+        // Store results in TreeMaps for each row
+        List<TreeMap<Integer, E>> rowMaps = new ArrayList<>();
+        for (int i = 0; i < resultRows; i++) {
+            rowMaps.add(new TreeMap<>());
+        }
+
+        Object[] aVals = a.getValues();
+        int[] aCols = a.getColIndices();
+        int[] aRowPtrs = a.getRowPointers();
+
+        Object[] bVals = b.getValues();
+        int[] bCols = b.getColIndices();
+        int[] bRowPtrs = b.getRowPointers();
+
+        if (resultRows < PARALLEL_THRESHOLD) {
+            // Sequential
+            for (int i = 0; i < resultRows; i++) {
+                computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals, r);
+            }
+        } else {
+            // Parallel
+            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+            IntStream.range(0, resultRows).parallel().forEach(i -> {
+                ctx.checkCancelled();
+                computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals, r);
+            });
+        }
+
+        return buildCSRFromMaps(rowMaps, resultRows, resultCols, r);
+    }
+
+    /**
+     * Builds a SparseMatrix in CSR format from row maps.
+     */
+    private SparseMatrix<E> buildCSRFromMaps(List<TreeMap<Integer, E>> rowMaps, int rows, int cols, Ring<E> r) {
+        // Create storage
+        E zero = r.zero();
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(
+                rows, cols, zero);
+
+        // Populate directly
+        for (int row = 0; row < rows; row++) {
+            for (Map.Entry<Integer, E> entry : rowMaps.get(row).entrySet()) {
+                storage.set(row, entry.getKey(), entry.getValue());
+            }
+        }
+
+        return new SparseMatrix<E>(storage, r);
+    }
+}

@@ -1,12 +1,12 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.media.vision.providers;
+package org.episteme.nativ.media.vision.providers;
 
-import org.jscience.core.media.vision.ImageOp;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.media.vision.ImageOp;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -22,7 +22,7 @@ class NativeCPUVisionBackendTest {
 
     @Test
     void testProviderMetadata() {
-        org.jscience.nativ.vision.backends.NativeCPUVisionBackend provider = new org.jscience.nativ.vision.backends.NativeCPUVisionBackend();
+        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
         assertEquals("native-cpu-vision", provider.getId());
         assertEquals("vision", provider.getType());
         assertNotNull(provider.getDescription());
@@ -30,14 +30,14 @@ class NativeCPUVisionBackendTest {
 
     @Test
     void testIsAvailableDefaultsToFalse() {
-        // Since jscience_vision.dll is not present
-        org.jscience.nativ.vision.backends.NativeCPUVisionBackend provider = new org.jscience.nativ.vision.backends.NativeCPUVisionBackend();
+        // Since episteme_vision.dll is not present
+        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
         assertFalse(provider.isAvailable(), "Provider should not be available without native library");
     }
 
     @Test
     void testApplyDelegates() {
-        org.jscience.nativ.vision.backends.NativeCPUVisionBackend provider = new org.jscience.nativ.vision.backends.NativeCPUVisionBackend();
+        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         
         // Define a simple Java Op
@@ -49,7 +49,7 @@ class NativeCPUVisionBackendTest {
 
     @Test
     void testProcessNativeThrowsException() {
-        org.jscience.nativ.vision.backends.NativeCPUVisionBackend provider = new org.jscience.nativ.vision.backends.NativeCPUVisionBackend();
+        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         
         // Should throw because library is not loaded

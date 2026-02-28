@@ -1,27 +1,27 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.analysis.fft;
+package org.episteme.nativ.mathematics.analysis.fft;
 
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.analysis.fft.FFTProvider;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
-import org.jscience.nativ.mathematics.linearalgebra.backends.OpenCLExecutionContext;
+import org.episteme.core.mathematics.numbers.complex.Complex;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.analysis.fft.FFTProvider;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 
 import static org.jocl.CL.*;
 import org.jocl.*;
 
 import java.util.logging.Logger;
 
-import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ExecutionContext;
 import java.nio.DoubleBuffer;
 
 /**
@@ -103,8 +103,8 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend {
     }
 
     @Override
-    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
     @Override

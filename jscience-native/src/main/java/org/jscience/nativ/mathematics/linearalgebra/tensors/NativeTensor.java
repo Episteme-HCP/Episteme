@@ -1,11 +1,11 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.tensors;
+package org.episteme.nativ.mathematics.linearalgebra.tensors;
 
-import org.jscience.core.mathematics.linearalgebra.Tensor;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
 import java.lang.foreign.*;
 import java.util.Arrays;
 import java.util.function.Function;

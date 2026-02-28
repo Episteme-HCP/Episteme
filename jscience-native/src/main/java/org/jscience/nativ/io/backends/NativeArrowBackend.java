@@ -1,11 +1,11 @@
-package org.jscience.nativ.io.backends;
+package org.episteme.nativ.io.backends;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;
@@ -75,7 +75,7 @@ public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, Na
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }
 

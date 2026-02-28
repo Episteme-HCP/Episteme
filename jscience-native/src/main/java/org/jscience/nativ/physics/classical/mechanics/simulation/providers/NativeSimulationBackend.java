@@ -1,16 +1,16 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.physics.classical.mechanics.simulation.providers;
+package org.episteme.nativ.physics.classical.mechanics.simulation.providers;
 
-import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
+import org.episteme.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.Operation;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.Operation;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -67,7 +67,7 @@ public class NativeSimulationBackend implements SimulationProvider, CPUBackend, 
 
     @Override
     public String getNativeLibraryName() {
-        return "jscience_sim_native";
+        return "episteme_sim_native";
     }
 
     @Override

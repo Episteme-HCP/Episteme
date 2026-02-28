@@ -1,23 +1,23 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.physics.classical.mechanics.backends;
+package org.episteme.nativ.physics.classical.mechanics.backends;
 
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.natural.physics.classical.mechanics.CollisionProvider;
-import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
-import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
-import org.jscience.natural.physics.classical.mechanics.RigidBody;
-import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
-import org.jscience.core.measure.units.SI;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.natural.physics.classical.mechanics.CollisionProvider;
+import org.episteme.natural.physics.classical.mechanics.MechanicsBackend;
+import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.measure.units.SI;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.List;
@@ -25,10 +25,10 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
+import org.episteme.natural.physics.classical.mechanics.simulation.SimulationProvider;
 
 /**
- * Implementation of {@link org.jscience.natural.physics.classical.mechanics.CollisionProvider} using Bullet Physics via Project Panama.
+ * Implementation of {@link org.episteme.natural.physics.classical.mechanics.CollisionProvider} using Bullet Physics via Project Panama.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -146,7 +146,7 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }
 
@@ -233,7 +233,7 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
                 // Identity transform (column-major 4x4)
                 MemorySegment transform = bodyArena.allocate(ValueLayout.JAVA_FLOAT, 16);
                 for (int i = 0; i < 16; i++) transform.setAtIndex(ValueLayout.JAVA_FLOAT, i, (i % 5 == 0) ? 1.0f : 0.0f);
-                org.jscience.core.mathematics.linearalgebra.Vector<org.jscience.core.mathematics.numbers.real.Real> pos = body.getPosition();
+                org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> pos = body.getPosition();
                 if (pos != null && pos.dimension() >= 3) {
                     transform.setAtIndex(ValueLayout.JAVA_FLOAT, 12, (float) pos.get(0).doubleValue());
                     transform.setAtIndex(ValueLayout.JAVA_FLOAT, 13, (float) pos.get(1).doubleValue());
@@ -264,12 +264,12 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
         }
 
         @Override
-        public void stepSimulation(org.jscience.core.measure.Quantity<org.jscience.core.measure.quantity.Time> timeStep) {
-            stepSimulation(timeStep, 10, org.jscience.core.measure.Quantities.create(1.0/60.0, org.jscience.core.measure.units.SI.SECOND));
+        public void stepSimulation(org.episteme.core.measure.Quantity<org.episteme.core.measure.quantity.Time> timeStep) {
+            stepSimulation(timeStep, 10, org.episteme.core.measure.Quantities.create(1.0/60.0, org.episteme.core.measure.units.SI.SECOND));
         }
 
         @Override
-        public void stepSimulation(org.jscience.core.measure.Quantity<org.jscience.core.measure.quantity.Time> timeStep, int maxSubSteps, org.jscience.core.measure.Quantity<org.jscience.core.measure.quantity.Time> fixedTimeStep) {
+        public void stepSimulation(org.episteme.core.measure.Quantity<org.episteme.core.measure.quantity.Time> timeStep, int maxSubSteps, org.episteme.core.measure.Quantity<org.episteme.core.measure.quantity.Time> fixedTimeStep) {
             try {
                 BT_DYNAMICS_WORLD_STEP_SIMULATION.invokeExact(worldPtr, 
                     (float) timeStep.getValue(SI.SECOND).doubleValue(), 

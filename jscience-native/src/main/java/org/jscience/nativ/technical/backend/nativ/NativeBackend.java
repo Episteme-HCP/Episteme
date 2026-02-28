@@ -1,16 +1,16 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.nativ;
+package org.episteme.nativ.technical.backend.nativ;
 
 /**
  * Mixin interface for backends that load native libraries via JNI, Panama FFM,
  * or other native interop mechanisms.
  * <p>
  * This is a <b>capability interface</b>, not a position in the
- * {@link org.jscience.core.technical.backend.ComputeBackend} hierarchy.
+ * {@link org.episteme.core.technical.backend.ComputeBackend} hierarchy.
  * Any backend type (CPU, GPU, SIMD, etc.) can additionally implement
  * {@code NativeBackend} to indicate it relies on native code.
  * </p>

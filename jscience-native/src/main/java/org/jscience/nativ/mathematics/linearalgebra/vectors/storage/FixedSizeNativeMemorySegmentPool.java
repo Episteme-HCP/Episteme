@@ -1,9 +1,9 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.vectors.storage;
+package org.episteme.nativ.mathematics.linearalgebra.vectors.storage;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class FixedSizeNativeMemorySegmentPool implements org.jscience.nativ.util.MemorySegmentPool {
+public class FixedSizeNativeMemorySegmentPool implements org.episteme.nativ.util.MemorySegmentPool {
 
     private static final Logger LOGGER = Logger.getLogger(FixedSizeNativeMemorySegmentPool.class.getName());
     

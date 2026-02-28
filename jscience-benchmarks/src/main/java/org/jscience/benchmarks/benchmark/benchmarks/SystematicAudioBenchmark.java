@@ -1,9 +1,9 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.core.media.audio.AudioAlgorithmBackend;
-import org.jscience.core.media.audio.AudioOp;
+import org.episteme.core.media.audio.AudioAlgorithmBackend;
+import org.episteme.core.media.audio.AudioOp;
 
 /**
  * Benchmark for Audio Processing Providers (Tarsos, Native, etc.).

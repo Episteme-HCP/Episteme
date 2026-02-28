@@ -1,0 +1,188 @@
+/*
+ *        @(#)ScreenSizeCalculator.java 1.4 00/09/20 15:47:49
+ *
+ * Copyright (c) 1996-2000 Sun Microsystems, Inc. All Rights Reserved.
+ *
+ * Sun grants you ("Licensee") a non-exclusive, royalty free, license to use,
+ * modify and redistribute this software in source and binary code form,
+ * provided that i) this copyright notice and license appear on all copies of
+ * the software; and ii) Licensee does not utilize the software in a manner
+ * which is disparaging to Sun.
+ *
+ * This software is provided "AS IS," without a warranty of any kind. ALL
+ * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING ANY
+ * IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN AND ITS LICENSORS SHALL NOT BE
+ * LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING
+ * OR DISTRIBUTING THE SOFTWARE OR ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS
+ * LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT,
+ * INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER
+ * CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF THE USE OF
+ * OR INABILITY TO USE SOFTWARE, EVEN IF SUN HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES.
+ *
+ * This software is not designed or intended for use in on-line control of
+ * aircraft, air traffic, aircraft navigation or aircraft communications; or in
+ * the design, construction, operation or maintenance of any nuclear
+ * facility. Licensee represents and warrants that it will not use or
+ * redistribute the Software for such purposes.
+ */
+package org.episteme.medicine.volumetric;
+
+
+//repackaged after the code available at http://www.j3d.org/tutorials/quick_fix/volume.html
+//author: Doug Gehringer
+//email:Doug.Gehringer@sun.com
+import javax.media.j3d.Canvas3D;
+import javax.media.j3d.Node;
+
+import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
+
+
+/**
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.3 $
+ */
+public class ScreenSizeCalculator {
+    /** DOCUMENT ME! */
+    LocalToWindow locToWindow;
+
+    /** DOCUMENT ME! */
+    Point3d localPt;
+
+    /** DOCUMENT ME! */
+    Point2d[] windowPts;
+
+/**
+     * Creates a new ScreenSizeCalculator object.
+     */
+    public ScreenSizeCalculator() {
+        locToWindow = new LocalToWindow();
+        localPt = new Point3d();
+        windowPts = new Point2d[4];
+
+        for (int i = 0; i < 4; i++) {
+            windowPts[i] = new Point2d();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param canvas DOCUMENT ME!
+     * @param renderNode DOCUMENT ME!
+     */
+    public void setScreenXform(Canvas3D canvas, Node renderNode) {
+        locToWindow.update(renderNode, canvas);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param pt1 DOCUMENT ME!
+     * @param pt2 DOCUMENT ME!
+     * @param pt3 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    private double triArea(Point2d pt1, Point2d pt2, Point2d pt3) {
+        Point2d top;
+        Point2d mid;
+        Point2d bot;
+        double area;
+
+        /* sort the points to find top, mid and bot in y */
+        top = pt1;
+
+        if (pt2.y > top.y) {
+            top = pt2;
+        }
+
+        if (pt3.y > top.y) {
+            top = pt3;
+        }
+
+        bot = pt1;
+
+        if (pt2.y < bot.y) {
+            bot = pt2;
+        }
+
+        if (pt3.y < bot.y) {
+            bot = pt3;
+        }
+
+        mid = pt1;
+
+        if ((mid == top) || (mid == bot)) {
+            mid = pt2;
+
+            if ((mid == top) || (mid == bot)) {
+                mid = pt3;
+            }
+        }
+
+        /* now have a tri:
+        
+                top
+                | \
+                |  mid
+                |
+                |
+                bot
+        
+        (or a mirror image)
+        
+        intersect top-bot edge at y value of mid
+        
+        */
+        double deltaX = top.x - bot.x;
+        double deltaY = top.y - bot.y;
+
+        if (deltaY == 0.0) {
+            return 0.0;
+        }
+
+        double intersectX = bot.x + ((deltaX * (mid.y - bot.y)) / deltaY);
+
+        /* area is the sum of the area of the two tris */
+        area = Math.abs(0.5 * (intersectX - mid.x) * (mid.y - bot.y));
+        area += Math.abs(0.5 * (intersectX - mid.x) * (top.y - mid.y));
+
+        return area;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param coords DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    double quadScreenSize(double[] coords) {
+        double area = 0.0f;
+
+        //System.out.println("wc pts = \n\t(" +
+        //	coords[0] + ", " + coords[1] + ", " + coords[2] + ") (" +
+        //	coords[3] + ", " + coords[4] + ", " + coords[5] + ")\n\t(" +
+        //	coords[6] + ", " + coords[7] + ", " + coords[8] + ") (" +
+        //	coords[9] + ", " + coords[10] + ", " + coords[11] + ")");
+        for (int i = 0; i < 4; i++) {
+            localPt.x = coords[(i * 3) + 0];
+            localPt.y = coords[(i * 3) + 1];
+            localPt.z = coords[(i * 3) + 2];
+            locToWindow.transformPt(localPt, windowPts[i]);
+        }
+
+        //System.out.println("window pts = " + windowPts[0] + " " +
+        //	windowPts[1] + " " + windowPts[2] + " " +
+        //	windowPts[3]);
+        area += triArea(windowPts[0], windowPts[1], windowPts[2]);
+        area += triArea(windowPts[1], windowPts[2], windowPts[3]);
+
+        return area;
+    }
+}

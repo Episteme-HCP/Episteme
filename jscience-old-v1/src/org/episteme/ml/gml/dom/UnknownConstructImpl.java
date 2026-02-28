@@ -1,0 +1,230 @@
+/**
+ * Name               Date          Change --------------     ----------
+ * ---------------- amilanovic         4-Sep-2001    Fixed bug #430473 so now
+ * this GML construct is preserving the information about the ordering of its
+ * child elements. amilanovic         29-Mar-2002   Updated for the new
+ * package name.
+ */
+package org.episteme.ml.gml.dom;
+
+import org.episteme.ml.gml.infoset.*;
+import org.episteme.ml.gml.util.*;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.util.Vector;
+
+
+/**
+ * Represents a GML construct that isn't of any familiar kind such as
+ * geometry or feature. This is just a wrapper around a DOM element. Users may
+ * ignore objects of this type or use the underlying DOM element.
+ *
+ * @author Aleksandar Milanovic
+ * @version 1.0
+ */
+public class UnknownConstructImpl extends GMLConstructImpl
+    implements UnknownConstruct {
+/**
+     * Initializes this GML construct and all GML constructs directly owned by
+     * it.
+     *
+     * @param owner      The owner of this unknown construct.
+     * @param domElement The corresponding DOM element.
+     * @param document   DOCUMENT ME!
+     */
+    public UnknownConstructImpl(UnknownConstructOwner owner,
+        Element domElement, GMLDocument document) {
+        super(owner, domElement, document);
+    }
+
+    // UnknownConstruct interface implementation
+    /**
+     * Returns the underlying DOM element.
+     *
+     * @return DOCUMENT ME!
+     */
+    public Object convertToFamiliarForm() {
+        return getDOMElement();
+    }
+
+    // FeatureOwner interface implementation.
+    /**
+     * Provides access to features owned by this FeatureOwner.
+     *
+     * @return FeatureIterator that can be used for iterating on features.
+     */
+    public FeatureIterator getFeatureIterator() {
+        GMLConstructIterator gmlConstructIterator = getGMLConstructIterator();
+        Vector features = new Vector();
+
+        while (gmlConstructIterator.hasNext()) {
+            GMLConstruct gmlConstruct = (GMLConstruct) gmlConstructIterator.next();
+
+            if (gmlConstruct instanceof Feature) {
+                features.addElement(gmlConstruct);
+            }
+        }
+
+        FeatureIterator featureterator = new FeatureIteratorImpl(features.iterator());
+
+        return featureterator;
+    }
+
+    // GeometryOwner interface implementation.
+    /**
+     * Provides access to geometries owned by this GeometryOwner.
+     *
+     * @return GeometryIterator that can be used for iterating on geometries.
+     */
+    public GeometryIterator getGeometryIterator() {
+        GMLConstructIterator gmlConstructIterator = getGMLConstructIterator();
+        Vector geometries = new Vector();
+
+        while (gmlConstructIterator.hasNext()) {
+            GMLConstruct gmlConstruct = (GMLConstruct) gmlConstructIterator.next();
+
+            if (gmlConstruct instanceof Geometry) {
+                geometries.addElement(gmlConstruct);
+            }
+        }
+
+        GeometryIterator geometryIterator = new GeometryIteratorImpl(geometries.iterator());
+
+        return geometryIterator;
+    }
+
+    // PropertyOwner interface implementation
+    /**
+     * Returns an iterator to all properties of this feature.
+     *
+     * @return DOCUMENT ME!
+     */
+    public PropertyIterator getPropertyIterator() {
+        GMLConstructIterator gmlConstructIterator = getGMLConstructIterator();
+        Vector properties = new Vector();
+
+        while (gmlConstructIterator.hasNext()) {
+            GMLConstruct gmlConstruct = (GMLConstruct) gmlConstructIterator.next();
+
+            if (gmlConstruct instanceof Property) {
+                properties.addElement(gmlConstruct);
+            }
+        }
+
+        PropertyIterator propertyIterator = new PropertyIteratorImpl(properties.iterator());
+
+        return propertyIterator;
+    }
+
+    // UnknownConstructOwner interface implementation
+    /**
+     * Returns an iterator to all unknown constructs of this unknown
+     * construct.
+     *
+     * @return DOCUMENT ME!
+     */
+    public UnknownConstructIterator getUnknownConstructIterator() {
+        GMLConstructIterator gmlConstructIterator = getGMLConstructIterator();
+        Vector unknownConstructs = new Vector();
+
+        while (gmlConstructIterator.hasNext()) {
+            GMLConstruct gmlConstruct = (GMLConstruct) gmlConstructIterator.next();
+
+            if (gmlConstruct instanceof UnknownConstruct) {
+                unknownConstructs.addElement(gmlConstruct);
+            }
+        }
+
+        UnknownConstructIterator unknownConstructIterator = new UnknownConstructIteratorImpl(unknownConstructs.iterator());
+
+        return unknownConstructIterator;
+    }
+
+    // redefined methods
+    /**
+     * Returns a one-line string representation of this unknown
+     * construct.
+     *
+     * @return DOCUMENT ME!
+     */
+    public String toString() {
+        String result = "Unknown construct " +
+            getXMLDescriptor().getNamespace() + ':' +
+            getXMLDescriptor().getLocalName();
+        Node firstChild = getDOMElement().getFirstChild();
+
+        if (firstChild != null) {
+            result += ("=\"" + firstChild.getNodeValue() + "\"");
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected boolean hasProperties() {
+        return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected boolean hasCoords() {
+        return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected boolean hasCoordinates() {
+        return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected boolean hasGeometries() {
+        return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected boolean hasFeatures() {
+        return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected boolean hasUnknownConstructs() {
+        return true;
+    }
+
+    /**
+     * Refreshes the internal data cache from the DOM source tree. This
+     * method should be called each time the underlying DOM structure has
+     * changed.
+     */
+    protected void refreshInternals() {
+        // first refresh the general GML construct internals
+        super.refreshInternals();
+
+        // do nothing extra
+    }
+}

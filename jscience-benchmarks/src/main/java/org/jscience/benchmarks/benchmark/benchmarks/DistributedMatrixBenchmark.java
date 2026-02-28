@@ -1,10 +1,10 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,24 +26,24 @@
  * SOFTWARE.
  */
 
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.TiledMatrix;
-import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCannonAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedFoxAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.Distributed25DAlgorithm;
-import org.jscience.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.distributed.DistributedContext;
-import org.jscience.core.distributed.LocalDistributedContext;
-import org.jscience.core.ComputeContext;
-import org.jscience.core.technical.monitoring.DistributedMonitor;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
+import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
+import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedCannonAlgorithm;
+import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedFoxAlgorithm;
+import org.episteme.core.mathematics.linearalgebra.algorithms.Distributed25DAlgorithm;
+import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.technical.backend.distributed.DistributedContext;
+import org.episteme.core.distributed.LocalDistributedContext;
+import org.episteme.core.ComputeContext;
+import org.episteme.core.technical.monitoring.DistributedMonitor;
 
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
@@ -127,8 +127,8 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
         double[][] dataA = generateRandomData(size);
         double[][] dataB = generateRandomData(size);
 
-        A = Matrix.of(toReal(dataA), org.jscience.core.mathematics.sets.Reals.getInstance());
-        B = Matrix.of(toReal(dataB), org.jscience.core.mathematics.sets.Reals.getInstance());
+        A = Matrix.of(toReal(dataA), org.episteme.core.mathematics.sets.Reals.getInstance());
+        B = Matrix.of(toReal(dataB), org.episteme.core.mathematics.sets.Reals.getInstance());
 
         // Create tiled versions
         tiledA = new TiledMatrix(A, tileSize, tileSize);

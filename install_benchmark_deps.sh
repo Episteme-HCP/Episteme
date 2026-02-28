@@ -1,8 +1,8 @@
 #!/bin/bash
-# JScience HPC - Benchmark Dependencies Installer (Linux)
+# Episteme HPC - Benchmark Dependencies Installer (Linux)
 set -e
 
-echo "=== JScience HPC Benchmark Dependencies Installer (Linux) ==="
+echo "=== Episteme HPC Benchmark Dependencies Installer (Linux) ==="
 
 if [ "$EUID" -ne 0 ]; then 
     echo "Please run as root (use sudo)"

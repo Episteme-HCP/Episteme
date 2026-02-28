@@ -1,0 +1,84 @@
+package org.episteme.mathematics.analysis.ode;
+
+/**
+ * This class represents an interpolator over the last step during an ODE
+ * integration for the 5(4) Higham and Hall integrator.
+ *
+ * @author L. Maisonobe
+ * @version $Id: HighamHall54StepInterpolator.java,v 1.3 2007-10-23 18:19:19 virtualcall Exp $
+ *
+ * @see HighamHall54Integrator
+ */
+class HighamHall54StepInterpolator extends RungeKuttaStepInterpolator {
+/**
+     * Simple constructor. This constructor builds an instance that is not
+     * usable yet, the {@link #reinitialize} method should be called before
+     * using the instance in order to initialize the internal arrays. This
+     * constructor is used only in order to delay the initialization in some
+     * cases. The {@link RungeKuttaFehlbergIntegrator} uses the prototyping
+     * design pattern to create the step interpolators by cloning an
+     * uninitialized model and latter initializing the copy.
+     */
+    public HighamHall54StepInterpolator() {
+        super();
+    }
+
+/**
+     * Copy constructor.
+     *
+     * @param interpolator interpolator to copy from. The copy is a deep copy:
+     *                     its arrays are separated from the original arrays of the
+     *                     instance
+     */
+    public HighamHall54StepInterpolator(
+        HighamHall54StepInterpolator interpolator) {
+        super(interpolator);
+    }
+
+    /**
+     * Clone the instance. the copy is a deep copy: its arrays are
+     * separated from the original arrays of the instance
+     *
+     * @return a copy of the instance
+     */
+    public Object clone() {
+        return new HighamHall54StepInterpolator(this);
+    }
+
+    /**
+     * Compute the state at the interpolated time.
+     *
+     * @param theta normalized interpolation abscissa within the step (theta is
+     *        zero at the previous time step and one at the current time step)
+     * @param oneMinusThetaH time gap between the interpolated time and the
+     *        current time
+     *
+     * @throws DerivativeException this exception is propagated to the caller
+     *         if the underlying user function triggers one
+     */
+    protected void computeInterpolatedState(double theta, double oneMinusThetaH)
+        throws DerivativeException {
+        double theta2 = theta * theta;
+
+        double b0 = h * ((-1.0 / 12.0) +
+            (theta * (1.0 +
+            (theta * ((-15.0 / 4.0) +
+            (theta * ((16.0 / 3.0) + ((theta * -5.0) / 2.0))))))));
+        double b2 = h * ((-27.0 / 32.0) +
+            (theta2 * ((459.0 / 32.0) +
+            (theta * ((-243.0 / 8.0) + ((theta * 135.0) / 8.0))))));
+        double b3 = h * ((4.0 / 3.0) +
+            (theta2 * (-22.0 + (theta * ((152.0 / 3.0) + (theta * -30.0))))));
+        double b4 = h * ((-125.0 / 96.0) +
+            (theta2 * ((375.0 / 32.0) +
+            (theta * ((-625.0 / 24.0) + ((theta * 125.0) / 8.0))))));
+        double b5 = h * ((-5.0 / 48.0) +
+            (theta2 * ((-5.0 / 16.0) + ((theta * 5.0) / 12.0))));
+
+        for (int i = 0; i < interpolatedState.length; ++i) {
+            interpolatedState[i] = currentState[i] + (b0 * yDotK[0][i]) +
+                (b2 * yDotK[2][i]) + (b3 * yDotK[3][i]) + (b4 * yDotK[4][i]) +
+                (b5 * yDotK[5][i]);
+        }
+    }
+}

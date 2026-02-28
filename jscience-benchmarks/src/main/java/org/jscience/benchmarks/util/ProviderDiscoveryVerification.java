@@ -1,11 +1,11 @@
-package org.jscience.benchmarks.util;
+package org.episteme.benchmarks.util;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import java.util.ServiceLoader;
 
 public class ProviderDiscoveryVerification {
     public static void main(String[] args) {
-        System.out.println("=== JScience Algorithm Provider Discovery Verification ===");
+        System.out.println("=== Episteme Algorithm Provider Discovery Verification ===");
         ServiceLoader<AlgorithmProvider> loader = ServiceLoader.load(AlgorithmProvider.class);
         int count = 0;
         for (AlgorithmProvider p : loader) {

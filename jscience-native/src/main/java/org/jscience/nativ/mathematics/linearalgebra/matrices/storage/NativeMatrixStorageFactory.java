@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,11 +21,11 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
+package org.episteme.nativ.mathematics.linearalgebra.matrices.storage;
 
-import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
-import org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorageFactory;
-import org.jscience.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorageFactory;
+import org.episteme.core.mathematics.structures.rings.Ring;
 import com.google.auto.service.AutoService;
 
 /**
@@ -39,7 +39,7 @@ public class NativeMatrixStorageFactory implements MatrixStorageFactory {
     public <E> MatrixStorage<E> createDense(int rows, int cols, Ring<E> ring) {
         // NativeMatrix only supports Real (double)
         E zero = ring.zero();
-        if (zero instanceof org.jscience.core.mathematics.numbers.real.Real) {
+        if (zero instanceof org.episteme.core.mathematics.numbers.real.Real) {
             @SuppressWarnings("unchecked")
             MatrixStorage<E> storage = (MatrixStorage<E>) new NativeDoubleMatrixStorage(rows, cols);
             return storage;

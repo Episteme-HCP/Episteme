@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,11 +21,11 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.vectors.storage;
+package org.episteme.nativ.mathematics.linearalgebra.vectors.storage;
 
-import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
-import org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorageFactory;
-import org.jscience.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorageFactory;
+import org.episteme.core.mathematics.structures.rings.Ring;
 
 /**
  * Native implementation of VectorStorageFactory.
@@ -37,7 +37,7 @@ public class NativeVectorStorageFactory implements VectorStorageFactory {
     public <E> VectorStorage<E> createDense(int dimension, Ring<E> ring) {
         // NativeVector only supports Real (double)
         E zero = ring.zero();
-        if (zero instanceof org.jscience.core.mathematics.numbers.real.Real) {
+        if (zero instanceof org.episteme.core.mathematics.numbers.real.Real) {
             @SuppressWarnings("unchecked")
             VectorStorage<E> storage = (VectorStorage<E>) new NativeDoubleVectorStorage(dimension);
             return storage;

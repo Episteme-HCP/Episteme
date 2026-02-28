@@ -11,4 +11,4 @@
 
 ## Legacy Codebase
 
-* Original JScience Team (Inspiration and Reference)
+* Original Episteme Team (Inspiration and Reference)

@@ -1,7 +1,7 @@
-package org.jscience.benchmarks.verification;
+package org.episteme.benchmarks.verification;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.core.technical.backend.Backend;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.technical.backend.Backend;
 import java.util.ServiceLoader;
 
 /**

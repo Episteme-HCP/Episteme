@@ -1,0 +1,34 @@
+package org.episteme.physics.relativity;
+
+import org.episteme.mathematics.algebraic.matrices.DoubleVector;
+
+
+/**
+ * The EMFieldTensor class encapsulates the electromagnetic field tensor.
+ *
+ * @author Mark Hale
+ * @version 1.0
+ */
+public final class EMFieldTensor extends Rank2Tensor {
+/**
+     * Constructs an electromagnetic field tensor.
+     *
+     * @param E electric field
+     * @param B magnetic field
+     */
+    public EMFieldTensor(DoubleVector E, DoubleVector B) {
+        rank2[0][0] = rank2[1][1] = rank2[2][2] = rank2[3][3] = 0.0;
+        rank2[1][0] = E.getPrimitiveElement(0);
+        rank2[2][0] = E.getPrimitiveElement(1);
+        rank2[3][0] = E.getPrimitiveElement(2);
+        rank2[3][2] = B.getPrimitiveElement(0);
+        rank2[1][3] = B.getPrimitiveElement(1);
+        rank2[2][1] = B.getPrimitiveElement(2);
+        rank2[0][1] = -rank2[1][0];
+        rank2[0][2] = -rank2[2][0];
+        rank2[0][3] = -rank2[3][0];
+        rank2[2][3] = -rank2[3][2];
+        rank2[3][1] = -rank2[1][3];
+        rank2[1][2] = -rank2[2][1];
+    }
+}

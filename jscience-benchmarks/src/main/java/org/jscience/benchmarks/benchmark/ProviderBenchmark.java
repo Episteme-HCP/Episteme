@@ -1,6 +1,6 @@
-package org.jscience.benchmarks.benchmark;
+package org.episteme.benchmarks.benchmark;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * A benchmark that is tied to a specific AlgorithmProvider.

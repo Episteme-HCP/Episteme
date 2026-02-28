@@ -1,19 +1,19 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.physics.nbody.backends;
+package org.episteme.nativ.physics.nbody.backends;
 
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.natural.physics.classical.mechanics.nbody.NBodyProvider;
-import org.jscience.core.technical.algorithm.OperationContext;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.natural.physics.classical.mechanics.nbody.NBodyProvider;
+import org.episteme.core.technical.algorithm.OperationContext;
 import com.google.auto.service.AutoService;
 import jcuda.driver.JCudaDriver;
 
-import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.Backend;
 import java.nio.DoubleBuffer;
 
 /**
@@ -42,12 +42,12 @@ public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend {
     }
 
     @Override
-    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null; // Implemented via JCuda internal context management
     }
 

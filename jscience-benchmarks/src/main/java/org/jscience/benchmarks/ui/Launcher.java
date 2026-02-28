@@ -1,7 +1,7 @@
-package org.jscience.benchmarks.ui;
+package org.episteme.benchmarks.ui;
 
 public class Launcher {
     public static void main(String[] args) {
-        JScienceBenchmarkingApp.main(args);
+        EpistemeBenchmarkingApp.main(args);
     }
 }

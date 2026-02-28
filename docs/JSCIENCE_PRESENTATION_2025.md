@@ -1,4 +1,4 @@
-# JScience – Modern Scientific API (2025)
+# Episteme – Modern Scientific API (2025)
 
 **Silvère Martin-Michiellot**  
 Senior Computer Programmer  
@@ -8,43 +8,43 @@ Senior Computer Programmer
 
 ## Abstract
 
-This paper describes **JScience**, a comprehensive general science API written in Java. Unlike traditional scientific libraries that focus solely on numerical recipes, JScience provides a semantic framework for modeling scientific concepts—from Quantum Mechanics to Sociology. Our goal is to cover the full spectrum of scientific knowledge, distributed freely under open-source licenses. In this 2025 edition, we present the revitalized architecture, featuring arbitrary-precision arithmetic, hardware acceleration, and a unified domain model.
+This paper describes **Episteme**, a comprehensive general science API written in Java. Unlike traditional scientific libraries that focus solely on numerical recipes, Episteme provides a semantic framework for modeling scientific concepts—from Quantum Mechanics to Sociology. Our goal is to cover the full spectrum of scientific knowledge, distributed freely under open-source licenses. In this 2025 edition, we present the revitalized architecture, featuring arbitrary-precision arithmetic, hardware acceleration, and a unified domain model.
 
 ## Introduction
 
-Scientific computing has historically been dominated by Fortran and C++. However, Java's evolution—offering rigorous type safety, object-oriented design, and now competitive performance via Just-In-Time (JIT) compilation and foreign memory access—makes it an ideal platform for complex scientific systems. JScience leverages these capabilities to prioritize **correctness** and **maintainability** without sacrificing performance.
+Scientific computing has historically been dominated by Fortran and C++. However, Java's evolution—offering rigorous type safety, object-oriented design, and now competitive performance via Just-In-Time (JIT) compilation and foreign memory access—makes it an ideal platform for complex scientific systems. Episteme leverages these capabilities to prioritize **correctness** and **maintainability** without sacrificing performance.
 
 ## Architecture Overview
 
-The JScience project (2025) is organized into three primary modules:
+The Episteme project (2025) is organized into three primary modules:
 
-1. **`jscience-core`**: The mathematical engine.
-    * **Arbitrary Precision**: Built on `org.jscience.mathematics.numbers.real.Real`, enabling calculations where precision is limited only by memory, not hardware floating-point constraints.
+1. **`episteme-core`**: The mathematical engine.
+    * **Arbitrary Precision**: Built on `org.episteme.mathematics.numbers.real.Real`, enabling calculations where precision is limited only by memory, not hardware floating-point constraints.
     * **Linear Algebra**: Generic Matrix and Vector implementations supporting field-agnostic operations.
     * **Hardware Acceleration**: Service-provider interfaces (`CPUDenseLinearAlgebraProvider`, `CUDADenseLinearAlgebraProvider`) allow offloading heavy computations to GPUs seamlessly.
     * **Structure**: Categories, Groups, Rings, Fields vector spaces.
 
-2. **`jscience-natural`**: The domain application layer.
+2. **`episteme-natural`**: The domain application layer.
     * **Physics**: Classical Mechanics, Relativity, Quantum Physics, Thermodynamics.
     * **Chemistry**: Periodic Table, Molecular Dynamics, Stoichiometry.
     * **Biology**: DNA/RNA sequencing, Codon mapping.
     * **Sociology/Economics**: Emerging modules for soft science modeling.
 
-3. **`jscience-benchmarks`**: A standardized suite to measure performance against naive implementations and other libraries.
+3. **`episteme-benchmarks`**: A standardized suite to measure performance against naive implementations and other libraries.
 
 ## The Semantic Difference
 
-Most scientific libraries are collections of functions (e.g., `fft(double[] data)`). JScience is a collection of **concepts**.
+Most scientific libraries are collections of functions (e.g., `fft(double[] data)`). Episteme is a collection of **concepts**.
 
 * **Type Safety**: You cannot accidentally add `Mass` to `Length`. The `Quantity<T>` system ensures dimensional consistency at compile time.
 * **Arbitrary Precision**: While legacy parts of the system still utilize primitive `double` for performance trade-offs, the core architecture is moving towards ubiquitous `Real` usage, allowing users to define the required precision context dynamically.
-* **Object-Oriented**: A `Particle` in JScience isn't just a position vector; it's an entity with Mass, Charge, Spin, and interactions defined by interfaces like `Relativistic` or `QuantumMechanical`.
+* **Object-Oriented**: A `Particle` in Episteme isn't just a position vector; it's an entity with Mass, Charge, Spin, and interactions defined by interfaces like `Relativistic` or `QuantumMechanical`.
 
 ## Key Features
 
 ### 1. High-Performance Linear Algebra across Platforms
 
-JScience automatically detects available acceleration hardware. For small matrices, it uses optimized CPU algorithms. For large simulations (like N-Body problems), it can dispatch operations to CUDA-enabled GPUs, transparent to the user.
+Episteme automatically detects available acceleration hardware. For small matrices, it uses optimized CPU algorithms. For large simulations (like N-Body problems), it can dispatch operations to CUDA-enabled GPUs, transparent to the user.
 
 ### 2. Signal Processing
 
@@ -52,7 +52,7 @@ The unified `SignalProcessing` framework provides Fast Fourier Transforms (FFT),
 
 ### 3. Data Externalization
 
-Hardcoded scientific constants are a thing of the past. JScience loads data (Isotopes, Planets, Codon Tables) from external JSON resources, making the library extensible without recompilation.
+Hardcoded scientific constants are a thing of the past. Episteme loads data (Isotopes, Planets, Codon Tables) from external JSON resources, making the library extensible without recompilation.
 
 ## Weaknesses & Roadmap
 
@@ -64,11 +64,11 @@ While powerful, the current version (2025) acknowledges certain limitations:
 
 ## Conclusion
 
-JScience represents the modern approach to scientific software: Strongly typed, semantically rich, and hardware-aware. It bridges the gap between theoretical correctness and computational efficiency, providing a robust foundation for the next generation of scientific applications.
+Episteme represents the modern approach to scientific software: Strongly typed, semantically rich, and hardware-aware. It bridges the gap between theoretical correctness and computational efficiency, providing a robust foundation for the next generation of scientific applications.
 
 ## References
 
-* Martin-Michiellot, S. (2025). *JScience Refactoring Roadmap*.
+* Martin-Michiellot, S. (2025). *Episteme Refactoring Roadmap*.
 * Dautelle, J.M. (2006). *Javolution: Real-Time Java Library*.
 * Open Source Contributors (2000-2025).
 
@@ -79,10 +79,10 @@ Senior computer programmer
 Keywords
 Numerical computing, scientific computing, Java, science library, framework.
 Abstract
-This paper describes JScience, a general science API (Application Programmer Interface) written in
+This paper describes Episteme, a general science API (Application Programmer Interface) written in
 Java. This API comes in two flavors: one main distribution and another experimental one. Our aim
 was to cover all knowledge (but database content) up to bachelor graduation level or higher and
-distribute it for free under GPL license. JScience is the first API ever to do so.
+distribute it for free under GPL license. Episteme is the first API ever to do so.
 In this paper, I argue that Java offers a different environment from previous languages (C, C++,
 Fortran) which allows to write a better science API (speed, portability, code quality, features,
 reusability, extensibility). We hope that this API will define a model for future scientific computing
@@ -91,13 +91,13 @@ Introduction
 
 ## Architecture Overview
 
-The JScience project is organized into several core packages:
+The Episteme project is organized into several core packages:
 
-* `org.jscience.mathematics` – mathematical foundations, sequences, series, dynamical systems.
-* `org.jscience.physics` – physical models, including the new `electricity` sub‑package.
-* `org.jscience.physics.electricity` – circuit components such as Resistor, Capacitor, Inductor, VoltageSource, CurrentSource, SimpleCircuit, SeriesCircuit, ParallelCircuit.
-* `org.jscience.mathematics.logic.connector` (renamed to `connectors`) – interfaces for proof import/export (Coq, Qedeq, Metamath).
-* `org.jscience.backend` – technical backend utilities (moved to `org.jscience.technicals.backend`).
+* `org.episteme.mathematics` – mathematical foundations, sequences, series, dynamical systems.
+* `org.episteme.physics` – physical models, including the new `electricity` sub‑package.
+* `org.episteme.physics.electricity` – circuit components such as Resistor, Capacitor, Inductor, VoltageSource, CurrentSource, SimpleCircuit, SeriesCircuit, ParallelCircuit.
+* `org.episteme.mathematics.logic.connector` (renamed to `connectors`) – interfaces for proof import/export (Coq, Qedeq, Metamath).
+* `org.episteme.backend` – technical backend utilities (moved to `org.episteme.technicals.backend`).
 
 These packages provide a modular, extensible foundation for scientific computing in Java.
 There is a lot of scientific software available for free on the Internet. Yet, actually, there is two
@@ -106,7 +106,7 @@ almost exclusively mathematics. Some of them cover also some hard sciences (phys
 and biology) but there is very few code in soft sciences. Then, most science packages focus
 numerical computation, not science software development. What we have is commercial software
 that helps solve numerical problems but is of no use if we want to make standalone applications.
-JScience effort has been made into existence as two separate API. The official distribution, which is
+Episteme effort has been made into existence as two separate API. The official distribution, which is
 small, written in Java 1.5 (generics, boxing...) is targeted towards core mathematics and unit
 systems makes a nice introduction to the scientific computing world. Its description is already
 covered in a separate communication. The other distribution is experimental, it has a much wider
@@ -122,8 +122,8 @@ you much less to develop and maintain. So, you can actually use the same money t
 machines. Moreover, because accuracy is a critical component in scientific computing you are
 taking much less risks using Java that stack overflow or other kind of hard to trace errors ever
 appear.
-History of JScience
-JScience started from a couple of unrelated projects. Mark Hale had developed Jsci from 1999 and
+History of Episteme
+Episteme started from a couple of unrelated projects. Mark Hale had developed Jsci from 1999 and
 ongoing. His focus was on mathematics and physics. Jean-Marie Dautelle had been working on
 JADE (Java Additions to Default Environment) from 2000 targeting unit systems and mathematics.
 I was, on my side, working with Digital Biosphere, a 3D virtual environment struggling with
@@ -135,16 +135,16 @@ The problem we faced is however not new. Many open source developers start build
 from scratch reusing few code from others, wasting time and energy because they are not able to
 find a good code base accepted fully by the community.
 There is therefore a lot of unfinished scientific projects available over the Internet. One of the key
-ideas of JScience was to reuse this effort and adapt code from others to the new architecture rather
+ideas of Episteme was to reuse this effort and adapt code from others to the new architecture rather
 than rewrite everything.
-JScience, the concept
-JScience aims to be a general science API in Java. We want to cover all knowledge (but databases
+Episteme, the concept
+Episteme aims to be a general science API in Java. We want to cover all knowledge (but databases
 contents that you will have to get elsewhere) up to graduation level or better. We also want it to be
 cost free and open source (delivered under GPL) because we want people to be able to use it the
-way they need it. Finally, we want JScience as a framework, that is, a conceptually sound set of
+way they need it. Finally, we want Episteme as a framework, that is, a conceptually sound set of
 tools that work together to provide something efficient.
 We target researchers mostly but we hope to gain some interest from corporate projects. We, at
-JScience, are ourselves a bunch of engineers and researchers, mostly computer enthusiasts with
+Episteme, are ourselves a bunch of engineers and researchers, mostly computer enthusiasts with
 common passion for science.
 Our approach is to use Java 1.5, think of objects as first rank citizens (and use less utility classes),
 use XML support as much as possible and implement international and acclaimed standards
@@ -166,20 +166,20 @@ geography, history, law, linguistics, mathematics, medicine, physics, philosophy
 psychology and social sciences.
 In fact, the only not covered by the experimental distribution is education. The reason is that there
 are many competing distance education frameworks around that would overlap and do a better job
-that JScience.
+that Episteme.
 Benefits
-The first benefit of using JScience is that it cuts down development costs dramatically. Not only
-developers have a very wide API to build their code upon, but JScience provides fast algorithms
+The first benefit of using Episteme is that it cuts down development costs dramatically. Not only
+developers have a very wide API to build their code upon, but Episteme provides fast algorithms
 that normal developers would have trouble to design and debug should they do so. The reason is
 that scientific computing is hard and code is made by field experts. Though it is completely
 unsound, many developers start their development from scratch and try to redesign these highly
 technical algorithms.
-Moreover, should you find a bug in JScience, or would like a new feature, we develop it for free
+Moreover, should you find a bug in Episteme, or would like a new feature, we develop it for free
 and include it in the next release making sure that we have the most efficient algorithm.
 On the opposite, you can ask that some new scientific module you have developed is added to
-JScience architecture. This means that your code can be part of the library and that you will only
+Episteme architecture. This means that your code can be part of the library and that you will only
 have to focus on your real application code in the future.
-Of course, when you use JScience you have all the standard advantages of using Java software:
+Of course, when you use Episteme you have all the standard advantages of using Java software:
 portability, object oriented code, memory management, error propagation, internationalization,
 embedded XML support and auto generated documentation (a must see feature for a scientific API).
 This language helps to design elegant code (code quality) that is both easy to maintain and opens
@@ -195,49 +195,49 @@ data files.
 library would be too big in Fortran without object oriented support (aside Fortran 2003) and useless in C++ because
 it lacks a proper documentation tool. Doxygen can help to provide such a documentation but it is not a standard tool
 of C++ and generated documentation would therefore be not of much help to the users of this science library.
-3 The JScience library is based on the real time Java library Javolution, which is designed by one of the JScience
+3 The Episteme library is based on the real time Java library Javolution, which is designed by one of the Episteme
 founders (Jean-Marie Dautelle).
 code that comes from the Java Runtime Environment (the official implementation of the Java
 language from Sun Microsystems).
 The idea to build a wide science library makes sense because we hope that this library will be
 someday (or at least parts of it) included in the core Java language distribution. As a matter of fact,
-the unit system used in JScience is now formally developed as JSR 275 (so called Units
+the unit system used in Episteme is now formally developed as JSR 275 (so called Units
 specification), the official Java Community Process (JCP) from Sun Microsystems for future
 extensions of the Java language API.
-The people at JScience think that scientific computation should be a service available at OS level
-along with I/O, GUI or networking API. This is also why JScience tries to stick to all existing
+The people at Episteme think that scientific computation should be a service available at OS level
+along with I/O, GUI or networking API. This is also why Episteme tries to stick to all existing
 standards rather than define new ones. Especially, we try to support XML oriented data.
-JScience tries to provide a model close to theoretical science concepts rather than just provide a
+Episteme tries to provide a model close to theoretical science concepts rather than just provide a
 numerical wrap up without correct foundations. As such, it supports infinite precision computation.
-Finally, there is something very interesting happening with JScience. Because we have coded the
+Finally, there is something very interesting happening with Episteme. Because we have coded the
 underlying concepts of most sciences, each time we now add a new module, less and less code has
 to be produced because we reuse much code from the other modules.
 For example, the
-• org.jscience.sociology.Person class extends
-• org.jscience.biology.human.Human which itself extends
-• org.jscience.biology.HistoricalIndividual (an organism with some chronological data) which
+• org.episteme.sociology.Person class extends
+• org.episteme.biology.human.Human which itself extends
+• org.episteme.biology.HistoricalIndividual (an organism with some chronological data) which
 itself extends
-• org.jscience.biology.Individual, itself basically a
-• java.util.Set (or org.jscience.mathematics.FiniteSet) of org.jscience.biology.Organs, itself a
-• java.util.Set of org.jscience.biology.Tissues, itself a
-• java.util.Set of org.jscience.biology.Cells which contain
-• org.jscience.biology.DNA or org.jscience.biology.RNA stored in
-• org.jscience.biology.Genome as org.jscience.biology.Chains4.
+• org.episteme.biology.Individual, itself basically a
+• java.util.Set (or org.episteme.mathematics.FiniteSet) of org.episteme.biology.Organs, itself a
+• java.util.Set of org.episteme.biology.Tissues, itself a
+• java.util.Set of org.episteme.biology.Cells which contain
+• org.episteme.biology.DNA or org.episteme.biology.RNA stored in
+• org.episteme.biology.Genome as org.episteme.biology.Chains4.
 Many other classes are used in the same way. This is very efficient because if you now need to
 access the DNA of the Person, you can get it without the need for a further line of code, because of
-Java object oriented features and JScience wide scientific spectrum approach.
-For our team, it seems that JScience fills a gap in scientific software. If you only need a couple
-Matrix operations to support some computation in you application, JScience is probably not a good
+Java object oriented features and Episteme wide scientific spectrum approach.
+For our team, it seems that Episteme fills a gap in scientific software. If you only need a couple
+Matrix operations to support some computation in you application, Episteme is probably not a good
 choice. On the opposite, if you need to use some units of measure, to display graphs, to access some
 standard data, to open some standard file formats and to have ready to use high level science
-targeted objects, JScience is a must see.
-The future of JScience
+targeted objects, Episteme is a must see.
+The future of Episteme
 We hope that in the near future we will get a wider interest from the community. We really look
 forward more support and recognition from other scientific computing people, especially the ones
 4 Amusingly, these are in turn available as
-• org.jscience.chemistry.Molecules made up of
-• org.jscience.chemistry.Atoms treated as
-• org.jscience.physics.Particles.
+• org.episteme.chemistry.Molecules made up of
+• org.episteme.chemistry.Atoms treated as
+• org.episteme.physics.Particles.
 that have used traditional languages since then.
 We also expect to grow in audience outside academic or big business companies.
 We plan to enhance the API with some more packages. Yet our main effort will be to provide
@@ -257,10 +257,10 @@ more suited to describe some scientific domains than traditional programming lan
 ● Models for social sciences: social sciences are only at the beginning, much improvement can
 be done by defining core concepts like it is done in physics, biology and chemistry.
 Conclusion
-JScience has made a reputation of its own in the small but growing world of scientific computing. It
+Episteme has made a reputation of its own in the small but growing world of scientific computing. It
 is regarded as quality software in the Java and some of its code is used as a base for the JSR 275
 official Java language extension for Unit specification.
-JScience is the starting point of a new generation of scientific API that makes use of object oriented
+Episteme is the starting point of a new generation of scientific API that makes use of object oriented
 features as well as garbage collection, just in time compilation and error management (thanks to
 Java). It is completely open source, fast, accurate and available now.
 References
@@ -283,9 +283,9 @@ Cambridge. Available at <http://research.microsoft.com/towards2020science/downlo
 Java Numerics <http://math.nist.gov/javanumerics>
 Java Programming Language Official Website <http://java.sun.com>
 Javolution Frontend Website <http://www.javolution.org>
-JScience Frontend Website <http://www.jscience.org>
-JScience Official Backend Website <https://jscience.dev.java.net>
-JScience Experimental Backend Website <https://jade.dev.java.net>
+Episteme Frontend Website <http://www.episteme.org>
+Episteme Official Backend Website <https://episteme.dev.java.net>
+Episteme Experimental Backend Website <https://jade.dev.java.net>
 Hale, D. (2006). The Java and C++ platforms for scientific computing. In 2006 Project Review,
 CWP-548. Available at
 <http://www.mines.edu/~dhale/papers/Hale06JavaAndCppPlatformsForScientificComputing.pdf>

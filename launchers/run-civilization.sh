@@ -1,9 +1,28 @@
 #!/bin/bash
+
+# VLC and Native Libs Setup
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LIBS_DIR="$SCRIPT_DIR/libs"
+if [ ! -d "$LIBS_DIR" ]; then LIBS_DIR="$SCRIPT_DIR/../libs"; fi
+if [ -d "$LIBS_DIR" ]; then
+    echo "[INFO] Adding libs/ to library path..."
+    export LD_LIBRARY_PATH="$LIBS_DIR:$LD_LIBRARY_PATH"
+    export DYLD_LIBRARY_PATH="$LIBS_DIR:$DYLD_LIBRARY_PATH"
+fi
+if [ -d "/usr/lib/vlc" ]; then
+    export LD_LIBRARY_PATH="/usr/lib/vlc:$LD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/usr/lib/vlc/plugins"
+fi
+if [ -d "/Applications/VLC.app/Contents/MacOS/lib" ]; then
+    export DYLD_LIBRARY_PATH="/Applications/VLC.app/Contents/MacOS/lib:$DYLD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/Applications/VLC.app/Contents/MacOS/plugins"
+fi
+
 cd "$(dirname "$0")/.."
-APP_CLASS=org.jscience.apps.apps.social.CivilizationApp
+APP_CLASS=org.episteme.apps.apps.social.CivilizationApp
 LIB_DIR=launchers/libs/libs
 MODULES_DIR=launchers/libs
-MODULE_PATH="${MODULES_DIR}/jscience-featured-apps-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/jscience-core-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/jscience-natural-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/jscience-social-1.0.0-SNAPSHOT.jar"
+MODULE_PATH="${MODULES_DIR}/episteme-featured-apps-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/episteme-core-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/episteme-natural-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/episteme-social-1.0.0-SNAPSHOT.jar"
 
 echo "Starting Civilization Collapse Model..."
 java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "$(dirname "$0")/libs/javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "${MODULE_PATH}:${LIB_DIR}/*" ${APP_CLASS} "$@"

@@ -1,29 +1,29 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import java.util.Optional;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.mathematics.context.MathContext;
-import org.jscience.core.technical.algorithm.AutoTuningManager;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.sets.Reals;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.technical.algorithm.AutoTuningManager;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 /**
@@ -262,12 +262,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     }
 
     @Override
-    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }
 }

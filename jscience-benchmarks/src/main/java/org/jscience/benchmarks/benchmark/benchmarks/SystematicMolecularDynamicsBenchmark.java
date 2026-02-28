@@ -1,8 +1,8 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.natural.physics.classical.matter.molecular.MolecularDynamicsProvider;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider;
 
 import java.util.ServiceLoader;
 

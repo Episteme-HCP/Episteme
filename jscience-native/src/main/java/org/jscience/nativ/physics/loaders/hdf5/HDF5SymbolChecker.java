@@ -1,4 +1,4 @@
-package org.jscience.nativ.physics.loaders.hdf5;
+package org.episteme.nativ.physics.loaders.hdf5;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.SymbolLookup;

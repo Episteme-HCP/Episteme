@@ -1,11 +1,30 @@
 #!/bin/bash
-# Start the JScience Demos App (Client)
-echo "Starting JScience Client..."
 
-if [ ! -f "jscience-core/target/jscience-core-1.0.0-SNAPSHOT.jar" ]; then
+# VLC and Native Libs Setup
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LIBS_DIR="$SCRIPT_DIR/libs"
+if [ ! -d "$LIBS_DIR" ]; then LIBS_DIR="$SCRIPT_DIR/../libs"; fi
+if [ -d "$LIBS_DIR" ]; then
+    echo "[INFO] Adding libs/ to library path..."
+    export LD_LIBRARY_PATH="$LIBS_DIR:$LD_LIBRARY_PATH"
+    export DYLD_LIBRARY_PATH="$LIBS_DIR:$DYLD_LIBRARY_PATH"
+fi
+if [ -d "/usr/lib/vlc" ]; then
+    export LD_LIBRARY_PATH="/usr/lib/vlc:$LD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/usr/lib/vlc/plugins"
+fi
+if [ -d "/Applications/VLC.app/Contents/MacOS/lib" ]; then
+    export DYLD_LIBRARY_PATH="/Applications/VLC.app/Contents/MacOS/lib:$DYLD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/Applications/VLC.app/Contents/MacOS/plugins"
+fi
+
+# Start the Episteme Demos App (Client)
+echo "Starting Episteme Client..."
+
+if [ ! -f "episteme-core/target/episteme-core-1.0.0-SNAPSHOT.jar" ]; then
     echo "Building Core..."
-    mvn clean package -pl jscience-core -am -DskipTests
+    mvn clean package -pl episteme-core -am -DskipTests
 fi
 
 echo "Launching App..."
-java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path jscience-core/target/classes:jscience-core/target/lib --add-modules javafx.controls,javafx.fxml -cp jscience-core/target/jscience-core-1.0.0-SNAPSHOT.jar org.jscience.ui.JScienceDemosApp "$@"
+java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path episteme-core/target/classes:episteme-core/target/lib --add-modules javafx.controls,javafx.fxml -cp episteme-core/target/episteme-core-1.0.0-SNAPSHOT.jar org.episteme.ui.EpistemeDemosApp "$@"

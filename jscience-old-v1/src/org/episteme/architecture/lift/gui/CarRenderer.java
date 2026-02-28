@@ -1,0 +1,123 @@
+package org.episteme.architecture.lift.gui;
+
+import org.episteme.architecture.lift.Car;
+import org.episteme.architecture.lift.World;
+
+import javax.swing.*;
+
+
+/**
+ * This file is licensed under the GNU Public Licens (GPL).<br>
+ *
+ * @author Nagy Elemer Karoly (eknagy@users.sourceforge.net)
+ * @version $Revision: 1.3 $ $Date: 2007-10-23 18:13:53 $
+ */
+public class CarRenderer {
+    /**
+     * DOCUMENT ME!
+     */
+    Car C = null;
+
+    /**
+     * DOCUMENT ME!
+     */
+    CarCanvas[] CCs = null;
+
+    /**
+     * Creates a new CarRenderer object.
+     *
+     * @param MyCar DOCUMENT ME!
+     * @param CarCanvases DOCUMENT ME!
+     */
+    public CarRenderer(Car MyCar, CarCanvas[] CarCanvases) {
+        C = MyCar;
+        CCs = CarCanvases;
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void renderCar() {
+        int CarsFloor = C.getCrtF();
+
+        for (int i = 0; i < CCs.length; i++) {
+            CCs[i].setCarPresent(i == CarsFloor);
+        }
+
+        int PassNum = C.getNoPs();
+        int Capacity = C.getCapacity();
+
+        CCs[CarsFloor].setActNumber(PassNum);
+        CCs[CarsFloor].setMaxNumber(Capacity);
+
+        int[] DstFloors = World.getPassengerDstFloorsInCar(C);
+
+        CCs[CarsFloor].setDstFloors(DstFloors);
+
+        switch (C.getState()) {
+        case Car.PARKING:
+            CCs[CarsFloor].setState(CarCanvas.PARKING);
+
+            break;
+
+        case Car.CLOSING:
+            CCs[CarsFloor].setState(CarCanvas.CLOSE_OPEN);
+            CCs[CarsFloor].setProgress(C.getKinematicModel().getProgress(C));
+
+            break;
+
+        case Car.OPENING:
+            CCs[CarsFloor].setState(CarCanvas.CLOSE_OPEN);
+            CCs[CarsFloor].setProgress(C.getKinematicModel().getProgress(C));
+
+            break;
+
+        case Car.WAITING:
+            CCs[CarsFloor].setState(CarCanvas.WAITING);
+
+            break;
+
+        case Car.GOING_UP:
+        case Car.GOING_DOWN:
+
+            double P = C.getKinematicModel().getProgress(C);
+            CCs[CarsFloor].setProgress(P);
+
+            if (C.getState() == Car.GOING_UP) {
+                CCs[CarsFloor].setState(CarCanvas.GOING_UP);
+
+                if (CarsFloor != (CCs.length - 1)) {
+                    CCs[CarsFloor + 1].setCarPresent(true);
+                    CCs[CarsFloor + 1].setState(CarCanvas.ARRIVING_UP);
+                    CCs[CarsFloor + 1].setProgress(P);
+                    CCs[CarsFloor + 1].setActNumber(PassNum);
+                    CCs[CarsFloor + 1].setMaxNumber(Capacity);
+                    CCs[CarsFloor + 1].setDstFloors(DstFloors);
+                }
+            } else {
+                CCs[CarsFloor].setState(CarCanvas.GOING_DOWN);
+
+                if (CarsFloor != 0) {
+                    CCs[CarsFloor - 1].setCarPresent(true);
+                    CCs[CarsFloor - 1].setState(CarCanvas.ARRIVING_DOWN);
+                    CCs[CarsFloor - 1].setProgress(P);
+                    CCs[CarsFloor - 1].setActNumber(PassNum);
+                    CCs[CarsFloor - 1].setMaxNumber(Capacity);
+                    CCs[CarsFloor - 1].setDstFloors(DstFloors);
+                }
+            }
+
+            break;
+
+        default:
+            throw new RuntimeException("Not implemented!");
+        }
+
+        for (int i = CarsFloor - 1; i <= (CarsFloor + 1); i++) {
+            if ((i >= 0) && (i < CCs.length)) {
+                ((JPanel) CCs[i]).revalidate();
+                ((JPanel) CCs[i]).repaint();
+            }
+        }
+    }
+}

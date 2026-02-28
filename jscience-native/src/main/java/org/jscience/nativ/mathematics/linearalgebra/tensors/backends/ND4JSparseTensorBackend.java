@@ -1,18 +1,18 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.tensors.backends;
+package org.episteme.nativ.mathematics.linearalgebra.tensors.backends;
 
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.nativ.mathematics.linearalgebra.backends.CUDAExecutionContext;
-import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUSparseTensorBackend;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
+import org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
+import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUSparseTensorBackend;
 
 /**
  * ND4J Sparse Tensor backend.

@@ -1,9 +1,9 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
@@ -13,23 +13,23 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import java.util.Optional;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
-import org.jscience.core.technical.algorithm.AutoTuningManager;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.algorithm.AutoTuningManager;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
- * Standalone Native Linear Algebra backend using bundled jscience_native library.
+ * Standalone Native Linear Algebra backend using bundled episteme_native library.
  * <p>
  * Provides a subset of BLAS operations without requiring external high-performance libraries.
  * For optimized performance using external BLAS/LAPACK, use {@link NativeFFMBLASBackend}.
@@ -72,7 +72,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
         try {
             Linker linker = NativeLibraryLoader.getLinker();
-            Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("jscience-jni", java.lang.foreign.Arena.global());
+            Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("episteme-jni", java.lang.foreign.Arena.global());
             if (lookupOpt.isEmpty()) {
                 lookupOpt = NativeLibraryLoader.loadLibrary("openblas", java.lang.foreign.Arena.global());
                 if (lookupOpt.isEmpty()) {
@@ -139,7 +139,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public String getNativeLibraryName() {
-        return "jscience-jni";
+        return "episteme-jni";
     }
 
     @Override
@@ -169,10 +169,10 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
-        return new org.jscience.core.technical.backend.ExecutionContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.core.technical.backend.ExecutionContext() {
             @Override
-            public <T> T execute(org.jscience.core.technical.backend.Operation<T> operation) {
+            public <T> T execute(org.episteme.core.technical.backend.Operation<T> operation) {
                 return operation.compute(this);
             }
 

@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,11 +21,11 @@
  * SOFTWARE.
  */
 
-package org.jscience.benchmarks.benchmark;
+package org.episteme.benchmarks.benchmark;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.core.ui.i18n.I18N;
+import org.episteme.core.ui.i18n.I18N;
 
 
 /**
@@ -55,8 +55,8 @@ public class BenchmarkRunner {
                 I18N.getInstance().get("benchmark.header.mem"));
         System.out.println("-".repeat(110));
 
-        org.jscience.core.technical.monitoring.DistributedMonitor monitor = 
-                org.jscience.core.technical.monitoring.DistributedMonitor.getInstance();
+        org.episteme.core.technical.monitoring.DistributedMonitor monitor = 
+                org.episteme.core.technical.monitoring.DistributedMonitor.getInstance();
 
         for (RunnableBenchmark b : benchmarks) {
             // Apply filter if present
@@ -121,14 +121,14 @@ public class BenchmarkRunner {
     }
 
     public void exportCharts() {
-        // JFreeChart removed. Charts are now handled natively in the JScience Studio GUI.
-        System.out.println("\nCharts are available in the JScience Studio GUI (--studio).");
+        // JFreeChart removed. Charts are now handled natively in the Episteme Studio GUI.
+        System.out.println("\nCharts are available in the Episteme Studio GUI (--studio).");
         System.out.println("Real-time metrics are available at http://localhost:7070/metrics");
     }
 
     public static void main(String[] args) {
         // Register benchmark I18N bundle
-        I18N.getInstance().addBundle("org.jscience.benchmarks.i18n.messages_benchmarks");
+        I18N.getInstance().addBundle("org.episteme.benchmarks.i18n.messages_benchmarks");
 
         boolean monitorEnabled = true;
         boolean forceGui = false;
@@ -143,17 +143,17 @@ public class BenchmarkRunner {
         }
 
         if (monitorEnabled) {
-            org.jscience.core.technical.monitoring.DistributedMonitor.getInstance().startServer();
+            org.episteme.core.technical.monitoring.DistributedMonitor.getInstance().startServer();
         }
 
         // GUI is default unless --cli/--console is specified
         if (forceGui || !forceCli) {
-            System.out.println("Launching JScience Benchmarking Suite (GUI)...");
-            org.jscience.benchmarks.ui.JScienceBenchmarkingApp.main(args);
+            System.out.println("Launching Episteme Benchmarking Suite (GUI)...");
+            org.episteme.benchmarks.ui.EpistemeBenchmarkingApp.main(args);
             return;
         }
 
-        System.out.println("Starting JScience Benchmarks (CLI mode)...");
+        System.out.println("Starting Episteme Benchmarks (CLI mode)...");
         BenchmarkRunner runner = new BenchmarkRunner();
         runner.discover();
         runner.runAll(filter);

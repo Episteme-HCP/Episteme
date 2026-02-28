@@ -1,4 +1,4 @@
-# JScience API Reference
+# Episteme API Reference
 
 ## gRPC Services
 
@@ -208,23 +208,23 @@ ServerBuilder.forPort(50051)
 
 | Metric | Type | Description |
 |--------|------|-------------|
-| `jscience_tasks_total` | Counter | Total submitted tasks |
-| `jscience_tasks_completed` | Counter | Completed tasks |
-| `jscience_tasks_failed` | Counter | Failed tasks |
-| `jscience_task_duration_seconds` | Histogram | Task execution time |
+| `episteme_tasks_total` | Counter | Total submitted tasks |
+| `episteme_tasks_completed` | Counter | Completed tasks |
+| `episteme_tasks_failed` | Counter | Failed tasks |
+| `episteme_task_duration_seconds` | Histogram | Task execution time |
 
 ### Worker Metrics
 
 | Metric | Type | Description |
 |--------|------|-------------|
-| `jscience_workers_active` | Gauge | Active workers |
-| `jscience_workers_idle` | Gauge | Idle workers |
-| `jscience_worker_cpu_usage` | Gauge | Worker CPU % |
+| `episteme_workers_active` | Gauge | Active workers |
+| `episteme_workers_idle` | Gauge | Idle workers |
+| `episteme_worker_cpu_usage` | Gauge | Worker CPU % |
 
 ### gRPC Metrics
 
 | Metric | Type | Description |
 |--------|------|-------------|
-| `jscience_grpc_calls_total` | Counter | Total RPC calls |
-| `jscience_grpc_errors_total` | Counter | Failed RPCs |
-| `jscience_grpc_latency_seconds` | Histogram | RPC latency |
+| `episteme_grpc_calls_total` | Counter | Total RPC calls |
+| `episteme_grpc_errors_total` | Counter | Failed RPCs |
+| `episteme_grpc_latency_seconds` | Histogram | RPC latency |

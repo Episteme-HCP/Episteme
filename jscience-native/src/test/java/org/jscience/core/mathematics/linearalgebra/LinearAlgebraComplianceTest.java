@@ -1,8 +1,8 @@
-package org.jscience.core.mathematics.linearalgebra;
+package org.episteme.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.jscience.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import org.ejml.simple.SimpleMatrix;
 
@@ -20,8 +20,8 @@ public class LinearAlgebraComplianceTest {
     private static final double TOLERANCE = 1e-8;
     private static final int SIZE = 50;
 
-    private static final String PROJECT_NAME = System.getProperty("org.jscience.project.name", "Episteme");
-    private static final String REPORT_PATH = System.getProperty("org.jscience.report.path", "../docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md");
+    private static final String PROJECT_NAME = System.getProperty("org.episteme.project.name", "Episteme");
+    private static final String REPORT_PATH = System.getProperty("org.episteme.report.path", "../docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md");
 
     private static class ComplianceResult {
         String providerName;
@@ -35,17 +35,17 @@ public class LinearAlgebraComplianceTest {
         @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> p : loader) {
-            if (p.isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
+            if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                 @SuppressWarnings("unchecked")
                 LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
                 rawProviders.add(typed);
             }
         }
         try {
-            for (org.jscience.core.technical.backend.Backend backend : org.jscience.core.technical.backend.BackendDiscovery.getInstance().getProviders()) {
-                for (org.jscience.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
+            for (org.episteme.core.technical.backend.Backend backend : org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders()) {
+                for (org.episteme.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (ap instanceof LinearAlgebraProvider<?> p) {
-                        if (p.isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
+                        if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                             @SuppressWarnings("unchecked")
                             LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
                             rawProviders.add(typed);
@@ -91,8 +91,8 @@ public class LinearAlgebraComplianceTest {
                     aData[i] = rand.nextGaussian();
                     bData[i] = rand.nextGaussian();
                 }
-                Vector<Real> a = org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
-                Vector<Real> b = org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                Vector<Real> a = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
+                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
                 Real result = provider.dot(a, b);
                 double expected = 0;
                 for (int i = 0; i < SIZE; i++) expected += aData[i] * bData[i];
@@ -103,7 +103,7 @@ public class LinearAlgebraComplianceTest {
                 Random rand = new Random(42);
                 double[] aData = new double[SIZE];
                 for (int i = 0; i < SIZE; i++) aData[i] = rand.nextGaussian();
-                Vector<Real> a = org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
+                Vector<Real> a = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
                 Real result = provider.norm(a);
                 double sumSq = 0;
                 for (double d : aData) sumSq += d * d;
@@ -245,7 +245,7 @@ public class LinearAlgebraComplianceTest {
             int pivot = (int) res.P().get(i).doubleValue();
             for (int j = 0; j < n; j++) paData[i][j] = a.get(pivot, j);
         }
-        Matrix<Real> PA = Matrix.of(paData, org.jscience.core.mathematics.sets.Reals.getInstance());
+        Matrix<Real> PA = Matrix.of(paData, org.episteme.core.mathematics.sets.Reals.getInstance());
         verifyMatrix(new SimpleMatrix(toDoubleArray(PA)), lu, 1e-8);
     }
 
@@ -262,7 +262,7 @@ public class LinearAlgebraComplianceTest {
                 sMatrix[i][j] = (i == j && i < k) ? res.S().get(i) : Real.ZERO;
             }
         }
-        Matrix<Real> S = Matrix.of(sMatrix, org.jscience.core.mathematics.sets.Reals.getInstance());
+        Matrix<Real> S = Matrix.of(sMatrix, org.episteme.core.mathematics.sets.Reals.getInstance());
         Matrix<Real> reconstructed = res.U().multiply(S).multiply(res.V().transpose());
         verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, 1e-8);
     }
@@ -283,7 +283,7 @@ public class LinearAlgebraComplianceTest {
             for (int r = 0; r < res.V().rows(); r++) {
                 vData[r] = res.V().get(r, i);
             }
-            Vector<Real> v = org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(Arrays.stream(vData).mapToDouble(Real::doubleValue).toArray());
+            Vector<Real> v = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(Arrays.stream(vData).mapToDouble(Real::doubleValue).toArray());
 
             Vector<Real> Av = a.multiply(v);
             Vector<Real> lv = v.multiply(lambda);

@@ -1,7 +1,7 @@
-package org.jscience.benchmarks;
+package org.episteme.benchmarks;
 
 import java.util.ServiceLoader;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 public class Repro {
     public static void main(String[] args) {

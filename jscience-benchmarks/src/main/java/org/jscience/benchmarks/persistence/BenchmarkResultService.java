@@ -1,6 +1,6 @@
-package org.jscience.benchmarks.persistence;
+package org.episteme.benchmarks.persistence;
 
-import org.jscience.benchmarks.ui.BenchmarkRunSummary;
+import org.episteme.benchmarks.ui.BenchmarkRunSummary;
 import java.util.List;
 import java.util.ArrayList;
 

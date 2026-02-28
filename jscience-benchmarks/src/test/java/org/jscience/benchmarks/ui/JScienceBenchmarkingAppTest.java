@@ -1,4 +1,4 @@
-package org.jscience.benchmarks.ui;
+package org.episteme.benchmarks.ui;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -13,16 +13,16 @@ import org.testfx.matcher.control.LabeledMatchers;
 import static org.testfx.api.FxAssert.verifyThat;
 
 @ExtendWith(ApplicationExtension.class)
-public class JScienceBenchmarkingAppTest {
+public class EpistemeBenchmarkingAppTest {
 
     @Start
     public void start(Stage stage) throws Exception {
-        new JScienceBenchmarkingApp().start(stage);
+        new EpistemeBenchmarkingApp().start(stage);
     }
 
     @Test
     public void should_have_correct_title(FxRobot robot) {
-        verifyThat(".header-title", LabeledMatchers.hasText("JSCIENCE BENCHMARKING"));
+        verifyThat(".header-title", LabeledMatchers.hasText("EPISTEME BENCHMARKING"));
     }
 
     @Test
@@ -40,7 +40,7 @@ public class JScienceBenchmarkingAppTest {
         try {
             robot.clickOn("ABOUT");
             // Looking for any node containing the text
-            // verifyThat("JScience Benchmarking Suite v1.0", isVisible());
+            // verifyThat("Episteme Benchmarking Suite v1.0", isVisible());
             robot.clickOn("OK");
         } catch (Exception e) {}
     }

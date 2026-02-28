@@ -1,11 +1,11 @@
 @echo off
 setlocal
 
-set APP_CLASS=org.jscience.core.ui.JScienceDemosApp
+set APP_CLASS=org.episteme.core.ui.EpistemeDemosApp
 set LIB_DIR=launchers\lib
-set MODULE_PATH=jscience-featured-apps\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes;jscience-native\target\classes;jscience-client\target\classes;jscience-server\target\classes
+set MODULE_PATH=episteme-featured-apps\target\classes;episteme-core\target\classes;episteme-natural\target\classes;episteme-social\target\classes;episteme-native\target\classes;episteme-client\target\classes;episteme-server\target\classes
 rem --- Native Libraries Setup ---
-set "NATIVE_ROOT=C:\JScience-Native"
+set "NATIVE_ROOT=C:\Episteme-Native"
 set "LIBS_DIR=%~dp0libs"
 
 rem --- VLC ---
@@ -19,7 +19,7 @@ if exist "%LIBS_DIR%" (
     set "PATH=%LIBS_DIR%;%PATH%"
 )
 
-echo Starting JScience Demos Suite...
+echo Starting Episteme Demos Suite...
 java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "%LIB_DIR%\javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "%MODULE_PATH%;%LIB_DIR%\*" %APP_CLASS% %*
 
 endlocal

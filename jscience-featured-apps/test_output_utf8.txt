@@ -9,51 +9,51 @@ WARNING: Please consider reporting this to the maintainers of class com.google.c
 WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
 [INFO] Scanning for projects...
 [WARNING] 
-[WARNING] Some problems were encountered while building the effective model for org.jscience:jscience-featured-apps:jar:1.0.0-SNAPSHOT
-[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service-annotations:jar -> version ${auto-service.version} vs 1.1.1 @ org.jscience:jscience-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\JScience\pom.xml, line 433, column 19
-[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service:jar -> version ${auto-service.version} vs 1.1.1 @ org.jscience:jscience-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\JScience\pom.xml, line 438, column 19
+[WARNING] Some problems were encountered while building the effective model for org.episteme:episteme-featured-apps:jar:1.0.0-SNAPSHOT
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service-annotations:jar -> version ${auto-service.version} vs 1.1.1 @ org.episteme:episteme-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\Episteme\pom.xml, line 433, column 19
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.auto.service:auto-service:jar -> version ${auto-service.version} vs 1.1.1 @ org.episteme:episteme-parent:1.0.0-SNAPSHOT, C:\Silvere\Encours\Developpement\Episteme\pom.xml, line 438, column 19
 [WARNING] 
 [WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
 [WARNING] 
 [WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
 [WARNING] 
 [INFO] 
-[INFO] ----------------< org.jscience:jscience-featured-apps >-----------------
-[INFO] Building JScience Featured Apps 1.0.0-SNAPSHOT
+[INFO] ----------------< org.episteme:episteme-featured-apps >-----------------
+[INFO] Building Episteme Featured Apps 1.0.0-SNAPSHOT
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
-[WARNING] The POM for org.jscience:jscience-natural:jar:1.0.0-SNAPSHOT is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
+[WARNING] The POM for org.episteme:episteme-natural:jar:1.0.0-SNAPSHOT is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
 [INFO] 
-[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-featured-apps ---
+[INFO] --- resources:3.3.1:resources (default-resources) @ episteme-featured-apps ---
 [INFO] Copying 4 resources from src\main\resources to target\classes
 [INFO] 
-[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-featured-apps ---
+[INFO] --- compiler:3.11.0:compile (default-compile) @ episteme-featured-apps ---
 [INFO] Nothing to compile - all classes are up to date
 [INFO] 
-[INFO] --- resources:3.3.1:testResources (default-testResources) @ jscience-featured-apps ---
-[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\JScience\jscience-featured-apps\src\test\resources
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ episteme-featured-apps ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\Episteme\episteme-featured-apps\src\test\resources
 [INFO] 
-[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ jscience-featured-apps ---
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ episteme-featured-apps ---
 [INFO] Nothing to compile - all classes are up to date
 [INFO] 
-[INFO] --- surefire:3.2.5:test (default-test) @ jscience-featured-apps ---
+[INFO] --- surefire:3.2.5:test (default-test) @ episteme-featured-apps ---
 [INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
 [INFO] 
 [INFO] -------------------------------------------------------
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 WARNING: Using incubator modules: jdk.incubator.vector
-[INFO] Running org.jscience.apps.apps.util.RunLoaderVerification
+[INFO] Running org.episteme.apps.apps.util.RunLoaderVerification
 WARNING: A restricted method in java.lang.foreign.SymbolLookup has been called
-WARNING: java.lang.foreign.SymbolLookup::libraryLookup has been called by org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader in an unnamed module (file:/C:/Users/silve/.m2/repository/org/jscience/jscience-native/1.0.0-SNAPSHOT/jscience-native-1.0.0-SNAPSHOT.jar)
+WARNING: java.lang.foreign.SymbolLookup::libraryLookup has been called by org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader in an unnamed module (file:/C:/Users/silve/.m2/repository/org/episteme/episteme-native/1.0.0-SNAPSHOT/episteme-native-1.0.0-SNAPSHOT.jar)
 WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
 WARNING: Restricted methods will be blocked in a future release unless native access is enabled
 
-USER.DIR: C:\Silvere\Encours\Developpement\JScience\jscience-featured-apps
-=== JScience Native Loader Verification ===
-Working Directory: C:\Silvere\Encours\Developpement\JScience\jscience-featured-apps
-NATIVE_ROOT: c:\Silvere\Encours\Developpement\JScience\libs
-java.library.path: C:\Program Files\Java\jdk-25\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin\x64;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\usr\bin;;C:\ProgramData\chocolatey\bin;C:\JScience-Native\HDF5\bin\;C:\Program Files\Microsoft SQL Server\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2025.4.1\;C:\Program Files\CMake\bin;C:\Users\silve\scoop\shims;C:\Users\silve\AppData\Local\Programs\Python\Launcher\;C:\Users\silve\AppData\Local\Microsoft\WindowsApps;C:\Users\silve\AppData\Local\Programs\Antigravity\bin;C:\Program Files\Apache\Maven\apache-maven-3.9.5\bin;C:\Program Files\Git\usr\bin;;C:\JScience-Native\FFTW3;C:\JScience-Native\OpenBLAS\bin;C:\JScience-Native\MPJ\bin;C:\JScience-Native\HDF5\bin;C:\Users\silve\.dotnet\tools;c:\Users\silve\.antigravity\extensions\vscjava.vscode-java-debug-0.58.5-universal\bundled\scripts\noConfigScripts;c:\Users\silve\.antigravity\extensions\ms-python.debugpy-2025.18.0-win32-x64\bundled\scripts\noConfigScripts;C:\Silvere\Encours\Developpement\JScience\libs;C:\Silvere\Encours\Developpement\JScience\libs;.
+USER.DIR: C:\Silvere\Encours\Developpement\Episteme\episteme-featured-apps
+=== Episteme Native Loader Verification ===
+Working Directory: C:\Silvere\Encours\Developpement\Episteme\episteme-featured-apps
+NATIVE_ROOT: c:\Silvere\Encours\Developpement\Episteme\libs
+java.library.path: C:\Program Files\Java\jdk-25\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin\x64;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\usr\bin;;C:\ProgramData\chocolatey\bin;C:\Episteme-Native\HDF5\bin\;C:\Program Files\Microsoft SQL Server\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2025.4.1\;C:\Program Files\CMake\bin;C:\Users\silve\scoop\shims;C:\Users\silve\AppData\Local\Programs\Python\Launcher\;C:\Users\silve\AppData\Local\Microsoft\WindowsApps;C:\Users\silve\AppData\Local\Programs\Antigravity\bin;C:\Program Files\Apache\Maven\apache-maven-3.9.5\bin;C:\Program Files\Git\usr\bin;;C:\Episteme-Native\FFTW3;C:\Episteme-Native\OpenBLAS\bin;C:\Episteme-Native\MPJ\bin;C:\Episteme-Native\HDF5\bin;C:\Users\silve\.dotnet\tools;c:\Users\silve\.antigravity\extensions\vscjava.vscode-java-debug-0.58.5-universal\bundled\scripts\noConfigScripts;c:\Users\silve\.antigravity\extensions\ms-python.debugpy-2025.18.0-win32-x64\bundled\scripts\noConfigScripts;C:\Silvere\Encours\Developpement\Episteme\libs;C:\Silvere\Encours\Developpement\Episteme\libs;.
 Checking openblas... OK
 Checking fftw3... OK
 Checking hdf5... OK
@@ -65,7 +65,7 @@ Checking QuEST... OK
 Checking libvlc... OK
 Checking cuda... MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)
 ==========================================
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.882 s -- in org.jscience.apps.apps.util.RunLoaderVerification
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.882 s -- in org.episteme.apps.apps.util.RunLoaderVerification
 [INFO] 
 [INFO] Results:
 [INFO] 

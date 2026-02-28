@@ -1,13 +1,13 @@
-# JScience Performance Report: Core vs. Native Backends
+# Episteme Performance Report: Core vs. Native Backends
 
-This report provides a detailed analysis of the performance characteristics of the JScience suite, comparing the standardized Java-based Core backends with various Native and Hardware-Accelerated backends.
+This report provides a detailed analysis of the performance characteristics of the Episteme suite, comparing the standardized Java-based Core backends with various Native and Hardware-Accelerated backends.
 
 ## Executive Summary
 
-The JScience architecture is designed for portability first, with transparent performance scaling when native libraries are available. 
+The Episteme architecture is designed for portability first, with transparent performance scaling when native libraries are available. 
 
-*   **JScience Core (Pure Java):** Offers excellent portability and predictably good performance for multi-core systems using parallel streams and the Java Vector API (SIMD).
-*   **JScience Native (FFM / Project Panama):** Provides significant speedups for heavy computational tasks (Linear Algebra, FFT) by leveraging optimized BLAS/LAPACK libraries like OpenBLAS.
+*   **Episteme Core (Pure Java):** Offers excellent portability and predictably good performance for multi-core systems using parallel streams and the Java Vector API (SIMD).
+*   **Episteme Native (FFM / Project Panama):** Provides significant speedups for heavy computational tasks (Linear Algebra, FFT) by leveraging optimized BLAS/LAPACK libraries like OpenBLAS.
 *   **GPU/Distributed Backends:** Best suited for large-scale problems where massive parallelism offsets transfer costs.
 
 ## Results & Visualizations
@@ -19,9 +19,9 @@ The JScience architecture is designed for portability first, with transparent pe
 
 | Implementation | Type | Score |
 |----------------|------|-------|
-| JScience (Ref) | CPU (Single) | 0.282 |
-| JScience (MC)  | CPU (Multi-Standard) | 1.142 |
-| JScience (MC)  | CPU (Multi-Strassen) | 1.686 |
+| Episteme (Ref) | CPU (Single) | 0.282 |
+| Episteme (MC)  | CPU (Multi-Standard) | 1.142 |
+| Episteme (MC)  | CPU (Multi-Strassen) | 1.686 |
 | Native BLAS (FFM) | CPU (Native/FFM) | **5.948** |
 | EJML           | CPU (Java/Optimized) | 1.422 |
 | JBlas (Native) | CPU (Native/JNI) | 0.482 |
@@ -32,8 +32,8 @@ The JScience architecture is designed for portability first, with transparent pe
 
 | Implementation | Solve Score |
 |----------------|-----------------|
-| JScience (Ref) | 0.357 |
-| JScience (MC)  | 0.525 |
+| Episteme (Ref) | 0.357 |
+| Episteme (MC)  | 0.525 |
 | Native BLAS (FFM) | **1.494** |
 | EJML           | 0.392 |
 | JBlas (Native) | 0.627 |
@@ -44,8 +44,8 @@ The JScience architecture is designed for portability first, with transparent pe
 
 | Implementation | Inversion Score |
 |----------------|-----------------|
-| JScience (Ref) | 0.251 |
-| JScience (MC)  | 0.333 |
+| Episteme (Ref) | 0.251 |
+| Episteme (MC)  | 0.333 |
 | Native BLAS (FFM) | **0.480** |
 | EJML           | 0.341 |
 
@@ -67,7 +67,7 @@ The visualization has been improved to group benchmarks by their functional cate
 
 ### 3. Native Core Recovery [IN PROGRESS]
 
-`jscience_native.dll` is now buildable via the provided `CMakeLists.txt`. This library is critical for the FFM-based Native CPU backend to interface with system BLAS.
+`episteme_native.dll` is now buildable via the provided `CMakeLists.txt`. This library is critical for the FFM-based Native CPU backend to interface with system BLAS.
 
 ## Environment Details
 - **OS:** Windows / Linux / macOS

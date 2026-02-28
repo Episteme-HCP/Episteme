@@ -6,10 +6,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 echo "============================================"
-echo "  JScience Javadoc Generator"
+echo "  Episteme Javadoc Generator"
 echo "============================================"
 echo ""
-echo "This script will regenerate the Javadoc for the entire JScience project."
+echo "This script will regenerate the Javadoc for the entire Episteme project."
 echo ""
 
 # Optional: Clean old javadoc

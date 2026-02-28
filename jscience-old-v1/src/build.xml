@@ -3,14 +3,14 @@
 <!--                This is an ant build script                   -->
 <!-- You should process this file with ant to compile the project -->
 
-<project name="jscience" basedir="." default="all">
+<project name="episteme" basedir="." default="all">
 
   <!-- Properties setting -->
   <target name="init">
 
-    <property name="rootpackagename" value="org.jscience" />
+    <property name="rootpackagename" value="org.episteme" />
     <property name="package.version" value="1.0" />
-    <property name="copyright"       value="2004-2007 JScience Opensource Consortium" />
+    <property name="copyright"       value="2004-2007 Episteme Opensource Consortium" />
 
     <!-- directories -->
     <property name="srcdir"      value="src" />

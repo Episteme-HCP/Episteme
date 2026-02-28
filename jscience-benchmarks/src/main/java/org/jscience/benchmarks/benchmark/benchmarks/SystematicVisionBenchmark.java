@@ -1,9 +1,9 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.core.media.vision.VisionAlgorithmBackend;
-import org.jscience.core.media.vision.ImageOp;
+import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.media.vision.ImageOp;
 
 /**
  * Benchmark for Computer Vision Providers (JavaCV, OpenCL, etc.).

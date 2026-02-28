@@ -1,0 +1,245 @@
+/**
+ * The NexStar class encapsulates a NexStar telescope. Copyright (C) 1999-2001
+ * Mark Hale
+ */
+package org.episteme.devices.telescopes.nexstar;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
+import javax.comm.*;
+
+
+/**
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.3 $
+ */
+public final class NexStar extends Object {
+    /** DOCUMENT ME! */
+    private SerialPort serial;
+
+    /** DOCUMENT ME! */
+    private InputStreamReader in;
+
+    /** DOCUMENT ME! */
+    private OutputStreamWriter out;
+
+/**
+     * Constructs a NexStar object.
+     *
+     * @param port DOCUMENT ME!
+     */
+    public NexStar(String port) {
+        try {
+            CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(port);
+            serial = (SerialPort) portID.open("NexStar", 10);
+            serial.setSerialPortParams(9600, SerialPort.DATABITS_8,
+                SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            in = new InputStreamReader(serial.getInputStream());
+            out = new OutputStreamWriter(serial.getOutputStream());
+        } catch (NoSuchPortException e) {
+            System.err.println("Port does not exist: " + e.getMessage());
+            e.printStackTrace();
+        } catch (PortInUseException e) {
+            System.err.println("Port is in use by another process: " +
+                e.getMessage());
+            e.printStackTrace();
+        } catch (UnsupportedCommOperationException e) {
+        } catch (IOException e) {
+        }
+    }
+
+    /**
+     * Convert RA from a string to a number.
+     *
+     * @param ra DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public static int raToInt(String ra) {
+        final int hrs = Integer.valueOf(ra.substring(0, 2)).intValue();
+        final int mins = Integer.valueOf(ra.substring(3, 5)).intValue();
+        final int secs = Integer.valueOf(ra.substring(6, 8)).intValue();
+
+        return (hrs * 600) + (mins * 10) + secs;
+    }
+
+    /**
+     * Convert dec from a string to a number.
+     *
+     * @param dec DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public static int decToInt(String dec) {
+        final int degs = Integer.valueOf(dec.substring(0, 3)).intValue();
+        final int mins = Integer.valueOf(dec.substring(4, 6)).intValue();
+        final int secs = Integer.valueOf(dec.substring(7, 9)).intValue();
+
+        if (degs >= 0) {
+            return (degs * 600) + (mins * 10) + secs;
+        } else {
+            return (degs * 600) - (mins * 10) - secs;
+        }
+    }
+
+    /**
+     * Convert alt from a string to a number.
+     *
+     * @param alt DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public static int altToInt(String alt) {
+        final int degs = Integer.valueOf(alt.substring(0, 3)).intValue();
+        final int mins = Integer.valueOf(alt.substring(4, 6)).intValue();
+        final int secs = Integer.valueOf(alt.substring(7, 9)).intValue();
+
+        if (degs >= 0) {
+            return (degs * 600) + (mins * 10) + secs;
+        } else {
+            return (degs * 600) - (mins * 10) - secs;
+        }
+    }
+
+    /**
+     * Convert az from a string to a number.
+     *
+     * @param az DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public static int azToInt(String az) {
+        final int degs = Integer.valueOf(az.substring(0, 3)).intValue();
+        final int mins = Integer.valueOf(az.substring(4, 6)).intValue();
+        final int secs = Integer.valueOf(az.substring(7, 9)).intValue();
+
+        return (degs * 600) + (mins * 10) + secs;
+    }
+
+    /**
+     * Returns the current RA and dec.
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public synchronized String getRADec() throws IOException {
+        sendCmd("E");
+
+        return readString();
+    }
+
+    /**
+     * Returns the current az and alt.
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public synchronized String getAzAlt() throws IOException {
+        sendCmd("Z");
+
+        return readString();
+    }
+
+    /**
+     * Goto the coordinates.
+     *
+     * @param ra DOCUMENT ME!
+     * @param dec DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public synchronized void gotoRADec(String ra, String dec)
+        throws IOException {
+        final int raBytes = raToInt(ra);
+        final int decBytes = decToInt(dec);
+        out.write('R');
+        out.write((byte) (raBytes >> 8));
+        out.write((byte) (raBytes));
+        out.write(',');
+        out.write((byte) (decBytes >> 8));
+        out.write((byte) (decBytes));
+        out.flush();
+    }
+
+    /**
+     * Goto the coordinates.
+     *
+     * @param az DOCUMENT ME!
+     * @param alt DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public synchronized void gotoAzAlt(String az, String alt)
+        throws IOException {
+        final int azBytes = azToInt(az);
+        final int altBytes = altToInt(alt);
+        out.write('A');
+        out.write((byte) (azBytes >> 8));
+        out.write((byte) (azBytes));
+        out.write(',');
+        out.write((byte) (altBytes >> 8));
+        out.write((byte) (altBytes));
+        out.flush();
+    }
+
+    /**
+     * Check whether the scope is moving.
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public synchronized boolean isMoving() throws IOException {
+        sendCmd("L");
+
+        return readString().equals("1");
+    }
+
+    /**
+     * Sends a command to the scope.
+     *
+     * @param cmd DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    private void sendCmd(String cmd) throws IOException {
+        out.write(cmd);
+        out.flush();
+    }
+
+    /**
+     * Reads a string from the scope, dropping the terminating #.
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    private String readString() throws IOException {
+        StringBuffer msg = new StringBuffer();
+        int ch = in.read();
+
+        while (ch != '#') {
+            msg.append(ch);
+            ch = in.read();
+        }
+
+        return msg.toString();
+    }
+
+    /**
+     * Closes the connection to the scope.
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public synchronized void close() throws IOException {
+        in.close();
+        out.close();
+        serial.close();
+    }
+}

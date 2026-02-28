@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# JScience HPC - Native Libraries Verification Script (Linux/macOS)
+# Episteme HPC - Native Libraries Verification Script (Linux/macOS)
 # Checks environment variables, local paths, and path visibility
 
 set -euo pipefail
@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIBS_DIR="$SCRIPT_DIR/libs"
 
-echo -e "${CYAN}=== JScience Native Library Verification ===${NC}"
+echo -e "${CYAN}=== Episteme Native Library Verification ===${NC}"
 echo ""
 echo -e "${GRAY}Script directory: $SCRIPT_DIR${NC}"
 echo -e "${GRAY}Libs directory:   $LIBS_DIR${NC}"

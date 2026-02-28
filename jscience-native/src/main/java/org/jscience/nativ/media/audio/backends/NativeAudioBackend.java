@@ -1,13 +1,13 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.nativ.media.audio.backends;
+package org.episteme.nativ.media.audio.backends;
 
 import com.google.auto.service.AutoService;
-import org.jscience.core.media.AudioBackend;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.media.AudioBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;

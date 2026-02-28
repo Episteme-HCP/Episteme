@@ -1,8 +1,8 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.social.ui.viewers.geography.MapBackend;
+import org.episteme.social.ui.viewers.geography.MapBackend;
 
 import java.util.ServiceLoader;
 import java.util.List;

@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.physics.loaders.fits;
+package org.episteme.nativ.physics.loaders.fits;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -32,8 +32,8 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.jscience.core.io.AbstractResourceReader;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.core.io.AbstractResourceReader;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * High-performance FITS reader using Project Panama to call cfitsio.

@@ -16,7 +16,7 @@ The aim would not be to build a java MFLOPS raw performance measure (as compared
 
 Our benchmark should provide:
 1. comparison with fortran and c++ for similar problems
-2. comparison with other maths packages in java, namely : colt, jama, JTEM, (jsci), jscience official, jscience experimental
+2. comparison with other maths packages in java, namely : colt, jama, JTEM, (jsci), episteme official, episteme experimental
 3. a system to report results, statistics, etc.
 4. a dedicated website/page
 5. a summary of results

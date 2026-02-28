@@ -1,0 +1,101 @@
+// This code is repackaged after the code from Craig A. Lindley, from Digital Audio with Java
+// Site ftp://ftp.prenhall.com/pub/ptr/professional_computer_science.w-022/digital_audio/
+// Email
+package org.episteme.media.audio.dsp.monitors;
+
+import org.episteme.media.audio.dsp.AbstractAudio;
+
+
+/**
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.3 $
+ */
+public class SpectrumAnalyzer extends AbstractAudio {
+    // Private class data
+    /** DOCUMENT ME! */
+    private TriggerFlag tf;
+
+    /** DOCUMENT ME! */
+    private String name;
+
+    /** DOCUMENT ME! */
+    private int sampleRate;
+
+    /** DOCUMENT ME! */
+    private int numberOfChannels;
+
+/**
+     * Spectrum Analyzer device class constructor
+     *
+     * @param name name is the name to be shown in the title bar of the
+     *             spectrum analyzer's UI for identification purposes.
+     */
+    public SpectrumAnalyzer(String name) {
+        super("Spectrum Analyzer", AbstractAudio.MONITOR);
+
+        this.name = name;
+
+        // Flag object for controlling analyzer triggering
+        tf = new TriggerFlag();
+    }
+
+    // Grab samples from previous stage and store for analysis
+    /**
+     * DOCUMENT ME!
+     *
+     * @param buffer DOCUMENT ME!
+     * @param length DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public int getSamples(short[] buffer, int length) {
+        if (length == 0) {
+            return 0;
+        }
+
+        // Get samples from the previous stage
+        int samples = previous.getSamples(buffer, length);
+
+        // See if scope should trigger
+        if (!tf.trigger()) {
+            // Indicate scope has triggered
+            tf.triggered();
+
+            // Clone the array for the scope
+            short[] newBuffer = new short[samples];
+
+            // Copy the data
+            System.arraycopy(buffer, 0, newBuffer, 0, length);
+        }
+
+        // Return samples read
+        return samples;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param min DOCUMENT ME!
+     * @param max DOCUMENT ME!
+     * @param preferred DOCUMENT ME!
+     */
+    public void minMaxSamplingRate(int min, int max, int preferred) {
+        super.minMaxSamplingRate(min, max, preferred);
+        sampleRate = preferred;
+    }
+
+    // Negotiate the number of channels
+    /**
+     * DOCUMENT ME!
+     *
+     * @param min DOCUMENT ME!
+     * @param max DOCUMENT ME!
+     * @param preferred DOCUMENT ME!
+     */
+    public void minMaxChannels(int min, int max, int preferred) {
+        super.minMaxChannels(min, max, preferred);
+        numberOfChannels = preferred;
+    }
+}

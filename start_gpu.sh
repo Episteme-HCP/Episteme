@@ -1,5 +1,24 @@
 #!/bin/bash
-# Start JScience in GPU mode
+
+# VLC and Native Libs Setup
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LIBS_DIR="$SCRIPT_DIR/libs"
+if [ ! -d "$LIBS_DIR" ]; then LIBS_DIR="$SCRIPT_DIR/../libs"; fi
+if [ -d "$LIBS_DIR" ]; then
+    echo "[INFO] Adding libs/ to library path..."
+    export LD_LIBRARY_PATH="$LIBS_DIR:$LD_LIBRARY_PATH"
+    export DYLD_LIBRARY_PATH="$LIBS_DIR:$DYLD_LIBRARY_PATH"
+fi
+if [ -d "/usr/lib/vlc" ]; then
+    export LD_LIBRARY_PATH="/usr/lib/vlc:$LD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/usr/lib/vlc/plugins"
+fi
+if [ -d "/Applications/VLC.app/Contents/MacOS/lib" ]; then
+    export DYLD_LIBRARY_PATH="/Applications/VLC.app/Contents/MacOS/lib:$DYLD_LIBRARY_PATH"
+    export VLC_PLUGIN_PATH="/Applications/VLC.app/Contents/MacOS/plugins"
+fi
+
+# Start Episteme in GPU mode
 # Usage: ./start_gpu.sh
 # Note: Requires CUDA drivers installed.
 

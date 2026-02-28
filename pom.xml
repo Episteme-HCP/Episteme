@@ -2,26 +2,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jscience</groupId>
-  <artifactId>jscience-parent</artifactId>
+  <groupId>org.episteme</groupId>
+  <artifactId>episteme-parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>JScience Unifying Parent</name>
-  <description>JScience - Unified Scientific Computing Framework (Parent POM)</description>
-  <url>https://github.com/silveremartin-dev/JScience</url>
+  <name>Episteme Unifying Parent</name>
+  <description>Episteme - Unified Scientific Computing Framework (Parent POM)</description>
+  <url>https://github.com/silveremartin-dev/Episteme</url>
   <inceptionYear>2025</inceptionYear>
   <modules>
-    <module>jscience-core</module>
-    <module>jscience-natural</module>
-    <module>jscience-social</module>
-    <module>jscience-native</module>
-    <module>jscience-benchmarks</module>
-    <module>jscience-featured-apps</module>
-    <module>jscience-server</module>
-    <module>jscience-worker</module>
-    <module>jscience-client</module>
-    <module>jscience-database</module>
-    <module>jscience-jni</module>
+    <module>episteme-core</module>
+    <module>episteme-natural</module>
+    <module>episteme-social</module>
+    <module>episteme-native</module>
+    <module>episteme-benchmarks</module>
+    <module>episteme-featured-apps</module>
+    <module>episteme-server</module>
+    <module>episteme-worker</module>
+    <module>episteme-client</module>
+    <module>episteme-database</module>
+    <module>episteme-jni</module>
   </modules>
   <licenses>
     <license>
@@ -34,7 +34,7 @@
     <repository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/silveremartin-dev/JScience</url>
+      <url>https://maven.pkg.github.com/silveremartin-dev/Episteme</url>
     </repository>
   </distributionManagement>
   <developers>
@@ -90,19 +90,19 @@
     <dependencies>
       <!-- Internal modules -->
       <dependency>
-        <groupId>org.jscience</groupId>
-        <artifactId>jscience-core</artifactId>
+        <groupId>org.episteme</groupId>
+        <artifactId>episteme-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.jscience</groupId>
-        <artifactId>jscience-natural</artifactId>
+        <groupId>org.episteme</groupId>
+        <artifactId>episteme-natural</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.jscience</groupId>
-        <artifactId>jscience-database</artifactId>
+        <groupId>org.episteme</groupId>
+        <artifactId>episteme-database</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- Web Server (Javalin) -->
@@ -480,7 +480,7 @@
           <configuration>
             <argLine>${argLine} --enable-preview --add-modules jdk.incubator.vector -Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
             <systemPropertyVariables>
-              <jscience.benchmark.skip>true</jscience.benchmark.skip>
+              <episteme.benchmark.skip>true</episteme.benchmark.skip>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -490,7 +490,7 @@
           <version>0.8.12</version>
           <configuration>
             <includes>
-              <include>org/jscience/**</include>
+              <include>org/episteme/**</include>
             </includes>
             <excludes>
               <exclude>com/sun/**</exclude>
@@ -531,10 +531,10 @@
             <author>true</author>
             <version>true</version>
             <use>true</use>
-            <windowtitle>JScience API Documentation</windowtitle>
-            <doctitle>JScience - Scientific Computing for Java</doctitle>
-            <header>&lt;b&gt;JScience ${project.version}&lt;/b&gt;</header>
-            <footer>&lt;i&gt;Copyright © 2024 JScience Team&lt;/i&gt;</footer>
+            <windowtitle>Episteme API Documentation</windowtitle>
+            <doctitle>Episteme - Scientific Computing for Java</doctitle>
+            <header>&lt;b&gt;Episteme ${project.version}&lt;/b&gt;</header>
+            <footer>&lt;i&gt;Copyright © 2024 Episteme Team&lt;/i&gt;</footer>
             <additionalOptions>
               <additionalOption>--add-modules</additionalOption>
               <additionalOption>jdk.incubator.vector</additionalOption>

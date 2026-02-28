@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
+package org.episteme.nativ.mathematics.linearalgebra.matrices.storage;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import org.jscience.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.numbers.real.RealDouble;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.real.RealDouble;
 
 /**
  * A dense matrix backed by off-heap native memory.

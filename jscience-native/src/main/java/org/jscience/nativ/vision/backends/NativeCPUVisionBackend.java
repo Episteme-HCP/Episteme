@@ -1,17 +1,17 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.vision.backends;
+package org.episteme.nativ.vision.backends;
 
-import org.jscience.core.media.vision.ImageOp;
-import org.jscience.core.media.vision.VisionAlgorithmBackend;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.media.vision.ImageOp;
+import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.awt.image.BufferedImage;
@@ -23,7 +23,7 @@ import java.util.Optional;
 /**
  * Native CPU Vision Backend using Project Panama (FFM API).
  * <p>
- * This backend delegates operations to the 'jscience_vision' native library.
+ * This backend delegates operations to the 'episteme_vision' native library.
  * Implements {@link CPUBackend} and {@link NativeBackend}.
  * </p>
  *
@@ -34,7 +34,7 @@ import java.util.Optional;
 @AutoService({Backend.class, ComputeBackend.class, CPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
 public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedImage>, CPUBackend, NativeBackend {
 
-    private static final String LIB_NAME = "jscience_vision";
+    private static final String LIB_NAME = "episteme_vision";
     private static final SymbolLookup LOOKUP;
     private static final Linker LINKER = Linker.nativeLinker();
     private static final boolean IS_AVAILABLE;
@@ -139,7 +139,7 @@ public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedIm
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
-        return new org.jscience.core.technical.backend.cpu.CPUExecutionContext();
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
     }
 }

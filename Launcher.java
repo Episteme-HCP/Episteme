@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Portable launcher for JScience.
+ * Portable launcher for Episteme.
  * Usage: java Launcher.java [CPU|GPU|AUTO]
  *
  * @author Silvere Martin-Michiellot
@@ -48,8 +48,8 @@ public class Launcher {
         command.add(javaBin);
         command.add("-cp");
         command.add(classpath);
-        command.add("-Dorg.jscience.compute.mode=" + mode);
-        command.add("org.jscience.JScience");
+        command.add("-Dorg.episteme.compute.mode=" + mode);
+        command.add("org.episteme.Episteme");
 
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.inheritIO();

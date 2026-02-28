@@ -1,7 +1,7 @@
-package org.jscience.benchmarks.ui;
+package org.episteme.benchmarks.ui;
 
 import javafx.beans.property.*;
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 
 /**
  * Model class for the Benchmark TreeTableView.
@@ -77,13 +77,13 @@ public class BenchmarkItem {
         if (pName.contains("MPI") || pName.contains("SPARK")) return "Distributed";
         
         // External libraries are generally single-threaded
-        if (!library.equals("JScience") && !library.equals("JScience Native")) {
+        if (!library.equals("Episteme") && !library.equals("Episteme Native")) {
             // JBlas uses native BLAS which may be multi-threaded internally
             if (library.equals("JBlas")) return "CPU (Native)";
             return "Monocore";
         }
         
-        // JScience CPU providers use parallel streams above PARALLEL_THRESHOLD
+        // Episteme CPU providers use parallel streams above PARALLEL_THRESHOLD
         return "Multicore";
     }
 
@@ -101,18 +101,18 @@ public class BenchmarkItem {
         if (pName.contains("FFTW")) return "FFTW3";
         if (pName.contains("MPI")) return "MPJ Express";
         if (pName.contains("SPARK")) return "Apache Spark";
-        if (pName.contains("NATIVE")) return "JScience Native";
-        if (pName.contains("JAVA REFERENCE")) return "JScience";
-        return "JScience"; 
+        if (pName.contains("NATIVE")) return "Episteme Native";
+        if (pName.contains("JAVA REFERENCE")) return "Episteme";
+        return "Episteme"; 
     }
 
     private String determineSimpleProvider(String fullName, String backend, String library) {
         // For external libraries, the provider name IS the library name
-        if (!library.equals("JScience") && !library.equals("JScience Native")) {
+        if (!library.equals("Episteme") && !library.equals("Episteme Native")) {
             return library;
         }
         
-        // For JScience / JScience Native, detect meaningful algorithm qualifiers
+        // For Episteme / Episteme Native, detect meaningful algorithm qualifiers
         String upper = fullName.toUpperCase();
         if (upper.contains("OPENBLAS")) return "OpenBLAS";
         if (upper.contains("VECTOR API")) return "Vector API";
@@ -147,7 +147,7 @@ public class BenchmarkItem {
             cleaned = next;
         }
         
-        cleaned = cleaned.replace("JScience", "")
+        cleaned = cleaned.replace("Episteme", "")
                          .replace("Native", "")
                          .replace("CPU", "")
                          .replace("GPU", "")

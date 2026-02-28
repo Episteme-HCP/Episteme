@@ -1,22 +1,22 @@
-# JScience Features
+# Episteme Features
 
-JScience Reimagined (2025-2026) provides a world-class scientific computing framework.
+Episteme Reimagined (2025-2026) provides a world-class scientific computing framework.
 
-## Technical Foundation (jscience-core)
+## Technical Foundation (episteme-core)
 
 ### Mathematics & Computation
 - **Linear Algebra**: Optimized dense/sparse/GPU backends.
-- **Arbitrary Precision**: Standardized on `org.jscience.mathematics.numbers.real.Real`.
+- **Arbitrary Precision**: Standardized on `org.episteme.mathematics.numbers.real.Real`.
 - **Logic & Proofs**: Framework for connectors to Coq, Metamath, and Qedeq.
 - **I18N Support**: 100% support for English and French, with Spanish and German baseline.
 
 ### Grid & Distributed
-- **JScience Grid**: High-performance gRPC-based distributed compute nodes.
+- **Episteme Grid**: High-performance gRPC-based distributed compute nodes.
 - **Python Interface**: gRPC bridge for direct access from Python and Jupyter Notebooks.
 
 ---
 
-## Natural Sciences (jscience-natural)
+## Natural Sciences (episteme-natural)
 
 ### Physics & Astronomy
 - **Mechanics**: Classical, Relativistic, and Quantum simulations.
@@ -28,7 +28,7 @@ JScience Reimagined (2025-2026) provides a world-class scientific computing fram
 
 ---
 
-## Social Sciences (jscience-social)
+## Social Sciences (episteme-social)
 
 ### Economics
 - **Market Models**: Free market and Planned economy simulations.
@@ -41,8 +41,8 @@ JScience Reimagined (2025-2026) provides a world-class scientific computing fram
 ---
 
 ## Interactive Demos
-- **59 Interactive Demos** available via `JScienceDemoApp`.
+- **59 Interactive Demos** available via `EpistemeDemoApp`.
 - **Javalin Dashboards** for real-time monitoring of social simulations.
 
 ---
-*JScience - Making scientific computing natural.*
+*Episteme - Making scientific computing natural.*

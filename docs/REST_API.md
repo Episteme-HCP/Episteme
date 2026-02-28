@@ -1,8 +1,8 @@
-# JScience REST API Documentation
+# Episteme REST API Documentation
 
 ## Overview
 
-JScience Server exposes a REST API for distributed scientific computing. The API provides endpoints for authentication, task submission, server monitoring, and metrics.
+Episteme Server exposes a REST API for distributed scientific computing. The API provides endpoints for authentication, task submission, server monitoring, and metrics.
 
 **Base URL**: `http://localhost:8080` (configurable via `server.rest.port`)
 
@@ -141,7 +141,7 @@ Authorization: Bearer <token>
 ```json
 {
   "taskType": "COMPUTE",
-  "taskClass": "org.jscience.compute.MandelbrotTask",
+  "taskClass": "org.episteme.compute.MandelbrotTask",
   "params": {
     "width": 1920,
     "height": 1080,
@@ -171,13 +171,13 @@ GET /metrics
 **Response** (200 OK, text/plain):
 
 ```
-# HELP jscience_tasks_submitted_total Total tasks submitted
-# TYPE jscience_tasks_submitted_total counter
-jscience_tasks_submitted_total 42.0
+# HELP episteme_tasks_submitted_total Total tasks submitted
+# TYPE episteme_tasks_submitted_total counter
+episteme_tasks_submitted_total 42.0
 
-# HELP jscience_api_worldbank_calls_total Total World Bank API calls
-# TYPE jscience_api_worldbank_calls_total counter
-jscience_api_worldbank_calls_total 15.0
+# HELP episteme_api_worldbank_calls_total Total World Bank API calls
+# TYPE episteme_api_worldbank_calls_total counter
+episteme_api_worldbank_calls_total 15.0
 
 # HELP jvm_memory_used_bytes JVM memory used
 # TYPE jvm_memory_used_bytes gauge

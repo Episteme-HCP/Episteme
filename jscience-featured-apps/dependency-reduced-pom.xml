@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <artifactId>jscience-parent</artifactId>
-    <groupId>org.jscience</groupId>
+    <artifactId>episteme-parent</artifactId>
+    <groupId>org.episteme</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>jscience-featured-apps</artifactId>
-  <name>JScience Featured Apps</name>
-  <description>Showcase Applications for JScience Framework</description>
+  <artifactId>episteme-featured-apps</artifactId>
+  <name>Episteme Featured Apps</name>
+  <description>Showcase Applications for Episteme Framework</description>
   <build>
     <plugins>
       <plugin>
@@ -16,7 +16,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>org.jscience.apps.apps.Launcher</mainClass>
+          <mainClass>org.episteme.apps.apps.Launcher</mainClass>
         </configuration>
       </plugin>
       <plugin>
@@ -31,7 +31,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>org.jscience.apps.apps.Launcher</mainClass>
+                  <mainClass>org.episteme.apps.apps.Launcher</mainClass>
                 </transformer>
                 <transformer />
               </transformers>

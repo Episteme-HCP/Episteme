@@ -1,27 +1,27 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import org.jocl.*;
 import static org.jocl.CL.*;
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUResult;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.sets.Reals;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 
 
@@ -295,7 +295,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     }
 
     private Vector<Real> toRealVector(double[] d) {
-        return org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
     }
 
     private double[] matVecMul(double[] a, double[] b, int rows, int cols) {
@@ -327,11 +327,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         return base;
     }
 
-    @Override public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
-    @Override public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    @Override public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }
 }

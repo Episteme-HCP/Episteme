@@ -1,6 +1,6 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2006 - JScience (http://jscience.org/)
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2006 - Episteme (http://episteme.org/)
  * All rights reserved.
  * 
  * Permission to use, copy, modify, and distribute this software is

@@ -1,7 +1,7 @@
-package org.jscience.benchmarks.benchmark;
+package org.episteme.benchmarks.benchmark;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.benchmarks.benchmark.benchmarks.SystematicBenchmark;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.benchmarks.benchmark.benchmarks.SystematicBenchmark;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -31,9 +31,9 @@ public class BenchmarkRegistry {
             }
 
             // 2. Discover all generic AlgorithmProviders and wrap them
-            ServiceLoader<org.jscience.core.technical.algorithm.AlgorithmProvider> providerLoader = 
-                    ServiceLoader.load(org.jscience.core.technical.algorithm.AlgorithmProvider.class);
-            for (org.jscience.core.technical.algorithm.AlgorithmProvider p : providerLoader) {
+            ServiceLoader<org.episteme.core.technical.algorithm.AlgorithmProvider> providerLoader = 
+                    ServiceLoader.load(org.episteme.core.technical.algorithm.AlgorithmProvider.class);
+            for (org.episteme.core.technical.algorithm.AlgorithmProvider p : providerLoader) {
                 try {
                     System.out.println("[DEBUG] Processing provider: " + p.getName() + " (" + p.getClass().getName() + ")");
                     // Display all providers, even unavailable ones (User Request)
@@ -56,7 +56,7 @@ public class BenchmarkRegistry {
         return all;
     }
 
-    private static RunnableBenchmark wrapProvider(org.jscience.core.technical.algorithm.AlgorithmProvider p) {
+    private static RunnableBenchmark wrapProvider(org.episteme.core.technical.algorithm.AlgorithmProvider p) {
         return new RunnableBenchmark() {
             @Override public String getId() { return "gen-" + p.getAlgorithmType() + "-" + p.getName().toLowerCase().replace(" ", "-"); }
             @Override public String getName() { 
@@ -70,11 +70,11 @@ public class BenchmarkRegistry {
                 String type = p.getAlgorithmType();
                 return type.substring(0, 1).toUpperCase() + type.substring(1);
             }
-            @Override public void setup() { if (p instanceof org.jscience.core.mathematics.analysis.fft.FFTProvider) { /* Custom setup if needed */ } }
+            @Override public void setup() { if (p instanceof org.episteme.core.mathematics.analysis.fft.FFTProvider) { /* Custom setup if needed */ } }
             @Override public void run() { 
                 // Generic execution test
-                if (p instanceof org.jscience.core.mathematics.analysis.fft.FFTProvider) {
-                    ((org.jscience.core.mathematics.analysis.fft.FFTProvider)p).transform(new double[1024], new double[1024]);
+                if (p instanceof org.episteme.core.mathematics.analysis.fft.FFTProvider) {
+                    ((org.episteme.core.mathematics.analysis.fft.FFTProvider)p).transform(new double[1024], new double[1024]);
                 }
             }
             @Override public void teardown() {}
@@ -83,7 +83,7 @@ public class BenchmarkRegistry {
         };
     }
 
-    private static <P extends org.jscience.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list) {
+    private static <P extends org.episteme.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list) {
         try {
             ServiceLoader<P> loader = ServiceLoader.load(base.getProviderClass());
             for (P p : loader) {
@@ -91,7 +91,7 @@ public class BenchmarkRegistry {
                 try {
                     // Check compatibility if it's a LinearAlgebraProvider
                     if (p instanceof LinearAlgebraProvider) {
-                        if (!((LinearAlgebraProvider<?>) p).isCompatible(org.jscience.core.mathematics.sets.Reals.getInstance())) {
+                        if (!((LinearAlgebraProvider<?>) p).isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                             continue;
                         }
                     }

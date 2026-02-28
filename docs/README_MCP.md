@@ -1,6 +1,6 @@
-# JScience MCP Integration - Scientific Kernel for AI
+# Episteme MCP Integration - Scientific Kernel for AI
 
-This module implements the **Model Context Protocol (MCP)**, allowing Large Language Models (LLMs) to use JScience as a computational brain.
+This module implements the **Model Context Protocol (MCP)**, allowing Large Language Models (LLMs) to use Episteme as a computational brain.
 
 ## ⚠️ Status: Active Development
 

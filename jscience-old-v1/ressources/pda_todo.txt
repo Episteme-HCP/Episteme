@@ -22,28 +22,28 @@ PDA 11 Feb 2006
 
 Okay -- first look at current documentation:
 
-org.jscience.mathematics: Package description consists of a (good) list of
+org.episteme.mathematics: Package description consists of a (good) list of
 Java math projects with hyperlinks. Need an overview, summarizing contents
 and stating goals and design decisions.
 
-org.jscience.mathematics.algebraic: Package description refers reader to
+org.episteme.mathematics.algebraic: Package description refers reader to
 Wikipedia. Need (as above) overview, summary and goals.
 
-org.jscience.mathematics.analysis. Package description is single line. Need
+org.episteme.mathematics.analysis. Package description is single line. Need
 overview, summary, goals.
 
-org.jscience.mathematics.axiomatic: Package description is single line. Classes
+org.episteme.mathematics.axiomatic: Package description is single line. Classes
 within the package are essentially undocumented. Two text files containing
 rules(?) and definitions are included.
 
-org.jscience.mathematics.geometry: Package is well-documented. Unfortunately,
+org.episteme.mathematics.geometry: Package is well-documented. Unfortunately,
 documentation is in Japanese. I will attempt to add some English descriptions
 where intent is obvious.
 
-org.jscience.mathematics.statistics: Package is well documented other than
+org.episteme.mathematics.statistics: Package is well documented other than
 top-level package description.
 
-org.jscience.mathematics.wavelets: Package description is missing. Lots of code
+org.episteme.mathematics.wavelets: Package description is missing. Lots of code
 here. I don't know anything about wavelets, so I will not attempt to document
 this package and subpackages at present.
 

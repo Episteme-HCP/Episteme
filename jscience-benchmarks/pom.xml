@@ -4,37 +4,37 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.jscience</groupId>
-        <artifactId>jscience-parent</artifactId>
+        <groupId>org.episteme</groupId>
+        <artifactId>episteme-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jscience-benchmarks</artifactId>
+    <artifactId>episteme-benchmarks</artifactId>
     <packaging>jar</packaging>
 
-    <name>JScience Benchmarking Suite</name>
-    <description>Benchmarking and performance analysis suite for JScience. Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
+    <name>Episteme Benchmarking Suite</name>
+    <description>Benchmarking and performance analysis suite for Episteme. Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
 
     <dependencies>
-        <!-- Core JScience Modules -->
+        <!-- Core Episteme Modules -->
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-core</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-natural</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-social</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-social</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-native</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-native</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -44,13 +44,13 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-client</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-server</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-server</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -227,7 +227,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>org.jscience.benchmarks.ui.JScienceBenchmarkingApp</mainClass>
+                            <mainClass>org.episteme.benchmarks.ui.EpistemeBenchmarkingApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -245,7 +245,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <excludeGroupIds>org.jscience</excludeGroupIds>
+                            <excludeGroupIds>org.episteme</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -255,7 +255,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>org.jscience.benchmarks.ui.JScienceBenchmarkingApp</mainClass>
+                    <mainClass>org.episteme.benchmarks.ui.EpistemeBenchmarkingApp</mainClass>
                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
                 </configuration>
             </plugin>

@@ -1,18 +1,18 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.tensors.backends;
+package org.episteme.nativ.mathematics.linearalgebra.tensors.backends;
 
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
-import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.DenseTensor;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.nativ.mathematics.linearalgebra.backends.CUDAExecutionContext;
-import org.jscience.core.technical.backend.cpu.CPUExecutionContext;
-import org.jscience.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend;
+import org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
+import org.episteme.core.mathematics.linearalgebra.tensors.DenseTensor;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
+import org.episteme.core.technical.backend.cpu.CPUExecutionContext;
+import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend;
 
 /**
  * Abstract base for ND4J-backed Tensor backends.
@@ -48,7 +48,7 @@ public abstract class ND4JBaseTensorBackend implements TensorBackend {
     }
 
     protected boolean checkCommonClasses() {
-        if (Boolean.getBoolean("jscience.nd4j.skip")) return false;
+        if (Boolean.getBoolean("episteme.nd4j.skip")) return false;
         try {
             Class.forName("org.nd4j.linalg.factory.Nd4j");
             Class.forName("org.nd4j.linalg.api.ndarray.INDArray");

@@ -1,32 +1,32 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.sets.Reals;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.core.technical.backend.simd.SIMDBackend;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.simd.SIMDBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
-import org.jscience.core.mathematics.linearalgebra.vectors.GenericVector;
-import org.jscience.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
+import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.Operation;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.Operation;
 
 /**
  * SIMD-accelerated Linear Algebra Backend for Real numbers using JDK Vector API.
@@ -329,7 +329,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) { 
-        return new org.jscience.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Real>().inverse(a); 
+        return new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Real>().inverse(a); 
     }
     @Override
     public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("SIMD determinant not implemented yet."); }

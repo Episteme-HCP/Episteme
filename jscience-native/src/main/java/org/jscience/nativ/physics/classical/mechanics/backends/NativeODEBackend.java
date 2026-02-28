@@ -1,27 +1,27 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.physics.classical.mechanics.backends;
+package org.episteme.nativ.physics.classical.mechanics.backends;
 
 import com.google.auto.service.AutoService;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.natural.physics.classical.mechanics.CollisionProvider;
-import org.jscience.natural.physics.classical.mechanics.MechanicsBackend;
-import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
-import org.jscience.natural.physics.classical.mechanics.RigidBody;
-import org.jscience.natural.physics.classical.mechanics.RigidBodyBridge;
-import org.jscience.natural.physics.classical.mechanics.simulation.SimulationProvider;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.natural.physics.classical.mechanics.CollisionProvider;
+import org.episteme.natural.physics.classical.mechanics.MechanicsBackend;
+import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.episteme.natural.physics.classical.mechanics.simulation.SimulationProvider;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import java.lang.foreign.*;
 import java.util.List;
 import java.util.Optional;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 /**
  * Native implementation of {@link MechanicsBackend} for ODE (Open Dynamics Engine).
@@ -85,7 +85,7 @@ public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CP
 
     @Override
     public PhysicsWorldBridge createWorld() {
-        return new org.jscience.nativ.physics.classical.mechanics.backends.ode.NativeODEWorld();
+        return new org.episteme.nativ.physics.classical.mechanics.backends.ode.NativeODEWorld();
     }
 
     @Override
@@ -119,7 +119,7 @@ public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CP
     }
  
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }
  

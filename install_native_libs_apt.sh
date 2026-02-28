@@ -1,10 +1,10 @@
 #!/bin/bash
-# JScience HPC - Native Libraries Installer for Ubuntu/Debian
+# Episteme HPC - Native Libraries Installer for Ubuntu/Debian
 # This script installs all required native libraries using apt
 
 set -e
 
-echo "=== JScience HPC Native Libraries Installer (Ubuntu/Debian) ==="
+echo "=== Episteme HPC Native Libraries Installer (Ubuntu/Debian) ==="
 echo ""
 
 # Check if running as root
@@ -102,5 +102,5 @@ echo ""
 echo "Next steps:"
 echo "1. Run: source ~/.bashrc"
 echo "2. Verify: ./verify_native_libs_linux.sh"
-echo "3. Build JScience: mvn clean compile"
+echo "3. Build Episteme: mvn clean compile"
 echo ""

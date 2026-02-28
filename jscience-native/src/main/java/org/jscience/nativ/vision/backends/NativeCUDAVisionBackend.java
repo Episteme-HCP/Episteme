@@ -1,16 +1,16 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.vision.backends;
+package org.episteme.nativ.vision.backends;
 
-import org.jscience.core.media.vision.ImageOp;
-import org.jscience.core.media.vision.VisionAlgorithmBackend;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.media.vision.ImageOp;
+import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 
 import java.nio.DoubleBuffer;
@@ -82,12 +82,12 @@ public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, 
     }
 
     @Override
-    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }
 

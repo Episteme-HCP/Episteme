@@ -1,16 +1,16 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.vectors.storage;
+package org.episteme.nativ.mathematics.linearalgebra.vectors.storage;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.DoubleBuffer;
-import org.jscience.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage;
-import org.jscience.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 /**
  * A dense vector backed by off-heap native memory.
@@ -93,15 +93,15 @@ public class NativeDoubleVectorStorage implements RealDoubleVectorStorage, AutoC
     /**
      * Views this vector as a matrix.
      */
-    public org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage asMatrix(int rows, int cols) {
+    public org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage asMatrix(int rows, int cols) {
         if ((long) rows * cols != dimension) {
             throw new IllegalArgumentException("Dimension mismatch");
         }
-        return new org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(data, rows, cols, arena);
+        return new org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(data, rows, cols, arena);
     }
 
     @Override
-    public org.jscience.core.mathematics.linearalgebra.vectors.storage.VectorStorage<Real> copy() {
+    public org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<Real> copy() {
         NativeDoubleVectorStorage copy = new NativeDoubleVectorStorage(dimension);
         MemorySegment.copy(this.data, 0, copy.data, 0, (long) dimension * Double.BYTES);
         return copy;

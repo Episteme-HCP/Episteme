@@ -1,23 +1,23 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.technical.algorithm.AutoTuningManager;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.technical.algorithm.AutoTuningManager;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -31,7 +31,7 @@ import java.util.List;
  * Implements {@link CPUBackend} and {@link NativeBackend}.
  */
 @AutoService({Backend.class, LinearAlgebraProvider.class, CPUBackend.class, NativeBackend.class})
-public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
+public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
 
     private static final SymbolLookup LOOKUP;
     private static final boolean IS_AVAILABLE;
@@ -206,9 +206,9 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public Vector<org.jscience.core.mathematics.numbers.real.Real> solve(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> solve(Matrix<org.episteme.core.mathematics.numbers.real.Real> A, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE || DGESV == null) return LinearAlgebraProvider.super.solve(A, b);
-        org.jscience.core.ComputeContext.checkCurrentCancelled();
+        org.episteme.core.ComputeContext.checkCurrentCancelled();
         
         int n = A.rows();
         if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
@@ -231,16 +231,16 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             double[] result = new double[n];
             MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
             
-            List<org.jscience.core.mathematics.numbers.real.Real> list = new ArrayList<>(n);
-            for(double v : result) list.add(org.jscience.core.mathematics.numbers.real.Real.of(v));
-            return new DenseVector<>(list, (Ring<org.jscience.core.mathematics.numbers.real.Real>) A.getScalarRing());
+            List<org.episteme.core.mathematics.numbers.real.Real> list = new ArrayList<>(n);
+            for(double v : result) list.add(org.episteme.core.mathematics.numbers.real.Real.of(v));
+            return new DenseVector<>(list, (Ring<org.episteme.core.mathematics.numbers.real.Real>) A.getScalarRing());
         } catch (Throwable e) {
              throw new RuntimeException(e);
         }
     }
     
     @Override
-    public Matrix<org.jscience.core.mathematics.numbers.real.Real> inverse(Matrix<org.jscience.core.mathematics.numbers.real.Real> A) {
+    public Matrix<org.episteme.core.mathematics.numbers.real.Real> inverse(Matrix<org.episteme.core.mathematics.numbers.real.Real> A) {
          if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) return LinearAlgebraProvider.super.inverse(A);
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
@@ -262,20 +262,20 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
              double[] result = new double[n * n];
              MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0L, result, 0, (int) ( (long) n * n ) );
              
-             org.jscience.core.mathematics.numbers.real.Real[][] resObj = new org.jscience.core.mathematics.numbers.real.Real[n][n];
+             org.episteme.core.mathematics.numbers.real.Real[][] resObj = new org.episteme.core.mathematics.numbers.real.Real[n][n];
              for(int i=0; i<n; i++) {
                  for(int j=0; j<n; j++) {
-                     resObj[i][j] = org.jscience.core.mathematics.numbers.real.Real.of(result[i*n + j]);
+                     resObj[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(result[i*n + j]);
                  }
              }
-             return new DenseMatrix<>(resObj, (Ring<org.jscience.core.mathematics.numbers.real.Real>) A.getScalarRing());
+             return new DenseMatrix<>(resObj, (Ring<org.episteme.core.mathematics.numbers.real.Real>) A.getScalarRing());
          } catch (Throwable e) {
              throw new RuntimeException(e);
          }
     }
 
     @Override
-    public org.jscience.core.mathematics.numbers.real.Real determinant(Matrix<org.jscience.core.mathematics.numbers.real.Real> A) {
+    public org.episteme.core.mathematics.numbers.real.Real determinant(Matrix<org.episteme.core.mathematics.numbers.real.Real> A) {
          if (!IS_AVAILABLE || DGETRF == null) return LinearAlgebraProvider.super.determinant(A);
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
@@ -289,7 +289,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
              
              int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
-             if (info > 0) return org.jscience.core.mathematics.numbers.real.Real.ZERO; // Singular
+             if (info > 0) return org.episteme.core.mathematics.numbers.real.Real.ZERO; // Singular
              
              double det = 1.0;
              for(int i=0; i<n; i++) {
@@ -297,7 +297,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                  int pivot = segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long) i);
                  if (pivot != i + 1) det = -det;
              }
-             return org.jscience.core.mathematics.numbers.real.Real.of(det);
+             return org.episteme.core.mathematics.numbers.real.Real.of(det);
          } catch (Throwable e) {
              throw new RuntimeException(e);
          }
@@ -319,7 +319,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public QRResult<org.jscience.core.mathematics.numbers.real.Real> qr(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
+    public QRResult<org.episteme.core.mathematics.numbers.real.Real> qr(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE || DGEQRF == null || DORGQR == null) {
             return LinearAlgebraProvider.super.qr(a);
         }
@@ -345,7 +345,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                     rData[i * n + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
                 }
             }
-            Matrix<org.jscience.core.mathematics.numbers.real.Real> R = createDenseMatrix(rData, k, n, a);
+            Matrix<org.episteme.core.mathematics.numbers.real.Real> R = createDenseMatrix(rData, k, n, a);
 
             // 3. Extract Q (orthogonal matrix)
             // dorgqr overwrites the matrix with Q. We use k because we want the economy QR (m x k).
@@ -358,7 +358,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                     qData[i * k + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
                 }
             }
-            Matrix<org.jscience.core.mathematics.numbers.real.Real> Q = createDenseMatrix(qData, m, k, a);
+            Matrix<org.episteme.core.mathematics.numbers.real.Real> Q = createDenseMatrix(qData, m, k, a);
 
             return new QRResult<>(Q, R);
         } catch (Throwable t) {
@@ -367,7 +367,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public SVDResult<org.jscience.core.mathematics.numbers.real.Real> svd(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
+    public SVDResult<org.episteme.core.mathematics.numbers.real.Real> svd(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE || DGESVD == null) {
             return LinearAlgebraProvider.super.svd(a);
         }
@@ -392,27 +392,27 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             // Extract S as a vector
             double[] sData = new double[k];
             MemorySegment.copy(s, ValueLayout.JAVA_DOUBLE, 0L, sData, 0, k);
-            List<org.jscience.core.mathematics.numbers.real.Real> sList = new ArrayList<>(k);
-            for (double v : sData) sList.add(org.jscience.core.mathematics.numbers.real.Real.of(v));
-            Vector<org.jscience.core.mathematics.numbers.real.Real> S = new DenseVector<>(sList, (Ring<org.jscience.core.mathematics.numbers.real.Real>) a.getScalarRing());
+            List<org.episteme.core.mathematics.numbers.real.Real> sList = new ArrayList<>(k);
+            for (double v : sData) sList.add(org.episteme.core.mathematics.numbers.real.Real.of(v));
+            Vector<org.episteme.core.mathematics.numbers.real.Real> S = new DenseVector<>(sList, (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing());
 
             // Extract U
             double[] uData = new double[m * m];
             MemorySegment.copy(u, ValueLayout.JAVA_DOUBLE, 0L, uData, 0, m * m);
-            Matrix<org.jscience.core.mathematics.numbers.real.Real> U = createDenseMatrix(uData, m, m, a);
+            Matrix<org.episteme.core.mathematics.numbers.real.Real> U = createDenseMatrix(uData, m, m, a);
 
             // Extract V (input Vt is V transpose)
             double[] vtData = new double[n * n];
             MemorySegment.copy(vt, ValueLayout.JAVA_DOUBLE, 0L, vtData, 0, n * n);
 
             // We return V, so we transpose Vt (in row-major, VT[j*n + i] is V[i*n + j])
-            org.jscience.core.mathematics.numbers.real.Real[][] vObj = new org.jscience.core.mathematics.numbers.real.Real[n][n];
+            org.episteme.core.mathematics.numbers.real.Real[][] vObj = new org.episteme.core.mathematics.numbers.real.Real[n][n];
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    vObj[i][j] = org.jscience.core.mathematics.numbers.real.Real.of(vtData[j * n + i]);
+                    vObj[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(vtData[j * n + i]);
                 }
             }
-            Matrix<org.jscience.core.mathematics.numbers.real.Real> V = new DenseMatrix<>(vObj, (Ring<org.jscience.core.mathematics.numbers.real.Real>) a.getScalarRing());
+            Matrix<org.episteme.core.mathematics.numbers.real.Real> V = new DenseMatrix<>(vObj, (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing());
 
             return new SVDResult<>(U, S, V);
         } catch (Throwable t) {
@@ -432,7 +432,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring.zero() instanceof org.jscience.core.mathematics.numbers.real.Real;
+        return ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real;
     }
 
     @Override
@@ -453,7 +453,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public Matrix<org.jscience.core.mathematics.numbers.real.Real> multiply(Matrix<org.jscience.core.mathematics.numbers.real.Real> A, Matrix<org.jscience.core.mathematics.numbers.real.Real> B) {
+    public Matrix<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> A, Matrix<org.episteme.core.mathematics.numbers.real.Real> B) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(A, B);
         int m = A.rows();
         int k = A.cols();
@@ -487,7 +487,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public org.jscience.core.mathematics.numbers.real.Real dot(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
+    public org.episteme.core.mathematics.numbers.real.Real dot(Vector<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
          if (!IS_AVAILABLE) return LinearAlgebraProvider.super.dot(a, b);
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
@@ -495,23 +495,23 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
              for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i).doubleValue());
              MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
              for(int i=0; i<n; i++) segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
-             try { return org.jscience.core.mathematics.numbers.real.Real.of((double) DDOT.invokeExact(n, segX, 1, segY, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
+             try { return org.episteme.core.mathematics.numbers.real.Real.of((double) DDOT.invokeExact(n, segX, 1, segY, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
          }
     }
     
     @Override
-    public org.jscience.core.mathematics.numbers.real.Real norm(Vector<org.jscience.core.mathematics.numbers.real.Real> a) {
+    public org.episteme.core.mathematics.numbers.real.Real norm(Vector<org.episteme.core.mathematics.numbers.real.Real> a) {
          if (!IS_AVAILABLE) return LinearAlgebraProvider.super.norm(a);
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
              for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i).doubleValue());
-             try { return org.jscience.core.mathematics.numbers.real.Real.of((double) DNRM2.invokeExact(n, segX, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
+             try { return org.episteme.core.mathematics.numbers.real.Real.of((double) DNRM2.invokeExact(n, segX, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
          }
     }
 
     @Override
-    public Vector<org.jscience.core.mathematics.numbers.real.Real> add(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> add(Vector<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.add(a, b);
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
@@ -522,14 +522,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                 segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.get(i).doubleValue());
             }
             try { DAXPY.invokeExact(n, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[n];
-            for (int i = 0; i < n; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)a.getScalarRing());
+            org.episteme.core.mathematics.numbers.real.Real[] result = new org.episteme.core.mathematics.numbers.real.Real[n];
+            for (int i = 0; i < n; i++) result[i] = org.episteme.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.episteme.core.mathematics.numbers.real.Real>)a.getScalarRing());
         }
     }
 
     @Override
-    public Vector<org.jscience.core.mathematics.numbers.real.Real> subtract(Vector<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> subtract(Vector<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.subtract(a, b);
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
@@ -540,28 +540,28 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
                 segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a.get(i).doubleValue());
             }
             try { DAXPY.invokeExact(n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[n];
-            for (int i = 0; i < n; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)a.getScalarRing());
+            org.episteme.core.mathematics.numbers.real.Real[] result = new org.episteme.core.mathematics.numbers.real.Real[n];
+            for (int i = 0; i < n; i++) result[i] = org.episteme.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.episteme.core.mathematics.numbers.real.Real>)a.getScalarRing());
         }
     }
 
     @Override
-    public Vector<org.jscience.core.mathematics.numbers.real.Real> multiply(Vector<org.jscience.core.mathematics.numbers.real.Real> vector, org.jscience.core.mathematics.numbers.real.Real scalar) {
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> multiply(Vector<org.episteme.core.mathematics.numbers.real.Real> vector, org.episteme.core.mathematics.numbers.real.Real scalar) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(vector, scalar);
         int n = vector.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
             for (int i = 0; i < n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, vector.get(i).doubleValue());
             try { DSCAL.invokeExact(n, scalar.doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[n];
-            for (int i = 0; i < n; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)vector.getScalarRing());
+            org.episteme.core.mathematics.numbers.real.Real[] result = new org.episteme.core.mathematics.numbers.real.Real[n];
+            for (int i = 0; i < n; i++) result[i] = org.episteme.core.mathematics.numbers.real.Real.of(segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.episteme.core.mathematics.numbers.real.Real>)vector.getScalarRing());
         }
     }
 
     @Override
-    public Matrix<org.jscience.core.mathematics.numbers.real.Real> add(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Matrix<org.jscience.core.mathematics.numbers.real.Real> b) {
+    public Matrix<org.episteme.core.mathematics.numbers.real.Real> add(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Matrix<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.add(a, b);
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
@@ -580,7 +580,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public Matrix<org.jscience.core.mathematics.numbers.real.Real> subtract(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Matrix<org.jscience.core.mathematics.numbers.real.Real> b) {
+    public Matrix<org.episteme.core.mathematics.numbers.real.Real> subtract(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Matrix<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.subtract(a, b);
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
@@ -599,7 +599,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public Matrix<org.jscience.core.mathematics.numbers.real.Real> scale(org.jscience.core.mathematics.numbers.real.Real scalar, Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
+    public Matrix<org.episteme.core.mathematics.numbers.real.Real> scale(org.episteme.core.mathematics.numbers.real.Real scalar, Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.scale(scalar, a);
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
@@ -615,7 +615,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public Matrix<org.jscience.core.mathematics.numbers.real.Real> transpose(Matrix<org.jscience.core.mathematics.numbers.real.Real> a) {
+    public Matrix<org.episteme.core.mathematics.numbers.real.Real> transpose(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
         if (IS_AVAILABLE && DOMATCOPY != null) {
             int m = a.rows(), n = a.cols();
             try (Arena arena = Arena.ofConfined()) {
@@ -638,18 +638,18 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
         return LinearAlgebraProvider.super.transpose(a);
     }
 
-    private Matrix<org.jscience.core.mathematics.numbers.real.Real> createDenseMatrix(double[] data, int rows, int cols, Matrix<org.jscience.core.mathematics.numbers.real.Real> reference) {
-        org.jscience.core.mathematics.numbers.real.Real[][] resObj = new org.jscience.core.mathematics.numbers.real.Real[rows][cols];
+    private Matrix<org.episteme.core.mathematics.numbers.real.Real> createDenseMatrix(double[] data, int rows, int cols, Matrix<org.episteme.core.mathematics.numbers.real.Real> reference) {
+        org.episteme.core.mathematics.numbers.real.Real[][] resObj = new org.episteme.core.mathematics.numbers.real.Real[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                resObj[i][j] = org.jscience.core.mathematics.numbers.real.Real.of(data[i * cols + j]);
+                resObj[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(data[i * cols + j]);
             }
         }
-        return new DenseMatrix<>(resObj, (Ring<org.jscience.core.mathematics.numbers.real.Real>) reference.getScalarRing());
+        return new DenseMatrix<>(resObj, (Ring<org.episteme.core.mathematics.numbers.real.Real>) reference.getScalarRing());
     }
 
     @Override
-    public Vector<org.jscience.core.mathematics.numbers.real.Real> multiply(Matrix<org.jscience.core.mathematics.numbers.real.Real> a, Vector<org.jscience.core.mathematics.numbers.real.Real> b) {
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(a, b);
         int m = a.rows(), k = a.cols();
         try (Arena arena = Arena.ofConfined()) {
@@ -662,18 +662,18 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
             for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i, b.get(i).doubleValue());
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m);
             try { DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, k, 1.0, segA, k, segX, 1, 0.0, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            org.jscience.core.mathematics.numbers.real.Real[] result = new org.jscience.core.mathematics.numbers.real.Real[m];
-            for (int i = 0; i < m; i++) result[i] = org.jscience.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i));
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.jscience.core.mathematics.numbers.real.Real>)b.getScalarRing());
+            org.episteme.core.mathematics.numbers.real.Real[] result = new org.episteme.core.mathematics.numbers.real.Real[m];
+            for (int i = 0; i < m; i++) result[i] = org.episteme.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i));
+            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.episteme.core.mathematics.numbers.real.Real>)b.getScalarRing());
         }
     }
 
-    private double[] toDoubleArray(Matrix<org.jscience.core.mathematics.numbers.real.Real> matrix) {
+    private double[] toDoubleArray(Matrix<org.episteme.core.mathematics.numbers.real.Real> matrix) {
         Object mObj = matrix;
-        if (mObj instanceof org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
-            return ((org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) mObj).toDoubleArray();
-        } else if (matrix instanceof org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix) {
-            return ((org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<?>) matrix).toDoubleArray();
+        if (mObj instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            return ((org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) mObj).toDoubleArray();
+        } else if (matrix instanceof org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix) {
+            return ((org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<?>) matrix).toDoubleArray();
         } else {
              int rows = matrix.rows();
              int cols = matrix.cols();
@@ -688,7 +688,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.jscience.
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null; 
     }
 }

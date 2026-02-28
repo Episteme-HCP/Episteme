@@ -10,11 +10,11 @@ cd certs
 
 echo "Generating Self-Signed CA..."
 openssl genrsa -out ca.key 4096
-openssl req -new -x509 -key ca.key -sha256 -subj "/C=US/ST=State/L=City/O=JScience/CN=JScienceRootCA" -days 365 -out ca.crt
+openssl req -new -x509 -key ca.key -sha256 -subj "/C=US/ST=State/L=City/O=Episteme/CN=EpistemeRootCA" -days 365 -out ca.crt
 
 echo "Generating Server Key and CSR..."
 openssl genrsa -out server.key 2048
-openssl req -new -key server.key -out server.csr -subj "/C=US/ST=State/L=City/O=JScience/CN=localhost"
+openssl req -new -key server.key -out server.csr -subj "/C=US/ST=State/L=City/O=Episteme/CN=localhost"
 
 echo "Signing Server Certificate..."
 openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365 -sha256

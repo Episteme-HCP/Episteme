@@ -1,8 +1,8 @@
-# JScience Reimagined
+# Episteme Reimagined
 
 **A unified scientific computing framework where all sciences naturally build upon their mathematical foundations.**
 
-[![Javadoc](https://img.shields.io/badge/Javadoc-Reference-blue)](https://silveremartin-dev.github.io/JScience/)
+[![Javadoc](https://img.shields.io/badge/Javadoc-Reference-blue)](https://silveremartin-dev.github.io/Episteme/)
 [![Demos](https://img.shields.io/badge/Demos-59-green)](README.md#demo-applications)
 [![I18n](https://img.shields.io/badge/Languages-EN%20|%20FR%20|%20ES%20|%20DE-orange)](README.md#internationalization)
 
@@ -12,7 +12,7 @@ Mathematics → Physics → Chemistry → Biology → Human Sciences
 
 ## Vision
 
-JScience Reimagined creates an integrated API where:
+Episteme Reimagined creates an integrated API where:
 
 - A **biologist** extends biology classes and automatically gets chemistry, physics, and mathematics
 - A **chemist** works with molecules and automatically gets quantum mechanics and statistical analysis
@@ -46,7 +46,7 @@ Statistics stats = dna.computeAlignmentStats();   // Mathematics layer
 
 ## 🚀 High Performance & Distributed Computing (HPC)
 
-JScience now includes native optimizations for heavy workloads:
+Episteme now includes native optimizations for heavy workloads:
 - **SIMD Acceleration**: Vector API (Incubator) utilization for AVX-512/NEON instructions in Matrix operations.
 - **Native BLAS**: Automatic bonding with OpenBLAS / MKL via Project Panama (Foreign Function & Memory API) for maximum CPU throughput.
 - **MPI Integration**: Distributed context capable of scaling from local simulation to true MPI clusters (OpenMPI/MPICH) without code changes.
@@ -54,8 +54,8 @@ JScience now includes native optimizations for heavy workloads:
 ## Quick Start
 
 ```bash
-git clone https://github.com/silveremartin-dev/JScience
-cd jscience
+git clone https://github.com/silveremartin-dev/Episteme
+cd episteme
 mvn clean install
 ```
 
@@ -80,31 +80,31 @@ Matrix<CudaFloat> gpu = Matrix.create(data, new CudaScalar());
 - Physics (Astronomy, Mechanics) & Chemistry (Periodic Table)
 - Comprehensive Cleanup & Benchmarking Suite
 - Full I18n support (EN/FR) with TestFX UI testing
-- **Server Migration**: `jscience-server` migrated to **Spring Boot 3.2** (gRPC, REST, JPA, Vault)
+- **Server Migration**: `episteme-server` migrated to **Spring Boot 3.2** (gRPC, REST, JPA, Vault)
 
 ## Module Structure
 
 ```text
-jscience/
-├── jscience-core/          # Mathematics, I/O, common utilities
+episteme/
+├── episteme-core/          # Mathematics, I/O, common utilities
 │   ├── mathematics/        # Linear algebra, calculus, statistics
 │   ├── measure/            # Quantities, units (JSR-385)
 │   ├── bibliography/       # Citation management, CrossRef
 │   └── ui/                 # Demo launcher, Matrix viewers
-├── jscience-natural/       # Natural sciences (34 demos)
+├── episteme-natural/       # Natural sciences (34 demos)
 │   ├── physics/            # Mechanics, thermodynamics, astronomy
 │   ├── chemistry/          # Molecules, reactions, biochemistry
 │   ├── biology/            # Genetics, evolution, ecology
 │   └── earth/              # Geology, meteorology, coordinates
-├── jscience-social/        # Social sciences (11 demos)
+├── episteme-social/        # Social sciences (11 demos)
 │   ├── economics/          # Markets, currencies, models
 │   ├── geography/          # GIS, maps, demographics
 │   └── sociology/          # Networks, organizations
-├── jscience-killer-apps/   # Advanced applications (10 demos)
+├── episteme-killer-apps/   # Advanced applications (10 demos)
 │   ├── biology/            # CRISPR Design, Pandemic Forecaster
 │   ├── physics/            # Quantum Circuits, Relativity
 │   └── chemistry/          # Titration, Crystal Structure
-└── jscience-benchmarks/    # JMH performance benchmarks
+└── episteme-benchmarks/    # JMH performance benchmarks
 ```
 
 ## Demo Applications
@@ -113,16 +113,16 @@ jscience/
 
 | Module | Demos | Examples |
 | --- | --- | --- |
-| jscience-core | 4 | Matrix Viewer, Function Plotter, 3D Surfaces |
-| jscience-natural | 34 | Mandelbrot, Game of Life, Stellar Sky, Pendulum |
-| jscience-social | 11 | GIS Maps, Voting Systems, GDP Models |
-| jscience-killer-apps | 10 | CRISPR, Quantum Circuits, Pandemic Forecaster |
+| episteme-core | 4 | Matrix Viewer, Function Plotter, 3D Surfaces |
+| episteme-natural | 34 | Mandelbrot, Game of Life, Stellar Sky, Pendulum |
+| episteme-social | 11 | GIS Maps, Voting Systems, GDP Models |
+| episteme-killer-apps | 10 | CRISPR, Quantum Circuits, Pandemic Forecaster |
 
 ### Launch Demo Launcher
 
 ```bash
 # From project root
-mvn exec:java -pl jscience-core -Dexec.mainClass="org.jscience.core.ui.JScienceDemosApp"
+mvn exec:java -pl episteme-core -Dexec.mainClass="org.episteme.core.ui.EpistemeDemosApp"
 
 # Or use batch script
 run_demos.bat
@@ -133,17 +133,17 @@ run_demos.bat
 
 ### Linear Algebra (Smart Dispatch)
 ```bash
-mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.linearalgebra.LinearAlgebraExample"
+mvn exec:java -pl episteme-featured-apps -Dexec.mainClass="org.episteme.examples.linearalgebra.LinearAlgebraExample"
 ```
 
 ### Audio Analysis (TarsosDSP)
 ```bash
-mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.audio.AudioAnalysisExample" -Dexec.args="path/to/audio.wav"
+mvn exec:java -pl episteme-featured-apps -Dexec.mainClass="org.episteme.examples.audio.AudioAnalysisExample" -Dexec.args="path/to/audio.wav"
 ```
 
 ### Physics Simulation (Native Bullet/Jolt)
 ```bash
-mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.physics.PhysicsSimulationExample"
+mvn exec:java -pl episteme-featured-apps -Dexec.mainClass="org.episteme.examples.physics.PhysicsSimulationExample"
 ```
 
 
@@ -151,17 +151,17 @@ mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples
 
 ### Linear Algebra (Smart Dispatch)
 ```bash
-mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.linearalgebra.LinearAlgebraExample"
+mvn exec:java -pl episteme-featured-apps -Dexec.mainClass="org.episteme.examples.linearalgebra.LinearAlgebraExample"
 ```
 
 ### Audio Analysis (TarsosDSP)
 ```bash
-mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.audio.AudioAnalysisExample" -Dexec.args="path/to/audio.wav"
+mvn exec:java -pl episteme-featured-apps -Dexec.mainClass="org.episteme.examples.audio.AudioAnalysisExample" -Dexec.args="path/to/audio.wav"
 ```
 
 ### Physics Simulation (Native Bullet/Jolt)
 ```bash
-mvn exec:java -pl jscience-featured-apps -Dexec.mainClass="org.jscience.examples.physics.PhysicsSimulationExample"
+mvn exec:java -pl episteme-featured-apps -Dexec.mainClass="org.episteme.examples.physics.PhysicsSimulationExample"
 ```
 
 ## Data Loaders
@@ -189,7 +189,7 @@ mvn test
 
 ```bash
 # With display
-mvn test -pl jscience-core -Dtest=*UITest,*DemoAppTest
+mvn test -pl episteme-core -Dtest=*UITest,*DemoAppTest
 
 # Headless mode (CI/CD)
 mvn test -Dtestfx.headless=true -Dprism.order=sw -Djava.awt.headless=true
@@ -201,10 +201,10 @@ Full support for English, French, Spanish, and German:
 
 | Module | EN | FR |
 | --- | --- | --- |
-| jscience-core | ✅ | ✅ |
-| jscience-natural | ✅ | ✅ |
-| jscience-social | ✅ | ✅ |
-| jscience-killer-apps | ✅ | ✅ |
+| episteme-core | ✅ | ✅ |
+| episteme-natural | ✅ | ✅ |
+| episteme-social | ✅ | ✅ |
+| episteme-killer-apps | ✅ | ✅ |
 
 Switch language via `Preferences > Language` menu.
 
@@ -222,7 +222,7 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete design.
 
 ## Documentation
 
-- 📚 **Online API Javadoc**: [https://silveremartin-dev.github.io/JScience/](https://silveremartin-dev.github.io/JScience/)
+- 📚 **Online API Javadoc**: [https://silveremartin-dev.github.io/Episteme/](https://silveremartin-dev.github.io/Episteme/)
 - [Architecture Guide](docs/ARCHITECTURE.md)
 - [Mathematical Concepts](docs/MATH_CONCEPTS.md)
 - [API Reference](docs/API.md)
@@ -243,7 +243,7 @@ MIT License - see [LICENSE](LICENSE) file.
 
 - **Original Vision**: Silvere Martin-Michiellot
 - **Implementation**: Gemini AI (Google DeepMind)
-- **Inspired by**: JScience (Jean-Marie Dautelle et al.)
+- **Inspired by**: Episteme (Jean-Marie Dautelle et al.)
 
 ## Contributing
 
@@ -259,4 +259,4 @@ Areas we need help:
 
 ---
 
-*JScience Reimagined - Making scientific computing natural.*
+*Episteme Reimagined - Making scientific computing natural.*

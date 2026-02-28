@@ -1,4 +1,4 @@
-package org.jscience.benchmarks.benchmark;
+package org.episteme.benchmarks.benchmark;
 
 import java.util.Map;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 # Resource Files - License & Attribution
 
-This document tracks licenses and attributions for all resource files in the JScience library.
+This document tracks licenses and attributions for all resource files in the Episteme library.
 
 ## Summary
 
@@ -65,7 +65,7 @@ This document tracks licenses and attributions for all resource files in the JSc
   - **License**: Check `geography/paleomaps/license.txt`
   - **Status**: ⚠️ **NEEDS REVIEW**
 - Traffic simulation UI (`architecture/traffic/images/*.gif`)
-  - **Status**: Part of JScience codebase
+  - **Status**: Part of Episteme codebase
 
 ### Psychology/Sociology
 - `psychology/dsmiv.xml` - Diagnostic classifications

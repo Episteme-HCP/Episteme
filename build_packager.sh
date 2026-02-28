@@ -18,17 +18,17 @@ mkdir -p "$TARGET_DIR"
 echo "Copying artifacts (Thin Jars only)..."
 
 MODULES=(
-    "jscience-core" 
-    "jscience-natural" 
-    "jscience-social" 
-    "jscience-native" 
-    "jscience-featured-apps" 
-    "jscience-server"
-    "jscience-client"
-    "jscience-database"
-    "jscience-worker"
-    "jscience-benchmarks"
-    "jscience-jni"
+    "episteme-core" 
+    "episteme-natural" 
+    "episteme-social" 
+    "episteme-native" 
+    "episteme-featured-apps" 
+    "episteme-server"
+    "episteme-client"
+    "episteme-database"
+    "episteme-worker"
+    "episteme-benchmarks"
+    "episteme-jni"
 )
 
 for MOD in "${MODULES[@]}"; do

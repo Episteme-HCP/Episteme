@@ -1,8 +1,8 @@
-# JScience GPU Acceleration Setup
+# Episteme GPU Acceleration Setup
 
 ## Overview
 
-JScience supports GPU acceleration via CUDA for linear algebra operations when available. GPU mode can deliver 10-100x speedups for large matrix operations.
+Episteme supports GPU acceleration via CUDA for linear algebra operations when available. GPU mode can deliver 10-100x speedups for large matrix operations.
 
 ## Prerequisites
 
@@ -40,18 +40,18 @@ start_gpu.bat
 ### Programmatic Configuration
 
 ```java
-import org.jscience.JScience;
-import org.jscience.backend.ComputeMode;
+import org.episteme.Episteme;
+import org.episteme.backend.ComputeMode;
 
 // Set compute mode at startup
-JScience.setComputeMode(ComputeMode.GPU);  // or ComputeMode.CPU
+Episteme.setComputeMode(ComputeMode.GPU);  // or ComputeMode.CPU
 
 // Query current mode
-ComputeMode mode = JScience.getComputeMode();
+ComputeMode mode = Episteme.getComputeMode();
 System.out.println("Running in: " + mode);
 
 // Check GPU availability
-if (JScience.isGPUAvailable()) {
+if (Episteme.isGPUAvailable()) {
     System.out.println("GPU acceleration available");
 }
 ```
@@ -63,8 +63,8 @@ if (JScience.isGPUAvailable()) {
 GPU acceleration is automatic once configured:
 
 ```java
-import org.jscience.mathematics.linear.*;
-import org.jscience.mathematics.number.Real;
+import org.episteme.mathematics.linear.*;
+import org.episteme.mathematics.number.Real;
 
 // Create large matrices
 Matrix<Real> A = DenseMatrix.create(1000, 1000);
@@ -102,16 +102,16 @@ Real dotProduct = v1.dot(v2);  // GPU-accelerated if available
 ### Benchmarking
 
 ```java
-import org.jscience.JScience;
+import org.episteme.Episteme;
 
 // Benchmark CPU
-JScience.setComputeMode(ComputeMode.CPU);
+Episteme.setComputeMode(ComputeMode.CPU);
 long startCPU = System.nanoTime();
 Matrix<Real> resultCPU = largeMatrix.inverse();
 long cpuTime = System.nanoTime() - startCPU;
 
 // Benchmark GPU
-JScience.setComputeMode(ComputeMode.GPU);
+Episteme.setComputeMode(ComputeMode.GPU);
 long startGPU = System.nanoTime();
 Matrix<Real> resultGPU = largeMatrix.inverse();
 long gpuTime = System.nanoTime() - startGPU;
@@ -124,7 +124,7 @@ System.out.printf("CPU: %.2f ms, GPU: %.2f ms, Speedup: %.1fx%n",
 
 ### GPU Not Available
 
-**If `JScience.isGPUAvailable()` returns `false`**:
+**If `Episteme.isGPUAvailable()` returns `false`**:
 
 1. **Check CUDA installation**:
    ```bash
@@ -138,9 +138,9 @@ System.out.printf("CPU: %.2f ms, GPU: %.2f ms, Speedup: %.1fx%n",
 
 3. **Fallback to CPU**:
    ```java
-   if (!JScience.isGPUAvailable()) {
+   if (!Episteme.isGPUAvailable()) {
        System.out.println("GPU not available, using CPU");
-       JScience.setComputeMode(ComputeMode.CPU);
+       Episteme.setComputeMode(ComputeMode.CPU);
    }
    ```
 
@@ -172,17 +172,17 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 // Set precision for Real number operations
-JScience.setMathContext(new MathContext(64, RoundingMode.HALF_EVEN));
+Episteme.setMathContext(new MathContext(64, RoundingMode.HALF_EVEN));
 ```
 
 ## Maven Configuration
 
 ```xml
 <dependencies>
-    <!-- JScience core -->
+    <!-- Episteme core -->
     <dependency>
-        <groupId>org.jscience</groupId>
-        <artifactId>jscience</artifactId>
+        <groupId>org.episteme</groupId>
+        <artifactId>episteme</artifactId>
         <version>2.0.0</version>
     </dependency>
     
@@ -206,12 +206,12 @@ JScience.setMathContext(new MathContext(64, RoundingMode.HALF_EVEN));
 
 ## Examples
 
-See `src/test/java/org/jscience/examples/` for complete examples:
+See `src/test/java/org/episteme/examples/` for complete examples:
 - `LinearAlgebraGPUDemo.java` - GPU acceleration demonstration
 - `MatrixBenchmark.java` - CPU vs GPU performance comparison
 
 ## Support
 
 For issues and questions:
-- GitHub Issues: https://github.com/jscience/jscience/issues
-- Documentation: https://jscience.org/docs
+- GitHub Issues: https://github.com/episteme/episteme/issues
+- Documentation: https://episteme.org/docs

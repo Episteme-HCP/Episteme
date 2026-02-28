@@ -1,16 +1,16 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.matrices.SparseMatrix;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.sets.Reals;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.sets.Reals;
 import java.util.Random;
 
 /**

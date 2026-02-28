@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <artifactId>jscience-parent</artifactId>
-    <groupId>org.jscience</groupId>
+    <artifactId>episteme-parent</artifactId>
+    <groupId>org.episteme</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>jscience-worker</artifactId>
-  <name>JScience Worker Node</name>
-  <description>Standalone Distributed Worker for JScience Grid</description>
+  <artifactId>episteme-worker</artifactId>
+  <name>Episteme Worker Node</name>
+  <description>Standalone Distributed Worker for Episteme Grid</description>
   <build>
     <plugins>
       <plugin>
@@ -23,7 +23,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>org.jscience.worker.WorkerNode</mainClass>
+                  <mainClass>org.episteme.worker.WorkerNode</mainClass>
                 </transformer>
               </transformers>
             </configuration>

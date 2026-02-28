@@ -1,16 +1,16 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.physics.loaders.fits;
+package org.episteme.nativ.physics.loaders.fits;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import org.jscience.natural.physics.loaders.fits.ImageHDU;
-import org.jscience.natural.physics.loaders.fits.FITSConstants;
-import org.jscience.natural.physics.loaders.fits.Header;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.natural.physics.loaders.fits.ImageHDU;
+import org.episteme.natural.physics.loaders.fits.FITSConstants;
+import org.episteme.natural.physics.loaders.fits.Header;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 import java.lang.foreign.Arena;
 
 /**

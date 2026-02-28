@@ -1,6 +1,6 @@
-# JScience Architecture
+# Episteme Architecture
 
-JScience is a unified scientific computing framework for the Java(TM) platform. It follows a modular architecture designed for high-performance, type-safety, and extensibility across multiple scientific domains.
+Episteme is a unified scientific computing framework for the Java(TM) platform. It follows a modular architecture designed for high-performance, type-safety, and extensibility across multiple scientific domains.
 
 ## Module Structure
 
@@ -9,17 +9,17 @@ The project is organized as a multi-module Maven system, where each module repre
 ```mermaid
 graph TD
     subgraph "Core Layer"
-        Core["jscience-core"]
+        Core["episteme-core"]
     end
 
     subgraph "Domain Layer"
-        Natural["jscience-natural"]
-        Social["jscience-social"]
+        Natural["episteme-natural"]
+        Social["episteme-social"]
     end
 
     subgraph "Application & Analysis"
-        Apps["jscience-killer-apps"]
-        Benchmarks["jscience-benchmarks"]
+        Apps["episteme-killer-apps"]
+        Benchmarks["episteme-benchmarks"]
     end
 
     Natural --> Core
@@ -30,7 +30,7 @@ graph TD
     Benchmarks --> Core
 ```
 
-### [jscience-core](file:///c:/Silvere/Encours/Developpement/JScience/jscience-core)
+### [episteme-core](file:///c:/Silvere/Encours/Developpement/Episteme/episteme-core)
 
 The foundation of the framework. It provides:
 
@@ -38,7 +38,7 @@ The foundation of the framework. It provides:
 - **Physics**: Units of Measurement (JSR-385 integration), physical quantities, and fundamental constants.
 - **I/O & Utilities**: Standardized loaders for Properties, JSON, and Protobuf, along with a unified `ComputeContext` for switching between CPU and GPU backends.
 
-### [jscience-natural](file:///c:/Silvere/Encours/Developpement/JScience/jscience-natural)
+### [episteme-natural](file:///c:/Silvere/Encours/Developpement/Episteme/episteme-natural)
 
 Implements specific scientific disciplines using the core primitives:
 
@@ -47,7 +47,7 @@ Implements specific scientific disciplines using the core primitives:
 - **Biology**: Sequence alignment, genetic modeling, and phylogenetic tree construction.
 - **Earth & Space**: Geospatial data, earthquake modeling, and ephemeris tracking.
 
-### [jscience-social](file:///c:/Silvere/Encours/Developpement/JScience/jscience-social)
+### [episteme-social](file:///c:/Silvere/Encours/Developpement/Episteme/episteme-social)
 
 Focuses on high-level simulations and the "human" aspect of science:
 
@@ -56,13 +56,13 @@ Focuses on high-level simulations and the "human" aspect of science:
 - **Engineering**: Architecture stability simulations and control systems.
 - **Visuals**: often hosts the `Javalin` based web dashboards and complex demo UI controllers.
 
-### [jscience-killer-apps](file:///c:/Silvere/Encours/Developpement/JScience/jscience-killer-apps)
+### [episteme-killer-apps](file:///c:/Silvere/Encours/Developpement/Episteme/episteme-killer-apps)
 
-A collection of end-user applications that demonstrate the full power of the JScience integration, from real-time data visualization to complex multi-physics simulations.
+A collection of end-user applications that demonstrate the full power of the Episteme integration, from real-time data visualization to complex multi-physics simulations.
 
-### [jscience-benchmarks](file:///c:/Silvere/Encours/Developpement/JScience/jscience-benchmarks)
+### [episteme-benchmarks](file:///c:/Silvere/Encours/Developpement/Episteme/episteme-benchmarks)
 
-Performance analysis module used to compare JScience operations (like FFT or Matrix multiplication) against industry standards like EJML, Apache Commons Math, and Colt.
+Performance analysis module used to compare Episteme operations (like FFT or Matrix multiplication) against industry standards like EJML, Apache Commons Math, and Colt.
 
 ## Key Design Principles
 

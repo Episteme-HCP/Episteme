@@ -1,18 +1,18 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.tensors.backends;
+package org.episteme.nativ.mathematics.tensors.backends;
 
-import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
-import org.jscience.nativ.mathematics.linearalgebra.tensors.NativeTensor;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
+import org.episteme.core.mathematics.linearalgebra.tensors.TensorProvider;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.nativ.mathematics.linearalgebra.tensors.NativeTensor;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.Arena;
@@ -97,8 +97,8 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
-        return new org.jscience.core.technical.backend.cpu.CPUExecutionContext();
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
     }
 
     @Override

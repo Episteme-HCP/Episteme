@@ -1,10 +1,10 @@
 #!/bin/bash
-# JScience HPC - Native Libraries Installer for RHEL/CentOS/Fedora
+# Episteme HPC - Native Libraries Installer for RHEL/CentOS/Fedora
 # This script installs all required native libraries using dnf
 
 set -e
 
-echo "=== JScience HPC Native Libraries Installer (RHEL/CentOS/Fedora) ==="
+echo "=== Episteme HPC Native Libraries Installer (RHEL/CentOS/Fedora) ==="
 echo ""
 
 # Check if running as root
@@ -119,5 +119,5 @@ echo ""
 echo "Next steps:"
 echo "1. Logout and login again (or run: source /etc/profile.d/openmpi.sh)"
 echo "2. Verify: ./verify_native_libs_linux.sh"
-echo "3. Build JScience: mvn clean compile"
+echo "3. Build Episteme: mvn clean compile"
 echo ""

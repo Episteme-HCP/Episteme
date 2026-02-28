@@ -1,6 +1,6 @@
-# JScience Server & Infrastructure Setup
+# Episteme Server & Infrastructure Setup
 
-This guide details how to set up, build, and run the JScience distributed computing environment, including the central server, database, worker nodes, and client applications.
+This guide details how to set up, build, and run the Episteme distributed computing environment, including the central server, database, worker nodes, and client applications.
 
 ## 1. Prerequisites
 
@@ -22,7 +22,7 @@ docker compose logs -f server
 
 * **Server**: gRPC `localhost:50051`, REST `localhost:8080/api`
 * **Prometheus**: `localhost:9090`
-* **Grafana**: `localhost:3000` (User/Pass: `admin`/`jscience`)
+* **Grafana**: `localhost:3000` (User/Pass: `admin`/`episteme`)
 
 ---
 
@@ -42,14 +42,14 @@ To use PostgreSQL (recommended for production):
     docker compose up -d postgres
     ```
 
-    This starts PostgreSQL 16 on port 5432 (User: `admin`, Pass: `SecureP@ssw0rd123!`, DB: `jscience`).
+    This starts PostgreSQL 16 on port 5432 (User: `admin`, Pass: `SecureP@ssw0rd123!`, DB: `episteme`).
 
 2. **Configure Server**: Set environment variables when running the server.
 
     ```bash
     export DATABASE_DRIVER_CLASS=org.postgresql.Driver
-    export DATABASE_JOBS_URL=jdbc:postgresql://localhost:5432/jscience
-    export DATABASE_USERS_URL=jdbc:postgresql://localhost:5432/jscience
+    export DATABASE_JOBS_URL=jdbc:postgresql://localhost:5432/episteme
+    export DATABASE_USERS_URL=jdbc:postgresql://localhost:5432/episteme
     export DATABASE_USERNAME=admin
     export DATABASE_PASSWORD=SecureP@ssw0rd123!
     ```
@@ -66,24 +66,24 @@ If you prefer running components manually (without Docker):
 mvn clean install -DskipTests
 ```
 
-### B. JScience Server (`jscience-server`)
+### B. Episteme Server (`episteme-server`)
 
 The central coordinator and API gateway.
 
 * **Run**:
 
     ```bash
-    java -jar jscience-server/target/jscience-server-1.0.0-SNAPSHOT.jar
+    java -jar episteme-server/target/episteme-server-1.0.0-SNAPSHOT.jar
     ```
 
 * **Configuration**:
-  * Config file: `jscience-server/src/main/resources/application.properties`
+  * Config file: `episteme-server/src/main/resources/application.properties`
   * **Env Vars**:
     * `PORT`: gRPC port (default: 50051)
     * `JWT_SECRET`: Signing key for tokens (Required in PROD)
     * `MLFLOW_TRACKING_URI`: URL for MLflow (default: <http://localhost:5000>)
 
-### C. Worker Node (`jscience-worker`)
+### C. Worker Node (`episteme-worker`)
 
 A compute node that connects to the server to execute tasks.
 
@@ -94,19 +94,19 @@ A compute node that connects to the server to execute tasks.
     export SERVER_HOST=localhost
     export SERVER_PORT=50051
     
-    java -jar jscience-worker/target/jscience-worker-1.0.0-SNAPSHOT.jar
+    java -jar episteme-worker/target/episteme-worker-1.0.0-SNAPSHOT.jar
     ```
 
 * You can run multiple instances of the worker in separate terminals.
 
-### D. Client Applications (`jscience-client`)
+### D. Client Applications (`episteme-client`)
 
 Example distributed applications (Fractals, N-Body, Molecular Dynamics).
 
 * **Run**:
 
     ```bash
-    java -jar jscience-client/target/jscience-client-1.0.0-SNAPSHOT.jar
+    java -jar episteme-client/target/episteme-client-1.0.0-SNAPSHOT.jar
     ```
 
 * Select the application to run from the CLI menu.

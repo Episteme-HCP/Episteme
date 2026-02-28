@@ -1,8 +1,8 @@
-# Native Libraries Installation Guide for JScience HPC
+# Native Libraries Installation Guide for Episteme HPC
 
 ## Overview
 
-JScience HPC requires several native libraries for optimal performance. This guide provides download links, installation instructions, and configuration details for Windows systems.
+Episteme HPC requires several native libraries for optimal performance. This guide provides download links, installation instructions, and configuration details for Windows systems.
 
 ---
 
@@ -138,7 +138,7 @@ lib /def:libfftw3l-3.def /out:libfftw3l-3.lib /machine:x64
 ### Building the Wrapper
 **Purpose**: Physics simulation for N-body collision detection.
 
-**Note**: JScience requires a custom C-API wrapper around Bullet Physics. Here's how to create it:
+**Note**: Episteme requires a custom C-API wrapper around Bullet Physics. Here's how to create it:
 
 **Download Bullet Physics**:
 ```powershell
@@ -373,9 +373,9 @@ Expand-Archive openblas.zip -DestinationPath C:\OpenBLAS
 Save as `verify_native_libs.ps1`:
 
 ```powershell
-# JScience Native Libraries Verification Script
+# Episteme Native Libraries Verification Script
 
-Write-Host "=== JScience HPC Native Libraries Verification ===" -ForegroundColor Cyan
+Write-Host "=== Episteme HPC Native Libraries Verification ===" -ForegroundColor Cyan
 
 $libraries = @(
     @{Name="HDF5"; DLL="hdf5.dll"; Path="C:\HDF5\bin"},

@@ -1,23 +1,23 @@
-# JScience Library Dependencies & Weight Analysis
+# Episteme Library Dependencies & Weight Analysis
 
 This document provides a technical breakdown of the `launchers/lib` directory, distinguishing between the lightweight requirements for the **Master Demo Suite** and the heavyweight engines required for **Standalone Applications**.
 
 ## Directory Overview: `launchers/lib`
 
-The `launchers/lib` directory serves as a standalone repository for runtime dependencies. It allows JScience applications to be executed without Maven, using direct `java` commands.
+The `launchers/lib` directory serves as a standalone repository for runtime dependencies. It allows Episteme applications to be executed without Maven, using direct `java` commands.
 
 - **Total Files**: 210
 - **Total Weight**: **~370 MB**
 
 ---
 
-## 1. Core "Bare" JScience Suite (~42 MB)
+## 1. Core "Bare" Episteme Suite (~42 MB)
 
-To run the `JScienceDemoApp` (Master Demo) and its 30+ interactive simulations, only about **11%** of the total library weight is required.
+To run the `EpistemeDemoApp` (Master Demo) and its 30+ interactive simulations, only about **11%** of the total library weight is required.
 
 | Component | Approx. Weight | Description |
 | :--- | :--- | :--- |
-| **JScience Modules** | 12.6 MB | Compiled JARs for `core`, `natural`, and `social`. |
+| **Episteme Modules** | 12.6 MB | Compiled JARs for `core`, `natural`, and `social`. |
 | **JavaFX Runtime** | 9.5 MB | UI framework for all visual demonstrations. |
 | **Measure & Math Core** | 5.2 MB | JSR-385 (Indriya), Vecmath, and Commons-Math. |
 | **Infrastructure** | 8.5 MB | Jackson (JSON), Guava, SLF4J/Logback. |
@@ -62,7 +62,7 @@ The remaining **89%** of the weight is comprised of industrial-grade engines use
 
 ### Java Version
 
-JScience 1.0.0-SNAPSHOT requires **JDK 21** or higher.
+Episteme 1.0.0-SNAPSHOT requires **JDK 21** or higher.
 
 ### JVM Arguments
 

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <artifactId>jscience-parent</artifactId>
-    <groupId>org.jscience</groupId>
+    <artifactId>episteme-parent</artifactId>
+    <groupId>org.episteme</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>jscience-benchmarks</artifactId>
-  <name>JScience Benchmarking Suite</name>
-  <description>Benchmarking and performance analysis suite for JScience. Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
+  <artifactId>episteme-benchmarks</artifactId>
+  <name>Episteme Benchmarking Suite</name>
+  <description>Benchmarking and performance analysis suite for Episteme. Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
   <build>
     <plugins>
       <plugin>
@@ -72,11 +72,11 @@
               </filters>
               <transformers>
                 <transformer>
-                  <mainClass>org.jscience.benchmarks.ui.JScienceBenchmarkingApp</mainClass>
+                  <mainClass>org.episteme.benchmarks.ui.EpistemeBenchmarkingApp</mainClass>
                 </transformer>
                 <transformer />
               </transformers>
-              <finalName>jscience-benchmarks</finalName>
+              <finalName>episteme-benchmarks</finalName>
             </configuration>
           </execution>
         </executions>
@@ -86,7 +86,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.1.0</version>
         <configuration>
-          <mainClass>org.jscience.benchmarks.ui.JScienceBenchmarkingApp</mainClass>
+          <mainClass>org.episteme.benchmarks.ui.EpistemeBenchmarkingApp</mainClass>
           <cleanupDaemonThreads>false</cleanupDaemonThreads>
         </configuration>
       </plugin>

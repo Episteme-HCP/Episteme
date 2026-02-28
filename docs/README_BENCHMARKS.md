@@ -1,6 +1,6 @@
-# JScience Benchmarking Suite
+# Episteme Benchmarking Suite
 
-This module provides a comprehensive suite of benchmarks to evaluate the performance of JScience algorithms and their external providers (Native, GPU, Distributed).
+This module provides a comprehensive suite of benchmarks to evaluate the performance of Episteme algorithms and their external providers (Native, GPU, Distributed).
 
 For detailed performance comparisons with other libraries (Commons Math, EJML, Colt, JBlas), see [BENCHMARK_COMPARISON.md](../docs/BENCHMARK_COMPARISON.md).
 
@@ -47,4 +47,4 @@ To add a new systematic benchmark:
 ## Status
 - **HDF5 I/O**: Benchmarks for native Read/Write (via Bytedeco HDF5) are implemented.
 - **Vector API (SIMD)**: Implemented. Leverage JDK Vector instructions (AVX-512/NEON) for matrix operations via SIMDRealLinearAlgebraProvider.
-- **Native Providers**: Supported via `jscience-native` module.
+- **Native Providers**: Supported via `episteme-native` module.

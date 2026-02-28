@@ -1,12 +1,12 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.natural.computing.ai.agents.Agent;
-import org.jscience.natural.computing.ai.agents.Behavior;
-import org.jscience.natural.computing.ai.agents.Environment;
-import org.jscience.natural.computing.ai.agents.acl.ACLMessage;
-import org.jscience.natural.computing.ai.agents.providers.VirtualThreadAgentProvider;
+import org.episteme.natural.computing.ai.agents.Agent;
+import org.episteme.natural.computing.ai.agents.Behavior;
+import org.episteme.natural.computing.ai.agents.Environment;
+import org.episteme.natural.computing.ai.agents.acl.ACLMessage;
+import org.episteme.natural.computing.ai.agents.providers.VirtualThreadAgentProvider;
 
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -36,7 +36,7 @@ public class SystematicAgentBenchmark implements RunnableBenchmark {
     @Override
     public boolean isAvailable() {
         try {
-            Class.forName("org.jscience.natural.computing.ai.agents.providers.VirtualThreadAgentProvider");
+            Class.forName("org.episteme.natural.computing.ai.agents.providers.VirtualThreadAgentProvider");
             return true;
         } catch (ClassNotFoundException e) {
             return false;

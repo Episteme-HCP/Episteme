@@ -1,4 +1,4 @@
-package org.jscience.benchmarks.ui;
+package org.episteme.benchmarks.ui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,26 +6,26 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.core.ui.i18n.I18N;
+import org.episteme.core.ui.i18n.I18N;
 import java.io.File;
 
 
 /**
- * JScience Benchmarking Suite - Master Control for Benchmarking and Performance Analysis.
+ * Episteme Benchmarking Suite - Master Control for Benchmarking and Performance Analysis.
  * Standardized JavaFX application using FXML and CSS.
  */
-public class JScienceBenchmarkingApp extends Application {
+public class EpistemeBenchmarkingApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         // Register benchmark I18N bundle
-        I18N.getInstance().addBundle("org.jscience.benchmarks.i18n.messages_benchmarks");
+        I18N.getInstance().addBundle("org.episteme.benchmarks.i18n.messages_benchmarks");
 
         // 1. Show Splash Screen immediately
         Stage splashStage = new Stage();
         splashStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
         
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("JScience Benchmarks");
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("Episteme Benchmarks");
         titleLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;");
         
         javafx.scene.control.Label loadLabel = new javafx.scene.control.Label("Initializing Core Modules...");
@@ -45,7 +45,7 @@ public class JScienceBenchmarkingApp extends Application {
 
         // Start metrics server background
         new Thread(() -> 
-            org.jscience.core.technical.monitoring.DistributedMonitor.getInstance().startServer()
+            org.episteme.core.technical.monitoring.DistributedMonitor.getInstance().startServer()
         , "Monitor-Starter").start();
 
         // 2. Load Main UI in background (emulated)
@@ -64,7 +64,7 @@ public class JScienceBenchmarkingApp extends Application {
 
                         try {
                             // Point to the specialized branded icon for Benchmarks
-                            java.io.InputStream is = getClass().getResourceAsStream("/org/jscience/benchmarks/ui/icon.png");
+                            java.io.InputStream is = getClass().getResourceAsStream("/org/episteme/benchmarks/ui/icon.png");
                             if (is != null) {
                                 javafx.scene.image.Image icon = new javafx.scene.image.Image(is);
                                 splashStage.getIcons().add(icon);
@@ -72,7 +72,7 @@ public class JScienceBenchmarkingApp extends Application {
                                 System.out.println("[INFO] Loaded specialized Benchmarking icon.");
                             } else {
                                 // Fallback to generic icon
-                                is = getClass().getResourceAsStream("/org/jscience/core/ui/icon.png");
+                                is = getClass().getResourceAsStream("/org/episteme/core/ui/icon.png");
                                 if (is != null) {
                                     javafx.scene.image.Image icon = new javafx.scene.image.Image(is);
                                     primaryStage.getIcons().add(icon);
@@ -82,7 +82,7 @@ public class JScienceBenchmarkingApp extends Application {
                             System.err.println("[ERROR] Failed to load application icon: " + ex.getMessage());
                         }
 
-                        primaryStage.setTitle("JScience Benchmarking Suite");
+                        primaryStage.setTitle("Episteme Benchmarking Suite");
                         primaryStage.setScene(scene);
                         
                         splashStage.close();
@@ -99,8 +99,8 @@ public class JScienceBenchmarkingApp extends Application {
 
     @Override
     public void stop() throws Exception {
-        System.out.println("Stopping JScience Benchmarking Suite...");
-        org.jscience.core.technical.monitoring.DistributedMonitor.getInstance().stopServer();
+        System.out.println("Stopping Episteme Benchmarking Suite...");
+        org.episteme.core.technical.monitoring.DistributedMonitor.getInstance().stopServer();
         super.stop();
         System.exit(0);
     }

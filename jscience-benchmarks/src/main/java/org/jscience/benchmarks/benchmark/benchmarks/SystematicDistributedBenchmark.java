@@ -1,9 +1,9 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.core.distributed.DistributedComputingProvider;
-import org.jscience.core.technical.backend.distributed.DistributedContext;
+import org.episteme.core.distributed.DistributedComputingProvider;
+import org.episteme.core.technical.backend.distributed.DistributedContext;
 import java.util.concurrent.Future;
 
 /**

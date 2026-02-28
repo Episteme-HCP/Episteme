@@ -1,8 +1,8 @@
-package org.jscience.benchmarks.cli;
+package org.episteme.benchmarks.cli;
 
-import org.jscience.benchmarks.benchmark.BenchmarkRegistry;
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.benchmarks.ui.BenchmarkItem;
+import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.ui.BenchmarkItem;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,7 +42,7 @@ public class BenchmarkCLI {
             return;
         }
 
-        System.out.println("Starting JScience Benchmarks (CLI Mode)...");
+        System.out.println("Starting Episteme Benchmarks (CLI Mode)...");
         System.out.println("OS: " + System.getProperty("os.name") + " " + System.getProperty("os.arch"));
         System.out.println("Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
         System.out.println("Cores: " + Runtime.getRuntime().availableProcessors());
@@ -134,7 +134,7 @@ public class BenchmarkCLI {
     }
 
     private static void printHelp() {
-        System.out.println("Usage: java org.jscience.benchmarks.cli.BenchmarkCLI [options]");
+        System.out.println("Usage: java org.episteme.benchmarks.cli.BenchmarkCLI [options]");
         System.out.println("Options:");
         System.out.println("  --run-all         Run all discovered benchmarks.");
         System.out.println("  --export-file <f> Save results to JSON file.");

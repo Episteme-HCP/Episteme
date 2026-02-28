@@ -4,15 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.jscience</groupId>
-        <artifactId>jscience-parent</artifactId>
+        <groupId>org.episteme</groupId>
+        <artifactId>episteme-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jscience-server</artifactId>
+    <artifactId>episteme-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>JScience Server</name>
+    <name>Episteme Server</name>
     <description>RPC Server for Distributed Scientific Computing (Coordinator Node)</description>
 
     <dependencyManagement>
@@ -77,24 +77,24 @@
             <artifactId>s3</artifactId>
         </dependency>
 
-        <!-- Core JScience -->
+        <!-- Core Episteme -->
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-core</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <!-- JScience Natural (for loaders: FASTALoader, VizieRLoader) -->
+        <!-- Episteme Natural (for loaders: FASTALoader, VizieRLoader) -->
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-natural</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <!-- JScience Social (for WorldBank and Economic Tools) -->
+        <!-- Episteme Social (for WorldBank and Economic Tools) -->
         <dependency>
-            <groupId>org.jscience</groupId>
-            <artifactId>jscience-social</artifactId>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-social</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -261,8 +261,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <imageName>jscience-server</imageName>
-                            <mainClass>org.jscience.server.JscienceApplication</mainClass>
+                            <imageName>episteme-server</imageName>
+                            <mainClass>org.episteme.server.JscienceApplication</mainClass>
                             <fallback>false</fallback>
                             <verbose>true</verbose>
                         </configuration>

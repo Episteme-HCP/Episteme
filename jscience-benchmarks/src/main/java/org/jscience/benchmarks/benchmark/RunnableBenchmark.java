@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,10 +21,10 @@
  * SOFTWARE.
  */
 
-package org.jscience.benchmarks.benchmark;
+package org.episteme.benchmarks.benchmark;
 
 /**
- * Standard interface for all JScience benchmarks.
+ * Standard interface for all Episteme benchmarks.
  * <p>
  * This interface allows benchmarks to be auto-discovered via ServiceLoader
  * and executed uniformly.
@@ -57,7 +57,7 @@ public interface RunnableBenchmark {
     String getDomain();
 
     /**
-     * @return The algorithm provider name (e.g. "JScience", "OpenCL", "NativeBLAS") or "Standard" if not applicable.
+     * @return The algorithm provider name (e.g. "Episteme", "OpenCL", "NativeBLAS") or "Standard" if not applicable.
      */
     default String getAlgorithmProvider() {
         return "Standard";

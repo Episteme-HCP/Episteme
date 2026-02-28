@@ -1,0 +1,85 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2006 - Episteme (http://episteme.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
+package org.episteme.physics.models;
+
+import javax.measure.converter.UnitConverter;
+import javax.measure.unit.BaseUnit;
+import javax.measure.unit.Dimension;
+
+
+/**
+ * <p> This abstract class represents a physical model. Instances of this
+ * class determinate the current quantities dimensions.</p>
+ * <p/>
+ * <p> To select a model, one needs only to call the model <code>select</code>
+ * static method. For example:[code]
+ * public static void main(String[] args) {
+ * // Global (LocalContext should be used for thread-local settings).
+ * RelativisticModel.select();
+ * ...
+ * [/code]</p>
+ * <p/>
+ * <p> Selecting a predefined model automatically sets the dimension of
+ * the {@link javax.measure.unit.BaseUnit base units}.</p>
+ *
+ * @author <a href="mailto:jean-marie@dautelle.com">Jean-Marie Dautelle</a>
+ * @version 3.1, April 22, 2006
+ */
+public abstract class PhysicalModel implements Dimension.Model {
+
+    /**
+     * Holds the current physical model.
+     */
+    private static PhysicalModel Current;
+
+    /**
+     * Holds the dimensional model.
+     */
+    private static final Dimension.Model DIMENSIONAL_MODEL
+            = new Dimension.Model() {
+
+        public Dimension getDimension(BaseUnit<?> unit) {
+            return PhysicalModel.Current.getDimension(unit);
+        }
+
+        public UnitConverter getTransform(BaseUnit<?> unit) {
+            return PhysicalModel.Current.getTransform(unit);
+        }
+    };
+
+    /**
+     * Default constructor (allows for derivation).
+     */
+    protected PhysicalModel() {
+    }
+
+    /**
+     * Returns the current physical model (default: instance of
+     * {@link StandardModel}).
+     *
+     * @return the context-local physical model.
+     */
+    public static final PhysicalModel current() {
+        PhysicalModel physicalModel = PhysicalModel.Current;
+        return (physicalModel == null) ? StandardModel.INSTANCE : physicalModel;
+    }
+
+    /**
+     * Sets the current model (this method is called when the a predefined
+     * model is selected).
+     *
+     * @param model the context-local physical model.
+     * @see #current
+     */
+    protected static final void setCurrent(PhysicalModel model) {
+        PhysicalModel.Current = model;
+        Dimension.setModel(DIMENSIONAL_MODEL);
+    }
+
+}

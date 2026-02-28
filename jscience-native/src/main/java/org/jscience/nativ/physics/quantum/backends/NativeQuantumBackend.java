@@ -1,13 +1,13 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.nativ.physics.quantum.backends;
+package org.episteme.nativ.physics.quantum.backends;
 
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;
@@ -16,12 +16,12 @@ import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.core.mathematics.sets.Complexes;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.complex.Complex;
+import org.episteme.core.mathematics.sets.Complexes;
 
-import org.jscience.natural.technical.backend.quantum.QuantumBackend;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.natural.technical.backend.quantum.QuantumBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 /**
  * Native Quantum Provider using Panama FFM bindings for QuEST or Qiskit Aer.
@@ -76,7 +76,6 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
                     .orElse(null);
                 
                 if (QUEST_CREATE_ENV == null) {
-                    System.err.println("[WARNING] NativeQuantumBackend: QuEST loaded but critical symbols not found. Marking as unavailable.");
                     LOOKUP = null; 
                 }
             } catch (Exception e) {
@@ -188,12 +187,12 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
     }
 
     @Override
-    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.jscience.core.technical.backend.HardwareAccelerator.QUANTUM;
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.QUANTUM;
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null; // Quantum backends often manage their own context or use a dummy
     }
 

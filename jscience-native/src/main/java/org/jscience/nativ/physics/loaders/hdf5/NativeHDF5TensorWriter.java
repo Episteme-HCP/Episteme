@@ -1,13 +1,13 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.physics.loaders.hdf5;
+package org.episteme.nativ.physics.loaders.hdf5;
 
-import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.core.io.ResourceWriter;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
+import org.episteme.core.io.ResourceWriter;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * Adapter to save Tensors to HDF5 files.
@@ -44,7 +44,7 @@ public class NativeHDF5TensorWriter implements ResourceWriter<Tensor<?>> {
 
     @Override
     public String getLongDescription() {
-        return "Adapter that allows saving org.jscience.core.mathematics.linearalgebra.Tensor objects directly to HDF5 files by converting them to NativeDoubleMatrixStorage representations.";
+        return "Adapter that allows saving org.episteme.core.mathematics.linearalgebra.Tensor objects directly to HDF5 files by converting them to NativeDoubleMatrixStorage representations.";
     }
 
     @Override

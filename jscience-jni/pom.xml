@@ -4,24 +4,24 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.jscience</groupId>
-    <artifactId>jscience-parent</artifactId>
+    <groupId>org.episteme</groupId>
+    <artifactId>episteme-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.jscience</groupId>
-  <artifactId>jscience-jni</artifactId>
+  <groupId>org.episteme</groupId>
+  <artifactId>episteme-jni</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>jscience-jni</name>
+  <name>episteme-jni</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
-      <groupId>org.jscience</groupId>
-      <artifactId>jscience-natural</artifactId>
+      <groupId>org.episteme</groupId>
+      <artifactId>episteme-natural</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jscience</groupId>
-      <artifactId>jscience-core</artifactId>
+      <groupId>org.episteme</groupId>
+      <artifactId>episteme-core</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>

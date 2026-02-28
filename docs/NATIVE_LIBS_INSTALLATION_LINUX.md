@@ -1,8 +1,8 @@
-# Native Libraries Installation Guide for JScience HPC - Linux
+# Native Libraries Installation Guide for Episteme HPC - Linux
 
 ## Overview
 
-This guide provides installation instructions for all native libraries required by JScience HPC on Linux systems (Ubuntu/Debian, RHEL/CentOS/Fedora, Arch).
+This guide provides installation instructions for all native libraries required by Episteme HPC on Linux systems (Ubuntu/Debian, RHEL/CentOS/Fedora, Arch).
 
 ---
 
@@ -12,7 +12,7 @@ This guide provides installation instructions for all native libraries required 
 
 ```bash
 # Download and run the installer
-curl -O https://raw.githubusercontent.com/jscience/jscience/main/install_native_libs_linux.sh
+curl -O https://raw.githubusercontent.com/episteme/episteme/main/install_native_libs_linux.sh
 chmod +x install_native_libs_linux.sh
 sudo ./install_native_libs_linux.sh
 ```
@@ -327,7 +327,7 @@ Save as `verify_native_libs_linux.sh`:
 ```bash
 #!/bin/bash
 
-echo "=== JScience HPC Native Libraries Verification (Linux) ==="
+echo "=== Episteme HPC Native Libraries Verification (Linux) ==="
 echo ""
 
 # Function to check library
@@ -428,7 +428,7 @@ RUN apt-get update && apt-get install -y \
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV PATH=$PATH:$JAVA_HOME/bin
 
-# Copy JScience project
+# Copy Episteme project
 WORKDIR /workspace
 COPY . .
 
@@ -440,8 +440,8 @@ CMD ["/bin/bash"]
 
 Build and run:
 ```bash
-docker build -t jscience-hpc .
-docker run -it --rm jscience-hpc
+docker build -t episteme-hpc .
+docker run -it --rm episteme-hpc
 ```
 
 ---
@@ -566,4 +566,4 @@ System.setProperty("fftw.wisdom.file", System.getProperty("user.home") + "/.fftw
 ---
 
 **Last Updated**: 2026-01-30  
-**Maintained By**: JScience HPC Team
+**Maintained By**: Episteme HPC Team

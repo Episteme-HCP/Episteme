@@ -1,9 +1,9 @@
 #!/bin/bash
-# JScience HPC - Native Libraries Auto-Installer
+# Episteme HPC - Native Libraries Auto-Installer
 # Bash script to download and install all required native libraries
 # Updated to prioritize local archives
 
-INSTALL_DIR="$HOME/JScience-Native"
+INSTALL_DIR="$HOME/Episteme-Native"
 SKIP_MPI=false
 SKIP_HDF5=false
 SKIP_FFTW=false
@@ -53,7 +53,7 @@ do
     esac
 done
 
-echo "=== JScience HPC Native Libraries Installer ==="
+echo "=== Episteme HPC Native Libraries Installer ==="
 echo "Installation Directory: $INSTALL_DIR"
 echo ""
 

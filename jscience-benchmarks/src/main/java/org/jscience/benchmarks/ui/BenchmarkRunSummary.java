@@ -1,4 +1,4 @@
-package org.jscience.benchmarks.ui;
+package org.episteme.benchmarks.ui;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

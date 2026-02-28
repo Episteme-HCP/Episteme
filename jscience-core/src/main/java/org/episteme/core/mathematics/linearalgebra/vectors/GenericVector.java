@@ -1,0 +1,242 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.episteme.core.mathematics.linearalgebra.vectors;
+
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
+import org.episteme.core.mathematics.structures.rings.Ring;
+
+/**
+ * A generic vector implementation using abstract storage and provider
+ * delegation.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class GenericVector<E> implements Vector<E> {
+
+    protected final VectorStorage<E> storage;
+    protected LinearAlgebraProvider<E> provider;
+    protected final Ring<E> ring;
+
+    public GenericVector(VectorStorage<E> storage, LinearAlgebraProvider<E> provider, Ring<E> ring) {
+        this.storage = storage;
+        this.provider = provider;
+        this.ring = ring;
+    }
+
+    /**
+     * Creates a GenericVector with automatic storage selection.
+     */
+    public GenericVector(java.util.List<E> data, Ring<E> ring) {
+        int dim = data.size();
+        int nz = 0;
+        E zero = ring.zero();
+        for (E val : data) if (!val.equals(zero)) nz++;
+        double density = (dim > 0) ? (double) nz / dim : 1.0;
+        
+        this.storage = org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry().createVectorStorage(dim, ring, density);
+        for (int i = 0; i < dim; i++) this.storage.set(i, data.get(i));
+        this.provider = org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring);
+        this.ring = ring;
+    }
+
+    // GenericVector relies on Vector.of() for smart instantiation.
+
+    // ================= Conversions =================
+
+    public Matrix<E> toMatrix() {
+        // Convert vector to Column Matrix (n x 1)
+        int dim = storage.dimension();
+        // Fallback to Object array if we can't get class easily?
+        // Actually, we can use the first element if any.
+        E zero = ring.zero();
+        Class<?> componentType = zero.getClass();
+        
+        @SuppressWarnings("unchecked")
+        E[][] matrixData = (E[][]) java.lang.reflect.Array.newInstance(componentType, dim, 1);
+        for (int i = 0; i < dim; i++) {
+            @SuppressWarnings("unchecked")
+            E[] row = (E[]) java.lang.reflect.Array.newInstance(componentType, 1);
+            row[0] = storage.get(i);
+            matrixData[i] = row;
+        }
+        return (GenericMatrix<E>) Matrix.of(matrixData, ring);
+    }
+
+    public Tensor<E> toTensor() {
+        int dim = dimension();
+        @SuppressWarnings("unchecked")
+        E[] data = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), dim);
+        for (int i = 0; i < dim; i++) {
+            data[i] = get(i);
+        }
+        return Tensor.of(data, dimension());
+    }
+
+    // ================= Vector<E> Implementation =================
+
+    @Override
+    public int dimension() {
+        return storage.dimension();
+    }
+
+    public void set(int index, E value) {
+        storage.set(index, value);
+    }
+
+    @Override
+    public E get(int index) {
+        return storage.get(index);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> add(Vector<E> other) {
+        if (other instanceof GenericVector) {
+            return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).add(this, (GenericVector<E>) other));
+        }
+        // Fallback
+        if (other.dimension() != dimension())
+            throw new IllegalArgumentException("Dim mismatch");
+
+        // Manually create dense result for fallback
+        // We need reflection for array creation if using DenseVectorStorage directly
+        // with array,
+        // or just use setters.
+        DenseVectorStorage<E> newStorage = new DenseVectorStorage<>(dimension());
+        for (int i = 0; i < dimension(); ++i) {
+            newStorage.set(i, ring.add(storage.get(i), other.get(i)));
+        }
+        return new GenericVector<>(newStorage, provider, ring);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> subtract(Vector<E> other) {
+        if (other instanceof GenericVector) {
+            return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).subtract(this, (GenericVector<E>) other));
+        }
+        if (other.dimension() != dimension())
+            throw new IllegalArgumentException("Dim mismatch");
+
+        DenseVectorStorage<E> newStorage = new DenseVectorStorage<>(dimension());
+        for (int i = 0; i < dimension(); ++i) {
+            E neg = ring.negate(other.get(i));
+            newStorage.set(i, ring.add(storage.get(i), neg));
+        }
+        return new GenericVector<>(newStorage, provider, ring);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> multiply(E scalar) {
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).multiply(this, scalar));
+    }
+
+    public Vector<E> scale(E scalar) {
+        return multiply(scalar);
+    }
+
+    @Override
+    public Vector<E> negate() {
+        return multiply(ring.negate(ring.one()));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public E dot(Vector<E> other) {
+        if (other instanceof GenericVector) {
+            return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+                p -> ((LinearAlgebraProvider<E>) p).dot(this, (GenericVector<E>) other));
+        }
+        E sum = ring.zero();
+        for (int i = 0; i < dimension(); ++i) {
+            sum = ring.add(sum, ring.multiply(get(i), other.get(i)));
+        }
+        return sum;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public E norm() {
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).norm(this));
+    }
+
+    @Override
+    public Ring<E> getScalarRing() {
+        return ring;
+    }
+
+    @Override
+    public Vector<E> scale(E scalar, Vector<E> element) {
+        return element.multiply(scalar);
+    }
+
+    public VectorStorage<E> getStorage() {
+        return storage;
+    }
+
+    public Ring<E> getField() {
+        return ring;
+    }
+
+    // --- Default implementations for Ring/Module ---
+
+    @Override
+    public boolean contains(Vector<E> element) {
+        return element.dimension() == this.dimension();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public Vector<E> inverse(Vector<E> element) {
+        return element.negate();
+    }
+
+    @Override
+    public Vector<E> operate(Vector<E> left, Vector<E> right) {
+        return left.add(right);
+    }
+
+    @Override
+    public String description() {
+        return "Generic Vector Space V^" + dimension();
+    }
+}
+

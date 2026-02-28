@@ -1,13 +1,13 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.matrices.storage;
+package org.episteme.nativ.mathematics.linearalgebra.matrices.storage;
 
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.nativ.physics.loaders.hdf5.NativeHDF5Reader;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.nativ.physics.loaders.hdf5.NativeHDF5Reader;
 import java.nio.file.Path;
 
 /**
@@ -21,7 +21,7 @@ import java.nio.file.Path;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class NativeHDF5MatrixStorage implements org.jscience.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real>, AutoCloseable {
+public class NativeHDF5MatrixStorage implements org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real>, AutoCloseable {
 
     private final Path hdf5Path;
     private final String datasetName;
@@ -66,10 +66,10 @@ public class NativeHDF5MatrixStorage implements org.jscience.core.mathematics.li
     @Override
     public Real get(int row, int col) {
         // For single element access, load a 1x1 block
-        org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage block = 
-            new org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(1, 1);
+        org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage block = 
+            new org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(1, 1);
         reader.readBlock(datasetName, block, row, col, 1, 1);
-        return org.jscience.core.mathematics.numbers.real.RealDouble.of(block.getDouble(0, 0));
+        return org.episteme.core.mathematics.numbers.real.RealDouble.of(block.getDouble(0, 0));
     }
 
     @Override
@@ -87,10 +87,10 @@ public class NativeHDF5MatrixStorage implements org.jscience.core.mathematics.li
      * @return Matrix containing the loaded block
      */
     public Matrix<Real> loadBlock(int startRow, int startCol, int rowCount, int colCount) {
-        org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage block = 
-            new org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(rowCount, colCount);
+        org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage block = 
+            new org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(rowCount, colCount);
         reader.readBlock(datasetName, block, startRow, startCol, rowCount, colCount);
-        return org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(block);
+        return org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(block);
     }
 
     @Override

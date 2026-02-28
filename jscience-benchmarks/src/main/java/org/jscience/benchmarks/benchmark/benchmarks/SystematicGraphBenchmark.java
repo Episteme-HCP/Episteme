@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,16 +21,16 @@
  * SOFTWARE.
  */
 
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 
 import com.google.auto.service.AutoService;
 
-import org.jscience.core.mathematics.discrete.Graph;
-import org.jscience.core.mathematics.discrete.generators.ScaleFreeGenerator;
-import org.jscience.core.mathematics.numbers.integers.Natural;
-import org.jscience.core.mathematics.discrete.graph.GraphAlgorithmProvider;
+import org.episteme.core.mathematics.discrete.Graph;
+import org.episteme.core.mathematics.discrete.generators.ScaleFreeGenerator;
+import org.episteme.core.mathematics.numbers.integers.Natural;
+import org.episteme.core.mathematics.discrete.graph.GraphAlgorithmProvider;
 
 /**
  * A benchmark that systematically tests all available GraphAlgorithmProviders.
@@ -67,7 +67,7 @@ public class SystematicGraphBenchmark implements SystematicBenchmark<GraphAlgori
         Graph<Natural> naturalGraph = ScaleFreeGenerator.generate(NUM_VERTICES, 3, 2);
         
         // Convert to Graph<String>
-        graph = new org.jscience.core.mathematics.discrete.UndirectedGraph<>();
+        graph = new org.episteme.core.mathematics.discrete.UndirectedGraph<>();
         for (Natural vertex : naturalGraph.vertices()) {
             graph.addVertex(vertex.toString());
         }

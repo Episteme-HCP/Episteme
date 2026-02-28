@@ -1,20 +1,20 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.core.mathematics.numerical.fem.FEMProvider;
-import org.jscience.core.mathematics.analysis.fem.Mesh;
-import org.jscience.core.mathematics.analysis.Function;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.numbers.real.Real;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.core.mathematics.numerical.fem.FEMProvider;
+import org.episteme.core.mathematics.analysis.fem.Mesh;
+import org.episteme.core.mathematics.analysis.Function;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 import java.util.ServiceLoader;
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.core.mathematics.analysis.fem.Node;
-import org.jscience.core.mathematics.analysis.fem.TriangularElement2D;
-import org.jscience.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.core.mathematics.sets.Reals;
+import org.episteme.core.mathematics.analysis.fem.Node;
+import org.episteme.core.mathematics.analysis.fem.TriangularElement2D;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.episteme.core.mathematics.sets.Reals;
 
 /**
  * Systematic benchmark for Finite Element Method (FEM) providers.

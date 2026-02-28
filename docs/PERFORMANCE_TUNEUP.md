@@ -1,6 +1,6 @@
-# JScience Performance Tuning Guide
+# Episteme Performance Tuning Guide
 
-This guide documents JVM startup parameters and optimization strategies to maximize JScience API performance for production deployments.
+This guide documents JVM startup parameters and optimization strategies to maximize Episteme API performance for production deployments.
 
 ---
 
@@ -16,8 +16,8 @@ java -server ^
      -XX:+UseStringDeduplication ^
      -XX:+AlwaysPreTouch ^
      -Xms2G -Xmx4G ^
-     -cp "jscience-natural/target/classes;jscience-core/target/classes;jscience-social/target/classes;lib/*;target/dependency/*" ^
-     org.jscience.JScience
+     -cp "episteme-natural/target/classes;episteme-core/target/classes;episteme-social/target/classes;lib/*;target/dependency/*" ^
+     org.episteme.Episteme
 ```
 
 ### Linux/macOS (Bash)
@@ -30,8 +30,8 @@ java -server \
      -XX:+UseStringDeduplication \
      -XX:+AlwaysPreTouch \
      -Xms2G -Xmx4G \
-     -cp "jscience-natural/target/classes:jscience-core/target/classes:jscience-social/target/classes:lib/*:target/dependency/*" \
-     org.jscience.JScience
+     -cp "episteme-natural/target/classes:episteme-core/target/classes:episteme-social/target/classes:lib/*:target/dependency/*" \
+     org.episteme.Episteme
 ```
 
 ---
@@ -81,7 +81,7 @@ java -server \
      -XX:+UseLargePages \
      -Xms8G -Xmx8G \
      --add-modules jdk.incubator.vector \
-     -cp "$CLASSPATH" org.jscience.JScience
+     -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 **Key additions:**
@@ -100,7 +100,7 @@ java -server \
      -XX:+AlwaysPreTouch \
      -XX:SoftMaxHeapSize=12G \
      --add-modules jdk.incubator.vector \
-     -cp "$CLASSPATH" org.jscience.ui.physics.astronomy.SolarSystemSimulation
+     -cp "$CLASSPATH" org.episteme.ui.physics.astronomy.SolarSystemSimulation
 ```
 
 **Key additions:**
@@ -122,7 +122,7 @@ java -server \
      -XX:+UseCompressedOops \
      -Xms2G -Xmx4G \
      -Djava.net.preferIPv4Stack=true \
-     -cp "$CLASSPATH" org.jscience.server.JScienceServer
+     -cp "$CLASSPATH" org.episteme.server.EpistemeServer
 ```
 
 ### Memory-Constrained Environments
@@ -133,7 +133,7 @@ java -server \
      -Xms512M -Xmx1G \
      -XX:+UseCompressedOops \
      -XX:+UseCompressedClassPointers \
-     -cp "$CLASSPATH" org.jscience.JScience
+     -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 ---
@@ -144,16 +144,16 @@ java -server \
 
 ```bash
 java --add-modules jdk.incubator.vector \
-     -Dorg.jscience.backend=vector \
-     -cp "$CLASSPATH" org.jscience.JScience
+     -Dorg.episteme.backend=vector \
+     -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 ### GPU Acceleration (OpenCL/CUDA)
 
 ```bash
-java -Dorg.jscience.backend=gpu \
+java -Dorg.episteme.backend=gpu \
      -Djava.library.path=./lib/native \
-     -cp "$CLASSPATH" org.jscience.JScience
+     -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 See `GPU_SETUP.md` for detailed GPU configuration.
@@ -178,7 +178,7 @@ See `GPU_SETUP.md` for detailed GPU configuration.
 native-image --no-fallback \
     -H:+ReportExceptionStackTraces \
     -cp "$CLASSPATH" \
-    org.jscience.JScience
+    org.episteme.Episteme
 ```
 
 ---
@@ -189,8 +189,8 @@ native-image --no-fallback \
 
 ```bash
 java -XX:+FlightRecorder \
-     -XX:StartFlightRecording=duration=60s,filename=jscience.jfr \
-     -cp "$CLASSPATH" org.jscience.JScience
+     -XX:StartFlightRecording=duration=60s,filename=episteme.jfr \
+     -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 ### Enable JMX Remote Monitoring
@@ -200,14 +200,14 @@ java -Dcom.sun.management.jmxremote \
      -Dcom.sun.management.jmxremote.port=9010 \
      -Dcom.sun.management.jmxremote.authenticate=false \
      -Dcom.sun.management.jmxremote.ssl=false \
-     -cp "$CLASSPATH" org.jscience.JScience
+     -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 ### GC Logging (JDK 11+)
 
 ```bash
 java -Xlog:gc*:file=gc.log:time,uptime:filecount=5,filesize=10M \
-     -cp "$CLASSPATH" org.jscience.JScience
+     -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 ---
@@ -229,9 +229,9 @@ set JAVA_OPTS=-server ^
     -Xms2G -Xmx4G ^
     --add-modules jdk.incubator.vector
 
-set CLASSPATH=jscience-core/target/classes;jscience-natural/target/classes;jscience-social/target/classes;target/dependency/*
+set CLASSPATH=episteme-core/target/classes;episteme-natural/target/classes;episteme-social/target/classes;target/dependency/*
 
-java %JAVA_OPTS% -cp "%CLASSPATH%" org.jscience.ui.JScienceDashboard
+java %JAVA_OPTS% -cp "%CLASSPATH%" org.episteme.ui.EpistemeDashboard
 ```
 
 ### run_optimized.sh (Linux/macOS)
@@ -248,9 +248,9 @@ JAVA_OPTS="-server \
     -Xms2G -Xmx4G \
     --add-modules jdk.incubator.vector"
 
-CLASSPATH="jscience-core/target/classes:jscience-natural/target/classes:jscience-social/target/classes:target/dependency/*"
+CLASSPATH="episteme-core/target/classes:episteme-natural/target/classes:episteme-social/target/classes:target/dependency/*"
 
-java $JAVA_OPTS -cp "$CLASSPATH" org.jscience.ui.JScienceDashboard
+java $JAVA_OPTS -cp "$CLASSPATH" org.episteme.ui.EpistemeDashboard
 ```
 
 ---
@@ -295,7 +295,7 @@ java $JAVA_OPTS -cp "$CLASSPATH" org.jscience.ui.JScienceDashboard
 ```bash
 # Use CDS (Class Data Sharing)
 java -Xshare:dump  # First, create archive
-java -Xshare:on -cp "$CLASSPATH" org.jscience.JScience
+java -Xshare:on -cp "$CLASSPATH" org.episteme.Episteme
 ```
 
 ---
@@ -310,15 +310,15 @@ java -server \
      -Xms4G -Xmx4G \
      -XX:+AlwaysPreTouch \
      --add-modules jdk.incubator.vector \
-     -cp "jscience-benchmarks/target/classes:$CLASSPATH" \
-     org.jscience.benchmarks.MatrixBenchmark
+     -cp "episteme-benchmarks/target/classes:$CLASSPATH" \
+     org.episteme.benchmarks.MatrixBenchmark
 ```
 
 Compare with baseline:
 
 ```bash
-java -cp "jscience-benchmarks/target/classes:$CLASSPATH" \
-     org.jscience.benchmarks.MatrixBenchmark
+java -cp "episteme-benchmarks/target/classes:$CLASSPATH" \
+     org.episteme.benchmarks.MatrixBenchmark
 ```
 
 ---

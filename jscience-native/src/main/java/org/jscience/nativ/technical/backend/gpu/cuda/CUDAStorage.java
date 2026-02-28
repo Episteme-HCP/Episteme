@@ -1,14 +1,14 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.technical.backend.gpu.cuda;
+package org.episteme.nativ.technical.backend.gpu.cuda;
 
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
-import org.jscience.core.technical.backend.gpu.GPUStorage;
+import org.episteme.core.technical.backend.gpu.GPUStorage;
 
 import java.lang.ref.Cleaner;
 

@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 
 import com.google.auto.service.AutoService;
 
-import org.jscience.core.mathematics.statistics.montecarlo.MonteCarloProvider;
+import org.episteme.core.mathematics.statistics.montecarlo.MonteCarloProvider;
 
 /**
  * A benchmark that systematically tests all available MonteCarloAlgorithmProviders.

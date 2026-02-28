@@ -1,13 +1,13 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.tensors.backends;
+package org.episteme.nativ.mathematics.linearalgebra.tensors.backends;
 
 import com.google.auto.service.AutoService;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
 
 /**
  * ND4J Native (CPU) Tensor backend, using AVX/AVX2/AVX512 instructions when available.

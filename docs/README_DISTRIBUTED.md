@@ -1,4 +1,4 @@
-# JScience - Distributed Scientific Computing Platform
+# Episteme - Distributed Scientific Computing Platform
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Java](https://img.shields.io/badge/Java-21-orange)]()
@@ -17,31 +17,31 @@ A comprehensive Java platform for distributed scientific computing, featuring:
 
 ```bash
 # Clone and build
-git clone https://github.com/your-org/jscience.git
-cd jscience
+git clone https://github.com/your-org/episteme.git
+cd episteme
 mvn clean install -DskipTests
 
 # Start server
-java -jar jscience-server/target/jscience-server.jar
+java -jar episteme-server/target/episteme-server.jar
 
 # Start workers (in separate terminals)
-java -jar jscience-worker/target/jscience-worker.jar
+java -jar episteme-worker/target/episteme-worker.jar
 
 # Run a client app
-java -jar jscience-client/target/jscience-client.jar MandelbrotApp
+java -jar episteme-client/target/episteme-client.jar MandelbrotApp
 ```
 
 ## 📦 Modules
 
 | Module | Description |
 |--------|-------------|
-| `jscience-core` | Core math, physics, visualization |
-| `jscience-natural` | N-body, thermodynamics, waves |
-| `jscience-social` | Agent-based modeling, economics |
-| `jscience-server` | gRPC server, scheduling, security |
-| `jscience-worker` | Distributed worker node |
-| `jscience-client` | JavaFX client applications |
-| `jscience-dashboard` | Next.js web dashboard |
+| `episteme-core` | Core math, physics, visualization |
+| `episteme-natural` | N-body, thermodynamics, waves |
+| `episteme-social` | Agent-based modeling, economics |
+| `episteme-server` | gRPC server, scheduling, security |
+| `episteme-worker` | Distributed worker node |
+| `episteme-client` | JavaFX client applications |
+| `episteme-dashboard` | Next.js web dashboard |
 
 ## 🖥️ Client Applications
 
@@ -85,16 +85,16 @@ workflow/       - WorkflowEngine
 ### Prometheus Metrics
 
 ```
-jscience_tasks_total        - Total tasks submitted
-jscience_tasks_completed    - Completed tasks
-jscience_workers_active     - Active worker count
-jscience_queue_depth        - Current queue size
-jscience_task_duration_seconds - Task duration histogram
+episteme_tasks_total        - Total tasks submitted
+episteme_tasks_completed    - Completed tasks
+episteme_workers_active     - Active worker count
+episteme_queue_depth        - Current queue size
+episteme_task_duration_seconds - Task duration histogram
 ```
 
 ### Grafana Dashboard
 
-Import `jscience-server/src/main/resources/grafana-dashboard.json`
+Import `episteme-server/src/main/resources/grafana-dashboard.json`
 
 ## ☸️ Kubernetes Deployment
 
@@ -107,7 +107,7 @@ kubectl apply -f k8s/monitoring.yaml
 kubectl apply -f k8s/ingress.yaml
 
 # Check status
-kubectl get pods -n jscience
+kubectl get pods -n episteme
 ```
 
 ### Auto-Scaling
@@ -146,7 +146,7 @@ public void submitTask(TaskRequest request, StreamObserver<TaskResponse> observe
 ## 🌐 Web Dashboard
 
 ```bash
-cd jscience-dashboard
+cd episteme-dashboard
 npm install
 npm run dev
 # Open http://localhost:3000
@@ -173,7 +173,7 @@ Features:
         └────────────┴────────────┴────────────┘
                           │ gRPC/REST
         ┌─────────────────┴─────────────────┐
-        │         JScience Server           │
+        │         Episteme Server           │
         │  ┌─────────────────────────────┐  │
         │  │ ComputeService │ AuthService│  │
         │  ├─────────────────────────────┤  │

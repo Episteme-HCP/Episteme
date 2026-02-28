@@ -1,9 +1,9 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.analysis.fft;
+package org.episteme.nativ.mathematics.analysis.fft;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
@@ -12,16 +12,16 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
-import org.jscience.core.mathematics.numbers.complex.Complex;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.analysis.fft.FFTProvider;
+import org.episteme.core.mathematics.numbers.complex.Complex;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.analysis.fft.FFTProvider;
 import com.google.auto.service.AutoService;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 
 /**
  * FFTW3 implementation of FFTProvider using Project Panama.
@@ -59,7 +59,7 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
         if (initialized) return;
         initialized = true;
         try {
-            SymbolLookup lookup = org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader.loadLibrary("fftw3");
+            SymbolLookup lookup = org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader.loadLibrary("fftw3");
             Linker linker = Linker.nativeLinker();
 
             DPLAN_R2C_1D = linker.downcallHandle(lookup.find("fftw_plan_dft_r2c_1d").get(),
@@ -113,7 +113,7 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }
 

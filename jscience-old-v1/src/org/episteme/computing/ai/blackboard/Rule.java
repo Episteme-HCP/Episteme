@@ -1,0 +1,113 @@
+/* Rule.java */
+package org.episteme.computing.ai.blackboard;
+
+import org.episteme.computing.ai.blackboard.util.Executable;
+import org.episteme.computing.ai.blackboard.util.ValuePair;
+
+import java.util.Hashtable;
+import java.util.Observable;
+
+
+/**
+ * Rule class.  This class implements a contained component of the
+ * knowledge source class.  A rule is defined as a conditional element coupled
+ * with a sequence of actions.
+ *
+ * @author:        Paul Brown
+ * @version:        1.3, 04/26/96
+ */
+
+// The author allowed us to redistribute this program under GPL:
+// name: Alun Preece
+// email: A.D.Preece@cs.cardiff.ac.uk
+// website: http://www.csd.abdn.ac.uk/~apreece/pbf/ or http://users.cs.cf.ac.uk/A.D.Preece/
+public class Rule extends org.episteme.computing.ai.blackboard.Condition
+    implements org.episteme.computing.ai.blackboard.util.EnquirableExecutable,
+        org.episteme.computing.ai.blackboard.util.Prioritised,
+        java.util.Observer {
+    /** A reference to the containing knowledge source. */
+    private KnowledgeSource ks;
+
+    /** A priority value. */
+    private int priority;
+
+    /** A list of sequentially ordered actions. */
+    private Executable[] actions;
+
+/**
+         * Constructs a new rule with the specified condition and associated
+         * actions and assigning that rule the specified priority value.
+         * @param blackboard a reference to the blackboard
+         * @param ks a reference to the containing knowledge source
+         * @param priority a priority value
+         * @param disjunctions an initialised conditional structure
+         * @param actions a sequence of actions
+         */
+    public Rule(Hashtable blackboard, KnowledgeSource ks, int priority,
+        ValuePair[] disjunctions, Executable[] actions) {
+        super(blackboard, disjunctions);
+        this.ks = ks;
+        this.priority = priority;
+        this.actions = actions;
+        ks.register(this);
+    }
+
+/**
+         * Constructs a new rule with the specified condition and associated
+         * actions, also providing a default priority value.
+         * @param blackboard a reference to the blackboard
+         * @param ks a reference to the containing knowledge source
+         * @param disjunctions an initialised conditional structure
+         * @param actions a sequence of actions
+         */
+    public Rule(Hashtable blackboard, KnowledgeSource ks,
+        ValuePair[] disjunctions, Executable[] actions) {
+        this(blackboard, ks, 0, disjunctions, actions);
+    }
+
+    /**
+     * Executes the rule, this involves the sequential execution of
+     * it's contained actions.
+     *
+     * @param arg variable bindings instantiated by rule condition evaluation
+     */
+    public void execute(Object arg) {
+        boolean quit = false;
+
+        for (int i = 0; ((i < actions.length) && (!quit)); i++) {
+            actions[i].execute(arg);
+            quit = (actions[i] instanceof Quit);
+        }
+    }
+
+    /**
+     * An accessor method to return the actions of this rule.
+     *
+     * @return the rule's actions
+     */
+    public Executable[] actions() {
+        return (actions);
+    }
+
+    /**
+     * An accessor method to return the priority of this rule.
+     *
+     * @return the rule priority
+     */
+    public int priority() {
+        return (priority);
+    }
+
+    /**
+     * This method is called by rule actions observed by this rule,
+     * this call signals a blackboard manipulation that may affect the
+     * evaluation of this rule's condition.  This method invokes a
+     * re-evaluation of the rule's condition.
+     *
+     * @param o DOCUMENT ME!
+     * @param arg DOCUMENT ME!
+     */
+    public void update(Observable o, Object arg) {
+        ks.updateAgenda(this);
+    }
+}

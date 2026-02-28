@@ -1,13 +1,13 @@
-package org.jscience.tests.integration;
+package org.episteme.tests.integration;
 
-import org.jscience.natural.computing.ai.agents.Agent;
-import org.jscience.natural.computing.ai.agents.Behavior;
-import org.jscience.natural.computing.ai.agents.Environment;
-import org.jscience.natural.computing.ai.agents.acl.ACLMessage;
-import org.jscience.natural.computing.ai.agents.services.YellowPages;
-import org.jscience.social.economics.money.Money;
-import org.jscience.natural.computing.ai.agents.acl.Performative;
-import org.jscience.natural.computing.ai.agents.services.ServiceDescription;
+import org.episteme.natural.computing.ai.agents.Agent;
+import org.episteme.natural.computing.ai.agents.Behavior;
+import org.episteme.natural.computing.ai.agents.Environment;
+import org.episteme.natural.computing.ai.agents.acl.ACLMessage;
+import org.episteme.natural.computing.ai.agents.services.YellowPages;
+import org.episteme.social.economics.money.Money;
+import org.episteme.natural.computing.ai.agents.acl.Performative;
+import org.episteme.natural.computing.ai.agents.services.ServiceDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;

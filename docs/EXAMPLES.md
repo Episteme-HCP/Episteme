@@ -1,10 +1,10 @@
-# JScience Examples
+# Episteme Examples
 
 ## 1. Deep Learning (Autograd)
 Training a simple Multi-Layer Perceptron (MLP) to learn XOR.
 
 ```java
-import org.jscience.core.mathematics.ml.neural.*;
+import org.episteme.core.mathematics.ml.neural.*;
 
 // 1. Define inputs and targets
 Variable input = new Variable(new double[][]{{0,0}, {0,1}, {1,0}, {1,1}});
@@ -45,7 +45,7 @@ for (int i = 0; i < 1000; i++) {
 Finding the minimum of the sphere function $f(x) = \sum x_i^2$.
 
 ```java
-import org.jscience.core.mathematics.optimization.swarm.*;
+import org.episteme.core.mathematics.optimization.swarm.*;
 
 // Define objective function
 ObjectiveFunction sphere = args -> {
@@ -63,8 +63,8 @@ System.out.println("Best Solution: " + Arrays.toString(bestPosition));
 ```
 
 ## 3. Running Demos
-JScience includes a JavaFX demo suite showcasing these features visually.
+Episteme includes a JavaFX demo suite showcasing these features visually.
 
 ```bash
-mvn exec:java -pl jscience-core -Dexec.mainClass="org.jscience.core.ui.JScienceDemosApp"
+mvn exec:java -pl episteme-core -Dexec.mainClass="org.episteme.core.ui.EpistemeDemosApp"
 ```

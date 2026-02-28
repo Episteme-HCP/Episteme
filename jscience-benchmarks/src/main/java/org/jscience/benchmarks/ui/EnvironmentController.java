@@ -1,4 +1,4 @@
-package org.jscience.benchmarks.ui;
+package org.episteme.benchmarks.ui;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -7,8 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import org.jscience.core.technical.algorithm.AlgorithmProvider;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 import java.util.ServiceLoader;
 
@@ -71,8 +71,16 @@ public class EnvironmentController {
         
         providers.clear();
         refreshThread = new Thread(() -> {
-            ServiceLoader<AlgorithmProvider> loader = ServiceLoader.load(AlgorithmProvider.class);
-            for (AlgorithmProvider p : loader) {
+            java.util.List<AlgorithmProvider> allProviders = new java.util.ArrayList<>();
+            java.util.Set<String> seenClasses = new java.util.HashSet<>();
+            ServiceLoader.load(AlgorithmProvider.class).forEach(allProviders::add);
+            ServiceLoader.load(org.episteme.core.technical.backend.Backend.class).forEach(b -> allProviders.addAll(b.getAlgorithmProviders()));
+            ServiceLoader.load(org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend.class).forEach(allProviders::add);
+
+            for (AlgorithmProvider p : allProviders) {
+                if (!seenClasses.add(p.getClass().getName())) {
+                    continue; // Skip duplicates
+                }
                 String type = p.getAlgorithmType();
                 if (type != null && !type.isEmpty()) {
                     type = type.substring(0, 1).toUpperCase() + type.substring(1);

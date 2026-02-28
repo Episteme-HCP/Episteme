@@ -2,32 +2,32 @@
 setlocal
 
 rem --- Argument Parsing ---
-set APP_CLASS=org.jscience.benchmarks.ui.Launcher
+set APP_CLASS=org.episteme.benchmarks.ui.Launcher
 for %%a in (%*) do (
-    if "%%a"=="--cli" set APP_CLASS=org.jscience.benchmarks.cli.BenchmarkCLI
+    if "%%a"=="--cli" set APP_CLASS=org.episteme.benchmarks.cli.BenchmarkCLI
     if "%%a"=="--shaded" set USE_SHADED_JAR=true
     if "%%a"=="-jar" set USE_SHADED_JAR=true
 )
-set JAR_PATH=jscience-benchmarks\target\jscience-benchmarks-1.0.0-SNAPSHOT.jar
+set JAR_PATH=episteme-benchmarks\target\episteme-benchmarks-1.0.0-SNAPSHOT.jar
 set LIB_DIR=launchers\lib
-set DEPENDENCY_DIR=jscience-benchmarks\target\lib
-set MODULE_PATH=jscience-benchmarks\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes;jscience-native\target\classes;jscience-client\target\classes;jscience-server\target\classes
+set DEPENDENCY_DIR=episteme-benchmarks\target\lib
+set MODULE_PATH=episteme-benchmarks\target\classes;episteme-core\target\classes;episteme-natural\target\classes;episteme-social\target\classes;episteme-native\target\classes;episteme-client\target\classes;episteme-server\target\classes
 
 rem --- Add Native JARs to Classpath ---
 if defined MPJ_HOME (
     set "MPJ_JAR=%MPJ_HOME%\lib\mpj.jar"
 ) else (
     rem Fallback if MPJ_HOME not set but folder exists
-    if exist "C:\JScience-Native\MPJ\lib\mpj.jar" set "MPJ_JAR=C:\JScience-Native\MPJ\lib\mpj.jar"
+    if exist "C:\Episteme-Native\MPJ\lib\mpj.jar" set "MPJ_JAR=C:\Episteme-Native\MPJ\lib\mpj.jar"
 )
 
 
 echo ==========================================
-echo Running JScience Benchmarks
+echo Running Episteme Benchmarks
 echo ==========================================
 
 rem --- Native Libraries Setup ---
-set "NATIVE_ROOT=C:\JScience-Native"
+set "NATIVE_ROOT=C:\Episteme-Native"
 set "LIBS_DIR=%~dp0libs"
 
 rem --- VLC ---
@@ -70,13 +70,13 @@ if defined USE_SHADED_JAR (
     java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Djava.library.path="libs/native" -cp "%JAR_PATH%;%DEPENDENCY_DIR%\*" %APP_CLASS% %*
 ) else (
     echo [INFO] Running latest compiled classes - Dev Mode. Use --shaded to force JAR.
-    if not exist "jscience-benchmarks\target\classes" (
+    if not exist "episteme-benchmarks\target\classes" (
         echo [INFO] Classes not found, building module...
-        call mvn compile -pl jscience-benchmarks -am -DskipTests
+        call mvn compile -pl episteme-benchmarks -am -DskipTests
     )
     if not exist "%DEPENDENCY_DIR%" (
         echo [INFO] Dependencies not found in target, copying...
-        call mvn dependency:copy-dependencies -pl jscience-benchmarks -DincludeScope=runtime -DskipTests
+        call mvn dependency:copy-dependencies -pl episteme-benchmarks -DincludeScope=runtime -DskipTests
     )
     java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %*
 

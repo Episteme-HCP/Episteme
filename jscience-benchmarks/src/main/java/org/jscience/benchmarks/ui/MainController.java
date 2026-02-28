@@ -1,4 +1,4 @@
-package org.jscience.benchmarks.ui;
+package org.episteme.benchmarks.ui;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -14,9 +14,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.benchmarks.benchmark.BenchmarkRegistry;
-import org.jscience.core.ui.i18n.I18N;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
+import org.episteme.core.ui.i18n.I18N;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -73,14 +73,14 @@ public class MainController {
     private final Map<String, BarChart<String, Number>> domainChartMap = new HashMap<>();
 
     private final ObservableList<BenchmarkRunSummary> historyList = FXCollections.observableArrayList();
-    private final org.jscience.benchmarks.persistence.BenchmarkResultService resultService = new org.jscience.benchmarks.persistence.BenchmarkResultService();
+    private final org.episteme.benchmarks.persistence.BenchmarkResultService resultService = new org.episteme.benchmarks.persistence.BenchmarkResultService();
     private final java.util.concurrent.ConcurrentLinkedQueue<BenchmarkItem> benchmarkQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
     private int selectedCount = 0;
     private int completedCount = 0;
     private final Object executionLock = new Object();
     private ResourceBundle resources;
     private Task<Void> mainTask;
-    private volatile org.jscience.core.ComputeContext activeComputeContext;
+    private volatile org.episteme.core.ComputeContext activeComputeContext;
     private boolean isProcessingQueue = false;
 
     private javafx.stage.Stage primaryStage;
@@ -94,7 +94,7 @@ public class MainController {
 
     private void updateUI(Locale locale) {
         try {
-            resources = ResourceBundle.getBundle("org.jscience.benchmarks.i18n.messages-benchmark", locale);
+            resources = ResourceBundle.getBundle("org.episteme.benchmarks.i18n.messages-benchmark", locale);
             
             // Header
             mainTitleLabel.setText(resources.getString("app.title"));
@@ -363,7 +363,7 @@ public class MainController {
     private void handleAbout() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("About");
-        alert.setHeaderText("JScience Benchmarking Suite");
+        alert.setHeaderText("Episteme Benchmarking Suite");
         alert.setContentText("Version 1.0\nCopyright 2026");
         alert.showAndWait();
     }
@@ -427,7 +427,7 @@ public class MainController {
         mainTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                activeComputeContext = org.jscience.core.ComputeContext.current();
+                activeComputeContext = org.episteme.core.ComputeContext.current();
                 activeComputeContext.setCancelled(false);
                 
                 while (!benchmarkQueue.isEmpty()) {
@@ -567,7 +567,7 @@ public class MainController {
                 case 4 -> java.util.Locale.CHINESE;
                 default -> java.util.Locale.ENGLISH;
             };
-            org.jscience.core.ui.i18n.I18N.getInstance().setLocale(newLocale);
+            org.episteme.core.ui.i18n.I18N.getInstance().setLocale(newLocale);
             updateUI(newLocale);
             System.out.println("Language changed to: " + newLocale.getDisplayName());
         });
@@ -736,7 +736,7 @@ public class MainController {
                     item.statusProperty().set("Skipped");
                     item.resultProperty().set("Skipped (Lib Missing)");
                  });
-            } else if (e instanceof org.jscience.core.technical.algorithm.OperationCancelledException || "Canceled".equals(errorMsg)) {
+            } else if (e instanceof org.episteme.core.technical.algorithm.OperationCancelledException || "Canceled".equals(errorMsg)) {
                  Platform.runLater(() -> {
                     item.statusProperty().set("Canceled");
                     item.resultProperty().set("Stopped");

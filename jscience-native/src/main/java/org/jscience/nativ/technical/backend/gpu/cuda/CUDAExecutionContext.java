@@ -1,12 +1,12 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.technical.backend.gpu.cuda;
 
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.technical.backend.Operation;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.Operation;
 import jcuda.driver.CUcontext;
 import jcuda.driver.CUdevice;
 import jcuda.driver.JCudaDriver;

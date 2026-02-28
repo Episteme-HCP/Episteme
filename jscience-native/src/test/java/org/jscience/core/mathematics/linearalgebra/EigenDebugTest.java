@@ -1,8 +1,8 @@
-package org.jscience.core.mathematics.linearalgebra;
+package org.episteme.core.mathematics.linearalgebra;
 
-import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition;
-import org.jscience.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition;
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import java.util.Random;
 

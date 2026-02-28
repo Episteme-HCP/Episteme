@@ -1,6 +1,6 @@
-# JScience Server
+# Episteme Server
 
-The **JScience Server** is the central coordinator for the Distributed Grid system. It manages computational tasks, data feeds, real-time collaboration sessions, and remote device control.
+The **Episteme Server** is the central coordinator for the Distributed Grid system. It manages computational tasks, data feeds, real-time collaboration sessions, and remote device control.
 
 ## Features
 
@@ -117,16 +117,16 @@ start-server.bat
 
 ```bash
 # Start with mTLS enabled (Requires keystores)
-java -Dssl=true -jar jscience-server.jar
+java -Dssl=true -jar episteme-server.jar
 ```
 
 **Custom Port:**
 
 ```bash
 # Server on port 9000
-java -Dport=9000 -jar jscience-server.jar
+java -Dport=9000 -jar episteme-server.jar
 # Or via CLI argument
-java -jar jscience-server.jar 9000
+java -jar episteme-server.jar 9000
 ```
 
 ## Worker Deployment
@@ -159,7 +159,7 @@ start-worker.bat 9000
 |----------|-------------|
 | **Horizontal** | Deploy multiple worker instances on different machines |
 | **Vertical** | Increase cores/memory per worker |
-| **Container** | Use Docker (example: `docker run jscience-worker --server grid.example.com`) |
+| **Container** | Use Docker (example: `docker run episteme-worker --server grid.example.com`) |
 | **Auto-Discovery** | Workers find server via mDNS (see below) |
 
 ### Auto-Discovery (mDNS)
@@ -168,10 +168,10 @@ When enabled, workers can automatically discover the server on the local network
 
 ```bash
 # Server broadcasts its presence
-java -Ddiscovery=true -jar jscience-server.jar
+java -Ddiscovery=true -jar episteme-server.jar
 
 # Worker discovers server automatically
-java -Ddiscovery=true -jar jscience-worker.jar
+java -Ddiscovery=true -jar episteme-worker.jar
 ```
 
 ## API Reference (Protobuf)

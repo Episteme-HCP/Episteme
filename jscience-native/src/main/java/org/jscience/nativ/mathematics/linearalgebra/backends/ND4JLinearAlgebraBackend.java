@@ -1,20 +1,20 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import com.google.auto.service.AutoService;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.inverse.InvertMatrix;
@@ -31,7 +31,7 @@ import org.nd4j.linalg.inverse.InvertMatrix;
  * @since 1.0
  */
 @AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class})
-public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.jscience.nativ.technical.backend.nativ.NativeBackend, org.jscience.core.technical.backend.cpu.CPUBackend {
+public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.episteme.nativ.technical.backend.nativ.NativeBackend, org.episteme.core.technical.backend.cpu.CPUBackend {
 
     @Override
     public int getPriority() {
@@ -49,10 +49,10 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
-        return new org.jscience.core.technical.backend.ExecutionContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.core.technical.backend.ExecutionContext() {
             @Override
-            public <T> T execute(org.jscience.core.technical.backend.Operation<T> operation) {
+            public <T> T execute(org.episteme.core.technical.backend.Operation<T> operation) {
                 return operation.compute(this);
             }
 
@@ -76,7 +76,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     private static final boolean IS_AVAILABLE;
     static {
         boolean avail = false;
-        if (!Boolean.getBoolean("jscience.nd4j.skip")) {
+        if (!Boolean.getBoolean("episteme.nd4j.skip")) {
             try {
                 Class.forName("org.nd4j.linalg.factory.Nd4j");
                 avail = true;
@@ -93,15 +93,15 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     }
 
     @Override
-    public boolean isCompatible(org.jscience.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring instanceof org.jscience.core.mathematics.sets.Reals;
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        return ring instanceof org.episteme.core.mathematics.sets.Reals;
     }
 
     @Override
-    public double score(org.jscience.core.technical.algorithm.OperationContext context) {
+    public double score(org.episteme.core.technical.algorithm.OperationContext context) {
         if (!isAvailable()) return -1.0;
         double score = getPriority();
-        if (context.hasHint(org.jscience.core.technical.algorithm.OperationContext.Hint.DENSE)) score += 10.0;
+        if (context.hasHint(org.episteme.core.technical.algorithm.OperationContext.Hint.DENSE)) score += 10.0;
         return score;
     }
 
@@ -136,7 +136,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
 
     private Vector<Real> fromINDArrayVector(INDArray arr) {
         double[] data = arr.data().asDouble();
-        return org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
     }
 
     @Override
@@ -286,7 +286,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         double[] sArr = sVals.data().asDouble();
         java.util.List<Real> sList = new java.util.ArrayList<>(k);
         for (double v : sArr) sList.add(Real.of(v));
-        Vector<Real> S = org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sArr);
+        Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sArr);
         return new SVDResult<>(fromINDArray(U), S, fromINDArray(Vt));
     }
 
@@ -325,8 +325,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         }
 
         // Build result
-        org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector D =
-            org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues);
+        org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector D =
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues);
         double[] vFlat = new double[n * n];
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
@@ -367,8 +367,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
                 U.putRow(row, U.getRow(row).sub(U.getRow(col).mul(factor)));
             }
         }
-        org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector P =
-            org.jscience.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pivots);
+        org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector P =
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pivots);
         return new LUResult<>(fromINDArray(L), fromINDArray(U), P);
     }
 }

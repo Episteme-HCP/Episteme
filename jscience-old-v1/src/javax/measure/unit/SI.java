@@ -1,6 +1,6 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2006 - JScience (http://jscience.org/)
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2006 - Episteme (http://episteme.org/)
  * All rights reserved.
  * 
  * Permission to use, copy, modify, and distribute this software is
@@ -22,7 +22,7 @@ import javax.measure.quantity.*;
  *     
  * <p> It also defines the 20 SI prefixes used to form decimal multiples and
  *     submultiples of SI units. For example:[code]
- *     import static org.jscience.physics.units.SI.*; // Static import.
+ *     import static org.episteme.physics.units.SI.*; // Static import.
  *     ...
  *     Unit<Pressure> HECTO_PASCAL = HECTO(PASCAL);
  *     Unit<Length> KILO_METER = KILO(METER);

@@ -1,18 +1,18 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.tensors.backends;
+package org.episteme.nativ.mathematics.tensors.backends;
 
-import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.nativ.mathematics.linearalgebra.tensors.CUDATensor;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.mathematics.linearalgebra.tensors.TensorProvider;
-import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
+import org.episteme.nativ.mathematics.linearalgebra.tensors.CUDATensor;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.mathematics.linearalgebra.tensors.TensorProvider;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;
 
 import jcuda.Pointer;
@@ -22,7 +22,7 @@ import jcuda.driver.CUdevice;
 import jcuda.driver.JCudaDriver;
 import jcuda.runtime.JCuda;
 import jcuda.runtime.cudaMemcpyKind;
-import org.jscience.nativ.mathematics.linearalgebra.backends.CUDAExecutionContext;
+import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
 
 import java.nio.DoubleBuffer;
 import java.util.Arrays;
@@ -196,12 +196,12 @@ public class NativeCUDATensorBackend implements TensorProvider, GPUBackend, Nati
     }
 
     @Override
-    public org.jscience.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.jscience.core.technical.backend.HardwareAccelerator.GPU;
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
     @Override
-    public org.jscience.core.technical.backend.ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         initCUDA();
         if (!initialized) return null;
         return new CUDAExecutionContext(globalContext, globalDevice);

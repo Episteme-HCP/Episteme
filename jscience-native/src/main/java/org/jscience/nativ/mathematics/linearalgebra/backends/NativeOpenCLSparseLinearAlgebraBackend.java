@@ -1,27 +1,28 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.mathematics.linearalgebra.backends;
 
-import org.jscience.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
-import org.jscience.core.mathematics.linearalgebra.Matrix;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.jscience.core.mathematics.context.MathContext;
-import org.jscience.core.technical.algorithm.OperationContext;
-import org.jscience.core.technical.algorithm.OperationContext.Hint;
-import org.jscience.core.technical.backend.Backend;
-import org.jscience.core.technical.backend.ComputeBackend;
-import org.jscience.core.technical.backend.gpu.GPUBackend;
-import org.jscience.core.technical.backend.HardwareAccelerator;
-import org.jscience.core.technical.backend.ExecutionContext;
-import org.jscience.core.mathematics.structures.rings.Ring;
-import org.jscience.core.mathematics.sets.Reals;
-import org.jscience.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.algorithm.OperationContext.Hint;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.sets.Reals;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.jocl.*;
 import static org.jocl.CL.*;
 import java.nio.DoubleBuffer;
@@ -321,7 +322,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
-            return org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, b);
+            return org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, b);
         }
         
         int m = a.rows(); int k = a.cols(); int n = b.cols();
@@ -337,7 +338,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         
         Real[] res = new Real[m * n];
         for(int i=0; i<m*n; i++) res[i] = Real.of(dc.get(i));
-        return new org.jscience.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
+        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
     }
 
     @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL add not implemented"); }
@@ -351,7 +352,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     public Vector<Real> multiplyCSR(Matrix<Real> a, Vector<Real> x) {
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
-            return org.jscience.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, x);
+            return org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, x);
         }
 
         // Extract CSR data from SparseMatrixStorage
@@ -415,7 +416,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
         Real[] res = new Real[rows];
         for (int i = 0; i < rows; i++) res[i] = Real.of(yData[i]);
-        return new org.jscience.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(res), Reals.getInstance());
+        return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(res), Reals.getInstance());
     }
 
     @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL vector add not implemented"); }

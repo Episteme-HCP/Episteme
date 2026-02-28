@@ -1,5 +1,5 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,10 +21,10 @@
  * SOFTWARE.
  */
 
-package org.jscience.nativ.physics.loaders.hdf5;
+package org.episteme.nativ.physics.loaders.hdf5;
 
 import java.util.Optional;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
@@ -34,8 +34,8 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.jscience.core.io.AbstractResourceWriter;
-import org.jscience.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.core.io.AbstractResourceWriter;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
 
 /**
  * High-performance HDF5 writer using Panama.

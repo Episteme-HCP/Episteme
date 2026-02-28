@@ -1,6 +1,6 @@
-# JScience Killer Apps
+# Episteme Killer Apps
 
-Professional-grade scientific applications built with JavaFX and the JScience library.
+Professional-grade scientific applications built with JavaFX and the Episteme library.
 
 ## 🔬 Pandemic Forecaster
 

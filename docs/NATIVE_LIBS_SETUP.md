@@ -1,12 +1,12 @@
-# JScience Native Library Setup Guide
+# Episteme Native Library Setup Guide
 
-JScience utilizes high-performance native backends for computation, physics, audio, and data I/O. This guide provides comprehensive instructions for acquiring, installing, and configuring these libraries across Windows, Linux, and macOS.
+Episteme utilizes high-performance native backends for computation, physics, audio, and data I/O. This guide provides comprehensive instructions for acquiring, installing, and configuring these libraries across Windows, Linux, and macOS.
 
 ---
 
 ## 🚀 Quick Start: The `libs/` Directory
 
-JScience is configured to look for native libraries in the project's root `libs/` directory. For a portable installation, place all relevant `.dll` (Windows), `.so` (Linux), or `.dylib` (macOS) files in this folder.
+Episteme is configured to look for native libraries in the project's root `libs/` directory. For a portable installation, place all relevant `.dll` (Windows), `.so` (Linux), or `.dylib` (macOS) files in this folder.
 
 **JVM Argument:**
 `-Djava.library.path=libs` (This is handled automatically by the provided launchers).
@@ -45,7 +45,7 @@ JScience is configured to look for native libraries in the project's root `libs/
 
 | Library | Purpose | Installation Method |
 | :--- | :--- | :--- |
-| **MiniAudio** | Low-latency Audio | **All**: [miniaud.io](https://miniaud.io/) <br> JScience uses a native wrapper. Ensure `miniaudio.dll` is present in `libs/`. |
+| **MiniAudio** | Low-latency Audio | **All**: [miniaud.io](https://miniaud.io/) <br> Episteme uses a native wrapper. Ensure `miniaudio.dll` is present in `libs/`. |
 | **PortAudio** | Cross-platform Audio | **Win**: [Official Site](http://www.portaudio.com/download.html) <br> **Lin**: `sudo apt install libportaudio2` <br> **Mac**: `brew install portaudio` |
 | **VLC (libvlc)** | Media Playback | **Win**: Install [VLC Media Player](https://www.videolan.org/vlc/) and copy `libvlc.dll`, `libvlccore.dll` and the `plugins/` folder. <br> **Lin**: `sudo apt install libvlc-dev` <br> **Mac**: `brew install --cask vlc` |
 | **mpg123** | MP3 Decoding | **Win**: [mpg123.org](https://mpg123.de/download/win64/) <br> **Lin**: `sudo apt install libmpg123-dev` <br> **Mac**: `brew install mpg123` |
@@ -132,14 +132,14 @@ Before downloading from the web, you can often find these missing DLLs in other 
 ### 🛠️ Step-by-Step Repatriation:
 1. Locate the software directory (e.g., VLC or Git).
 2. Search for the missing `.dll` files listed in the checklist above.
-3. **Copy (don't move)** the files into the JScience `libs/` folder.
+3. **Copy (don't move)** the files into the Episteme `libs/` folder.
 4. For VLC, copy the entire `plugins/` folder into `libs/`.
 
 ---
 
 ## ✅ Verification Tools
 
-To verify that JScience can successfully find and load your native components, use the following launcher:
+To verify that Episteme can successfully find and load your native components, use the following launcher:
 - **Windows**: `.\launchers\run-verify.bat`
 - **Linux/macOS**: `./launchers/run-verify.sh`
 
@@ -148,4 +148,4 @@ To verify that JScience can successfully find and load your native components, u
 ## ❓ Troubleshooting
 
 - **`UnsatisfiedLinkError`**: This usually means a dependency of the library is missing (e.g., missing `libgfortran` for OpenBLAS). Use `ldd` (Linux), `Dependencies` (Windows), or `otool -L` (macOS) to check for missing transitive dependencies.
-- **Wrong Architecture**: Ensure you are using **64-bit (x64)** libraries. JScience does not support 32-bit (x86) backends.
+- **Wrong Architecture**: Ensure you are using **64-bit (x64)** libraries. Episteme does not support 32-bit (x86) backends.

@@ -3,19 +3,19 @@ Jscience is a general scientific library in Java.
 
 
 
-This is the readme.txt file for JScience (http://www.jscience.org/) version 2.0 EXPERIMENTAL, as of 4th September 2007.
+This is the readme.txt file for Episteme (http://www.episteme.org/) version 2.0 EXPERIMENTAL, as of 4th September 2007.
 
 For a complete readme.txt file read the v1 readme.txt in the corresponding sub directory.
 
 
-This is starting point for version 2.0 of the Mathematics package although the complete 1.0 version of JScience has not yet been released. Use at your own risks.
+This is starting point for version 2.0 of the Mathematics package although the complete 1.0 version of Episteme has not yet been released. Use at your own risks.
 
 
 Expected first beta release hopefully... someday. 
 
 
 All packages and data are delivered under GPL license EXCEPT a couple packages using specific licenses:
-org.jscience.mathematics.geometry
+org.episteme.mathematics.geometry
 
 Many of these licenses are quite similar to GPL which are usually called "compatible".
 
@@ -55,7 +55,7 @@ Our coding standards are namely:
 - XML oriented
 - Documented
 
-Why using JScience and not another package ? Well, JScience is a collective effort which has the aim to be maintained and enhanced over the time. JScience is also quite useful because you can submit your subpackages for addition into the framework for the benefits of everyone. Finally we make a lot of effort to always provide the fastest algorithms in a strong architecture, something that is quite difficult to achieve, especially for specialized packages.
+Why using Episteme and not another package ? Well, Episteme is a collective effort which has the aim to be maintained and enhanced over the time. Episteme is also quite useful because you can submit your subpackages for addition into the framework for the benefits of everyone. Finally we make a lot of effort to always provide the fastest algorithms in a strong architecture, something that is quite difficult to achieve, especially for specialized packages.
 
 This is an API, not an application per se. Mostly, it is an API to develop some others API or some applications. We therefore expect a different target audience than the mainstream internet user. In fact we target well defined sub groups:
 - API builders to design APIs on top of this one
@@ -63,7 +63,7 @@ This is an API, not an application per se. Mostly, it is an API to develop some 
 - Applet/Webstart developers that need to quick develop a product
 - Researchers and graduate students that want to test something and (may be) don't require to build a full application
 
-JScience, and especially the numerical intensive packages (mostly mathematics), uses two models. The first one is the traditional way in which scientific libraries are designed, is optimized for speed and relies heavily on ints and doubles, while offering a strong logic. The other one provides an even better model closer to theoritical concepts generally acknowledged in science. It is based on ExactIntegers and ExactReals which both provide infinite precision support at the sacrifice of some speed. It comes along with unit systems and quantities. It is much less developed in the current release than the traditional model mostly for the reason that it makes this API bigger and more complex while probably required by less users. There are some bridges that help switch from one model from another so you shouldn't have much difficulites using any of the two. Classes normally behave the same way in both models and mostly only differ by their names.
+Episteme, and especially the numerical intensive packages (mostly mathematics), uses two models. The first one is the traditional way in which scientific libraries are designed, is optimized for speed and relies heavily on ints and doubles, while offering a strong logic. The other one provides an even better model closer to theoritical concepts generally acknowledged in science. It is based on ExactIntegers and ExactReals which both provide infinite precision support at the sacrifice of some speed. It comes along with unit systems and quantities. It is much less developed in the current release than the traditional model mostly for the reason that it makes this API bigger and more complex while probably required by less users. There are some bridges that help switch from one model from another so you shouldn't have much difficulites using any of the two. Classes normally behave the same way in both models and mostly only differ by their names.
 
 The library supports almost everything you should expect in Mathematics.
 
@@ -73,7 +73,7 @@ Some limitations are to be mentionned, see todo.txt for a complete explanation.
 
 Finally there are many data files that are cobundled along with the classes. They are support information, NOT necessarily used by classes but brought to you so that you can have a handy reliable source of data.
 
-Although we have made many efforts to produce such a library there is still room for a lot of improvements. Please report any inaccuray, bug, feature request through the JScience website http://www.jscience.org/.
+Although we have made many efforts to produce such a library there is still room for a lot of improvements. Please report any inaccuray, bug, feature request through the Episteme website http://www.episteme.org/.
 
 
 2. INSTALLATION FOR END USERS:
@@ -83,16 +83,16 @@ Apart from Java itself, the distribution contains all the required files to be r
 Install Java (1.5 or later) from http://www.java.com/. All class files are Java VM 1.5 compatible (as far as we know) although most of the packages should compile with Java 1.3 if needed.
 See also the "Required libraries" section below.
 
-a. Unzip the current version of jscience.zip.
+a. Unzip the current version of episteme.zip.
 
 b. either:
-Put the JScience library in the <jre>/lib/ext directory of your Java installation, removing all previous Jscience files.
-Also include all the files in jscience/lib/ in the <jre>/lib/ext directory of your Java installation.
+Put the Episteme library in the <jre>/lib/ext directory of your Java installation, removing all previous Jscience files.
+Also include all the files in episteme/lib/ in the <jre>/lib/ext directory of your Java installation.
 Note that you may write over existing files (which are probably older versions of the same libraries).
 Or:
-Remove any previous version of JScience by simply deleting the org.jscience directory.
-Make sure your CLASSPATH environment variable contains a path to jscience/classes/jscience.jar.
-Make sure your CLASSPATH environment variable contains a path to jscience/lib/ (the packages needed by JScience to run).
+Remove any previous version of Episteme by simply deleting the org.episteme directory.
+Make sure your CLASSPATH environment variable contains a path to episteme/classes/episteme.jar.
+Make sure your CLASSPATH environment variable contains a path to episteme/lib/ (the packages needed by Episteme to run).
 
 Run any sample with the command line, as usual.
 
@@ -101,18 +101,18 @@ Run any sample with the command line, as usual.
 
 To compile all the code:
 Install Java (1.5 or later) from http://www.java.com/. All class files are Java VM 1.5 compatible although most of the packages should compile with Java 1.3 if needed.
-The text encoding for the compiler must be UTF-8 (mainly for some Measure package classes) except for the  org.jscience.mathematics.geometry (cp1252).
+The text encoding for the compiler must be UTF-8 (mainly for some Measure package classes) except for the  org.episteme.mathematics.geometry (cp1252).
 See also the "Required libraries" section below.
 Compile with the command line, as usual or with Ant (http://ant.apache.org/) using the supplied build.xml in the org package.
 
-Javadoc shouldn't be generated for some classes in org.jscience.mathematics.algebraic.numbers and org.jscience.mathematics.geometry see the readme.txt in the corresponding package, as these classes are not part of the API.
+Javadoc shouldn't be generated for some classes in org.episteme.mathematics.algebraic.numbers and org.episteme.mathematics.geometry see the readme.txt in the corresponding package, as these classes are not part of the API.
 
 
 4. REQUIRED LIBRARIES:
 
 To compile and/or run all the classes in this library you will also need several libraries (list below). These libraries have been included in the lib directory (apart from JavaComm and Java3D which you can download from Sun) so that you just need to drag and drop them to you Java /lib/ext folder.
 
-The XML parsers (org.jscience.ml subpackages) require several XML libraries:
+The XML parsers (org.episteme.ml subpackages) require several XML libraries:
 Xerces XML parser found at http://xml.apache.org/xerces2-j/
 JDom XML parser found at http://www.jdom.org/
 JAXEN XML parser found at http://www.jaxen.org/
@@ -120,14 +120,14 @@ JAXEN XML parser found at http://www.jaxen.org/
 Remember that you only need these libraries if you use the corresponding package or plan to recompile everything.
 
 Optional libraries:
-tools.jar (JDK doclet system) from the JDK lib directory must be in the classpath to compile the org.jscience.help.doclet subpackage. Warning, only version 1.5 of the tool.jar library (distributed with Java JDK 1.5) is supported, it won't compile with previous versions. This package is mostly needed if you want to recompile JScience and of no use as a developer.
-JUnit for org.jscience.test subpackage found at http://www.junit.org/index.htm. This package is needed only if you want to test JScience and of no use as a developer.
+tools.jar (JDK doclet system) from the JDK lib directory must be in the classpath to compile the org.episteme.help.doclet subpackage. Warning, only version 1.5 of the tool.jar library (distributed with Java JDK 1.5) is supported, it won't compile with previous versions. This package is mostly needed if you want to recompile Episteme and of no use as a developer.
+JUnit for org.episteme.test subpackage found at http://www.junit.org/index.htm. This package is needed only if you want to test Episteme and of no use as a developer.
 Ant build tool to automate compilation found at http://ant.apache.org/
 
-All these are also bundled in the lib directory along with the source code of JScience.
+All these are also bundled in the lib directory along with the source code of Episteme.
 
 Note about the MathML 2.0, 2nd edition implementation and dtd:
-The MathML (partial) implementation that can be found on the Jscience website is different from the standard implementation of the MathML dtd (http://dev.w3.org/cvsweb/java/classes/org/w3c/dom/mathml/) and corrects minor bugs. Please download the version from jscience named MathML DOM. You will find the MathML dtd at http://www.w3.org/TR/2003/REC-MathML2-20031021/
+The MathML (partial) implementation that can be found on the Jscience website is different from the standard implementation of the MathML dtd (http://dev.w3.org/cvsweb/java/classes/org/w3c/dom/mathml/) and corrects minor bugs. Please download the version from episteme named MathML DOM. You will find the MathML dtd at http://www.w3.org/TR/2003/REC-MathML2-20031021/
 
 5. WARNINGS:
 
@@ -196,8 +196,8 @@ You can offer a contribution in many ways:
 - you want to submit a bug report
 - you want to submit a request for enhancement
 - you have some datafiles you would like us to bundle in
-- you want to review or write some comments about JScience or one of the pacakges
-- you have written an application or an applet that uses JScience and would like to let us know so that we can link to you
+- you want to review or write some comments about Episteme or one of the pacakges
+- you have written an application or an applet that uses Episteme and would like to let us know so that we can link to you
 
 Don't hesitate to contact us should you want to contribute in a way or another.
 
@@ -206,7 +206,7 @@ Don't hesitate to contact us should you want to contribute in a way or another.
 
 This software is based on the work from several authors which code we used to produce our own code. Normally, we merge every feature from every package (a notable exception is Biojava).
 
-We downloaded the code for (almost) each package on the 1st January 2005, so any later release should be more recent than the code we built JScience upon.
+We downloaded the code for (almost) each package on the 1st January 2005, so any later release should be more recent than the code we built Episteme upon.
 
 Specifically:
 Janet 1.10 beta (partial inclusion) (Carsten Knudsen <Carsten.Knudsen@fysik.dtu.dk>)
@@ -227,6 +227,6 @@ JGCL 1.0 (ryo@sra.co.jp)
 
 8. CONTACT US:
 
-Though we do not have any formal postal address, you can contact us using the website www.jscience.org, or jscience.dev.java.net. You can also join the mailing list or contact directly:
+Though we do not have any formal postal address, you can contact us using the website www.episteme.org, or episteme.dev.java.net. You can also join the mailing list or contact directly:
 "Jean-Marie Dautelle" <jean-marie@dautelle.com>
 "Silvere Martin-Michiellot" <silvere@digitalbiosphere.org>

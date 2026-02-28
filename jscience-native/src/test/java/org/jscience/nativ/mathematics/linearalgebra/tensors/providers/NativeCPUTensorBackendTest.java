@@ -1,13 +1,13 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.mathematics.linearalgebra.tensors.providers;
+package org.episteme.nativ.mathematics.linearalgebra.tensors.providers;
 
-import org.jscience.core.mathematics.linearalgebra.Tensor;
-import org.jscience.nativ.mathematics.linearalgebra.tensors.NativeTensor;
-import org.jscience.nativ.mathematics.tensors.backends.NativeCPUTensorBackend;
+import org.episteme.core.mathematics.linearalgebra.Tensor;
+import org.episteme.nativ.mathematics.linearalgebra.tensors.NativeTensor;
+import org.episteme.nativ.mathematics.tensors.backends.NativeCPUTensorBackend;
 import org.junit.jupiter.api.Test;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;

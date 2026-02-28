@@ -1,12 +1,12 @@
-# JScience Data Sources & Integrations
+# Episteme Data Sources & Integrations
 
-A comprehensive list of file formats, APIs, and datasets that JScience supports to bridge the gap between theoretical models and real-world data.
+A comprehensive list of file formats, APIs, and datasets that Episteme supports to bridge the gap between theoretical models and real-world data.
 
 ## Loader Architecture
 
-All JScience loaders implement the `ResourceReader<T>` interface (from `org.jscience.io`), enabling:
+All Episteme loaders implement the `ResourceReader<T>` interface (from `org.episteme.io`), enabling:
 
-- **Dashboard Discovery**: Automatic registration with the JScience Dashboard
+- **Dashboard Discovery**: Automatic registration with the Episteme Dashboard
 - **Caching**: Built-in resource caching via `AbstractResourceReader`
 - **Fallback Data**: Sample data when external resources are unavailable
 
@@ -41,17 +41,17 @@ public interface ResourceWriter<T> extends ResourceIO<T> {
 
 ## XML-Based Scientific Data Formats
 
-JScience provides comprehensive support for standard XML formats used across scientific disciplines. All XML readers extend `AbstractResourceReader<T>` and implement the `ResourceReader<T>` interface.
+Episteme provides comprehensive support for standard XML formats used across scientific disciplines. All XML readers extend `AbstractResourceReader<T>` and implement the `ResourceReader<T>` interface.
 
 ### Biology & Life Sciences
 
 | Reader | Format | Package | Description |
 |--------|--------|---------|-------------|
-| `PhyloXMLReader` | PhyloXML | `org.jscience.biology.loaders.phyloxml` | Phylogenetic trees with clades, taxonomy, and evolutionary events |
-| `SBMLReader` | SBML | `org.jscience.biology.loaders.sbml` | Systems biology models with reactions, species, and kinetics |
-| `NeuroMLReader` | NeuroML v2 | `org.jscience.biology.loaders.neuroml` | Computational neuroscience models with morphology and ion channels |
-| `PDBMLReader` | PDBML | `org.jscience.biology.loaders.pdbml` | Protein Data Bank structures with atomic coordinates |
-| `BioPAXReader` | BioPAX Level 3 | `org.jscience.biology.loaders.biopax` | Biological pathways, reactions, and molecular interactions |
+| `PhyloXMLReader` | PhyloXML | `org.episteme.biology.loaders.phyloxml` | Phylogenetic trees with clades, taxonomy, and evolutionary events |
+| `SBMLReader` | SBML | `org.episteme.biology.loaders.sbml` | Systems biology models with reactions, species, and kinetics |
+| `NeuroMLReader` | NeuroML v2 | `org.episteme.biology.loaders.neuroml` | Computational neuroscience models with morphology and ion channels |
+| `PDBMLReader` | PDBML | `org.episteme.biology.loaders.pdbml` | Protein Data Bank structures with atomic coordinates |
+| `BioPAXReader` | BioPAX Level 3 | `org.episteme.biology.loaders.biopax` | Biological pathways, reactions, and molecular interactions |
 
 #### PhyloXML Reader
 **Supported Elements:**
@@ -141,8 +141,8 @@ for (Pathway pathway : model.getPathways()) {
 
 | Reader | Format | Package | Description |
 |--------|--------|---------|-------------|
-| `CMLReader` | Chemical Markup Language | `org.jscience.chemistry.loaders.cml` | Molecules, atoms, bonds, and spectra |
-| `AnIMLReader` | AnIML | `org.jscience.chemistry.loaders.animl` | Analytical instrument measurement data |
+| `CMLReader` | Chemical Markup Language | `org.episteme.chemistry.loaders.cml` | Molecules, atoms, bonds, and spectra |
+| `AnIMLReader` | AnIML | `org.episteme.chemistry.loaders.animl` | Analytical instrument measurement data |
 
 #### CML Reader
 **Supported Elements:**
@@ -156,7 +156,7 @@ for (Pathway pathway : model.getPathways()) {
 
 | Reader | Format | Package | Description |
 |--------|--------|---------|-------------|
-| `ThermoMLReader` | ThermoML | `org.jscience.physics.loaders.thermoml` | Thermodynamic property measurements |
+| `ThermoMLReader` | ThermoML | `org.episteme.physics.loaders.thermoml` | Thermodynamic property measurements |
 
 #### ThermoML Reader
 **Supported Elements:**
@@ -169,7 +169,7 @@ for (Pathway pathway : model.getPathways()) {
 
 | Reader | Format | Package | Description |
 |--------|--------|---------|-------------|
-| `GMLReader` | Geography Markup Language | `org.jscience.earth.loaders.gml` | OGC standard for geographic features |
+| `GMLReader` | Geography Markup Language | `org.episteme.earth.loaders.gml` | OGC standard for geographic features |
 
 #### GML Reader
 **Supported GML 3.2 Elements:**
@@ -195,7 +195,7 @@ for (GMLFeature feature : doc.getFeatures()) {
 
 | Reader | Format | Package | Description |
 |--------|--------|---------|-------------|
-| `PMMLReader` | PMML 4.4 | `org.jscience.computing.loaders.pmml` | Predictive models (ML/AI) |
+| `PMMLReader` | PMML 4.4 | `org.episteme.computing.loaders.pmml` | Predictive models (ML/AI) |
 
 #### PMML Reader
 **Supported Model Types:**
@@ -220,9 +220,9 @@ if ("TreeModel".equals(treeModel.getType())) {
 
 | Reader/Writer | Format | Package | Description |
 |---------------|--------|---------|-------------|
-| `OpenMathReader` | OpenMath | `org.jscience.mathematics.loaders.openmath` | Mathematical expressions and objects |
-| `OpenMathWriter` | OpenMath | `org.jscience.mathematics.loaders.openmath` | Export mathematical objects |
-| `MathMLReader` | MathML | `org.jscience.mathematics.loaders.mathml` | Mathematical notation and content |
+| `OpenMathReader` | OpenMath | `org.episteme.mathematics.loaders.openmath` | Mathematical expressions and objects |
+| `OpenMathWriter` | OpenMath | `org.episteme.mathematics.loaders.openmath` | Export mathematical objects |
+| `MathMLReader` | MathML | `org.episteme.mathematics.loaders.mathml` | Mathematical notation and content |
 
 #### OpenMath Reader/Writer
 **Supported Elements:**
@@ -370,7 +370,7 @@ All loaders follow consistent naming:
 
 ## Adding New Loaders
 
-1. Extend `AbstractResourceReader<T>` (from `org.jscience.io`)
+1. Extend `AbstractResourceReader<T>` (from `org.episteme.io`)
 2. Implement required methods for `ResourceIO<T>`:
    - `getResourcePath()`, `getResourceType()`
    - `getName()`, `getDescription()`, `getLongDescription()`, `getCategory()`

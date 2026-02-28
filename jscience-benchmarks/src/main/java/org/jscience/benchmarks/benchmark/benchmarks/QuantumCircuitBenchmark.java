@@ -1,14 +1,14 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.jscience.natural.technical.backend.quantum.QuantumBackend;
-import org.jscience.natural.technical.backend.quantum.QuantumAlgorithmProvider;
+import org.episteme.natural.technical.backend.quantum.QuantumBackend;
+import org.episteme.natural.technical.backend.quantum.QuantumAlgorithmProvider;
 
 /**
  * Benchmark for Quantum Circuit Simulation.

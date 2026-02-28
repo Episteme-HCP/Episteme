@@ -1,9 +1,9 @@
-package org.jscience.benchmarks.benchmark.benchmarks;
+package org.episteme.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
-import org.jscience.benchmarks.benchmark.RunnableBenchmark;
-import org.jscience.natural.physics.classical.waves.electromagnetism.MaxwellProvider;
-import org.jscience.core.mathematics.geometry.Vector4D;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.natural.physics.classical.waves.electromagnetism.MaxwellProvider;
+import org.episteme.core.mathematics.geometry.Vector4D;
 
 import java.util.ServiceLoader;
 

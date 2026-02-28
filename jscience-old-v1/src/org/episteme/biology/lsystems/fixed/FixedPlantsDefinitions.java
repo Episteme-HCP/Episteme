@@ -1,0 +1,147 @@
+/*
+---------------------------------------------------------------------
+VIRTUAL PLANTS
+==============
+
+University of applied sciences Biel
+
+hosted by Claude Schwab
+
+programmed by Rene Gressly
+
+March - July 1999
+
+---------------------------------------------------------------------
+*/
+package org.episteme.biology.lsystems.fixed;
+
+import javax.vecmath.Color3f;
+
+
+/**
+ * All definitions used in the lsys package are stored in this class.
+ * Strings defining keywords, signs or other static and not changing data
+ * should be defined in this class so it is easier to change a value and no
+ * definitions are stored in the code of the program.
+ *
+ * @author Rene Gressly
+ */
+public class FixedPlantsDefinitions {
+    /** Project name */
+    public static final String STR_PROJECT_NAME = "Virtual Plants";
+
+    /**
+     * The codeword for the depth of the LSystem. This is the number of
+     * iterations to be performed. Case sensitive !
+     */
+    public static final String STR_DEPTH = "depth";
+
+    /** The codeword for the angle between branches. Case sensitive ! */
+    public static final String STR_ANGLE = "angle";
+
+    /** The codeword for the length of one piece branch. Case sensitive ! */
+    public static final String STR_LENGTH = "length";
+
+    /** The codeword for the thickness of a branch. Case sensitive ! */
+    public static final String STR_THICKNESS = "thickness";
+
+    /**
+     * The codeword for the decrement value of thickness of branches.
+     * Case sensitive !
+     */
+    public static final String STR_DECREMENT = "decrement";
+
+    /** The codeword for the axiom of the LSystem. Case sensitive ! */
+    public static final String STR_AXIOM = "axiom";
+
+    /** The codeword for a rule of the LSystem. Case sensitive ! */
+    public static final String STR_RULE = "rule";
+
+    /** The codeword for the separator of a codeword and the value. */
+    public static final String STR_SEPARATOR = "=";
+
+    /** The codeword for the separator of the predecessor to the successor. */
+    public static final String STR_RULESIGN = "->";
+
+    /**
+     * This string contains all the valid signs for a rule or axiom. No
+     * other signs (except letters) may be used.
+     */
+    public static final String STR_SIGNS = "+-&^\\/|[]!'{}";
+
+    /** The sign to turn left */
+    public static final char C_TURN_LEFT = '+';
+
+    /** The sign to turn right */
+    public static final char C_TURN_RIGHT = '-';
+
+    /** The sign to pitch down */
+    public static final char C_PITCH_DOWN = '&';
+
+    /** The sign to pitch up */
+    public static final char C_PITCH_UP = '^';
+
+    /** The sign to roll left */
+    public static final char C_ROLL_LEFT = '\\';
+
+    /** The sign to roll right */
+    public static final char C_ROLL_RIGHT = '/';
+
+    /** The sign to turn around 180� */
+    public static final char C_TURN_AROUND = '|';
+
+    /** The sign to store the actual turtle information */
+    public static final char C_PUSH_TURTLE = '[';
+
+    /** The sign to restore the actual turtle information */
+    public static final char C_POP_TURTLE = ']';
+
+    /** Decrement diameter */
+    public static final char C_DECREMENT_DIAMETER = '!';
+
+    /** Change color */
+    public static final char C_CHANGE_COLOR = '\'';
+
+    /** Begin leaf */
+    public static final char C_BEGIN_LEAF = '{';
+
+    /** End leaf */
+    public static final char C_END_LEAF = '}';
+
+    /** The sign to make a branch */
+    public static final char C_BRANCH = 'F';
+
+    /** The sign to make a step without drawing */
+    public static final char C_STEP = 'f';
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_RED = new Color3f(1, 0, 0);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_BLUE = new Color3f(0, 0, 1);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_GREEN = new Color3f(0, 1, 0);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_WHITE = new Color3f(1, 1, 1);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_BLACK = new Color3f(0, 0, 0);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_SILVER = new Color3f(0.75f, 0.75f, 0.75f);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_BROWN = new Color3f(0.5f, 0.35f, 0.15f);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_LIGHT_BLUE = new Color3f(0, 0.75f, 1);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_DARK_GREEN = new Color3f(0, 0.5f, 0);
+
+    /** DOCUMENT ME! */
+    public static final Color3f COLOR_DARK_BROWN = new Color3f(0.05f, 0.04f,
+            0.02f);
+}

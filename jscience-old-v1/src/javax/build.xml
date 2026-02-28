@@ -1,7 +1,7 @@
 <!-- ANT BUILD FILE (Ref. http://jakarta.apache.org/ant ) -->
-<project name="JScience" default="distribution" basedir=".">
+<project name="Episteme" default="distribution" basedir=".">
     <description>
-    	JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+    	Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
     </description>
     
     <target name="info">
@@ -9,7 +9,7 @@
     </target>	
     <target name="init">
     	<tstamp/>
-        <property name="library"   value="jscience" />
+        <property name="library"   value="episteme" />
         <property name="version"   value="4.3" />
         <property name="release"   value="1" />
         <property name="src"       value="src" />
@@ -32,10 +32,10 @@
         </javac>	
 
 		<!-- Updates version information (Javolution class) -->
-		<delete file="${bin}/org/jscience/JScience.class"/>
+		<delete file="${bin}/org/episteme/Episteme.class"/>
         <filter token="VERSION" value="${version}.${release} ${TODAY}"/>
-        <copy file="src/org/jscience/JScience.java"
-              todir="${bin}/org/jscience" filtering="true"/>
+        <copy file="src/org/episteme/Episteme.java"
+              todir="${bin}/org/episteme" filtering="true"/>
         <javac srcdir="${bin}" destdir="${bin}" classpath="${classpath}" target="1.5" source="1.5"
                debug="${debug}" optimize="${optimize}" encoding="${encoding}"/> 
 
@@ -52,7 +52,7 @@
         <mkdir dir="${api}" />
         <javadoc sourcepath="${src}"
                  destdir="${api}"
-                 windowtitle="JScience v${version} API"
+                 windowtitle="Episteme v${version} API"
                  overview="src/overview.html"
                  author="true"
                  version="true"
@@ -64,16 +64,16 @@
         	     link="http://javolution.org/api/"
                  splitindex="true">
             <header>
-                <![CDATA[<A HREF="http://jscience.org">
+                <![CDATA[<A HREF="http://episteme.org">
             	<SPAN CLASS="style0">J</SPAN><SPAN CLASS="style1">Science v${version}</SPAN></A>]]>
             </header>
             <bottom>
                <![CDATA[<i>Copyright &#169; 2006 - 2007 <b>J<b>Science.</i>]]>
             </bottom>
-            <group title="JScience modules moved to JSR-275 to be part of Java Standard Library" packages="javax.*"/>
-            <group title="JScience core modules" packages="org.jscience.*"/>            
+            <group title="Episteme modules moved to JSR-275 to be part of Java Standard Library" packages="javax.*"/>
+            <group title="Episteme core modules" packages="org.episteme.*"/>            
             <packageset dir="${src}" defaultexcludes="yes">
-                <include name="org/jscience/**/*" />
+                <include name="org/episteme/**/*" />
                 <include name="javax/**/*" />
                 <exclude name="**/doc-files/**"/>
                 <exclude name="**/res-files/**"/>
@@ -103,19 +103,19 @@
              update="false">
              <manifest>
                  <attribute name="Main-Class"
-                           value="org.jscience.JScience"/>
+                           value="org.episteme.Episteme"/>
                  <attribute name="Specification-Title"
-                            value="JScience - Core"/>
+                            value="Episteme - Core"/>
                  <attribute name="Specification-Version"
                             value="${version}"/>
                  <attribute name="Specification-Vendor"
-                            value="JScience"/>
+                            value="Episteme"/>
                  <attribute name="Implementation-Title"
-                            value="JScience - Core"/>
+                            value="Episteme - Core"/>
                  <attribute name="Implementation-URL"
-                            value="http://jscience.org"/>
+                            value="http://episteme.org"/>
                  <attribute name="Implementation-Vendor"
-                            value="JScience"/>
+                            value="Episteme"/>
                  <attribute name="Implementation-Version"
                             value="${version}.${release} ${TODAY}"/>
              </manifest>
@@ -134,19 +134,19 @@
              update="false">
              <manifest>
                  <attribute name="Main-Class"
-                           value="org.jscience.JScience"/>
+                           value="org.episteme.Episteme"/>
                  <attribute name="Specification-Title"
-                            value="JScience - Core"/>
+                            value="Episteme - Core"/>
                  <attribute name="Specification-Version"
                             value="${version}-VM1.4"/>
                  <attribute name="Specification-Vendor"
-                            value="JScience"/>
+                            value="Episteme"/>
                  <attribute name="Implementation-Title"
-                            value="JScience - Core"/>
+                            value="Episteme - Core"/>
                  <attribute name="Implementation-URL"
-                            value="http://jscience.org"/>
+                            value="http://episteme.org"/>
                  <attribute name="Implementation-Vendor"
-                            value="JScience"/>
+                            value="Episteme"/>
                  <attribute name="Implementation-Version"
                             value="${version}.${release} ${TODAY} VM1.4"/>
              </manifest>
@@ -175,7 +175,7 @@
     </target>
     <!-- NETBEANS SUPPORT -->
     <target name="run" depends="clean, compile">
-        <java classpath="${classpath}" classname="org.jscience.JScience" fork="true">
+        <java classpath="${classpath}" classname="org.episteme.Episteme" fork="true">
             <jvmarg value="-server" />
             <jvmarg value="-Xms512M" />
             <jvmarg value="-Xmx512M" />
@@ -183,7 +183,7 @@
         </java>
     </target>
     <target name="test" depends="clean, compile">
-        <java classpath="${classpath}" classname="org.jscience.JScience" fork="true">
+        <java classpath="${classpath}" classname="org.episteme.Episteme" fork="true">
             <arg value="test" />
         </java>
     </target>

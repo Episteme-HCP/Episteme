@@ -1,17 +1,17 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.jscience.nativ.physics.classical.mechanics.backends.genesis;
+package org.episteme.nativ.physics.classical.mechanics.backends.genesis;
 
-import org.jscience.core.measure.Quantity;
-import org.jscience.core.measure.quantity.Time;
-import org.jscience.core.mathematics.linearalgebra.Vector;
-import org.jscience.core.mathematics.numbers.real.Real;
-import org.jscience.natural.physics.classical.mechanics.PhysicsWorldBridge;
-import org.jscience.natural.physics.classical.mechanics.RigidBody;
-import org.jscience.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Time;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.RigidBody;
+import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;

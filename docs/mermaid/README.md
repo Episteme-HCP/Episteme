@@ -1,28 +1,28 @@
-# JScience Architecture Documentation
+# Episteme Architecture Documentation
 
-This folder contains the Mermaid diagrams describing the JScience project architecture.
+This folder contains the Mermaid diagrams describing the Episteme project architecture.
 
 ## Ecosystem Overview
 `01_ecosystem_overview.mmd`
 
 ```mermaid
 graph TD
-    subgraph JScience_Ecosystem
-        Parent[jscience-parent]
-        Core[jscience-core]
-        Native[jscience-native]
-        Natural[jscience-natural]
-        Social[jscience-social]
-        Apps[jscience-featured-apps]
-        Bench[jscience-benchmarks]
-        DB[jscience-database]
-        JNI[jscience-jni]
+    subgraph Episteme_Ecosystem
+        Parent[episteme-parent]
+        Core[episteme-core]
+        Native[episteme-native]
+        Natural[episteme-natural]
+        Social[episteme-social]
+        Apps[episteme-featured-apps]
+        Bench[episteme-benchmarks]
+        DB[episteme-database]
+        JNI[episteme-jni]
     end
     
     subgraph Distributed_Stack
-        Server[jscience-server]
-        Client[jscience-client]
-        Worker[jscience-worker]
+        Server[episteme-server]
+        Client[episteme-client]
+        Worker[episteme-worker]
     end
 
     Parent --> Core
