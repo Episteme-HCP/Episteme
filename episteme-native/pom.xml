@@ -18,6 +18,7 @@
         <!-- Requires Java 25 (Project Panama / Valhalla) -->
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
+        <cuda.excludes>none</cuda.excludes>
     </properties>
 
     <dependencies>
@@ -123,6 +124,10 @@
                         <arg>jdk.incubator.vector</arg>
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
+                    <excludes>
+                        <exclude>${cuda.excludes}</exclude>
+                        <exclude>module-info.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -212,31 +217,9 @@
                     <family>mac</family>
                 </os>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <release>25</release>
-                            <compilerArgs>
-                                <arg>--enable-preview</arg>
-                                <arg>--add-modules</arg>
-                                <arg>jdk.incubator.vector</arg>
-                                <arg>-Xpkginfo:always</arg>
-                            </compilerArgs>
-                            <excludes>
-                                <exclude>**/cuda/*.java</exclude>
-                                <exclude>**/cuda/**/*.java</exclude>
-                                <exclude>**/*CUDA*.java</exclude>
-                            </excludes>
-                            <testExcludes>
-                                <testExclude>**/*CUDA*Test.java</testExclude>
-                            </testExcludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <cuda.excludes>**/cuda/**,**/*CUDA*.java</cuda.excludes>
+            </properties>
         </profile>
         <profile>
             <id>no-cuda-arm</id>
@@ -245,31 +228,9 @@
                     <arch>aarch64</arch>
                 </os>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <release>25</release>
-                            <compilerArgs>
-                                <arg>--enable-preview</arg>
-                                <arg>--add-modules</arg>
-                                <arg>jdk.incubator.vector</arg>
-                                <arg>-Xpkginfo:always</arg>
-                            </compilerArgs>
-                            <excludes>
-                                <exclude>**/cuda/*.java</exclude>
-                                <exclude>**/cuda/**/*.java</exclude>
-                                <exclude>**/*CUDA*.java</exclude>
-                            </excludes>
-                            <testExcludes>
-                                <testExclude>**/*CUDA*Test.java</testExclude>
-                            </testExcludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <cuda.excludes>**/cuda/**,**/*CUDA*.java</cuda.excludes>
+            </properties>
         </profile>
     </profiles>
 </project>
