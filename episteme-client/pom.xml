@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.episteme</groupId>
         <artifactId>episteme-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0-beta1</version>
     </parent>
     <artifactId>episteme-client</artifactId>
     <name>Episteme Client Applications</name>
