@@ -1,5 +1,0 @@
-<unit id="footSquared" name="foot squared" abbreviation="ft^2" unitType="area" parentSI="meterSquared"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>12 inches squared</description>
-    <unit ref="foot" power="2"/>
-</unit>

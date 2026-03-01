@@ -1,4 +1,0 @@
-<unit id="poiseuille" name="poiseuille" abbreviation="Pl" unitType="dynamicViscosity" parentSI="pascalSecond"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>An MKS unit. 1 poiseuille = 10 poise</description>
-</unit>

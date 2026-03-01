@@ -1,3 +1,0 @@
-<unit id="ouncePerGallon_imperial" name="ounce per imperial gallon" abbreviation="oz/gal" unitType="massDensity"
-      parentSI="kilogramPerMeterCubed" multiplierToSI="6.236023" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

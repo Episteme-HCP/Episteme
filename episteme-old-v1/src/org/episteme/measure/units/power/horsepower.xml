@@ -1,4 +1,0 @@
-<unit id="horsepower" name="horsepower" abbreviation="hp" unitType="power" parentSI="watt" multiplierToSI="745.6999"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>US horsepower</description>
-</unit>

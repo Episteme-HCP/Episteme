@@ -8,6 +8,7 @@ package org.episteme.nativ.mathematics.linearalgebra.tensors.backends;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * ND4J Native (CPU) Tensor backend, using AVX/AVX2/AVX512 instructions when available.
@@ -16,7 +17,7 @@ import org.episteme.core.technical.backend.HardwareAccelerator;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({TensorBackend.class})
+@AutoService({TensorBackend.class, AlgorithmProvider.class})
 public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
 
     @Override

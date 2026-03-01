@@ -1,4 +1,0 @@
-<unit id="microsecond" name="microsecond" abbreviation="microsec" unitType="time" parentSI="second"
-      multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1/100000 of a second</description>
-</unit>

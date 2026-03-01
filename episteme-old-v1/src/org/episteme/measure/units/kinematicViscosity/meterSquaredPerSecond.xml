@@ -1,3 +1,0 @@
-<unit id="meterSquaredPerSecond" name="meter squared per second" abbreviation="m^2/s" unitType="kinematicViscosity"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

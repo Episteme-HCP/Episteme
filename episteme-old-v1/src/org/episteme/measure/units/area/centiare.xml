@@ -1,4 +1,0 @@
-<unit id="centiare" name="centiare" abbreviation="ca" unitType="area" parentSI="meterSquared" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 centiare = 1 square meter</description>
-</unit>

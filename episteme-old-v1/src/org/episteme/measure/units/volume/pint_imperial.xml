@@ -1,4 +1,0 @@
-<unit id="pint_imperial" name="imperial pint" abbreviation="pt" unitType="volume" parentSI="meterCubed"
-      multiplierToSI="5.68261E-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 imperial pint = 1/2 imperial quart</description>
-</unit>

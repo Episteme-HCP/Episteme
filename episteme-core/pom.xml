@@ -46,10 +46,17 @@
         <!-- MPJ Express for MPI Distributed Backend -->
         <dependency>
             <groupId>org.mpjexpress</groupId>
+            <artifactId>mpi</artifactId>
+            <version>0.44</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/mpi.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.mpjexpress</groupId>
             <artifactId>mpj</artifactId>
             <version>0.44</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/MPJ/lib/mpj.jar</systemPath>
+            <systemPath>${project.basedir}/../libs/mpj.jar</systemPath>
         </dependency>
 
         <!-- Testing -->
@@ -214,20 +221,6 @@
             <version>6.0.0</version>
         </dependency>
 
-        <!-- MPJ Express (MPI) -->
-        <dependency>
-            <groupId>org.mpjexpress</groupId>
-            <artifactId>mpi</artifactId>
-            <version>0.44</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mpjexpress</groupId>
-            <artifactId>mpj</artifactId>
-            <version>0.44</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- Apache Spark -->
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -245,12 +238,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Audio / Media Backends -->
-        <dependency>
-            <groupId>uk.co.caprica</groupId>
-            <artifactId>vlcj</artifactId>
-            <version>4.8.2</version>
-        </dependency>
         <!-- TarsosDSP (Audio Analysis) -->
         <dependency>
             <groupId>be.tarsos.dsp</groupId>

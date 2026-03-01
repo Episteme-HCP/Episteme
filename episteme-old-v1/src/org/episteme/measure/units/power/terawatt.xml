@@ -1,4 +1,0 @@
-<unit id="terawatt" name="terawatt" abbreviation="TW" unitType="power" parentSI="watt" multiplierToSI="1.0E+12"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>10^12 W</description>
-</unit>

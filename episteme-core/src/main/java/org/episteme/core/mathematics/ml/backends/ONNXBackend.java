@@ -30,20 +30,23 @@ import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;
 
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+
 /**
  * ONNX Runtime inference backend.
  * <p>
  * Wraps the ONNX Runtime (ORT) Java API for running machine learning model
  * inference. Available when the {@code ai.onnxruntime} library is on the
  * classpath. Registers as a native-library-dependent backend.
+ * Implements {@link ComputeBackend} and {@link AlgorithmProvider}.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class})
-public class ONNXBackend implements ComputeBackend {
+@AutoService({Backend.class, ComputeBackend.class, AlgorithmProvider.class})
+public class ONNXBackend implements ComputeBackend, AlgorithmProvider {
 
     @Override
     public String getType() {
@@ -78,6 +81,11 @@ public class ONNXBackend implements ComputeBackend {
     @Override
     public int getPriority() {
         return 70;
+    }
+
+    @Override
+    public String getAlgorithmType() {
+        return "Machine Learning (ONNX)";
     }
 
     @Override

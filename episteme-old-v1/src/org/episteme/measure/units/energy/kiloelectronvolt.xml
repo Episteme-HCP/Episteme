@@ -1,4 +1,0 @@
-<unit id="kiloelectronvolt" name="kiloelectronvolt" abbreviation="keV" unitType="energy" parentSI="joule"
-      multiplierToSI="1.60218E-16" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 keV = 1000 eV</description>
-</unit>

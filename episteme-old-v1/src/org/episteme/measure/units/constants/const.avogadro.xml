@@ -1,3 +1,0 @@
-<unit id="const.avogadro" name="Avogadro number" abbreviation="N_A" unitType="amountDensity" parentSI="numberPerMole"
-      multiplierToSI="6.0221367E+23" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

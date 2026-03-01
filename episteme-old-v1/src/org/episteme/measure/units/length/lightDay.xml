@@ -1,4 +1,0 @@
-<unit id="lightDay" name="light day" unitType="length" parentSI="meter" multiplierToSI="2.59020683712E+13"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>The distance travelled by light in a vacuum in one day.</description>
-</unit>

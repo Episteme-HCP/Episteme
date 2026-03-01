@@ -1,4 +1,0 @@
-<unit id="link" name="link" unitType="length" parentSI="meter" multiplierToSI="0.201168"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 link = 1/100 chain</description>
-</unit>

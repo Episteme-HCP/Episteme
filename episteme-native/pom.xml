@@ -14,11 +14,8 @@
     <name>Episteme Native</name>
     <description>Native library integration via Project Panama (FFM API)</description>
 
-    <properties>
-        <!-- Requires Java 25 (Project Panama / Valhalla) -->
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
-        <cuda.excludes>none</cuda.excludes>
+        <cuda.exclude.1>none</cuda.exclude.1>
+        <cuda.exclude.2>none</cuda.exclude.2>
     </properties>
 
     <dependencies>
@@ -47,14 +44,13 @@
         <dependency>
             <groupId>com.microsoft.onnxruntime</groupId>
             <artifactId>onnxruntime</artifactId>
-            <version>1.17.0</version>
         </dependency>
 
         <!-- DeepLearning4J / ND4J -->
         <dependency>
             <groupId>org.deeplearning4j</groupId>
             <artifactId>deeplearning4j-core</artifactId>
-            <version>1.0.0-M1</version>
+            <version>1.0.0-M2.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -65,13 +61,13 @@
         <dependency>
             <groupId>org.nd4j</groupId>
             <artifactId>nd4j-native-platform</artifactId>
-            <version>1.0.0-M1.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j2-impl</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.0.0-M2.1</version>
+        </dependency>
+
+        <!-- Apache Arrow (Native) -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>arrow-platform</artifactId>
         </dependency>
 
         <!-- JOCL (OpenCL) -->
@@ -125,7 +121,8 @@
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
                     <excludes>
-                        <exclude>${cuda.excludes}</exclude>
+                        <exclude>${cuda.exclude.1}</exclude>
+                        <exclude>${cuda.exclude.2}</exclude>
                         <exclude>module-info.java</exclude>
                     </excludes>
                 </configuration>
@@ -218,7 +215,8 @@
                 </os>
             </activation>
             <properties>
-                <cuda.excludes>**/cuda/**,**/*CUDA*.java</cuda.excludes>
+                <cuda.exclude.1>**/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>**/*CUDA*.java</cuda.exclude.2>
             </properties>
         </profile>
         <profile>
@@ -229,7 +227,8 @@
                 </os>
             </activation>
             <properties>
-                <cuda.excludes>**/cuda/**,**/*CUDA*.java</cuda.excludes>
+                <cuda.exclude.1>**/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>**/*CUDA*.java</cuda.exclude.2>
             </properties>
         </profile>
     </profiles>

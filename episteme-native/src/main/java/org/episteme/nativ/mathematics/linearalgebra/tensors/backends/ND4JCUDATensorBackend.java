@@ -9,6 +9,8 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+
 /**
  * ND4J CUDA (GPU) Tensor backend.
  *
@@ -16,7 +18,7 @@ import org.episteme.core.technical.backend.HardwareAccelerator;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({TensorBackend.class})
+@AutoService({TensorBackend.class, AlgorithmProvider.class})
 public class ND4JCUDATensorBackend extends ND4JBaseTensorBackend {
 
     @Override

@@ -1,4 +1,0 @@
-<unit id="megaliter" name="megaliter" abbreviation="ML" unitType="volume" parentSI="meterCubed" multiplierToSI="1000"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1000 m^3</description>
-</unit>

@@ -1,7 +1,0 @@
-
-<!ENTITY henryPerMeter.xml SYSTEM "../magneticPermeability/henryPerMeter.xml">
-
-<!ENTITY magneticPermeability.elements	"
-&henryPerMeter.xml;
-">
-

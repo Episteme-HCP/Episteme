@@ -1,3 +1,0 @@
-<unit id="poundPerFootCubed" name="pound per foot cubed" abbreviation="lb/ft^3" unitType="massDensity"
-      parentSI="kilogramPerMeterCubed" multiplierToSI="16.018406" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,4 +1,0 @@
-<unit id="statfarad" name="statfarad" unitType="capacitance" parentSI="farad" multiplierToSI="1.1126E-12"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Part of the CGS electrostatic system</description>
-</unit>

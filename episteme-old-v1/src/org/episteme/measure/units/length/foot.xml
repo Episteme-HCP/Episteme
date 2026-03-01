@@ -1,4 +1,0 @@
-<unit id="foot" name="foot" abbreviation="ft" unitType="length" parentSI="meter" multiplierToSI="0.3048"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>12 inches</description>
-</unit>

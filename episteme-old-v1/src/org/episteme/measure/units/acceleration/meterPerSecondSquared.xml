@@ -1,3 +1,0 @@
-<unit id="meterPerSecondSquared" name="meter per second squared" abbreviation="m/s^2" unitType="acceleration"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,3 +1,0 @@
-<unitType id="permeability" name="permeability">
-    <dimension name="length" power="2" preserve="no"/>
-</unitType>

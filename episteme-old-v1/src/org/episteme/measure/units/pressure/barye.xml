@@ -1,4 +1,0 @@
-<unit id="barye" name="barye" abbreviation="ba" unitType="pressure" parentSI="pascal" multiplierToSI="0.1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 barye = 1 dyne/cm^2</description>
-</unit>

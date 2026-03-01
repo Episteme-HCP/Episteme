@@ -25,12 +25,14 @@ import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+
 /**
  * High-Performance Native BLAS Backend using Project Panama (FFM).
  * Binds to OpenBLAS/MKL for Matrix Operations.
- * Implements {@link CPUBackend} and {@link NativeBackend}.
+ * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
-@AutoService({Backend.class, LinearAlgebraProvider.class, CPUBackend.class, NativeBackend.class})
+@AutoService({Backend.class, LinearAlgebraProvider.class, CPUBackend.class, NativeBackend.class, AlgorithmProvider.class})
 public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
 
     private static final SymbolLookup LOOKUP;

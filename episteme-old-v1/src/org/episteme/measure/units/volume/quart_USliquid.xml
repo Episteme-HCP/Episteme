@@ -1,4 +1,0 @@
-<unit id="quart_USliquid" name="US liquid quart" abbreviation="qt" unitType="volume" parentSI="meterCubed"
-      multiplierToSI="9.463529E-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 US liquid quart = 1/4 US gallon</description>
-</unit>

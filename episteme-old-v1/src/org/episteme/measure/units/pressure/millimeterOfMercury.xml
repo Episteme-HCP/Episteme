@@ -1,3 +1,0 @@
-<unit id="millimeterOfMercury" name="millimeter of mercury" abbreviation="mm Hg" unitType="pressure" parentSI="pascal"
-      multiplierToSI="133.322" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

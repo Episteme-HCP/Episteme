@@ -1,4 +1,0 @@
-<unit id="pound" name="pound" abbreviation="lb" unitType="mass" parentSI="kilogram" multiplierToSI="0.45359"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 pound in the Avoirdupois (commerce) scale</description>
-</unit>

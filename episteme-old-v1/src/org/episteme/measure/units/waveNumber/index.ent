@@ -1,9 +1,0 @@
-
-<!ENTITY kayser.xml SYSTEM "../waveNumber/kayser.xml">
-<!ENTITY numberPerMeter.xml SYSTEM "../waveNumber/numberPerMeter.xml">
-
-<!ENTITY waveNumber.elements	"
-&kayser.xml;
-&numberPerMeter.xml;
-">
-

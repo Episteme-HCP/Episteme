@@ -1,4 +1,0 @@
-<unit id="prefix" name="prefix" unitType="dimensionless" parentSI="SELF"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>a prefix for scaling</description>
-</unit>

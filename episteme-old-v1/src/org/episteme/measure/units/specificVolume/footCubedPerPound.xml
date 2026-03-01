@@ -1,4 +1,0 @@
-<unit id="footCubedPerPound" name="foot cubed per pound" abbreviation="ft^3/lb" unitType="specificVolume"
-      parentSI="meterCubedPerKilogram" multiplierToSI="0.062428184"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

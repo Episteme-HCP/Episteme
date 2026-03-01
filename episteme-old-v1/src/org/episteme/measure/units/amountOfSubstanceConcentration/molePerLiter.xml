@@ -1,4 +1,0 @@
-<unit id="molePerLiter" name="mole per liter" abbreviation="mol/l" unitType="amountOfSubstanceConcentration"
-      parentSI="molePerMeterCubed" multiplierToSI="1000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Molar concentration</description>
-</unit>

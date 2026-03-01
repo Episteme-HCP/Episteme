@@ -16,6 +16,7 @@
     <module>episteme-social</module>
     <module>episteme-native</module>
     <module>episteme-benchmarks</module>
+    <module>episteme-resources</module>
     <module>episteme-featured-apps</module>
     <module>episteme-server</module>
     <module>episteme-worker</module>
@@ -78,6 +79,9 @@
     <mockito.version>5.11.0</mockito.version>
     <resilience4j.version>2.2.0</resilience4j.version>
     <onnxruntime.version>1.17.1</onnxruntime.version>
+    <nd4j.version>1.0.0-M2.1</nd4j.version>
+    <arrow.version>15.0.2-1.5.10</arrow.version>
+    <ode4j.version>0.4.5</ode4j.version>
     <auto-service.version>1.1.1</auto-service.version>
     <jmh.version>1.37</jmh.version>
     <!-- Native Libraries -->
@@ -206,13 +210,6 @@
         <groupId>org.ejml</groupId>
         <artifactId>ejml-all</artifactId>
         <version>0.43</version>
-      </dependency>
-      <!-- Annotation Processing -->
-      <dependency>
-        <groupId>com.google.auto.service</groupId>
-        <artifactId>auto-service</artifactId>
-        <version>${auto-service.version}</version>
-        <optional>true</optional>
       </dependency>
       <!-- Colt (scientific computing) -->
       <dependency>
@@ -353,6 +350,12 @@
       <!-- AutoService for SPI generation -->
       <dependency>
         <groupId>com.google.auto.service</groupId>
+        <artifactId>auto-service</artifactId>
+        <version>${auto-service.version}</version>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>com.google.auto.service</groupId>
         <artifactId>auto-service-annotations</artifactId>
         <version>${auto-service.version}</version>
         <optional>true</optional>
@@ -418,7 +421,7 @@
       <dependency>
         <groupId>org.nd4j</groupId>
         <artifactId>nd4j-native</artifactId>
-        <version>1.0.0-M2.1</version>
+        <version>${nd4j.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.bytedeco</groupId>
@@ -431,15 +434,24 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>com.google.auto.service</groupId>
-        <artifactId>auto-service-annotations</artifactId>
-        <version>1.1.1</version>
+        <groupId>org.nd4j</groupId>
+        <artifactId>nd4j-native-platform</artifactId>
+        <version>${nd4j.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.google.auto.service</groupId>
-        <artifactId>auto-service</artifactId>
-        <version>1.1.1</version>
-        <optional>true</optional>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>arrow</artifactId>
+        <version>${arrow.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>arrow-platform</artifactId>
+        <version>${arrow.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ode4j</groupId>
+        <artifactId>core</artifactId>
+        <version>${ode4j.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -556,6 +568,14 @@
   </build>
   <repositories>
     <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>jitpack.io</id>
       <name>JitPack</name>
       <url>https://jitpack.io</url>
@@ -564,8 +584,24 @@
       <id>jzy3d-releases</id>
       <name>Jzy3d Releases</name>
       <url>https://maven.jzy3d.org/releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
-    <!-- TarsosDSP Audio Analysis -->
+    <repository>
+      <id>jzy3d-snapshots</id>
+      <name>Jzy3d Snapshots</name>
+      <url>https://maven.jzy3d.org/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    <!-- Mirror for jzy3d on OSS Sonatype as fallback -->
+    <repository>
+      <id>oss-sonatype</id>
+      <name>OSS Sonatype</name>
+      <url>https://oss.sonatype.org/content/repositories/releases/</url>
+    </repository>
     <repository>
       <id>tarsos-dsp</id>
       <name>TarsosDSP Repository</name>

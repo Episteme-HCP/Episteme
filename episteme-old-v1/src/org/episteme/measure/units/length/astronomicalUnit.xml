@@ -1,4 +1,0 @@
-<unit id="astronomicalUnit" name="astronomical unit" abbreviation="au" unitType="length" parentSI="meter"
-      multiplierToSI="149597870691" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Average distance from the center of the Earth to the center of the Sun</description>
-</unit>

@@ -13,6 +13,7 @@ import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
 import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUSparseTensorBackend;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * ND4J Sparse Tensor backend.
@@ -25,7 +26,7 @@ import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUSparseTen
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({TensorBackend.class})
+@AutoService({TensorBackend.class, AlgorithmProvider.class})
 public class ND4JSparseTensorBackend implements TensorBackend {
 
     private static boolean available = false;

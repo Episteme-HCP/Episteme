@@ -1,4 +1,0 @@
-<unit id="numberPerMeterCubed" name="numberPerMeterCubed" abbreviation="#/m^3" unitType="volumetricDensity"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>number per meter cubed</description>
-</unit>

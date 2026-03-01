@@ -1,3 +1,0 @@
-<unit id="inchPerSecond" name="inch per second" abbreviation="in/s" unitType="speed" parentSI="meterPerSecond"
-      multiplierToSI="0.0254" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

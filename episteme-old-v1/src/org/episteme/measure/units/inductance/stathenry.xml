@@ -1,4 +1,0 @@
-<unit id="stathenry" name="stathenry" unitType="inductance" parentSI="henry" multiplierToSI="8.9876E+11"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Part of the CGS electrostatic system</description>
-</unit>

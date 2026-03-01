@@ -1,4 +1,0 @@
-<unit id="auVelocity" name="au velocity" abbreviation="auv" unitType="speed" parentSI="meterPerSecond"
-      multiplierToSI="2.18769142E+06" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Velocity in atomic units</description>
-</unit>

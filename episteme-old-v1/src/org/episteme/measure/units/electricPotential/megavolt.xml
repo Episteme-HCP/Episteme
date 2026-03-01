@@ -1,4 +1,0 @@
-<unit id="megavolt" name="megavolt" abbreviation="MV" unitType="electricPotential" parentSI="volt"
-      multiplierToSI="1.0E+6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>megavolt</description>
-</unit>

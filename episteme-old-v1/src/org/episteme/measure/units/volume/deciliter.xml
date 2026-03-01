@@ -1,4 +1,0 @@
-<unit id="deciliter" name="deciliter" abbreviation="dL" unitType="volume" parentSI="meterCubed" multiplierToSI="1.0E-4"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>0.1 L</description>
-</unit>

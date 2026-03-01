@@ -1,4 +1,0 @@
-<unit id="lightMinute" name="light minute" unitType="length" parentSI="meter" multiplierToSI="1.798754748E+10"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>The distance travelled by light in a vacuum in one minute.</description>
-</unit>

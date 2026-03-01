@@ -1,4 +1,0 @@
-<unit id="weberPerAmpere" name="weber per ampere" abbreviation="Wb/A" unitType="inductance" parentSI="henry"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 Wb/A = 1 H</description>
-</unit>

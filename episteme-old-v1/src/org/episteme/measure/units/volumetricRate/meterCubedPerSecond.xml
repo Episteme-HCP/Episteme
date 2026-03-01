@@ -1,3 +1,0 @@
-<unit id="meterCubedPerSecond" name="meter cubed per second" abbreviation="m^3/s" unitType="volumetricRate"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

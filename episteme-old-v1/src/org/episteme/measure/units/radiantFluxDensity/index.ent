@@ -1,7 +1,0 @@
-
-<!ENTITY wattPerMeterSquared.xml SYSTEM "../radiantFluxDensity/wattPerMeterSquared.xml">
-
-<!ENTITY radiantFluxDensity.elements	"
-&wattPerMeterSquared.xml;
-">
-

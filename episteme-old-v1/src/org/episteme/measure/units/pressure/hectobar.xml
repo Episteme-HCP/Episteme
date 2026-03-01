@@ -1,4 +1,0 @@
-<unit id="hectobar" name="hectobar" abbreviation="hbar" unitType="pressure" parentSI="pascal" multiplierToSI="1.0E+7"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 bar = 10 megapascals</description>
-</unit>

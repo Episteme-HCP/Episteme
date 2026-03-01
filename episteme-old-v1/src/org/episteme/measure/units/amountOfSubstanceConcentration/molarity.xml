@@ -1,4 +1,0 @@
-<unit id="molarity" name="molarity" abbreviation="M" unitType="amountOfSubstanceConcentration"
-      parentSI="molePerMeterCubed" multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>molarity = moles/liter</description>
-</unit>

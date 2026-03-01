@@ -1,5 +1,0 @@
-<unit id="bushelPerAcre" name="bushel per acre" unitType="volumetricArea" parentSI="meterCubedPerMeterSquared"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <unit ref="bushel" power="1"/>
-    <unit ref="acre" power="-1"/>
-</unit>

@@ -1,4 +1,0 @@
-<unit id="ohm" name="ohm" abbreviation="Omega" unitType="electricResistance" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>ohm</description>
-</unit>

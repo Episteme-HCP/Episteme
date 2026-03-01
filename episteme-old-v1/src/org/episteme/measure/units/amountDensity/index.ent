@@ -1,7 +1,0 @@
-
-<!ENTITY numberPerMole.xml SYSTEM "../amountDensity/numberPerMole.xml">
-
-<!ENTITY amountDensity.elements	"
-&numberPerMole.xml;
-">
-

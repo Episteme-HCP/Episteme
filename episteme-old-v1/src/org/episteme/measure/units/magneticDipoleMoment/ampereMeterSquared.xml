@@ -1,3 +1,0 @@
-<unit id="ampereMeterSquared" name="ampere meter squared" Abbreviation="A m^2" unitType="magneticDipoleMoment"
-      parentSI="joulePerTesla" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

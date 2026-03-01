@@ -1,6 +1,0 @@
-<unit id="kilogramPerHectarePerYear" name="kilogramPerHectarePerYear" unitType="arealMassFlux"
-      parentSI="kilogramPerMeterSquaredPerSecond" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <unit ref="kilogram" power="1"/>
-    <unit ref="hectare" power="-1"/>
-    <unit ref="year" power="-1"/>
-</unit>

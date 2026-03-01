@@ -1,3 +1,0 @@
-<unit id="micronewton" name="micronewton" abbreviation="microN" unitType="force" parentSI="newton"
-      multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,3 +1,0 @@
-<unit id="nanobar" name="nanobar" abbreviation="nbar" unitType="pressure" parentSI="pascal" multiplierToSI="1.0E-4"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

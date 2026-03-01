@@ -1,5 +1,0 @@
-<unit id="inchCubed" name="inch cubed" unitType="volume" parentSI="meterCubed"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>cubic inch</description>
-    <unit ref="inch" power="3"/>
-</unit>

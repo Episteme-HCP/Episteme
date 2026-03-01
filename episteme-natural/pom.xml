@@ -64,11 +64,9 @@
             <version>1.6.1</version>
         </dependency>
 
-        <!-- ODE4J for Pure Java Physics Backend -->
         <dependency>
             <groupId>org.ode4j</groupId>
             <artifactId>core</artifactId>
-            <version>0.4.5</version>
         </dependency>
 
         <!-- JAXB (Jakarta XML Binding) -->
@@ -110,10 +108,6 @@
             <artifactId>jbullet</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.ode4j</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

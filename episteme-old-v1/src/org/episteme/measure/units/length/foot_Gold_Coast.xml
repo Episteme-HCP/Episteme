@@ -1,4 +1,0 @@
-<unit id="foot_Gold_Coast" name="Foot_Gold_Coast" abbreviation="gcft" unitType="length" parentSI="meter"
-      multiplierToSI="0.3047997101815088" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>12 inches</description>
-</unit>

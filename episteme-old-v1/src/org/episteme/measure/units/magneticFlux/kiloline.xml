@@ -1,3 +1,0 @@
-<unit id="kiloline" name="kiloline" unitType="magneticFlux" parentSI="weber" multiplierToSI="1.0E-5"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

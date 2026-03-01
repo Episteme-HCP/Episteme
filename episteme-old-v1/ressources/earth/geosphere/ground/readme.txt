@@ -1,1 +1,0 @@
-Ground forces are very strong forces that should modify geometry and contents of the Virtual World when they occur. 

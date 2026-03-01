@@ -1,4 +1,0 @@
-<unit id="second" name="second" abbreviation="s" unitType="time" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>The SI unit of time</description>
-</unit>

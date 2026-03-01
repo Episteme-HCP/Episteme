@@ -1,3 +1,0 @@
-<unit id="gramPerMilliliter" name="gram per milliliter" abbreviation="g/ml" unitType="massDensity"
-      parentSI="kilogramPerMeterCubed" multiplierToSI="1000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,7 +1,0 @@
-
-<!ENTITY coulombPerKilogram.xml SYSTEM "../exposure/coulombPerKilogram.xml">
-
-<!ENTITY exposure.elements	"
-&coulombPerKilogram.xml;
-">
-

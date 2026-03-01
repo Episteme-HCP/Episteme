@@ -1,9 +1,0 @@
-
-<!ENTITY kilogramPerMeter.xml SYSTEM "../massPerUnitLength/kilogramPerMeter.xml">
-<!ENTITY poundPerFoot.xml SYSTEM "../massPerUnitLength/poundPerFoot.xml">
-
-<!ENTITY massPerUnitLength.elements	"
-&kilogramPerMeter.xml;
-&poundPerFoot.xml;
-">
-

@@ -1,9 +1,0 @@
-http://commons.wikimedia.org/wiki/Image:Multiburst.jpg
-http://commons.wikimedia.org/wiki/Image:TwibrightLinksTestCard.png
-http://commons.wikimedia.org/wiki/Image:Tpulse.jpg
-http://commons.wikimedia.org/wiki/Image:Telefunken_FuBK.jpg
-http://commons.wikimedia.org/wiki/Image:SMPTE_Color_Bars_16x9.svg
-http://commons.wikimedia.org/wiki/Image:SMPTE_Color_Bars.svg
-http://commons.wikimedia.org/wiki/Image:SMPTE_RP-133.png
-http://commons.wikimedia.org/wiki/Image:TESTPATTERN_RCA_3.jpg
-http://commons.wikimedia.org/wiki/Image:Philips_PM5544.gif

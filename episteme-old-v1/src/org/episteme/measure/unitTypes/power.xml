@@ -1,6 +1,0 @@
-<unitType id="power" name="power">
-    <alternative convention="nist:units">radiant flux</alternative>
-    <dimension name="mass" power="1" preserve="no"/>
-    <dimension name="length" power="2" preserve="no"/>
-    <dimension name="time" power="-3" preserve="no"/>
-</unitType>

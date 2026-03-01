@@ -1,3 +1,0 @@
-<unit id="meterPerMinute" name="meter per minute" abbreviation="m/min" unitType="speed" parentSI="meterPerSecond"
-      multiplierToSI="0.016666666666667" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

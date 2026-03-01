@@ -1,4 +1,0 @@
-<unit id="dekameter" name="dekameter" abbreviation="dam" unitType="length" parentSI="meter" multiplierToSI="10"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>10 meters</description>
-</unit>

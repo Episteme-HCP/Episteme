@@ -1,4 +1,0 @@
-<unitType id="luminance" name="luminance">
-    <dimension name="luminousIntensity" power="1" preserve="no"/>
-    <dimension name="length" power="-2" preserve="no"/>
-</unitType>

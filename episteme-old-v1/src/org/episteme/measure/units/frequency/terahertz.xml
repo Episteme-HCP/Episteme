@@ -1,4 +1,0 @@
-<unit id="terahertz" name="terahertz" abbreviation="THz" unitType="frequency" parentSI="hertz" multiplierToSI="1.0E+12"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 THz = 10^12 Hz</description>
-</unit>

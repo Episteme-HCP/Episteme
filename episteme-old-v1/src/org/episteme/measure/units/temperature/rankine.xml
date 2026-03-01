@@ -1,6 +1,0 @@
-<unit id="rankine" name="Rankine" abbreviation="R" unitType="temperature" parentSI="K"
-      multiplierTOSI="0.55555555555555555555555555555556" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Temperature unit which is 5/9 of the Kelvin and has the same temperature intervals as the Fahrenheit
-        scale.
-    </description>
-</unit>

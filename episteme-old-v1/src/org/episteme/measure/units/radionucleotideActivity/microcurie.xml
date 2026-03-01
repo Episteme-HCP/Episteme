@@ -1,4 +1,0 @@
-<unit id="microcurie" name="microcurie" abbreviation="microCi" unitType="radionucleotideActivity" parentSI="becquerel"
-      multiplierToSI="3.7E+4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 microCi = 37 kBq</description>
-</unit>

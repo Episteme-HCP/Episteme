@@ -1,3 +1,0 @@
-<unit id="caloriePerKelvin" name="calorie per Kelvin" abbreviation="cal/K" unitType="entropy" parentSI="joulePerKelvin"
-      multiplierToSI="4.1868" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

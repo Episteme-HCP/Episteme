@@ -1,4 +1,0 @@
-<unitType id="angularVelocity" name="angular velocity">
-    <dimension name="angle" power="1" preserve="no"/>
-    <dimension name="time" power="-1" preserve="no"/>
-</unitType>

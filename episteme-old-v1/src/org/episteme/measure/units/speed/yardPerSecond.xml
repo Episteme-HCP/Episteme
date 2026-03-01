@@ -1,5 +1,0 @@
-<unit id="yardPerSecond" name="yardPerSecond" unitType="speed" parentSI="meterPerSecond"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <unit ref="yard" power="1"/>
-    <unit ref="second" power="-1"/>
-</unit>

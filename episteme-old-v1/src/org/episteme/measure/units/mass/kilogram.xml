@@ -1,4 +1,0 @@
-<unit id="kilogram" name="kilogram" abbreviation="kg" unitType="mass" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>SI unit of mass</description>
-</unit>

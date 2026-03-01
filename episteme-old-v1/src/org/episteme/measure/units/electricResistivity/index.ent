@@ -1,7 +1,0 @@
-
-<!ENTITY ohmMeter.xml SYSTEM "../electricResistivity/ohmMeter.xml">
-
-<!ENTITY electricResistivity.elements	"
-&ohmMeter.xml;
-">
-

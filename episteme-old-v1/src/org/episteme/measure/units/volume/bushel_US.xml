@@ -1,4 +1,0 @@
-<unit id="bushel_US" name="US bushel" abbreviation="bu" unitType="volume" parentSI="meterCubed"
-      multiplierToSI="0.03523907" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 US bushel = 32 US dry quarts</description>
-</unit>

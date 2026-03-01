@@ -1,4 +1,0 @@
-<unit id="footPound" name="foot pound" abbreviation="ft-lb" unitType="energy" parentSI="joule" multiplierToSI="1.355818"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 ft-lbs = 1.355818 J. Pound is a unit of force in this context.</description>
-</unit>

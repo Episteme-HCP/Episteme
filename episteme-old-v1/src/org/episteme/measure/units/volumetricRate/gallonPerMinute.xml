@@ -1,5 +1,0 @@
-<unit id="gallonPerMinute" name="gallon per minute" abbreviation="gal/min" unitType="volumetricRate"
-      parentSI="meterCubedPerSecond" multiplierToSI="6.30901964E-5"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>US gallons per minute</description>
-</unit>

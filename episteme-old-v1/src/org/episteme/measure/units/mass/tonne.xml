@@ -1,4 +1,0 @@
-<unit id="tonne" name="tonne" unitType="mass" parentSI="kilogram" multiplierToSI="1000"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>metric ton or tonne</description>
-</unit>

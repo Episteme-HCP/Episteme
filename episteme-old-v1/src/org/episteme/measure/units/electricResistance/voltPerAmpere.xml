@@ -1,4 +1,0 @@
-<unit id="voltPerAmpere" name="volt per ampere" abbreviation="V/A" unitType="electricResistance" parentSI="ohm"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 V/A = 1 ohm</description>
-</unit>

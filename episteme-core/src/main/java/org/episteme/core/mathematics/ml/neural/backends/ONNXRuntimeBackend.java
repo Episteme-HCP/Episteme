@@ -28,19 +28,22 @@ import org.episteme.core.technical.backend.Backend;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.technical.algorithm.OperationContext;
+
 /**
  * Provider for running ONNX (Open Neural Network Exchange) models.
  * <p>
  * Allows executing pre-trained models (e.g., from PyTorch/TensorFlow) within Episteme.
- * Implements {@link Backend} for standardized discovery.
+ * Implements {@link Backend} and {@link AlgorithmProvider} for standardized discovery.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class})
-public class ONNXRuntimeBackend implements Backend {
+@AutoService({Backend.class, AlgorithmProvider.class})
+public class ONNXRuntimeBackend implements Backend, AlgorithmProvider {
 
     @Override
     public String getType() {
@@ -75,6 +78,16 @@ public class ONNXRuntimeBackend implements Backend {
     @Override
     public int getPriority() {
         return 100; // High priority for native execution
+    }
+
+    @Override
+    public String getAlgorithmType() {
+        return "Neural Inference (ONNX)";
+    }
+
+    @Override
+    public double score(OperationContext context) {
+        return isAvailable() ? getPriority() : -1;
     }
 
     @Override

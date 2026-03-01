@@ -1,6 +1,0 @@
-<unit id="year" name="year" abbreviation="a" unitType="time" parentSI="second"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Rough calendar year. Do not use for accurate work</description>
-    <unit ref="day" power="1"/>
-    <multiplier>365.24</multiplier>
-</unit>

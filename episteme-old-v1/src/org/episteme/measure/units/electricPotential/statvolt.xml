@@ -1,4 +1,0 @@
-<unit id="statvolt" name="statvolt" unitType="electricPotential" parentSI="volt" multiplierToSI="299.79"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Part of the CGS electrostatic system</description>
-</unit>
