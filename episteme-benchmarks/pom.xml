@@ -194,6 +194,7 @@
                     <compilerArgs>
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
+                        <arg>--enable-preview</arg>
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
