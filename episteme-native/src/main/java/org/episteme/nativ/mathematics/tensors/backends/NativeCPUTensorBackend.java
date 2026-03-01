@@ -140,6 +140,10 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
              for (int i = 0; i < data.length; i++) {
                  segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, (Double) data[i]);
              }
+        } else if (type == org.episteme.core.mathematics.numbers.real.Real.class) {
+             for (int i = 0; i < data.length; i++) {
+                 segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((org.episteme.core.mathematics.numbers.real.Real) data[i]).doubleValue());
+             }
         }
         return tensor;
     }

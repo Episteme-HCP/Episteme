@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.nativ.vision.backends;
+package org.episteme.nativ.media.vision.backends;
 
 import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.media.vision.VisionAlgorithmBackend;

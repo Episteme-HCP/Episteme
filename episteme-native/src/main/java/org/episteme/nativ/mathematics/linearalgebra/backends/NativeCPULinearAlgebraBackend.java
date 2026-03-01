@@ -17,6 +17,7 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
@@ -39,7 +40,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class})
+@AutoService({ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;
@@ -73,9 +74,9 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         try {
             Linker linker = NativeLibraryLoader.getLinker();
             Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("episteme-jni", java.lang.foreign.Arena.global());
-            if (lookupOpt.isEmpty()) {
+            if (lookupOpt.isEmpty() || lookupOpt.get().find("cblas_dgemm").isEmpty()) {
                 lookupOpt = NativeLibraryLoader.loadLibrary("openblas", java.lang.foreign.Arena.global());
-                if (lookupOpt.isEmpty()) {
+                if (lookupOpt.isEmpty() || lookupOpt.get().find("cblas_dgemm").isEmpty()) {
                     lookupOpt = NativeLibraryLoader.loadLibrary("mkl_rt", java.lang.foreign.Arena.global());
                 }
             }

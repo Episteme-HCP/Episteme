@@ -3,10 +3,10 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.nativ.vision.backends;
+package org.episteme.nativ.media.vision.backends;
 
-import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
@@ -16,9 +16,9 @@ import com.google.auto.service.AutoService;
 import java.nio.DoubleBuffer;
 
 /**
- * CUDA-accelerated Vision Backend.
+ * OpenCL-accelerated Vision Backend.
  * <p>
- * Implements GPU-accelerated image processing using NVIDIA CUDA.
+ * This class handles GPU-accelerated image processing using OpenCL.
  * Implements {@link GPUBackend} and {@link NativeBackend}.
  * </p>
  *
@@ -27,7 +27,7 @@ import java.nio.DoubleBuffer;
  * @since 2.0
  */
 @AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
-public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, GPUBackend, NativeBackend {
+public class NativeOpenCLVisionBackend implements VisionAlgorithmBackend<Object>, GPUBackend, NativeBackend {
 
     @Override
     public boolean isLoaded() {
@@ -36,25 +36,27 @@ public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, 
 
     @Override
     public String getNativeLibraryName() {
-        return "cuda";
+        return "opencl";
     }
 
     @Override public String getType() { return "vision"; }
-    @Override public String getId() { return "native-cuda-vision"; }
-    @Override public String getDescription() { return "GPU-accelerated image processing using NVIDIA CUDA."; }
+    @Override public String getId() { return "native-opencl-vision"; }
+    @Override public String getDescription() { return "GPU-accelerated image processing using OpenCL."; }
     @Override public boolean isAvailable() {
         try {
-            Class.forName("jcuda.driver.JCudaDriver");
-            return true; 
+            Class.forName("org.jocl.CL");
+            return true;
         } catch (Throwable t) {
             return false;
         }
     }
 
+    private org.jocl.cl_context context;
+
     @Override
     public Object apply(Object image, ImageOp<Object> op) {
-        if (!(image instanceof jcuda.driver.CUdeviceptr)) {
-            throw new IllegalArgumentException("Expected CUdeviceptr for NativeCUDAVisionBackend");
+        if (!(image instanceof org.jocl.cl_mem)) {
+            throw new IllegalArgumentException("Expected cl_mem for NativeOpenCLVisionBackend");
         }
         return op.process(image);
     }
@@ -63,22 +65,22 @@ public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, 
     public Object createImage(Object data, int width, int height) {
         if (data instanceof int[]) {
             int[] pixels = (int[]) data;
-            jcuda.driver.CUdeviceptr deviceData = new jcuda.driver.CUdeviceptr();
-            jcuda.driver.JCudaDriver.cuMemAlloc(deviceData, (long) pixels.length * 4);
-            jcuda.driver.JCudaDriver.cuMemcpyHtoD(deviceData, jcuda.Pointer.to(pixels), (long) pixels.length * 4);
-            return deviceData;
+            org.jocl.cl_mem mem = org.jocl.CL.clCreateBuffer(context, 
+                org.jocl.CL.CL_MEM_READ_WRITE | org.jocl.CL.CL_MEM_COPY_HOST_PTR, 
+                (long) pixels.length * 4, org.jocl.Pointer.to(pixels), null);
+            return mem;
         }
-        throw new UnsupportedOperationException("CUDA data upload only supported for int arrays for now.");
+        throw new UnsupportedOperationException("OpenCL data upload only supported for int arrays for now.");
     }
     
     @Override
     public String getName() {
-        return "CUDA Vision Backend";
+        return "OpenCL Vision Backend";
     }
 
     @Override
     public int getPriority() {
-        return 20; 
+        return 15; 
     }
 
     @Override

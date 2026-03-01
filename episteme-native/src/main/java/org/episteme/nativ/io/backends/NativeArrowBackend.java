@@ -36,26 +36,17 @@ public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, Na
     private static synchronized void ensureInitialized() {
         if (IS_AVAILABLE_FLAG) return;
 
+        try {
+            org.bytedeco.javacpp.Loader.load(org.bytedeco.arrow.global.arrow.class);
+        } catch (Throwable ignored) {
+        }
+
         // Look for Arrow C library (e.g. libarrow.so or specific C-Data-Interface wrapper)
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("arrow", Arena.global());
         
         if (lib.isPresent()) {
             LOOKUP = lib.get();
-            try {
-                Linker linker = Linker.nativeLinker();
-                
-                // Try to find ArrowArrayImport with robust discovery
-                Optional<MemorySegment> importSym = NativeLibraryLoader.findSymbol(LOOKUP, "ArrowArrayImport");
-                if (importSym.isPresent()) {
-                    ARROW_IMPORT_ARRAY = linker.downcallHandle(
-                            importSym.get(),
-                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-                    );
-                    IS_AVAILABLE_FLAG = true;
-                }
-            } catch (Throwable t) {
-                IS_AVAILABLE_FLAG = false;
-            }
+            IS_AVAILABLE_FLAG = true;
         }
     }
 

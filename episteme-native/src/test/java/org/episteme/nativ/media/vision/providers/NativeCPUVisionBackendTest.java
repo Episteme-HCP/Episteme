@@ -22,7 +22,7 @@ class NativeCPUVisionBackendTest {
 
     @Test
     void testProviderMetadata() {
-        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
+        org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
         assertEquals("native-cpu-vision", provider.getId());
         assertEquals("vision", provider.getType());
         assertNotNull(provider.getDescription());
@@ -31,13 +31,13 @@ class NativeCPUVisionBackendTest {
     @Test
     void testIsAvailableDefaultsToFalse() {
         // Since episteme_vision.dll is not present
-        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
+        org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
         assertFalse(provider.isAvailable(), "Provider should not be available without native library");
     }
 
     @Test
     void testApplyDelegates() {
-        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
+        org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         
         // Define a simple Java Op
@@ -49,7 +49,7 @@ class NativeCPUVisionBackendTest {
 
     @Test
     void testProcessNativeThrowsException() {
-        org.episteme.nativ.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.vision.backends.NativeCPUVisionBackend();
+        org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         
         // Should throw because library is not loaded

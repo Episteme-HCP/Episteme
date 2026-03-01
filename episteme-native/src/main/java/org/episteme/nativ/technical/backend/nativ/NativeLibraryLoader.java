@@ -193,7 +193,12 @@ public class NativeLibraryLoader {
         try {
             fullPath = basePath.resolve(mappedName).toAbsolutePath();
             if (java.nio.file.Files.exists(fullPath)) {
-                return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
+                try {
+                    return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
+                } catch (Throwable t) {
+                    System.err.println("[ERROR] NativeLibraryLoader: Failed to load " + fullPath + " : " + t.getMessage());
+                    t.printStackTrace();
+                }
             }
             
             String[] subs = {"lib", "bin"};

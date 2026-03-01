@@ -9,6 +9,7 @@ import org.episteme.core.mathematics.linearalgebra.Tensor;
 import java.lang.foreign.*;
 import java.util.Arrays;
 import java.util.function.Function;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 /**
  * Tensor implementation backed by native memory (off-heap).
@@ -69,11 +70,11 @@ public class NativeTensor<T> implements Tensor<T> {
         if (type == Float.class) {
             byteSize = size * Float.BYTES;
             this.segment = arena.allocate(byteSize, Float.BYTES);
-        } else if (type == Double.class) {
+        } else if (type == Double.class || type == Real.class) {
             byteSize = size * Double.BYTES;
             this.segment = arena.allocate(byteSize, Double.BYTES);
         } else {
-            throw new IllegalArgumentException("NativeTensor only supports Float and Double, got: " + type.getSimpleName());
+            throw new IllegalArgumentException("NativeTensor only supports Float, Double, and Real, got: " + type.getSimpleName());
         }
     }
 
@@ -120,8 +121,10 @@ public class NativeTensor<T> implements Tensor<T> {
         long offset = computeOffset(indices);
         if (type == Float.class) {
             return type.cast(segment.getAtIndex(ValueLayout.JAVA_FLOAT, offset));
-        } else {
+        } else if (type == Double.class) {
             return type.cast(segment.getAtIndex(ValueLayout.JAVA_DOUBLE, offset));
+        } else {
+            return type.cast(Real.of(segment.getAtIndex(ValueLayout.JAVA_DOUBLE, offset)));
         }
     }
 
@@ -130,8 +133,10 @@ public class NativeTensor<T> implements Tensor<T> {
         long offset = computeOffset(indices);
         if (type == Float.class) {
             segment.setAtIndex(ValueLayout.JAVA_FLOAT, offset, (Float) value);
-        } else {
+        } else if (type == Double.class) {
             segment.setAtIndex(ValueLayout.JAVA_DOUBLE, offset, (Double) value);
+        } else {
+            segment.setAtIndex(ValueLayout.JAVA_DOUBLE, offset, ((Real) value).doubleValue());
         }
     }
 
@@ -157,7 +162,7 @@ public class NativeTensor<T> implements Tensor<T> {
                  result.segment.setAtIndex(ValueLayout.JAVA_FLOAT, i, a + b);
              } else {
                  double a = segment.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-                 double b = (Double) other.get(unflatten(i));
+                 double b = type == Double.class ? (Double) other.get(unflatten(i)) : ((Real) other.get(unflatten(i))).doubleValue();
                  result.segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a + b);
              }
         }
@@ -191,7 +196,7 @@ public class NativeTensor<T> implements Tensor<T> {
                  result.segment.setAtIndex(ValueLayout.JAVA_FLOAT, i, a * b);
              } else {
                  double a = segment.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-                 double b = (Double) other.get(unflatten(i));
+                 double b = type == Double.class ? (Double) other.get(unflatten(i)) : ((Real) other.get(unflatten(i))).doubleValue();
                  result.segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a * b);
              }
         }
@@ -208,7 +213,7 @@ public class NativeTensor<T> implements Tensor<T> {
                  result.segment.setAtIndex(ValueLayout.JAVA_FLOAT, i, val * s);
              }
          } else {
-             double s = (Double) scalar;
+             double s = type == Double.class ? (Double) scalar : ((Real) scalar).doubleValue();
              for (long i = 0; i < size; i++) {
                  double val = segment.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
                  result.segment.setAtIndex(ValueLayout.JAVA_DOUBLE, i, val * s);
