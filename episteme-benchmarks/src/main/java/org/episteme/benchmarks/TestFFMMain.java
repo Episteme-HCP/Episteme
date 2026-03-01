@@ -8,33 +8,25 @@ public class TestFFMMain {
     public static void main(String[] args) {
         System.out.println("--- TESTING OTHER BACKENDS START ---");
         try {
-            NativeCPUTensorBackend tensorBackend = new NativeCPUTensorBackend();
-            System.out.println("NativeCPUTensorBackend available: " + tensorBackend.isAvailable());
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        
-        try {
-            System.out.println("Preloading Bytedeco Arrow...");
-            org.bytedeco.javacpp.Loader.load(org.bytedeco.arrow.global.arrow.class);
-            java.lang.foreign.SymbolLookup lookup = java.lang.foreign.SymbolLookup.loaderLookup();
-            System.out.println("Loader Lookup found ArrowArrayImport: " + lookup.find("ArrowArrayImport").isPresent());
-            NativeArrowBackend arrowBackend = new NativeArrowBackend();
-            System.out.println("NativeArrowBackend available: " + arrowBackend.isAvailable());
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+            System.out.println("\n--- Vision Backends ---");
+            org.episteme.nativ.media.vision.backends.NativeCPUCBindingVisionBackend cBindingVision = new org.episteme.nativ.media.vision.backends.NativeCPUCBindingVisionBackend();
+            System.out.println("NativeCPUCBindingVisionBackend available: " + cBindingVision.isAvailable());
 
-        try {
-            ND4JCUDATensorBackend nd4jCuda = new ND4JCUDATensorBackend();
-            System.out.println("ND4JCUDATensorBackend available: " + nd4jCuda.isAvailable());
-            org.episteme.nativ.mathematics.linearalgebra.tensors.backends.ND4JNativeTensorBackend nd4jNative = new org.episteme.nativ.mathematics.linearalgebra.tensors.backends.ND4JNativeTensorBackend();
-            System.out.println("ND4JNativeTensorBackend available: " + nd4jNative.isAvailable());
-            org.episteme.nativ.mathematics.linearalgebra.tensors.backends.ND4JSparseTensorBackend nd4jSparse = new org.episteme.nativ.mathematics.linearalgebra.tensors.backends.ND4JSparseTensorBackend();
-            System.out.println("ND4JSparseTensorBackend available: " + nd4jSparse.isAvailable());
+            org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend javaCvVision = new org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend();
+            System.out.println("NativeJavaCVVisionBackend available: " + javaCvVision.isAvailable());
+
+            org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend cpuVision = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
+            System.out.println("NativeCPUVisionBackend (OpenCV) available: " + cpuVision.isAvailable());
+            
+            org.episteme.nativ.media.vision.backends.NativeCUDAVisionBackend cudaVision = new org.episteme.nativ.media.vision.backends.NativeCUDAVisionBackend();
+            System.out.println("NativeCUDAVisionBackend available: " + cudaVision.isAvailable());
+            
+            org.episteme.nativ.media.vision.backends.NativeOpenCLVisionBackend oclVision = new org.episteme.nativ.media.vision.backends.NativeOpenCLVisionBackend();
+            System.out.println("NativeOpenCLVisionBackend available: " + oclVision.isAvailable());
+            
         } catch (Throwable t) {
-            t.printStackTrace();
+            t.printStackTrace(System.out);
         }
-        System.out.println("--- TESTING OTHER BACKENDS END ---");
+        System.out.println("--- TESTING END ---");
     }
 }

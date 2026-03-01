@@ -86,6 +86,8 @@
     <jmh.version>1.37</jmh.version>
     <!-- Native Libraries -->
     <javacpp.version>1.5.10</javacpp.version>
+    <javacv.version>1.5.10</javacv.version>
+    <opencv.version>4.9.0-1.5.10</opencv.version>
     <openblas.version>0.3.26-${javacpp.version}</openblas.version>
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
     <argLine></argLine>
@@ -447,6 +449,26 @@
         <groupId>org.bytedeco</groupId>
         <artifactId>arrow-platform</artifactId>
         <version>${arrow.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>javacv</artifactId>
+        <version>${javacv.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>javacv-platform</artifactId>
+        <version>${javacv.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>opencv</artifactId>
+        <version>${opencv.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>opencv-platform</artifactId>
+        <version>${opencv.version}</version>
       </dependency>
       <dependency>
         <groupId>org.ode4j</groupId>

@@ -29,10 +29,10 @@ class NativeCPUVisionBackendTest {
     }
 
     @Test
-    void testIsAvailableDefaultsToFalse() {
-        // Since episteme_vision.dll is not present
+    void testIsAvailableDefaultsToTrue() {
+        // Since it is a pure Java Panama implementation it is always available
         org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
-        assertFalse(provider.isAvailable(), "Provider should not be available without native library");
+        assertTrue(provider.isAvailable(), "Provider should be available (pure java FFM)");
     }
 
     @Test
@@ -48,14 +48,14 @@ class NativeCPUVisionBackendTest {
     }
 
     @Test
-    void testProcessNativeThrowsException() {
+    void testProcessNativeSucceeds() {
         org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         
-        // Should throw because library is not loaded
-        assertThrows(UnsupportedOperationException.class, () -> {
-            provider.processNative(img, 1);
-        });
+        // Should succeed because it uses pure Java Panama MemorySegments
+        BufferedImage result = provider.processNative(img, 1);
+        assertNotNull(result);
+        assertEquals(10, result.getWidth());
     }
 
     @Test

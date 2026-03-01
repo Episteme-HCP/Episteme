@@ -10,19 +10,18 @@
   </parent>
   <groupId>org.episteme</groupId>
   <artifactId>episteme-jni</artifactId>
-  <version>1</version>
   <name>episteme-jni</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
       <groupId>org.episteme</groupId>
       <artifactId>episteme-natural</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.episteme</groupId>
       <artifactId>episteme-core</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

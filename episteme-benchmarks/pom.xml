@@ -171,6 +171,16 @@
             <artifactId>hdf5-platform</artifactId>
             <version>1.14.3-1.5.10</version>
         </dependency>
+
+        <!-- JavaCV / OpenCV for Benchmarking -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>opencv-platform</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -190,7 +200,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <release>21</release>
+                    <release>25</release>
                     <compilerArgs>
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>

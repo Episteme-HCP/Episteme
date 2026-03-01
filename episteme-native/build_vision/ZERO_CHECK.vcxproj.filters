@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Silvere\Encours\Developpement\Episteme\episteme-native\build_vision\CMakeFiles\01b740fda2db4b7d75398e17965d4fdf\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{C5CBF651-7DD4-376F-ADFA-0FB3927566BB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
