@@ -107,5 +107,5 @@ EXPOSE 50051
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
-ENTRYPOINT ["java", "--add-modules", "jdk.incubator.vector", "--enable-native-access=ALL-UNNAMED", "-Djava.library.path=/app/libs", "-cp", "server.jar:lib/*", "org.episteme.server.JscienceServer"]
+ENTRYPOINT ["java", "--add-modules", "jdk.incubator.vector", "--enable-native-access=ALL-UNNAMED", "-Djava.library.path=/app/libs", "-cp", "server.jar:lib/*", "org.episteme.server.server.EpistemeApplication"]
 CMD []
