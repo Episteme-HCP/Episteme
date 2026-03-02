@@ -66,11 +66,11 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("bullet_capi", arena);
         lookup = lib.orElse(null);
 
-        if (lookup != null && NativeLibraryLoader.findSymbol(lookup, "bt_detect_sphere_collisions").isPresent()) {
-            DETECT_SPHERES = linker.downcallHandle(NativeLibraryLoader.findSymbol(lookup, "bt_detect_sphere_collisions").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            RESOLVE_COLLISIONS = linker.downcallHandle(NativeLibraryLoader.findSymbol(lookup, "bt_resolve_sphere_collisions").get(),
-                FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        if (lookup != null) {
+            DETECT_SPHERES = NativeLibraryLoader.findSymbol(lookup, "bt_detect_sphere_collisions")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+            RESOLVE_COLLISIONS = NativeLibraryLoader.findSymbol(lookup, "bt_resolve_sphere_collisions")
+                .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
             
             // Look up dynamics handles
             BT_DEFAULT_COLLISION_CONFIGURATION_NEW = NativeLibraryLoader.findSymbol(lookup, "btDefaultCollisionConfiguration_new")
@@ -172,7 +172,7 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
 
     @Override
     public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
-        if (!IS_AVAILABLE_FLAG) throw new UnsupportedOperationException("Bullet native library not found");
+        if (!IS_AVAILABLE_FLAG || DETECT_SPHERES == null) throw new UnsupportedOperationException("Bullet native batch collision functions not found in DLL");
         try {
             return (int) DETECT_SPHERES.invokeExact(positions, radii, n, collisions);
         } catch (Throwable t) {
@@ -182,7 +182,7 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
 
     @Override
     public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
-        if (!IS_AVAILABLE_FLAG) throw new UnsupportedOperationException("Bullet native library not found");
+        if (!IS_AVAILABLE_FLAG || RESOLVE_COLLISIONS == null) throw new UnsupportedOperationException("Bullet native batch collision functions not found in DLL");
         try {
             RESOLVE_COLLISIONS.invokeExact(positions, velocities, masses, n, collisions, numCollisions);
         } catch (Throwable t) {

@@ -199,10 +199,13 @@ public class NativeLibraryLoader {
             logPath = fullPath;
             if (java.nio.file.Files.exists(fullPath)) {
                 try {
-                    // Before loading the target library, try loading ALL other DLLs in the same directory 
-                    // as they might be runtime dependencies (like libstdc++-6.dll)
+                    // Before loading the target library, try loading ALL other libraries in the same directory 
+                    // as they might be runtime dependencies (like libstdc++-6.dll, .so, etc)
                     try (java.util.stream.Stream<java.nio.file.Path> siblingFiles = java.nio.file.Files.list(basePath)) {
-                        siblingFiles.filter(p -> p.toString().endsWith(".dll") && !p.equals(fullPath))
+                        siblingFiles.filter(p -> {
+                            String name = p.toString().toLowerCase();
+                            return (name.endsWith(".dll") || name.endsWith(".so") || name.endsWith(".dylib")) && !p.equals(fullPath);
+                        })
                                     .forEach(p -> {
                                         try { 
                                             SymbolLookup.libraryLookup(p, arena); 

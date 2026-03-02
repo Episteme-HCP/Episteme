@@ -82,5 +82,10 @@ else
         echo "[INFO] Classes not found, building module..."
         mvn compile -pl episteme-benchmarks -am -DskipTests
     fi
-    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "${MODULE_PATH}:${LIB_DIR}/*" "${APP_CLASS}" "$@"
+    DEPENDENCY_DIR="episteme-benchmarks/target/lib"
+    if [ ! -d "$DEPENDENCY_DIR" ]; then
+        echo "[INFO] Dependencies not found in target, copying..."
+        mvn dependency:copy-dependencies -pl episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests
+    fi
+    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "${MODULE_PATH}:${DEPENDENCY_DIR}/*:${LIB_DIR}/*" "${APP_CLASS}" "$@"
 fi

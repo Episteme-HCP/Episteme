@@ -55,7 +55,7 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
             try {
                 Linker linker = NativeLibraryLoader.getLinker();
                 
-                QUEST_CREATE_ENV = NativeLibraryLoader.findSymbol(LOOKUP, "createQuESTEnv", "createQuESTEnv@0", "_createQuESTEnv")
+                QUEST_CREATE_ENV = NativeLibraryLoader.findSymbol(LOOKUP, "createQuESTEnv", "createQuESTEnv@0", "_createQuESTEnv", "initQuESTEnv", "initQuESTEnv@0", "_initQuESTEnv")
                     .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.of(ValueLayout.ADDRESS)))
                     .orElse(null);
                     
