@@ -24,9 +24,10 @@ public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
     protected boolean checkAvailability() {
         if (!checkCommonClasses()) return false;
         try {
-            Class.forName("org.nd4j.linalg.cpu.nativecpu.CpuBackend");
-            return true;
-        } catch (ClassNotFoundException e) {
+            // Try to load the CPU backend specifically
+            org.nd4j.linalg.factory.Nd4jBackend backend = org.nd4j.linalg.factory.Nd4j.getBackend();
+            return backend != null && backend.getClass().getName().contains("CpuBackend");
+        } catch (Throwable t) {
             return false;
         }
     }

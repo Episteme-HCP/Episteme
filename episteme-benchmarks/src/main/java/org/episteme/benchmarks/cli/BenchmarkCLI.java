@@ -21,6 +21,7 @@ public class BenchmarkCLI {
 
     public static void main(String[] args) {
         boolean runAll = false;
+        boolean dryRun = false;
         String exportFile = null;
 
         // Parse arguments
@@ -28,6 +29,8 @@ public class BenchmarkCLI {
             String arg = args[i];
             if ("--run-all".equals(arg)) {
                 runAll = true;
+            } else if ("--dry-run".equals(arg)) {
+                dryRun = true;
             } else if ("--export-file".equals(arg) && i + 1 < args.length) {
                 exportFile = args[++i];
             } else if ("--help".equals(arg)) {
@@ -59,9 +62,11 @@ public class BenchmarkCLI {
         int skipped = 0;
 
         for (RunnableBenchmark benchmark : benchmarks) {
+            benchmark.setDryRun(dryRun);
             BenchmarkItem item = new BenchmarkItem(benchmark);
             System.out.println("----------------------------------------------------------------");
             System.out.println("Running: " + item.getName() + " [" + item.getBackend() + "/" + item.getProvider() + "]");
+            if (dryRun) System.out.println("Mode: DRY RUN (Small Dataset)");
 
             if (!benchmark.isAvailable()) {
                 System.out.println("Status: SKIPPED (Unavailable)");
@@ -137,6 +142,7 @@ public class BenchmarkCLI {
         System.out.println("Usage: java org.episteme.benchmarks.cli.BenchmarkCLI [options]");
         System.out.println("Options:");
         System.out.println("  --run-all         Run all discovered benchmarks.");
+        System.out.println("  --dry-run         Run with minimal datasets for functional verification.");
         System.out.println("  --export-file <f> Save results to JSON file.");
         System.out.println("  --help            Show this message.");
     }

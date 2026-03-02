@@ -42,10 +42,12 @@ import java.util.Random;
 public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
     private static final int SIZE = 1024;
+    private static final int DRY_RUN_SIZE = 16;
     private static final int POOL_SIZE = 1;
     private RealDoubleMatrix[] matricesA;
     private RealDoubleMatrix[] matricesB;
     private LinearAlgebraProvider<Real> currentProvider;
+    private boolean dryRun = false;
 
     @Override public String getId() { return getIdPrefix(); }
     @Override public String getName() { return getNameBase(); }
@@ -66,14 +68,18 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
 
     @Override
     public void setup() {
+        int actualSize = dryRun ? DRY_RUN_SIZE : SIZE;
         matricesA = new RealDoubleMatrix[POOL_SIZE];
         matricesB = new RealDoubleMatrix[POOL_SIZE];
         Random r = new Random(42);
         for (int i = 0; i < POOL_SIZE; i++) {
-            matricesA[i] = RealDoubleMatrix.of(generateData(SIZE, r));
-            matricesB[i] = RealDoubleMatrix.of(generateData(SIZE, r));
+            matricesA[i] = RealDoubleMatrix.of(generateData(actualSize, r));
+            matricesB[i] = RealDoubleMatrix.of(generateData(actualSize, r));
         }
     }
+
+    @Override public void setDryRun(boolean dryRun) { this.dryRun = dryRun; }
+    @Override public boolean isDryRun() { return dryRun; }
 
     @Override
     public void setProvider(LinearAlgebraProvider<Real> provider) {

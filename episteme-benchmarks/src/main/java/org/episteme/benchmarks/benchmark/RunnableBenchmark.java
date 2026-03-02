@@ -101,6 +101,16 @@ public interface RunnableBenchmark {
         return java.util.Collections.emptyMap();
     }
     /**
+     * Sets whether this benchmark should run in dry-run mode (minimal dataset).
+     */
+    default void setDryRun(boolean dryRun) {}
+
+    /**
+     * @return true if this benchmark is in dry-run mode
+     */
+    default boolean isDryRun() { return false; }
+
+    /**
      * Checks if the benchmark requirements (e.g. native libraries, hardware) are met.
      * @return true if the benchmark can be executed
      */

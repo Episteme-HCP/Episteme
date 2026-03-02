@@ -18,6 +18,7 @@ public class SystematicVisionBenchmark implements SystematicBenchmark<VisionAlgo
     private VisionAlgorithmBackend<Object> provider;
     private Object image;
     private final ImageOp<Object> identityOp = (img) -> img;
+    private boolean dryRun = false;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -45,12 +46,16 @@ public class SystematicVisionBenchmark implements SystematicBenchmark<VisionAlgo
         return provider != null && provider.isAvailable();
     }
 
+    @Override public void setDryRun(boolean dryRun) { this.dryRun = dryRun; }
+    @Override public boolean isDryRun() { return dryRun; }
+
     @Override
     public void setup() {
         if (provider == null) throw new IllegalStateException("Provider not set");
         try {
-            // Create a dummy 1MP image (1000x1000 ints)
-            image = provider.createImage(new int[1000 * 1000], 1000, 1000);
+            int size = dryRun ? 256 : 1000;
+            // Create a dummy image
+            image = provider.createImage(new int[size * size], size, size);
         } catch (Exception e) {
             image = null;
         }

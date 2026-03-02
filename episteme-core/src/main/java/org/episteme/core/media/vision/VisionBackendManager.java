@@ -64,4 +64,11 @@ public class VisionBackendManager extends AbstractBackendManager<VisionAlgorithm
     public static java.util.Collection<VisionAlgorithmBackend<?>> staticAll() {
         return INSTANCE.managerAll();
     }
+
+    /**
+     * Alias for staticAll() to align with other managers.
+     */
+    public static java.util.Collection<VisionAlgorithmBackend<?>> staticAllBackends() {
+        return staticAll();
+    }
 }
