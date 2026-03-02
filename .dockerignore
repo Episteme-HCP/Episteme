@@ -1,0 +1,41 @@
+# Version Control
+.git
+.github
+.gitignore
+
+# IDEs
+.idea
+.vscode
+*.iml
+
+# Maven outputs (except the server target we actually need)
+target/
+*/target/
+!episteme-server/target/episteme-server-*.jar
+!episteme-server/target/lib/
+
+# Local Python Environments
+*.venv
+venv
+.env
+__pycache__
+
+# Javadoc and Docs
+javadoc/
+docs/
+
+# Terraform
+terraform/
+.terraform/
+
+# Large temporary/data files
+test_ffm.txt
+*.log
+*.zip
+*.tar.gz
+*.tmp
+
+# Miscellaneous local dev
+k8s/
+monitoring/
+tools/
