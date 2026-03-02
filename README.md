@@ -72,6 +72,12 @@ Matrix<CudaFloat> gpu = Matrix.create(data, new CudaScalar());
 // Same API, 100x faster!
 ```
 
+## ☁️ Cloud Deployment (GCP GPU)
+
+You can launch a completely pre-configured Google Cloud Shell environment to deploy Episteme on an NVIDIA GPU Virtual Machine with one click:
+
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/silveremartin-dev/Episteme&cloudshell_run_command=echo%20%22Ready%20to%20deploy%20Episteme!%20See%20gcp_deployment_plan.md%20for%20the%20gcloud%20command.%22)
+
 ## Project Status
 
 **Phase 1-14: Core, Cleanup, Benchmarks & UI** (Completed)
