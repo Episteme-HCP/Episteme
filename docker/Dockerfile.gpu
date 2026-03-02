@@ -64,7 +64,7 @@ WORKDIR /app
 # The build context should be the root of the project.
 # We assume 'mvn package -DskipTests' was run on the host or in an Alpine builder stage prior.
 # We simply copy the built JARs and dependencies.
-COPY episteme-server/target/episteme-server-1.0.0-SNAPSHOT.jar /app/server.jar
+COPY episteme-server/target/episteme-server-*.jar /app/server.jar
 COPY episteme-server/target/lib /app/lib
 COPY libs /app/libs
 
