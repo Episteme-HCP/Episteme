@@ -68,6 +68,11 @@ COPY episteme-server/target/episteme-server-*.jar /app/server.jar
 COPY episteme-server/target/lib /app/lib
 COPY libs /app/libs
 
+# Copy Execution Scripts
+COPY run_diagnostic.sh /app/run_diagnostic.sh
+COPY run-benchmarks.sh /app/run-benchmarks.sh
+RUN chmod +x /app/*.sh
+
 # Native configuration
 ENV LD_LIBRARY_PATH="/app/libs:/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
 ENV CUDA_PATH="/usr/local/cuda"
