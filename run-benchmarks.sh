@@ -19,6 +19,22 @@ do
     fi
 done
 
+# --- Environment Setup ---
+export NATIVE_ROOT="/opt/episteme-native"
+
+# --- Python (Qiskit) Integration ---
+if [ -z "$EPISTEME_PYTHON" ]; then
+    # Defaulting to common installation path, can be overridden by user
+    export EPISTEME_PYTHON="/usr/bin/python3"
+fi
+
+# --- CUDA Setup ---
+if [ -z "$CUDA_PATH" ]; then
+    export CUDA_PATH="/usr/local/cuda"
+fi
+export PATH="$CUDA_PATH/bin:$PATH"
+export LD_LIBRARY_PATH="$CUDA_PATH/lib64:$LD_LIBRARY_PATH"
+
 # Native Library Path Setup
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LIBS_DIR="${SCRIPT_DIR}/libs"

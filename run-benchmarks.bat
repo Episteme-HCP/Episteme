@@ -35,6 +35,12 @@ if not defined EPISTEME_PYTHON (
     set "EPISTEME_PYTHON=C:\Users\silve\AppData\Local\Programs\Python\Python314\python.exe"
 )
 
+rem --- CUDA Setup ---
+if not defined CUDA_PATH (
+    set "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1"
+)
+set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
+
 rem --- VLC ---
 if exist "C:\Program Files\VideoLAN\VLC" (
     echo [INFO] Adding VLC to PATH...
