@@ -76,6 +76,9 @@ if [ "$USE_SHADED" = true ]; then
         echo "[ERROR] Shaded JAR not found at $JAR_PATH. Run 'mvn package' first."
         exit 1
     fi
+elif [ -f "server.jar" ]; then
+    echo "[INFO] Running from Pre-Compiled Docker Environment (server.jar)"
+    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "server.jar:lib/*" "${APP_CLASS}" "$@"
 else
     echo "[INFO] Running latest compiled classes - Dev Mode. Use --shaded to force JAR."
     if [ ! -d "episteme-benchmarks/target/classes" ]; then
