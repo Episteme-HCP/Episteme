@@ -1,25 +1,28 @@
-# Multi-stage build for Episteme Server
-FROM eclipse-temurin:21-jdk-alpine AS builder
+# Episteme CPU Server Node Dockerfile
+FROM ubuntu:22.04
 
-# Install Maven
-RUN apk add --no-cache maven
+ENV DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /build
-COPY pom.xml .
-COPY episteme-core episteme-core
-COPY episteme-server episteme-server
+# Install base dependencies and Java 25 GA
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    curl \
+    netcat-openbsd \
+    && wget https://download.java.net/java/GA/jdk25.0.2/b1e0dfa218384cb9959bdcb897162d4e/10/GPL/openjdk-25.0.2_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz \
+    && mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 \
+    && tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 \
+    && rm /tmp/jdk25.tar.gz \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Build server module (skip tests for faster build)
-RUN mvn package -pl episteme-server -am -DskipTests
-
-# Runtime image
-FROM eclipse-temurin:21-jre-alpine
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="$JAVA_HOME/bin:$PATH"
 
 WORKDIR /app
 
-# Copy the built JAR and dependencies
-COPY --from=builder /build/episteme-server/target/episteme-server-1.0.0-SNAPSHOT.jar /app/server.jar
-COPY --from=builder /build/episteme-server/target/lib /app/lib
+# The build context should be the root of the project.
+# We assume 'mvn package -DskipTests' was run on the host or in an Alpine builder stage prior.
+COPY episteme-server/target/episteme-server-*.jar /app/server.jar
+COPY episteme-server/target/lib /app/lib
 
 # Copy certs if available
 COPY certs /app/certs
@@ -32,5 +35,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD nc -z localhost 50051 || exit 1
 
 # Run server
-ENTRYPOINT ["java", "-cp", "server.jar:lib/*", "org.episteme.server.server.EpistemeApplication"]
+ENTRYPOINT ["java", "--add-modules", "jdk.incubator.vector", "--enable-native-access=ALL-UNNAMED", "-cp", "server.jar:lib/*", "org.episteme.server.server.EpistemeApplication"]
 CMD []
