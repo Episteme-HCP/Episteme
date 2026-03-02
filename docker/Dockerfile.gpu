@@ -27,6 +27,16 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     libsnappy-dev \
     libzstd-dev \
     zlib1g-dev \
+    apt-transport-https \
+    gnupg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add Apache Arrow Repository for Ubuntu 22.04 (jammy)
+RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+    && apt-get install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y -V \
     libarrow-dev \
     libarrow-dataset-dev \
     libparquet-dev \
