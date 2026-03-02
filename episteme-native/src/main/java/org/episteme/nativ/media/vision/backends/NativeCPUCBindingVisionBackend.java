@@ -53,11 +53,12 @@ public class NativeCPUCBindingVisionBackend implements VisionAlgorithmBackend<Bu
                     ValueLayout.JAVA_INT
             );
             
-            Optional<MemorySegment> symbol = LOOKUP.find("process_image");
+            Optional<MemorySegment> symbol = NativeLibraryLoader.findSymbol(LOOKUP, "process_image");
             if (symbol.isPresent()) {
                 MH_PROCESS_IMAGE = LINKER.downcallHandle(symbol.get(), desc);
                 IS_AVAILABLE = true;
             } else {
+                System.err.println("[DEBUG] NativeCPUCBindingVisionBackend: Symbol 'process_image' not found in library.");
                 MH_PROCESS_IMAGE = null;
                 IS_AVAILABLE = false;
             }

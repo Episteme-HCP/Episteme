@@ -137,12 +137,14 @@ public class NativeLibraryLoader {
         for (String variant : variants) {
             String currentMapped = System.mapLibraryName(variant);
             
-            try {
-                SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
-                return Optional.of(lookup);
-            } catch (Exception e) {
-                // System.out.println("[DEBUG] NativeLibraryLoader: System load failed for " + variant + ": " + e.getMessage());
-            }
+                try {
+                    // Force pre-loading of runtime dependencies before loading the main library
+                    preloadRuntimes(discoveredLibs, arena);
+                    SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
+                    return Optional.of(lookup);
+                } catch (Exception e) {
+                    System.err.println("[DEBUG] NativeLibraryLoader: System load failed for " + variant + " in libs: " + e.toString());
+                }
 
             // 2. Try custom search paths
             String cudaPath = System.getenv("CUDA_PATH");
@@ -176,6 +178,8 @@ public class NativeLibraryLoader {
                             System.out.println("[INFO] NativeLibraryLoader: Successfully loaded " + variant + " from subdirectory: " + sub.getName());
                             System.out.flush();
                             return found;
+                        } else {
+                            System.err.println("[DEBUG] NativeLibraryLoader: Library '" + variant + "' could not be loaded from subdirectory: " + sub.getName());
                         }
                     }
                 }
@@ -189,15 +193,25 @@ public class NativeLibraryLoader {
     }
 
     private static Optional<SymbolLookup> tryLoadFromDirectory(java.nio.file.Path basePath, String mappedName, Arena arena) {
-        java.nio.file.Path fullPath = null;
+        java.nio.file.Path logPath = basePath;
         try {
-            fullPath = basePath.resolve(mappedName).toAbsolutePath();
+            final java.nio.file.Path fullPath = basePath.resolve(mappedName).toAbsolutePath();
+            logPath = fullPath;
             if (java.nio.file.Files.exists(fullPath)) {
                 try {
+                    // Before loading the target library, try loading ALL other DLLs in the same directory 
+                    // as they might be runtime dependencies (like libstdc++-6.dll)
+                    try (java.util.stream.Stream<java.nio.file.Path> siblingFiles = java.nio.file.Files.list(basePath)) {
+                        siblingFiles.filter(p -> p.toString().endsWith(".dll") && !p.equals(fullPath))
+                                    .forEach(p -> {
+                                        try { 
+                                            SymbolLookup.libraryLookup(p, arena); 
+                                        } catch (Throwable ignored) {} 
+                                    });
+                    }
                     return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
                 } catch (Throwable t) {
                     System.err.println("[ERROR] NativeLibraryLoader: Failed to load " + fullPath + " : " + t.getMessage());
-                    t.printStackTrace();
                 }
             }
             
@@ -205,12 +219,11 @@ public class NativeLibraryLoader {
             for (String sub : subs) {
                 java.nio.file.Path subPath = basePath.resolve(sub).resolve(mappedName).toAbsolutePath();
                 if (java.nio.file.Files.exists(subPath)) {
-                    fullPath = subPath; 
                     return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
                 }
             }
         } catch (Throwable t) {
-            System.err.println("[ERROR] NativeLibraryLoader: Failed to load " + mappedName + " from " + (fullPath != null ? fullPath : basePath) + ": " + t.getMessage());
+            System.err.println("[ERROR] NativeLibraryLoader: Failed to load " + mappedName + " from " + logPath + ": " + t.getMessage());
             if (t.getCause() != null) {
                 System.err.println("  Cause: " + t.getCause().getMessage());
             }

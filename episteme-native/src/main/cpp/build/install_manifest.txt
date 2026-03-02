@@ -1,0 +1,2 @@
+C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp/../../../libs/episteme_vision.lib
+C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp/../../../libs/episteme_vision.dll

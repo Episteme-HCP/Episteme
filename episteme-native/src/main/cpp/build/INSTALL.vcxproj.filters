@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Silvere\Encours\Developpement\Episteme\episteme-native\src\main\cpp\build\CMakeFiles\4549b1b0c67fb3c374f4f7c05e935a4d\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{00D8B7A6-B233-3499-9416-3EE4E0028B2B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

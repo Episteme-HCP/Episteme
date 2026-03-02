@@ -33,6 +33,11 @@ public class ND4JCUDATensorBackend extends ND4JBaseTensorBackend {
             Class.forName("org.nd4j.linalg.jcublas.JCublasBackend");
             return true;
         } catch (ClassNotFoundException e) {
+            // Log that the dependency is missing entirely
+            // System.out.println("[INFO] ND4J CUDA (GPU) skipped: nd4j-cuda-platform dependency not found on classpath.");
+            return false;
+        } catch (Throwable t) {
+            System.err.println("[WARN] ND4J CUDA (GPU) initialization failed: " + t.toString());
             return false;
         }
     }

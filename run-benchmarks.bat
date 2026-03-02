@@ -30,6 +30,11 @@ rem --- Native Libraries Setup ---
 set "NATIVE_ROOT=C:\Episteme-Native"
 set "LIBS_DIR=%~dp0libs"
 
+rem --- Python (Qiskit) Integration ---
+if not defined EPISTEME_PYTHON (
+    set "EPISTEME_PYTHON=C:\Users\silve\AppData\Local\Programs\Python\Python314\python.exe"
+)
+
 rem --- VLC ---
 if exist "C:\Program Files\VideoLAN\VLC" (
     echo [INFO] Adding VLC to PATH...

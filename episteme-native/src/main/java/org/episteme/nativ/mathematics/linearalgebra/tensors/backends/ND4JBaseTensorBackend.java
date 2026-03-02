@@ -48,10 +48,11 @@ public abstract class ND4JBaseTensorBackend implements TensorBackend {
     }
 
     protected boolean checkCommonClasses() {
-        if (Boolean.getBoolean("episteme.nd4j.skip")) return false;
         try {
-            Class.forName("org.nd4j.linalg.factory.Nd4j");
-            Class.forName("org.nd4j.linalg.api.ndarray.INDArray");
+            // ND4J's static initializer for Nd4j.getBackend() is very sensitive to CUDA jars.
+            // If the jar is there but the DLLs aren't, it throws UnsatisfiedLinkError.
+            // We try to catch it early.
+            Class.forName("org.nd4j.linalg.factory.Nd4j", false, ND4JBaseTensorBackend.class.getClassLoader());
             return true;
         } catch (Throwable t) {
             return false;

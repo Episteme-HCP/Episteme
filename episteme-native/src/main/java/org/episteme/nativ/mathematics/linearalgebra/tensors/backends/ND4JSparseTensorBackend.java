@@ -35,9 +35,9 @@ public class ND4JSparseTensorBackend implements TensorBackend {
     static {
         try {
             Class.forName("org.nd4j.linalg.factory.Nd4j");
-            Class.forName("org.nd4j.linalg.api.ndarray.BaseSparseNDArray");
-            available = true;
-        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+            org.nd4j.linalg.factory.Nd4jBackend backend = org.nd4j.linalg.factory.Nd4j.getBackend();
+            available = backend != null;
+        } catch (Throwable t) {
             available = false;
         }
     }

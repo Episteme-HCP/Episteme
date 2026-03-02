@@ -1,0 +1,10 @@
+^C:\SILVERE\ENCOURS\DEVELOPPEMENT\EPISTEME\EPISTEME-NATIVE\SRC\MAIN\CPP\BUILD\CMAKEFILES\4549B1B0C67FB3C374F4F7C05E935A4D\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp -BC:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp/build/episteme_vision.slnx
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

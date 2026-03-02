@@ -1,0 +1,10 @@
+^C:\SILVERE\ENCOURS\DEVELOPPEMENT\EPISTEME\EPISTEME-NATIVE\SRC\MAIN\CPP\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp -BC:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp/build --check-stamp-file C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/cpp/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

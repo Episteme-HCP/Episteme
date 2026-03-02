@@ -26,8 +26,18 @@ public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
         try {
             // Try to load the CPU backend specifically
             org.nd4j.linalg.factory.Nd4jBackend backend = org.nd4j.linalg.factory.Nd4j.getBackend();
-            return backend != null && backend.getClass().getName().contains("CpuBackend");
+            boolean isCpu = backend != null && backend.getClass().getName().contains("CpuBackend");
+            if (!isCpu && backend != null) {
+                System.out.println("[INFO] ND4J Native (CPU) found GPU backend instead: " + backend.getClass().getSimpleName() + ". Fallback to CPU Dense.");
+            }
+            return isCpu;
         } catch (Throwable t) {
+            String msg = t.getMessage() != null ? t.getMessage() : t.toString();
+            if (msg.contains("cuda") || msg.contains("cublas")) {
+                System.err.println("[WARN] ND4J Native (CPU) initialization failed due to CUDA conflict: " + msg + ". This happens when nd4j-cuda is on the classpath but the CUDA Toolkit (likely 12.x) is missing.");
+            } else {
+                System.err.println("[WARN] ND4J Native (CPU) initialization failed: " + msg);
+            }
             return false;
         }
     }
