@@ -299,6 +299,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <includeScope>runtime</includeScope>
+                            <excludeGroupIds>org.episteme</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>

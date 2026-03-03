@@ -264,6 +264,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <excludeGroupIds>org.episteme</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
