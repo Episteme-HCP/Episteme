@@ -13,10 +13,12 @@ endif()
 
 add_library(episteme_vision SHARED vision/process_image.cpp)
 
-set_target_properties(episteme_vision PROPERTIES
-    PREFIX ""
-    SUFFIX ".dll"
-)
+if(WIN32)
+    set_target_properties(episteme_vision PROPERTIES
+        PREFIX ""
+        SUFFIX ".dll"
+    )
+endif()
 
 # Output directly to the libs directory for the benchmarker to find it
 install(TARGETS episteme_vision DESTINATION ${CMAKE_SOURCE_DIR}/../../../libs)
