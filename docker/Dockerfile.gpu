@@ -70,6 +70,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget curl python3 python3-pip python3-venv \
     libvlc-dev vlc-plugin-base libhdf5-dev libfftw3-dev libopenblas-dev libportaudio2 \
     libsnappy-dev libzstd-dev zlib1g-dev \
+    libxxf86vm1 libglu1-mesa libxrender1 libxtst6 libxi6 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install scientifiques python pour le plot (Legacy)
