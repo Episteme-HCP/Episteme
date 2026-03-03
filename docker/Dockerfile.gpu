@@ -58,15 +58,8 @@ RUN chmod +x /build/build_vision.sh && ./build_vision.sh && \
     find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
     mvn install -DskipTests -Dmdep.skip=true && \
     mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false && \
-    cp episteme-core/target/episteme-core-*.jar episteme-server/target/lib/ && \
-    cp episteme-natural/target/episteme-natural-*.jar episteme-server/target/lib/ && \
-    cp episteme-social/target/episteme-social-*.jar episteme-server/target/lib/ && \
-    cp episteme-native/target/episteme-native-*.jar episteme-server/target/lib/ && \
-    cp episteme-core/target/episteme-core-*.jar episteme-benchmarks/target/lib/ && \
-    cp episteme-natural/target/episteme-natural-*.jar episteme-benchmarks/target/lib/ && \
-    cp episteme-social/target/episteme-social-*.jar episteme-benchmarks/target/lib/ && \
-    cp episteme-native/target/episteme-native-*.jar episteme-benchmarks/target/lib/ && \
-    cp episteme-server/target/episteme-server-*.jar episteme-benchmarks/target/lib/
+    for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-server/target/lib/; done && \
+    for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-benchmarks/target/lib/; done
 
 # --- Stage 2: Final (Runtime Image) ---
 FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
