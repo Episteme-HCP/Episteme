@@ -31,12 +31,14 @@ RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     cd /tmp/QuEST && mkdir build && cd build && \
     cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DCMAKE_CUDA_ARCHITECTURES=75 -DGPU_COMPUTE_CAPABILITY=75 -DENABLE_DISTRIBUTION=OFF && \
     make -j$(nproc) && \
-    mkdir -p /build/libs && find . -name "libQuEST.so" -exec cp {} /build/libs/ \;
+    mkdir -p /build/libs && find . -name "libQuEST.so" -exec cp {} /build/libs/ \; && \
+    rm -rf /tmp/QuEST
 
 RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
     cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -S . -B build && \
     cmake --build build -j$(nproc) && \
-    find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \;
+    find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \; && \
+    rm -rf /tmp/bullet3
 
 # 2. Prepare for Java Build
 # We copy internal libs first to install them in the local repo
@@ -49,10 +51,13 @@ RUN mvn install:install-file \
     -Dpackaging=jar
 
 # 3. Compile Episteme Native Vision & Java Project
+# We use -Dmdep.skip=true to avoid copying dependencies for every module,
+# saving gigabytes of disk space during the build.
 COPY . /build/
 RUN chmod +x /build/build_vision.sh && ./build_vision.sh && \
     find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
-    mvn clean package -DskipTests
+    mvn install -DskipTests -Dmdep.skip=true && \
+    mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DincludeScope=runtime -Dmdep.skip=false
 
 # --- Stage 2: Final (Runtime Image) ---
 FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
