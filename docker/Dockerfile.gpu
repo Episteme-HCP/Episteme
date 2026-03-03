@@ -100,14 +100,16 @@ RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet
 RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     cd /tmp/QuEST && \
     mkdir build && cd build && \
-    cmake .. -DENABLE_CUDA=ON -DGPU_COMPUTE_CAPABILITY=80 -DENABLE_DISTRIBUTION=OFF && \
+    cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DGPU_COMPUTE_CAPABILITY=80 -DENABLE_DISTRIBUTION=OFF && \
     make -j$(nproc) && \
     cp QuEST/libQuEST.so /app/libs/ || echo "Warning: Could not copy QuEST lib" && \
     rm -rf /tmp/QuEST
 
 # 3. Compile Episteme Native Vision & Native components
-RUN chmod +x ./build_vision.sh && ./build_vision.sh && \
-    cp episteme-native/src/main/resources/linux-x86_64/libepisteme_vision.so /app/libs/ || echo "Warning: Could not copy Vision lib"
+COPY build_vision.sh /app/build_vision.sh
+COPY episteme-native/ /app/episteme-native/
+RUN chmod +x /app/build_vision.sh && /app/build_vision.sh && \
+    cp /app/episteme-native/src/main/resources/linux-x86_64/libepisteme_vision.so /app/libs/ || echo "Warning: Could not copy Vision lib"
 
 # Expose NVIDIA devices
 ENV NVIDIA_VISIBLE_DEVICES=all
