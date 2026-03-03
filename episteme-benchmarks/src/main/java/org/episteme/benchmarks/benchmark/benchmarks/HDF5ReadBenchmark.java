@@ -124,7 +124,8 @@ public class HDF5ReadBenchmark implements RunnableBenchmark {
     @Override
     public boolean isAvailable() {
         try {
-            Class.forName("org.bytedeco.hdf5.H5");
+            // Check for the global method class which is always present if the lib is on classpath
+            Class.forName("org.bytedeco.hdf5.global.hdf5");
             return true;
         } catch (Throwable t) {
             return false;
