@@ -68,6 +68,10 @@ COPY episteme-server/target/episteme-server-*.jar /app/server.jar
 COPY episteme-server/target/lib /app/lib
 COPY libs /app/libs
 
+# Copy Benchmarks JAR so Diagnostic tools can execute
+COPY episteme-benchmarks/target/episteme-benchmarks-*.jar /app/benchmarks.jar
+COPY episteme-benchmarks/target/lib /app/lib/
+
 # Copy Execution Scripts
 COPY run_diagnostic.sh /app/run_diagnostic.sh
 COPY run-benchmarks.sh /app/run-benchmarks.sh

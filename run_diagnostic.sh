@@ -36,7 +36,7 @@ fi
 echo "[INFO] Running Java Diagnostic Class..."
 if [ -f "server.jar" ]; then
     # Docker Container Execution
-    java -cp "server.jar:lib/*" org.episteme.benchmarks.cli.DiagnosticTool "$@"
+    java -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.cli.DiagnosticTool "$@"
 else
     # Local Development Execution
     java -cp "episteme-benchmarks/target/classes:episteme-core/target/classes:episteme-native/target/classes:episteme-benchmarks/target/lib/*" \
