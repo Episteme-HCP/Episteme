@@ -113,23 +113,8 @@ if defined USE_SHADED_JAR (
     java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %* %EXTRA_ARGS%
 )
 
-rem --- Post-Processing: PDF Generation ---
-if "%GENERATE_PDF%"=="true" (
-    echo.
-    echo [INFO] Generating PDF Report from %EXPORT_FILE%...
-    
-    rem Try explicit path first
-    if exist "%EPISTEME_PYTHON%" (
-        "%EPISTEME_PYTHON%" plot_benchmarks.py %EXPORT_FILE%
-    ) else (
-        where python >nul 2>nul
-        if %ERRORLEVEL% equ 0 (
-            python plot_benchmarks.py %EXPORT_FILE%
-        ) else (
-            echo [WARNING] Python not found ^(%EPISTEME_PYTHON%^). Skipping PDF generation.
-        )
-    )
 )
+
 
 echo.
 pause

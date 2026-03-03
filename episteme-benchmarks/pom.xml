@@ -181,6 +181,14 @@
             <groupId>org.bytedeco</groupId>
             <artifactId>opencv-platform</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

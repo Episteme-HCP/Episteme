@@ -22,7 +22,9 @@ public class BenchmarkCLI {
     public static void main(String[] args) {
         boolean runAll = false;
         boolean dryRun = false;
+        boolean generatePdf = false;
         String exportFile = null;
+        String pdfFile = null;
 
         // Parse arguments
         for (int i = 0; i < args.length; i++) {
@@ -31,6 +33,8 @@ public class BenchmarkCLI {
                 runAll = true;
             } else if ("--dry-run".equals(arg)) {
                 dryRun = true;
+            } else if ("--pdf".equals(arg)) {
+                generatePdf = true;
             } else if ("--export-file".equals(arg) && i + 1 < args.length) {
                 exportFile = args[++i];
             } else if ("--help".equals(arg)) {
@@ -135,6 +139,15 @@ public class BenchmarkCLI {
         // Export JSON
         if (exportFile != null) {
             exportJson(exportFile, results);
+            
+            // Generate PDF if requested
+            if (generatePdf) {
+                String pdfPath = exportFile.replace(".json", ".pdf");
+                if (pdfPath.equals(exportFile)) pdfPath += ".pdf";
+                
+                System.out.println("[INFO] Generating PDF Report: " + pdfPath);
+                org.episteme.benchmarks.reporting.BenchmarkReporter.generateReport(results, pdfPath);
+            }
         }
     }
 
@@ -144,6 +157,7 @@ public class BenchmarkCLI {
         System.out.println("  --run-all         Run all discovered benchmarks.");
         System.out.println("  --dry-run         Run with minimal datasets for functional verification.");
         System.out.println("  --export-file <f> Save results to JSON file.");
+        System.out.println("  --pdf             Generate PDF Report (requires --export-file).");
         System.out.println("  --help            Show this message.");
     }
 
@@ -208,17 +222,4 @@ public class BenchmarkCLI {
         return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
-    private static class BenchmarkResult {
-        BenchmarkItem item;
-        String status;
-        double score;
-        double p99;
-
-        public BenchmarkResult(BenchmarkItem item, String status, double score, double p99) {
-            this.item = item;
-            this.status = status;
-            this.score = score;
-            this.p99 = p99;
-        }
-    }
 }

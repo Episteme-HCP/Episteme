@@ -109,15 +109,5 @@ else
     java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "${MODULE_PATH}:${DEPENDENCY_DIR}/*:${LIB_DIR}/*" "${APP_CLASS}" "$@"
 fi
 
-# --- Post-Processing: PDF Generation ---
-if [ "$GENERATE_PDF" = true ]; then
-    echo ""
-    echo "[INFO] Generating PDF Report from $EXPORT_FILE..."
-    if command -v python3 &>/dev/null; then
-        python3 plot_benchmarks.py "$EXPORT_FILE"
-    elif command -v python &>/dev/null; then
-        python plot_benchmarks.py "$EXPORT_FILE"
-    else
-        echo "[WARNING] Python not found. Skipping PDF generation."
-    fi
 fi
+
