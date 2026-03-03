@@ -18,9 +18,9 @@
         <!-- Requires Java 25 (Project Panama / Valhalla) -->
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
-        <cuda.exclude.1>none</cuda.exclude.1>
-        <cuda.exclude.2>none</cuda.exclude.2>
-        <cuda.exclude.3>none</cuda.exclude.3>
+        <cuda.exclude.1>**/_NONE_/**</cuda.exclude.1>
+        <cuda.exclude.2>**/_NONE_/**</cuda.exclude.2>
+        <cuda.exclude.3>**/_NONE_/**</cuda.exclude.3>
     </properties>
 
     <dependencies>
@@ -246,9 +246,9 @@
                 </os>
             </activation>
             <properties>
-                <cuda.exclude.1>**/gpu/cuda/**</cuda.exclude.1>
-                <cuda.exclude.2>**/CUDAExecutionContext.java</cuda.exclude.2>
-                <cuda.exclude.3>**/CUDAQuantumBackend.java</cuda.exclude.3>
+                <cuda.exclude.1>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>org/episteme/nativ/technical/backend/gpu/cuda/CUDAExecutionContext.java</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/CUDAQuantumBackend.java</cuda.exclude.3>
             </properties>
         </profile>
         <profile>
@@ -259,9 +259,9 @@
                 </os>
             </activation>
             <properties>
-                <cuda.exclude.1>**/gpu/cuda/**</cuda.exclude.1>
-                <cuda.exclude.2>**/CUDAExecutionContext.java</cuda.exclude.2>
-                <cuda.exclude.3>**/CUDAQuantumBackend.java</cuda.exclude.3>
+                <cuda.exclude.1>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>org/episteme/nativ/technical/backend/gpu/cuda/CUDAExecutionContext.java</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/CUDAQuantumBackend.java</cuda.exclude.3>
             </properties>
         </profile>
     </profiles>
