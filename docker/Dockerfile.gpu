@@ -41,8 +41,10 @@ RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet
     rm -rf /tmp/bullet3
 
 # 2. Prepare for Java Build
-# We copy internal libs first to install them in the local repo
-COPY libs /build/libs_local
+# We DO NOT copy the whole 'libs' folder as it contains Windows .dlls
+# We only copy the specific .jar files needed for the builder
+COPY libs/mpj.jar /build/libs_local/
+COPY libs/mpi.jar /build/libs_local/
 RUN mvn install:install-file \
     -Dfile=/build/libs_local/mpj.jar \
     -DgroupId=org.mpjexpress \
@@ -70,8 +72,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget curl python3 python3-pip python3-venv \
     libvlc-dev vlc-plugin-base libhdf5-dev libfftw3-dev libopenblas-dev libportaudio2 \
     libsnappy-dev libzstd-dev zlib1g-dev \
-    libxxf86vm1 libglu1-mesa libxrender1 libxtst6 libxi6 \
+    libxxf86vm1 libglu1-mesa libxrender1 libxtst6 libxi6 libgl1 libgl1-mesa-dri \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Fix library names for Episteme's NativeLibraryLoader
+RUN ln -s /usr/lib/x86_64-linux-gnu/libfftw3.so.3 /usr/lib/libfftw3.so && \
+    ln -s /usr/lib/x86_64-linux-gnu/libopenblas.so.0 /usr/lib/libopenblas.so
 
 # Install scientifiques python pour le plot (Legacy)
 RUN python3 -m venv /opt/qiskit_env && \
