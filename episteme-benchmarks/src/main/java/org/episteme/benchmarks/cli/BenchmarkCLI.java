@@ -37,10 +37,17 @@ public class BenchmarkCLI {
                 generatePdf = true;
             } else if ("--export-file".equals(arg) && i + 1 < args.length) {
                 exportFile = args[++i];
+            } else if (arg.startsWith("--export-file=")) {
+                exportFile = arg.substring("--export-file=".length());
             } else if ("--help".equals(arg)) {
                 printHelp();
                 return;
             }
+        }
+
+        // Safety: if PDF is requested, we NEED an export file for results
+        if (generatePdf && exportFile == null) {
+            exportFile = "benchmark-results.json";
         }
 
         if (!runAll) {
