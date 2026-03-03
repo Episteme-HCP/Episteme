@@ -32,15 +32,23 @@ else
     echo "[WARN] CUDA_PATH not found."
 fi
 
+# --- NVIDIA-SMI Check ---
+echo "[INFO] Checking NVIDIA GPU visibility..."
+if command -v nvidia-smi &>/dev/null; then
+    nvidia-smi -L
+else
+    echo "[WARN] nvidia-smi not found. GPU may not be visible to container."
+fi
+
 # --- Run Java Diagnostics ---
 echo "[INFO] Running Java Diagnostic Class..."
 if [ -f "server.jar" ]; then
     # Docker Container Execution
-    java -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.cli.DiagnosticTool "$@"
+    java -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.BackendDiagnostic "$@"
 else
     # Local Development Execution
     java -cp "episteme-benchmarks/target/classes:episteme-core/target/classes:episteme-native/target/classes:episteme-benchmarks/target/lib/*" \
-         org.episteme.benchmarks.cli.DiagnosticTool "$@"
+         org.episteme.benchmarks.BackendDiagnostic "$@"
 fi
 
 echo "=========================================="

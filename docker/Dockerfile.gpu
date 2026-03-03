@@ -1,6 +1,6 @@
 # Episteme GPU-Enabled Server Dockerfile
 # Based on official NVIDIA CUDA images (Ubuntu 22.04 base)
-FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
 
 # Avoid tzdata interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
