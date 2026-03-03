@@ -100,7 +100,7 @@ RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet
 RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     cd /tmp/QuEST && \
     mkdir build && cd build && \
-    cmake .. -DGPUACCELERATED=1 -DGPU_COMPUTE_CAPABILITY=80 -DDISTRIBUTED=0 && \
+    cmake .. -DENABLE_CUDA=ON -DGPU_COMPUTE_CAPABILITY=80 -DENABLE_DISTRIBUTION=OFF && \
     make -j$(nproc) && \
     cp QuEST/libQuEST.so /app/libs/ || echo "Warning: Could not copy QuEST lib" && \
     rm -rf /tmp/QuEST
