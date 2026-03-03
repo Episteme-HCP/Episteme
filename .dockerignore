@@ -8,13 +8,9 @@
 .vscode
 *.iml
 
-# Maven outputs (except the server target we actually need)
+# Maven outputs
 target/
-*/target/
-!episteme-server/target/episteme-server-*.jar
-!episteme-server/target/lib/
-!episteme-benchmarks/target/episteme-benchmarks-*.jar
-!episteme-benchmarks/target/lib/
+**/target/
 
 # Local Python Environments
 *.venv
