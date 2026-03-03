@@ -20,6 +20,7 @@
         <maven.compiler.target>25</maven.compiler.target>
         <cuda.exclude.1>none</cuda.exclude.1>
         <cuda.exclude.2>none</cuda.exclude.2>
+        <cuda.exclude.3>none</cuda.exclude.3>
     </properties>
 
     <dependencies>
@@ -143,6 +144,7 @@
                     <excludes>
                         <exclude>${cuda.exclude.1}</exclude>
                         <exclude>${cuda.exclude.2}</exclude>
+                        <exclude>${cuda.exclude.3}</exclude>
                         <exclude>module-info.java</exclude>
                     </excludes>
                 </configuration>
@@ -172,12 +174,17 @@
     <profiles>
         <!-- JCuda profiles for supported architectures -->
         <profile>
-            <id>jcuda-x86_64</id>
+            <id>jcuda-linux-x86_64</id>
             <activation>
                 <os>
+                    <family>unix</family>
                     <arch>amd64</arch>
                 </os>
             </activation>
+            <properties>
+                <cuda.exclude.1>none</cuda.exclude.1>
+                <cuda.exclude.2>none</cuda.exclude.2>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.jcuda</groupId>
@@ -234,21 +241,11 @@
                     <family>mac</family>
                 </os>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/cuda/**</exclude>
-                                <exclude>**/*CUDA*.java</exclude>
-                                <exclude>module-info.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <cuda.exclude.1>**/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>**/*CUDA*.java</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
+            </properties>
         </profile>
         <profile>
             <id>no-cuda-arm</id>
@@ -257,21 +254,11 @@
                     <arch>aarch64</arch>
                 </os>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/cuda/**</exclude>
-                                <exclude>**/*CUDA*.java</exclude>
-                                <exclude>module-info.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <cuda.exclude.1>**/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>**/*CUDA*.java</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
+            </properties>
         </profile>
     </profiles>
 </project>
