@@ -4,7 +4,7 @@ FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget curl git build-essential cmake libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev \
+    wget curl git build-essential cmake pkg-config libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
@@ -12,7 +12,7 @@ WORKDIR /build
 # Compile QuEST (GPU)
 RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     cd /tmp/QuEST && mkdir build && cd build && \
-    cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DGPU_COMPUTE_CAPABILITY=80 -DENABLE_DISTRIBUTION=OFF && \
+    cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DCMAKE_CUDA_ARCHITECTURES=75 -DGPU_COMPUTE_CAPABILITY=75 -DENABLE_DISTRIBUTION=OFF && \
     make -j$(nproc) && \
     mkdir -p /build/libs && cp QuEST/libQuEST.so /build/libs/
 
