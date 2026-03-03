@@ -203,9 +203,13 @@
             <activation>
                 <os>
                     <family>windows</family>
-                    <arch>x86_64</arch>
+                    <arch>amd64</arch>
                 </os>
             </activation>
+            <properties>
+                <cuda.exclude.1>none</cuda.exclude.1>
+                <cuda.exclude.2>none</cuda.exclude.2>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.jcuda</groupId>
