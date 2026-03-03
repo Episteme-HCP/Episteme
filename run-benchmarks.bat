@@ -106,7 +106,9 @@ if defined USE_SHADED_JAR (
     if not exist "%DEPENDENCY_DIR%" (
         echo [INFO] Dependencies not found in target, copying...
         call mvn dependency:copy-dependencies -pl episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests
-    )
+    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %* %EXTRA_ARGS%
+)
+
 rem --- Post-Processing: PDF Generation ---
 if "%GENERATE_PDF%"=="true" (
     echo.
