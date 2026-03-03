@@ -3,11 +3,28 @@ setlocal
 
 rem --- Argument Parsing ---
 set APP_CLASS=org.episteme.benchmarks.ui.Launcher
+set EXPORT_FILE=
+set GENERATE_PDF=false
+
 for %%a in (%*) do (
     if "%%a"=="--cli" set APP_CLASS=org.episteme.benchmarks.cli.BenchmarkCLI
     if "%%a"=="--shaded" set USE_SHADED_JAR=true
     if "%%a"=="-jar" set USE_SHADED_JAR=true
+    if "%%a"=="--pdf" set GENERATE_PDF=true
+    
+    set "ARG=%%a"
+    if "!ARG:~0,14!"=="--export-file=" (
+        set "EXPORT_FILE=!ARG:~14!"
+    )
 )
+
+if "%GENERATE_PDF%"=="true" (
+    if "%EXPORT_FILE%"=="" (
+        set EXPORT_FILE=benchmark-results.json
+        set EXTRA_ARGS=--export-file=benchmark-results.json
+    )
+)
+
 set JAR_PATH=episteme-benchmarks\target\episteme-benchmarks-1.0.0-SNAPSHOT.jar
 set LIB_DIR=launchers\lib
 set DEPENDENCY_DIR=episteme-benchmarks\target\lib
@@ -89,8 +106,19 @@ if defined USE_SHADED_JAR (
         echo [INFO] Dependencies not found in target, copying...
         call mvn dependency:copy-dependencies -pl episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests
     )
-    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %*
+    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %* %EXTRA_ARGS%
+)
 
+rem --- Post-Processing: PDF Generation ---
+if "%GENERATE_PDF%"=="true" (
+    echo.
+    echo [INFO] Generating PDF Report from %EXPORT_FILE%...
+    where python >nul 2>nul
+    if %ERRORLEVEL% equ 0 (
+        python plot_benchmarks.py %EXPORT_FILE%
+    ) else (
+        echo [WARNING] Python not found. Skipping PDF generation.
+    )
 )
 
 echo.

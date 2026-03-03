@@ -9,6 +9,9 @@ MODULE_PATH="episteme-benchmarks/target/classes:episteme-core/target/classes:epi
 USE_SHADED=false
 
 # Parse arguments
+EXPORT_FILE=""
+GENERATE_PDF=false
+
 for arg in "$@"
 do
     if [ "$arg" == "--cli" ]; then
@@ -17,7 +20,20 @@ do
     if [ "$arg" == "--shaded" ] || [ "$arg" == "-jar" ]; then
         USE_SHADED=true
     fi
+    if [[ "$arg" == --export-file=* ]]; then
+        EXPORT_FILE="${arg#*=}"
+    fi
+    if [ "$arg" == "--pdf" ]; then
+        GENERATE_PDF=true
+    fi
 done
+
+# If PDF requested but no export file, set a default
+if [ "$GENERATE_PDF" = true ] && [ -z "$EXPORT_FILE" ]; then
+    EXPORT_FILE="benchmark-results.json"
+    # Append the default export file to arguments if not already present
+    set -- "$@" "--export-file=$EXPORT_FILE"
+fi
 
 # --- Environment Setup ---
 export NATIVE_ROOT="/opt/episteme-native"
@@ -91,4 +107,17 @@ else
         mvn dependency:copy-dependencies -pl episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests
     fi
     java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "${MODULE_PATH}:${DEPENDENCY_DIR}/*:${LIB_DIR}/*" "${APP_CLASS}" "$@"
+fi
+
+# --- Post-Processing: PDF Generation ---
+if [ "$GENERATE_PDF" = true ]; then
+    echo ""
+    echo "[INFO] Generating PDF Report from $EXPORT_FILE..."
+    if command -v python3 &>/dev/null; then
+        python3 plot_benchmarks.py "$EXPORT_FILE"
+    elif command -v python &>/dev/null; then
+        python plot_benchmarks.py "$EXPORT_FILE"
+    else
+        echo "[WARNING] Python not found. Skipping PDF generation."
+    fi
 fi
