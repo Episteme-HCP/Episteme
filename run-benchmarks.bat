@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 
 rem --- Argument Parsing ---
 set APP_CLASS=org.episteme.benchmarks.ui.Launcher
@@ -7,18 +7,21 @@ set EXPORT_FILE=
 set GENERATE_PDF=false
 set EXTRA_ARGS=
 
-for %%a in (%*) do (
-    set "ARG=%%a"
-    if "%%a"=="--cli" set APP_CLASS=org.episteme.benchmarks.cli.BenchmarkCLI
-    if "%%a"=="--shaded" set USE_SHADED_JAR=true
-    if "%%a"=="-jar" set USE_SHADED_JAR=true
-    if "%%a"=="--pdf" set GENERATE_PDF=true
-    
-    if "!ARG:~0,14!"=="--export-file=" (
-        set "EXPORT_FILE=!ARG:~14!"
-    )
-)
+:parse_args
+if "%~1"=="" goto end_parse
+if "%~1"=="--cli" set APP_CLASS=org.episteme.benchmarks.cli.BenchmarkCLI
+if "%~1"=="--shaded" set USE_SHADED_JAR=true
+if "%~1"=="-jar" set USE_SHADED_JAR=true
+if "%~1"=="--pdf" set GENERATE_PDF=true
 
+set "ARG=%~1"
+if "%ARG:~0,14%"=="--export-file=" (
+    set "EXPORT_FILE=%ARG:~14%"
+)
+shift
+goto parse_args
+
+:end_parse
 if "%GENERATE_PDF%"=="true" (
     if "%EXPORT_FILE%"=="" (
         set "EXPORT_FILE=benchmark-results.json"
@@ -120,7 +123,7 @@ if "%GENERATE_PDF%"=="true" (
         "%EPISTEME_PYTHON%" plot_benchmarks.py %EXPORT_FILE%
     ) else (
         where python >nul 2>nul
-        if !ERRORLEVEL! equ 0 (
+        if %ERRORLEVEL% equ 0 (
             python plot_benchmarks.py %EXPORT_FILE%
         ) else (
             echo [WARNING] Python not found ^(%EPISTEME_PYTHON%^). Skipping PDF generation.

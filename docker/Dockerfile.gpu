@@ -1,124 +1,75 @@
-# Episteme GPU-Enabled Server Dockerfile
-# Based on official NVIDIA CUDA images (Ubuntu 22.04 base)
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+# --- Stage 1: Builder (Devel Image) ---
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS builder
 
-# Avoid tzdata interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install base system dependencies
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    wget \
-    curl \
-    git \
-    software-properties-common \
-    python3 \
-    python3-pip \
-    python3-venv \
-    build-essential \
-    cmake \
-    libvlc-dev \
-    vlc-plugin-base \
-    vlc-plugin-video-output \
-    libhdf5-dev \
-    libfftw3-dev \
-    libopenblas-dev \
-    libportaudio2 \
-    portaudio19-dev \
-    libsnappy-dev \
-    libzstd-dev \
-    zlib1g-dev \
-    apt-transport-https \
-    gnupg \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget curl git build-essential cmake libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Add Apache Arrow Repository for Ubuntu 22.04 (jammy)
-RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
-    && apt-get install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y -V \
-    libarrow-dev \
-    libarrow-dataset-dev \
-    libparquet-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
 
-# Install OpenJDK 25.0.2 GA
-RUN wget https://download.java.net/java/GA/jdk25.0.2/b1e0dfa218384cb9959bdcb897162d4e/10/GPL/openjdk-25.0.2_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz && \
-    mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 && \
-    tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 && \
-    rm /tmp/jdk25.tar.gz
+# Compile QuEST (GPU)
+RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
+    cd /tmp/QuEST && mkdir build && cd build && \
+    cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DGPU_COMPUTE_CAPABILITY=80 -DENABLE_DISTRIBUTION=OFF && \
+    make -j$(nproc) && \
+    mkdir -p /build/libs && cp QuEST/libQuEST.so /build/libs/
 
-# Set Java Context
-ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
-ENV PATH="$JAVA_HOME/bin:$PATH"
+# Compile Bullet
+RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
+    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -S . -B build && \
+    cmake --build build -j$(nproc) && \
+    cp build/src/BulletDynamics/libBulletDynamics.so /build/libs/libbulletc.so
 
-# Setup Python Qiskit Environment
+# Compile Episteme Native Vision
+COPY build_vision.sh /build/build_vision.sh
+COPY episteme-native/ /build/episteme-native/
+RUN chmod +x /build/build_vision.sh && ./build_vision.sh
+
+# --- Stage 2: Final (Runtime Image) ---
+FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget curl python3 python3-pip python3-venv \
+    libvlc-dev vlc-plugin-base libhdf5-dev libfftw3-dev libopenblas-dev libportaudio2 \
+    libsnappy-dev libzstd-dev zlib1g-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install scientifiques python pour le plot
 RUN python3 -m venv /opt/qiskit_env && \
     /opt/qiskit_env/bin/pip install --no-cache-dir qiskit qiskit-nature pandas matplotlib seaborn
 ENV EPISTEME_PYTHON=/opt/qiskit_env/bin/python
 
+# Install OpenJDK 25
+RUN wget https://download.java.net/java/GA/jdk25.0.2/b1e0dfa218384cb9959bdcb897162d4e/10/GPL/openjdk-25.0.2_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz && \
+    mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 && \
+    tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 && \
+    rm /tmp/jdk25.tar.gz
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="$JAVA_HOME/bin:$PATH"
 
 WORKDIR /app
-
-# The build context should be the root of the project.
-# We assume 'mvn package -DskipTests' was run on the host or in an Alpine builder stage prior.
-# We simply copy the built JARs and dependencies.
 COPY episteme-server/target/episteme-server-*.jar /app/server.jar
 COPY episteme-server/target/lib /app/lib
 COPY libs /app/libs
-
-# Copy Benchmarks JAR so Diagnostic tools can execute
 COPY episteme-benchmarks/target/episteme-benchmarks-*.jar /app/benchmarks.jar
 COPY episteme-benchmarks/target/lib /app/lib/
 
-# Copy Execution Scripts
-COPY run_diagnostic.sh /app/run_diagnostic.sh
-COPY run-benchmarks.sh /app/run-benchmarks.sh
+# Copy compiled libs from builder
+COPY --from=builder /build/libs/ /app/libs/
+COPY --from=builder /build/episteme-native/src/main/resources/linux-x86_64/libepisteme_vision.so /app/libs/
+
+COPY run_diagnostic.sh run-benchmarks.sh plot_benchmarks.py /app/
 RUN chmod +x /app/*.sh
 
-# Native configuration
 ENV LD_LIBRARY_PATH="/app/libs:/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
 ENV CUDA_PATH="/usr/local/cuda"
-
-# 1. Compile Bullet Physics (C-API subset proxy to bulletc if needed)
-RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
-    cd /tmp/bullet3 && \
-    cmake -DBUILD_SHARED_LIBS=ON \
-          -DBUILD_CPU_DEMOS=OFF \
-          -DBUILD_OPENGL3_DEMOS=OFF \
-          -DBUILD_BULLET2_DEMOS=OFF \
-          -DBUILD_EXTRAS=OFF \
-          -DBUILD_UNIT_TESTS=OFF \
-          -S . -B build && \
-    cmake --build build -j$(nproc) && \
-    mkdir -p /app/libs && \
-    cp build/src/BulletDynamics/libBulletDynamics.so /app/libs/libbulletc.so || echo "Warning: Could not copy Bullet libs" && \
-    rm -rf /tmp/bullet3
-
-# 2. Compile QuEST Quantum Simulator (GPU Accelerated)
-RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
-    cd /tmp/QuEST && \
-    mkdir build && cd build && \
-    cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DGPU_COMPUTE_CAPABILITY=80 -DENABLE_DISTRIBUTION=OFF && \
-    make -j$(nproc) && \
-    cp QuEST/libQuEST.so /app/libs/ || echo "Warning: Could not copy QuEST lib" && \
-    rm -rf /tmp/QuEST
-
-# 3. Compile Episteme Native Vision & Native components
-COPY build_vision.sh /app/build_vision.sh
-COPY episteme-native/ /app/episteme-native/
-RUN chmod +x /app/build_vision.sh && /app/build_vision.sh && \
-    cp /app/episteme-native/src/main/resources/linux-x86_64/libepisteme_vision.so /app/libs/ || echo "Warning: Could not copy Vision lib"
-
-# Expose NVIDIA devices
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 EXPOSE 50051
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
-
-ENTRYPOINT ["java", "--add-modules", "jdk.incubator.vector", "--enable-native-access=ALL-UNNAMED", "-Djava.library.path=/app/libs", "-cp", "server.jar:lib/*", "org.episteme.server.server.EpistemeApplication"]
-CMD []
+ENTRYPOINT ["java", "--add-modules", "jdk.incubator.vector", "--enable-native-access=ALL-UNNAMED", "-Djava.library.path=/app/libs", "-cp", "benchmarks.jar:server.jar:lib/*", "org.episteme.benchmarks.cli.BenchmarkCLI"]
+CMD ["--help"]
