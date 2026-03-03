@@ -246,9 +246,9 @@
                 </os>
             </activation>
             <properties>
-                <cuda.exclude.1>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.1>
-                <cuda.exclude.2>org/episteme/nativ/technical/backend/gpu/cuda/CUDAExecutionContext.java</cuda.exclude.2>
-                <cuda.exclude.3>org/episteme/nativ/mathematics/tensors/backends/NativeCUDATensorBackend.java</cuda.exclude.3>
+                <cuda.exclude.1>**/*CUDA*</cuda.exclude.1>
+                <cuda.exclude.2>**/*Cuda*</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
             </properties>
         </profile>
         <profile>
@@ -259,9 +259,9 @@
                 </os>
             </activation>
             <properties>
-                <cuda.exclude.1>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.1>
-                <cuda.exclude.2>org/episteme/nativ/technical/backend/gpu/cuda/CUDAExecutionContext.java</cuda.exclude.2>
-                <cuda.exclude.3>org/episteme/nativ/mathematics/tensors/backends/NativeCUDATensorBackend.java</cuda.exclude.3>
+                <cuda.exclude.1>**/*CUDA*</cuda.exclude.1>
+                <cuda.exclude.2>**/*Cuda*</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
             </properties>
         </profile>
     </profiles>
