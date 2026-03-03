@@ -1,6 +1,12 @@
 #include <cstdint>
 #include <algorithm>
 
+#if defined(_WIN32)
+    #define EPISTEME_EXPORT __declspec(dllexport)
+#else
+    #define EPISTEME_EXPORT __attribute__((visibility("default")))
+#endif
+
 extern "C" {
     /**
      * Optimized image processing loop for Project Panama.
@@ -10,7 +16,7 @@ extern "C" {
      * @param height Image height
      * @param opCode Operation to perform (1: Grayscale, 2: Invert, 3: Sepia)
      */
-    __declspec(dllexport) void process_image(int32_t* pixels, int32_t width, int32_t height, int32_t opCode) {
+    EPISTEME_EXPORT void process_image(int32_t* pixels, int32_t width, int32_t height, int32_t opCode) {
         int32_t length = width * height;
         
         // Use a simple loop that the compiler can auto-vectorize with AVX2/AVX-512
