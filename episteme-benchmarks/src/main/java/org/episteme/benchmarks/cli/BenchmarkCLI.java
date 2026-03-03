@@ -45,9 +45,20 @@ public class BenchmarkCLI {
             }
         }
 
-        // Safety: if PDF is requested, we NEED an export file for results
-        if (generatePdf && exportFile == null) {
-            exportFile = "benchmark-results.json";
+        // Default export logic: specialized directory and timestamped filename
+        if (exportFile == null) {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+            // Ensure docs/benchmark_results directory exists
+            String dirPath = "docs/benchmark_results";
+            new File(dirPath).mkdirs();
+            
+            exportFile = dirPath + "/benchmark-results-" + timestamp + ".json";
+        } else {
+            // If user provided a path, ensure parent directory exists
+            File f = new File(exportFile);
+            if (f.getParentFile() != null && !f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+            }
         }
 
         if (!runAll) {
