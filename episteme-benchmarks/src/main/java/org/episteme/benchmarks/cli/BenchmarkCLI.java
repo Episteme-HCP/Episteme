@@ -152,29 +152,40 @@ public class BenchmarkCLI {
             StringBuilder json = new StringBuilder();
             json.append("{\n");
             
-            // Metadata
-            json.append("  \"metadata\": {\n");
+            // Metadata -> context
+            json.append("  \"context\": {\n");
+            json.append(String.format("    \"java_version\": \"%s\",\n", escape(System.getProperty("java.version"))));
             json.append(String.format("    \"os_name\": \"%s\",\n", escape(System.getProperty("os.name"))));
             json.append(String.format("    \"os_arch\": \"%s\",\n", escape(System.getProperty("os.arch"))));
-            json.append(String.format("    \"java_version\": \"%s\",\n", escape(System.getProperty("java.version"))));
             json.append(String.format("    \"processors\": %d,\n", Runtime.getRuntime().availableProcessors()));
-            json.append(String.format("    \"timestamp\": \"%s\"\n", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+            json.append(String.format("    \"timestamp\": \"%s\"\n", java.time.Instant.now().toString()));
             json.append("  },\n");
 
-            // Results
-            json.append("  \"results\": [\n");
+            // Results -> runs
+            json.append("  \"runs\": [\n");
             for (int i = 0; i < results.size(); i++) {
                 BenchmarkResult r = results.get(i);
-                json.append("    {\n");
-                json.append(String.format("      \"name\": \"%s\",\n", escape(r.item.getName())));
-                json.append(String.format("      \"backend\": \"%s\",\n", escape(r.item.backendProperty().get())));
-                json.append(String.format("      \"provider\": \"%s\",\n", escape(r.item.providerProperty().get())));
-                json.append(String.format("      \"library\": \"%s\",\n", escape(r.item.libraryProperty().get())));
-                json.append(String.format("      \"domain\": \"%s\",\n", escape(r.item.getDomain())));
-                json.append(String.format("      \"status\": \"%s\",\n", escape(r.status)));
-                json.append(String.format(Locale.US, "      \"ops_per_sec\": %.4f,\n", r.score));
-                json.append(String.format(Locale.US, "      \"p99_ms\": %.4f\n", r.p99));
-                json.append("    }");
+                
+                String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                String resultText;
+                if ("SUCCESS".equals(r.status)) {
+                    if (r.score < 1.0) resultText = String.format(Locale.US, "%.5f ops/s", r.score);
+                    else if (r.score < 100.0) resultText = String.format(Locale.US, "%.3f ops/s", r.score);
+                    else resultText = String.format(Locale.US, "%.2f ops/s", r.score);
+                } else {
+                    resultText = r.status;
+                }
+                
+                json.append("    {");
+                json.append(String.format("\"date\":\"%s\",", escape(dateStr)));
+                json.append(String.format("\"name\":\"%s\",", escape(r.item.getName())));
+                json.append(String.format("\"backend\":\"%s\",", escape(r.item.backendProperty().get())));
+                json.append(String.format("\"provider\":\"%s\",", escape(r.item.providerProperty().get())));
+                json.append(String.format("\"library\":\"%s\",", escape(r.item.libraryProperty().get())));
+                json.append(String.format("\"domain\":\"%s\",", escape(r.item.getDomain())));
+                json.append(String.format("\"result\":\"%s\"", escape(resultText)));
+                json.append("}");
+                
                 if (i < results.size() - 1) json.append(",");
                 json.append("\n");
             }
