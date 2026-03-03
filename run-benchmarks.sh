@@ -12,6 +12,8 @@ USE_SHADED=false
 EXPORT_FILE=""
 GENERATE_PDF=false
 
+RUN_DIAGNOSTIC=false
+
 for arg in "$@"
 do
     if [ "$arg" == "--cli" ]; then
@@ -26,7 +28,19 @@ do
     if [ "$arg" == "--pdf" ]; then
         GENERATE_PDF=true
     fi
+    if [ "$arg" == "--diagnostic" ]; then
+        RUN_DIAGNOSTIC=true
+    fi
 done
+
+if [ "$RUN_DIAGNOSTIC" = true ]; then
+    if [ -f "./run_diagnostic.sh" ]; then
+        chmod +x ./run_diagnostic.sh
+        ./run_diagnostic.sh
+    else
+        echo "[WARN] run_diagnostic.sh not found."
+    fi
+fi
 
 # If PDF requested but no export file, set a default
 if [ "$GENERATE_PDF" = true ] && [ -z "$EXPORT_FILE" ]; then
