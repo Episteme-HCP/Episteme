@@ -27,8 +27,6 @@ WORKDIR /build
 
 # 1. Compile Native Components (QuEST, Bullet)
 # These don't depend on project files, so they cache well.
-# Note: QuEST CMake produces libQuEST.so in the build root or subroot. 
-# We use find to be robust.
 RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     cd /tmp/QuEST && mkdir build && cd build && \
     cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DCMAKE_CUDA_ARCHITECTURES=75 -DGPU_COMPUTE_CAPABILITY=75 -DENABLE_DISTRIBUTION=OFF && \
@@ -40,8 +38,17 @@ RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet
     cmake --build build -j$(nproc) && \
     find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \;
 
-# 2. Compile Episteme Native Vision & Java Project
-# We copy the source AFTER native compilation to leverage caching.
+# 2. Prepare for Java Build
+# We copy internal libs first to install them in the local repo
+COPY libs /build/libs_local
+RUN mvn install:install-file \
+    -Dfile=/build/libs_local/mpj.jar \
+    -DgroupId=org.mpjexpress \
+    -DartifactId=mpj \
+    -Dversion=0.44 \
+    -Dpackaging=jar
+
+# 3. Compile Episteme Native Vision & Java Project
 COPY . /build/
 RUN chmod +x /build/build_vision.sh && ./build_vision.sh && \
     find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
@@ -58,7 +65,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsnappy-dev libzstd-dev zlib1g-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install scientifiques python pour le plot (Mostly legacy now as we use Java)
+# Install scientifiques python pour le plot (Legacy)
 RUN python3 -m venv /opt/qiskit_env && \
     /opt/qiskit_env/bin/pip install --no-cache-dir qiskit qiskit-nature pandas matplotlib seaborn
 ENV EPISTEME_PYTHON=/opt/qiskit_env/bin/python
