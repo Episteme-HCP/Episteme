@@ -177,7 +177,7 @@
             <id>jcuda-linux-x86_64</id>
             <activation>
                 <os>
-                    <family>unix</family>
+                    <name>linux</name>
                     <arch>amd64</arch>
                 </os>
             </activation>
@@ -246,9 +246,9 @@
                 </os>
             </activation>
             <properties>
-                <cuda.exclude.1>**/cuda/**</cuda.exclude.1>
-                <cuda.exclude.2>**/*CUDA*.java</cuda.exclude.2>
-                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
+                <cuda.exclude.1>**/gpu/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>**/CUDAExecutionContext.java</cuda.exclude.2>
+                <cuda.exclude.3>**/CUDAQuantumBackend.java</cuda.exclude.3>
             </properties>
         </profile>
         <profile>
@@ -259,9 +259,9 @@
                 </os>
             </activation>
             <properties>
-                <cuda.exclude.1>**/cuda/**</cuda.exclude.1>
-                <cuda.exclude.2>**/*CUDA*.java</cuda.exclude.2>
-                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
+                <cuda.exclude.1>**/gpu/cuda/**</cuda.exclude.1>
+                <cuda.exclude.2>**/CUDAExecutionContext.java</cuda.exclude.2>
+                <cuda.exclude.3>**/CUDAQuantumBackend.java</cuda.exclude.3>
             </properties>
         </profile>
     </profiles>

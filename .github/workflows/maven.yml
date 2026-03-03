@@ -49,7 +49,7 @@ jobs:
       continue-on-error: true
       run: |
         java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED \
-        -cp "episteme-benchmarks/target/episteme-benchmarks-1.0.0-SNAPSHOT.jar:episteme-benchmarks/target/lib/*" \
+        -cp "episteme-benchmarks/target/episteme-benchmarks-1.0.0-beta1.jar:episteme-benchmarks/target/lib/*" \
         org.episteme.benchmarks.cli.BenchmarkCLI --run-all --export-file benchmark-results.json
 
     - name: Upload Benchmark Results
