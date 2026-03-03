@@ -172,10 +172,9 @@
     <profiles>
         <!-- JCuda profiles for supported architectures -->
         <profile>
-            <id>jcuda-linux-x86_64</id>
+            <id>jcuda-x86_64</id>
             <activation>
                 <os>
-                    <family>linux</family>
                     <arch>amd64</arch>
                 </os>
             </activation>

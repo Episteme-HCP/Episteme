@@ -9,6 +9,8 @@ import java.lang.foreign.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Robust native library loader using Project Panama (Foreign Function & Memory API).
@@ -22,8 +24,10 @@ import java.util.Optional;
  */
 public class NativeLibraryLoader {
 
+    private static final Logger logger = LoggerFactory.getLogger(NativeLibraryLoader.class);
     private static final Linker LINKER = Linker.nativeLinker();
     private static final java.util.Set<String> FAILED_LIBS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final java.util.Set<String> FAILED_VARIANTS = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     /**
      * Finds the "libs" directory by searching upwards from user.dir.
@@ -143,7 +147,9 @@ public class NativeLibraryLoader {
                     SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
                     return Optional.of(lookup);
                 } catch (Exception e) {
-                    System.err.println("[DEBUG] NativeLibraryLoader: System load failed for " + variant + " in libs: " + e.toString());
+                    if (FAILED_VARIANTS.add(variant)) {
+                        logger.debug("System load failed for {} in libs: {}", variant, e.toString());
+                    }
                 }
 
             // 2. Try custom search paths
@@ -175,20 +181,21 @@ public class NativeLibraryLoader {
                     for (java.io.File sub : subDirs) {
                         Optional<SymbolLookup> found = tryLoadFromDirectory(sub.toPath(), currentMapped, arena);
                         if (found.isPresent()) {
-                            System.out.println("[INFO] NativeLibraryLoader: Successfully loaded " + variant + " from subdirectory: " + sub.getName());
-                            System.out.flush();
+                            logger.info("Successfully loaded {} from subdirectory: {}", variant, sub.getName());
                             return found;
                         } else {
-                            System.err.println("[DEBUG] NativeLibraryLoader: Library '" + variant + "' could not be loaded from subdirectory: " + sub.getName());
+                            if (FAILED_VARIANTS.add(variant + "@" + sub.getName())) {
+                                logger.trace("Library '{}' could not be loaded from subdirectory: {}", variant, sub.getName());
+                            }
                         }
                     }
                 }
             }
         }
         
-        System.err.println("[WARNING] Could not find or load native library " + libName + " (tried variants: " + variants + ")");
-        System.err.flush();
-        FAILED_LIBS.add(libName);
+        if (FAILED_LIBS.add(libName)) {
+            logger.warn("Could not find or load native library {} (tried variants: {})", libName, variants);
+        }
         return Optional.empty();
     }
 
@@ -214,7 +221,9 @@ public class NativeLibraryLoader {
                     }
                     return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
                 } catch (Throwable t) {
-                    System.err.println("[ERROR] NativeLibraryLoader: Failed to load " + fullPath + " : " + t.getMessage());
+                    if (FAILED_VARIANTS.add(fullPath.toString())) {
+                        logger.debug("Failed to load native library at {}: {}", fullPath, t.getMessage());
+                    }
                 }
             }
             
@@ -226,11 +235,9 @@ public class NativeLibraryLoader {
                 }
             }
         } catch (Throwable t) {
-            System.err.println("[ERROR] NativeLibraryLoader: Failed to load " + mappedName + " from " + logPath + ": " + t.getMessage());
-            if (t.getCause() != null) {
-                System.err.println("  Cause: " + t.getCause().getMessage());
+            if (FAILED_VARIANTS.add(mappedName + "@" + logPath)) {
+                logger.trace("Failed to load {} from {}: {}", mappedName, logPath, t.getMessage());
             }
-            System.err.flush();
         }
         return Optional.empty();
     }
@@ -257,7 +264,7 @@ public class NativeLibraryLoader {
 
     public static void clearCache() {
         FAILED_LIBS.clear();
-        System.out.println("[INFO] NativeLibraryLoader: Failure cache cleared.");
-        System.out.flush();
+        FAILED_VARIANTS.clear();
+        logger.info("Failure cache cleared.");
     }
 }

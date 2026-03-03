@@ -55,7 +55,7 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Setup Python Qiskit Environment
 RUN python3 -m venv /opt/qiskit_env && \
-    /opt/qiskit_env/bin/pip install --no-cache-dir qiskit qiskit-nature
+    /opt/qiskit_env/bin/pip install --no-cache-dir qiskit qiskit-nature pandas matplotlib seaborn
 ENV EPISTEME_PYTHON=/opt/qiskit_env/bin/python
 
 

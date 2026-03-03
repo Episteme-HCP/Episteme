@@ -6,12 +6,17 @@ from matplotlib.backends.backend_pdf import PdfPages
 import os
 import sys
 
-def plot_benchmarks(json_path, output_pdf="benchmark_report.pdf"):
+def plot_benchmarks(json_path, output_pdf=None):
     if not os.path.exists(json_path):
         print(f"Error: {json_path} not found.")
         return
 
-    with open(json_path, 'r') as f:
+    # If no output path, use JSON folder + .pdf
+    if output_pdf is None:
+        base, _ = os.path.splitext(json_path)
+        output_pdf = base + ".pdf"
+    
+    with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     # Convert to DataFrame
@@ -64,11 +69,17 @@ def plot_benchmarks(json_path, output_pdf="benchmark_report.pdf"):
             # Extract numerical value from result (e.g. "123.45 ops/s")
             def extract_score(s):
                 try:
-                    return float(s.split(' ')[0])
+                    # Handle "N/A" or status strings
+                    parts = s.split(' ')
+                    if not parts: return 0.0
+                    return float(parts[0])
                 except:
                     return 0.0
             
             domain_df['score_val'] = domain_df['result'].apply(extract_score)
+            domain_df = domain_df[domain_df['score_val'] > 0] # Filter out failures
+            
+            if domain_df.empty: continue
             
             # Create labels for bars: Name + Library
             domain_df['label'] = domain_df['name'] + "\n(" + domain_df['library'] + ")"
