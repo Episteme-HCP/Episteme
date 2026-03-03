@@ -26,20 +26,26 @@ ENV PATH="/opt/maven/bin:${PATH}"
 WORKDIR /build
 
 # 1. Compile Native Components (QuEST, Bullet)
+# These don't depend on project files, so they cache well.
+# Note: QuEST CMake produces libQuEST.so in the build root or subroot. 
+# We use find to be robust.
 RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     cd /tmp/QuEST && mkdir build && cd build && \
     cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DCMAKE_CUDA_ARCHITECTURES=75 -DGPU_COMPUTE_CAPABILITY=75 -DENABLE_DISTRIBUTION=OFF && \
     make -j$(nproc) && \
-    mkdir -p /build/libs && cp QuEST/libQuEST.so /build/libs/
+    mkdir -p /build/libs && find . -name "libQuEST.so" -exec cp {} /build/libs/ \;
 
 RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
     cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -S . -B build && \
     cmake --build build -j$(nproc) && \
-    cp build/src/BulletDynamics/libBulletDynamics.so /build/libs/libbulletc.so
+    find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \;
 
-# 2. Compile Java Project (Self-contained build)
+# 2. Compile Episteme Native Vision & Java Project
+# We copy the source AFTER native compilation to leverage caching.
 COPY . /build/
-RUN mvn clean package -DskipTests
+RUN chmod +x /build/build_vision.sh && ./build_vision.sh && \
+    find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
+    mvn clean package -DskipTests
 
 # --- Stage 2: Final (Runtime Image) ---
 FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
@@ -52,7 +58,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsnappy-dev libzstd-dev zlib1g-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install scientifiques python pour le plot (Optional, since we moved to Java reporting, but keeping for compatibility)
+# Install scientifiques python pour le plot (Mostly legacy now as we use Java)
 RUN python3 -m venv /opt/qiskit_env && \
     /opt/qiskit_env/bin/pip install --no-cache-dir qiskit qiskit-nature pandas matplotlib seaborn
 ENV EPISTEME_PYTHON=/opt/qiskit_env/bin/python
@@ -67,13 +73,12 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 WORKDIR /app
 
-# Copy artifacts from builder stage ( independent of host target folders )
+# Copy artifacts from builder stage
 COPY --from=builder /build/episteme-server/target/episteme-server-*.jar /app/server.jar
 COPY --from=builder /build/episteme-server/target/lib /app/lib
 COPY --from=builder /build/libs /app/libs
 COPY --from=builder /build/episteme-benchmarks/target/episteme-benchmarks-*.jar /app/benchmarks.jar
 COPY --from=builder /build/episteme-benchmarks/target/lib /app/lib/
-COPY --from=builder /build/episteme-native/src/main/resources/linux-x86_64/libepisteme_vision.so /app/libs/
 
 COPY run_diagnostic.sh run-benchmarks.sh /app/
 RUN chmod +x /app/*.sh
