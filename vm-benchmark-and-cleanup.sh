@@ -5,6 +5,13 @@
 # - Construit l'image GPU optimisée
 # - Lance les benchmarks avec accès GPU
 
+# --- [0/4] Configuration ---
+# On définit les dossiers de travail en premier pour éviter les erreurs de variable vide
+LOG_DIR="$(pwd)/tmp"
+RES_DIR="$(pwd)/docs/benchmark-results"
+mkdir -p "$LOG_DIR"
+mkdir -p "$RES_DIR"
+
 echo "--- [1/4] État de l'espace disque & Nettoyage ---"
 df -h / | grep /
 # Nettoyage Docker (Images orphelines, containers arrêtés, cache inutilisé)
@@ -23,7 +30,10 @@ fi
 # Store the hash of the current script to detect updates
 SCRIPT_HASH_BEFORE=$(md5sum "$0" | cut -d' ' -f1)
 
-git pull origin main
+# Pull depuis la branche courante (main ou master)
+CURRENT_BRANCH=$(git branch --show-current)
+echo "Mise à jour depuis la branche : $CURRENT_BRANCH"
+git pull origin "$CURRENT_BRANCH"
 
 SCRIPT_HASH_AFTER=$(md5sum "$0" | cut -d' ' -f1)
 
@@ -45,13 +55,6 @@ export DOCKER_BUILDKIT=1
 docker build -t episteme-gpu -f docker/Dockerfile.gpu . > "$LOG_DIR/docker_build.log" 2>&1
 
 echo "--- [4/4] Lancement des Benchmarks ---"
-# S'assurer que le dossier de résultats et tmp existent
-mkdir -p "$(pwd)/docs/benchmark-results"
-mkdir -p "$(pwd)/tmp"
-
-LOG_DIR="$(pwd)/tmp"
-RES_DIR="$(pwd)/docs/benchmark-results"
-
 echo "Exécution des diagnostics..."
 docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > "$LOG_DIR/diagnostic_output.txt" 2>&1
 
@@ -60,6 +63,11 @@ BENCH_ARGS="$@"
 if [ -z "$BENCH_ARGS" ]; then
     BENCH_ARGS="--run-all --domain \"Linear Algebra\" --exclude-provider ND4J --pdf"
     echo "Aucun argument fourni. Utilisation des filtres par défaut : $BENCH_ARGS"
+else
+    # Si des arguments sont fournis mais que --run-all manque, on le rajoute pour éviter l'erreur "Nothing to run"
+    if [[ ! "$BENCH_ARGS" =~ "--run-all" ]] && [[ ! "$BENCH_ARGS" =~ "--help" ]] && [[ ! "$BENCH_ARGS" =~ "--diagnostic" ]]; then
+        BENCH_ARGS="--run-all $BENCH_ARGS"
+    fi
 fi
 
 echo "Lancement des benchmarks : $BENCH_ARGS"
@@ -72,3 +80,4 @@ stdbuf -oL -eL docker run --rm --gpus all -v "$RES_DIR:/app/docs/benchmark-resul
 echo "Terminé ! Les résultats sont dans docs/benchmark-results/"
 echo "Les logs de console sont dans $LOG_DIR/console.txt"
 echo "Les logs de build sont dans $LOG_DIR/docker_build.log"
+echo "Les diagnostics sont dans $LOG_DIR/diagnostic_output.txt"
