@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-13]
       fail-fast: false # Don't cancel other OS jobs if one fails
 
     env:
@@ -39,7 +39,7 @@ jobs:
       # Currently skips tests because they are known to be broken.
       # TODO: Re-enable tests once Unit Tests are fixed.
       shell: bash
-      run: mvn -B -T 1C package -DskipTests -Djacoco.skip=true --file pom.xml
+      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true --file pom.xml
 
     - name: Run Benchmarks (CLI)
       # Run benchmarks and export JSON. 
@@ -48,11 +48,8 @@ jobs:
       shell: bash
       continue-on-error: true
       run: |
-        SEP=":"
-        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then SEP=";"; fi
-        java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED \
-        -cp "episteme-benchmarks/target/episteme-benchmarks-1.0.0-beta1.jar${SEP}episteme-benchmarks/target/lib/*" \
-        org.episteme.benchmarks.cli.BenchmarkCLI --run-all --export-file benchmark-results.json
+        mvn exec:java -pl episteme-benchmarks -Dexec.mainClass="org.episteme.benchmarks.cli.BenchmarkCLI" \
+        -Dexec.args="--run-all --export-file benchmark-results.json"
 
     - name: Upload Benchmark Results
       uses: actions/upload-artifact@v4
