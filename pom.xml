@@ -89,6 +89,10 @@
     <javacv.version>1.5.10</javacv.version>
     <opencv.version>4.9.0-1.5.10</opencv.version>
     <openblas.version>0.3.26-${javacpp.version}</openblas.version>
+    
+    <!-- Platform targeting to avoid downloading all binaries (e.g. Windows DLLs in Docker) -->
+    <javacpp.platform>${os.detected.classifier}</javacpp.platform>
+    
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
     <argLine></argLine>
   </properties>
@@ -607,28 +611,7 @@
       <name>JitPack</name>
       <url>https://jitpack.io</url>
     </repository>
-    <repository>
-      <id>jzy3d-releases</id>
-      <name>Jzy3d Releases</name>
-      <url>https://maven.jzy3d.org/releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>jzy3d-snapshots</id>
-      <name>Jzy3d Snapshots</name>
-      <url>https://maven.jzy3d.org/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-    <!-- Mirror for jzy3d on OSS Sonatype as fallback -->
-    <repository>
-      <id>oss-sonatype</id>
-      <name>OSS Sonatype</name>
-      <url>https://oss.sonatype.org/content/repositories/releases/</url>
-    </repository>
+    <!-- jzy3d repositories moved to 'ui-desktop' profile to avoid 429 errors in headless builds -->
     <repository>
       <id>tarsos-dsp</id>
       <name>TarsosDSP Repository</name>
@@ -683,6 +666,35 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>ui-desktop</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>jzy3d-releases</id>
+          <name>Jzy3d Releases</name>
+          <url>https://maven.jzy3d.org/releases</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>jzy3d-snapshots</id>
+          <name>Jzy3d Snapshots</name>
+          <url>https://maven.jzy3d.org/snapshots</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+        </repository>
+        <repository>
+          <id>oss-sonatype</id>
+          <name>OSS Sonatype</name>
+          <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+      </repositories>
     </profile>
   </profiles>
 </project>

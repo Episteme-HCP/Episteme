@@ -168,18 +168,37 @@
         <!-- HDF5 Native Library (for benchmarking) -->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>hdf5-platform</artifactId>
+            <artifactId>hdf5</artifactId>
             <version>1.14.3-1.5.10</version>
         </dependency>
-
-        <!-- JavaCV / OpenCV for Benchmarking -->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>javacv-platform</artifactId>
+            <artifactId>hdf5</artifactId>
+            <version>1.14.3-1.5.10</version>
+            <classifier>${javacpp.platform}</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv</artifactId>
+            <version>${javacv.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>opencv-platform</artifactId>
+            <artifactId>javacv</artifactId>
+            <version>${javacv.version}</version>
+            <classifier>${javacpp.platform}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>opencv</artifactId>
+            <version>${opencv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>opencv</artifactId>
+            <version>${opencv.version}</version>
+            <classifier>${javacpp.platform}</classifier>
         </dependency>
         <dependency>
             <groupId>org.jfree</groupId>

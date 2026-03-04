@@ -58,8 +58,8 @@ RUN --mount=type=cache,target=/root/.m2 mvn install:install-file \
 COPY . /build/
 RUN --mount=type=cache,target=/root/.m2 chmod +x /build/build_vision.sh && ./build_vision.sh && \
     find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
-    mvn install -DskipTests -Dmdep.skip=true && \
-    mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false && \
+    mvn install -DskipTests -Dmdep.skip=true -Djavacpp.platform=linux-x86_64 -P!ui-desktop && \
+    mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false -Djavacpp.platform=linux-x86_64 -P!ui-desktop && \
     for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-server/target/lib/; done && \
     for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-benchmarks/target/lib/; done
 
@@ -72,12 +72,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget curl python3 python3-pip python3-venv \
     libvlc-dev vlc-plugin-base libhdf5-dev libfftw3-dev libopenblas-dev libportaudio2 \
     libsnappy-dev libzstd-dev zlib1g-dev \
+    ocl-icd-libopencl1 \
     libxxf86vm1 libglu1-mesa libxrender1 libxtst6 libxi6 libgl1 libgl1-mesa-dri \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Fix library names for Episteme's NativeLibraryLoader
 RUN ln -s /usr/lib/x86_64-linux-gnu/libfftw3.so.3 /usr/lib/libfftw3.so && \
-    ln -s /usr/lib/x86_64-linux-gnu/libopenblas.so.0 /usr/lib/libopenblas.so
+    ln -s /usr/lib/x86_64-linux-gnu/libopenblas.so.0 /usr/lib/libopenblas.so && \
+    ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1 /usr/lib/libGL.so.1
 
 # Install scientifiques python pour le plot (Legacy)
 RUN python3 -m venv /opt/qiskit_env && \

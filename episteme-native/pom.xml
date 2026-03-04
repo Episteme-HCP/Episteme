@@ -65,14 +65,27 @@
         </dependency>
         <dependency>
             <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-native-platform</artifactId>
-            <version>1.0.0-M2.1</version>
+            <artifactId>nd4j-native</artifactId>
+            <version>${nd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native</artifactId>
+            <version>${nd4j.version}</version>
+            <classifier>${javacpp.platform}</classifier>
         </dependency>
 
         <!-- Apache Arrow (Native) -->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>arrow-platform</artifactId>
+            <artifactId>arrow</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>arrow</artifactId>
+            <version>${arrow.version}</version>
+            <classifier>${javacpp.platform}</classifier>
         </dependency>
 
         <!-- JOCL (OpenCL) -->
@@ -82,7 +95,6 @@
         </dependency>
 
         
-        <!-- FFTW (JavaCPP) -->
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>fftw</artifactId>
@@ -92,7 +104,7 @@
             <groupId>org.bytedeco</groupId>
             <artifactId>fftw</artifactId>
             <version>3.3.10-${javacpp.version}</version>
-            <classifier>windows-x86_64</classifier>
+            <classifier>${javacpp.platform}</classifier>
         </dependency>
                 
         <!-- AutoService for SPI generation -->
