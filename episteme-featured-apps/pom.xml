@@ -36,6 +36,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.episteme</groupId>
             <artifactId>episteme-native</artifactId>
             <version>${project.version}</version>
@@ -167,7 +172,6 @@
         </plugins>
     </build>
 
-    <profiles>
         <profile>
             <id>ui-desktop</id>
             <activation>
@@ -176,13 +180,6 @@
             <properties>
                 <jzy3d.exclude>none</jzy3d.exclude>
             </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jzy3d</groupId>
-                    <artifactId>jzy3d-api</artifactId>
-                    <version>1.0.0</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>headless</id>
