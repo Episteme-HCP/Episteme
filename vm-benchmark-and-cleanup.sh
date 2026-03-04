@@ -33,9 +33,17 @@ export DOCKER_BUILDKIT=1
 docker build -t episteme-gpu -f docker/Dockerfile.gpu .
 
 echo "--- [4/4] Lancement des Benchmarks ---"
-# S'assurer que le dossier de résultats existe
+# S'assurer que le dossier de résultats et tmp existent
 mkdir -p docs/benchmark-results
+mkdir -p tmp
+
+echo "Exécution des diagnostics..."
+docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > tmp/diagnostic_output.txt 2>&1
+
+echo "Lancement des benchmarks (Logging vers tmp/console.txt)..."
 # Lance le container avec accès au GPU et génère le PDF
-docker run --rm --gpus all -v "$(pwd)/docs/benchmark-results:/app/docs/benchmark-results" episteme-gpu --run-all --pdf
+# Redirection de la sortie vers tmp/console.txt pour analyse
+docker run --rm --gpus all -v "$(pwd)/docs/benchmark-results:/app/docs/benchmark-results" episteme-gpu --run-all --pdf 2>&1 | tee tmp/console.txt
 
 echo "Terminé ! Les résultats sont dans docs/benchmark-results/"
+echo "Les logs de console sont dans tmp/console.txt"

@@ -96,14 +96,16 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
             
             if (lookup.find("H5T_NATIVE_DOUBLE_g").isPresent()) {
                 MemorySegment seg = lookup.find("H5T_NATIVE_DOUBLE_g").get();
-                H5T_NATIVE_DOUBLE = seg.get(ValueLayout.JAVA_LONG, 0);
+                // hid_t can be 32 or 64 bits depending on the HDF5 build. 
+                // We try reading 8 bytes, and if it's 0 or looks suspicious, we might be on a 32-bit ID build.
+                H5T_NATIVE_DOUBLE = seg.byteSize() >= 8 ? seg.get(ValueLayout.JAVA_LONG, 0) : seg.get(ValueLayout.JAVA_INT, 0);
             } else {
                 H5T_NATIVE_DOUBLE = 0L;
             }
 
             if (lookup.find("H5P_CLS_DATASET_CREATE_ID_g").isPresent()) {
                  MemorySegment seg = lookup.find("H5P_CLS_DATASET_CREATE_ID_g").get();
-                 H5P_DATASET_CREATE = seg.get(ValueLayout.JAVA_LONG, 0);
+                 H5P_DATASET_CREATE = seg.byteSize() >= 8 ? seg.get(ValueLayout.JAVA_LONG, 0) : seg.get(ValueLayout.JAVA_INT, 0);
             } else {
                  H5P_DATASET_CREATE = 0L;
             }

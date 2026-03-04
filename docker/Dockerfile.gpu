@@ -81,10 +81,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Fix library names for Episteme's NativeLibraryLoader
-RUN ln -s /usr/lib/x86_64-linux-gnu/libfftw3.so.3 /usr/lib/libfftw3.so && \
-    ln -s /usr/lib/x86_64-linux-gnu/libopenblas.so.0 /usr/lib/libopenblas.so && \
-    ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1 /usr/lib/libGL.so.1 && \
-    ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
+# We put them in /usr/lib/x86_64-linux-gnu so they are found by default
+RUN ln -sf /usr/lib/x86_64-linux-gnu/libfftw3.so.3 /usr/lib/x86_64-linux-gnu/libfftw3.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libopenblas.so.3 /usr/lib/x86_64-linux-gnu/libopenblas.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/x86_64-linux-gnu/libOpenCL.so
 
 # Install scientifiques python pour le plot (Legacy)
 RUN python3 -m venv /opt/qiskit_env && \
