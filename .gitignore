@@ -31,3 +31,8 @@ certs/*.key
 certs/*.pem
 certs/*.srl
 
+# Large Data & Reports
+*.h5
+*.pdf
+benchmark-results.json
+

@@ -35,9 +35,13 @@ RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     rm -rf /tmp/QuEST
 
 RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
-    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -S . -B build && \
+    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=ON -DBUILD_UNIT_TESTS=OFF -S . -B build && \
     cmake --build build -j$(nproc) && \
     find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \; && \
+    find build -name "libBulletCollision.so" -exec cp {} /build/libs/ \; && \
+    find build -name "libLinearMath.so" -exec cp {} /build/libs/ \; && \
+    # Create the symlink expected by the benchmarks
+    cp /build/libs/libbulletc.so /build/libs/libbullet_capi.so && \
     rm -rf /tmp/bullet3
 
 # 2. Prepare for Java Build
@@ -79,7 +83,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Fix library names for Episteme's NativeLibraryLoader
 RUN ln -s /usr/lib/x86_64-linux-gnu/libfftw3.so.3 /usr/lib/libfftw3.so && \
     ln -s /usr/lib/x86_64-linux-gnu/libopenblas.so.0 /usr/lib/libopenblas.so && \
-    ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1 /usr/lib/libGL.so.1
+    ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1 /usr/lib/libGL.so.1 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
 
 # Install scientifiques python pour le plot (Legacy)
 RUN python3 -m venv /opt/qiskit_env && \
