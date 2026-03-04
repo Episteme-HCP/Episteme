@@ -89,34 +89,29 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
             H5P_SET_SZIP = linker.downcallHandle(lookup.find("H5Pset_szip").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
-            H5P_SET_FILTER = linker.downcallHandle(lookup.find("H5Pset_filter").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
             H5P_CLOSE = linker.downcallHandle(lookup.find("H5Pclose").get(),
-            H5P_CLOSE = linker.downcallHandle(HDF5_LOOKUP.find("H5Pclose").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             
-            MemorySegment h5tNativeDouble = findSymbol(HDF5_LOOKUP, "H5T_NATIVE_DOUBLE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found"));
+            MemorySegment h5tNativeDouble = NativeLibraryLoader.findSymbol(lookup, "H5T_NATIVE_DOUBLE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found"));
             
             // On some systems, the global is a direct ID, on others it's a pointer to the ID.
-            // We use the segment size to decide how to read it.
             if (h5tNativeDouble.byteSize() == 4) {
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_INT, 0);
             } else if (h5tNativeDouble.byteSize() == 8) {
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
             } else {
-                // Fallback: try to read it as a long and cast
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
-                logger.fine(String.format("H5T_NATIVE_DOUBLE_g size unexpected: %d, read as long", h5tNativeDouble.byteSize()));
+                System.out.println("[DEBUG] H5T_NATIVE_DOUBLE_g size unexpected: " + h5tNativeDouble.byteSize());
             }
 
-            MemorySegment h5pDatasetCreate = findSymbol(HDF5_LOOKUP, "H5P_CLS_DATASET_CREATE_ID_g").orElseThrow(() -> new IllegalStateException("H5P_CLS_DATASET_CREATE_ID_g not found"));
+            MemorySegment h5pDatasetCreate = NativeLibraryLoader.findSymbol(lookup, "H5P_CLS_DATASET_CREATE_ID_g").orElseThrow(() -> new IllegalStateException("H5P_CLS_DATASET_CREATE_ID_g not found"));
             if (h5pDatasetCreate.byteSize() == 4) {
                 H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_INT, 0);
             } else {
                 H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_LONG, 0);
             }
             
-            logger.info(String.format("Retrieved HDF5 Globals: H5T_NATIVE_DOUBLE=%d, H5P_DATASET_CREATE=%d", H5T_NATIVE_DOUBLE, H5P_DATASET_CREATE));
+            System.out.println("[INFO] Retrieved HDF5 Globals: H5T_NATIVE_DOUBLE=" + H5T_NATIVE_DOUBLE + ", H5P_DATASET_CREATE=" + H5P_DATASET_CREATE);
             
             AVAILABLE = true;
         } else {

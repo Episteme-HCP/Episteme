@@ -149,17 +149,20 @@ public class NativeLibraryLoader {
         for (String variant : variants) {
             String currentMapped = System.mapLibraryName(variant);
             
-                try {
-                    // Force pre-loading of runtime dependencies before loading the main library
-                    preloadRuntimes(discoveredLibs, arena);
-                    SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
-                    return Optional.of(lookup);
-                } catch (Exception e) {
-                    FAILURE_CAUSES.put(variant, e.toString());
-                    if (FAILED_VARIANTS.add(variant)) {
-                        logger.warn("System load failed for {}: {}", variant, e.toString());
-                    }
+            // 1. Try loading directly via System.loadLibrary (or equivalent)
+            try {
+                logger.info("Probing native library variant: " + variant);
+                // Force pre-loading of runtime dependencies before loading the main library
+                preloadRuntimes(discoveredLibs, arena);
+                SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
+                logger.info("Successfully loaded library variant: " + variant);
+                return Optional.of(lookup);
+            } catch (Exception e) {
+                FAILURE_CAUSES.put(variant, e.toString());
+                if (FAILED_VARIANTS.add(variant)) {
+                    logger.warn("Native load failed for " + variant + ": " + e.getMessage());
                 }
+            }
 
             // 2. Try custom search paths
             String cudaPath = System.getenv("CUDA_PATH");

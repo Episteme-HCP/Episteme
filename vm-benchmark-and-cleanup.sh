@@ -27,10 +27,10 @@ if [ -n "$GIT_CHANGES" ]; then
     git stash pop
 fi
 
-echo "--- [3/4] Construction de l'image GPU ---"
+echo "--- [3/4] Construction de l'image GPU (Logging vers $LOG_DIR/docker_build.log) ---"
 # On force BuildKit pour le cache intelligent
 export DOCKER_BUILDKIT=1
-docker build -t episteme-gpu -f docker/Dockerfile.gpu .
+docker build -t episteme-gpu -f docker/Dockerfile.gpu . > "$LOG_DIR/docker_build.log" 2>&1
 
 echo "--- [4/4] Lancement des Benchmarks ---"
 # S'assurer que le dossier de résultats et tmp existent
@@ -43,10 +43,20 @@ RES_DIR="$(pwd)/docs/benchmark-results"
 echo "Exécution des diagnostics..."
 docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > "$LOG_DIR/diagnostic_output.txt" 2>&1
 
-echo "Lancement des benchmarks (Logging vers $LOG_DIR/console.txt)..."
+# Gestion des arguments par défaut
+BENCH_ARGS="$@"
+if [ -z "$BENCH_ARGS" ]; then
+    BENCH_ARGS="--run-all --domain \"Linear Algebra\" --exclude-provider ND4J --pdf"
+    echo "Aucun argument fourni. Utilisation des filtres par défaut : $BENCH_ARGS"
+fi
+
+echo "Lancement des benchmarks : $BENCH_ARGS"
+echo "Logging vers $LOG_DIR/console.txt..."
+
 # Redirection de la sortie vers tmp/console.txt pour analyse
 # Note: usage de stdbuf pour forcer le flush du log en cas de Ctrl+C
-stdbuf -oL -eL docker run --rm --gpus all -v "$RES_DIR:/app/docs/benchmark-results" episteme-gpu --run-all --pdf 2>&1 | tee "$LOG_DIR/console.txt"
+stdbuf -oL -eL docker run --rm --gpus all -v "$RES_DIR:/app/docs/benchmark-results" episteme-gpu $BENCH_ARGS 2>&1 | tee "$LOG_DIR/console.txt"
 
 echo "Terminé ! Les résultats sont dans docs/benchmark-results/"
 echo "Les logs de console sont dans $LOG_DIR/console.txt"
+echo "Les logs de build sont dans $LOG_DIR/docker_build.log"

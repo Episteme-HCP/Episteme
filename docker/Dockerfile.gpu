@@ -120,5 +120,5 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 EXPOSE 50051
-ENTRYPOINT ["java", "--add-modules", "jdk.incubator.vector", "--enable-native-access=ALL-UNNAMED", "-Djava.library.path=/app/libs", "-cp", "benchmarks.jar:server.jar:lib/*", "org.episteme.benchmarks.cli.BenchmarkCLI"]
-CMD ["--help"]
+ENTRYPOINT ["./run-benchmarks.sh"]
+CMD ["--cli"]
