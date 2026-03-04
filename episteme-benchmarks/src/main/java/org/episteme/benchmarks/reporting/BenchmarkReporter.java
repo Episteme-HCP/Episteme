@@ -113,6 +113,8 @@ public class BenchmarkReporter {
 
         for (BenchmarkResult r : results) {
             String lib = r.item.libraryProperty().get();
+            String provider = r.item.providerProperty().get();
+            
             // Shorten common library names for better labels
             if (lib.contains("Commons Math")) lib = "Commons";
             else if (lib.contains("DistributedContext")) lib = "Distributed";
@@ -120,12 +122,10 @@ public class BenchmarkReporter {
             else if (lib.contains("JBlas")) lib = "JBlas";
             else if (lib.contains("EJML")) lib = "EJML";
             
-            // Clean up the label: if the benchmark name is "Matrix Inversion", and lib is "Commons", 
-            // the result is "Matrix Inversion [Commons]". We want just "Commons".
-            String label = "[" + lib + "]";
+            // Clean up the label: Combine Lib and Provider for uniqueness
+            // Format: [Lib] Provider (e.g., [Episteme] CARMA)
+            String label = "[" + lib + "] " + provider;
             
-            // If the lib name is complex or multiple backends for same lib, we might need more detail, 
-            // but for now, the user wants to avoid "Matrix Inversion" repetition.
             dataset.addValue(r.score, "Throughput", label);
         }
 
