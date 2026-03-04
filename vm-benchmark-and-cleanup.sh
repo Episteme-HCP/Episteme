@@ -13,18 +13,30 @@ echo "Après nettoyage :"
 df -h / | grep /
 
 echo "--- [2/4] Mise à jour du code (Git) ---"
-# Gestion des conflits locaux (stash automatique pour permettre le pull)
+# Gestion des conflits locaux
 GIT_CHANGES=$(git status --porcelain)
 if [ -n "$GIT_CHANGES" ]; then
     echo "Changements locaux détectés. Stash temporaire..."
     git stash
 fi
 
+# Store the hash of the current script to detect updates
+SCRIPT_HASH_BEFORE=$(md5sum "$0" | cut -d' ' -f1)
+
 git pull origin main
 
+SCRIPT_HASH_AFTER=$(md5sum "$0" | cut -d' ' -f1)
+
 if [ -n "$GIT_CHANGES" ]; then
-    echo "Réapplication des changements locaux (si possible)..."
+    echo "Réapplication des changements locaux..."
     git stash pop
+fi
+
+# Self-restart if the script was updated
+if [ "$SCRIPT_HASH_BEFORE" != "$SCRIPT_HASH_AFTER" ]; then
+    echo "Le script de maintenance a été mis à jour via Git. Redémarrage immédiat..."
+    exec "$0" "$@"
+    exit 0
 fi
 
 echo "--- [3/4] Construction de l'image GPU (Logging vers $LOG_DIR/docker_build.log) ---"
