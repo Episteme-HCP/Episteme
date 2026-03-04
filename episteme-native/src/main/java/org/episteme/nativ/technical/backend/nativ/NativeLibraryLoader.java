@@ -155,7 +155,7 @@ public class NativeLibraryLoader {
                     return Optional.of(lookup);
                 } catch (Exception e) {
                     if (FAILED_VARIANTS.add(variant)) {
-                        logger.debug("System load failed for {} in libs: {}", variant, e.toString());
+                        logger.warn("System load failed for {}: {}", variant, e.toString());
                     }
                 }
 

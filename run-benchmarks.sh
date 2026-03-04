@@ -108,7 +108,7 @@ if [ "$USE_SHADED" = true ]; then
     fi
 elif [ -f "server.jar" ]; then
     echo "[INFO] Running from Pre-Compiled Docker Environment (server.jar)"
-    java -XshowSettings:properties -verbose:jni --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "benchmarks.jar:server.jar:lib/*" "${APP_CLASS}" "$@"
+    java -XshowSettings:properties --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "benchmarks.jar:server.jar:lib/*" "${APP_CLASS}" "$@"
 else
     echo "[INFO] Running latest compiled classes - Dev Mode. Use --shaded to force JAR."
     if [ ! -d "episteme-benchmarks/target/classes" ]; then

@@ -24,7 +24,8 @@ public class BenchmarkCLI {
         boolean dryRun = false;
         boolean generatePdf = false;
         String exportFile = null;
-        String pdfFile = null;
+        String domainFilter = null;
+        List<String> excludedProviders = new ArrayList<>();
 
         // Parse arguments
         for (int i = 0; i < args.length; i++) {
@@ -39,6 +40,14 @@ public class BenchmarkCLI {
                 exportFile = args[++i];
             } else if (arg.startsWith("--export-file=")) {
                 exportFile = arg.substring("--export-file=".length());
+            } else if ("--domain".equals(arg) && i + 1 < args.length) {
+                domainFilter = args[++i];
+            } else if (arg.startsWith("--domain=")) {
+                domainFilter = arg.substring("--domain=".length());
+            } else if ("--exclude-provider".equals(arg) && i + 1 < args.length) {
+                excludedProviders.add(args[++i]);
+            } else if (arg.startsWith("--exclude-provider=")) {
+                excludedProviders.add(arg.substring("--exclude-provider=".length()));
             } else if ("--help".equals(arg)) {
                 printHelp();
                 return;
@@ -73,8 +82,34 @@ public class BenchmarkCLI {
         System.out.println("Cores: " + Runtime.getRuntime().availableProcessors());
 
         // Discover Benchmarks
-        List<RunnableBenchmark> benchmarks = BenchmarkRegistry.discover();
-        System.out.println("Discovered " + benchmarks.size() + " benchmarks.");
+        List<RunnableBenchmark> allBenchmarks = BenchmarkRegistry.discover();
+        List<RunnableBenchmark> benchmarks = new ArrayList<>();
+        
+        for (RunnableBenchmark b : allBenchmarks) {
+            BenchmarkItem item = new BenchmarkItem(b);
+            String provider = item.providerProperty().get();
+            String domain = b.getDomain();
+            
+            if (domainFilter != null && !domain.equalsIgnoreCase(domainFilter)) {
+                continue;
+            }
+            
+            boolean excluded = false;
+            for (String ex : excludedProviders) {
+                if (provider.equalsIgnoreCase(ex)) {
+                    excluded = true;
+                    break;
+                }
+            }
+            
+            if (excluded) {
+                continue;
+            }
+            
+            benchmarks.add(b);
+        }
+        
+        System.out.println("Discovered " + allBenchmarks.size() + " benchmarks. Filtered to " + benchmarks.size() + ".");
 
         List<BenchmarkResult> results = new ArrayList<>();
 
@@ -176,6 +211,8 @@ public class BenchmarkCLI {
         System.out.println("  --dry-run         Run with minimal datasets for functional verification.");
         System.out.println("  --export-file <f> Save results to JSON file.");
         System.out.println("  --pdf             Generate PDF Report (requires --export-file).");
+        System.out.println("  --domain <d>      Only run benchmarks in this domain (e.g. 'Linear Algebra').");
+        System.out.println("  --exclude-provider <p> Skip benchmarks from this provider (e.g. 'ND4J').");
         System.out.println("  --help            Show this message.");
     }
 

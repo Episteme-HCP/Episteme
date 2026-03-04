@@ -80,6 +80,6 @@ public class BackendDiagnostic {
         } catch (Throwable t) {
             error = " [ERROR: " + t.getClass().getSimpleName() + ": " + t.getMessage() + "]";
         }
-        System.out.printf("%-40s | Available: %-5b%s\n", name, available, error);
+        System.out.printf("%-45s | Available: %-5b%s\n", name, available, error);
     }
 }
