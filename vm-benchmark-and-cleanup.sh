@@ -30,10 +30,11 @@ fi
 # Store the hash of the current script to detect updates
 SCRIPT_HASH_BEFORE=$(md5sum "$0" | cut -d' ' -f1)
 
-# Pull depuis la branche courante (main ou master)
-CURRENT_BRANCH=$(git branch --show-current)
-echo "Mise à jour depuis la branche : $CURRENT_BRANCH"
-git pull origin "$CURRENT_BRANCH"
+# Passage forcé sur la branche main
+echo "Mise à jour depuis la branche : main"
+git fetch origin main
+git checkout main || git checkout -b main origin/main
+git pull origin main
 
 SCRIPT_HASH_AFTER=$(md5sum "$0" | cut -d' ' -f1)
 
