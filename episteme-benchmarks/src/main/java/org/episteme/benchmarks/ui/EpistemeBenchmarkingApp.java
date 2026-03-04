@@ -7,7 +7,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.episteme.core.ui.i18n.I18N;
-import java.io.File;
 
 
 /**

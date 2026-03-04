@@ -375,7 +375,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"preview", "restricted"})
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (a.cols() != b.rows()) {
             throw new IllegalArgumentException("Matrix inner dimensions must match");
@@ -953,6 +953,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (a.rows() != a.cols())
             throw new ArithmeticException("Must be square");
@@ -1012,7 +1013,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 res[i] = (rhs[i] - sum) / mat[i * n + i];
             }
 
-            @SuppressWarnings("unchecked")
             E[] resArray = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
             for (int i = 0; i < n; i++) resArray[i] = (E)(Object) Real.of(res[i]);
             return new GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
@@ -1079,7 +1079,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         List<E> res = new ArrayList<>();
         for (int i = 0; i < n; i++)
             res.add(aug.get(i).get(n));
-        @SuppressWarnings("unchecked")
         E[] resArray = (E[]) res
                 .toArray();
         return new GenericVector<>(

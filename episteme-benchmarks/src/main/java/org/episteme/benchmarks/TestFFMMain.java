@@ -1,9 +1,5 @@
 package org.episteme.benchmarks;
 
-import org.episteme.nativ.mathematics.tensors.backends.NativeCPUTensorBackend;
-import org.episteme.nativ.io.backends.NativeArrowBackend;
-import org.episteme.nativ.mathematics.linearalgebra.tensors.backends.ND4JCUDATensorBackend;
-
 public class TestFFMMain {
     public static void main(String[] args) {
         System.out.println("--- TESTING OTHER BACKENDS START ---");

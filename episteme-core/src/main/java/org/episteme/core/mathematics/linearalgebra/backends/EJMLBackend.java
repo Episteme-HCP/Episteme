@@ -268,6 +268,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public SVDResult<E> svd(Matrix<E> a) {
             org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
             org.ejml.interfaces.decomposition.SingularValueDecomposition_F64<org.ejml.data.DMatrixRMaj> svd = 
@@ -280,7 +281,6 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             svd.getV(V, false);
             double[] singleton = svd.getSingularValues();
             
-            @SuppressWarnings("unchecked")
             E[] sData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), singleton.length);
             for(int i=0; i<singleton.length; i++) sData[i] = (E)(Object) org.episteme.core.mathematics.numbers.real.Real.of(singleton[i]);
             Vector<E> S = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
@@ -290,6 +290,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public EigenResult<E> eigen(Matrix<E> a) {
             org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
             org.ejml.interfaces.decomposition.EigenDecomposition_F64<org.ejml.data.DMatrixRMaj> evd = 
@@ -301,7 +302,6 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             
             // Extract eigenvalues as a vector
             int size = Dmat.getNumRows();
-            @SuppressWarnings("unchecked")
             E[] dData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), size);
             for(int i=0; i<size; i++) dData[i] = (E)(Object) org.episteme.core.mathematics.numbers.real.Real.of(Dmat.get(i, i));
             Vector<E> D = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
@@ -311,6 +311,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public LUResult<E> lu(Matrix<E> a) {
             org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(a);
             
@@ -345,7 +346,6 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             }
             
             int[] pivotArr = luDecomp.getRowPivotV(null);
-            @SuppressWarnings("unchecked")
             E[] pData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), pivotArr.length);
             for(int i=0; i<pivotArr.length; i++) pData[i] = (E)(Object) org.episteme.core.mathematics.numbers.real.Real.of(pivotArr[i]);
             Vector<E> P = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(

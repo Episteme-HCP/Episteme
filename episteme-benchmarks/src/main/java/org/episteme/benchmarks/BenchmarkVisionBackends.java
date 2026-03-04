@@ -1,6 +1,5 @@
 package org.episteme.benchmarks;
 
-import org.episteme.core.media.vision.ImageOp;
 import org.episteme.nativ.media.vision.backends.NativeCPUCBindingVisionBackend;
 import org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend;
 import org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend;

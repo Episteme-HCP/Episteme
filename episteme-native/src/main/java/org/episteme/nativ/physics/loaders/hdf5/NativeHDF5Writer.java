@@ -46,6 +46,7 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
     private final boolean isShared;
     private static final MethodHandle H5F_CREATE;
     private static final MethodHandle H5F_CLOSE;
+    private static final MethodHandle H5_OPEN;
     private static final MethodHandle H5S_CREATE_SIMPLE;
     private static final MethodHandle H5D_CREATE2;
     private static final MethodHandle H5D_WRITE;
@@ -89,19 +90,27 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
             H5P_SET_SZIP = linker.downcallHandle(lookup.find("H5Pset_szip").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            H5P_SET_FILTER = linker.downcallHandle(lookup.find("H5Pset_filter").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
             H5P_CLOSE = linker.downcallHandle(lookup.find("H5Pclose").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             
+            H5_OPEN = linker.downcallHandle(lookup.find("H5open").get(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT));
+            
+            try {
+                H5_OPEN.invokeExact();
+                System.out.println("[INFO] HDF5 Library initialized via H5open()");
+            } catch (Throwable t) {
+                System.err.println("[WARN] Failed to call H5open(): " + t.getMessage());
+            }
+
             MemorySegment h5tNativeDouble = NativeLibraryLoader.findSymbol(lookup, "H5T_NATIVE_DOUBLE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found"));
             
-            // On some systems, the global is a direct ID, on others it's a pointer to the ID.
             if (h5tNativeDouble.byteSize() == 4) {
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_INT, 0);
-            } else if (h5tNativeDouble.byteSize() == 8) {
-                H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
             } else {
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
-                System.out.println("[DEBUG] H5T_NATIVE_DOUBLE_g size unexpected: " + h5tNativeDouble.byteSize());
             }
 
             MemorySegment h5pDatasetCreate = NativeLibraryLoader.findSymbol(lookup, "H5P_CLS_DATASET_CREATE_ID_g").orElseThrow(() -> new IllegalStateException("H5P_CLS_DATASET_CREATE_ID_g not found"));
@@ -112,10 +121,9 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
             }
             
             System.out.println("[INFO] Retrieved HDF5 Globals: H5T_NATIVE_DOUBLE=" + H5T_NATIVE_DOUBLE + ", H5P_DATASET_CREATE=" + H5P_DATASET_CREATE);
-            
             AVAILABLE = true;
         } else {
-            H5F_CREATE = H5F_CLOSE = H5S_CREATE_SIMPLE = H5D_CREATE2 = H5D_WRITE = H5D_CLOSE = H5S_CLOSE = null;
+            H5F_CREATE = H5F_CLOSE = H5_OPEN = H5S_CREATE_SIMPLE = H5D_CREATE2 = H5D_WRITE = H5D_CLOSE = H5S_CLOSE = null;
             H5P_CREATE = H5P_SET_CHUNK = H5P_SET_DEFLATE = H5P_SET_SZIP = H5P_SET_FILTER = H5P_CLOSE = null;
             H5T_NATIVE_DOUBLE = 0L;
             H5P_DATASET_CREATE = 0L;

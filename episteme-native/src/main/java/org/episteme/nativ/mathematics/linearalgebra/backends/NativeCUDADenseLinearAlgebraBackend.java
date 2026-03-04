@@ -60,7 +60,6 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
         SymbolLookup cuda = null;
         SymbolLookup cublas = null;
-        SymbolLookup cusolver = null;
 
         try (Arena arena = Arena.ofConfined()) { // Test loading
             Optional<SymbolLookup> cudaOpt = NativeLibraryLoader.loadLibrary("cuda", Arena.global());
@@ -71,11 +70,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             cuda = cudaOpt.get();
             cublas = cublasOpt.get();
             
-            try {
-                cusolver = NativeLibraryLoader.loadLibrary("cusolver", Arena.global()).orElse(null);
-            } catch (Throwable t) {
-                // optional
-            }
+            
 
             // CUDA Runtime Memory Management
             CUDA_MALLOC = LINKER.downcallHandle(

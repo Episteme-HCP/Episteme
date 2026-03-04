@@ -52,7 +52,7 @@ fi
 echo "--- [3/4] Construction de l'image GPU (Logging vers $LOG_DIR/docker_build.log) ---"
 # On force BuildKit pour le cache intelligent
 export DOCKER_BUILDKIT=1
-docker build -t episteme-gpu -f docker/Dockerfile.gpu . > "$LOG_DIR/docker_build.log" 2>&1
+docker build --progress=plain -t episteme-gpu -f docker/Dockerfile.gpu . 2>&1 | tee "$LOG_DIR/docker_build.log"
 
 echo "--- [4/4] Lancement des Benchmarks ---"
 echo "Exécution des diagnostics..."

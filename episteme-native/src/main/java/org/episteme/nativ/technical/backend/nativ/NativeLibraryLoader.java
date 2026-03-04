@@ -138,6 +138,10 @@ public class NativeLibraryLoader {
         if (!isWin) {
             if (libName.equalsIgnoreCase("opencl")) {
                 variants.add("OpenCL");
+                variants.add("OpenCL.so.1");
+                variants.add("OpenCL.so.1.0.0");
+                variants.add("OpenCL.so.1.1.0");
+                variants.add("OpenCL.so.1.2.0");
             }
         }
 

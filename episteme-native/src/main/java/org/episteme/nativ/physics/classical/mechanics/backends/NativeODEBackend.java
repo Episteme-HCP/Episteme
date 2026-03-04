@@ -34,7 +34,6 @@ import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 @AutoService({CollisionProvider.class, MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
 public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
  
-    private static SymbolLookup LOOKUP;
     private static boolean IS_INITIALIZED = false;
     private static boolean IS_AVAILABLE = false;
 
@@ -42,7 +41,6 @@ public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CP
         if (IS_INITIALIZED) return;
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("ode", Arena.global());
         IS_AVAILABLE = lib.isPresent();
-        LOOKUP = lib.orElse(null);
         IS_INITIALIZED = true;
     }
 
