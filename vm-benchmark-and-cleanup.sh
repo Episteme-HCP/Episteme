@@ -34,8 +34,8 @@ docker build -t episteme-gpu -f docker/Dockerfile.gpu .
 
 echo "--- [4/4] Lancement des Benchmarks ---"
 # S'assurer que le dossier de résultats existe
-mkdir -p docs/benchmarks_results
+mkdir -p docs/benchmark-results
 # Lance le container avec accès au GPU et génère le PDF
-docker run --rm --gpus all -v "$(pwd)/docs/benchmarks_results:/app/docs/benchmark-results" episteme-gpu --run-all --pdf
+docker run --rm --gpus all -v "$(pwd)/docs/benchmark-results:/app/docs/benchmark-results" episteme-gpu --run-all --pdf
 
-echo "Terminé ! Les résultats sont dans docs/benchmarks_results/"
+echo "Terminé ! Les résultats sont dans docs/benchmark-results/"

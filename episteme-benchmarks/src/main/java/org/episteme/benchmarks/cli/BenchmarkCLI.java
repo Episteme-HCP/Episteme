@@ -48,7 +48,7 @@ public class BenchmarkCLI {
         // Default export logic: specialized directory and timestamped filename in docs/
         if (exportFile == null) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-            // Ensure docs/benchmark-results directory exists
+            // Standardizing to hyphenated directory as requested by user
             String dirPath = "docs/benchmark-results";
             new File(dirPath).mkdirs();
             

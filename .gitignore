@@ -35,4 +35,4 @@ certs/*.srl
 *.h5
 *.pdf
 benchmark-results.json
-
+docs/benchmark-results/
