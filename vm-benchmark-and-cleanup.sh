@@ -58,24 +58,32 @@ echo "--- [4/4] Lancement des Benchmarks ---"
 echo "Exécution des diagnostics..."
 docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > "$LOG_DIR/diagnostic_output.txt" 2>&1
 
-# Gestion des arguments par défaut
-BENCH_ARGS="$@"
-if [ -z "$BENCH_ARGS" ]; then
-    BENCH_ARGS="--run-all --domain \"Linear Algebra\" --exclude-provider ND4J --pdf"
-    echo "Aucun argument fourni. Utilisation des filtres par défaut : $BENCH_ARGS"
+# Gestion des arguments par défaut en utilisant un tableau pour préserver les espaces
+if [ "$#" -eq 0 ]; then
+    BENCH_ARGS=(--run-all --domain "Linear Algebra" --exclude-provider ND4J --pdf)
+    echo "Aucun argument fourni. Utilisation des filtres par défaut : ${BENCH_ARGS[*]}"
 else
-    # Si des arguments sont fournis mais que --run-all manque, on le rajoute pour éviter l'erreur "Nothing to run"
-    if [[ ! "$BENCH_ARGS" =~ "--run-all" ]] && [[ ! "$BENCH_ARGS" =~ "--help" ]] && [[ ! "$BENCH_ARGS" =~ "--diagnostic" ]]; then
-        BENCH_ARGS="--run-all $BENCH_ARGS"
+    BENCH_ARGS=("$@")
+    # Si des arguments sont fournis mais que --run-all manque
+    HAS_RUN_ALL=false
+    for arg in "${BENCH_ARGS[@]}"; do
+        if [[ "$arg" == "--run-all" || "$arg" == "--help" || "$arg" == "--diagnostic" ]]; then
+            HAS_RUN_ALL=true
+            break
+        fi
+    done
+    
+    if [ "$HAS_RUN_ALL" = false ]; then
+        BENCH_ARGS=(--run-all "${BENCH_ARGS[@]}")
     fi
 fi
 
-echo "Lancement des benchmarks : $BENCH_ARGS"
+echo "Lancement des benchmarks : ${BENCH_ARGS[*]}"
 echo "Logging vers $LOG_DIR/console.txt..."
 
 # Redirection de la sortie vers tmp/console.txt pour analyse
-# Note: usage de stdbuf pour forcer le flush du log en cas de Ctrl+C
-stdbuf -oL -eL docker run --rm --gpus all -v "$RES_DIR:/app/docs/benchmark-results" episteme-gpu $BENCH_ARGS 2>&1 | tee "$LOG_DIR/console.txt"
+# L'utilisation de "${BENCH_ARGS[@]}" garantit que "Linear Algebra" reste un seul argument
+stdbuf -oL -eL docker run --rm --gpus all -v "$RES_DIR:/app/docs/benchmark-results" episteme-gpu "${BENCH_ARGS[@]}" 2>&1 | tee "$LOG_DIR/console.txt"
 
 echo "Terminé ! Les résultats sont dans docs/benchmark-results/"
 echo "Les logs de console sont dans $LOG_DIR/console.txt"

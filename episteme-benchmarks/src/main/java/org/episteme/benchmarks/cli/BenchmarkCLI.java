@@ -41,13 +41,13 @@ public class BenchmarkCLI {
             } else if (arg.startsWith("--export-file=")) {
                 exportFile = arg.substring("--export-file=".length());
             } else if ("--domain".equals(arg) && i + 1 < args.length) {
-                domainFilter = args[++i];
+                domainFilter = args[++i].replaceAll("^[\"']|[\"']$", "");
             } else if (arg.startsWith("--domain=")) {
-                domainFilter = arg.substring("--domain=".length());
+                domainFilter = arg.substring("--domain=".length()).replaceAll("^[\"']|[\"']$", "");
             } else if ("--exclude-provider".equals(arg) && i + 1 < args.length) {
-                excludedProviders.add(args[++i]);
+                excludedProviders.add(args[++i].replaceAll("^[\"']|[\"']$", ""));
             } else if (arg.startsWith("--exclude-provider=")) {
-                excludedProviders.add(arg.substring("--exclude-provider=".length()));
+                excludedProviders.add(arg.substring("--exclude-provider=".length()).replaceAll("^[\"']|[\"']$", ""));
             } else if ("--help".equals(arg)) {
                 printHelp();
                 return;
