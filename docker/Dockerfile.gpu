@@ -56,9 +56,18 @@ RUN --mount=type=cache,target=/root/.m2 mvn install:install-file \
     -Dversion=0.44 \
     -Dpackaging=jar
 
-# 3. Compile Episteme Native Vision & Java Project
-# We use -Dmdep.skip=true to avoid copying dependencies for every module,
-# saving gigabytes of disk space during the build.
+# 3. Cache Maven Dependencies (Go Offline)
+COPY pom.xml /build/
+COPY episteme-core/pom.xml /build/episteme-core/
+COPY episteme-native/pom.xml /build/episteme-native/
+COPY episteme-natural/pom.xml /build/episteme-natural/
+COPY episteme-social/pom.xml /build/episteme-social/
+COPY episteme-server/pom.xml /build/episteme-server/
+COPY episteme-benchmarks/pom.xml /build/episteme-benchmarks/
+
+RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline -B -Dmdep.skip=true -Djavacpp.platform=linux-x86_64
+
+# 4. Compile Episteme Native Vision & Java Project
 COPY . /build/
 RUN --mount=type=cache,target=/root/.m2 chmod +x /build/build_vision.sh && ./build_vision.sh && \
     find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \

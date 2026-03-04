@@ -15,7 +15,8 @@ mkdir -p "$RES_DIR"
 echo "--- [1/4] État de l'espace disque & Nettoyage ---"
 df -h / | grep /
 # Nettoyage Docker (Images orphelines, containers arrêtés, cache inutilisé)
-docker system prune -f --volumes
+# Removed `docker system prune -f --volumes` to preserve BuildKit cache!
+# If disk space becomes an issue, we can periodically prune dangling images only.
 echo "Après nettoyage :"
 df -h / | grep /
 
