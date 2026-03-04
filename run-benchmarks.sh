@@ -113,7 +113,7 @@ else
     echo "[INFO] Running latest compiled classes - Dev Mode. Use --shaded to force JAR."
     if [ ! -d "episteme-benchmarks/target/classes" ]; then
         echo "[INFO] Classes not found, building module..."
-        mvn compile -pl episteme-benchmarks -am -DskipTests
+        mvn compile -pl episteme-benchmarks -am -DskipTests -Pheadless
     fi
     DEPENDENCY_DIR="episteme-benchmarks/target/lib"
     if [ ! -d "$DEPENDENCY_DIR" ]; then

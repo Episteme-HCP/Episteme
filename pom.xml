@@ -89,6 +89,7 @@
     <javacv.version>1.5.10</javacv.version>
     <opencv.version>4.9.0-1.5.10</opencv.version>
     <openblas.version>0.3.26-${javacpp.version}</openblas.version>
+    <hdf5.version>1.14.3-1.5.10</hdf5.version>
     
     <!-- Platform targeting to avoid downloading all binaries (e.g. Windows DLLs in Docker) -->
     <javacpp.platform>${os.detected.classifier}</javacpp.platform>
@@ -385,6 +386,16 @@
         <version>0.5.4</version>
       </dependency>
       <!-- HDF5 (High-Performance IO) -->
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>hdf5</artifactId>
+        <version>${hdf5.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>hdf5-platform</artifactId>
+        <version>${hdf5.version}</version>
+      </dependency>
       <dependency>
         <groupId>io.jhdf</groupId>
         <artifactId>jhdf</artifactId>

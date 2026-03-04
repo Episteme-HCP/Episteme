@@ -127,6 +127,19 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- HDF5 Native Library -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>hdf5</artifactId>
+            <version>${hdf5.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>hdf5</artifactId>
+            <version>${hdf5.version}</version>
+            <classifier>${javacpp.platform}</classifier>
+        </dependency>
+
         <!-- JavaCV / OpenCV for Vision -->
         <dependency>
             <groupId>org.bytedeco</groupId>

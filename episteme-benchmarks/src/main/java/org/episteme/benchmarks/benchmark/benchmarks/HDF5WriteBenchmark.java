@@ -85,10 +85,10 @@ public class HDF5WriteBenchmark implements RunnableBenchmark {
             DataSpace dataspace = new DataSpace(1, dims);
 
             // 3. Create Dataset
-            DataSet dataset = file.createDataSet(DATASET_NAME, new DataType((long)H5T_NATIVE_FLOAT), dataspace);
+            DataSet dataset = file.createDataSet(DATASET_NAME, PredType.NATIVE_FLOAT(), dataspace);
 
             // 4. Write Data
-            dataset.write(data, new DataType((long)H5T_NATIVE_FLOAT));
+            dataset.write(data, PredType.NATIVE_FLOAT());
 
             // 5. Close Resources
             dataset.close();

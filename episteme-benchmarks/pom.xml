@@ -169,12 +169,12 @@
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>hdf5</artifactId>
-            <version>1.14.3-1.5.10</version>
+            <version>${hdf5.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>hdf5</artifactId>
-            <version>1.14.3-1.5.10</version>
+            <version>${hdf5.version}</version>
             <classifier>${javacpp.platform}</classifier>
         </dependency>
 

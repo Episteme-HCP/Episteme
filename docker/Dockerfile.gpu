@@ -58,8 +58,8 @@ RUN --mount=type=cache,target=/root/.m2 mvn install:install-file \
 COPY . /build/
 RUN --mount=type=cache,target=/root/.m2 chmod +x /build/build_vision.sh && ./build_vision.sh && \
     find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
-    mvn install -DskipTests -Dmdep.skip=true -Djavacpp.platform=linux-x86_64 -P!ui-desktop && \
-    mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false -Djavacpp.platform=linux-x86_64 -P!ui-desktop && \
+    mvn install -DskipTests -Dmdep.skip=true -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
+    mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
     for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-server/target/lib/; done && \
     for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-benchmarks/target/lib/; done
 

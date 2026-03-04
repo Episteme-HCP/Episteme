@@ -344,10 +344,9 @@
                     <compilerArgs>
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
+                        <arg>--enable-preview</arg>
+                        <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
-                    <excludes>
-                        <exclude>${jzy3d.exclude}</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
             <plugin>

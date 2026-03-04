@@ -69,12 +69,12 @@ public class HDF5ReadBenchmark implements RunnableBenchmark {
             H5File file = new H5File(FILE_NAME, H5F_ACC_TRUNC);
             long[] dims = {ARRAY_SIZE};
             DataSpace dataspace = new DataSpace(1, dims);
-            DataSet dataset = file.createDataSet(DATASET_NAME, new DataType((long)H5T_NATIVE_FLOAT), dataspace);
+            DataSet dataset = file.createDataSet(DATASET_NAME, PredType.NATIVE_FLOAT(), dataspace);
             
             // Write random data
             FloatPointer writeData = new FloatPointer(ARRAY_SIZE);
             for (int i = 0; i < 1000; i++) writeData.put(i, (float)Math.random()); // Partial fill speedup
-            dataset.write(writeData, new DataType((long)H5T_NATIVE_FLOAT));
+            dataset.write(writeData, PredType.NATIVE_FLOAT());
             writeData.close();
             
             dataset.close();
@@ -96,7 +96,7 @@ public class HDF5ReadBenchmark implements RunnableBenchmark {
             DataSet dataset = file.openDataSet(DATASET_NAME);
 
             // 3. Read Data
-            dataset.read(buffer, new DataType((long)H5T_NATIVE_FLOAT));
+            dataset.read(buffer, PredType.NATIVE_FLOAT());
 
             // 4. Close Resources
             dataset.close();
