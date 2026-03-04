@@ -15,6 +15,10 @@
     <name>Episteme Core Engine</name>
     <description>Episteme Core - Mathematics, Measure, and Computing Infrastructure</description>
 
+    <properties>
+        <jzy3d.exclude>**/Jzy3d*.java</jzy3d.exclude>
+    </properties>
+
     <dependencies>
         <!-- JSR-385: Units of Measurement API -->
         <dependency>
@@ -301,21 +305,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-
-        <!-- jzy3d repository moved to profile -->
-        <repository>
-            <id>jitpack.io</id>
-            <name>JitPack</name>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>clojars</id>
-            <name>Clojars</name>
-            <url>https://repo.clojars.org</url>
-        </repository>
-    </repositories>
-
     <build>
         <resources>
             <resource>
@@ -338,6 +327,19 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>--add-modules</arg>
+                        <arg>jdk.incubator.vector</arg>
+                    </compilerArgs>
+                    <excludes>
+                        <exclude>${jzy3d.exclude}</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -371,6 +373,21 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <!-- jzy3d repository moved to profile -->
+        <repository>
+            <id>jitpack.io</id>
+            <name>JitPack</name>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>clojars</id>
+            <name>Clojars</name>
+            <url>https://repo.clojars.org</url>
+        </repository>
+    </repositories>
+
     <profiles>
         <profile>
             <id>jcuda-support</id>
@@ -398,6 +415,9 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                <jzy3d.exclude>none</jzy3d.exclude>
+            </properties>
             <repositories>
                 <repository>
                     <id>jzy3d-releases</id>

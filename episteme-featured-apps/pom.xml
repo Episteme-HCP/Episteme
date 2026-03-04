@@ -14,6 +14,10 @@
     <name>Episteme Featured Apps</name>
     <description>Showcase Applications for Episteme Framework</description>
 
+    <properties>
+        <jzy3d.exclude>**/Jzy3d*.java,**/SpinField2DViewer.java</jzy3d.exclude>
+    </properties>
+
     <dependencies>
         <!-- Episteme Modules -->
         <dependency>
@@ -115,6 +119,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>${jzy3d.exclude}</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
@@ -158,4 +171,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>ui-desktop</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <jzy3d.exclude>none</jzy3d.exclude>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jzy3d</groupId>
+                    <artifactId>jzy3d-api</artifactId>
+                    <version>1.0.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

@@ -75,7 +75,12 @@ public class BenchmarkReporter {
             List<String> sortedDomains = grouped.keySet().stream().sorted().collect(Collectors.toList());
 
             for (String domain : sortedDomains) {
-                document.add(new Paragraph("Domain Analysis: " + domain, sectionFont));
+                // Professional Section Header - Dark Blue, centered
+                Paragraph domainHeader = new Paragraph(domain, sectionFont);
+                domainHeader.setAlignment(Element.ALIGN_CENTER);
+                domainHeader.setSpacingBefore(30);
+                document.add(domainHeader);
+                
                 document.add(new Paragraph(" "));
 
                 JFreeChart chart = createChart(domain, grouped.get(domain));
@@ -111,8 +116,16 @@ public class BenchmarkReporter {
             // Shorten common library names for better labels
             if (lib.contains("Commons Math")) lib = "Commons";
             else if (lib.contains("DistributedContext")) lib = "Distributed";
+            else if (lib.contains("ND4J")) lib = "ND4J";
+            else if (lib.contains("JBlas")) lib = "JBlas";
+            else if (lib.contains("EJML")) lib = "EJML";
             
-            String label = r.item.getName() + " [" + lib + "]";
+            // Clean up the label: if the benchmark name is "Matrix Inversion", and lib is "Commons", 
+            // the result is "Matrix Inversion [Commons]". We want just "Commons".
+            String label = "[" + lib + "]";
+            
+            // If the lib name is complex or multiple backends for same lib, we might need more detail, 
+            // but for now, the user wants to avoid "Matrix Inversion" repetition.
             dataset.addValue(r.score, "Throughput", label);
         }
 

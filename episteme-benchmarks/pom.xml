@@ -185,12 +185,6 @@
         </dependency>
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>javacv</artifactId>
-            <version>${javacv.version}</version>
-            <classifier>${javacpp.platform}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.bytedeco</groupId>
             <artifactId>opencv</artifactId>
             <version>${opencv.version}</version>
         </dependency>
