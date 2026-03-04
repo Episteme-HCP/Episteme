@@ -1,23 +1,41 @@
 #!/bin/bash
 # Episteme VM Maintenance & Benchmark Script
 # - Nettoie l'espace disque (Docker + Maven)
+# - Met à jour le code (Git pull avec gestion des conflits)
 # - Construit l'image GPU optimisée
 # - Lance les benchmarks avec accès GPU
 
-echo "--- [1/3] Nettoyage de l'espace disque ---"
+echo "--- [1/4] État de l'espace disque & Nettoyage ---"
+df -h / | grep /
 # Nettoyage Docker (Images orphelines, containers arrêtés, cache inutilisé)
 docker system prune -f --volumes
+echo "Après nettoyage :"
+df -h / | grep /
 
-# Nettoyage Maven local (facultatif mais libère de la place si besoin)
-# rm -rf ~/.m2/repository/org/episteme
+echo "--- [2/4] Mise à jour du code (Git) ---"
+# Gestion des conflits locaux (stash automatique pour permettre le pull)
+GIT_CHANGES=$(git status --porcelain)
+if [ -n "$GIT_CHANGES" ]; then
+    echo "Changements locaux détectés. Stash temporaire..."
+    git stash
+fi
 
-echo "--- [2/3] Construction de l'image GPU ---"
+git pull origin main
+
+if [ -n "$GIT_CHANGES" ]; then
+    echo "Réapplication des changements locaux (si possible)..."
+    git stash pop
+fi
+
+echo "--- [3/4] Construction de l'image GPU ---"
 # On force BuildKit pour le cache intelligent
 export DOCKER_BUILDKIT=1
 docker build -t episteme-gpu -f docker/Dockerfile.gpu .
 
-echo "--- [3/3] Lancement des Benchmarks ---"
+echo "--- [4/4] Lancement des Benchmarks ---"
+# S'assurer que le dossier de résultats existe
+mkdir -p docs/benchmarks_results
 # Lance le container avec accès au GPU et génère le PDF
-docker run --rm --gpus all -v "$(pwd)/docs/benchmark-results:/app/docs/benchmark-results" episteme-gpu --run-all --pdf
+docker run --rm --gpus all -v "$(pwd)/docs/benchmarks_results:/app/docs/benchmark-results" episteme-gpu --run-all --pdf
 
-echo "Terminé ! Les résultats sont dans docs/benchmark-results/"
+echo "Terminé ! Les résultats sont dans docs/benchmarks_results/"
