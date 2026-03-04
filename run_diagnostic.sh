@@ -40,6 +40,17 @@ else
     echo "[WARN] nvidia-smi not found. GPU may not be visible to container."
 fi
 
+# --- Dependency Check (ldd) ---
+echo "[INFO] Checking library dependencies (ldd)..."
+for lib in /usr/lib/x86_64-linux-gnu/libOpenCL.so /usr/lib/x86_64-linux-gnu/libhdf5.so /usr/local/cuda/lib64/libcudart.so; do
+    if [ -f "$lib" ]; then
+        echo "Dependencies for $lib:"
+        ldd "$lib" | grep "not found" || echo "  All dependencies satisfied."
+    else
+        echo "[WARN] Library $lib not found for ldd check."
+    fi
+done
+
 # --- Run Java Diagnostics ---
 echo "[INFO] Running Java Diagnostic Class..."
 if [ -f "server.jar" ]; then
