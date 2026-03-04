@@ -36,3 +36,8 @@ certs/*.srl
 *.pdf
 benchmark-results.json
 docs/benchmark-results/
+
+# VM / Docker temp files
+/tmp/
+build_log*.txt
+FETCH_HEAD
