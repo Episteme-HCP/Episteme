@@ -35,7 +35,7 @@ RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     rm -rf /tmp/QuEST
 
 RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
-    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=ON -DBUILD_UNIT_TESTS=OFF -S . -B build && \
+    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -S . -B build && \
     cmake --build build -j$(nproc) && \
     find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \; && \
     find build -name "libBulletCollision.so" -exec cp {} /build/libs/ \; && \
@@ -84,8 +84,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # We put them in /usr/lib/x86_64-linux-gnu so they are found by default
 RUN ln -sf /usr/lib/x86_64-linux-gnu/libfftw3.so.3 /usr/lib/x86_64-linux-gnu/libfftw3.so && \
     ln -sf /usr/lib/x86_64-linux-gnu/libopenblas.so.3 /usr/lib/x86_64-linux-gnu/libopenblas.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/liblapack.so.3 /usr/lib/x86_64-linux-gnu/liblapack.so && \
     ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so && \
     ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libopencl.so && \
+    ln -sf /usr/local/cuda/lib64/libcublas.so /usr/lib/libcublas.so && \
+    ln -sf /usr/local/cuda/lib64/libcusolver.so /usr/lib/libcusolver.so && \
+    ln -sf /usr/local/cuda/lib64/libcudart.so /usr/lib/libcudart.so && \
+    ln -sf /usr/local/cuda/lib64/libcuda.so /usr/lib/libcuda.so && \
     ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/x86_64-linux-gnu/libOpenCL.so && \
     ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/x86_64-linux-gnu/libopencl.so
 
@@ -120,5 +125,7 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 EXPOSE 50051
+
+ENV JAVA_OPTS="-Xlog:library=info -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -ea"
 ENTRYPOINT ["./run-benchmarks.sh"]
 CMD ["--cli"]

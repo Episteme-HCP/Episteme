@@ -203,8 +203,13 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
                     }
                 }
 
+                // H5P_DEFAULT = 0
+                long lcpl_id = 0L;
+                long dapl_id = 0L;
+                long actual_dcpl = dcpl != 0 ? dcpl : 0L;
+
                 MemorySegment nameSegment = arena.allocateFrom(datasetName);
-                long datasetId = (long) H5D_CREATE2.invokeExact(fileId, nameSegment, H5T_NATIVE_DOUBLE, spaceId, 0L, dcpl, 0L);
+                long datasetId = (long) H5D_CREATE2.invokeExact(fileId, nameSegment, H5T_NATIVE_DOUBLE, spaceId, lcpl_id, actual_dcpl, dapl_id);
                 try {
                     H5D_WRITE.invokeExact(datasetId, H5T_NATIVE_DOUBLE, 0L, 0L, 0L, matrix.segment());
                 } finally {
