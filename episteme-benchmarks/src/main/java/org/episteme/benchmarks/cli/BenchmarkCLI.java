@@ -45,11 +45,11 @@ public class BenchmarkCLI {
             }
         }
 
-        // Default export logic: specialized directory and timestamped filename at project root
+        // Default export logic: specialized directory and timestamped filename in docs/
         if (exportFile == null) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-            // Ensure benchmark-results directory exists at project root
-            String dirPath = "benchmark-results";
+            // Ensure docs/benchmark-results directory exists
+            String dirPath = "docs/benchmark-results";
             new File(dirPath).mkdirs();
             
             exportFile = dirPath + "/benchmark-results-" + timestamp + ".json";
