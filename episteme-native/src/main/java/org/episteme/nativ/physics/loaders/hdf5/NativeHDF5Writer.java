@@ -92,23 +92,31 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
             H5P_SET_FILTER = linker.downcallHandle(lookup.find("H5Pset_filter").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
             H5P_CLOSE = linker.downcallHandle(lookup.find("H5Pclose").get(),
+            H5P_CLOSE = linker.downcallHandle(HDF5_LOOKUP.find("H5Pclose").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
             
-            if (lookup.find("H5T_NATIVE_DOUBLE_g").isPresent()) {
-                MemorySegment seg = lookup.find("H5T_NATIVE_DOUBLE_g").get();
-                // hid_t can be 32 or 64 bits depending on the HDF5 build. 
-                // We try reading 8 bytes, and if it's 0 or looks suspicious, we might be on a 32-bit ID build.
-                H5T_NATIVE_DOUBLE = seg.byteSize() >= 8 ? seg.get(ValueLayout.JAVA_LONG, 0) : seg.get(ValueLayout.JAVA_INT, 0);
+            MemorySegment h5tNativeDouble = findSymbol(HDF5_LOOKUP, "H5T_NATIVE_DOUBLE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found"));
+            
+            // On some systems, the global is a direct ID, on others it's a pointer to the ID.
+            // We use the segment size to decide how to read it.
+            if (h5tNativeDouble.byteSize() == 4) {
+                H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_INT, 0);
+            } else if (h5tNativeDouble.byteSize() == 8) {
+                H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
             } else {
-                H5T_NATIVE_DOUBLE = 0L;
+                // Fallback: try to read it as a long and cast
+                H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
+                logger.fine(String.format("H5T_NATIVE_DOUBLE_g size unexpected: %d, read as long", h5tNativeDouble.byteSize()));
             }
 
-            if (lookup.find("H5P_CLS_DATASET_CREATE_ID_g").isPresent()) {
-                 MemorySegment seg = lookup.find("H5P_CLS_DATASET_CREATE_ID_g").get();
-                 H5P_DATASET_CREATE = seg.byteSize() >= 8 ? seg.get(ValueLayout.JAVA_LONG, 0) : seg.get(ValueLayout.JAVA_INT, 0);
+            MemorySegment h5pDatasetCreate = findSymbol(HDF5_LOOKUP, "H5P_CLS_DATASET_CREATE_ID_g").orElseThrow(() -> new IllegalStateException("H5P_CLS_DATASET_CREATE_ID_g not found"));
+            if (h5pDatasetCreate.byteSize() == 4) {
+                H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_INT, 0);
             } else {
-                 H5P_DATASET_CREATE = 0L;
+                H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_LONG, 0);
             }
+            
+            logger.info(String.format("Retrieved HDF5 Globals: H5T_NATIVE_DOUBLE=%d, H5P_DATASET_CREATE=%d", H5T_NATIVE_DOUBLE, H5P_DATASET_CREATE));
             
             AVAILABLE = true;
         } else {

@@ -28,6 +28,7 @@ public class NativeLibraryLoader {
     private static final Linker LINKER = Linker.nativeLinker();
     private static final java.util.Set<String> FAILED_LIBS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final java.util.Set<String> FAILED_VARIANTS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final java.util.Map<String, String> FAILURE_CAUSES = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * Finds the "libs" directory by searching upwards from user.dir.
@@ -154,6 +155,7 @@ public class NativeLibraryLoader {
                     SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
                     return Optional.of(lookup);
                 } catch (Exception e) {
+                    FAILURE_CAUSES.put(variant, e.toString());
                     if (FAILED_VARIANTS.add(variant)) {
                         logger.warn("System load failed for {}: {}", variant, e.toString());
                     }
@@ -267,6 +269,19 @@ public class NativeLibraryLoader {
             if (segment.isPresent()) return segment;
         }
         return Optional.empty();
+    }
+
+    /**
+     * Returns the last recorded failure cause for a library or variant.
+     */
+    public static String getFailureCause(String libName) {
+        return FAILURE_CAUSES.getOrDefault(libName, "No recorded error");
+    }
+
+    public static List<String> getAllFailureCauses() {
+        List<String> results = new ArrayList<>();
+        FAILURE_CAUSES.forEach((k, v) -> results.add(k + ": " + v));
+        return results;
     }
 
     public static void clearCache() {

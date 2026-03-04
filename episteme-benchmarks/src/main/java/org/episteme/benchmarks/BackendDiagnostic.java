@@ -45,12 +45,13 @@ public class BackendDiagnostic {
             }
         });
 
-        System.out.println("\n--- General Backends (SPI) ---");
         safeIterate(ServiceLoader.load(Backend.class), b -> {
             if (b.getName().contains("Arrow") || b.getName().contains("FFM")) {
                  checkAvailability(b.getName(), b::isAvailable);
             }
         });
+
+        printNativeFailureDetails();
     }
 
     private static <T> void safeIterate(ServiceLoader<T> loader, java.util.function.Consumer<T> consumer) {
@@ -81,5 +82,20 @@ public class BackendDiagnostic {
             error = " [ERROR: " + t.getClass().getSimpleName() + ": " + t.getMessage() + "]";
         }
         System.out.printf("%-45s | Available: %-5b%s\n", name, available, error);
+    }
+
+    private static void printNativeFailureDetails() {
+        System.out.println("\n--- Native Loading Failure Details ---");
+        try {
+            Class<?> loaderClass = Class.forName("org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader");
+            java.util.List<String> causes = (java.util.List<String>) loaderClass.getMethod("getAllFailureCauses").invoke(null);
+            if (causes.isEmpty()) {
+                System.out.println("No native loading failures recorded.");
+            } else {
+                causes.forEach(System.out::println);
+            }
+        } catch (Throwable t) {
+            System.out.println("Could not retrieve native failure details: " + t.getMessage());
+        }
     }
 }
