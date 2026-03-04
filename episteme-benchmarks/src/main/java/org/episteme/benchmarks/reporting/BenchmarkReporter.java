@@ -131,7 +131,7 @@ public class BenchmarkReporter {
 
         JFreeChart chart = ChartFactory.createBarChart(
                 domain + " | Scaling Performance",
-                "Implementation Architecture",
+                null, // Remove "Implementation Architecture" domain axis label
                 "Throughput (Operations per Second)",
                 dataset,
                 PlotOrientation.HORIZONTAL,

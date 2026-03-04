@@ -42,12 +42,8 @@ if [ "$RUN_DIAGNOSTIC" = true ]; then
     fi
 fi
 
-# If PDF requested but no export file, set a default
-if [ "$GENERATE_PDF" = true ] && [ -z "$EXPORT_FILE" ]; then
-    EXPORT_FILE="benchmark-results.json"
-    # Append the default export file to arguments if not already present
-    set -- "$@" "--export-file=$EXPORT_FILE"
-fi
+# If PDF requested but no export file, Java CLI logic handles timestamp generation automatically 
+# (No need to append static name).
 
 # --- Environment Setup ---
 export NATIVE_ROOT="/opt/episteme-native"
