@@ -34,16 +34,19 @@ docker build -t episteme-gpu -f docker/Dockerfile.gpu .
 
 echo "--- [4/4] Lancement des Benchmarks ---"
 # S'assurer que le dossier de résultats et tmp existent
-mkdir -p docs/benchmark-results
-mkdir -p tmp
+mkdir -p "$(pwd)/docs/benchmark-results"
+mkdir -p "$(pwd)/tmp"
+
+LOG_DIR="$(pwd)/tmp"
+RES_DIR="$(pwd)/docs/benchmark-results"
 
 echo "Exécution des diagnostics..."
-docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > tmp/diagnostic_output.txt 2>&1
+docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > "$LOG_DIR/diagnostic_output.txt" 2>&1
 
-echo "Lancement des benchmarks (Logging vers tmp/console.txt)..."
-# Lance le container avec accès au GPU et génère le PDF
+echo "Lancement des benchmarks (Logging vers $LOG_DIR/console.txt)..."
 # Redirection de la sortie vers tmp/console.txt pour analyse
-docker run --rm --gpus all -v "$(pwd)/docs/benchmark-results:/app/docs/benchmark-results" episteme-gpu --run-all --pdf 2>&1 | tee tmp/console.txt
+# Note: usage de stdbuf pour forcer le flush du log en cas de Ctrl+C
+stdbuf -oL -eL docker run --rm --gpus all -v "$RES_DIR:/app/docs/benchmark-results" episteme-gpu --run-all --pdf 2>&1 | tee "$LOG_DIR/console.txt"
 
 echo "Terminé ! Les résultats sont dans docs/benchmark-results/"
-echo "Les logs de console sont dans tmp/console.txt"
+echo "Les logs de console sont dans $LOG_DIR/console.txt"

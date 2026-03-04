@@ -133,6 +133,13 @@ public class NativeLibraryLoader {
             }
         }
 
+        // Common Linux/Universal variants
+        if (!isWin) {
+            if (libName.equalsIgnoreCase("opencl")) {
+                variants.add("OpenCL");
+            }
+        }
+
         java.nio.file.Path discoveredLibs = findLibsDirectory();
         if (discoveredLibs != null) {
             preloadRuntimes(discoveredLibs, arena);
