@@ -105,19 +105,19 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
                 System.err.println("[WARN] Failed to call H5open(): " + t.getMessage());
             }
 
-            MemorySegment h5tNativeDouble = NativeLibraryLoader.findSymbol(lookup, "H5T_NATIVE_DOUBLE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found"));
+            MemorySegment h5tNativeDouble = NativeLibraryLoader.findSymbol(lookup, "H5T_NATIVE_DOUBLE_g").orElseGet(() -> NativeLibraryLoader.findSymbol(lookup, "H5T_IEEE_F64LE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found")));
             
-            if (h5tNativeDouble.byteSize() == 4) {
-                H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_INT, 0);
-            } else {
+            if (h5tNativeDouble.byteSize() >= 8) {
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
+            } else {
+                H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_INT, 0);
             }
 
             MemorySegment h5pDatasetCreate = NativeLibraryLoader.findSymbol(lookup, "H5P_CLS_DATASET_CREATE_ID_g").orElseThrow(() -> new IllegalStateException("H5P_CLS_DATASET_CREATE_ID_g not found"));
-            if (h5pDatasetCreate.byteSize() == 4) {
-                H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_INT, 0);
-            } else {
+            if (h5pDatasetCreate.byteSize() >= 8) {
                 H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_LONG, 0);
+            } else {
+                H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_INT, 0);
             }
             
             System.out.println("[INFO] Retrieved HDF5 Globals: H5T_NATIVE_DOUBLE=" + H5T_NATIVE_DOUBLE + ", H5P_DATASET_CREATE=" + H5P_DATASET_CREATE);
