@@ -8,9 +8,10 @@ LOG_DIR="$(pwd)/tmp"
 RES_DIR="$(pwd)/docs/benchmark-results"
 mkdir -p "$LOG_DIR"
 mkdir -p "$RES_DIR"
+mkdir -p "$(pwd)/libs"
 
 # Ensure directories are writable by the current user
-chmod -R 777 "$LOG_DIR" "$RES_DIR"
+chmod -R 777 "$LOG_DIR" "$RES_DIR" "$(pwd)/libs" 2>/dev/null || echo "[WARN] Could not chmod directories. If you see permission errors, try: sudo chown -R \$USER:\$USER ."
 
 echo "--- [1/2] Mise à jour et Compilation Locale ---"
 # Gestion Git classique
@@ -26,6 +27,14 @@ export CUDA_PATH="/usr/local/cuda"
 # Compilation C++ Vision
 chmod +x build_vision.sh
 ./build_vision.sh
+# Copy vision lib to shared libs directory
+cp episteme-native/src/main/resources/linux-x86_64/libepisteme_vision.so libs/
+
+# Compilation JNI
+cd episteme-jni
+chmod +x compile_jni_linux.sh
+./compile_jni_linux.sh
+cd ..
 
 # Compilation Java Maven
 mvn clean install -DskipTests -Pheadless
