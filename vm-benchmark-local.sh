@@ -65,4 +65,10 @@ export LD_LIBRARY_PATH="$(pwd)/libs:/usr/local/cuda/lib64:/usr/lib/x86_64-linux-
 chmod +x run-benchmarks.sh
 ./run-benchmarks.sh "${BENCH_ARGS[@]}" 2>&1 | tee "$LOG_DIR/console.txt"
 
-echo "Terminé! Résultats dans $RES_DIR"
+echo "=========================================="
+echo "Benchmark Session Complete"
+echo "=========================================="
+echo "Results exported to: $RES_DIR"
+ls -lh "$RES_DIR" | tail -n 5
+echo "=========================================="
+echo "Terminé!"
