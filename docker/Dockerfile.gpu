@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Build Tools and Java dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget curl git build-essential cmake pkg-config libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev \
+    wget curl git build-essential cmake pkg-config libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev portaudio19-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install OpenJDK 25
@@ -35,7 +35,7 @@ RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
     rm -rf /tmp/QuEST
 
 RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
-    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -S . -B build && \
+    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_BULLET_ROBOTICS_GUI=OFF -DBUILD_BULLET3=OFF -S . -B build && \
     cmake --build build -j$(nproc) && \
     find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \; && \
     find build -name "libBulletCollision.so" -exec cp {} /build/libs/ \; && \
@@ -69,7 +69,13 @@ RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline -B -Dmdep.skip
 
 # 4. Compile Episteme Native Vision & Java Project
 COPY . /build/
-RUN --mount=type=cache,target=/root/.m2 chmod +x /build/build_vision.sh && ./build_vision.sh && \
+RUN mkdir -p /tmp/miniaudio && \
+    cp /build/episteme-native/src/main/resources/native/miniaudio/miniaudio-master/miniaudio.c /tmp/miniaudio/ && \
+    cp /build/episteme-native/src/main/resources/native/miniaudio/miniaudio-master/miniaudio.h /tmp/miniaudio/ && \
+    cd /tmp/miniaudio && \
+    gcc -O3 -shared -fPIC miniaudio.c -o /build/libs/libminiaudio.so -lpthread -lm -ldl && \
+    rm -rf /tmp/miniaudio && \
+    --mount=type=cache,target=/root/.m2 chmod +x /build/build_vision.sh && ./build_vision.sh && \
     find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
     mvn install -DskipTests -Dmdep.skip=true -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
     mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
