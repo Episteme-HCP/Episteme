@@ -29,7 +29,7 @@ mvn clean install -DskipTests -Pheadless
 
 echo "--- [2/2] Exécution des Benchmarks (Native Linux) ---"
 if [ "$#" -eq 0 ]; then
-    BENCH_ARGS=(--run-all --domain "Linear Algebra" --exclude-provider ND4J --pdf)
+    BENCH_ARGS=(--cli --run-all --domain "Linear Algebra" --exclude-provider ND4J --pdf)
     echo "Aucun argument fourni. Utilisation des filtres par défaut : ${BENCH_ARGS[*]}"
 else
     BENCH_ARGS=("$@")

@@ -20,6 +20,7 @@ import java.util.Locale;
 public class BenchmarkCLI {
 
     public static void main(String[] args) {
+        System.setProperty("java.awt.headless", "true");
         boolean runAll = false;
         boolean dryRun = false;
         boolean generatePdf = false;

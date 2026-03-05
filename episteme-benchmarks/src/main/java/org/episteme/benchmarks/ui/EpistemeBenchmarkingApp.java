@@ -105,6 +105,12 @@ public class EpistemeBenchmarkingApp extends Application {
     }
 
     public static void main(String[] args) {
+        for (String arg : args) {
+            if ("--cli".equals(arg)) {
+                org.episteme.benchmarks.cli.BenchmarkCLI.main(args);
+                return;
+            }
+        }
         launch(args);
     }
 }
