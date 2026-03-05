@@ -43,15 +43,15 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @SuppressWarnings("unused")
     private static final Logger LOGGER = Logger.getLogger(NativeOpenCLSparseLinearAlgebraBackend.class.getName());
 
-    private cl_context context;
-    private cl_command_queue commandQueue;
-    private cl_device_id device;
-    private boolean isInitialized = false;
+    private static cl_context staticContext;
+    private static cl_command_queue staticCommandQueue;
+    private static cl_device_id staticDevice;
+    private static cl_kernel matMulKernel;
+    private static cl_program sparseProgram;
+    private static cl_program denseProgram;
+    private static volatile boolean isInitialized = false;
+    private static volatile boolean initAttempted = false;
     private static Boolean cachedAvailability = null;
-
-    private cl_kernel matMulKernel;
-    private cl_program sparseProgram;
-    private cl_program denseProgram;
 
     // Kernels
     private static final String KERNEL_SPMV = 
@@ -202,12 +202,14 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     private boolean attemptInitialization() {
         if (isInitialized) return true;
+        if (initAttempted) return isInitialized;
         start();
         return isInitialized;
     }
 
-    private synchronized void start() {
-        if (isInitialized) return;
+    private static synchronized void start() {
+        if (initAttempted) return;
+        initAttempted = true;
         try {
             CL.setExceptionsEnabled(true);
             int[] numPlatformsArray = new int[1];
@@ -221,27 +223,28 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             
             cl_context_properties contextProperties = new cl_context_properties();
             contextProperties.addProperty(CL.CL_CONTEXT_PLATFORM, platform);
-            context = CL.clCreateContext(contextProperties, 1, new cl_device_id[]{device}, null, null, null);
+            staticContext = CL.clCreateContext(contextProperties, 1, new cl_device_id[]{staticDevice}, null, null, null);
             cl_queue_properties queueProperties = new cl_queue_properties();
-            commandQueue = CL.clCreateCommandQueueWithProperties(context, device, queueProperties, null);
+            staticCommandQueue = CL.clCreateCommandQueueWithProperties(staticContext, staticDevice, queueProperties, null);
             
             initKernels();
             
             isInitialized = true;
         } catch (Exception e) {
             isInitialized = false;
-            LOGGER.warning("Failed to initialize OpenCL Backend: " + e.getMessage());
+            initAttempted = true;
+            LOGGER.warning("Failed to initialize OpenCL Sparse Backend: " + e.getMessage());
         }
     }
 
-    private void initKernels() {
+    private static void initKernels() {
         try {
             // Sparse Program
-            sparseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SPMV}, null, null);
+            sparseProgram = clCreateProgramWithSource(staticContext, 1, new String[]{KERNEL_SPMV}, null, null);
             clBuildProgram(sparseProgram, 0, null, null, null, null);
 
             // Dense Program
-            denseProgram = clCreateProgramWithSource(context, 1, new String[]{KERNEL_DENSE}, null, null);
+            denseProgram = clCreateProgramWithSource(staticContext, 1, new String[]{KERNEL_DENSE}, null, null);
             clBuildProgram(denseProgram, 0, null, null, null, null);
             matMulKernel = clCreateKernel(denseProgram, "matrixMultiply", null);
         } catch (CLException e) {
@@ -258,7 +261,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override
     public ExecutionContext createContext() {
         if (!isInitialized) start();
-        return new OpenCLExecutionContext(context, commandQueue);
+        return isInitialized ? new OpenCLExecutionContext(staticContext, staticCommandQueue) : null;
     }
 
     @Override
@@ -281,9 +284,9 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         double[] dataB = new double[k * n]; B.get(dataB); B.rewind();
         double[] dataC = new double[m * n];
 
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * m * k, Pointer.to(dataA), null);
-        cl_mem memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * k * n, Pointer.to(dataB), null);
-        cl_mem memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * m * n, null, null);
+        cl_mem memA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * m * k, Pointer.to(dataA), null);
+        cl_mem memB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * k * n, Pointer.to(dataB), null);
+        cl_mem memC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, Sizeof.cl_double * m * n, null, null);
 
         try {
             clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
@@ -294,8 +297,8 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
 
             long[] globalWorkSize = new long[]{n, m};
-            clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
-            clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, Sizeof.cl_double * m * n, Pointer.to(dataC), 0, null, null);
+            clEnqueueNDRangeKernel(staticCommandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, memC, CL_TRUE, 0, Sizeof.cl_double * m * n, Pointer.to(dataC), 0, null, null);
             C.put(dataC); C.rewind();
         } finally {
             clReleaseMemObject(memA);
@@ -313,7 +316,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override
     public void copyFromGPU(long handle, DoubleBuffer buffer, long size) {}
     @Override
-    public void synchronize() { if (commandQueue != null) clFinish(commandQueue); }
+    public void synchronize() { if (staticCommandQueue != null) clFinish(staticCommandQueue); }
 
     // Linear Algebra Implementation
     @Override
@@ -387,11 +390,11 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         for (int i = 0; i < cols; i++) xData[i] = x.get(i).doubleValue();
         double[] yData = new double[rows];
 
-        cl_mem memPtr = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null);
-        cl_mem memInd = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * nnz, Pointer.to(colIndices), null);
-        cl_mem memVal = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * nnz, Pointer.to(values), null);
-        cl_mem memX = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * cols, Pointer.to(xData), null);
-        cl_mem memY = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * rows, null, null);
+        cl_mem memPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null);
+        cl_mem memInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * nnz, Pointer.to(colIndices), null);
+        cl_mem memVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * nnz, Pointer.to(values), null);
+        cl_mem memX = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * cols, Pointer.to(xData), null);
+        cl_mem memY = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, Sizeof.cl_double * rows, null, null);
 
         cl_kernel spmvKernel = clCreateKernel(sparseProgram, "spmv_csr", null);
         try {
@@ -403,8 +406,8 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             clSetKernelArg(spmvKernel, 5, Sizeof.cl_mem, Pointer.to(memY));
 
             long[] globalWorkSize = new long[]{rows};
-            clEnqueueNDRangeKernel(commandQueue, spmvKernel, 1, null, globalWorkSize, null, 0, null, null);
-            clEnqueueReadBuffer(commandQueue, memY, CL_TRUE, 0, Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
+            clEnqueueNDRangeKernel(staticCommandQueue, spmvKernel, 1, null, globalWorkSize, null, 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, memY, CL_TRUE, 0, Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
         } finally {
             clReleaseKernel(spmvKernel);
             clReleaseMemObject(memPtr);
