@@ -98,8 +98,8 @@ public class BenchmarkCLI {
             
             boolean excluded = false;
             for (String ex : excludedProviders) {
-                if (provider.equalsIgnoreCase(ex)) {
-                    System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because provider '" + provider + "' is excluded by '" + ex + "'.");
+                if (provider.toLowerCase().contains(ex.toLowerCase())) {
+                    System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because provider '" + provider + "' matches exclusion '" + ex + "'.");
                     excluded = true;
                     break;
                 }

@@ -12,6 +12,7 @@ import java.util.ServiceLoader;
 public class BenchmarkRegistry {
 
     public static List<RunnableBenchmark> discover() {
+        List<RunnableBenchmark> all = new ArrayList<>();
         ClassLoader loader = BenchmarkRegistry.class.getClassLoader();
         try {
             // 1. Discover explicit benchmarks
