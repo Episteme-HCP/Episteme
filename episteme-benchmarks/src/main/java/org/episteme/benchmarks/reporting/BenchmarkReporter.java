@@ -99,6 +99,7 @@ public class BenchmarkReporter {
             }
 
             document.close();
+            System.out.println("[SUCCESS] PDF Report generated at: " + pdfPath);
         } catch (Exception e) {
             System.err.println("Error generating PDF report: " + e.getMessage());
             e.printStackTrace();

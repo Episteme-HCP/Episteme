@@ -71,4 +71,10 @@ echo "=========================================="
 echo "Results exported to: $RES_DIR"
 ls -lh "$RES_DIR" | tail -n 5
 echo "=========================================="
+
+# Copy results to tmp/ for automatic retrieval by the user's script
+echo "Copying results to $LOG_DIR for retrieval..."
+cp "$RES_DIR"/* "$LOG_DIR/" 2>/dev/null
+chmod -R 777 "$LOG_DIR"
+
 echo "Terminé!"

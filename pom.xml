@@ -656,11 +656,25 @@
       <name>JitPack</name>
       <url>https://jitpack.io</url>
     </repository>
-    <!-- jzy3d repositories moved to 'ui-desktop' profile to avoid 429 errors in headless builds -->
     <repository>
       <id>tarsos-dsp</id>
       <name>TarsosDSP Repository</name>
       <url>https://mvn.0110.be/releases</url>
+    </repository>
+    <repository>
+      <id>oss-sonatype</id>
+      <name>OSS Sonatype</name>
+      <url>https://oss.sonatype.org/content/repositories/releases/</url>
+    </repository>
+    <repository>
+      <id>jzy3d-releases</id>
+      <name>Jzy3d Releases</name>
+      <url>https://maven.jzy3d.org/releases/</url>
+    </repository>
+    <repository>
+      <id>jzy3d-snapshots</id>
+      <name>Jzy3d Snapshots</name>
+      <url>https://maven.jzy3d.org/snapshots/</url>
     </repository>
   </repositories>
   <profiles>
@@ -728,23 +742,6 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-      <repositories>
-        <repository>
-          <id>oss-sonatype</id>
-          <name>OSS Sonatype</name>
-          <url>https://oss.sonatype.org/content/repositories/releases/</url>
-        </repository>
-        <repository>
-          <id>jzy3d-releases</id>
-          <name>Jzy3d Releases</name>
-          <url>https://maven.jzy3d.org/releases/</url>
-        </repository>
-        <repository>
-          <id>jzy3d-snapshots</id>
-          <name>Jzy3d Snapshots</name>
-          <url>https://maven.jzy3d.org/snapshots/</url>
-        </repository>
-      </repositories>
     </profile>
   </profiles>
 </project>

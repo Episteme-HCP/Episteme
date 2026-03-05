@@ -104,7 +104,7 @@ if [ "$USE_SHADED" = true ]; then
     fi
 elif [ -f "/app/benchmarks.jar" ] && [ -f "/app/server.jar" ]; then
     echo "[INFO] Running from Pre-Compiled Docker Environment (/app/benchmarks.jar)"
-    java -Xlog:library=info -verbose:jni -XshowSettings:properties --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "benchmarks.jar:server.jar:lib/*:libs/*" "${APP_CLASS}" "$@"
+    java -Xlog:library=info -Djava.awt.headless=true -verbose:jni -XshowSettings:properties --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "benchmarks.jar:server.jar:lib/*:libs/*" "${APP_CLASS}" "$@"
 else
     echo "[INFO] Running latest compiled classes - Dev Mode. Use --shaded to force JAR."
     if [ ! -d "episteme-benchmarks/target/classes" ]; then
@@ -116,6 +116,6 @@ else
         echo "[INFO] Dependencies not found in target, copying..."
         mvn dependency:copy-dependencies -pl episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests
     fi
-    java -XshowSettings:properties -verbose:jni --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "${MODULE_PATH}:${DEPENDENCY_DIR}/*:${LIB_DIR}/*" "${APP_CLASS}" "$@"
+    java -XshowSettings:properties -Djava.awt.headless=true -verbose:jni --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "${MODULE_PATH}:${DEPENDENCY_DIR}/*:${LIB_DIR}/*" "${APP_CLASS}" "$@"
 fi
 
