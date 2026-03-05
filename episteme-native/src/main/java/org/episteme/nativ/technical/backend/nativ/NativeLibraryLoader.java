@@ -29,6 +29,7 @@ public class NativeLibraryLoader {
     private static final java.util.Set<String> FAILED_LIBS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final java.util.Set<String> FAILED_VARIANTS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final java.util.Map<String, String> FAILURE_CAUSES = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<String, SymbolLookup> LOADED_LIBS = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * Finds the "libs" directory by searching upwards from user.dir.
@@ -87,6 +88,9 @@ public class NativeLibraryLoader {
      * @return an Optional containing the SymbolLookup if found, or empty.
      */
     public static Optional<SymbolLookup> loadLibrary(String libName, Arena arena) {
+        if (LOADED_LIBS.containsKey(libName)) {
+            return Optional.of(LOADED_LIBS.get(libName));
+        }
         if (FAILED_LIBS.contains(libName)) {
             return Optional.empty();
         }
@@ -170,11 +174,14 @@ public class NativeLibraryLoader {
             
             // 1. Try loading directly via System.loadLibrary (or equivalent)
             try {
-                logger.info("Probing native library variant: " + variant);
+                if (!FAILED_VARIANTS.contains(variant)) {
+                    logger.info("Probing native library variant: " + variant);
+                }
                 // Force pre-loading of runtime dependencies before loading the main library
                 preloadRuntimes(discoveredLibs, arena);
                 SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
                 logger.info("Successfully loaded library variant: " + variant);
+                LOADED_LIBS.put(libName, lookup);
                 return Optional.of(lookup);
             } catch (Exception e) {
                 FAILURE_CAUSES.put(variant, e.toString());
@@ -206,6 +213,7 @@ public class NativeLibraryLoader {
                 if (path == null || path.isEmpty()) continue; 
                 Optional<SymbolLookup> found = tryLoadFromDirectory(java.nio.file.Paths.get(path), currentMapped, arena);
                 if (found.isPresent()) {
+                    LOADED_LIBS.put(libName, found.get());
                     return found;
                 }
             }
@@ -217,6 +225,7 @@ public class NativeLibraryLoader {
                         Optional<SymbolLookup> found = tryLoadFromDirectory(sub.toPath(), currentMapped, arena);
                         if (found.isPresent()) {
                             logger.info("Successfully loaded {} from subdirectory: {}", variant, sub.getName());
+                            LOADED_LIBS.put(libName, found.get());
                             return found;
                         } else {
                             if (FAILED_VARIANTS.add(variant + "@" + sub.getName())) {
@@ -241,19 +250,6 @@ public class NativeLibraryLoader {
             logPath = fullPath;
             if (java.nio.file.Files.exists(fullPath)) {
                 try {
-                    // Before loading the target library, try loading ALL other libraries in the same directory 
-                    // as they might be runtime dependencies (like libstdc++-6.dll, .so, etc)
-                    try (java.util.stream.Stream<java.nio.file.Path> siblingFiles = java.nio.file.Files.list(basePath)) {
-                        siblingFiles.filter(p -> {
-                            String name = p.toString().toLowerCase();
-                            return (name.endsWith(".dll") || name.endsWith(".so") || name.endsWith(".dylib")) && !p.equals(fullPath);
-                        })
-                                    .forEach(p -> {
-                                        try { 
-                                            SymbolLookup.libraryLookup(p, arena); 
-                                        } catch (Throwable ignored) {} 
-                                    });
-                    }
                     return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
                 } catch (Throwable t) {
                     if (FAILED_VARIANTS.add(fullPath.toString())) {

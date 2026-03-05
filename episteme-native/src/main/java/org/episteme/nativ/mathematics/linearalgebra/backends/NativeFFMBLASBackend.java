@@ -129,7 +129,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 }
 
                 // LAPACK
-                Optional<MemorySegment> dgesvAddr = LOOKUP.find("LAPACKE_dgesv").or(() -> LOOKUP.find("dgesv"));
+                Optional<MemorySegment> dgesvAddr = LOOKUP.find("LAPACKE_dgesv");
                 if (dgesvAddr.isPresent()) {
                     FunctionDescriptor dgesvDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -139,7 +139,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                     DGESV = LINKER.downcallHandle(dgesvAddr.get(), dgesvDesc);
                 }
 
-                Optional<MemorySegment> dgetrfAddr = LOOKUP.find("LAPACKE_dgetrf").or(() -> LOOKUP.find("dgetrf"));
+                Optional<MemorySegment> dgetrfAddr = LOOKUP.find("LAPACKE_dgetrf");
                 if (dgetrfAddr.isPresent()) {
                     FunctionDescriptor dgetrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -148,7 +148,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                     DGETRF = LINKER.downcallHandle(dgetrfAddr.get(), dgetrfDesc);
                 }
                 
-                Optional<MemorySegment> dgetriAddr = LOOKUP.find("LAPACKE_dgetri").or(() -> LOOKUP.find("dgetri"));
+                Optional<MemorySegment> dgetriAddr = LOOKUP.find("LAPACKE_dgetri");
                 if (dgetriAddr.isPresent()) {
                     FunctionDescriptor dgetriDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
