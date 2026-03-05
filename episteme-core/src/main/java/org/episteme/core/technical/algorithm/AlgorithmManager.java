@@ -33,6 +33,7 @@ public final class AlgorithmManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlgorithmManager.class.getName());
     private static final Map<Class<?>, AlgorithmProvider> BEST_PROVIDERS = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, List<? extends AlgorithmProvider>> PROVIDER_CACHE = new ConcurrentHashMap<>();
     private static final ProviderRegistry REGISTRY = new ProviderRegistry();
 
     static {
@@ -92,7 +93,12 @@ public final class AlgorithmManager {
      * @param providerClass the interface class of the provider
      * @return list of available providers sorted by priority (descending)
      */
+    @SuppressWarnings("unchecked")
     public static <P extends AlgorithmProvider> List<P> getProviders(Class<P> providerClass) {
+        return (List<P>) PROVIDER_CACHE.computeIfAbsent(providerClass, k -> discoverProviders((Class<P>) k));
+    }
+
+    private static <P extends AlgorithmProvider> List<P> discoverProviders(Class<P> providerClass) {
         // Use IdentityHashMap to deduplicate by instance identity
         Set<AlgorithmProvider> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         List<P> available = new ArrayList<>();
@@ -205,6 +211,8 @@ public final class AlgorithmManager {
      */
     public static void refresh() {
         BEST_PROVIDERS.clear();
+        PROVIDER_CACHE.clear();
+        NativeLibraryLoader.clearCache();
     }
 }
 

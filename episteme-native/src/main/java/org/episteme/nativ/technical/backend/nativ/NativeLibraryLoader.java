@@ -183,10 +183,10 @@ public class NativeLibraryLoader {
                 logger.info("Successfully loaded library variant: " + variant);
                 LOADED_LIBS.put(libName, lookup);
                 return Optional.of(lookup);
-            } catch (Exception e) {
-                FAILURE_CAUSES.put(variant, e.toString());
+            } catch (Throwable t) {
+                FAILURE_CAUSES.put(variant, t.toString());
                 if (FAILED_VARIANTS.add(variant)) {
-                    logger.warn("Native load failed for " + variant + ": " + e.getMessage());
+                    logger.warn("Native load failed for " + variant + ": " + t.getMessage());
                 }
             }
 
