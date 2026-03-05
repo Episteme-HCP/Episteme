@@ -12,11 +12,11 @@ import java.util.ServiceLoader;
 public class BenchmarkRegistry {
 
     public static List<RunnableBenchmark> discover() {
-        List<RunnableBenchmark> all = new ArrayList<>();
-        
+        ClassLoader loader = BenchmarkRegistry.class.getClassLoader();
         try {
             // 1. Discover explicit benchmarks
-            ServiceLoader<RunnableBenchmark> benchLoader = ServiceLoader.load(RunnableBenchmark.class);
+            System.out.println("[DEBUG] Discovery: Loading explicit benchmarks...");
+            ServiceLoader<RunnableBenchmark> benchLoader = ServiceLoader.load(RunnableBenchmark.class, loader);
             int explicitCount = 0;
             for (RunnableBenchmark b : benchLoader) {
                 explicitCount++;
@@ -88,10 +88,12 @@ public class BenchmarkRegistry {
     }
 
     private static <P extends org.episteme.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list) {
+        System.out.println("[DEBUG]   - Expanding systematic benchmark: " + base.getNameBase() + " using provider class: " + base.getProviderClass().getName());
         try {
-            ServiceLoader<P> loader = ServiceLoader.load(base.getProviderClass());
+            ClassLoader loader = BenchmarkRegistry.class.getClassLoader();
+            ServiceLoader<P> sLoader = ServiceLoader.load(base.getProviderClass(), loader);
             int pCount = 0;
-            for (P p : loader) {
+            for (P p : sLoader) {
                 pCount++;
                 System.out.println("[DEBUG]   - Found systematic provider implementation: " + p.getName() + " (Type: " + p.getAlgorithmType() + ")");
                 try {
