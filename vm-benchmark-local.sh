@@ -9,6 +9,9 @@ RES_DIR="$(pwd)/docs/benchmark-results"
 mkdir -p "$LOG_DIR"
 mkdir -p "$RES_DIR"
 
+# Ensure directories are writable by the current user
+chmod -R 777 "$LOG_DIR" "$RES_DIR"
+
 echo "--- [1/2] Mise à jour et Compilation Locale ---"
 # Gestion Git classique
 git fetch origin main
@@ -49,8 +52,8 @@ fi
 # Variables environnement requises pour le natif
 export LD_LIBRARY_PATH="$(pwd)/libs:/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
 
-# On exécute run-benchmarks.sh en local
+# On exécute run-benchmarks.sh en local avec capture de la console
 chmod +x run-benchmarks.sh
-./run-benchmarks.sh "${BENCH_ARGS[@]}"
+./run-benchmarks.sh "${BENCH_ARGS[@]}" 2>&1 | tee "$LOG_DIR/console.txt"
 
 echo "Terminé! Résultats dans $RES_DIR"

@@ -11,6 +11,7 @@ LOG_DIR="$(pwd)/tmp"
 RES_DIR="$(pwd)/docs/benchmark-results"
 mkdir -p "$LOG_DIR"
 mkdir -p "$RES_DIR"
+chmod -R 777 "$LOG_DIR" "$RES_DIR"
 
 echo "--- [1/4] État de l'espace disque & Nettoyage ---"
 df -h / | grep /
