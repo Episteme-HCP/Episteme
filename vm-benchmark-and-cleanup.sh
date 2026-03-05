@@ -62,7 +62,7 @@ docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > "$LOG_DIR/diagnost
 
 # Gestion des arguments par défaut en utilisant un tableau pour préserver les espaces
 if [ "$#" -eq 0 ]; then
-    BENCH_ARGS=(--run-all --domain "Linear Algebra" --exclude-provider ND4J --pdf)
+    BENCH_ARGS=(--cli --run-all --domain "Linear Algebra" --exclude-provider ND4J --pdf)
     echo "Aucun argument fourni. Utilisation des filtres par défaut : ${BENCH_ARGS[*]}"
 else
     BENCH_ARGS=("$@")
