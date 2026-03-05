@@ -40,7 +40,7 @@ public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlg
 
     @Override
     public String getDomain() {
-        return "Matrix Inversion";
+        return "Linear Algebra";
     }
 
     @Override

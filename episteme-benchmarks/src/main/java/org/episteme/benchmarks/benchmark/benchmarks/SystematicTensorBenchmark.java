@@ -40,7 +40,7 @@ public class SystematicTensorBenchmark implements SystematicBenchmark<TensorProv
 
     @Override
     public String getDomain() {
-        return "Deep Learning (Tensor)";
+        return "Linear Algebra";
     }
 
     @Override

@@ -43,7 +43,7 @@ public class SystematicSparseMatrixBenchmark implements SystematicBenchmark<Spar
 
     @Override
     public String getDomain() {
-        return "Sparse Matrix Multiplication";
+        return "Linear Algebra";
     }
 
     @Override
