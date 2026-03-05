@@ -19,10 +19,9 @@ if ! dpkg -l | grep -q "libfontconfig1"; then
 fi
 
 echo "--- [1/2] Mise à jour et Compilation Locale ---"
-# Gestion Git classique
+# Gestion Git classique - Force sync
 git fetch origin main
-git checkout main
-git pull origin main
+git reset --hard origin/main
 
 # Compilation rapide (sans tests, sans copier les dépendances GUI inutiles)
 export JAVA_HOME="/usr/lib/jvm/java-25-openjdk-amd64"
