@@ -139,9 +139,24 @@ public class NativeLibraryLoader {
             if (libName.equalsIgnoreCase("opencl")) {
                 variants.add("OpenCL");
                 variants.add("OpenCL.so.1");
-                variants.add("OpenCL.so.1.0.0");
-                variants.add("OpenCL.so.1.1.0");
+                variants.add("OpenCL.so.2");
                 variants.add("OpenCL.so.1.2.0");
+            } else if (libName.equals("cuda")) {
+                variants.add("cuda");
+                variants.add("cuda.so.1");
+            } else if (libName.equals("cublas")) {
+                variants.add("cublas");
+                variants.add("cublas.so.12");
+                variants.add("cublas.so.11");
+                variants.add("cublas.so.10");
+            } else if (libName.equals("cusolver")) {
+                variants.add("cusolver");
+                variants.add("cusolver.so.11");
+                variants.add("cusolver.so.10");
+            } else if (libName.equals("cudart")) {
+                variants.add("cudart");
+                variants.add("cudart.so.12");
+                variants.add("cudart.so.11");
             }
         }
 
@@ -176,7 +191,11 @@ public class NativeLibraryLoader {
             searchPaths.add("C:\\Windows\\System32\\");
             
             if (System.getenv("NATIVE_ROOT") != null) searchPaths.add(System.getenv("NATIVE_ROOT"));
-            if (cudaPath != null) searchPaths.add(cudaPath + java.io.File.separator + "bin");
+            if (cudaPath != null) {
+                searchPaths.add(cudaPath + java.io.File.separator + "bin");
+                searchPaths.add(cudaPath + java.io.File.separator + "lib64");
+                searchPaths.add(cudaPath + java.io.File.separator + "lib");
+            }
             
             if (discoveredLibs != null) searchPaths.add(discoveredLibs.toString());
 
