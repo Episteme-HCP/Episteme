@@ -66,7 +66,7 @@ public class SpinField2DViewer {
         // this.magnetization = new float[width][height][3];
         
         // Initialize Jzy3d chart
-        this.chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
+        this.chart = AWTChartComponentFactory.chart(Quality.Advanced(), "awt");
         this.chart.getView().setBackgroundColor(org.jzy3d.colors.Color.BLACK);
     }
 

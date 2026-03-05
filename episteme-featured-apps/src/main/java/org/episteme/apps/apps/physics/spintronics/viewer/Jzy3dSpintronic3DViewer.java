@@ -50,7 +50,7 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
     private final Map<String, Coord3d> arrowBases = new HashMap<>();
 
     public Jzy3dSpintronic3DViewer() {
-        chart = AWTChartComponentFactory.chart(Quality.Advanced, "newt");
+        chart = AWTChartComponentFactory.chart(Quality.Advanced(), "newt");
     }
 
     @Override
