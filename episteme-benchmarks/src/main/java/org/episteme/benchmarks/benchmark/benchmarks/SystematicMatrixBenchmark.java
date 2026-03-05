@@ -63,7 +63,7 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
 
     @Override
     public String getDomain() {
-        return "Linear Algebra";
+        return "Linear Algebra (Dense)";
     }
 
     @Override
