@@ -13,6 +13,11 @@ mkdir -p "$(pwd)/libs"
 # Ensure directories are writable by the current user
 chmod -R 777 "$LOG_DIR" "$RES_DIR" "$(pwd)/libs" 2>/dev/null || echo "[WARN] Could not chmod directories. If you see permission errors, try: sudo chown -R \$USER:\$USER ."
 
+# Check for font libraries (required for PDF generation)
+if ! dpkg -l | grep -q "libfontconfig1"; then
+    echo "[WARN] libfontconfig1 not found. PDF generation might fail. Try: sudo apt-get update && sudo apt-get install -y libfontconfig1"
+fi
+
 echo "--- [1/2] Mise à jour et Compilation Locale ---"
 # Gestion Git classique
 git fetch origin main
