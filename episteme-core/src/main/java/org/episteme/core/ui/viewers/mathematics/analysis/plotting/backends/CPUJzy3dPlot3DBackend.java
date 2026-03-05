@@ -25,6 +25,8 @@ package org.episteme.core.ui.viewers.mathematics.analysis.plotting.backends;
 
 import org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 
+import com.google.auto.service.AutoService;
+
 /**
  * Backend for Jzy3D 3D plotting.
  * Available when Jzy3D library is on classpath.
@@ -32,7 +34,8 @@ import org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBacken
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Jzy3dPlot3DBackend implements PlottingBackend {
+@AutoService(PlottingBackend.class)
+public class CPUJzy3dPlot3DBackend implements PlottingBackend {
 
     @Override
     public String getType() {
@@ -41,12 +44,12 @@ public class Jzy3dPlot3DBackend implements PlottingBackend {
 
     @Override
     public String getId() {
-        return "jzy3d";
+        return "jzy3d-cpu";
     }
 
     @Override
     public String getName() {
-        return "Jzy3D";
+        return "Jzy3D (CPU)";
     }
 
     @Override
@@ -66,7 +69,7 @@ public class Jzy3dPlot3DBackend implements PlottingBackend {
 
     @Override
     public int getPriority() {
-        return 70; // High priority for 3D (OpenGL-based)
+        return 40; // Base priority for CPU fallback
     }
     @Override public boolean isSupported2D() { return false; }
     @Override public boolean isSupported3D() { return true; }

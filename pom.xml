@@ -81,7 +81,7 @@
     <onnxruntime.version>1.17.1</onnxruntime.version>
     <nd4j.version>1.0.0-M2.1</nd4j.version>
     <arrow.version>6.0.1-1.5.8</arrow.version>
-    <ode4j.version>0.4.5</ode4j.version>
+    <ode4j.version>0.5.4</ode4j.version>
     <auto-service.version>1.1.1</auto-service.version>
     <jmh.version>1.37</jmh.version>
     <!-- Native Libraries -->
@@ -379,12 +379,7 @@
         <version>20101010</version>
         <optional>true</optional>
       </dependency>
-      <!-- ODE4J Physics -->
-      <dependency>
-        <groupId>org.ode4j</groupId>
-        <artifactId>core</artifactId>
-        <version>0.5.4</version>
-      </dependency>
+
       <!-- HDF5 (High-Performance IO) -->
       <dependency>
         <groupId>org.bytedeco</groupId>
@@ -498,7 +493,46 @@
     </dependencies>
   </dependencyManagement>
   <build>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.1</version>
+      </extension>
+    </extensions>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>3.1.2</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>install-mpi</id>
+            <phase>initialize</phase>
+            <goals><goal>install-file</goal></goals>
+            <configuration>
+              <file>${project.basedir}/libs/mpi.jar</file>
+              <groupId>org.mpjexpress</groupId>
+              <artifactId>mpi</artifactId>
+              <version>0.44</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
+          <execution>
+            <id>install-mpj</id>
+            <phase>initialize</phase>
+            <goals><goal>install-file</goal></goals>
+            <configuration>
+              <file>${project.basedir}/libs/mpj.jar</file>
+              <groupId>org.mpjexpress</groupId>
+              <artifactId>mpj</artifactId>
+              <version>0.44</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -631,6 +665,17 @@
   </repositories>
   <profiles>
     <profile>
+      <id>m2e-ide-classifier-fallback</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <properties>
+        <os.detected.classifier>windows-x86_64</os.detected.classifier>
+      </properties>
+    </profile>
+    <profile>
       <id>legacy</id>
       <activation>
         <activeByDefault>true</activeByDefault>
@@ -688,6 +733,16 @@
           <id>oss-sonatype</id>
           <name>OSS Sonatype</name>
           <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+          <id>jzy3d-releases</id>
+          <name>Jzy3d Releases</name>
+          <url>https://maven.jzy3d.org/releases/</url>
+        </repository>
+        <repository>
+          <id>jzy3d-snapshots</id>
+          <name>Jzy3d Snapshots</name>
+          <url>https://maven.jzy3d.org/snapshots/</url>
         </repository>
       </repositories>
     </profile>

@@ -149,6 +149,22 @@
             <groupId>org.bytedeco</groupId>
             <artifactId>opencv-platform</artifactId>
         </dependency>
+
+        <!-- Jzy3d 3D Plotting API (Native JOGL Hardware Accelerated) -->
+        <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-core</artifactId>
+            <version>2.2.2-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/jzy3d-core-2.2.2-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-native-jogl-awt</artifactId>
+            <version>2.2.2-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/jzy3d-native-jogl-awt-2.2.2-SNAPSHOT.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

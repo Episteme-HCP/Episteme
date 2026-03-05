@@ -85,15 +85,11 @@
             <groupId>org.mpjexpress</groupId>
             <artifactId>mpi</artifactId>
             <version>0.44</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/mpi.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.mpjexpress</groupId>
             <artifactId>mpj</artifactId>
             <version>0.44</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/mpj.jar</systemPath>
         </dependency>
 
         <!-- Testing -->
@@ -152,6 +148,19 @@
             <groupId>org.knowm.xchart</groupId>
             <artifactId>xchart</artifactId>
             <version>3.8.8</version>
+        </dependency>
+
+        <!-- Jzy3d 3D Plotting API (CPU Emulator for Core) -->
+        <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-api</artifactId>
+            <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda-natives</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- JOCL (OpenCL) -->

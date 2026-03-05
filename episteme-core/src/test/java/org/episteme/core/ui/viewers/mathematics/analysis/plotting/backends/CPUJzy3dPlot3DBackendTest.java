@@ -9,18 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Automated baseline test for Jzy3dPlot3DBackend.
+ * Automated baseline test for CPUJzy3dPlot3DBackend.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Jzy3dPlot3DBackendTest {
+public class CPUJzy3dPlot3DBackendTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(Jzy3dPlot3DBackend.class);
+        assertNotNull(CPUJzy3dPlot3DBackend.class);
     }
 }
 

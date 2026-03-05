@@ -48,5 +48,6 @@ public interface PlottingBackend extends Backend {
     public static final String XCHART = "xchart";
     public static final String JAVAFX = "javafx";
     public static final String JFREECHART = "jfreechart";
-    public static final String JZY3D = "jzy3d";
+    public static final String JZY3D_CPU = "jzy3d-cpu";
+    public static final String JZY3D_NATIVE = "jzy3d-native";
 }
