@@ -99,9 +99,15 @@ public final class AlgorithmManager {
 
         // Path 1: Direct SPI discovery
         ServiceLoader<P> loader = ServiceLoader.load(providerClass);
-        for (P provider : loader) {
-            if (provider.isAvailable() && seen.add(provider)) {
-                available.add(provider);
+        Iterator<P> iterator = loader.iterator();
+        while (iterator.hasNext()) {
+            try {
+                P provider = iterator.next();
+                if (provider.isAvailable() && seen.add(provider)) {
+                    available.add(provider);
+                }
+            } catch (ServiceConfigurationError | RuntimeException e) {
+                LOGGER.warning("Skipping bad provider for " + providerClass.getSimpleName() + ": " + e.getMessage());
             }
         }
 
