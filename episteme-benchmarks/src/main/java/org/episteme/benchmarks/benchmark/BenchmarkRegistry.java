@@ -18,31 +18,33 @@ public class BenchmarkRegistry {
             // 1. Discover explicit benchmarks
             System.out.println("[DEBUG] Discovery: Loading explicit benchmarks...");
             ServiceLoader<RunnableBenchmark> benchLoader = ServiceLoader.load(RunnableBenchmark.class, loader);
+            java.util.Iterator<RunnableBenchmark> benchIterator = benchLoader.iterator();
             int explicitCount = 0;
-            for (RunnableBenchmark b : benchLoader) {
-                explicitCount++;
-                System.out.println("[DEBUG] Found explicit benchmark: " + b.getName() + " (ID: " + b.getId() + ", Class: " + b.getClass().getSimpleName() + ")");
+            while (benchIterator.hasNext()) {
                 try {
+                    RunnableBenchmark b = benchIterator.next();
+                    explicitCount++;
+                    System.out.println("[DEBUG] Found explicit benchmark: " + b.getName() + " (ID: " + b.getId() + ", Class: " + b.getClass().getSimpleName() + ")");
                     if (b instanceof SystematicBenchmark) {
                         System.out.println("[DEBUG]   - Is systematic, expanding...");
                         expandSystematic((SystematicBenchmark<?>) b, all);
                     } else {
                         all.add(b);
                     }
-                } catch (Throwable t) {
-                    System.err.println("[WARN] Failed to process explicit benchmark: " + t.getMessage());
+                } catch (java.util.ServiceConfigurationError | Exception e) {
+                    System.err.println("[WARN] Skipping bad explicit benchmark: " + e.getMessage());
                 }
             }
             System.out.println("[DEBUG] Discovery: Found " + explicitCount + " explicit benchmarks candidates.");
 
             // 2. Discover all generic AlgorithmProviders and wrap them
             ServiceLoader<org.episteme.core.technical.algorithm.AlgorithmProvider> providerLoader = 
-                    ServiceLoader.load(org.episteme.core.technical.algorithm.AlgorithmProvider.class);
-            for (org.episteme.core.technical.algorithm.AlgorithmProvider p : providerLoader) {
+                    ServiceLoader.load(org.episteme.core.technical.algorithm.AlgorithmProvider.class, loader);
+            java.util.Iterator<org.episteme.core.technical.algorithm.AlgorithmProvider> providerIterator = providerLoader.iterator();
+            while (providerIterator.hasNext()) {
                 try {
+                    org.episteme.core.technical.algorithm.AlgorithmProvider p = providerIterator.next();
                     System.out.println("[DEBUG] Processing provider: " + p.getName() + " (" + p.getClass().getName() + ")");
-                    // Display all providers, even unavailable ones (User Request)
-                    // if (!p.isAvailable()) continue; 
                     
                     // Avoid duplicates if already covered by systematic expansion
                     if (all.stream().anyMatch(b -> b.getId().contains(p.getName().toLowerCase().replace(" ", "-")))) {
@@ -50,8 +52,8 @@ public class BenchmarkRegistry {
                     }
                     
                     all.add(wrapProvider(p));
-                } catch (Throwable t) {
-                    System.err.println("[WARN] Failed to load provider benchmark for " + p.getName() + ": " + t.getMessage());
+                } catch (java.util.ServiceConfigurationError | Exception e) {
+                    System.err.println("[WARN] Skipping bad algorithm provider: " + e.getMessage());
                 }
             }
         } catch (Throwable t) {
@@ -93,11 +95,14 @@ public class BenchmarkRegistry {
         try {
             ClassLoader loader = BenchmarkRegistry.class.getClassLoader();
             ServiceLoader<P> sLoader = ServiceLoader.load(base.getProviderClass(), loader);
+            java.util.Iterator<P> iterator = sLoader.iterator();
             int pCount = 0;
-            for (P p : sLoader) {
-                pCount++;
-                System.out.println("[DEBUG]   - Found systematic provider implementation: " + p.getName() + " (Type: " + p.getAlgorithmType() + ")");
+            while (iterator.hasNext()) {
                 try {
+                    P p = iterator.next();
+                    pCount++;
+                    System.out.println("[DEBUG]   - Found systematic provider implementation: " + p.getName() + " (Type: " + p.getAlgorithmType() + ")");
+                    
                     // Check compatibility if it's a LinearAlgebraProvider
                     if (p instanceof LinearAlgebraProvider) {
                         if (!((LinearAlgebraProvider<?>) p).isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
@@ -105,7 +110,6 @@ public class BenchmarkRegistry {
                             continue;
                         }
                     }
-
 
                     // Strict separation: Do not mix Sparse providers in Dense benchmarks
                     boolean isProviderSparse = p.getAlgorithmType().toLowerCase().contains("sparse");
@@ -130,8 +134,8 @@ public class BenchmarkRegistry {
                     };
                     System.out.println("[DEBUG]     + Added benchmark instance: " + rb.getId() + " [Domain: " + rb.getDomain() + "]");
                     list.add(rb);
-                } catch (Throwable t) {
-                    System.err.println("[WARN] Failed to instantiate provider for " + base.getNameBase() + ": " + t.getMessage());
+                } catch (java.util.ServiceConfigurationError | Exception e) {
+                    System.err.println("[WARN] Skipping bad systematic provider: " + e.getMessage());
                 }
             }
         } catch (Throwable t) {

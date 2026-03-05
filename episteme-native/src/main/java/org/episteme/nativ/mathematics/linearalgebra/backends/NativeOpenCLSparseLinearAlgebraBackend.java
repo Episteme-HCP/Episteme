@@ -219,7 +219,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             
             cl_device_id[] devices = new cl_device_id[1];
             CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 1, devices, null);
-            device = devices[0];
+            staticDevice = devices[0];
             
             cl_context_properties contextProperties = new cl_context_properties();
             contextProperties.addProperty(CL.CL_CONTEXT_PLATFORM, platform);
