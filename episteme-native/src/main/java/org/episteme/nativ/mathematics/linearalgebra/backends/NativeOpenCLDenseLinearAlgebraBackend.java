@@ -242,12 +242,34 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         double sum = 0; for (double v : sq) sum += v;
         return Real.of(Math.sqrt(sum));
     }
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for matrix inverse"); }
-    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for determinant"); }
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for solve"); }
-    @Override public EigenResult<Real> eigen(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for eigendecomposition"); }
-    @Override public SVDResult<Real> svd(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for SVD"); }
-    @Override public LUResult<Real> lu(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL: use a CPU backend for LU decomposition"); }
+    // Fallback CPU operations for complex decompositions not implemented in OpenCL
+    private org.episteme.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraBackend getCPUFallback() {
+        return new org.episteme.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraBackend();
+    }
+
+    @Override public Matrix<Real> inverse(Matrix<Real> a) { 
+        return getCPUFallback().inverse(a);
+    }
+    
+    @Override public Real determinant(Matrix<Real> a) { 
+        return getCPUFallback().determinant(a);
+    }
+    
+    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { 
+        return getCPUFallback().solve(a, b);
+    }
+    
+    @Override public EigenResult<Real> eigen(Matrix<Real> a) { 
+        return getCPUFallback().eigen(a);
+    }
+    
+    @Override public SVDResult<Real> svd(Matrix<Real> a) { 
+        return getCPUFallback().svd(a);
+    }
+    
+    @Override public LUResult<Real> lu(Matrix<Real> a) { 
+        return getCPUFallback().lu(a);
+    }
 
     // ---- helpers ----
 
