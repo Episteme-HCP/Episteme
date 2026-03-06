@@ -77,11 +77,26 @@ public class BenchmarkRegistry {
                 String type = p.getAlgorithmType();
                 return type.substring(0, 1).toUpperCase() + type.substring(1);
             }
-            @Override public void setup() { if (p instanceof org.episteme.core.mathematics.analysis.fft.FFTProvider) { /* Custom setup if needed */ } }
+            @Override public void setup() { 
+                if (p instanceof org.episteme.core.mathematics.analysis.fft.FFTProvider) { /* Custom setup if needed */ }
+                else if (p instanceof LinearAlgebraProvider) {
+                    // Initialize some small matrices for verification
+                }
+            }
             @Override public void run() { 
                 // Generic execution test
                 if (p instanceof org.episteme.core.mathematics.analysis.fft.FFTProvider) {
                     ((org.episteme.core.mathematics.analysis.fft.FFTProvider)p).transform(new double[1024], new double[1024]);
+                } else if (p instanceof LinearAlgebraProvider) {
+                    // Execute a small dummy operation to verify the backend is truly working
+                    try {
+                        org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix A = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(new double[][]{{1,2},{3,4}});
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real> provider = (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>) p;
+                        provider.multiply(A, A);
+                    } catch (Throwable t) {
+                        throw new RuntimeException("Generic LinearAlgebra validation failed: " + t.getMessage(), t);
+                    }
                 }
             }
             @Override public void teardown() {}
@@ -96,11 +111,9 @@ public class BenchmarkRegistry {
             ClassLoader loader = BenchmarkRegistry.class.getClassLoader();
             ServiceLoader<P> sLoader = ServiceLoader.load(base.getProviderClass(), loader);
             java.util.Iterator<P> iterator = sLoader.iterator();
-            int pCount = 0;
             while (iterator.hasNext()) {
                 try {
                     P p = iterator.next();
-                    pCount++;
                     System.out.println("[DEBUG]   - Found systematic provider implementation: " + p.getName() + " (Type: " + p.getAlgorithmType() + ")");
                     
                     // Check compatibility if it's a LinearAlgebraProvider

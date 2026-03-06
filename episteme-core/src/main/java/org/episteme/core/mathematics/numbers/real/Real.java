@@ -42,49 +42,53 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     private static final long serialVersionUID = 1L;
 
-    private static final class Constants {
-        private static final Real ZERO = RealDouble.create(0.0);
-        private static final Real ONE = RealDouble.create(1.0);
-        private static final Real NaN = RealDouble.create(Double.NaN);
-        private static final Real PI = RealDouble.create(Math.PI);
-        private static final Real E = RealDouble.create(Math.E);
-    }
-
     /** The real number 0 */
-    public static final Real ZERO = Constants.ZERO;
+    public static Real zeroE() { return RealConstants.ZERO; }
+    public static final Real ZERO = RealConstants.ZERO;
 
     /** The real number 1 */
-    public static final Real ONE = Constants.ONE;
+    public static Real oneE() { return RealConstants.ONE; }
+    public static final Real ONE = RealConstants.ONE;
 
     /** The real number NaN */
-    public static final Real NaN = Constants.NaN;
+    public static Real nanE() { return RealConstants.NaN; }
+    public static final Real NaN = RealConstants.NaN;
 
     /** The real number PI */
-    public static final Real PI = Constants.PI;
+    public static Real piE() { return RealConstants.PI; }
+    public static final Real PI = RealConstants.PI;
 
     /** The real number E */
-    public static final Real E = Constants.E;
+    public static Real eE() { return RealConstants.E; }
+    public static final Real E = RealConstants.E;
 
     /** The real number 2 */
-    public static final Real TWO = RealDouble.create(2.0);
+    public static Real twoE() { return RealConstants.TWO; }
+    public static final Real TWO = RealConstants.TWO;
 
     /** 2Ãâ‚¬ - commonly used in angular calculations */
-    public static final Real TWO_PI = RealDouble.create(2.0 * Math.PI);
+    public static Real twoPiE() { return RealConstants.TWO_PI; }
+    public static final Real TWO_PI = RealConstants.TWO_PI;
 
     /** Ãâ‚¬/2 - quarter turn in radians */
-    public static final Real HALF_PI = RealDouble.create(Math.PI / 2.0);
+    public static Real halfPiE() { return RealConstants.HALF_PI; }
+    public static final Real HALF_PI = RealConstants.HALF_PI;
 
     /** Positive infinity */
-    public static final Real POSITIVE_INFINITY = RealDouble.create(Double.POSITIVE_INFINITY);
+    public static Real positiveInfinityE() { return RealConstants.POSITIVE_INFINITY; }
+    public static final Real POSITIVE_INFINITY = RealConstants.POSITIVE_INFINITY;
 
     /** Negative infinity */
-    public static final Real NEGATIVE_INFINITY = RealDouble.create(Double.NEGATIVE_INFINITY);
+    public static Real negativeInfinityE() { return RealConstants.NEGATIVE_INFINITY; }
+    public static final Real NEGATIVE_INFINITY = RealConstants.NEGATIVE_INFINITY;
 
     /** Natural logarithm of 2 */
-    public static final Real LN2 = RealDouble.create(Math.log(2.0));
+    public static Real ln2E() { return RealConstants.LN2; }
+    public static final Real LN2 = RealConstants.LN2;
 
     /** Natural logarithm of 10 */
-    public static final Real LN10 = RealDouble.create(Math.log(10.0));
+    public static Real ln10E() { return RealConstants.LN10; }
+    public static final Real LN10 = RealConstants.LN10;
 
     /**
      * Creates a real number from a double value.
@@ -95,11 +99,11 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      */
     public static Real of(double value) {
         if (value == 0.0)
-            return ZERO;
+            return zeroE();
         if (value == 1.0)
-            return ONE;
+            return oneE();
         if (Double.isNaN(value))
-            return NaN;
+            return nanE();
 
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
@@ -559,22 +563,12 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     @Override
     public Real zero() {
-        return ZERO;
-    }
-
-    @Override
-    public Real subtract(Real left, Real right) {
-        return left.subtract(right);
-    }
-
-    @Override
-    public Real negate(Real element) {
-        return element.negate();
+        return zeroE();
     }
 
     @Override
     public Real one() {
-        return ONE;
+        return oneE();
     }
 
     @Override

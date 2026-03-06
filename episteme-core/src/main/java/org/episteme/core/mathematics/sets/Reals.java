@@ -91,7 +91,7 @@ public final class Reals implements Field<Real>, InfiniteSet<Real> {
 
     @Override
     public Real zero() {
-        return Real.ZERO;
+        return Real.zeroE();
     }
 
     @Override
@@ -106,7 +106,7 @@ public final class Reals implements Field<Real>, InfiniteSet<Real> {
 
     @Override
     public Real one() {
-        return Real.ONE;
+        return Real.oneE();
     }
 
     @Override

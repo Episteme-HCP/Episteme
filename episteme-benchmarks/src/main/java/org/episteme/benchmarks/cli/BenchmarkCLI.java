@@ -154,36 +154,42 @@ public class BenchmarkCLI {
 
                 List<Long> iterNanos = new ArrayList<>();
                 long totalStart = System.nanoTime();
-                while (System.nanoTime() - totalStart < 2_000_000_000L) { // 2s
-                    long iterStart = System.nanoTime();
-                    benchmark.run();
-                    iterNanos.add(System.nanoTime() - iterStart);
+                try {
+                    while (System.nanoTime() - totalStart < 2_000_000_000L) { // 2s
+                        long iterStart = System.nanoTime();
+                        benchmark.run();
+                        iterNanos.add(System.nanoTime() - iterStart);
+                    }
+                    long totalEnd = System.nanoTime();
+
+                    // Teardown
+                    benchmark.teardown();
+                    
+                    // Stats
+                    double durationSec = (totalEnd - totalStart) / 1_000_000_000.0;
+                    double opsSec = iterNanos.size() / durationSec;
+                    
+                    // P99
+                    iterNanos.sort(Long::compareTo);
+                    int p99Index = Math.max(0, (int) Math.ceil(iterNanos.size() * 0.99) - 1);
+                    double p99Ms = iterNanos.size() > 0 ? iterNanos.get(p99Index) / 1_000_000.0 : 0;
+
+                    System.out.println("DONE");
+                    System.out.printf(Locale.US, "Result: %.2f ops/s, P99: %.3f ms%n", opsSec, p99Ms);
+                    
+                    results.add(new BenchmarkResult(item, "SUCCESS", opsSec, p99Ms));
+                    success++;
+                } catch (Throwable t) {
+                    System.out.println("FAILED during measurement");
+                    System.out.println("Error: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                    results.add(new BenchmarkResult(item, "FAILED: " + t.getClass().getSimpleName() + " (" + t.getMessage() + ")", 0, 0));
+                    fail++;
                 }
-                long totalEnd = System.nanoTime();
-
-                // Teardown
-                benchmark.teardown();
-                
-                // Stats
-                double durationSec = (totalEnd - totalStart) / 1_000_000_000.0;
-                double opsSec = iterNanos.size() / durationSec;
-                
-                // P99
-                iterNanos.sort(Long::compareTo);
-                int p99Index = Math.max(0, (int) Math.ceil(iterNanos.size() * 0.99) - 1);
-                double p99Ms = iterNanos.get(p99Index) / 1_000_000.0;
-
-                System.out.println("DONE");
-                System.out.printf(Locale.US, "Result: %.2f ops/s, P99: %.3f ms%n", opsSec, p99Ms);
-                
-                results.add(new BenchmarkResult(item, "SUCCESS", opsSec, p99Ms));
-                success++;
 
             } catch (Throwable t) {
-                System.out.println("FAILED");
-                System.out.println("Error: " + t.getMessage());
-                // t.printStackTrace(); 
-                results.add(new BenchmarkResult(item, "FAILED: " + t.getClass().getSimpleName(), 0, 0));
+                System.out.println("FAILED during setup/warmup");
+                System.out.println("Error: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                results.add(new BenchmarkResult(item, "FAILED AT SETUP: " + t.getClass().getSimpleName() + " (" + t.getMessage() + ")", 0, 0));
                 fail++;
             }
         }

@@ -212,7 +212,6 @@ public final class AlgorithmManager {
     public static void refresh() {
         BEST_PROVIDERS.clear();
         PROVIDER_CACHE.clear();
-        NativeLibraryLoader.clearCache();
     }
 }
 
