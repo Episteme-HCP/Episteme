@@ -170,7 +170,14 @@ public class NativeLibraryLoader {
         }
 
         for (String variant : variants) {
-            String currentMapped = System.mapLibraryName(variant);
+            String currentMapped;
+            if (!isWin && variant.contains(".so")) {
+                currentMapped = variant.startsWith("lib") ? variant : "lib" + variant;
+            } else if (!isWin && variant.contains(".dylib")) {
+                currentMapped = variant.startsWith("lib") ? variant : "lib" + variant;
+            } else {
+                currentMapped = System.mapLibraryName(variant);
+            }
             
             // 1. Try loading directly via System.loadLibrary (or equivalent)
             try {

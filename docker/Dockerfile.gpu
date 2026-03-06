@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget curl git build-essential cmake pkg-config libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev portaudio19-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install OpenJDK 25
-RUN wget https://download.java.net/java/GA/jdk25.0.2/b1e0dfa218384cb9959bdcb897162d4e/10/GPL/openjdk-25.0.2_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz && \
+# Install OpenJDK 25 (Early Access)
+RUN wget https://download.java.net/java/early_access/jdk25/11/GPL/openjdk-25-ea+11_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz && \
     mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 && \
     tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 && \
     rm /tmp/jdk25.tar.gz

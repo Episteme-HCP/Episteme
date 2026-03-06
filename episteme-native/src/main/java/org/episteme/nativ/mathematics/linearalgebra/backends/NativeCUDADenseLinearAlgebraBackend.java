@@ -113,6 +113,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             IS_AVAILABLE = true;
         } catch (Throwable t) {
             IS_AVAILABLE = false;
+            System.out.println("\n[WARNING] Native CUDA Backend initialization completely failed: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+            t.printStackTrace(System.out);
         }
     }
 

@@ -108,10 +108,14 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         } catch (org.jocl.CLException e) {
             initialized = false;
             if (e.getMessage() != null && e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
-                System.err.println("WARNING: OpenCL Dense backend device might not support double precision. Init aborted.");
+                System.out.println("\n[WARNING] OpenCL Dense backend device might not support double precision. Init aborted.");
+            } else {
+                System.out.println("\n[WARNING] OpenCL initialization failed (JOCL): " + e.getMessage());
             }
-        } catch (Exception e) {
+        } catch (Throwable t) {
             initialized = false;
+            System.out.println("\n[WARNING] Native OpenCL Backend initialization completely failed: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+            t.printStackTrace(System.out);
         }
     }
 
