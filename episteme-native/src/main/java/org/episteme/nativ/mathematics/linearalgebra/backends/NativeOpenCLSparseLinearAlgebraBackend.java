@@ -126,6 +126,11 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             return -1.0; // Hardware Float/Double cannot handle Arbitrary Precision MathContext
         }
 
+        // Check for unsupported operations
+        if (context.hasHint(Hint.MAT_INV) || context.hasHint(Hint.MAT_DET) || 
+            context.hasHint(Hint.MAT_SOLVE) || context.hasHint(Hint.MAT_DIV)) {
+            return 0.1; // Very low score, let it fall back naturally
+        }
         
         double base = getPriority();
         if (context.hasHint(Hint.GPU_RESIDENT)) base += 50;
@@ -133,7 +138,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         
         // Granular scoring for OpenCL
         if (context.hasHint(Hint.MAT_MUL)) base += 10;
-        if (context.hasHint(Hint.MAT_SOLVE)) base -= 30; // Native solver might be slow or less stable
         
         if (context.getDataSize() > 1000) base += 20;
         
@@ -325,7 +329,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
-            return org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, b);
+            return SparseLinearAlgebraProvider.super.multiply(a, b);
         }
         
         int m = a.rows(); int k = a.cols(); int n = b.cols();
@@ -355,7 +359,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     public Vector<Real> multiplyCSR(Matrix<Real> a, Vector<Real> x) {
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
-            return org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, x);
+            return SparseLinearAlgebraProvider.super.multiply(a, x);
         }
 
         // Extract CSR data from SparseMatrixStorage
@@ -427,32 +431,4 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override public Vector<Real> multiply(Vector<Real> v, Real s) { throw new UnsupportedOperationException("OpenCL vector scale not implemented"); }
     @Override public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL dot not implemented"); }
     @Override public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("OpenCL norm not implemented"); }
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL inverse not implemented"); }
-    @Override public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL determinant not implemented"); }
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL solve not implemented"); }
-
-    @Override
-    public LUResult<Real> lu(Matrix<Real> a) {
-        throw new UnsupportedOperationException("OpenCL LU decomposition requires CLBlast/clMAGMA integration.");
-    }
-
-    @Override
-    public QRResult<Real> qr(Matrix<Real> a) {
-        throw new UnsupportedOperationException("OpenCL QR decomposition requires CLBlast/clMAGMA integration.");
-    }
-
-    @Override
-    public CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        throw new UnsupportedOperationException("OpenCL Cholesky decomposition requires CLBlast/clMAGMA integration.");
-    }
-
-    @Override
-    public SVDResult<Real> svd(Matrix<Real> a) {
-        throw new UnsupportedOperationException("OpenCL SVD requires CLBlast/clMAGMA integration.");
-    }
-
-    @Override
-    public EigenResult<Real> eigen(Matrix<Real> a) {
-        throw new UnsupportedOperationException("OpenCL Eigen decomposition requires CLBlast/clMAGMA integration.");
-    }
 }

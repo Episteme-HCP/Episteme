@@ -252,6 +252,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
         if (MathContext.getCurrent().getRealPrecision() == MathContext.RealPrecision.EXACT) {
             return -1.0; // Hardware Float/Double cannot handle Arbitrary Precision MathContext
         }
+
+        // Check for unsupported operations
+        if (context.hasHint(OperationContext.Hint.MAT_INV) ||
+            context.hasHint(OperationContext.Hint.MAT_DET) ||
+            context.hasHint(OperationContext.Hint.MAT_SOLVE)) {
+            return 0.1; // Let it fall back naturally
+        }
+
         double base = AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());
         if (context.getDataSize() < 256) base -= 200; // Prefer CPU for small matrices
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;

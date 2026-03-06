@@ -68,7 +68,6 @@ public class BenchmarkReporter {
 
             // Group by Domain
             Map<String, List<BenchmarkResult>> grouped = results.stream()
-                .filter(r -> "SUCCESS".equals(r.status))
                 .collect(Collectors.groupingBy(r -> r.item.getDomain()));
 
             // Sort domains for consistent reporting
@@ -127,7 +126,13 @@ public class BenchmarkReporter {
             // Format: [Lib] Provider (e.g., [Episteme] CARMA)
             String label = "[" + lib + "] " + provider;
             
-            dataset.addValue(r.score, "Throughput", label);
+            // Provide a visual cue for failures
+            double scoreValue = r.score;
+            if (!"SUCCESS".equals(r.status)) {
+                scoreValue = 0.01; // Tiny bar to show it existed but failed
+            }
+            
+            dataset.addValue(scoreValue, "Throughput", label);
         }
 
         JFreeChart chart = ChartFactory.createBarChart(

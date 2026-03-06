@@ -62,7 +62,14 @@ public class BackendDiscovery {
         if (cachedProviders == null) {
             cachedProviders = new ArrayList<>();
             ServiceLoader<Backend> loader = ServiceLoader.load(Backend.class);
-            for (Backend provider : loader) cachedProviders.add(provider);
+            Iterator<Backend> iterator = loader.iterator();
+            while (iterator.hasNext()) {
+                try {
+                    cachedProviders.add(iterator.next());
+                } catch (ServiceConfigurationError | Exception e) {
+                    System.err.println("[WARN] Skipping bad Backend provider: " + e.getMessage());
+                }
+            }
         }
         return cachedProviders;
     }

@@ -24,7 +24,7 @@ import java.util.Optional;
  * @since 1.2
  */
 @SuppressWarnings({"preview", "unused", "restricted"})
-@AutoService({AlgorithmProvider.class, ComputeBackend.class, NativeBackend.class, Backend.class})
+// @AutoService({AlgorithmProvider.class, ComputeBackend.class, NativeBackend.class, Backend.class})
 public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, NativeBackend {
 
     private static SymbolLookup LOOKUP;

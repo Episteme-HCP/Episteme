@@ -202,6 +202,15 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
     @Override
     public double score(OperationContext context) {
         if (!isAvailable()) return -1.0;
+
+        // Check for unsupported operations
+        if (context.hasHint(OperationContext.Hint.MAT_INV) ||
+            context.hasHint(OperationContext.Hint.MAT_DET) ||
+            context.hasHint(OperationContext.Hint.MAT_SOLVE) ||
+            context.hasHint(OperationContext.Hint.MAT_DIV)) {
+            return 0.1; // Let it fall back naturally
+        }
+
         double base = getPriority();
         if (context.getDataSize() < 100) base -= 100;
         if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 30;
@@ -228,48 +237,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
         
         return fromDoubleBuffer(dc, m, n);
     }
-    
-    @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("CUDA Sparse add not implemented");
-    }
-
-    @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("CUDA Sparse subtract not implemented");
-    }
-    
-    @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        throw new UnsupportedOperationException("CUDA Sparse scale not implemented");
-    }
-    
-    @Override
-    public Matrix<Real> transpose(Matrix<Real> a) {
-        throw new UnsupportedOperationException("CUDA Sparse transpose not implemented");
-    }
-
-    @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        throw new UnsupportedOperationException("CUDA Sparse multiply not implemented");
-    }
-
-    @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse add not implemented"); }
-    @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse subtract not implemented"); }
-    @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) { throw new UnsupportedOperationException("CUDA Sparse multiply not implemented"); }
-    @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse dot not implemented"); }
-    @Override
-    public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("CUDA Sparse norm not implemented"); }
-    @Override
-    public Matrix<Real> inverse(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA Sparse inverse not implemented"); }
-    @Override
-    public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("CUDA Sparse determinant not implemented"); }
-    @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("CUDA Sparse solve not implemented"); }
 
     private DoubleBuffer toDoubleBuffer(Matrix<Real> m) {
         int rows = m.rows();

@@ -242,33 +242,21 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         double sum = 0; for (double v : sq) sum += v;
         return Real.of(Math.sqrt(sum));
     }
-    // Fallback CPU operations for complex decompositions not implemented in OpenCL
-    private org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real> getCPUFallback() {
-        return new org.episteme.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider();
-    }
+    @Override public double score(OperationContext context) {
+        if (!isAvailable()) return -1.0;
+        double base = getPriority();
 
-    @Override public Matrix<Real> inverse(Matrix<Real> a) { 
-        return getCPUFallback().inverse(a);
-    }
-    
-    @Override public Real determinant(Matrix<Real> a) { 
-        return getCPUFallback().determinant(a);
-    }
-    
-    @Override public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) { 
-        return getCPUFallback().solve(a, b);
-    }
-    
-    @Override public EigenResult<Real> eigen(Matrix<Real> a) { 
-        return getCPUFallback().eigen(a);
-    }
-    
-    @Override public SVDResult<Real> svd(Matrix<Real> a) { 
-        return getCPUFallback().svd(a);
-    }
-    
-    @Override public LUResult<Real> lu(Matrix<Real> a) { 
-        return getCPUFallback().lu(a);
+        // Check for unsupported operations
+        if (context.hasHint(OperationContext.Hint.MAT_INV) ||
+            context.hasHint(OperationContext.Hint.MAT_DET) ||
+            context.hasHint(OperationContext.Hint.MAT_SOLVE)) {
+            return 0.1; // Very low score, let it fall back naturally
+        }
+
+        if (context.getDataSize() < 256) base -= 200;
+        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;
+        if (context.hasHint(OperationContext.Hint.MAT_MUL)) base += 20;
+        return base;
     }
 
     // ---- helpers ----
@@ -338,19 +326,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
             clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{rows}));
             clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{1}));
             clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{cols}));
-            clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, new long[]{1, rows}, null, 0, null, null);
+            long[] globalWorkSize = new long[]{1, rows};
+            clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * rows, Pointer.to(c), 0, null, null);
         } finally { clReleaseMemObject(mA); clReleaseMemObject(mB); clReleaseMemObject(mC); }
         return c;
-    }
-
-    @Override public double score(OperationContext context) {
-        if (!isAvailable()) return -1.0;
-        double base = getPriority();
-        if (context.getDataSize() < 256) base -= 200;
-        if (context.hasHint(OperationContext.Hint.GPU_RESIDENT)) base += 50;
-        if (context.hasHint(OperationContext.Hint.MAT_MUL)) base += 20;
-        return base;
     }
 
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
