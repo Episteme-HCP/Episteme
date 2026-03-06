@@ -115,8 +115,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
             IS_AVAILABLE = true;
             logger.info("Native CUDA/cuBLAS Backend initialized successfully.");
+        } catch (java.util.NoSuchElementException e) {
+            logger.debug("Native CUDA/cuBLAS symbols not found. GPU backend will be disabled.");
         } catch (Throwable t) {
-            logger.error("Failed to initialize CUDA/cuBLAS Backend", t);
+            logger.debug("Failed to initialize CUDA/cuBLAS Backend", t);
         }
     }
 

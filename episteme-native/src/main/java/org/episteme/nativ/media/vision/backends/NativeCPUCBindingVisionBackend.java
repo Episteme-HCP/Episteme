@@ -35,7 +35,7 @@ import java.util.Optional;
 @AutoService({Backend.class, ComputeBackend.class, CPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
 public class NativeCPUCBindingVisionBackend implements VisionAlgorithmBackend<BufferedImage>, CPUBackend, NativeBackend {
 
-    private static final String LIB_NAME = "episteme_vision";
+    private static final String LIB_NAME = "episteme-native";
     private static final SymbolLookup LOOKUP;
     private static final Linker LINKER = Linker.nativeLinker();
     private static final boolean IS_AVAILABLE;
@@ -115,7 +115,7 @@ public class NativeCPUCBindingVisionBackend implements VisionAlgorithmBackend<Bu
     }
     
     public BufferedImage processNative(BufferedImage image, int opCode) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native library not available. Compile episteme_vision with CMake.");
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native library not available. Compile episteme-native with CMake.");
         int width = image.getWidth();
         int height = image.getHeight();
         

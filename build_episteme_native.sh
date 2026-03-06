@@ -1,10 +1,10 @@
 #!/bin/bash
 # Episteme Vision C++ Build Script for Linux
-# Builds libepisteme_vision.so using CMake
+# Builds libepisteme-native.so using CMake
 
 BUILD_DIR="episteme-native/build_vision_linux"
 SOURCE_DIR="episteme-native/src/main/cpp"
-OUTPUT_DIR="episteme-native/src/main/resources/linux-x86_64"
+OUTPUT_DIR="episteme-native/libs"
 
 echo "Cleaning build directory..."
 rm -rf "$BUILD_DIR"
@@ -21,8 +21,8 @@ cmake --build . --config Release
 
 cd ../..
 
-echo "Copying libepisteme_vision.so to resources..."
+echo "Copying libepisteme-native.so to libs..."
 mkdir -p "$OUTPUT_DIR"
-cp "$BUILD_DIR/libepisteme_vision.so" "$OUTPUT_DIR/"
+cp "$BUILD_DIR/libepisteme-native.so" "$OUTPUT_DIR/"
 
 echo "[SUCCESS] Episteme Vision (Linux) build complete."

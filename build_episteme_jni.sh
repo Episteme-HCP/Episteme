@@ -7,8 +7,8 @@ if [ -z "$JAVA_HOME" ]; then
     exit 1
 fi
 
-SOURCE_DIR="src/main/cpp"
-OUTPUT_DIR="../libs"
+SOURCE_DIR="episteme-jni/src/main/cpp"
+OUTPUT_DIR="episteme-jni/libs"
 mkdir -p "$OUTPUT_DIR"
 
 echo "Compiling episteme-jni for Linux..."
@@ -17,7 +17,7 @@ g++ -O3 -shared -fPIC \
     -I"$JAVA_HOME/include" \
     -I"$JAVA_HOME/include/linux" \
     -I"$SOURCE_DIR" \
-    "$SOURCE_DIR/episteme_native.cpp" \
+    "$SOURCE_DIR/episteme_jni.cpp" \
     -o "$OUTPUT_DIR/libepisteme-jni.so"
 
 if [ $? -eq 0 ]; then

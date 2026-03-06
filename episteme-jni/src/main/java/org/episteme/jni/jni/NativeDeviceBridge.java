@@ -37,7 +37,7 @@ public class NativeDeviceBridge {
         try {
             System.loadLibrary("episteme-jni");
         } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native library 'episteme_native' failed to load.\n" + e);
+            System.err.println("Native library 'episteme-jni' failed to load.\n" + e);
         }
     }
 

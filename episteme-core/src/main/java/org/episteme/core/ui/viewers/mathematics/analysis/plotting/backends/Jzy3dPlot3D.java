@@ -28,7 +28,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.ui.viewers.mathematics.analysis.plotting.Plot3D;
 import org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlotFormat;
 import org.jzy3d.chart.Chart;
-import org.jzy3d.chart.factories.AWTChartComponentFactory;
+import org.jzy3d.chart.factories.EmulGLChartFactory;
 import org.jzy3d.colors.Color;
 import org.jzy3d.maths.Coord2d;
 import org.jzy3d.maths.Coord3d;
@@ -51,8 +51,9 @@ public class Jzy3dPlot3D implements Plot3D {
     private final Chart chart;
 
     public Jzy3dPlot3D(String title) {
-        // Jzy3d 1.0.0 compatible factory
-        this.chart = AWTChartComponentFactory.chart(Quality.Advanced, "newt");
+        // Jzy3d 2.2.2 EmulGL factory
+        EmulGLChartFactory factory = new EmulGLChartFactory();
+        this.chart = factory.newChart(Quality.Advanced());
     }
 
     @Override
@@ -106,9 +107,9 @@ public class Jzy3dPlot3D implements Plot3D {
 
     @Override
     public Plot3D setAxisLabels(String xLabel, String yLabel, String zLabel) {
-        chart.getAxeLayout().setXAxeLabel(xLabel);
-        chart.getAxeLayout().setYAxeLabel(yLabel);
-        chart.getAxeLayout().setZAxeLabel(zLabel);
+        chart.getAxisLayout().setXAxisLabel(xLabel);
+        chart.getAxisLayout().setYAxisLabel(yLabel);
+        chart.getAxisLayout().setZAxisLabel(zLabel);
         return this;
     }
 
@@ -132,7 +133,7 @@ public class Jzy3dPlot3D implements Plot3D {
     public void show() {
         // Jzy3d 1.0.0 launcher logic
         try {
-            org.jzy3d.analysis.AnalysisLauncher.open(new org.jzy3d.analysis.AbstractAnalysis() {
+            org.jzy3d.analysis.AnalysisLauncher.open(new org.jzy3d.analysis.AbstractAnalysis(new EmulGLChartFactory()) {
                 @Override
                 public void init() {
                     this.chart = Jzy3dPlot3D.this.chart;
