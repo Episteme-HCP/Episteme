@@ -11,9 +11,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;

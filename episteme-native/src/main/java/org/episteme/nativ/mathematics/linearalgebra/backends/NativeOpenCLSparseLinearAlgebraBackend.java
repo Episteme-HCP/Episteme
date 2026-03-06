@@ -11,7 +11,7 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.OperationContext.Hint;
