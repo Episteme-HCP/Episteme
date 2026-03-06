@@ -4,7 +4,7 @@
 APP_CLASS="org.episteme.benchmarks.ui.Launcher"
 JAR_PATH="episteme-benchmarks/target/episteme-benchmarks.jar"
 LIB_DIR="launchers/lib"
-MODULE_PATH="episteme-benchmarks/target/classes:episteme-core/target/classes:episteme-natural/target/classes:episteme-social/target/classes:episteme-native/target/classes"
+MODULE_PATH="episteme-benchmarks/target/classes:episteme-core/target/classes:episteme-natural/target/classes:episteme-social/target/classes:episteme-native/target/classes:episteme-database/target/classes:episteme-jni/target/classes"
 
 USE_SHADED=false
 
