@@ -76,12 +76,27 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static synchronized void init() {
         if (initAttempted) return;
         initAttempted = true;
+        
+        // Defensive check for JOCL classes to avoid NoClassDefFoundError if lib is missing
+        try {
+            Class.forName("org.jocl.CL");
+        } catch (ClassNotFoundException e) {
+            logger.warn("JOCL classes not found on classpath. OpenCL backend disabled.");
+            return;
+        }
+
         logger.info("Initializing Native OpenCL Dense Backend...");
         try {
             setExceptionsEnabled(true);
             int[] numPlatformsArray = new int[1];
+            
+            // This might still throw UnsatisfiedLinkError if JOCL native is missing
             clGetPlatformIDs(0, null, numPlatformsArray);
-            if (numPlatformsArray[0] == 0) return;
+            
+            if (numPlatformsArray[0] == 0) {
+                logger.info("No OpenCL platforms found.");
+                return;
+            }
 
             cl_platform_id[] platforms = new cl_platform_id[numPlatformsArray[0]];
             clGetPlatformIDs(platforms.length, platforms, null);
@@ -100,6 +115,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
             program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE}, null, null);
             clBuildProgram(program, 0, null, null, null, null);
+            
             matMulKernel = clCreateKernel(program, "matrixMultiply", null);
             vecAddKernel = clCreateKernel(program, "vec_add", null);
             vecSubKernel = clCreateKernel(program, "vec_sub", null);
@@ -110,15 +126,18 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             logger.info("Native OpenCL Dense Backend initialized successfully.");
         } catch (org.jocl.CLException e) {
             initialized = false;
-            if (e.getMessage() != null && e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
-                System.out.println("\n[WARNING] OpenCL Dense backend device might not support double precision. Init aborted.");
+            String msg = e.getMessage() != null ? e.getMessage() : "Unknown CLException";
+            if (msg.contains("CL_BUILD_PROGRAM_FAILURE")) {
+                logger.warn("OpenCL program build failure (likely no fp64 support on this device).");
             } else {
-                System.out.println("\n[WARNING] OpenCL initialization failed (JOCL): " + e.getMessage());
+                logger.warn("OpenCL initialization failed (JOCL): {}", msg);
             }
+        } catch (UnsatisfiedLinkError e) {
+            initialized = false;
+            logger.warn("JOCL native library not found or could not be loaded: {}", e.getMessage());
         } catch (Throwable t) {
             initialized = false;
-            System.out.println("\n[WARNING] Native OpenCL Backend initialization completely failed: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-            t.printStackTrace(System.out);
+            logger.warn("Native OpenCL Backend initialization failed: {} - {}", t.getClass().getSimpleName(), t.getMessage());
         }
     }
 

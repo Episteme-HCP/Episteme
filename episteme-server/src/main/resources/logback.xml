@@ -5,15 +5,25 @@
         </encoder>
     </appender>
 
-    <!-- ELK Stack Appender (Disabled due to missing dependency)
-    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>logstash:5000</destination>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    <appender name="DIAGNOSTICS" class="ch.qos.logback.core.FileAppender">
+        <file>episteme_diagnostics.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
     </appender>
-    -->
+
+    <appender name="BENCHMARK" class="ch.qos.logback.core.FileAppender">
+        <file>episteme_benchmark.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
-        <!-- <appender-ref ref="LOGSTASH" /> -->
+        <appender-ref ref="DIAGNOSTICS" />
+        <appender-ref ref="BENCHMARK" />
     </root>
 </configuration>

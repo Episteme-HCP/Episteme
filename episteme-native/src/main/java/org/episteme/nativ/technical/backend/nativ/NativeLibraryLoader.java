@@ -144,24 +144,20 @@ public class NativeLibraryLoader {
                 variants.add("OpenCL");
                 variants.add("OpenCL.so.1");
                 variants.add("OpenCL.so.2");
-                variants.add("OpenCL.so.1.2.0");
+                variants.add("nvidia-opencl");
+                variants.add("intel-opencl");
             } else if (libName.equals("cuda")) {
                 variants.add("cuda");
                 variants.add("cuda.so.1");
+                variants.add("nvcuda");
             } else if (libName.equals("cublas")) {
                 variants.add("cublas");
                 variants.add("cublas.so.12");
                 variants.add("cublas.so.11");
-                variants.add("cublas.so.10");
-            } else if (libName.equals("cusolver")) {
-                variants.add("cusolver");
-                variants.add("cusolver.so.11");
-                variants.add("cusolver.so.10");
             } else if (libName.equals("cudart")) {
                 variants.add("cudart");
                 variants.add("cudart.so.12");
                 variants.add("cudart.so.11");
-                variants.add("cudart.so.10");
             }
         }
 
@@ -172,10 +168,8 @@ public class NativeLibraryLoader {
 
         for (String variant : variants) {
             String currentMapped;
-            if (!isWin && variant.contains(".so")) {
-                currentMapped = variant.startsWith("lib") ? variant : "lib" + variant;
-            } else if (!isWin && variant.contains(".dylib")) {
-                currentMapped = variant.startsWith("lib") ? variant : "lib" + variant;
+            if (!isWin && (variant.contains(".so") || variant.contains(".dylib"))) {
+                currentMapped = variant.startsWith("lib") || variant.equals("OpenCL") ? variant : "lib" + variant;
             } else {
                 currentMapped = System.mapLibraryName(variant);
             }
@@ -183,56 +177,41 @@ public class NativeLibraryLoader {
             // 1. Try loading directly via System.loadLibrary (or equivalent)
             try {
                 if (!FAILED_VARIANTS.contains(variant)) {
-                    logger.info("Probing native library variant: " + variant);
+                    String msg = "Probing native library variant: " + variant;
+                    logger.debug(msg);
+                    System.out.println("[NativeLoader] " + msg);
                 }
-                // Force pre-loading of runtime dependencies before loading the main library
-                preloadRuntimes(discoveredLibs, arena);
                 
                 // CRITICAL FIX: Only use libraryLookup(String) if it's a simple name (no dots/suffixes)
-                // Otherwise, it might trigger UnsatisfiedLinkError because it delegates to System.loadLibrary
-                if (!variant.contains(".") && !variant.contains("/")) {
+                if (!variant.contains(".") && !variant.contains("/") && !variant.contains("\\")) {
                     SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
-                    logger.info("Successfully loaded library variant via system lookup: " + variant);
+                    String msg = "Successfully loaded library variant via system lookup: " + variant;
+                    logger.info(msg);
+                    System.out.println("[NativeLoader] " + msg);
                     LOADED_LIBS.put(libName, lookup);
                     return Optional.of(lookup);
                 }
             } catch (Throwable t) {
                 FAILURE_CAUSES.put(variant, t.toString());
-                if (FAILED_VARIANTS.add(variant)) {
-                    logger.trace("System load failed for " + variant + " (trying path-based lookup): " + t.getMessage());
-                }
             }
 
             // 2. Try custom search paths
-            String cudaPath = System.getenv("CUDA_PATH");
             List<String> searchPaths = new ArrayList<>();
+            if (discoveredLibs != null) searchPaths.add(discoveredLibs.toString());
             
-            // Linux common paths
+            String envCudaPath = System.getenv("CUDA_PATH");
+            if (envCudaPath != null) {
+                searchPaths.add(envCudaPath + java.io.File.separator + "bin");
+                searchPaths.add(envCudaPath + java.io.File.separator + "lib64");
+            }
+
             if (!isWin) {
                 searchPaths.add("/usr/lib/x86_64-linux-gnu");
-                searchPaths.add("/usr/lib/i386-linux-gnu");
                 searchPaths.add("/usr/lib/nvidia");
+                searchPaths.add("/usr/local/cuda/lib64");
+                searchPaths.add("/usr/local/lib");
             }
             
-            searchPaths.add("/usr/local/lib/");
-            searchPaths.add("/usr/lib/");
-            searchPaths.add("C:\\Windows\\System32\\");
-            
-            if (System.getenv("NATIVE_ROOT") != null) searchPaths.add(System.getenv("NATIVE_ROOT"));
-            if (cudaPath != null) {
-                searchPaths.add(cudaPath + java.io.File.separator + "bin");
-                searchPaths.add(cudaPath + java.io.File.separator + "lib64");
-                searchPaths.add(cudaPath + java.io.File.separator + "lib");
-            }
-            
-            // Log environment state if this is the last variant and we are still failing
-            if (variant.equals(variants.get(variants.size() - 1))) {
-                logger.debug("Native Load Environment: java.library.path={}, LD_LIBRARY_PATH={}", 
-                    System.getProperty("java.library.path"), System.getenv("LD_LIBRARY_PATH"));
-            }
-            
-            if (discoveredLibs != null) searchPaths.add(discoveredLibs.toString());
-
             searchPaths.add(System.getProperty("user.dir"));
             searchPaths.add(System.getProperty("user.dir") + java.io.File.separator + "libs");
             
@@ -244,64 +223,59 @@ public class NativeLibraryLoader {
                     return found;
                 }
             }
-            
-            if (discoveredLibs != null && java.nio.file.Files.isDirectory(discoveredLibs)) {
-                java.io.File[] subDirs = discoveredLibs.toFile().listFiles(java.io.File::isDirectory);
-                if (subDirs != null) {
-                    for (java.io.File sub : subDirs) {
-                        Optional<SymbolLookup> found = tryLoadFromDirectory(sub.toPath(), currentMapped, arena);
-                        if (found.isPresent()) {
-                            logger.info("Successfully loaded {} from subdirectory: {}", variant, sub.getName());
-                            LOADED_LIBS.put(libName, found.get());
-                            return found;
-                        } else {
-                            if (FAILED_VARIANTS.add(variant + "@" + sub.getName())) {
-                                logger.trace("Library '{}' could not be loaded from subdirectory: {}", variant, sub.getName());
-                            }
-                        }
-                    }
-                }
-            }
         }
         
         if (FAILED_LIBS.add(libName)) {
             logger.warn("Could not find or load native library {} (tried variants: {})", libName, variants);
+            logger.warn("Failure summary: {}", getFailureSummary(libName, variants));
         }
         return Optional.empty();
+    }
+
+    private static String getFailureSummary(String libName, List<String> variants) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n  - Library: ").append(libName);
+        sb.append("\n  - Java Path: ").append(System.getProperty("java.library.path"));
+        sb.append("\n  - LD_LIBRARY_PATH: ").append(System.getenv("LD_LIBRARY_PATH"));
+        sb.append("\n  - Probed Variants Errors:");
+        for (String v : variants) {
+            sb.append("\n    * ").append(v).append(": ").append(FAILURE_CAUSES.getOrDefault(v, "Not found on disk"));
+        }
+        return sb.toString();
     }
 
     private static Optional<SymbolLookup> tryLoadFromDirectory(java.nio.file.Path basePath, String mappedName, Arena arena) {
-        java.nio.file.Path logPath = basePath;
         try {
+            if (!java.nio.file.Files.exists(basePath)) return Optional.empty();
             final java.nio.file.Path fullPath = basePath.resolve(mappedName).toAbsolutePath();
-            logPath = fullPath;
             if (java.nio.file.Files.exists(fullPath)) {
                 try {
-                    return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
+                    SymbolLookup lookup = SymbolLookup.libraryLookup(fullPath, arena);
+                    String msg = "Successfully loaded library from path: " + fullPath;
+                    logger.info(msg);
+                    System.out.println("[NativeLoader] " + msg);
+                    return Optional.of(lookup);
                 } catch (Throwable t) {
-                    if (FAILED_VARIANTS.add(fullPath.toString())) {
-                        logger.debug("Failed to load native library at {}: {}", fullPath, t.getMessage());
-                    }
+                    FAILURE_CAUSES.put(fullPath.toString(), t.toString());
+                    String msg = "Dependency resolution failed for " + fullPath + ": " + t.getMessage();
+                    logger.debug(msg);
+                    System.err.println("[NativeLoader] " + msg);
                 }
             }
             
-            String[] subs = {"lib", "bin"};
-            for (String sub : subs) {
+            // Try subdirectory "lib" or "bin"
+            for (String sub : new String[]{"lib", "bin"}) {
                 java.nio.file.Path subPath = basePath.resolve(sub).resolve(mappedName).toAbsolutePath();
                 if (java.nio.file.Files.exists(subPath)) {
-                    return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
+                    try {
+                        return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
+                    } catch (Throwable t) {
+                        FAILURE_CAUSES.put(subPath.toString(), t.toString());
+                    }
                 }
             }
-        } catch (Throwable t) {
-            if (FAILED_VARIANTS.add(mappedName + "@" + logPath)) {
-                logger.trace("Failed to load {} from {}: {}", mappedName, logPath, t.getMessage());
-            }
-        }
+        } catch (Throwable ignored) {}
         return Optional.empty();
-    }
-
-    public static Optional<SymbolLookup> getSystemLookup() {
-         return Optional.of(SymbolLookup.loaderLookup());
     }
 
     public static Linker getLinker() {
@@ -313,11 +287,14 @@ public class NativeLibraryLoader {
         for (String name : names) {
             Optional<MemorySegment> segment = lookup.find(name);
             if (segment.isPresent()) return segment;
-
             segment = lookup.find("_" + name);
             if (segment.isPresent()) return segment;
         }
         return Optional.empty();
+    }
+
+    public static Optional<SymbolLookup> getSystemLookup() {
+        return Optional.of(SymbolLookup.loaderLookup());
     }
 
     /**
@@ -336,6 +313,7 @@ public class NativeLibraryLoader {
     public static void clearCache() {
         FAILED_LIBS.clear();
         FAILED_VARIANTS.clear();
+        FAILURE_CAUSES.clear();
         logger.info("Failure cache cleared.");
     }
 }

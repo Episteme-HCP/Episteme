@@ -25,6 +25,8 @@ z _ a n a t o m y _ s o u r c e /
 !libs/MPJ/lib/*.jar
 !launchers/packaged/**/*.jar
 !episteme-natural/lib/fbx_loader/*.jar
+!episteme-native/libs/jzy3d-*
+!episteme-core/libs/jzy3d-*
 
 # Certificates
 certs/*.key

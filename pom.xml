@@ -553,6 +553,7 @@
               <artifactId>jzy3d-all</artifactId>
               <version>2.2.2-SNAPSHOT</version>
               <packaging>pom</packaging>
+              <generatePom>true</generatePom>
             </configuration>
           </execution>
           <execution>
@@ -565,6 +566,7 @@
               <artifactId>jzy3d-core</artifactId>
               <version>2.2.2-SNAPSHOT</version>
               <packaging>jar</packaging>
+              <generatePom>true</generatePom>
             </configuration>
           </execution>
           <execution>
@@ -577,6 +579,20 @@
               <artifactId>jzy3d-native-jogl-javafx</artifactId>
               <version>2.2.2-SNAPSHOT</version>
               <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+          </execution>
+          <execution>
+            <id>install-jzy3d-native-awt</id>
+            <phase>initialize</phase>
+            <goals><goal>install-file</goal></goals>
+            <configuration>
+              <file>${project.basedir}/episteme-native/libs/jzy3d-native-jogl-awt-2.2.2-SNAPSHOT.jar</file>
+              <groupId>org.jzy3d</groupId>
+              <artifactId>jzy3d-native-jogl-awt</artifactId>
+              <version>2.2.2-SNAPSHOT</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
             </configuration>
           </execution>
           <execution>
@@ -589,6 +605,7 @@
               <artifactId>jzy3d-emul-gl-awt</artifactId>
               <version>2.2.2-SNAPSHOT</version>
               <packaging>jar</packaging>
+              <generatePom>true</generatePom>
             </configuration>
           </execution>
         </executions>

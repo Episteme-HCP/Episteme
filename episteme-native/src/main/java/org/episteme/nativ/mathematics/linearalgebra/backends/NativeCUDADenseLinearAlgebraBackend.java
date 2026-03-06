@@ -76,49 +76,48 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             cublas = cublasOpt.get();
 
             // CUDA Runtime Memory Management
-            CUDA_MALLOC = LINKER.downcallHandle(
-                NativeLibraryLoader.findSymbol(cudart, "cudaMalloc").orElseThrow(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG)
-            );
-            CUDA_FREE = LINKER.downcallHandle(
-                NativeLibraryLoader.findSymbol(cudart, "cudaFree").orElseThrow(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-            );
-            CUDA_MEMCPY = LINKER.downcallHandle(
-                NativeLibraryLoader.findSymbol(cudart, "cudaMemcpy").orElseThrow(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT)
-            );
-            CUDA_DEVICE_SYNCHRONIZE = LINKER.downcallHandle(
-                NativeLibraryLoader.findSymbol(cudart, "cudaDeviceSynchronize").orElseThrow(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT)
-            );
+            Optional<MemorySegment> mallocSym = NativeLibraryLoader.findSymbol(cudart, "cudaMalloc");
+            Optional<MemorySegment> freeSym = NativeLibraryLoader.findSymbol(cudart, "cudaFree");
+            Optional<MemorySegment> memcpySym = NativeLibraryLoader.findSymbol(cudart, "cudaMemcpy");
+            Optional<MemorySegment> syncSym = NativeLibraryLoader.findSymbol(cudart, "cudaDeviceSynchronize");
+
+            if (mallocSym.isEmpty() || freeSym.isEmpty() || memcpySym.isEmpty() || syncSym.isEmpty()) {
+                logger.warn("Required CUDA runtime symbols missing (malloc={}, free={}, memcpy={}, sync={}). Backend disabled.", 
+                    mallocSym.isPresent(), freeSym.isPresent(), memcpySym.isPresent(), syncSym.isPresent());
+                return;
+            }
+
+            CUDA_MALLOC = LINKER.downcallHandle(mallocSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+            CUDA_FREE = LINKER.downcallHandle(freeSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUDA_MEMCPY = LINKER.downcallHandle(memcpySym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
+            CUDA_DEVICE_SYNCHRONIZE = LINKER.downcallHandle(syncSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT));
 
             // cuBLAS
-            CUBLAS_CREATE = LINKER.downcallHandle(
-                NativeLibraryLoader.findSymbol(cublas, "cublasCreate_v2", "cublasCreate").orElseThrow(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-            );
-            CUBLAS_DESTROY = LINKER.downcallHandle(
-                NativeLibraryLoader.findSymbol(cublas, "cublasDestroy_v2", "cublasDestroy").orElseThrow(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-            );
-            CUBLAS_DGEMM = LINKER.downcallHandle(
-                NativeLibraryLoader.findSymbol(cublas, "cublasDgemm_v2", "cublasDgemm").orElseThrow(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT
-                )
-            );
+            Optional<MemorySegment> createSym = NativeLibraryLoader.findSymbol(cublas, "cublasCreate_v2", "cublasCreate");
+            Optional<MemorySegment> destroySym = NativeLibraryLoader.findSymbol(cublas, "cublasDestroy_v2", "cublasDestroy");
+            Optional<MemorySegment> dgemmSym = NativeLibraryLoader.findSymbol(cublas, "cublasDgemm_v2", "cublasDgemm");
+
+            if (createSym.isEmpty() || destroySym.isEmpty() || dgemmSym.isEmpty()) {
+                logger.warn("Required cuBLAS symbols missing (create={}, destroy={}, dgemm={}). Backend disabled.", 
+                    createSym.isPresent(), destroySym.isPresent(), dgemmSym.isPresent());
+                return;
+            }
+
+            CUBLAS_CREATE = LINKER.downcallHandle(createSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUBLAS_DESTROY = LINKER.downcallHandle(destroySym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUBLAS_DGEMM = LINKER.downcallHandle(dgemmSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+            ));
 
             IS_AVAILABLE = true;
             logger.info("Native CUDA/cuBLAS Backend initialized successfully.");
-        } catch (java.util.NoSuchElementException e) {
-            logger.debug("Native CUDA/cuBLAS symbols not found. GPU backend will be disabled.");
         } catch (Throwable t) {
-            logger.debug("Failed to initialize CUDA/cuBLAS Backend", t);
+            logger.warn("Failed to initialize CUDA/cuBLAS Backend: {} - {}", t.getClass().getSimpleName(), t.getMessage());
+            logger.debug("Stack trace:", t);
         }
     }
 
