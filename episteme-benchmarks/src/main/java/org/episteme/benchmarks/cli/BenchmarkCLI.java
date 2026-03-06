@@ -198,6 +198,9 @@ public class BenchmarkCLI {
         System.out.println("Summary: " + success + " Success, " + fail + " Failed, " + skipped + " Skipped.");
         System.out.println("================================================================");
 
+        // Print Performance Report
+        System.out.println(org.episteme.core.util.PerformanceLogger.getReport());
+
         // Export JSON
         if (exportFile != null) {
             exportJson(exportFile, results);

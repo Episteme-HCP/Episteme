@@ -142,6 +142,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA not available");
 
+        long start = System.nanoTime();
         int m = a.rows();
         int k = a.cols();
         int n = b.cols();
@@ -200,8 +201,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             CUDA_FREE.invokeExact(d_A);
             CUDA_FREE.invokeExact(d_B);
             CUDA_FREE.invokeExact(d_C);
-
-            return fromDoubleArray(h_C, m, n);
+            
+            Matrix<Real> result = fromDoubleArray(h_C, m, n);
+            org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/CUDA", System.nanoTime() - start);
+            return result;
 
         } catch (Throwable t) {
             throw new RuntimeException("CUDA GPU execution error", t);

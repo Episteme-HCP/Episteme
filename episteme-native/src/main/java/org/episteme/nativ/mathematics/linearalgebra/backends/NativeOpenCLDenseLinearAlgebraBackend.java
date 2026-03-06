@@ -127,6 +127,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
 
+        long start = System.nanoTime();
         int m = a.rows();
         int k = a.cols();
         int n = b.cols();
@@ -151,7 +152,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
             clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(h_C), 0, null, null);
             
-            return fromDoubleArray(h_C, m, n);
+            Matrix<Real> result = fromDoubleArray(h_C, m, n);
+            org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/OpenCL", System.nanoTime() - start);
+            return result;
         } finally {
             clReleaseMemObject(memA);
             clReleaseMemObject(memB);
