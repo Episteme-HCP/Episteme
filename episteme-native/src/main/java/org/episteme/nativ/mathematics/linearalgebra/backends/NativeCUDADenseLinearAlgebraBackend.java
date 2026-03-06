@@ -61,49 +61,49 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static synchronized void ensureInitialized() {
         if (IS_AVAILABLE) return;
 
-        SymbolLookup cuda = null;
         SymbolLookup cublas = null;
 
-        try (Arena arena = Arena.ofConfined()) { // Test loading
-            Optional<SymbolLookup> cudaOpt = NativeLibraryLoader.loadLibrary("cuda", Arena.global());
+        try { // Test loading
+            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", Arena.global());
             Optional<SymbolLookup> cublasOpt = NativeLibraryLoader.loadLibrary("cublas", Arena.global());
             
-            if (cudaOpt.isEmpty() || cublasOpt.isEmpty()) return;
+            if (cudaRtOpt.isEmpty() || cublasOpt.isEmpty()) {
+                logger.warn("Native CUDA/cuBLAS libraries not found (cudart={}, cublas={})", cudaRtOpt.isPresent(), cublasOpt.isPresent());
+                return;
+            }
             
-            cuda = cudaOpt.get();
+            SymbolLookup cudart = cudaRtOpt.get();
             cublas = cublasOpt.get();
-            
-            
 
             // CUDA Runtime Memory Management
             CUDA_MALLOC = LINKER.downcallHandle(
-                cuda.find("cudaMalloc").get(),
+                NativeLibraryLoader.findSymbol(cudart, "cudaMalloc").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG)
             );
             CUDA_FREE = LINKER.downcallHandle(
-                cuda.find("cudaFree").get(),
+                NativeLibraryLoader.findSymbol(cudart, "cudaFree").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
             );
             CUDA_MEMCPY = LINKER.downcallHandle(
-                cuda.find("cudaMemcpy").get(),
+                NativeLibraryLoader.findSymbol(cudart, "cudaMemcpy").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT)
             );
             CUDA_DEVICE_SYNCHRONIZE = LINKER.downcallHandle(
-                cuda.find("cudaDeviceSynchronize").get(),
+                NativeLibraryLoader.findSymbol(cudart, "cudaDeviceSynchronize").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT)
             );
 
             // cuBLAS
             CUBLAS_CREATE = LINKER.downcallHandle(
-                cublas.find("cublasCreate_v2").get(),
+                NativeLibraryLoader.findSymbol(cublas, "cublasCreate_v2", "cublasCreate").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
             );
             CUBLAS_DESTROY = LINKER.downcallHandle(
-                cublas.find("cublasDestroy_v2").get(),
+                NativeLibraryLoader.findSymbol(cublas, "cublasDestroy_v2", "cublasDestroy").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
             );
             CUBLAS_DGEMM = LINKER.downcallHandle(
-                cublas.find("cublasDgemm_v2").get(),
+                NativeLibraryLoader.findSymbol(cublas, "cublasDgemm_v2", "cublasDgemm").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                     ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -114,10 +114,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             );
 
             IS_AVAILABLE = true;
+            logger.info("Native CUDA/cuBLAS Backend initialized successfully.");
         } catch (Throwable t) {
-            IS_AVAILABLE = false;
-            System.out.println("\n[WARNING] Native CUDA Backend initialization completely failed: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-            t.printStackTrace(System.out);
+            logger.error("Failed to initialize CUDA/cuBLAS Backend", t);
         }
     }
 

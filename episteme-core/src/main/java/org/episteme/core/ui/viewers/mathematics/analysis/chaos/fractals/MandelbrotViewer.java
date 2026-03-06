@@ -50,7 +50,7 @@ import java.util.ArrayList;
  * @since 1.0
  */
 @AutoService(Viewer.class)
-public class MandelbrotViewer extends AbstractViewer {
+public class MandelbrotViewer<E> extends AbstractViewer {
 
     private static final String CFG_PREFIX = "viewer.mandelbrot.default.";
 

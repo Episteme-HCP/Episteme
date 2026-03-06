@@ -19,7 +19,7 @@ cmake "$ABS_SOURCE_DIR" -DCMAKE_BUILD_TYPE=Release
 echo "Building Release..."
 cmake --build . --config Release
 
-cd ../../..
+cd ../..
 
 echo "Copying libepisteme_vision.so to resources..."
 mkdir -p "$OUTPUT_DIR"

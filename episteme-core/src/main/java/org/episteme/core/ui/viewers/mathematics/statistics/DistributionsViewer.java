@@ -46,7 +46,7 @@ import javafx.scene.layout.*;
  * @since 1.0
  */
 @AutoService(Viewer.class)
-public class DistributionsViewer extends AbstractViewer {
+public class DistributionsViewer<E> extends AbstractViewer {
 
     private final StackPane chartContainer = new StackPane();
     private String currentType = "Normal";

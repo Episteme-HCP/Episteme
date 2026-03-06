@@ -53,6 +53,7 @@ import java.lang.reflect.Constructor;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
 public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 

@@ -531,6 +531,42 @@
               <packaging>jar</packaging>
             </configuration>
           </execution>
+          <execution>
+            <id>install-jfbx</id>
+            <phase>initialize</phase>
+            <goals><goal>install-file</goal></goals>
+            <configuration>
+              <file>${project.basedir}/episteme-natural/lib/fbx_loader/java-fbx-loader-v1.0.jar</file>
+              <groupId>com.github.studygameengines</groupId>
+              <artifactId>java-fbx-loader</artifactId>
+              <version>1.0</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
+          <execution>
+            <id>install-jzy3d-core</id>
+            <phase>initialize</phase>
+            <goals><goal>install-file</goal></goals>
+            <configuration>
+              <file>${project.basedir}/episteme-native/libs/jzy3d-core-2.2.2-SNAPSHOT.jar</file>
+              <groupId>org.jzy3d</groupId>
+              <artifactId>jzy3d-core</artifactId>
+              <version>2.2.2-SNAPSHOT</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
+          <execution>
+            <id>install-jzy3d-native</id>
+            <phase>initialize</phase>
+            <goals><goal>install-file</goal></goals>
+            <configuration>
+              <file>${project.basedir}/episteme-native/libs/jzy3d-native-jogl-awt-2.2.2-SNAPSHOT.jar</file>
+              <groupId>org.jzy3d</groupId>
+              <artifactId>jzy3d-native-jogl-awt</artifactId>
+              <version>2.2.2-SNAPSHOT</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

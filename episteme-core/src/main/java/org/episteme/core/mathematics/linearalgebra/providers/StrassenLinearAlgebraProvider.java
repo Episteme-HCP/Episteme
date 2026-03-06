@@ -17,6 +17,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Linear Algebra Provider that forces the use of the Strassen algorithm.
  * Intended for benchmarking and comparison purposes.
  */
+@SuppressWarnings("rawtypes")
 @AutoService({LinearAlgebraProvider.class})
 public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 

@@ -17,6 +17,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Linear Algebra Provider that forces the use of the CARMA algorithm.
  * Intended for benchmarking and comparison purposes.
  */
+@SuppressWarnings("rawtypes")
 @AutoService({LinearAlgebraProvider.class})
 public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 

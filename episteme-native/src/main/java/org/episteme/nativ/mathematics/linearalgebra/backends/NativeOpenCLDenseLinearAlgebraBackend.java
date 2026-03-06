@@ -36,7 +36,7 @@ import java.nio.DoubleBuffer;
  * @since 2.0
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
-public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
+public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLDenseLinearAlgebraBackend.class);
     private static cl_context context;

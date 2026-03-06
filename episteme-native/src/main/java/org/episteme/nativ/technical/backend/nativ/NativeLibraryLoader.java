@@ -161,6 +161,7 @@ public class NativeLibraryLoader {
                 variants.add("cudart");
                 variants.add("cudart.so.12");
                 variants.add("cudart.so.11");
+                variants.add("cudart.so.10");
             }
         }
 
