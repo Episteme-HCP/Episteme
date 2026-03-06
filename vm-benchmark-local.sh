@@ -41,7 +41,7 @@ chmod +x compile_jni_linux.sh
 cd ..
 
 # Compilation Java Maven
-mvn clean install -DskipTests -Pheadless
+mvn install -DskipTests -Pheadless
 
 echo "--- [2/2] Exécution des Benchmarks (Native Linux) ---"
 if [ "$#" -eq 0 ]; then

@@ -3,12 +3,12 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install base dependencies and Java 25 GA
+# Install base dependencies and Java 25 EA
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     curl \
     netcat-openbsd \
-    && wget https://download.java.net/java/GA/jdk25.0.2/b1e0dfa218384cb9959bdcb897162d4e/10/GPL/openjdk-25.0.2_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz \
+    && wget https://download.java.net/java/early_access/jdk25/11/GPL/openjdk-25-ea+11_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz \
     && mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 \
     && tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 \
     && rm /tmp/jdk25.tar.gz \

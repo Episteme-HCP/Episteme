@@ -13,11 +13,11 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest, windows-latest, macos-14]
       fail-fast: false # Don't cancel other OS jobs if one fails
 
     env:
-      MAVEN_OPTS: "-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
+      MAVEN_OPTS: "--add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
 
     steps:
     - uses: actions/checkout@v4
