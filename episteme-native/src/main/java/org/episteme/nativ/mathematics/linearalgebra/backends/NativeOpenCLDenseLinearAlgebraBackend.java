@@ -243,8 +243,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
         return Real.of(Math.sqrt(sum));
     }
     // Fallback CPU operations for complex decompositions not implemented in OpenCL
-    private org.episteme.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraBackend getCPUFallback() {
-        return new org.episteme.core.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraBackend();
+    private org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real> getCPUFallback() {
+        return new org.episteme.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider();
     }
 
     @Override public Matrix<Real> inverse(Matrix<Real> a) { 

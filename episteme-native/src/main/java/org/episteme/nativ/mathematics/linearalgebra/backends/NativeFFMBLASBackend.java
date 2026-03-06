@@ -260,21 +260,25 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
          try (Arena arena = Arena.ofConfined()) {
-             int len = (int) ((long) n * n);
-             MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) len);
              double[] arrA = toDoubleArray(A);
-             MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
+             MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
+             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
              
-             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
-             
+             // 1. LU Factorization
              int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
-             if (info != 0) throw new ArithmeticException("LU Factorization failed. Info: " + info);
+             if (info != 0) {
+                 if (info > 0) throw new ArithmeticException("Matrix is singular (U(" + info + "," + info + ") is exactly zero). Cannot compute inverse.");
+                 throw new ArithmeticException("LU Factorization failed with illegal argument at position " + (-info));
+             }
              
+             // 2. Inverse using LU Factorization
              info = (int) DGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
-             if (info != 0) throw new ArithmeticException("Inverse failed. Info: " + info);
+             if (info != 0) {
+                 if (info > 0) throw new ArithmeticException("Matrix is singular during inversion. Cannot compute inverse.");
+                 throw new ArithmeticException("Inverse failed with illegal argument at position " + (-info));
+             }
              
-             double[] result = new double[n * n];
-             MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0L, result, 0, (int) ( (long) n * n ) );
+             double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
              
              org.episteme.core.mathematics.numbers.real.Real[][] resObj = new org.episteme.core.mathematics.numbers.real.Real[n][n];
              for(int i=0; i<n; i++) {
@@ -284,7 +288,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
              }
              return new DenseMatrix<>(resObj, (Ring<org.episteme.core.mathematics.numbers.real.Real>) A.getScalarRing());
          } catch (Throwable e) {
-             throw new RuntimeException(e);
+             throw new RuntimeException("FFM Inverse Segmentation Fault Prevented", e);
          }
     }
 
