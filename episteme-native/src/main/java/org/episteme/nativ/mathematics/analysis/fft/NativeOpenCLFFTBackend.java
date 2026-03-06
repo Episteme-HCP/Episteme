@@ -16,7 +16,8 @@ import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import static org.jocl.CL.*;
 import org.jocl.*;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.technical.backend.ComputeBackend;
@@ -38,7 +39,7 @@ import java.nio.DoubleBuffer;
 @AutoService({FFTProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
 public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend {
 
-    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLFFTBackend.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLFFTBackend.class);
 
     // Simple DFT kernel for correctness/verification on GPU
     private static final String KERNEL_SOURCE = 
@@ -87,7 +88,7 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend {
 
             initialized = true;
         } catch (Exception e) {
-            LOGGER.severe("Failed to initialize OpenCL FFT: " + e.getMessage());
+            logger.error("Failed to initialize OpenCL FFT: {}", e.getMessage());
             throw new RuntimeException("OpenCL initialization error", e);
         }
     }

@@ -26,8 +26,8 @@ package org.episteme.core.io;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base for resource readers with caching and fallback support.
@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractResourceReader<T> implements ResourceReader<T> {
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractResourceReader.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AbstractResourceReader.class);
     private final ConcurrentHashMap<String, T> localCache = new ConcurrentHashMap<>();
     private boolean usingFallback = false;
     private boolean cacheEnabled = true;
@@ -73,13 +73,13 @@ public abstract class AbstractResourceReader<T> implements ResourceReader<T> {
                 return obj;
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to load '" + id + "': " + e.getMessage() + ". Using fallback.");
+            logger.warn("Failed to load '{}': {}. Using fallback.", id, e.getMessage());
         }
 
         T fallbackObj = loadFromFallback(id);
         if (fallbackObj != null) {
             usingFallback = true;
-            LOGGER.info("Using embedded sample data for '" + id + "'");
+            logger.info("Using embedded sample data for '{}'", id);
             if (cacheEnabled)
                 localCache.put(id, fallbackObj);
             return fallbackObj;
@@ -96,7 +96,7 @@ public abstract class AbstractResourceReader<T> implements ResourceReader<T> {
                 return items;
             }
         } catch (Exception e) {
-            LOGGER.warning("Failed to load all from source. Using fallback.");
+            logger.warn("Failed to load all from source. Using fallback.");
         }
 
         MiniCatalog<T> catalog = getMiniCatalog();
@@ -124,7 +124,7 @@ public abstract class AbstractResourceReader<T> implements ResourceReader<T> {
                 if (is != null)
                     return loadFromInputStream(is, id);
             } catch (Exception e) {
-                LOGGER.log(Level.FINE, "Could not load sample data", e);
+                logger.debug("Could not load sample data", e);
             }
         }
         return null;

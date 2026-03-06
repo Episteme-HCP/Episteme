@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
@@ -28,7 +29,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
  */
 public class ProviderRegistry {
  
-    private static final Logger LOGGER = Logger.getLogger(ProviderRegistry.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ProviderRegistry.class);
 
     private final Map<String, LinearAlgebraProvider<?>> providers = new ConcurrentHashMap<>();
     private static final List<MatrixStorageFactory> matrixStorageFactories = new ArrayList<>();
@@ -71,7 +72,7 @@ public class ProviderRegistry {
                  }
              }
         } catch (Exception e) {
-            LOGGER.warning("Failed to select best LinearAlgebraProvider: " + e.getMessage());
+            logger.warn("Failed to select best LinearAlgebraProvider: {}", e.getMessage());
         }
 
         // Fallback: Pick whatever is available via AlgorithmManager instead of hardcoded new instance

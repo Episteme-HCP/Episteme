@@ -10,7 +10,8 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A pool of reusable native MemorySegments to avoid frequent allocations.
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
  */
 public class FixedSizeNativeMemorySegmentPool implements org.episteme.nativ.util.MemorySegmentPool {
 
-    private static final Logger LOGGER = Logger.getLogger(FixedSizeNativeMemorySegmentPool.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(FixedSizeNativeMemorySegmentPool.class);
     
     private final long segmentSize;
     private final Arena arena;
@@ -48,9 +49,8 @@ public class FixedSizeNativeMemorySegmentPool implements org.episteme.nativ.util
     @Override
     public MemorySegment acquire(long sizeBytes) {
         if (sizeBytes != segmentSize) {
-            LOGGER.warning(() -> String.format(
-                "Requested size %d does not match pool size %d. Returning pool-sized segment.",
-                sizeBytes, segmentSize));
+            logger.warn("Requested size {} does not match pool size {}. Returning pool-sized segment.",
+                sizeBytes, segmentSize);
         }
         return acquire();
     }
@@ -63,8 +63,8 @@ public class FixedSizeNativeMemorySegmentPool implements org.episteme.nativ.util
         if (segment == null) {
             segment = arena.allocate(segmentSize, ValueLayout.JAVA_DOUBLE.byteAlignment());
             allocatedCount.incrementAndGet();
-            LOGGER.fine(() -> String.format("Allocated new native segment of %d bytes. Total: %d", 
-                segmentSize, allocatedCount.get()));
+            logger.debug("Allocated new native segment of {} bytes. Total: {}", 
+                segmentSize, allocatedCount.get());
         }
         return segment;
     }

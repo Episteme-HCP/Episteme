@@ -27,6 +27,8 @@ import org.episteme.natural.chemistry.biochemistry.AminoAcid;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The standard genetic code for translating RNA codons to Amino Acids.
@@ -38,6 +40,8 @@ import java.util.Map;
 public enum CodonTable {
 
     STANDARD;
+
+    private static final Logger logger = LoggerFactory.getLogger(CodonTable.class);
 
     private final Map<String, AminoAcid> codonMap;
     private final Map<String, Character> codonCharMap;
@@ -55,7 +59,7 @@ public enum CodonTable {
             java.io.InputStream is = CodonTable.class
                     .getResourceAsStream("/org/episteme/biology/codons.json");
             if (is == null) {
-                java.util.logging.Logger.getLogger("CodonTable").severe("codons.json not found!");
+                logger.error("codons.json not found!");
                 return;
             }
             com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(is);
@@ -76,8 +80,7 @@ public enum CodonTable {
                         register(codon, aa);
                     } else {
                         // Warning: Amino Acid not found?
-                        java.util.logging.Logger.getLogger("CodonTable")
-                                .warning("Amino Acid not found for code: " + aaCode);
+                        logger.warn("Amino Acid not found for code: {}", aaCode);
                     }
                 }
             }
@@ -91,7 +94,7 @@ public enum CodonTable {
 
             is.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to load codon table", e);
         }
     }
 

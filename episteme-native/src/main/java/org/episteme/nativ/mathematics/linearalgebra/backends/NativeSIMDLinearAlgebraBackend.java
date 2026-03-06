@@ -13,6 +13,8 @@ import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import com.google.auto.service.AutoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
@@ -38,6 +40,7 @@ import org.episteme.core.technical.backend.Operation;
 @AutoService({Backend.class, ComputeBackend.class, SIMDBackend.class, LinearAlgebraProvider.class, NativeBackend.class, CPUBackend.class})
 public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
+    private static final Logger logger = LoggerFactory.getLogger(NativeSIMDLinearAlgebraBackend.class);
     private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
 
     @Override
@@ -114,6 +117,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+        logger.debug("Entering SIMD multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         SIMDRealDoubleMatrix sa = asSIMD(a);
         SIMDRealDoubleMatrix sb = asSIMD(b);
         return sa.multiply(sb);

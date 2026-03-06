@@ -31,14 +31,16 @@ import org.episteme.core.ui.viewers.mathematics.discrete.GraphViewer;
 import org.episteme.social.ui.viewers.sociology.DemographicProfileViewer;
 import org.episteme.social.economics.loaders.EconomicScenarioReader;
 import org.episteme.social.sociology.loaders.DemographicResourceReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Global Stability Studio: A professional tool for analyzing world risks.
  * Integrates markets, geopolitics, and demographics.
  */
 public final class GlobalStabilityStudio extends FeaturedAppBase {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalStabilityStudio.class);
 
     private FinancialPortfolioViewer marketViewer;
     private GraphViewer allianceViewer;
@@ -86,7 +88,7 @@ public final class GlobalStabilityStudio extends FeaturedAppBase {
             // For allianceViewer, we'll keep it as is or create a GeopoliticalResourceReader later
             // For now, let's just use a placeholder or empty graph if we can't find a reader
         } catch (Exception e) {
-            Logger.getGlobal().log(Level.SEVERE, "Failed to load scenarios", e);
+            logger.error("Failed to load scenarios", e);
         }
         
         setStatus("System Ready. All data layers synchronized.");

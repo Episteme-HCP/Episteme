@@ -28,7 +28,8 @@ import org.episteme.core.mathematics.ml.neural.backends.ONNXRuntimeBackend.ONNXS
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Standardized Loader for ONNX (Open Neural Network Exchange) models.
@@ -43,8 +44,7 @@ import java.util.logging.Logger;
  */
 public class ONNXModelReader extends AbstractResourceReader<ONNXSession> {
 
-    @SuppressWarnings("unused")
-    private static final Logger LOGGER = Logger.getLogger(ONNXModelReader.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ONNXModelReader.class);
     private static final ONNXModelReader INSTANCE = new ONNXModelReader();
 
     public static ONNXModelReader getInstance() {
@@ -57,6 +57,7 @@ public class ONNXModelReader extends AbstractResourceReader<ONNXSession> {
         Path modelPath = Paths.get(id);
         
         ONNXRuntimeBackend provider = new ONNXRuntimeBackend(); // Could be singleton/injected
+        logger.info("Loading ONNX model from: {}", modelPath);
         ONNXSession session = provider.loadModel(modelPath);
         
         if (session == null) {

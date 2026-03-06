@@ -27,6 +27,8 @@ import org.episteme.natural.chemistry.Molecule;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.util.persistence.Attribute;
 import org.episteme.core.util.persistence.Persistent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,8 @@ import java.util.List;
  */
 @Persistent
 public class AminoAcid extends Molecule {
+
+    private static final Logger logger = LoggerFactory.getLogger(AminoAcid.class);
 
     private static final long serialVersionUID = 2L;
 
@@ -94,7 +98,7 @@ public class AminoAcid extends Molecule {
             java.io.InputStream is = AminoAcid.class
                     .getResourceAsStream("/org/episteme/chemistry/biochemistry/amino_acids.json");
             if (is == null) {
-                java.util.logging.Logger.getLogger("AminoAcid").severe("amino_acids.json not found!");
+                logger.error("amino_acids.json not found!");
                 return;
             }
             com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(is);

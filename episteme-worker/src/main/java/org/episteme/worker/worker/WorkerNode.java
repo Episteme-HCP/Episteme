@@ -33,7 +33,8 @@ import org.episteme.server.server.proto.*;
 
 import java.io.*;
 import java.util.Optional;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Episteme Worker Node.
@@ -55,7 +56,7 @@ import java.util.logging.Logger;
  */
 public class WorkerNode {
 
-    private static final Logger LOGGER = Logger.getLogger(WorkerNode.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(WorkerNode.class);
 
     private final ManagedChannel channel;
     private final ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
@@ -73,7 +74,7 @@ public class WorkerNode {
         this.channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
         this.blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
         this.taskRegistry = TaskRegistry.getInstance();
-        LOGGER.info("WorkerNode connecting to " + host + ":" + port);
+        logger.info("WorkerNode connecting to {}:{}", host, port);
     }
 
     /**
@@ -81,17 +82,17 @@ public class WorkerNode {
      */
     public void start() {
         register();
-        LOGGER.info("Worker " + workerId + " started, polling for tasks...");
+        logger.info("Worker {} started, polling for tasks...", workerId);
 
         while (running) {
             try {
                 pollAndExecute();
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                LOGGER.info("Worker interrupted, shutting down");
+                logger.info("Worker interrupted, shutting down");
                 break;
             } catch (Exception e) {
-                LOGGER.warning("Error processing task: " + e.getMessage());
+                logger.warn("Error processing task: {}", e.getMessage());
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ie) {
@@ -115,7 +116,7 @@ public class WorkerNode {
      */
     public void shutdown() {
         channel.shutdown();
-        LOGGER.info("Worker " + workerId + " shut down");
+        logger.info("Worker {} shut down", workerId);
     }
 
     private void register() {
@@ -124,7 +125,7 @@ public class WorkerNode {
                 .setCores(Runtime.getRuntime().availableProcessors())
                 .build();
         this.workerId = blockingStub.registerWorker(reg).getWorkerId();
-        LOGGER.info("Registered as worker: " + workerId);
+        logger.info("Registered as worker: {}", workerId);
     }
 
     private void pollAndExecute() {
@@ -135,7 +136,7 @@ public class WorkerNode {
             return;
         }
 
-        LOGGER.fine("Received task: " + task.getTaskId() + " type: " + task.getTaskType());
+        logger.debug("Received task: {} type: {}", task.getTaskId(), task.getTaskType());
 
         try {
             byte[] resultBytes = executeTask(task);
@@ -144,9 +145,9 @@ public class WorkerNode {
                     .setStatus(Status.COMPLETED)
                     .setSerializedData(ByteString.copyFrom(resultBytes))
                     .build());
-            LOGGER.fine("Task " + task.getTaskId() + " completed successfully");
+            logger.debug("Task {} completed successfully", task.getTaskId());
         } catch (Exception e) {
-            LOGGER.warning("Task " + task.getTaskId() + " failed: " + e.getMessage());
+            logger.warn("Task {} failed: {}", task.getTaskId(), e.getMessage());
             blockingStub.submitResult(TaskResult.newBuilder()
                     .setTaskId(task.getTaskId())
                     .setStatus(Status.FAILED)

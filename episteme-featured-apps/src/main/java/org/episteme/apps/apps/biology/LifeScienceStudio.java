@@ -31,14 +31,16 @@ import org.episteme.natural.ui.viewers.shared.scientific.ScientificProcessViewer
 import org.episteme.social.ui.viewers.geography.SpatialFluxViewer;
 import org.episteme.natural.biology.loaders.BiologicalResourceReader;
 import org.episteme.natural.biology.ProteinFolding;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Life Science Studio: A consolidated environment for biological and ecological simulation.
  */
 public final class LifeScienceStudio extends FeaturedAppBase {
+
+    private static final Logger logger = LoggerFactory.getLogger(LifeScienceStudio.class);
 
     private ScientificProcessViewer energyViewer;
     private SpatialFluxViewer hazardViewer;
@@ -78,7 +80,7 @@ public final class LifeScienceStudio extends FeaturedAppBase {
             
             // For now, hazardViewer will be empty or we'll add a reader later
         } catch (Exception e) {
-             Logger.getGlobal().log(Level.SEVERE, "Failed to load biological data", e);
+             logger.error("Failed to load biological data", e);
         }
         
         setStatus("Ready.");

@@ -45,7 +45,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.episteme.core.util.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * FBX loader for JavaFX 3D using the jfbx library.
@@ -60,7 +61,7 @@ import org.episteme.core.util.Logger;
  */
 public class FbxMeshReader extends AbstractResourceReader<Group> {
     
-    private static final Logger LOGGER = Logger.getLogger(FbxMeshReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(FbxMeshReader.class);
     
     @Override
     public String[] getSupportedVersions() {
@@ -157,7 +158,7 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
         FBXNode objectsNode = root.getChildByName("Objects");
         if (objectsNode == null) return fbxRoot;
         
-        LOGGER.debug("Starting parseJfbx (Hierarchy + Raw Transforms)");
+        logger.debug("Starting parseJfbx (Hierarchy + Raw Transforms)");
 
         // Inner classes for parsing
         class TransformData { 
@@ -298,7 +299,7 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             models.put(id, md);
         }
         
-        LOGGER.debug(() -> "Parsed " + models.size() + " Models");
+        logger.debug("Parsed {} Models", models.size());
         
         // 2. Parse Connections to build Hierarchy and Link Geometries
         // Map: ChildID -> ParentID
@@ -333,8 +334,8 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             }
         }
         
-        LOGGER.debug(() -> "Found " + childToParent.size() + " Model hierarchy links");
-        LOGGER.debug(() -> "Found " + geomModelLinks.size() + " Geometry-Model links");
+        logger.debug("Found {} Model hierarchy links", childToParent.size());
+        logger.debug("Found {} Geometry-Model links", geomModelLinks.size());
         
         // 3. Assemble Scene Graph
         for (ModelData md : models.values()) {
@@ -417,8 +418,8 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             }
         }
         
-        LOGGER.debug("Attached " + attachedCount + " meshes to models");
-        LOGGER.debug("fbxRoot has " + fbxRoot.getChildren().size() + " root children");
+        logger.debug("Attached {} meshes to models", attachedCount);
+        logger.debug("fbxRoot has {} root children", fbxRoot.getChildren().size());
         
         // 5. Global Coordinate System Fix
         Group worldGroup = new Group(fbxRoot);
@@ -446,7 +447,7 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
         fbxRoot.setTranslateZ(-cz);
         */
         
-        LOGGER.info(() -> "Applied global scale: " + globalScale + " with Y-Flip. Auto-Center DISABLED for alignment.");
+        logger.info("Applied global scale: {} with Y-Flip. Auto-Center DISABLED for alignment.", globalScale);
 
         return worldGroup;
     }

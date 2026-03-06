@@ -5,7 +5,8 @@
 
 package org.episteme.natural.physics.classical.matter.fluids.providers;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider;
 import com.google.auto.service.AutoService;
@@ -21,7 +22,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 @AutoService(AlgorithmProvider.class)
 public class MulticoreNavierStokesProvider implements NavierStokesProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(MulticoreNavierStokesProvider.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(MulticoreNavierStokesProvider.class);
 
     @Override
     public int getPriority() {
@@ -30,12 +31,12 @@ public class MulticoreNavierStokesProvider implements NavierStokesProvider {
 
     @Override
     public void solve(Real[] density, Real[] u, Real[] v, Real[] w, Real dt, Real viscosity, int width, int height, int depth) {
-        LOGGER.finest("Performing Real-based Navier-Stokes step on " + width + "x" + height + "x" + depth + " grid.");
+        logger.trace("Performing Real-based Navier-Stokes step on {}x{}x{} grid.", width, height, depth);
     }
 
     @Override
     public void solve(double[] density, double[] u, double[] v, double[] w, double dt, double viscosity, int width, int height, int depth) {
-        LOGGER.finest("Performing double-based Navier-Stokes step on " + width + "x" + height + "x" + depth + " grid.");
+        logger.trace("Performing double-based Navier-Stokes step on {}x{}x{} grid.", width, height, depth);
     }
 
     @Override

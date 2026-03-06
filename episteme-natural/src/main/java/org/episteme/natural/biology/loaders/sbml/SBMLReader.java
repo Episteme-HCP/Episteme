@@ -34,8 +34,8 @@ import org.episteme.core.io.AbstractResourceReader;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Systems Biology Markup Language (SBML) Reader.
@@ -75,7 +75,7 @@ import java.util.logging.Logger;
  */
 public class SBMLReader extends AbstractResourceReader<SBMLModel> {
 
-    private static final Logger LOGGER = Logger.getLogger(SBMLReader.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SBMLReader.class);
 
     /**
      * Creates a new SBMLReader.
@@ -199,7 +199,7 @@ public class SBMLReader extends AbstractResourceReader<SBMLModel> {
             try {
                 model.setNotes(jsbmlModel.getNotesString());
             } catch (XMLStreamException e) {
-                LOGGER.log(Level.FINE, "Could not extract notes", e);
+                logger.debug("Could not extract notes", e);
             }
         }
         
@@ -230,7 +230,7 @@ public class SBMLReader extends AbstractResourceReader<SBMLModel> {
                 extractFBCData(fbcPlugin, model);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.FINE, "FBC extension not available or error extracting", e);
+            logger.debug("FBC extension not available or error extracting", e);
         }
         
         return model;

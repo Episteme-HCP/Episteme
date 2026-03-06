@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Registry for distributed task implementations.
@@ -54,7 +55,7 @@ import java.util.logging.Logger;
  * */
 public final class TaskRegistry {
 
-    private static final Logger LOGGER = Logger.getLogger(TaskRegistry.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TaskRegistry.class);
     private static final TaskRegistry INSTANCE = new TaskRegistry();
 
     private final Map<String, Class<? extends DistributedTask<?, ?>>> taskClasses = new ConcurrentHashMap<>();
@@ -82,7 +83,7 @@ public final class TaskRegistry {
      */
     public static void register(String taskType, Class<? extends DistributedTask<?, ?>> taskClass) {
         INSTANCE.taskClasses.put(taskType.toUpperCase(), taskClass);
-        LOGGER.info("Registered task: " + taskType);
+        logger.info("Registered task: {}", taskType);
     }
 
     /**
@@ -96,7 +97,7 @@ public final class TaskRegistry {
      */
     public static void registerProvider(String taskType, TaskProvider<?, ?> provider) {
         INSTANCE.taskProviders.put(taskType.toUpperCase(), provider);
-        LOGGER.info("Registered task provider: " + taskType);
+        logger.info("Registered task provider: {}", taskType);
     }
 
     /**
@@ -120,7 +121,7 @@ public final class TaskRegistry {
             try {
                 return Optional.of(clazz.getDeclaredConstructor().newInstance());
             } catch (Exception e) {
-                LOGGER.warning("Failed to instantiate task " + taskType + ": " + e.getMessage());
+                logger.warn("Failed to instantiate task {}: {}", taskType, e.getMessage());
             }
         }
 
@@ -174,7 +175,7 @@ public final class TaskRegistry {
         for (DistributedTask<?, ?> task : taskLoader) {
             taskClasses.put(task.getTaskType().toUpperCase(),
                     (Class<? extends DistributedTask<?, ?>>) task.getClass());
-            LOGGER.info("Discovered task via ServiceLoader: " + task.getTaskType());
+            logger.info("Discovered task via ServiceLoader: {}", task.getTaskType());
         }
 
         // ServiceLoader-based discovery for Providers
@@ -182,8 +183,8 @@ public final class TaskRegistry {
                 .load(TaskProvider.class);
         for (TaskProvider<?, ?> provider : providerLoader) {
             taskProviders.put(provider.getTaskType().toUpperCase(), provider);
-            LOGGER.info("Discovered provider via ServiceLoader: " + provider.getTaskType() + " ("
-                    + provider.getClass().getSimpleName() + ")");
+            logger.info("Discovered provider via ServiceLoader: {} ({})", provider.getTaskType(),
+                    provider.getClass().getSimpleName());
         }
     }
 

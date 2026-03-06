@@ -25,6 +25,8 @@ package org.episteme.core.technical.backend;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for managing a set of backends of a specific type.
@@ -36,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractBackendManager<T extends Backend> {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final Map<String, T> backends = new ConcurrentHashMap<>();
     protected T defaultBackend;
     protected final Class<T> backendClass;
@@ -55,6 +58,9 @@ public abstract class AbstractBackendManager<T extends Backend> {
         }
         if (defaultBackend == null) {
             defaultBackend = selectBestBackend();
+            if (defaultBackend != null) {
+                logger.info("Auto-selected best backend: {} for {}", defaultBackend.getName(), backendClass.getSimpleName());
+            }
         }
     }
 
@@ -101,6 +107,7 @@ public abstract class AbstractBackendManager<T extends Backend> {
         if (!backend.isAvailable()) {
             throw new IllegalArgumentException("Backend not available: " + name);
         }
+        logger.debug("Setting default backend to: {} for {}", backend.getName(), backendClass.getSimpleName());
         defaultBackend = backend;
     }
 
@@ -110,6 +117,7 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * @param backend the backend to register
      */
     public void managerRegister(T backend) {
+        logger.trace("Registering backend: {} for {}", backend.getName(), backendClass.getSimpleName());
         backends.put(backend.getName(), backend);
     }
 

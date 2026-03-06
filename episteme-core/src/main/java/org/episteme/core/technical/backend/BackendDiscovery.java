@@ -7,6 +7,8 @@ package org.episteme.core.technical.backend;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility for discovering and accessing backends of different types.
@@ -48,6 +50,7 @@ public class BackendDiscovery {
     public static final String TYPE_IO = "io";
     public static final String TYPE_ML = "ml";
 
+    private static final Logger logger = LoggerFactory.getLogger(BackendDiscovery.class);
     private static final BackendDiscovery INSTANCE = new BackendDiscovery();
 
     private BackendDiscovery() {}
@@ -65,9 +68,11 @@ public class BackendDiscovery {
             Iterator<Backend> iterator = loader.iterator();
             while (iterator.hasNext()) {
                 try {
-                    cachedProviders.add(iterator.next());
+                    Backend backend = iterator.next();
+                    cachedProviders.add(backend);
+                    logger.debug("Discovered Backend: {} (Priority: {})", backend.getName(), backend.getPriority());
                 } catch (ServiceConfigurationError | Exception e) {
-                    System.err.println("[WARN] Skipping bad Backend provider: " + e.getMessage());
+                    logger.warn("Skipping bad Backend provider: {}", e.getMessage());
                 }
             }
         }

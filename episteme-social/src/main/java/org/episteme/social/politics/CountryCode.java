@@ -27,8 +27,8 @@ import org.episteme.core.util.EnumRegistry;
 import org.episteme.core.util.ExtensibleEnum;
 import org.episteme.core.util.persistence.Persistent;
 import org.episteme.social.politics.loaders.CountryCodesReader;
-
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extensible listing of Country Codes (ISO 3166-1 alpha-2).
@@ -45,14 +45,14 @@ import java.util.logging.Logger;
 public final class CountryCode extends ExtensibleEnum {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(CountryCode.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CountryCode.class);
 
     // Static initializer to load values from JSON
     static {
         try {
             CountryCodesReader.getInstance().loadAll();
         } catch (Exception e) {
-            LOGGER.severe("Failed to load Country Codes from reader: " + e.getMessage());
+            logger.error("Failed to load Country Codes from reader: {}", e.getMessage(), e);
         }
     }
 

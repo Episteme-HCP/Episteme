@@ -8,7 +8,8 @@ package org.episteme.core.technical.algorithm;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Context-aware provider selector.
@@ -34,7 +35,7 @@ import java.util.logging.Logger;
  */
 public final class ProviderSelector {
 
-    private static final Logger LOGGER = Logger.getLogger(ProviderSelector.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ProviderSelector.class);
 
     private ProviderSelector() {}
 
@@ -70,7 +71,7 @@ public final class ProviderSelector {
                 .max(Comparator.comparingDouble(p -> p.score(context)))
                 .orElseThrow(() -> new NoSuchElementException("No provider satisfying filter for: " + providerClass.getSimpleName()));
 
-        LOGGER.fine("Selected " + best.getName() + " (score=" + best.score(context) + ") for " + providerClass.getSimpleName());
+        logger.debug("Selected {} (score={}) for {}", best.getName(), best.score(context), providerClass.getSimpleName());
         return best;
     }
 
@@ -98,7 +99,7 @@ public final class ProviderSelector {
             try {
                 return operation.apply(provider);
             } catch (Throwable t) {
-                LOGGER.warning("Provider " + provider.getName() + " failed: " + t.getMessage() + ". Attempting fallback...");
+                logger.warn("Provider {} failed: {}. Attempting fallback...", provider.getName(), t.getMessage());
                 lastError = t;
             }
         }

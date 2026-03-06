@@ -26,6 +26,8 @@ package org.episteme.natural.physics;
 import org.episteme.core.mathematics.numbers.real.Real;
 import java.util.Map;
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.episteme.core.util.identity.Identified;
 import org.episteme.core.util.identity.Identification;
@@ -54,6 +56,7 @@ public class ParticleType implements Identified<Identification>, Named {
     public static final Real SIN2_THETA_W = Real.of(0.23122);
 
     private static final Map<String, ParticleType> PARTICLES = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(ParticleType.class);
 
     static {
         loadParticles();
@@ -126,7 +129,7 @@ public class ParticleType implements Identified<Identification>, Named {
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             java.io.InputStream is = ParticleType.class.getResourceAsStream("/org/episteme/physics/particles.json");
             if (is == null) {
-                java.util.logging.Logger.getLogger("StandardModel").severe("particles.json not found!");
+                logger.error("particles.json not found!");
                 return;
             }
 
@@ -150,7 +153,7 @@ public class ParticleType implements Identified<Identification>, Named {
             is.close();
         } catch (Exception e) {
             // Log instead of throw to allow partial initialization
-            java.util.logging.Logger.getLogger("StandardModel").warning("Failed to load Standard Model particles: " + e.getMessage());
+            logger.warn("Failed to load Standard Model particles: {}", e.getMessage());
         }
     }
 

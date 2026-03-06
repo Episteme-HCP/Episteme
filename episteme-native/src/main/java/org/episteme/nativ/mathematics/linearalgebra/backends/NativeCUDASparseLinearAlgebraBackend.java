@@ -8,6 +8,8 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.technical.algorithm.OperationContext;
@@ -36,6 +38,7 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, SparseLinearAlgebraProvider<Real>, GPUBackend {
 
+    private static final Logger logger = LoggerFactory.getLogger(NativeCUDASparseLinearAlgebraBackend.class);
     private static final Linker LINKER = Linker.nativeLinker();
 
 
@@ -118,7 +121,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
             alpha.set(ValueLayout.JAVA_DOUBLE, 0, 1.0);
             beta.set(ValueLayout.JAVA_DOUBLE, 0, 0.0);
             
-            System.out.println("[CUDA] Dispatched " + m + "x" + n + " matrix multiplication to CUBLAS.");
+            logger.debug("[CUDA] Dispatched {}x{} matrix multiplication to CUBLAS.", m, n);
             
             copyFromGPU(d_C, C, m * n);
             
@@ -141,17 +144,17 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
 
     @Override
     public void copyToGPU(long handle, DoubleBuffer buffer, long count) {
-        System.out.println("[CUDA] Copying " + count + " doubles to GPU (handle: " + handle + ")");
+        logger.trace("[CUDA] Copying {} doubles to GPU (handle: {})", count, handle);
     }
 
     @Override
     public void copyFromGPU(long handle, DoubleBuffer buffer, long count) {
-        System.out.println("[CUDA] Copying " + count + " doubles from GPU (handle: " + handle + ")");
+        logger.trace("[CUDA] Copying {} doubles from GPU (handle: {})", count, handle);
     }
 
     @Override
     public void freeGPUMemory(long handle) {
-        System.out.println("[CUDA] Freeing GPU memory (handle: " + handle + ")");
+        logger.trace("[CUDA] Freeing GPU memory (handle: {})", handle);
     }
 
     @Override
@@ -228,6 +231,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements NativeBackend, Spar
         int n = b.cols();
         
         if (k != b.rows()) throw new IllegalArgumentException("Dimension mismatch");
+        
+        logger.debug("Entering CUDA multiply: [{}x{}] * [{}x{}]", m, k, k, n);
         
         DoubleBuffer da = toDoubleBuffer(a);
         DoubleBuffer db = toDoubleBuffer(b);

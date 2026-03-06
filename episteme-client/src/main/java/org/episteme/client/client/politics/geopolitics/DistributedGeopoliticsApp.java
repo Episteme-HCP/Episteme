@@ -40,6 +40,8 @@ import org.episteme.server.server.politics.GeopoliticalEngineTask;
 import org.episteme.social.politics.loaders.FactbookReader;
 import org.episteme.server.server.proto.*;
 import org.episteme.core.ui.ThemeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.*;
@@ -57,6 +59,8 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @since 1.0
  */
 public class DistributedGeopoliticsApp extends Application implements org.episteme.core.ui.App {
+
+    private static final Logger logger = LoggerFactory.getLogger(DistributedGeopoliticsApp.class);
 
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
@@ -88,7 +92,7 @@ public class DistributedGeopoliticsApp extends Application implements org.episte
             if (!inflData.isEmpty())
                 inflation = inflData.values().iterator().next() / 100.0;
         } catch (Exception e) {
-            System.err.println("Failed to fetch WB data: " + e.getMessage());
+            logger.error("Failed to fetch WB data: {}", e.getMessage());
         }
 
         economyTask = new DistributedEconomyTask("Global Core",

@@ -26,7 +26,8 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.jocl.*;
 import static org.jocl.CL.*;
 import java.nio.DoubleBuffer;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.auto.service.AutoService;
 
 /**
@@ -40,8 +41,7 @@ import com.google.auto.service.AutoService;
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, SparseLinearAlgebraProvider<Real>, GPUBackend {
 
-    @SuppressWarnings("unused")
-    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLSparseLinearAlgebraBackend.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLSparseLinearAlgebraBackend.class);
 
     private static cl_context staticContext;
     private static cl_command_queue staticCommandQueue;
@@ -185,7 +185,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 }
             }
             
-            LOGGER.warning("OpenCL found but no device supports double precision (cl_khr_fp64/cl_amd_fp64).");
+            logger.warn("OpenCL found but no device supports double precision (cl_khr_fp64/cl_amd_fp64).");
             cachedAvailability = false;
             return false;
         } catch (Throwable t) {
@@ -237,7 +237,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         } catch (Exception e) {
             isInitialized = false;
             initAttempted = true;
-            LOGGER.warning("Failed to initialize OpenCL Sparse Backend: " + e.getMessage());
+            logger.warn("Failed to initialize OpenCL Sparse Backend: {}", e.getMessage());
         }
     }
 
@@ -253,9 +253,9 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             matMulKernel = clCreateKernel(denseProgram, "matrixMultiply", null);
         } catch (CLException e) {
             if (e.getMessage() != null && e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
-                LOGGER.warning("This OpenCL device might not support double precision (cl_khr_fp64/cl_amd_fp64) or build failed. Initialization aborted.");
+                logger.warn("This OpenCL device might not support double precision (cl_khr_fp64/cl_amd_fp64) or build failed. Initialization aborted.");
             } else {
-                LOGGER.warning("Failed to build OpenCL kernels: " + e.getMessage());
+                logger.warn("Failed to build OpenCL kernels: {}", e.getMessage());
             }
             // Do not throw; let initialization fail gracefully so fallback occurs.
             isInitialized = false;
@@ -331,6 +331,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
             return SparseLinearAlgebraProvider.super.multiply(a, b);
         }
+        logger.debug("Entering OpenCL Dense multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         
         int m = a.rows(); int k = a.cols(); int n = b.cols();
         DoubleBuffer da = DoubleBuffer.allocate(m * k);
@@ -361,6 +362,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
             return SparseLinearAlgebraProvider.super.multiply(a, x);
         }
+        logger.debug("Entering OpenCL Sparse multiplyCSR: [{}x{}] * [{}]", a.rows(), a.cols(), x.dimension());
 
         // Extract CSR data from SparseMatrixStorage
         // Simplified for now: assuming a is already sparse or converting it

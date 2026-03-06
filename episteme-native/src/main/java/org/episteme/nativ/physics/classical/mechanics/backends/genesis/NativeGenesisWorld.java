@@ -16,7 +16,8 @@ import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.Optional;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Native-backed implementation of {@link PhysicsWorldBridge} for the Genesis physics engine.
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  */
 public class NativeGenesisWorld implements PhysicsWorldBridge {
 
-    private static final Logger LOG = Logger.getLogger(NativeGenesisWorld.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NativeGenesisWorld.class);
 
     /** Opaque pointer to the native Genesis world object. {@code null} when unavailable. */
     private final MemorySegment nativeWorld;
@@ -75,7 +76,7 @@ public class NativeGenesisWorld implements PhysicsWorldBridge {
                 );
                 avail = true;
             } catch (Throwable t) {
-                LOG.fine("[NativeGenesisWorld] Failed to bind native symbols: " + t.getMessage());
+                logger.debug("[NativeGenesisWorld] Failed to bind native symbols: {}", t.getMessage());
             }
         }
         NATIVE_AVAILABLE = avail;
@@ -87,11 +88,11 @@ public class NativeGenesisWorld implements PhysicsWorldBridge {
             try {
                 world = (MemorySegment) GENESIS_CREATE_WORLD.invoke();
             } catch (Throwable t) {
-                LOG.warning("[NativeGenesisWorld] genesis_create_world() failed: " + t.getMessage());
+                logger.warn("[NativeGenesisWorld] genesis_create_world() failed: {}", t.getMessage());
             }
         }
         if (world == null) {
-            LOG.info("[NativeGenesisWorld] GenesisC library not available; running in no-op mode.");
+            logger.info("[NativeGenesisWorld] GenesisC library not available; running in no-op mode.");
         }
         this.nativeWorld = world;
     }
@@ -107,7 +108,7 @@ public class NativeGenesisWorld implements PhysicsWorldBridge {
             // Mass is not directly accessible from RigidBody at this level; default to 1.0
             GENESIS_ADD_BODY.invoke(nativeWorld, 1.0, x, y, z);
         } catch (Throwable t) {
-            LOG.warning("[NativeGenesisWorld] addRigidBody failed: " + t.getMessage());
+            logger.warn("[NativeGenesisWorld] addRigidBody failed: {}", t.getMessage());
         }
     }
 
@@ -131,7 +132,7 @@ public class NativeGenesisWorld implements PhysicsWorldBridge {
             try {
                 GENESIS_STEP.invoke(nativeWorld, subDt);
             } catch (Throwable t) {
-                LOG.warning("[NativeGenesisWorld] stepSimulation failed: " + t.getMessage());
+                logger.warn("[NativeGenesisWorld] stepSimulation failed: {}", t.getMessage());
                 break;
             }
         }
@@ -143,7 +144,7 @@ public class NativeGenesisWorld implements PhysicsWorldBridge {
         try {
             GENESIS_SET_GRAVITY.invoke(nativeWorld, gravityX, gravityY, gravityZ);
         } catch (Throwable t) {
-            LOG.warning("[NativeGenesisWorld] setGravity failed: " + t.getMessage());
+            logger.warn("[NativeGenesisWorld] setGravity failed: {}", t.getMessage());
         }
     }
 }

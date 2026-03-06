@@ -10,7 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 
@@ -31,7 +32,7 @@ import org.episteme.core.technical.backend.BackendDiscovery;
  */
 public final class AlgorithmManager {
 
-    private static final Logger LOGGER = Logger.getLogger(AlgorithmManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AlgorithmManager.class);
     private static final Map<Class<?>, AlgorithmProvider> BEST_PROVIDERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, List<? extends AlgorithmProvider>> PROVIDER_CACHE = new ConcurrentHashMap<>();
     private static final ProviderRegistry REGISTRY = new ProviderRegistry();
@@ -57,7 +58,7 @@ public final class AlgorithmManager {
                         BenchmarkRunner.runAll();
                         AutoTuningManager.loadResults();
                     } catch (Exception e) {
-                        LOGGER.warning("Auto-benchmark failed: " + e.getMessage());
+                        logger.warn("Auto-benchmark failed: {}", e.getMessage());
                     }
                 }, "Episteme-AutoBenchmark").start();
             }
@@ -113,7 +114,7 @@ public final class AlgorithmManager {
                     available.add(provider);
                 }
             } catch (ServiceConfigurationError | RuntimeException e) {
-                LOGGER.warning("Skipping bad provider for " + providerClass.getSimpleName() + ": " + e.getMessage());
+                logger.warn("Skipping bad provider for {}: {}", providerClass.getSimpleName(), e.getMessage());
             }
         }
 
@@ -127,7 +128,7 @@ public final class AlgorithmManager {
                 }
             }
         } catch (Exception e) {
-            LOGGER.fine("BackendDiscovery not available for provider bridge: " + e.getMessage());
+            logger.trace("BackendDiscovery not available for provider bridge: {}", e.getMessage());
         }
 
         available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
@@ -138,11 +139,12 @@ public final class AlgorithmManager {
         List<P> available = getProviders(providerClass);
 
         if (available.isEmpty()) {
+            logger.error("No available provider found for: {}", providerClass.getSimpleName());
             throw new NoSuchElementException("No available provider found for: " + providerClass.getSimpleName());
         }
         
         P best = available.get(0);
-        LOGGER.info("Selected best provider " + best.getName() + " for " + providerClass.getSimpleName() + " (Priority: " + best.getPriority() + ")");
+        logger.info("Selected best provider {} for {} (Priority: {})", best.getName(), providerClass.getSimpleName(), best.getPriority());
         return best;
     }
 
@@ -192,11 +194,15 @@ public final class AlgorithmManager {
         }
 
         if (index >= 0 && index < available.size() - 1) {
-            return available.get(index + 1);
+            P next = available.get(index + 1);
+            logger.debug("Falling back from {} to {} for {}", current.getName(), next.getName(), providerClass.getSimpleName());
+            return next;
         }
 
         // If not found or last, return the absolute reference provider
-        return getReferenceProvider(providerClass);
+        P ref = getReferenceProvider(providerClass);
+        logger.debug("Falling back to reference provider {} for {}", ref.getName(), providerClass.getSimpleName());
+        return ref;
     }
 
     /**

@@ -12,6 +12,8 @@ import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Native Audio Backend using miniaudio (via Panama FFM) for low-latency playback.
@@ -25,6 +27,7 @@ import java.util.Optional;
 @AutoService({Backend.class})
 public class NativeAudioBackend implements AudioBackend { // Removed redundant Backend interface
 
+    private static final Logger logger = LoggerFactory.getLogger(NativeAudioBackend.class);
     private static final SymbolLookup LOOKUP;
     private static final boolean IS_AVAILABLE_FLAG; // Renamed to avoid confusion/conflict if any
 
@@ -82,7 +85,7 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
                     avail = true;
                 } catch (RuntimeException e) {
                      // Symbols missing, partial loading
-                     System.err.println("NativeAudioBackend: Symbols missing in native library. " + e.getMessage());
+                     logger.error("NativeAudioBackend: Symbols missing in native library. {}", e.getMessage());
                      avail = false;
                 }
 
@@ -167,7 +170,7 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
             throw new RuntimeException("Native audio initialization failed", t);
         }
         
-        System.out.println("[NativeAudio] Loaded: " + path);
+        logger.info("[NativeAudio] Loaded: {}", path);
     }
 
     @Override
@@ -178,7 +181,7 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
         try {
             int result = (int) MA_DEVICE_START.invokeExact(device);
             if (result == 0) isPlaying = true;
-            System.out.println("[NativeAudio] Playing...");
+            logger.info("[NativeAudio] Playing...");
         } catch (Throwable t) {
             throw new RuntimeException("Failed to start playback", t);
         }
@@ -192,7 +195,7 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
         try {
             int result = (int) MA_DEVICE_STOP.invokeExact(device);
             if (result == 0) isPlaying = false;
-            System.out.println("[NativeAudio] Paused.");
+            logger.info("[NativeAudio] Paused.");
         } catch (Throwable t) {
             throw new RuntimeException("Failed to pause playback", t);
         }

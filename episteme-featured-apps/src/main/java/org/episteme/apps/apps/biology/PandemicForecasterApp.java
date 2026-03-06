@@ -50,6 +50,8 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.io.AbstractResourceReader;
 import org.episteme.core.ui.Viewer;
 import com.google.auto.service.AutoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Pandemic Propagation Forecaster.
@@ -60,6 +62,8 @@ import com.google.auto.service.AutoService;
  */
 @AutoService(Viewer.class)
 public class PandemicForecasterApp extends FeaturedAppBase {
+
+    private static final Logger logger = LoggerFactory.getLogger(PandemicForecasterApp.class);
 
     // UI Components
     private ComboBox<Country> countrySelector;
@@ -89,8 +93,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
             // However, to follow the pattern strictly:
             this.countries = new java.util.ArrayList<>();
         } catch (Throwable t) {
-            System.err.println("CRITICAL: Failed to initialize PandemicForecasterApp: " + t.getMessage());
-            t.printStackTrace();
+            logger.error("CRITICAL: Failed to initialize PandemicForecasterApp", t);
         }
     }
 

@@ -10,7 +10,8 @@ import org.episteme.natural.physics.classical.mechanics.nbody.NBodyProvider;
 import com.google.auto.service.AutoService;
 import org.episteme.core.technical.algorithm.OperationContext;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jocl.cl_context;
 import org.jocl.cl_command_queue;
 import org.jocl.cl_kernel;
@@ -134,7 +135,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend {
     }
 
 
-    private static final Logger LOGGER = Logger.getLogger(NativeOpenCLNBodyBackend.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLNBodyBackend.class);
 
     /** Minimum particle count where GPU N-body outperforms CPU. */
     private static final int GPU_NBODY_THRESHOLD = 500;
@@ -266,7 +267,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend {
 
             initialized = true;
         } catch (Exception e) {
-            LOGGER.warning("OpenCL NBody init failed (device may lack fp64 support): " + e.getMessage());
+            logger.warn("OpenCL NBody init failed (device may lack fp64 support): {}", e.getMessage());
             initialized = false;
         }
     }

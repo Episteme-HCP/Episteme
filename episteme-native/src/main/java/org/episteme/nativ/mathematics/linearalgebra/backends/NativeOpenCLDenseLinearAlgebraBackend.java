@@ -12,6 +12,8 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
@@ -36,6 +38,7 @@ import java.nio.DoubleBuffer;
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
 
+    private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLDenseLinearAlgebraBackend.class);
     private static cl_context context;
     private static cl_command_queue commandQueue;
     private static cl_kernel matMulKernel;
@@ -73,6 +76,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     private static synchronized void init() {
         if (initAttempted) return;
         initAttempted = true;
+        logger.info("Initializing Native OpenCL Dense Backend...");
         try {
             setExceptionsEnabled(true);
             int[] numPlatformsArray = new int[1];
@@ -103,6 +107,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
             vecDotPartialKernel = clCreateKernel(program, "vec_dot_partial", null);
 
             initialized = true;
+            logger.info("Native OpenCL Dense Backend initialized successfully.");
         } catch (org.jocl.CLException e) {
             initialized = false;
             if (e.getMessage() != null && e.getMessage().contains("CL_BUILD_PROGRAM_FAILURE")) {
@@ -127,6 +132,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements NativeBackend, Lin
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
 
+        logger.debug("Entering OpenCL multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         long start = System.nanoTime();
         int m = a.rows();
         int k = a.cols();

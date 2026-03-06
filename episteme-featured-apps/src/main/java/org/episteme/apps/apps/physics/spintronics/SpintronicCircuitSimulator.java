@@ -30,6 +30,8 @@ import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Transient circuit simulator for spintronic devices.
@@ -50,6 +52,8 @@ import java.util.*;
  * @since 1.0
  */
 public class SpintronicCircuitSimulator {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpintronicCircuitSimulator.class);
 
     private final SpintronicNetlist netlist;
     private final int numNodes;
@@ -276,7 +280,7 @@ public class SpintronicCircuitSimulator {
                 v_guess = v_guess.subtract(dv);
             } catch (ArithmeticException e) {
                 // Matrix is still singular despite regularization, return current guess
-                System.err.println("Warning: Matrix singular in DC operating point, using zero initial state");
+                logger.warn("Matrix singular in DC operating point, using zero initial state");
                 return new DenseVector<Real>(Arrays.asList(zeroArr), org.episteme.core.mathematics.sets.Reals.INSTANCE);
             }
         }
@@ -427,7 +431,7 @@ public class SpintronicCircuitSimulator {
                 v_next = J.inverse().multiply(rhs_eff);
             } catch (ArithmeticException e) {
                 // Matrix is singular, return previous solution
-                System.err.println("Warning: Matrix singular in solveStep, using previous state");
+                logger.warn("Matrix singular in solveStep, using previous state");
                 return prevSol;
             }
             

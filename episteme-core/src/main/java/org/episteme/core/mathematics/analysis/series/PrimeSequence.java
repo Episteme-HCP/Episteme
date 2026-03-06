@@ -28,6 +28,8 @@ import org.episteme.core.mathematics.numbers.integers.Integer;
 import org.episteme.core.mathematics.numbers.integers.Natural;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Prime number sequence: 2, 3, 5, 7, 11, ...
@@ -47,6 +49,7 @@ import java.util.List;
  */
 public class PrimeSequence implements IntegerSequence {
 
+    private static final Logger logger = LoggerFactory.getLogger(PrimeSequence.class);
     private final List<Long> cachedPrimes = new ArrayList<>();
     private ComputeBackend backend;
 
@@ -154,8 +157,7 @@ public class PrimeSequence implements IntegerSequence {
     private void generatePrimesGPU() {
         // GPU acceleration requested but not implemented for this backend.
         // Falling back to CPU generation.
-        java.util.logging.Logger.getLogger(PrimeSequence.class.getName())
-                .info("GPU acceleration for primes not available in current backend. Using CPU sieve.");
+        logger.info("GPU acceleration for primes not available in current backend. Using CPU sieve.");
         generatePrimesCPU();
     }
 

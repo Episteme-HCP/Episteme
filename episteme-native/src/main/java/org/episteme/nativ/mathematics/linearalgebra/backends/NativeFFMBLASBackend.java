@@ -24,8 +24,8 @@ import java.lang.invoke.MethodHandle;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
@@ -37,7 +37,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 @AutoService({Backend.class, LinearAlgebraProvider.class, CPUBackend.class, NativeBackend.class, AlgorithmProvider.class})
 public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
     
-    private static final Logger LOGGER = Logger.getLogger(NativeFFMBLASBackend.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NativeFFMBLASBackend.class);
 
     private static final SymbolLookup LOOKUP;
     private static final boolean IS_AVAILABLE;
@@ -78,9 +78,9 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         }
         
         if (lib.isPresent()) {
-             LOGGER.fine("FFM: Successfully matched native library for FFM backend.");
+             logger.debug("FFM: Successfully matched native library for FFM backend.");
         } else {
-             LOGGER.info("FFM: No suitable BLAS/LAPACK library found for FFM backend (OpenBLAS or MKL).");
+             logger.info("FFM: No suitable BLAS/LAPACK library found for FFM backend (OpenBLAS or MKL).");
         }
         
         LOOKUP = lib.orElse(null);
@@ -200,9 +200,9 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 }
 
                 available = true;
-                LOGGER.info("FFM: Backend initialized successfully. Handles: DGEMM=" + (DGEMM != null) + ", DGESV=" + (DGESV != null) + ", DGETRI=" + (DGETRI != null));
+                logger.info("FFM: Backend initialized successfully. Handles: DGEMM={}, DGESV={}, DGETRI={}", (DGEMM != null), (DGESV != null), (DGETRI != null));
             } catch (Throwable t) {
-                LOGGER.log(Level.WARNING, "FFM: Failed to link native symbols", t);
+                logger.warn("FFM: Failed to link native symbols: {}", t.getMessage());
                 available = false;
             }
         }

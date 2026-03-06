@@ -38,7 +38,8 @@ import org.episteme.core.measure.quantity.MassDensity;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Loads chemistry data (elements, molecules) from JSON.
@@ -111,15 +112,14 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
         };
     }
 
-    private static final Logger LOGGER = Logger.getLogger(ChemistryDataReader.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ChemistryDataReader.class);
     private static ObjectMapper MAPPER;
 
     static {
         try {
             MAPPER = new ObjectMapper();
         } catch (Throwable t) {
-            System.err.println("CRITICAL ERROR: Could not initialize Jackson ObjectMapper. Check dependencies!");
-            t.printStackTrace();
+            logger.error("CRITICAL ERROR: Could not initialize Jackson ObjectMapper. Check dependencies!", t);
             MAPPER = null;
         }
     }
@@ -128,13 +128,13 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
 
     public static void loadElements() {
         if (MAPPER == null) {
-            System.err.println("ERROR: ChemistryDataReader cannot function because ObjectMapper failed to initialize.");
+            logger.error("ChemistryDataReader cannot function because ObjectMapper failed to initialize.");
             return;
         }
 
         try (InputStream is = ChemistryDataReader.class.getResourceAsStream("/org/episteme/chemistry/elements.json")) {
             if (is == null) {
-                LOGGER.warning("elements.json not found in /org/episteme/chemistry/");
+                logger.warn("elements.json not found in /org/episteme/chemistry/");
                 return;
             }
 
@@ -206,14 +206,13 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
                 }
 
                 PeriodicTable.registerElement(element);
-                LOGGER.fine("Registered element: " + data.symbol);
+                logger.debug("Registered element: {}", data.symbol);
             }
 
             loadMolecules();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.severe("Failed to load elements.json: " + e.getMessage());
+            logger.error("Failed to load elements.json: {}", e.getMessage(), e);
         }
     }
 
@@ -223,7 +222,7 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
 
         try (InputStream is = ChemistryDataReader.class.getResourceAsStream("/org/episteme/chemistry/molecules.json")) {
             if (is == null) {
-                LOGGER.warning("molecules.json not found in /org/episteme/chemistry/");
+                logger.warn("molecules.json not found in /org/episteme/chemistry/");
                 return;
             }
             MoleculeListWrapper wrapper = MAPPER.readValue(is, MoleculeListWrapper.class);
@@ -231,18 +230,18 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
                 boolean valid = true;
                 for (AtomData ad : md.atoms) {
                     if (PeriodicTable.bySymbol(ad.symbol) == null) {
-                        LOGGER.warning("Unknown element symbol in molecule " + md.name + ": " + ad.symbol);
+                        logger.warn("Unknown element symbol in molecule {}: {}", md.name, ad.symbol);
                         valid = false;
                         break;
                     }
                 }
                 if (valid) {
                     MOLECULE_DATA_CACHE.put(md.name, md);
-                    LOGGER.fine("Registered molecule data: " + md.name);
+                    logger.debug("Registered molecule data: {}", md.name);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to load molecules.json", e);
         }
     }
 

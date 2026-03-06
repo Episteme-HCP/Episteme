@@ -24,17 +24,13 @@
 package org.episteme.core.util;
 
 import java.util.function.Supplier;
-import java.util.logging.Level;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logging facade for Episteme.
  * <p>
- * Provides a simple, performance-optimized logging API built on
- * java.util.logging.
- * Users can bridge to SLF4J/Logback if needed.
+ * Provides a simple, performance-optimized logging API built on SLF4J.
  * </p>
- * <p>
- * <b>Usage:</b>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -42,9 +38,9 @@ import java.util.logging.Level;
  */
 public class Logger {
 
-    private final java.util.logging.Logger delegate;
+    private final org.slf4j.Logger delegate;
 
-    private Logger(java.util.logging.Logger delegate) {
+    private Logger(org.slf4j.Logger delegate) {
         this.delegate = delegate;
     }
 
@@ -55,7 +51,7 @@ public class Logger {
      * @return the logger
      */
     public static Logger getLogger(Class<?> clazz) {
-        return new Logger(java.util.logging.Logger.getLogger(clazz.getName()));
+        return new Logger(LoggerFactory.getLogger(clazz));
     }
 
     /**
@@ -65,30 +61,30 @@ public class Logger {
      * @return the logger
      */
     public static Logger getLogger(String name) {
-        return new Logger(java.util.logging.Logger.getLogger(name));
+        return new Logger(LoggerFactory.getLogger(name));
     }
 
-    // TRACE level (using FINEST)
+    // TRACE level
 
     public void trace(String message) {
-        delegate.finest(message);
+        delegate.trace(message);
     }
 
     public void trace(Supplier<String> messageSupplier) {
-        if (delegate.isLoggable(Level.FINEST)) {
-            delegate.finest(messageSupplier.get());
+        if (delegate.isTraceEnabled()) {
+            delegate.trace(messageSupplier.get());
         }
     }
 
-    // DEBUG level (using FINE)
+    // DEBUG level
 
     public void debug(String message) {
-        delegate.fine(message);
+        delegate.debug(message);
     }
 
     public void debug(Supplier<String> messageSupplier) {
-        if (delegate.isLoggable(Level.FINE)) {
-            delegate.fine(messageSupplier.get());
+        if (delegate.isDebugEnabled()) {
+            delegate.debug(messageSupplier.get());
         }
     }
 
@@ -99,74 +95,89 @@ public class Logger {
     }
 
     public void info(Supplier<String> messageSupplier) {
-        if (delegate.isLoggable(Level.INFO)) {
+        if (delegate.isInfoEnabled()) {
             delegate.info(messageSupplier.get());
         }
     }
 
-    // WARN level (using WARNING)
+    // WARN level
 
     public void warn(String message) {
-        delegate.warning(message);
+        delegate.warn(message);
     }
 
     public void warn(String message, Throwable throwable) {
-        delegate.log(Level.WARNING, message, throwable);
+        delegate.warn(message, throwable);
     }
 
     public void warn(Supplier<String> messageSupplier) {
-        if (delegate.isLoggable(Level.WARNING)) {
-            delegate.warning(messageSupplier.get());
+        if (delegate.isWarnEnabled()) {
+            delegate.warn(messageSupplier.get());
         }
     }
 
-    // ERROR level (using SEVERE)
+    // ERROR level
 
     public void error(String message) {
-        delegate.severe(message);
+        delegate.error(message);
     }
 
     public void error(String message, Throwable throwable) {
-        delegate.log(Level.SEVERE, message, throwable);
+        delegate.error(message, throwable);
     }
 
     public void error(Supplier<String> messageSupplier) {
-        if (delegate.isLoggable(Level.SEVERE)) {
-            delegate.severe(messageSupplier.get());
+        if (delegate.isErrorEnabled()) {
+            delegate.error(messageSupplier.get());
         }
     }
 
-    // Level checks
-
+    /**
+     * Check if trace is enabled.
+     * @return true if enabled
+     */
     public boolean isTraceEnabled() {
-        return delegate.isLoggable(Level.FINEST);
-    }
-
-    public boolean isDebugEnabled() {
-        return delegate.isLoggable(Level.FINE);
-    }
-
-    public boolean isInfoEnabled() {
-        return delegate.isLoggable(Level.INFO);
-    }
-
-    public boolean isWarnEnabled() {
-        return delegate.isLoggable(Level.WARNING);
-    }
-
-    public boolean isErrorEnabled() {
-        return delegate.isLoggable(Level.SEVERE);
+        return delegate.isTraceEnabled();
     }
 
     /**
-     * Gets the underlying java.util.logging.Logger for advanced use cases.
+     * Check if debug is enabled.
+     * @return true if enabled
+     */
+    public boolean isDebugEnabled() {
+        return delegate.isDebugEnabled();
+    }
+
+    /**
+     * Check if info is enabled.
+     * @return true if enabled
+     */
+    public boolean isInfoEnabled() {
+        return delegate.isInfoEnabled();
+    }
+
+    /**
+     * Check if warn is enabled.
+     * @return true if enabled
+     */
+    public boolean isWarnEnabled() {
+        return delegate.isWarnEnabled();
+    }
+
+    /**
+     * Check if error is enabled.
+     * @return true if enabled
+     */
+    public boolean isErrorEnabled() {
+        return delegate.isErrorEnabled();
+    }
+
+    /**
+     * Gets the underlying SLF4J Logger for advanced use cases.
      *
      * @return the delegate logger
      */
-    public java.util.logging.Logger getDelegate() {
+    public org.slf4j.Logger getDelegate() {
         return delegate;
     }
 }
-
-
-

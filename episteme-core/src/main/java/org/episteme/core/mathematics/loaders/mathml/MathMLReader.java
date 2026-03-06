@@ -31,7 +31,8 @@ import org.w3c.dom.mathml.MathMLDocument;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MathML Reader for Content and Presentation MathML.
@@ -67,7 +68,7 @@ import java.util.logging.Logger;
  */
 public class MathMLReader extends AbstractResourceReader<MathMLDocument> {
 
-    private static final Logger LOGGER = Logger.getLogger(MathMLReader.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(MathMLReader.class);
     private static final String MATHML_NS = "http://www.w3.org/1998/Math/MathML";
 
     public MathMLReader() {
@@ -148,7 +149,7 @@ public class MathMLReader extends AbstractResourceReader<MathMLDocument> {
      */
     public MathMLDocument read(InputStream input) throws MathMLException {
         try {
-            LOGGER.fine("Parsing MathML document from input stream");
+            logger.debug("Parsing MathML document from input stream");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();

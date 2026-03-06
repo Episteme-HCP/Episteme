@@ -26,7 +26,8 @@ package org.episteme.core.util.persistence;
 import java.util.ServiceLoader;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Central manager for persistent scientific object graphs.
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
  */
 public final class PersistenceManager {
 
-    private static final Logger logger = Logger.getLogger(PersistenceManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PersistenceManager.class);
     private static final PersistenceManager INSTANCE = new PersistenceManager();
 
     private GraphProvider provider;
@@ -53,11 +54,11 @@ public final class PersistenceManager {
         
         if (first.isPresent()) {
             this.provider = first.get();
-            logger.info("Loaded GraphProvider: " + provider.getName());
+            logger.info("Loaded GraphProvider: {}", provider.getName());
         } else {
             // Default to in-memory if no SPI provider is found
             this.provider = new InMemoryGraphProvider();
-            logger.warning("No GraphProvider found via SPI, falling back to InMemoryGraphProvider");
+            logger.warn("No GraphProvider found via SPI, falling back to InMemoryGraphProvider");
         }
     }
 

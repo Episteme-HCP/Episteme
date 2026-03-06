@@ -23,6 +23,8 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
@@ -38,6 +40,7 @@ import com.google.auto.service.AutoService;
 @AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, LinearAlgebraProvider.class})
 public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
 
+    private static final Logger logger = LoggerFactory.getLogger(NativeCUDADenseLinearAlgebraBackend.class);
     private static boolean IS_AVAILABLE = false;
     private static final Linker LINKER = NativeLibraryLoader.getLinker();
 
@@ -142,6 +145,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA not available");
 
+        logger.debug("Entering CUDA multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         long start = System.nanoTime();
         int m = a.rows();
         int k = a.cols();
