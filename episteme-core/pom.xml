@@ -390,23 +390,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <name>JitPack</name>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>clojars</id>
-            <name>Clojars</name>
-            <url>https://repo.clojars.org</url>
-        </repository>
-        <repository>
-            <id>jzy3d-releases</id>
-            <name>Jzy3d Releases</name>
-            <url>https://maven.jzy3d.org/releases</url>
-        </repository>
-    </repositories>
 
     <profiles>
         <profile>

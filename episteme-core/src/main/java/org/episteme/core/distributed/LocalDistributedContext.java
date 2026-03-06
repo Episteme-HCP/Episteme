@@ -52,12 +52,14 @@ public class LocalDistributedContext implements DistributedContext {
     private final ForkJoinPool pool;
 
     public LocalDistributedContext() {
-        this(ForkJoinPool.getCommonPoolParallelism());
+        this.pool = ForkJoinPool.commonPool();
     }
 
     public LocalDistributedContext(int parallelism) {
-        this.pool = new ForkJoinPool(parallelism);
-        LOG.debug(() -> String.format("LocalDistributedContext initialized with parallelism=%d", pool.getParallelism()));
+        this.pool = (parallelism == ForkJoinPool.getCommonPoolParallelism()) ? 
+                    ForkJoinPool.commonPool() : new ForkJoinPool(parallelism);
+        LOG.debug(() -> String.format("LocalDistributedContext initialized with parallelism=%d (CommonPool: %b)", 
+                  pool.getParallelism(), pool == ForkJoinPool.commonPool()));
     }
 
     @Override
@@ -119,7 +121,9 @@ public class LocalDistributedContext implements DistributedContext {
 
     @Override
     public void shutdown() {
-        // Common pool doesn't need explicit shutdown usually
+        if (pool != ForkJoinPool.commonPool()) {
+            pool.shutdown();
+        }
     }
 
     private final DoubleBuffer localMemory = DoubleBuffer.allocate(1000000);

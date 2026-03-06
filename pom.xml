@@ -662,6 +662,11 @@
       <url>https://mvn.0110.be/releases</url>
     </repository>
     <repository>
+      <id>clojars</id>
+      <name>Clojars</name>
+      <url>https://repo.clojars.org</url>
+    </repository>
+    <repository>
       <id>oss-sonatype</id>
       <name>OSS Sonatype</name>
       <url>https://oss.sonatype.org/content/repositories/releases/</url>
@@ -678,6 +683,30 @@
     </repository>
   </repositories>
   <profiles>
+    <profile>
+      <id>macos-arm64-classifier</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <properties>
+        <javacpp.platform>macosx-arm64</javacpp.platform>
+      </properties>
+    </profile>
+    <profile>
+      <id>macos-x86_64-classifier</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+        <javacpp.platform>macosx-x86_64</javacpp.platform>
+      </properties>
+    </profile>
     <profile>
       <id>m2e-ide-classifier-fallback</id>
       <activation>

@@ -257,10 +257,15 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> inverse(Matrix<org.episteme.core.mathematics.numbers.real.Real> A) {
          if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) return LinearAlgebraProvider.super.inverse(A);
          int n = A.rows();
+         if (n <= 0) throw new IllegalArgumentException("Matrix dimension must be positive");
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
          try (Arena arena = Arena.ofConfined()) {
              double[] arrA = toDoubleArray(A);
+             if (arrA.length < (long)n * n) {
+                 throw new IllegalArgumentException("Matrix data size mismatch: expected " + (n*n) + ", got " + arrA.length);
+             }
+
              MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
              
@@ -280,15 +285,10 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
              
              double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
              
-             org.episteme.core.mathematics.numbers.real.Real[][] resObj = new org.episteme.core.mathematics.numbers.real.Real[n][n];
-             for(int i=0; i<n; i++) {
-                 for(int j=0; j<n; j++) {
-                     resObj[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(result[i*n + j]);
-                 }
-             }
-             return new DenseMatrix<>(resObj, (Ring<org.episteme.core.mathematics.numbers.real.Real>) A.getScalarRing());
+             return createDenseMatrix(result, n, n, A);
          } catch (Throwable e) {
-             throw new RuntimeException("FFM Inverse Segmentation Fault Prevented", e);
+             logger.error("FFM: Inversion failed for {}x{} matrix. Cause: {}", n, n, e.getMessage());
+             throw new RuntimeException("FFM Inverse Operation Failed", e);
          }
     }
 

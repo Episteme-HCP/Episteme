@@ -186,20 +186,33 @@ public class NativeLibraryLoader {
                 }
                 // Force pre-loading of runtime dependencies before loading the main library
                 preloadRuntimes(discoveredLibs, arena);
-                SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
-                logger.info("Successfully loaded library variant: " + variant);
-                LOADED_LIBS.put(libName, lookup);
-                return Optional.of(lookup);
+                
+                // CRITICAL FIX: Only use libraryLookup(String) if it's a simple name (no dots/suffixes)
+                // Otherwise, it might trigger UnsatisfiedLinkError because it delegates to System.loadLibrary
+                if (!variant.contains(".") && !variant.contains("/")) {
+                    SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
+                    logger.info("Successfully loaded library variant via system lookup: " + variant);
+                    LOADED_LIBS.put(libName, lookup);
+                    return Optional.of(lookup);
+                }
             } catch (Throwable t) {
                 FAILURE_CAUSES.put(variant, t.toString());
                 if (FAILED_VARIANTS.add(variant)) {
-                    logger.warn("Native load failed for " + variant + ": " + t.getMessage());
+                    logger.trace("System load failed for " + variant + " (trying path-based lookup): " + t.getMessage());
                 }
             }
 
             // 2. Try custom search paths
             String cudaPath = System.getenv("CUDA_PATH");
             List<String> searchPaths = new ArrayList<>();
+            
+            // Linux common paths
+            if (!isWin) {
+                searchPaths.add("/usr/lib/x86_64-linux-gnu");
+                searchPaths.add("/usr/lib/i386-linux-gnu");
+                searchPaths.add("/usr/lib/nvidia");
+            }
+            
             searchPaths.add("/usr/local/lib/");
             searchPaths.add("/usr/lib/");
             searchPaths.add("C:\\Windows\\System32\\");
@@ -209,6 +222,12 @@ public class NativeLibraryLoader {
                 searchPaths.add(cudaPath + java.io.File.separator + "bin");
                 searchPaths.add(cudaPath + java.io.File.separator + "lib64");
                 searchPaths.add(cudaPath + java.io.File.separator + "lib");
+            }
+            
+            // Log environment state if this is the last variant and we are still failing
+            if (variant.equals(variants.get(variants.size() - 1))) {
+                logger.debug("Native Load Environment: java.library.path={}, LD_LIBRARY_PATH={}", 
+                    System.getProperty("java.library.path"), System.getenv("LD_LIBRARY_PATH"));
             }
             
             if (discoveredLibs != null) searchPaths.add(discoveredLibs.toString());

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.episteme.core.technical.backend.distributed.DistributedContext;
-import org.episteme.core.distributed.LocalDistributedContext;
 import java.math.MathContext;
 import org.episteme.core.mathematics.context.ComputeMode;
 import org.episteme.core.mathematics.context.MathContext.OverflowMode;
@@ -65,7 +64,7 @@ public class ComputeContext {
     private final ProviderRegistry providerRegistry = new ProviderRegistry();
 
     // RESOURCES (Kept in Context)
-    private volatile DistributedContext distributedContext = new LocalDistributedContext();
+    private volatile DistributedContext distributedContext = org.episteme.core.distributed.DistributedCompute.getContext();
     private volatile GPUBackend gpuBackend;
     private volatile boolean cancelled = false;
 
