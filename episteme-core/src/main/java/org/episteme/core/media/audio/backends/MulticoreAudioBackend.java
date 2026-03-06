@@ -19,7 +19,6 @@ import java.util.stream.IntStream;
 /**
  * High-performance AudioBackend using Java Parallel Streams.
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, AudioAlgorithmBackend.class})
 public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBackend<AudioBuffer> {
 

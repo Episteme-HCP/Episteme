@@ -17,7 +17,6 @@ import java.awt.image.BufferedImage;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, VisionAlgorithmBackend.class})
 public class JavaAWTVisionBackend implements VisionAlgorithmBackend<BufferedImage> {
 

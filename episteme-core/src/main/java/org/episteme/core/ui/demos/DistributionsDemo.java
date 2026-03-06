@@ -25,6 +25,7 @@ package org.episteme.core.ui.demos;
 
 import org.episteme.core.ui.AbstractDemo;
 import org.episteme.core.ui.viewers.mathematics.statistics.DistributionsViewer;
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.ui.i18n.I18N;
 
 /**
@@ -52,7 +53,7 @@ public class DistributionsDemo extends AbstractDemo {
 
     @Override
     protected javafx.scene.Node createViewerNode() {
-        return new DistributionsViewer();
+        return new DistributionsViewer<Real>();
     }
 
     @Override

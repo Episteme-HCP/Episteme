@@ -34,7 +34,7 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@SuppressWarnings({"preview", "rawtypes"})
+@SuppressWarnings({"preview"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
 

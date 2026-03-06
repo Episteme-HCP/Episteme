@@ -25,6 +25,7 @@ package org.episteme.core.ui.demos;
 
 import org.episteme.core.ui.AbstractDemo;
 import org.episteme.core.ui.viewers.mathematics.analysis.chaos.fractals.MandelbrotViewer;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 /**
  * Demo Provider for Mandelbrot Set Viewer.
@@ -52,7 +53,7 @@ public class MandelbrotDemo extends AbstractDemo {
 
     @Override
     protected javafx.scene.Node createViewerNode() {
-        return new MandelbrotViewer();
+        return new MandelbrotViewer<Real>();
     }
 
     @Override
