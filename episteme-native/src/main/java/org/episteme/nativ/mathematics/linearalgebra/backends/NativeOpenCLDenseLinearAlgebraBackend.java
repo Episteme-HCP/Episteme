@@ -357,21 +357,34 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                     for (int j = 0; j < n; j++) { double t = inv[k * n + j]; inv[k * n + j] = inv[max * n + j]; inv[max * n + j] = t; }
                     clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
                 }
-                double pivot = h_A[k * n + k];
-                if (Math.abs(pivot) < 1e-15) throw new ArithmeticException("Singular matrix");
-                
-                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                if (n - k - 1 > 0) clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+                // 1. Normalize pivot row
+                clSetKernelArg(normalizeRowKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(normalizeRowKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(normalizeRowKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n})); // cols
+                clSetKernelArg(normalizeRowKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(commandQueue, normalizeRowKernel, 1, null, new long[]{n - k}, null, 0, null, null);
 
+                // 2. Eliminate other rows (Gauss-Jordan)
+                clSetKernelArg(gaussJordanKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussJordanKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n})); // cols
+                clSetKernelArg(gaussJordanKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(commandQueue, gaussJordanKernel, 1, null, new long[]{n}, null, 0, null, null);
+
+                // For now, we still handle the inverse matrix updates in Java to keep it simple,
+                // but A is being reduced to I on the GPU.
+                // TODO: Fully move J's updates to GPU
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)n * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                double pivotVal = h_A[k * n + k];
+                
                 for (int i = 0; i < n; i++) {
                     if (i != k) {
-                        double factor = h_A[i * n + k] / pivot;
+                        clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)i * n * Sizeof.cl_double, (long)Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)i * n * Sizeof.cl_double), 0, null, null);
+                        double factor = h_A[i * n + k];
                         for (int j = 0; j < n; j++) inv[i * n + j] -= factor * inv[k * n + j];
                     }
                 }
-                for (int j = 0; j < n; j++) inv[k * n + j] /= pivot;
+                for (int j = 0; j < n; j++) inv[k * n + j] /= pivotVal;
             }
             return fromDoubleArray(inv, n, n);
         } finally { clReleaseMemObject(memA); }
@@ -396,10 +409,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                     clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
                 }
                 det *= h_A[k * n + k];
-                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                if (n - k - 1 > 0) clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+                clSetKernelArg(gaussJordanKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussJordanKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(commandQueue, gaussJordanKernel, 1, null, new long[]{n}, null, 0, null, null);
             }
             return Real.of(det);
         } finally { clReleaseMemObject(memA); }
@@ -429,12 +443,28 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return fromDoubleArray(scaleVec(toDoubleArray(a), scalar.doubleValue()), a.rows(), a.cols());
     }
     @Override public Matrix<Real> transpose(Matrix<Real> a) {
-        // Pure Java transpose — not memory-bound enough to warrant a kernel
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
         int r = a.rows(), c = a.cols();
         double[] src = toDoubleArray(a);
         double[] dst = new double[r * c];
-        for (int i = 0; i < r; i++) for (int j = 0; j < c; j++) dst[j * r + i] = src[i * c + j];
-        return fromDoubleArray(dst, c, r);
+        
+        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * r * c, Pointer.to(src), null);
+        cl_mem memB = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * r * c, null, null);
+        try {
+            clSetKernelArg(transposeKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(transposeKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(transposeKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{r}));
+            clSetKernelArg(transposeKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{c}));
+            
+            long[] globalWorkSize = new long[]{c, r};
+            clEnqueueNDRangeKernel(commandQueue, transposeKernel, 2, null, globalWorkSize, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, memB, CL_TRUE, 0, (long)Sizeof.cl_double * r * c, Pointer.to(dst), 0, null, null);
+            
+            return fromDoubleArray(dst, c, r);
+        } finally {
+            clReleaseMemObject(memA);
+            clReleaseMemObject(memB);
+        }
     }
     @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
         // Mv = A * (b as column matrix) — reuse GPU matmul kernel
