@@ -348,4 +348,13 @@ public class NativeLibraryLoader {
         FAILURE_CAUSES.clear();
         logger.info("Failure cache cleared.");
     }
+
+    /**
+     * Shuts down the loader, clearing all caches and references.
+     */
+    public static void shutdown() {
+        LOADED_LIBS.clear();
+        clearCache();
+        logger.info("NativeLibraryLoader shut down.");
+    }
 }

@@ -34,6 +34,11 @@ public class Quantum4JBackend implements QuantumBackend, QuantumAlgorithmProvide
         } catch (ClassNotFoundException e) { return false; }
     }
 
+    @Override
+    public void shutdown() {
+        // No explicit resources to release for Quantum4J backend.
+    }
+
     @Override public ExecutionContext createContext() { return null; }
 
     @Override

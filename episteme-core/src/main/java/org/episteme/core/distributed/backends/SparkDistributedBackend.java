@@ -53,4 +53,9 @@ public class SparkDistributedBackend implements DistributedBackend {
         if (!available) throw new UnsupportedOperationException("Spark not available");
         return new SparkDistributedContext();
     }
+
+    @Override
+    public void shutdown() {
+        // Nothing to release for Spark
+    }
 }

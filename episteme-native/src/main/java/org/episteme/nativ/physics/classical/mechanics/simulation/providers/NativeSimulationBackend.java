@@ -64,6 +64,10 @@ public class NativeSimulationBackend implements SimulationProvider, CPUBackend, 
             public void close() {}
         };
     }
+    @Override
+    public void shutdown() {
+        // No resources to release for NativeSimulationBackend.
+    }
 
     @Override
     public String getNativeLibraryName() {

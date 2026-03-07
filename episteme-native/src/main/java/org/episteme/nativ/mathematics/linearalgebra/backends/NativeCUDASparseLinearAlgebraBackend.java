@@ -224,6 +224,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     }
 
     @Override
+    public void shutdown() {
+        // No-op. CUDA handles and resources are released via NativeLibraryLoader or Arena.
+    }
+
+    @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         int m = a.rows();
         int k = a.cols();

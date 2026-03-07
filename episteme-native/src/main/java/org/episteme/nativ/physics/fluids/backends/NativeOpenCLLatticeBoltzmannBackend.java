@@ -110,6 +110,15 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
         return backend.isAvailable();
     }
 
+    @Override
+    public void shutdown() {
+        if (initialized) {
+            clReleaseKernel(kernel);
+            clReleaseProgram(program);
+            initialized = false;
+        }
+    }
+
     public synchronized void initialize() {
         if (initialized) return;
         if (!backend.isAvailable()) throw new IllegalStateException("OpenCL not available");

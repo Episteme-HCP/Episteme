@@ -166,5 +166,10 @@ public class ONNXRuntimeBackend implements Backend, AlgorithmProvider {
             }
         }
     }
+
+    @Override
+    public void shutdown() {
+        // ONNX Runtime session handles are managed within loadModel and the session classes.
+    }
 }
 

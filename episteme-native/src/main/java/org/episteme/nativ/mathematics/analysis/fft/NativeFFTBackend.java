@@ -508,4 +508,9 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
         for (int i = 0; i < a.length; i++) result[i] = toReal2D(a[i]);
         return result;
     }
+
+    @Override
+    public void shutdown() {
+        // Nothing to release for FFTW downcall handles
+    }
 }

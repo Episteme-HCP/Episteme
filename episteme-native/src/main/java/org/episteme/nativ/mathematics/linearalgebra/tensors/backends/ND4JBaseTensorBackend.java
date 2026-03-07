@@ -10,7 +10,6 @@ import org.episteme.core.mathematics.linearalgebra.Tensor;
 import org.episteme.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.ExecutionContext;
-import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
 import org.episteme.core.technical.backend.cpu.CPUExecutionContext;
 import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend;
 
@@ -59,17 +58,14 @@ public abstract class ND4JBaseTensorBackend implements TensorBackend {
         }
     }
 
+    protected abstract ExecutionContext doGetContext();
+
     @Override
     public ExecutionContext createContext() {
         if (!isAvailable) {
             throw new IllegalStateException("ND4J backend not available");
         }
-        if (supportsGPU()) {
-            @SuppressWarnings("deprecation")
-            ExecutionContext context = new CUDAExecutionContext();
-            return context;
-        }
-        return new CPUExecutionContext();
+        return doGetContext();
     }
 
     @Override

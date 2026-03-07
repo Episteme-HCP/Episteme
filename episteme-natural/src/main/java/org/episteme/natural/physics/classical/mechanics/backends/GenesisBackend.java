@@ -43,6 +43,11 @@ public class GenesisBackend implements MechanicsBackend, CPUBackend, CollisionPr
     }
 
     @Override
+    public void shutdown() {
+        // Pure Java/SIMD backend — no resources to release
+    }
+
+    @Override
     public String getAlgorithmType() {
         return "mechanics";
     }

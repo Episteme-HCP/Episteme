@@ -26,7 +26,6 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
 public class NativeOpenCLVisionBackend implements VisionAlgorithmBackend<Object>, GPUBackend, NativeBackend {
 
@@ -43,13 +42,19 @@ public class NativeOpenCLVisionBackend implements VisionAlgorithmBackend<Object>
     @Override public String getType() { return "vision"; }
     @Override public String getId() { return "native-opencl-vision"; }
     @Override public String getDescription() { return "GPU-accelerated image processing using OpenCL."; }
-    @Override public boolean isAvailable() {
+    @Override
+    public boolean isAvailable() {
         try {
             Class.forName("org.jocl.CL");
             return true;
         } catch (Throwable t) {
             return false;
         }
+    }
+
+    @Override
+    public void shutdown() {
+        // No explicit resources to release for OpenCL Vision backend.
     }
 
     private org.jocl.cl_context context;

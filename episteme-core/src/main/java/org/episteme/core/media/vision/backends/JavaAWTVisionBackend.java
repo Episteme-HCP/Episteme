@@ -46,4 +46,9 @@ public class JavaAWTVisionBackend implements VisionAlgorithmBackend<BufferedImag
     public Object createBackend() { 
         return this; // Stateless service
     }
+
+    @Override
+    public void shutdown() {
+        // No-op for standard Java AWT backend
+    }
 }

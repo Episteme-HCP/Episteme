@@ -142,6 +142,12 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
+    @Override
+    public void shutdown() {
+        // No explicit native resources to release in the wrapper.
+        // JBlas handles its own native library lifecycle.
+    }
+
     @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.add(a, b); }
     @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.subtract(a, b); }
     @Override public Vector<E> multiply(Vector<E> vector, E scalar) { checkJBlas(); return jblasImpl.multiply(vector, scalar); }

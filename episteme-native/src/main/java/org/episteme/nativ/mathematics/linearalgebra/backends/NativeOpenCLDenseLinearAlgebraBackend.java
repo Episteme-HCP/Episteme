@@ -570,6 +570,25 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
+    @Override
+    public void shutdown() {
+        if (initialized) {
+            clReleaseKernel(matMulKernel);
+            clReleaseKernel(vecAddKernel);
+            clReleaseKernel(vecSubKernel);
+            clReleaseKernel(vecScaleKernel);
+            clReleaseKernel(vecDotPartialKernel);
+            clReleaseKernel(transposeKernel);
+            clReleaseKernel(normalizeRowKernel);
+            clReleaseKernel(gaussJordanKernel);
+            clReleaseKernel(gaussElimPhase1Kernel);
+            clReleaseProgram(program);
+            clReleaseCommandQueue(commandQueue);
+            clReleaseContext(context);
+            initialized = false;
+        }
+    }
+
     @Override public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
     }

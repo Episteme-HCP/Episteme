@@ -109,4 +109,9 @@ public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, Na
     public int getPriority() {
         return 70; // High priority for native Arrow
     }
+
+    @Override
+    public void shutdown() {
+        // Nothing to release explicitly for Arrow Panama lookup
+    }
 }

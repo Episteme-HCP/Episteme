@@ -247,6 +247,17 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend {
         return backend.isAvailable();
     }
 
+    @Override
+    public void shutdown() {
+        if (initialized) {
+            clReleaseKernel(kernel);
+            clReleaseProgram(program);
+            clReleaseKernel(bhKernel);
+            clReleaseProgram(bhProgram);
+            initialized = false;
+        }
+    }
+
     public synchronized void initialize() {
         if (initialized) return;
         if (!isAvailable()) throw new IllegalStateException("OpenCL not available");

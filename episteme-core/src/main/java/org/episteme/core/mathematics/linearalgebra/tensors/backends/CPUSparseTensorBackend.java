@@ -208,6 +208,11 @@ public class CPUSparseTensorBackend implements TensorBackend, CPUBackend {
     }
 
     @Override
+    public void shutdown() {
+        // No explicit resources to release for CPU Sparse tensors.
+    }
+
+    @Override
     public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
         return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }

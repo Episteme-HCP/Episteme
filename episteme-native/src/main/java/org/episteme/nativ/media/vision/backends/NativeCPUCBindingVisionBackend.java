@@ -105,6 +105,11 @@ public class NativeCPUCBindingVisionBackend implements VisionAlgorithmBackend<Bu
     }
 
     @Override
+    public void shutdown() {
+        // Native library lifecycle is managed by this wrapper.
+    }
+
+    @Override
     public int getPriority() {
         return 100; // Highest priority for Vision
     }

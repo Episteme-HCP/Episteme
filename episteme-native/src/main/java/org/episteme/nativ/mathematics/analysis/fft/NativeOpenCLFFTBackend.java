@@ -452,4 +452,10 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend {
         for (int i = 0; i < a.length; i++) r[i] = toReal2D(a[i]);
         return r;
     }
+
+    @Override
+    public void shutdown() {
+        if (kernel != null) clReleaseKernel(kernel);
+        if (program != null) clReleaseProgram(program);
+    }
 }

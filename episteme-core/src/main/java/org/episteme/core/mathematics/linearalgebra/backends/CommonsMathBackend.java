@@ -130,6 +130,11 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
         return this;
     }
 
+    @Override
+    public void shutdown() {
+        // Nothing to release for Commons Math
+    }
+
     private boolean canUseCommons() {
         return field != null && 
                (field instanceof org.episteme.core.mathematics.sets.Reals ||

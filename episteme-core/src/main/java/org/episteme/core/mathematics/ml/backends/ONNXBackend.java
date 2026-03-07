@@ -112,4 +112,9 @@ public class ONNXBackend implements ComputeBackend, AlgorithmProvider {
     public boolean supportsComplexNumbers() {
         return false;
     }
+
+    @Override
+    public void shutdown() {
+        // ONNX Runtime handles are managed by close() on sessions or the environment.
+    }
 }

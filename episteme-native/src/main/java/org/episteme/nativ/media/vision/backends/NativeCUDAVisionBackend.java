@@ -42,13 +42,19 @@ public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, 
     @Override public String getType() { return "vision"; }
     @Override public String getId() { return "native-cuda-vision"; }
     @Override public String getDescription() { return "GPU-accelerated image processing using NVIDIA CUDA."; }
-    @Override public boolean isAvailable() {
+    @Override
+    public boolean isAvailable() {
         try {
             Class.forName("jcuda.driver.JCudaDriver");
             return true; 
         } catch (Throwable t) {
             return false;
         }
+    }
+
+    @Override
+    public void shutdown() {
+        // JCuda driver handles its own lifecycle.
     }
 
     @Override

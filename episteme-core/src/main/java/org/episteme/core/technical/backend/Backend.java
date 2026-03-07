@@ -79,6 +79,16 @@ public interface Backend {
         }
         return List.of();
     }
+
+    /**
+     * Called when the application is shutting down or the backend is being
+     * replaced.
+     * Use this to release hardware resources, close file handles, or stop
+     * background threads.
+     */
+    default void shutdown() {
+        // Default implementation does nothing
+    }
 }
 
 

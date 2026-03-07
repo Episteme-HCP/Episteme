@@ -490,6 +490,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     }
 
     @Override
+    public void shutdown() {
+        // No-op. Panama memory segments are managed via ScopedArena in operations.
+    }
+
+    @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> A, Matrix<org.episteme.core.mathematics.numbers.real.Real> B) {
         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(A, B);
         int m = A.rows();

@@ -81,6 +81,11 @@ public class JBulletBackend implements MechanicsBackend, CPUBackend, CollisionPr
         }
     }
 
+    @Override
+    public void shutdown() {
+        // JBullet is pure Java and handles its own memory.
+    }
+
 
     @Override
     public int getPriority() {

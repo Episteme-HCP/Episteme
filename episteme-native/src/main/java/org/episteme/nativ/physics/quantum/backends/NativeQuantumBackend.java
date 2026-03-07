@@ -93,6 +93,11 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
     }
 
     @Override
+    public void shutdown() {
+        // Quest handles its own lifecycle in this wrapper.
+    }
+
+    @Override
     public boolean isLoaded() {
         return isAvailable();
     }

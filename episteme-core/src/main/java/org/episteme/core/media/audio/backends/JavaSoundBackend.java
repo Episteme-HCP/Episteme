@@ -86,6 +86,13 @@ public class JavaSoundBackend implements AudioBackend, ComputeBackend, AudioAlgo
     
     @Override public String getBackendName() { return "Standard JavaSound"; }
 
+    @Override
+    public void shutdown() {
+        if (clip != null && clip.isOpen()) {
+            clip.close();
+        }
+    }
+
     // ---- AudioAlgorithmBackend Implementation (Processing) ----
 
     @Override

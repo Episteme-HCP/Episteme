@@ -62,4 +62,9 @@ public class JavaCVBackend implements AudioBackend, AlgorithmProvider {
     @Override public double getDuration() { return (grabber!=null) ? grabber.getLengthInTime() / 1_000_000.0 : 0; }
     @Override public float[] getSpectrum() { return new float[128]; }
     @Override public String getBackendName() { return "JavaCV (FFmpeg)"; }
+
+    @Override
+    public void shutdown() {
+        stop();
+    }
 }

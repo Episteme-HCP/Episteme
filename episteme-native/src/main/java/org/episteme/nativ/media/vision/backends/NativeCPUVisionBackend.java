@@ -28,7 +28,6 @@ import java.lang.foreign.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, CPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
 public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedImage>, CPUBackend, NativeBackend {
     private static final boolean IS_AVAILABLE = true;
@@ -68,6 +67,11 @@ public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedIm
     @Override
     public boolean isAvailable() {
         return IS_AVAILABLE;
+    }
+
+    @Override
+    public void shutdown() {
+        // Pure Panama backend - no resources to release
     }
 
     @Override

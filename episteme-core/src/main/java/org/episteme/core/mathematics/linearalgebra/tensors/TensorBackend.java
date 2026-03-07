@@ -45,6 +45,11 @@ import org.episteme.core.technical.backend.ComputeBackend;
 public interface TensorBackend extends ComputeBackend, TensorProvider {
 
     @Override
+    default void shutdown() {
+        // Default no-op to resolve diamond inheritance between ComputeBackend and TensorProvider
+    }
+
+    @Override
     default boolean isAvailable() {
         return true;
     }

@@ -51,6 +51,11 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
     }
 
     @Override
+    public void shutdown() {
+        // No explicit resources to release for Python Quantum (Hybrid) backend.
+    }
+
+    @Override
     public ExecutionContext createContext() {
         return new ExecutionContext() {
             @Override

@@ -39,6 +39,11 @@ import org.episteme.core.technical.backend.ComputeBackend;
  */
 public interface MechanicsBackend extends ComputeBackend, AlgorithmProvider {
 
+    @Override
+    default void shutdown() {
+        // Default no-op to resolve diamond inheritance between ComputeBackend and AlgorithmProvider
+    }
+
     /**
      * Creates a new physics world (simulation environment).
      * 

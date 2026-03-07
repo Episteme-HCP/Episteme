@@ -188,6 +188,11 @@ public class CPUDenseTensorBackend implements TensorBackend, CPUBackend {
     }
 
     @Override
+    public void shutdown() {
+        // No explicit resources to release for CPU Dense tensors.
+    }
+
+    @Override
     public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
         return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }

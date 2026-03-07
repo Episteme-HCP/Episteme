@@ -56,6 +56,11 @@ public class NativeGenesisBackend implements CollisionProvider, MechanicsBackend
     }
 
     @Override
+    public void shutdown() {
+        // Native library lifecycle is managed by this wrapper.
+    }
+
+    @Override
     public boolean isLoaded() {
         return false;
     }

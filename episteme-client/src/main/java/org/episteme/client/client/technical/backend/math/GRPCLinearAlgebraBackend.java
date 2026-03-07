@@ -95,8 +95,13 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E> {
     /**
      * Shuts down the gRPC channel gracefully.
      */
-    public void shutdown() throws InterruptedException {
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+    @Override
+    public void shutdown() {
+        try {
+            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     // ==================== Matrix Operations ====================

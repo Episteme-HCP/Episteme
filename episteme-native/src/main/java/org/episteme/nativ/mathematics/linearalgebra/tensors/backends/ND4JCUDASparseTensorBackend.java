@@ -27,7 +27,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * @since 1.0
  */
 @AutoService({TensorBackend.class, AlgorithmProvider.class})
-public class ND4JSparseTensorBackend implements TensorBackend {
+public class ND4JCUDASparseTensorBackend implements TensorBackend {
 
     private static boolean available = false;
     private static final CPUSparseTensorBackend fallback = new CPUSparseTensorBackend();

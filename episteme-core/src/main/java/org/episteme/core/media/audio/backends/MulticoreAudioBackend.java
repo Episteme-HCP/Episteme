@@ -54,6 +54,11 @@ public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBack
     }
 
     @Override
+    public void shutdown() {
+        // Multicore Java Streams backend does not require explicit shutdown
+    }
+
+    @Override
     public ExecutionContext createContext() {
         return new MulticoreAudioContext();
     }

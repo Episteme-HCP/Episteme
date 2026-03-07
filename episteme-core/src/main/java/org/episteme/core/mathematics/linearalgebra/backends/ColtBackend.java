@@ -130,6 +130,11 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         return this;
     }
 
+    @Override
+    public void shutdown() {
+        // Nothing to release for Colt
+    }
+
     private boolean canUseColt() {
         return field != null && 
                (field instanceof org.episteme.core.mathematics.sets.Reals ||

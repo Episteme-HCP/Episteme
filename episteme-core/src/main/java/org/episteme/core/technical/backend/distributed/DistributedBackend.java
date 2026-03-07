@@ -83,4 +83,9 @@ public interface DistributedBackend extends ComputeBackend, DistributedComputing
     default ExecutionContext createContext() {
         return new DistributedExecutionContext(createDistributedContext());
     }
+
+    @Override
+    default void shutdown() {
+        // Default no-op to resolve conflict
+    }
 }

@@ -200,6 +200,22 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     @Override
+    public void shutdown() {
+        if (isInitialized) {
+            try {
+                if (matMulKernel != null) clReleaseKernel(matMulKernel);
+                if (sparseProgram != null) clReleaseProgram(sparseProgram);
+                if (denseProgram != null) clReleaseProgram(denseProgram);
+                if (staticCommandQueue != null) clReleaseCommandQueue(staticCommandQueue);
+                if (staticContext != null) clReleaseContext(staticContext);
+                isInitialized = false;
+            } catch (Throwable t) {
+                logger.warn("Error during OpenCL shutdown: {}", t.getMessage());
+            }
+        }
+    }
+
+    @Override
     public String getNativeLibraryName() {
         return "opencl";
     }

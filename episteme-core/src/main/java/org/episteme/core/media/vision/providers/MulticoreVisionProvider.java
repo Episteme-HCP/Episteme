@@ -109,4 +109,9 @@ public class MulticoreVisionProvider implements VisionAlgorithmBackend<BufferedI
     public int getPriority() {
         return 5; // Standard priority
     }
+
+    @Override
+    public void shutdown() {
+        // No-op for parallel stream based provider
+    }
 }

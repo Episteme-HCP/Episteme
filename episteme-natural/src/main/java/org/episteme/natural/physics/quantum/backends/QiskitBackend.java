@@ -39,6 +39,11 @@ public class QiskitBackend implements QuantumBackend, QuantumAlgorithmProvider {
         } catch (Exception e) { return false; }
     }
 
+    @Override
+    public void shutdown() {
+        // No explicit resources to release for Qiskit (Python) bridge.
+    }
+
     @Override public ExecutionContext createContext() { return null; }
 
     @Override

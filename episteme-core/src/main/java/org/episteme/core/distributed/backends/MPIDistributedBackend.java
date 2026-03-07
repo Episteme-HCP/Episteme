@@ -53,4 +53,9 @@ public class MPIDistributedBackend implements DistributedBackend {
         if (!available) throw new UnsupportedOperationException("MPI not available");
         return new MPIDistributedContext(new String[0]);
     }
+
+    @Override
+    public void shutdown() {
+        // Nothing to release for MPI
+    }
 }

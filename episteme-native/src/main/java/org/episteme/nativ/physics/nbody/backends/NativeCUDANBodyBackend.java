@@ -81,6 +81,11 @@ public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend {
         return cudaAvailable;
     }
 
+    @Override
+    public void shutdown() {
+        // CUDA driver handles its own lifecycle.
+    }
+
     private static boolean detectCuda() {
         try {
             JCudaDriver.setExceptionsEnabled(true);

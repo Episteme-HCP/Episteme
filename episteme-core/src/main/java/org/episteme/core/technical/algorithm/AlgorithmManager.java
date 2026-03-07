@@ -62,6 +62,7 @@ public final class AlgorithmManager {
                     }
                 }, "Episteme-AutoBenchmark").start();
             }
+            Runtime.getRuntime().addShutdownHook(new Thread(AlgorithmManager::shutdown, "Episteme-Shutdown"));
         } catch (Throwable t) {
             System.err.println("[CRITICAL] AlgorithmManager static init failed: " + t.getMessage());
             t.printStackTrace();
@@ -242,6 +243,43 @@ public final class AlgorithmManager {
     public static void refresh() {
         BEST_PROVIDERS.clear();
         PROVIDER_CACHE.clear();
+    }
+
+    /**
+     * Shuts down all discovered backends and providers.
+     */
+    public static void shutdown() {
+        logger.info("Universal AlgorithmManager shutting down...");
+
+        // Shutdown all discovered AlgorithmProviders currently in cache
+        Set<AlgorithmProvider> allProviders = new HashSet<>();
+        for (List<? extends AlgorithmProvider> providers : PROVIDER_CACHE.values()) {
+            allProviders.addAll(providers);
+        }
+        allProviders.addAll(BEST_PROVIDERS.values());
+
+        for (AlgorithmProvider provider : allProviders) {
+            try {
+                provider.shutdown();
+            } catch (Exception e) {
+                logger.warn("Error shutting down provider {}: {}", provider.getName(), e.getMessage());
+            }
+        }
+
+        // Shutdown all discovered Backends
+        try {
+            for (Backend backend : BackendDiscovery.getInstance().getProviders()) {
+                try {
+                    backend.shutdown();
+                } catch (Exception e) {
+                    logger.warn("Error shutting down backend {}: {}", backend.getName(), e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            // BackendDiscovery might not be initialized or accessible
+        }
+
+        refresh();
     }
 }
 

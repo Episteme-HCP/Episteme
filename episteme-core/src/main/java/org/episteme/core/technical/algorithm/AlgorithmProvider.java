@@ -58,4 +58,22 @@ public interface AlgorithmProvider {
     default double score(OperationContext context) {
         return getPriority();
     }
+
+    /**
+     * Called when the provider is no longer needed (e.g., application shutdown).
+     * Use this to release local resources or close native segments.
+     */
+    default void shutdown() {
+        // Default implementation does nothing
+    }
+
+    /**
+     * Returns metadata about the provider's performance and capabilities.
+     * This can be used for advanced matching in the ProviderSelector.
+     * 
+     * @return a map of metadata keys and values
+     */
+    default java.util.Map<String, String> getMetadata() {
+        return java.util.Collections.emptyMap();
+    }
 }

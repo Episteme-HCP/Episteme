@@ -87,6 +87,11 @@ public class NativeJavaCVVisionBackend implements VisionAlgorithmBackend<Buffere
     }
 
     @Override
+    public void shutdown() {
+        // JavaCV/OpenCV handles its own lifecycle.
+    }
+
+    @Override
     public int getPriority() {
         return 50; // Medium priority, fallback from pure C binding
     }

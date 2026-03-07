@@ -100,6 +100,11 @@ public class NativeCUDATensorBackend implements TensorProvider, GPUBackend, Nati
     }
 
     @Override
+    public void shutdown() {
+        // CUDA driver handles its own lifecycle.
+    }
+
+    @Override
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
         ensureAvailable();
         validateType(elementType);

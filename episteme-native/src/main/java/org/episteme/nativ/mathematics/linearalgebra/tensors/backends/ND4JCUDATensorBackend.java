@@ -22,6 +22,13 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 public class ND4JCUDATensorBackend extends ND4JBaseTensorBackend {
 
     @Override
+    protected org.episteme.core.technical.backend.ExecutionContext doGetContext() {
+        @SuppressWarnings("deprecation")
+        org.episteme.core.technical.backend.ExecutionContext context = new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext();
+        return context;
+    }
+
+    @Override
     public HardwareAccelerator getAcceleratorType() {
         return HardwareAccelerator.GPU;
     }

@@ -93,6 +93,11 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     }
 
     @Override
+    public void shutdown() {
+        // ND4J handles its own lifecycle.
+    }
+
+    @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         return ring instanceof org.episteme.core.mathematics.sets.Reals;
     }

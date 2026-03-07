@@ -148,6 +148,11 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         return this;
     }
 
+    @Override
+    public void shutdown() {
+        // Nothing to release for EJML
+    }
+
     private boolean canUseEJML() {
         return field != null && 
                (field instanceof org.episteme.core.mathematics.sets.Reals ||

@@ -42,4 +42,9 @@ public interface VisionAlgorithmBackend<T> extends Backend, AlgorithmProvider {
     default String getAlgorithmType() {
         return "Computer Vision";
     }
+
+    @Override
+    default void shutdown() {
+        // Default no-op
+    }
 }

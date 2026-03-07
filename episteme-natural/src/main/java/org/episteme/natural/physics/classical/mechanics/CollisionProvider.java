@@ -21,6 +21,11 @@ import java.lang.foreign.MemorySegment;
 public interface CollisionProvider extends ComputeBackend, AlgorithmProvider {
 
     @Override
+    default void shutdown() {
+        // Default no-op
+    }
+
+    @Override
     default int getPriority() {
         return 0;
     }

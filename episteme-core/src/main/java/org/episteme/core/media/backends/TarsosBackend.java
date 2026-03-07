@@ -91,6 +91,13 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
     public String getBackendName() {
         return "TarsosDSP (Scientific)";
     }
+
+    @Override
+    public void shutdown() {
+        if (engine != null) {
+            engine.stop();
+        }
+    }
     
     // AlgorithmProvider methods
     @Override

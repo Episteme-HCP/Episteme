@@ -65,6 +65,11 @@ public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CP
         return IS_AVAILABLE;
     }
 
+    @Override
+    public void shutdown() {
+        // Native ODE library lifecycle is managed by this wrapper.
+    }
+
 
     @Override
     public boolean isLoaded() {

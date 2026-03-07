@@ -13,6 +13,9 @@ import org.episteme.core.technical.backend.Backend;
  */
 public interface AudioAlgorithmBackend<T> extends Backend, AlgorithmProvider {
 
+    @Override
+    default void shutdown() {}
+
     /**
      * Applies an operation to audio data.
      */

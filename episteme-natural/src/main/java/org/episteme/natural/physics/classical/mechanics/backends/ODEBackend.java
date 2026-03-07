@@ -82,6 +82,11 @@ public class ODEBackend implements MechanicsBackend, CPUBackend, CollisionProvid
     }
 
     @Override
+    public void shutdown() {
+        // No explicit resources to release for ODE (Java port) backend.
+    }
+
+    @Override
     public int getPriority() {
         return 10;
     }

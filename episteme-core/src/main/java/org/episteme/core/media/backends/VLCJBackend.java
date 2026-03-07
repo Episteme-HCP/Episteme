@@ -18,6 +18,16 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer;
 public class VLCJBackend implements AudioBackend, AlgorithmProvider {
 
     @Override
+    public void shutdown() {
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+        }
+        if (factory != null) {
+            factory.release();
+        }
+    }
+
+    @Override
     public String getAlgorithmType() {
         return "Audio/Video Engine";
     }

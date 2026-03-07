@@ -89,6 +89,14 @@ public class MinimBackend implements AudioBackend, AlgorithmProvider {
 
     @Override public String getBackendName() { return "Minim (Creative)"; }
 
+    @Override
+    public void shutdown() {
+        if (engine != null) {
+            engine.stop();
+            // MinimEngine cleanup could go here
+        }
+    }
+
     /**
      * Isolated engine to prevent NoClassDefFoundError during class loading of MinimBackend.
      */

@@ -43,6 +43,11 @@ public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
     }
 
     @Override
+    protected org.episteme.core.technical.backend.ExecutionContext doGetContext() {
+        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
+    }
+
+    @Override
     public String getId() {
         return "nd4j-native";
     }

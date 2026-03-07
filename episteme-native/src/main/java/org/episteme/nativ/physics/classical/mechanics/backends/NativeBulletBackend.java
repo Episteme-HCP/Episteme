@@ -116,6 +116,11 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
     }
 
     @Override
+    public void shutdown() {
+        // Native Bullet library lifecycle is managed by this wrapper.
+    }
+
+    @Override
     public boolean isLoaded() {
         return IS_AVAILABLE_FLAG;
     }

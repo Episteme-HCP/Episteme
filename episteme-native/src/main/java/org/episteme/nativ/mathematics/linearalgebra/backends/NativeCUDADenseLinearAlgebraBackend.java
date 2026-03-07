@@ -231,6 +231,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     public boolean isLoaded() { return IS_AVAILABLE; }
 
     @Override
+    public void shutdown() {
+        // cuBLAS/cuSolver and CUDA handles are managed by the NativeLibraryLoader and Arena.
+    }
+
+    @Override
     public String getEnvironmentInfo() {
         return IS_AVAILABLE ? "GPU (CUDA)" : "N/A";
     }
@@ -1207,5 +1212,30 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
+    }
+
+    @Override
+    public void shutdown() {
+        logger.info("CUDADenseLinearAlgebraBackend shutting down...");
+        try {
+            synchronize();
+            // We only shutdown the loader if this is the primary user 
+            // but for now global shutdown is fine as we are exiting.
+            NativeLibraryLoader.shutdown();
+        } catch (Exception e) {
+            logger.warn("Error during CUDA backend shutdown: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    public java.util.Map<String, String> getMetadata() {
+        java.util.Map<String, String> meta = new java.util.HashMap<>();
+        meta.put("accelerator", "gpu");
+        meta.put("api", "cuda");
+        meta.put("precision", "fp64");
+        meta.put("vendor", "nvidia");
+        meta.put("solver", "cusolver");
+        meta.put("optimized_size", ">256");
+        return meta;
     }
 }

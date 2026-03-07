@@ -233,6 +233,11 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
 
     @Override
+    public void shutdown() {
+        // No-op for now. Memory segments are managed via ScopedArena in operations.
+    }
+
+    @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (AVAILABLE && a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
             RealDoubleMatrix adm = (RealDoubleMatrix) a;

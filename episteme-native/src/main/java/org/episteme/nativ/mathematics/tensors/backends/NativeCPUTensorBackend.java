@@ -158,4 +158,21 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
         for(int i=0; i<arr.length; i++) res[i] = arr[i];
         return res;
     }
+
+    @Override
+    public void shutdown() {
+        if (IS_AVAILABLE) {
+            NativeLibraryLoader.shutdown();
+        }
+    }
+
+    @Override
+    public java.util.Map<String, String> getMetadata() {
+        java.util.Map<String, String> meta = new java.util.HashMap<>();
+        meta.put("accelerator", "cpu");
+        meta.put("api", "dnnl");
+        meta.put("precision", "fp32,fp64");
+        meta.put("optimized_size", "all");
+        return meta;
+    }
 }

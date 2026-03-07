@@ -113,6 +113,11 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
 
     @Override
+    public void shutdown() {
+        // No-op. Vector API does not require explicit shutdown.
+    }
+
+    @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         logger.debug("Entering SIMD multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         SIMDRealDoubleMatrix sa = asSIMD(a);

@@ -48,6 +48,11 @@ public class StrangeBackend implements QuantumBackend, QuantumAlgorithmProvider 
     }
 
     @Override
+    public void shutdown() {
+        // No explicit resources to release for Strange (Local) simulator.
+    }
+
+    @Override
     public ExecutionContext createContext() {
         return null; // Placeholder
     }
