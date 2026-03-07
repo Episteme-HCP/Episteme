@@ -100,8 +100,8 @@ public final class AlgorithmManager {
     }
 
     private static <P extends AlgorithmProvider> List<P> discoverProviders(Class<P> providerClass) {
-        // Use IdentityHashMap to deduplicate by instance identity
-        Set<AlgorithmProvider> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        // Key for deduplication: Class + Name
+        Set<String> seenKeys = new HashSet<>();
         List<P> available = new ArrayList<>();
 
         // Path 1: Direct SPI discovery
@@ -110,7 +110,8 @@ public final class AlgorithmManager {
         while (iterator.hasNext()) {
             try {
                 P provider = iterator.next();
-                if (provider.isAvailable() && seen.add(provider)) {
+                String key = provider.getClass().getName() + ":" + provider.getName();
+                if (provider.isAvailable() && seenKeys.add(key)) {
                     available.add(provider);
                 }
             } catch (ServiceConfigurationError | RuntimeException e) {
@@ -118,12 +119,15 @@ public final class AlgorithmManager {
             }
         }
 
-        // Path 2: Backend-bridged discovery
         try {
             for (Backend backend : BackendDiscovery.getInstance().getProviders()) {
                 for (AlgorithmProvider ap : backend.getAlgorithmProviders()) {
-                    if (providerClass.isInstance(ap) && ap.isAvailable() && seen.add(ap)) {
-                        available.add(providerClass.cast(ap));
+                    if (providerClass.isInstance(ap)) {
+                        P provider = providerClass.cast(ap);
+                        String key = provider.getClass().getName() + ":" + provider.getName();
+                        if (provider.isAvailable() && seenKeys.add(key)) {
+                            available.add(provider);
+                        }
                     }
                 }
             }
@@ -186,8 +190,9 @@ public final class AlgorithmManager {
         List<P> available = getProviders(providerClass);
         int index = -1;
         for (int i = 0; i < available.size(); i++) {
-            // Check identity or name since some providers might be wrapped
-            if (available.get(i) == current || available.get(i).getName().equals(current.getName())) {
+            P p = available.get(i);
+            // Check identity or name + class since some providers might be wrapped or duplicated in discovery
+            if (p == current || (p.getName().equals(current.getName()) && p.getClass().equals(current.getClass()))) {
                 index = i;
                 break;
             }

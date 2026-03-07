@@ -136,25 +136,20 @@
         </dependency>
 
         <!-- Jzy3d 3D Plotting API (Core for CPU/GPU flexibility) -->
+        <!-- Jzy3d -->
         <dependency>
             <groupId>org.jzy3d</groupId>
             <artifactId>jzy3d-core</artifactId>
             <version>2.2.2-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcuda-natives</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jzy3d</groupId>
-            <artifactId>jzy3d-emul-gl-awt</artifactId>
+            <artifactId>jzy3d-core-awt</artifactId>
             <version>2.2.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.jzy3d</groupId>
-            <artifactId>jzy3d-awt</artifactId>
+            <artifactId>jzy3d-emul-gl-awt</artifactId>
             <version>2.2.2-SNAPSHOT</version>
         </dependency>
 

@@ -608,6 +608,19 @@
               <generatePom>true</generatePom>
             </configuration>
           </execution>
+          <execution>
+            <id>install-jzy3d-core-awt</id>
+            <phase>initialize</phase>
+            <goals><goal>install-file</goal></goals>
+            <configuration>
+              <file>${project.basedir}/episteme-core/libs/jzy3d-core-awt-2.2.2-SNAPSHOT.jar</file>
+              <groupId>org.jzy3d</groupId>
+              <artifactId>jzy3d-core-awt</artifactId>
+              <version>2.2.2-SNAPSHOT</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
