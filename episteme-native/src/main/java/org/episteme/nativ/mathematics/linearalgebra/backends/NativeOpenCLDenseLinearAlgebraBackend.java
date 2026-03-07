@@ -47,7 +47,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel vecScaleKernel;
     private static cl_kernel vecDotPartialKernel;
     private static cl_kernel transposeKernel;
-    private static cl_kernel gaussElimPhase1Kernel;
+    private static cl_kernel normalizeRowKernel;
+    private static cl_kernel gaussJordanKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -85,6 +86,20 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "__kernel void transpose(__global const double *a, __global double *b, const int rows, const int cols) {\n" +
         "    int r = get_global_id(1); int c = get_global_id(0);\n" +
         "    if (r < rows && c < cols) b[c * rows + r] = a[r * cols + c];\n" +
+        "}\n" +
+        "__kernel void normalizeRow(__global double *a, const int rows, const int cols, const int k) {\n" +
+        "    int j = get_global_id(0) + k + 1;\n" +
+        "    double pivot = a[k * cols + k];\n" +
+        "    if (j < cols) a[k * cols + j] /= pivot;\n" +
+        "    if (j == k + 1) a[k * cols + k] = 1.0;\n" + // Only one thread does this
+        "}\n" +
+        "__kernel void gaussJordan(__global double *a, const int rows, const int cols, const int k) {\n" +
+        "    int i = get_global_id(0);\n" +
+        "    if (i < rows && i != k) {\n" +
+        "        double factor = a[i * cols + k];\n" +
+        "        for (int j = k + 1; j < cols; j++) a[i * cols + j] -= factor * a[k * cols + j];\n" +
+        "        a[i * cols + k] = 0.0;\n" +
+        "    }\n" +
         "}\n";
 
     private static synchronized void init() {
@@ -132,6 +147,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             
             matMulKernel = clCreateKernel(program, "matrixMultiply", null);
             transposeKernel = clCreateKernel(program, "transpose", null);
+            normalizeRowKernel = clCreateKernel(program, "normalizeRow", null);
+            gaussJordanKernel = clCreateKernel(program, "gaussJordan", null);
             vecAddKernel = clCreateKernel(program, "vec_add", null);
             vecSubKernel = clCreateKernel(program, "vec_sub", null);
             vecScaleKernel = clCreateKernel(program, "vec_scale", null);

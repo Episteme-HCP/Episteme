@@ -193,16 +193,27 @@ public final class AlgorithmManager {
             }
         }
 
+        // Return the next one in the list if available
         if (index >= 0 && index < available.size() - 1) {
             P next = available.get(index + 1);
             logger.debug("Falling back from {} to {} for {}", current.getName(), next.getName(), providerClass.getSimpleName());
             return next;
         }
 
-        // If not found or last, return the absolute reference provider
-        P ref = getReferenceProvider(providerClass);
-        logger.debug("Falling back to reference provider {} for {}", ref.getName(), providerClass.getSimpleName());
-        return ref;
+        // If 'current' is the last one or not found, we cannot fall back further within this list
+        // and we must avoid returning 'current' again to prevent infinite loops.
+        if (available.size() > 1) {
+            // If there's at least one other provider, pick the first one that isn't 'current'
+            for (P p : available) {
+                if (p != current && !p.getName().equals(current.getName())) {
+                    logger.debug("Forced fallback from {} to {} (first available alternative)", current.getName(), p.getName());
+                    return p;
+                }
+            }
+        }
+
+        logger.error("No alternative provider available for {} after {}. Operation will likely fail.", providerClass.getSimpleName(), current.getName());
+        throw new NoSuchElementException("No alternative provider available for " + providerClass.getSimpleName());
     }
 
     /**

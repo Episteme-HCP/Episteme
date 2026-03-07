@@ -9,6 +9,10 @@ fi
 
 SOURCE_DIR="episteme-jni/src/main/cpp"
 OUTPUT_DIR="episteme-jni/libs"
+if [ -f "$OUTPUT_DIR" ]; then
+    echo "Removing existing file '$OUTPUT_DIR' to create directory."
+    rm "$OUTPUT_DIR"
+fi
 mkdir -p "$OUTPUT_DIR"
 
 echo "Compiling episteme-jni for Linux..."

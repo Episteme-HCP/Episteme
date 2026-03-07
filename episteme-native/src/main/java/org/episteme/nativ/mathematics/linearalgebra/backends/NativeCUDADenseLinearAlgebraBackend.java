@@ -108,10 +108,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             Optional<MemorySegment> createSym = NativeLibraryLoader.findSymbol(cublas, "cublasCreate_v2", "cublasCreate");
             Optional<MemorySegment> destroySym = NativeLibraryLoader.findSymbol(cublas, "cublasDestroy_v2", "cublasDestroy");
             Optional<MemorySegment> dgemmSym = NativeLibraryLoader.findSymbol(cublas, "cublasDgemm_v2", "cublasDgemm");
+            Optional<MemorySegment> dgeamSym = NativeLibraryLoader.findSymbol(cublas, "cublasDgeam_v2", "cublasDgeam");
 
-            if (createSym.isEmpty() || destroySym.isEmpty() || dgemmSym.isEmpty()) {
-                logger.warn("Required cuBLAS symbols missing (create={}, destroy={}, dgemm={}). Backend disabled.", 
-                    createSym.isPresent(), destroySym.isPresent(), dgemmSym.isPresent());
+            if (createSym.isEmpty() || destroySym.isEmpty() || dgemmSym.isEmpty() || dgeamSym.isEmpty()) {
+                logger.warn("Required cuBLAS symbols missing (create={}, destroy={}, dgemm={}, dgeam={}). Backend disabled.", 
+                    createSym.isPresent(), destroySym.isPresent(), dgemmSym.isPresent(), dgeamSym.isPresent());
                 return;
             }
 
@@ -123,6 +124,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+            ));
+            
+            CUBLAS_DGEAM = LINKER.downcallHandle(dgeamSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT
             ));
 
             // cuSolver
