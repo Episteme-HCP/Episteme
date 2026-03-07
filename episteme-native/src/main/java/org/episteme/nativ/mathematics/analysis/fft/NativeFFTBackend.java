@@ -59,7 +59,7 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
         if (initialized) return;
         initialized = true;
         try {
-            SymbolLookup lookup = org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader.loadLibrary("fftw3");
+            SymbolLookup lookup = org.episteme.core.technical.backend.nativ.NativeLibraryLoader.loadLibrary("fftw3");
             Linker linker = Linker.nativeLinker();
 
             DPLAN_R2C_1D = linker.downcallHandle(lookup.find("fftw_plan_dft_r2c_1d").get(),

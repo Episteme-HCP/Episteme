@@ -6,7 +6,7 @@
 package org.episteme.nativ.media.vision.providers;
 
 import org.episteme.core.media.vision.ImageOp;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;

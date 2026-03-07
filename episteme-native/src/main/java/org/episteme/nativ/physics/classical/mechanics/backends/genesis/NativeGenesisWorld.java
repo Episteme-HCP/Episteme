@@ -11,7 +11,7 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;

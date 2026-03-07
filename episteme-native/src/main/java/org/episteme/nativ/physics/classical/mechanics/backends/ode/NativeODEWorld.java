@@ -9,7 +9,7 @@ import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.quantity.Time;
 import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;

@@ -23,6 +23,8 @@
 
 package org.episteme.jni.jni;
 
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+
 /**
  * JNI Bridge for communicating with real hardware devices via C++/Rust native
  * libraries.
@@ -34,32 +36,7 @@ package org.episteme.jni.jni;
 public class NativeDeviceBridge {
 
     static {
-        try {
-            System.loadLibrary("episteme-jni");
-        } catch (UnsatisfiedLinkError e) {
-            // Fallback for development/test environments
-            boolean loaded = false;
-            String libName = System.mapLibraryName("episteme-jni");
-            String[] searchPaths = { 
-                "libs", "../libs", "../../libs", "episteme-jni/libs", 
-                System.getProperty("user.dir") + "/libs"
-            };
-            
-            for (String path : searchPaths) {
-                java.io.File file = new java.io.File(path, libName);
-                if (file.exists()) {
-                    try {
-                        System.load(file.getAbsolutePath());
-                        loaded = true;
-                        break;
-                    } catch (Throwable ignored) {}
-                }
-            }
-            
-            if (!loaded) {
-                System.err.println("Native library 'episteme-jni' failed to load via standard and fallback paths.\n" + e);
-            }
-        }
+        NativeLibraryLoader.loadLibrary("episteme-jni");
     }
 
     /**

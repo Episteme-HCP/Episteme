@@ -5,7 +5,7 @@
 package org.episteme.nativ.physics.quantum.backends;
 
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;

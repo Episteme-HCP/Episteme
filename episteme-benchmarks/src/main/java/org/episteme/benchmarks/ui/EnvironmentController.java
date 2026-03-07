@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 
 import java.util.ServiceLoader;
 

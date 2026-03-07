@@ -87,7 +87,7 @@ public class BackendDiagnostic {
     private static void printNativeFailureDetails() {
         System.out.println("\n--- Native Loading Failure Details ---");
         try {
-            Class<?> loaderClass = Class.forName("org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader");
+            Class<?> loaderClass = Class.forName("org.episteme.core.technical.backend.nativ.NativeLibraryLoader");
             @SuppressWarnings("unchecked")
             java.util.List<String> causes = (java.util.List<String>) loaderClass.getMethod("getAllFailureCauses").invoke(null);
             if (causes.isEmpty()) {

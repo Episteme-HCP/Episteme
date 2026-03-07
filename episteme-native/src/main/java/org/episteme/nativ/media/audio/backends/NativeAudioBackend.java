@@ -7,7 +7,7 @@ package org.episteme.nativ.media.audio.backends;
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.AudioBackend;
 import org.episteme.core.technical.backend.Backend;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;

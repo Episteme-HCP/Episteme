@@ -1,6 +1,6 @@
 package org.episteme.apps.apps.util;
 
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import java.lang.foreign.Arena;
 
 

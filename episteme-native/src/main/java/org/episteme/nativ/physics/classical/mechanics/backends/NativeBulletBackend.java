@@ -16,7 +16,7 @@ import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.episteme.natural.physics.classical.mechanics.RigidBody;
 import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import org.episteme.core.measure.units.SI;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;

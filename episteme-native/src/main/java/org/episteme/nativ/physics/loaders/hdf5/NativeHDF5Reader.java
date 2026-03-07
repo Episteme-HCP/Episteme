@@ -25,7 +25,7 @@ package org.episteme.nativ.physics.loaders.hdf5;
 
 import java.io.IOException;
 import java.util.Optional;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;

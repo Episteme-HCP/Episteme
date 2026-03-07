@@ -27,7 +27,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 
 /**
  * Standalone Native Linear Algebra backend using bundled episteme_native library.

@@ -21,7 +21,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import java.lang.foreign.*;
 import java.util.List;
 import java.util.Optional;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 
 /**
  * Native implementation of {@link MechanicsBackend} for ODE (Open Dynamics Engine).

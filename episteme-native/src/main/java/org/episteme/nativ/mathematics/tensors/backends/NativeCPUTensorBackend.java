@@ -12,7 +12,7 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.mathematics.linearalgebra.tensors.NativeTensor;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.nativ.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.Arena;

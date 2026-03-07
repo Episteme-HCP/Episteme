@@ -1,4 +1,4 @@
-package org.episteme.nativ.technical.backend.nativ;
+package org.episteme.core.technical.backend.nativ;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
