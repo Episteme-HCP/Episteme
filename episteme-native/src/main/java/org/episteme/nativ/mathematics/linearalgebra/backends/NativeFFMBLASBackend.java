@@ -658,30 +658,6 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         }
     }
 
-    @Override
-    public Matrix<org.episteme.core.mathematics.numbers.real.Real> transpose(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
-        if (IS_AVAILABLE && DOMATCOPY != null) {
-            int m = a.rows(), n = a.cols();
-            try (Arena arena = Arena.ofConfined()) {
-                int len = m * n;
-                MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long)len);
-                double[] arrA = toDoubleArray(a);
-                MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int)arrA.length);
-                
-                MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-                
-                // CblasTrans = 112
-                try { DOMATCOPY.invokeExact(CblasRowMajor, 112, (long)m, (long)n, 1.0, segA, (long)n, segB, (long)m); } catch (Throwable e) { throw new RuntimeException(e); }
-                
-                double[] result = new double[len];
-                MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, len);
-                return createDenseMatrix(result, n, m, a);
-            }
-        }
-        
-        return LinearAlgebraProvider.super.transpose(a);
-    }
-
     private Matrix<org.episteme.core.mathematics.numbers.real.Real> createDenseMatrix(double[] data, int rows, int cols, Matrix<org.episteme.core.mathematics.numbers.real.Real> reference) {
         org.episteme.core.mathematics.numbers.real.Real[][] resObj = new org.episteme.core.mathematics.numbers.real.Real[rows][cols];
         for (int i = 0; i < rows; i++) {

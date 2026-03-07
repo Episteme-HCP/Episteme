@@ -49,6 +49,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel transposeKernel;
     private static cl_kernel normalizeRowKernel;
     private static cl_kernel gaussJordanKernel;
+    private static cl_kernel gaussElimPhase1Kernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -441,30 +442,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
         return fromDoubleArray(scaleVec(toDoubleArray(a), scalar.doubleValue()), a.rows(), a.cols());
-    }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
-        int r = a.rows(), c = a.cols();
-        double[] src = toDoubleArray(a);
-        double[] dst = new double[r * c];
-        
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * r * c, Pointer.to(src), null);
-        cl_mem memB = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * r * c, null, null);
-        try {
-            clSetKernelArg(transposeKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-            clSetKernelArg(transposeKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
-            clSetKernelArg(transposeKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{r}));
-            clSetKernelArg(transposeKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{c}));
-            
-            long[] globalWorkSize = new long[]{c, r};
-            clEnqueueNDRangeKernel(commandQueue, transposeKernel, 2, null, globalWorkSize, null, 0, null, null);
-            clEnqueueReadBuffer(commandQueue, memB, CL_TRUE, 0, (long)Sizeof.cl_double * r * c, Pointer.to(dst), 0, null, null);
-            
-            return fromDoubleArray(dst, c, r);
-        } finally {
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memB);
-        }
     }
     @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
         // Mv = A * (b as column matrix) — reuse GPU matmul kernel
