@@ -38,6 +38,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, LinearAlgebraProvider.class})
 public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDADenseLinearAlgebraBackend.class);
@@ -215,13 +216,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
                     
                     // cublasDgeam(handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc)
-                    // We use CUBLAS_OP_T for transa to perform C = alpha * A^T + beta * B
-                    // Here B is null/not used as beta is 0.0
                     checkCublas((int) CUBLAS_DGEAM.invokeExact(handle.get(ValueLayout.ADDRESS, 0), 
                         1, 0, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), m, beta, MemorySegment.NULL, m, d_C.get(ValueLayout.ADDRESS, 0), n));
                     
                     double[] resultData = new double[m * n];
-                    checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofArray(resultData), d_C.get(ValueLayout.ADDRESS, 0), (long)m * n * Double.BYTES, 2));
+                    MemorySegment h_Result = arena.allocate(ValueLayout.JAVA_DOUBLE, (long)m * n);
+                    checkCuda((int) CUDA_MEMCPY.invokeExact(h_Result, d_C.get(ValueLayout.ADDRESS, 0), (long)m * n * Double.BYTES, CUDA_MEMCPY_DEVICE_TO_HOST));
+                    MemorySegment.copy(h_Result, ValueLayout.JAVA_DOUBLE, 0, resultData, 0, m * n);
                     
                     return fromDoubleArray(resultData, n, m);
                 } finally {

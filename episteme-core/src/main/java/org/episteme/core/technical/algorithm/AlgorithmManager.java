@@ -200,9 +200,14 @@ public final class AlgorithmManager {
 
         // Return the next one in the list if available
         if (index >= 0 && index < available.size() - 1) {
-            P next = available.get(index + 1);
-            logger.debug("Falling back from {} to {} for {}", current.getName(), next.getName(), providerClass.getSimpleName());
-            return next;
+            for (int i = index + 1; i < available.size(); i++) {
+                P next = available.get(i);
+                // Skip if it's the same class to avoid infinite loops when operating on the same logic
+                if (!next.getClass().equals(current.getClass())) {
+                    logger.debug("Falling back from {} to {} for {}", current.getName(), next.getName(), providerClass.getSimpleName());
+                    return next;
+                }
+            }
         }
 
         // If 'current' is the last one or not found, we cannot fall back further within this list

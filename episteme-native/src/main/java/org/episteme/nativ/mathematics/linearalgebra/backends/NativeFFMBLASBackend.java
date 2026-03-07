@@ -34,6 +34,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * Binds to OpenBLAS/MKL for Matrix Operations.
  * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, LinearAlgebraProvider.class, CPUBackend.class, NativeBackend.class, AlgorithmProvider.class})
 public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
     

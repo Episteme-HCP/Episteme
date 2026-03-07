@@ -37,7 +37,28 @@ public class NativeDeviceBridge {
         try {
             System.loadLibrary("episteme-jni");
         } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native library 'episteme-jni' failed to load.\n" + e);
+            // Fallback for development/test environments
+            boolean loaded = false;
+            String libName = System.mapLibraryName("episteme-jni");
+            String[] searchPaths = { 
+                "libs", "../libs", "../../libs", "episteme-jni/libs", 
+                System.getProperty("user.dir") + "/libs"
+            };
+            
+            for (String path : searchPaths) {
+                java.io.File file = new java.io.File(path, libName);
+                if (file.exists()) {
+                    try {
+                        System.load(file.getAbsolutePath());
+                        loaded = true;
+                        break;
+                    } catch (Throwable ignored) {}
+                }
+            }
+            
+            if (!loaded) {
+                System.err.println("Native library 'episteme-jni' failed to load via standard and fallback paths.\n" + e);
+            }
         }
     }
 
