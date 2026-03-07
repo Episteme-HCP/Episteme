@@ -1,0 +1,88 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --------------------< org.episteme:episteme-native >--------------------
+[INFO] Building Episteme Native 1.0.0-beta1
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Downloading from clojars: https://repo.clojars.org/org/jzy3d/jzy3d-core/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from tarsos-dsp: https://mvn.0110.be/releases/org/jzy3d/jzy3d-core/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jitpack.io: https://jitpack.io/org/jzy3d/jzy3d-core/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from oss-sonatype: https://oss.sonatype.org/content/repositories/releases/org/jzy3d/jzy3d-core/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-releases: https://maven.jzy3d.org/releases/org/jzy3d/jzy3d-core/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-snapshots: https://maven.jzy3d.org/snapshots/org/jzy3d/jzy3d-core/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jitpack.io: https://jitpack.io/org/jzy3d/jzy3d-core-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from clojars: https://repo.clojars.org/org/jzy3d/jzy3d-core-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from tarsos-dsp: https://mvn.0110.be/releases/org/jzy3d/jzy3d-core-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from oss-sonatype: https://oss.sonatype.org/content/repositories/releases/org/jzy3d/jzy3d-core-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-releases: https://maven.jzy3d.org/releases/org/jzy3d/jzy3d-core-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-snapshots: https://maven.jzy3d.org/snapshots/org/jzy3d/jzy3d-core-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jitpack.io: https://jitpack.io/org/jzy3d/jzy3d-emul-gl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from tarsos-dsp: https://mvn.0110.be/releases/org/jzy3d/jzy3d-emul-gl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from clojars: https://repo.clojars.org/org/jzy3d/jzy3d-emul-gl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from oss-sonatype: https://oss.sonatype.org/content/repositories/releases/org/jzy3d/jzy3d-emul-gl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-releases: https://maven.jzy3d.org/releases/org/jzy3d/jzy3d-emul-gl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-snapshots: https://maven.jzy3d.org/snapshots/org/jzy3d/jzy3d-emul-gl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from tarsos-dsp: https://mvn.0110.be/releases/org/jzy3d/jzy3d-native-jogl-javafx/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from clojars: https://repo.clojars.org/org/jzy3d/jzy3d-native-jogl-javafx/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jitpack.io: https://jitpack.io/org/jzy3d/jzy3d-native-jogl-javafx/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from oss-sonatype: https://oss.sonatype.org/content/repositories/releases/org/jzy3d/jzy3d-native-jogl-javafx/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-releases: https://maven.jzy3d.org/releases/org/jzy3d/jzy3d-native-jogl-javafx/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-snapshots: https://maven.jzy3d.org/snapshots/org/jzy3d/jzy3d-native-jogl-javafx/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from tarsos-dsp: https://mvn.0110.be/releases/org/jzy3d/jzy3d-native-jogl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from clojars: https://repo.clojars.org/org/jzy3d/jzy3d-native-jogl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jitpack.io: https://jitpack.io/org/jzy3d/jzy3d-native-jogl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from oss-sonatype: https://oss.sonatype.org/content/repositories/releases/org/jzy3d/jzy3d-native-jogl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-releases: https://maven.jzy3d.org/releases/org/jzy3d/jzy3d-native-jogl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] Downloading from jzy3d-snapshots: https://maven.jzy3d.org/snapshots/org/jzy3d/jzy3d-native-jogl-awt/2.2.2-SNAPSHOT/maven-metadata.xml
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ episteme-native ---
+[INFO] Deleting C:\Silvere\Encours\Developpement\Episteme\episteme-native\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ episteme-native ---
+[INFO] Copying 198 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ episteme-native ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 57 source files with javac [debug release 25] to target\classes
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/mathematics/linearalgebra/backends/NativeOpenCLSparseLinearAlgebraBackend.java:[41,1] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/mathematics/linearalgebra/backends/NativeOpenCLSparseLinearAlgebraBackend.java:[41,1] Service provider org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/mathematics/linearalgebra/backends/NativeSIMDLinearAlgebraBackend.java:[37,1] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/mathematics/linearalgebra/backends/NativeCUDASparseLinearAlgebraBackend.java:[38,1] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/mathematics/linearalgebra/backends/NativeCUDASparseLinearAlgebraBackend.java:[38,1] Service provider org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/media/vision/backends/NativeCUDAVisionBackend.java:[29,1] Service provider org.episteme.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/media/vision/backends/NativeJavaCVVisionBackend.java:[38,1] Service provider org.episteme.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/media/vision/backends/NativeCPUCBindingVisionBackend.java:[35,1] Service provider org.episteme.core.media.vision.VisionAlgorithmBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] /C:/Silvere/Encours/Developpement/Episteme/episteme-native/src/main/java/org/episteme/nativ/mathematics/linearalgebra/backends/NativeOpenCLDenseLinearAlgebraBackend.java:[38,1] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ episteme-native ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\Episteme\episteme-native\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ episteme-native ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 10 source files with javac [debug release 25] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ episteme-native ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ episteme-native ---
+[INFO] Building jar: C:\Silvere\Encours\Developpement\Episteme\episteme-native\target\episteme-native-1.0.0-beta1.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ episteme-native ---
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-native\pom.xml to C:\Users\silve\.m2\repository\org\episteme\episteme-native\1.0.0-beta1\episteme-native-1.0.0-beta1.pom
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-native\target\episteme-native-1.0.0-beta1.jar to C:\Users\silve\.m2\repository\org\episteme\episteme-native\1.0.0-beta1\episteme-native-1.0.0-beta1.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:20 min
+[INFO] Finished at: 2026-03-07T17:42:41+01:00
+[INFO] ------------------------------------------------------------------------

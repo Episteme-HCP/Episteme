@@ -74,7 +74,13 @@ public final class OperationContext {
         /** QR Decomposition */
         MAT_QR,
         /** SVD Decomposition */
-        MAT_SVD
+        MAT_SVD,
+        /** Cholesky Decomposition */
+        MAT_CHOLESKY,
+        /** LU Decomposition */
+        MAT_LU,
+        /** Eigenvalue Decomposition */
+        MAT_EIGEN
     }
 
     public static final OperationContext DEFAULT = new OperationContext.Builder().build();
