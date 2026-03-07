@@ -30,7 +30,6 @@ import java.lang.foreign.*;
  */
 @AutoService({Backend.class, ComputeBackend.class, CPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
 public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedImage>, CPUBackend, NativeBackend {
-
     private static final boolean IS_AVAILABLE = true;
 
     // No external C++ library to load (Pure Java Panama)

@@ -24,9 +24,6 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
-import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
-import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
-
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.Operation;
 
@@ -74,11 +71,11 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
 
     @Override
-    public ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return new SIMDExecutionContext();
     }
 
-    private class SIMDExecutionContext implements ExecutionContext {
+    private class SIMDExecutionContext implements org.episteme.core.technical.backend.ExecutionContext {
         @Override
         public <T> T execute(Operation<T> operation) {
             return operation.compute(this);
@@ -218,11 +215,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         
         Real[] res = new Real[n];
         for(int i=0; i<n; i++) res[i] = Real.of(x[i]);
-        return new GenericVector<Real>(
-                 new DenseVectorStorage<Real>(res),
-                 (LinearAlgebraProvider<Real>) this,
-                 Reals.getInstance()
-            );
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
     }
 
     @Override
@@ -244,7 +237,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         for (; i < n; i++) {
             cData[i] = aData[i] + bData[i];
         }
-        return fromDoubleArray(cData);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
     }
     @Override
     public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
@@ -265,7 +258,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         for (; i < n; i++) {
             cData[i] = aData[i] - bData[i];
         }
-        return fromDoubleArray(cData);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
     }
     @Override
     public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
@@ -283,7 +276,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         for (; i < n; i++) {
             cData[i] = aData[i] * s;
         }
-        return fromDoubleArray(cData);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
     }
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
@@ -321,22 +314,121 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         return data; 
     }
     
-    private Vector<Real> fromDoubleArray(double[] data) {
-        int n = data.length;
-        Real[] reals = new Real[n];
-        for(int i=0; i<n; i++) reals[i] = Real.of(data[i]);
-        return new GenericVector<Real>(
-             new DenseVectorStorage<Real>(reals),
-             this,
-             Reals.getInstance()
-        );
+    private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
+        Real[] reals = new Real[data.length];
+        for(int i=0; i<data.length; i++) reals[i] = Real.of(data[i]);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<Real>(reals, rows, cols, Reals.getInstance());
     }
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) { 
-        return new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Real>().inverse(a); 
+    public Matrix<Real> inverse(Matrix<Real> a) {
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        
+        // Solve AX = I using Gaussian elimination with partial pivoting
+        SIMDRealDoubleMatrix simdA = asSIMD(a);
+        double[] data = simdA.getInternalData();
+        double[] inv = new double[n * n];
+        for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
+        
+        var species = DoubleVector.SPECIES_PREFERRED;
+        
+        for (int k = 0; k < n; k++) {
+            // Pivoting
+            int max = k;
+            for (int i = k + 1; i < n; i++) {
+                if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
+            }
+            if (k != max) {
+                // Swap rows in A
+                for (int j = k; j < n; j++) {
+                    double temp = data[k * n + j];
+                    data[k * n + j] = data[max * n + j];
+                    data[max * n + j] = temp;
+                }
+                // Swap rows in Inverse
+                for (int j = 0; j < n; j++) {
+                    double temp = inv[k * n + j];
+                    inv[k * n + j] = inv[max * n + j];
+                    inv[max * n + j] = temp;
+                }
+            }
+            
+            double pivot = data[k * n + k];
+            if (Math.abs(pivot) < 1e-15) throw new ArithmeticException("Matrix is singular");
+            
+            // Normalize row k
+            for (int j = k + 1; j < n; j++) data[k * n + j] /= pivot;
+            for (int j = 0; j < n; j++) inv[k * n + j] /= pivot;
+            data[k * n + k] = 1.0;
+            
+            // Eliminate other rows
+            for (int i = 0; i < n; i++) {
+                if (i != k) {
+                    double factor = data[i * n + k];
+                    int j = k + 1;
+                    // Vectorized elimination for A
+                    for (; j + species.length() <= n; j += species.length()) {
+                        var vRowK = DoubleVector.fromArray(species, data, k * n + j);
+                        var vRowI = DoubleVector.fromArray(species, data, i * n + j);
+                        vRowI.sub(vRowK.mul(factor)).intoArray(data, i * n + j);
+                    }
+                    for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];
+                    
+                    // Vectorized elimination for Inverse
+                    j = 0;
+                    for (; j + species.length() <= n; j += species.length()) {
+                        var vInvK = DoubleVector.fromArray(species, inv, k * n + j);
+                        var vInvI = DoubleVector.fromArray(species, inv, i * n + j);
+                        vInvI.sub(vInvK.mul(factor)).intoArray(inv, i * n + j);
+                    }
+                    for (; j < n; j++) inv[i * n + j] -= factor * inv[k * n + j];
+                }
+            }
+        }
+        return fromDoubleArray(inv, n, n);
     }
+
     @Override
-    public Real determinant(Matrix<Real> a) { throw new UnsupportedOperationException("SIMD determinant not implemented yet."); }
+    public Real determinant(Matrix<Real> a) {
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        
+        SIMDRealDoubleMatrix simdA = asSIMD(a);
+        double[] data = simdA.getInternalData();
+        double det = 1.0;
+        var species = DoubleVector.SPECIES_PREFERRED;
+        
+        for (int k = 0; k < n; k++) {
+            int max = k;
+            for (int i = k + 1; i < n; i++) {
+                if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
+            }
+            if (k != max) {
+                for (int j = k; j < n; j++) {
+                    double temp = data[k * n + j];
+                    data[k * n + j] = data[max * n + j];
+                    data[max * n + j] = temp;
+                }
+                det = -det;
+            }
+            
+            double pivot = data[k * n + k];
+            det *= pivot;
+            if (Math.abs(det) < 1e-100) return Real.ZERO;
+            
+            for (int i = k + 1; i < n; i++) {
+                double factor = data[i * n + k] / pivot;
+                int j = k + 1;
+                for (; j + species.length() <= n; j += species.length()) {
+                    var vRowK = DoubleVector.fromArray(species, data, k * n + j);
+                    var vRowI = DoubleVector.fromArray(species, data, i * n + j);
+                    vRowI.sub(vRowK.mul(factor)).intoArray(data, i * n + j);
+                }
+                for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];
+            }
+        }
+        return Real.of(det);
+    }
 
     private SIMDRealDoubleMatrix asSIMD(Matrix<Real> m) {
         if (m instanceof SIMDRealDoubleMatrix) return (SIMDRealDoubleMatrix) m;

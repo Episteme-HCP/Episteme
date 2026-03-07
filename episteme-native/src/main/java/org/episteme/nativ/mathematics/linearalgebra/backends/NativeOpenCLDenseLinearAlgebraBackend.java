@@ -46,6 +46,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel vecSubKernel;
     private static cl_kernel vecScaleKernel;
     private static cl_kernel vecDotPartialKernel;
+    private static cl_kernel gaussElimPhase1Kernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -71,6 +72,14 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "}\n" +
         "__kernel void vec_dot_partial(__global const double *a, __global const double *b, __global double *out, const int n) {\n" +
         "    int i = get_global_id(0); if (i < n) out[i] = a[i] * b[i];\n" +
+        "}\n" +
+        "__kernel void gaussElimPhase1(__global double *a, const int n, const int k) {\n" +
+        "    int i = get_global_id(0) + k + 1;\n" +
+        "    if (i < n) {\n" +
+        "        double factor = a[i*n + k] / a[k*n + k];\n" +
+        "        for (int j = k + 1; j < n; j++) a[i*n + j] -= factor * a[k*n + j];\n" +
+        "        a[i*n + k] = 0.0;\n" +
+        "    }\n" +
         "}\n";
 
     private static synchronized void init() {
@@ -121,6 +130,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             vecSubKernel = clCreateKernel(program, "vec_sub", null);
             vecScaleKernel = clCreateKernel(program, "vec_scale", null);
             vecDotPartialKernel = clCreateKernel(program, "vec_dot_partial", null);
+            gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
 
             initialized = true;
             logger.info("Native OpenCL Dense Backend initialized successfully.");
@@ -205,6 +215,137 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return new DenseMatrix<Real>(reals, rows, cols, Reals.getInstance());
     }
 
+    @Override
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        int n = a.rows();
+        if (n != a.cols() || b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
+
+        double[] h_A = toDoubleArray(a);
+        double[] h_B = toDoubleVec(b);
+
+        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        try {
+            for (int k = 0; k < n; k++) {
+                // Pivoting on CPU for simplicity (avoiding complex GPU sync)
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)(n - k) * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                
+                int max = k;
+                for (int i = k + 1; i < n; i++) {
+                    if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
+                }
+                if (k != max) {
+                    // Swap on CPU and write back or use a swap kernel. CPU swap for small n is fine.
+                    for (int j = k; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
+                    double tb = h_B[k]; h_B[k] = h_B[max]; h_B[max] = tb;
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
+                }
+
+                double pivot = h_A[k * n + k];
+                if (Math.abs(pivot) < 1e-15) throw new ArithmeticException("Singular matrix");
+
+                // Vectorized elimination on GPU
+                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                
+                if (n - k - 1 > 0) {
+                    clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+                }
+                
+                // Update B on CPU (small enough)
+                for (int i = k + 1; i < n; i++) {
+                    h_B[i] -= (h_A[i * n + k] / pivot) * h_B[k];
+                }
+            }
+            
+            // Back substitution on CPU
+            clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
+            double[] x = new double[n];
+            for (int i = n - 1; i >= 0; i--) {
+                double sum = 0;
+                for (int j = i + 1; j < n; j++) sum += h_A[i * n + j] * x[j];
+                x[i] = (h_B[i] - sum) / h_A[i * n + i];
+            }
+            return toRealVector(x);
+        } finally {
+            clReleaseMemObject(memA);
+        }
+    }
+
+    @Override
+    public Matrix<Real> inverse(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        
+        // Identity matrix as B, solve AX = I
+        double[] h_A = toDoubleArray(a);
+        double[] inv = new double[n * n];
+        for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
+
+        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        try {
+            for (int k = 0; k < n; k++) {
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)(n - k) * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                int max = k;
+                for (int i = k + 1; i < n; i++) {
+                    if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
+                }
+                if (k != max) {
+                    for (int j = 0; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
+                    for (int j = 0; j < n; j++) { double t = inv[k * n + j]; inv[k * n + j] = inv[max * n + j]; inv[max * n + j] = t; }
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
+                }
+                double pivot = h_A[k * n + k];
+                if (Math.abs(pivot) < 1e-15) throw new ArithmeticException("Singular matrix");
+                
+                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                if (n - k - 1 > 0) clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+
+                for (int i = 0; i < n; i++) {
+                    if (i != k) {
+                        double factor = h_A[i * n + k] / pivot;
+                        for (int j = 0; j < n; j++) inv[i * n + j] -= factor * inv[k * n + j];
+                    }
+                }
+                for (int j = 0; j < n; j++) inv[k * n + j] /= pivot;
+            }
+            return fromDoubleArray(inv, n, n);
+        } finally { clReleaseMemObject(memA); }
+    }
+
+    @Override
+    public Real determinant(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        int n = a.rows();
+        double[] h_A = toDoubleArray(a);
+        double det = 1.0;
+        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        try {
+            for (int k = 0; k < n; k++) {
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)(n - k) * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                int max = k;
+                for (int i = k + 1; i < n; i++) if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
+                if (k != max) {
+                    for (int j = k; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
+                    det = -det;
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
+                }
+                det *= h_A[k * n + k];
+                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                if (n - k - 1 > 0) clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+            }
+            return Real.of(det);
+        } finally { clReleaseMemObject(memA); }
+    }
+
     @Override public String getNativeLibraryName() { return "opencl"; }
     @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }
     @Override public void selectDevice(int deviceId) { }
@@ -276,7 +417,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         if (context.hasHint(OperationContext.Hint.MAT_INV) ||
             context.hasHint(OperationContext.Hint.MAT_DET) ||
             context.hasHint(OperationContext.Hint.MAT_SOLVE)) {
-            return 0.1; // Very low score, let it fall back naturally
+            base += 5.0;
         }
 
         if (context.getDataSize() < 256) base -= 200;

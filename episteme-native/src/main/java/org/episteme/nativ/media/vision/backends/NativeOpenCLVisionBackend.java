@@ -26,6 +26,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
 public class NativeOpenCLVisionBackend implements VisionAlgorithmBackend<Object>, GPUBackend, NativeBackend {
 

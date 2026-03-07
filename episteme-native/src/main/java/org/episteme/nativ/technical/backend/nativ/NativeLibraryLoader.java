@@ -158,6 +158,10 @@ public class NativeLibraryLoader {
                 variants.add("cudart");
                 variants.add("cudart.so.12");
                 variants.add("cudart.so.11");
+            } else if (libName.equals("cusolver")) {
+                variants.add("cusolver");
+                variants.add("cusolver.so.11");
+                variants.add("cusolver.so.10");
             }
         }
 

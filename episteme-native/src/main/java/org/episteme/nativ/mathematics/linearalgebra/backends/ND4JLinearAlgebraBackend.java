@@ -32,7 +32,6 @@ import org.nd4j.linalg.inverse.InvertMatrix;
  */
 @AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class})
 public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.episteme.nativ.technical.backend.nativ.NativeBackend, org.episteme.core.technical.backend.cpu.CPUBackend {
-
     @Override
     public int getPriority() {
         return 50; // Lower than NativeCPULinearAlgebraBackend (100)
