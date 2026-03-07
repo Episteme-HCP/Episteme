@@ -188,41 +188,44 @@ public final class AlgorithmManager {
      */
     public static <P extends AlgorithmProvider> P getNextProvider(Class<P> providerClass, AlgorithmProvider current) {
         List<P> available = getProviders(providerClass);
+        if (available.isEmpty()) {
+            throw new NoSuchElementException("No provider available for " + providerClass.getSimpleName());
+        }
+
+        String currentName = current.getName().trim();
+        Class<?> currentClass = current.getClass();
+
+        // Find the position of 'current' in the priority list
         int index = -1;
         for (int i = 0; i < available.size(); i++) {
             P p = available.get(i);
-            // Check identity or name + class since some providers might be wrapped or duplicated in discovery
-            if (p == current || (p.getName().equals(current.getName()) && p.getClass().equals(current.getClass()))) {
+            if (p == current || (p.getClass().equals(currentClass) && p.getName().trim().equals(currentName))) {
                 index = i;
                 break;
             }
         }
 
-        // Return the next one in the list if available
-        if (index >= 0 && index < available.size() - 1) {
-            for (int i = index + 1; i < available.size(); i++) {
-                P next = available.get(i);
-                // Skip if it's the same class or same name to avoid infinite loops when operating on the same logic
-                if (!next.getClass().equals(current.getClass()) && !next.getName().equals(current.getName())) {
-                    logger.debug("Falling back from {} to {} for {}", current.getName(), next.getName(), providerClass.getSimpleName());
-                    return next;
-                }
+        // Try to find a successor that is NOT basically the same as 'current'
+        // We look forward in the priority list first.
+        for (int i = index + 1; i < available.size(); i++) {
+            P next = available.get(i);
+            if (!next.getClass().equals(currentClass) && !next.getName().trim().equals(currentName)) {
+                logger.debug("Falling back from {} to {} for {}", currentName, next.getName(), providerClass.getSimpleName());
+                return next;
             }
         }
 
-        // If 'current' is the last one or not found, we cannot fall back further within this list
-        // and we must avoid returning 'current' again to prevent infinite loops.
-        if (available.size() > 1) {
-            // If there's at least one other provider, pick the first one that isn't 'current'
-            for (P p : available) {
-                if (p != current && !p.getName().equals(current.getName())) {
-                    logger.debug("Forced fallback from {} to {} (first available alternative)", current.getName(), p.getName());
-                    return p;
-                }
+        // Emergency: if we can't find a forward successor, try any alternative that is actually DIFFERENT.
+        // This handles cases where 'current' might not have been in the priority list somehow.
+        for (P alternative : available) {
+            if (!alternative.getClass().equals(currentClass) && !alternative.getName().trim().equals(currentName)) {
+                logger.debug("Non-sequential fallback from {} to {} for {}", currentName, alternative.getName(), providerClass.getSimpleName());
+                return alternative;
             }
         }
 
-        logger.error("No alternative provider available for {} after {}. Operation will likely fail.", providerClass.getSimpleName(), current.getName());
+        logger.error("No alternative provider available for {} after {}. Total available: {}. Loop detected if we return {}.", 
+            providerClass.getSimpleName(), currentName, available.size(), currentName);
         throw new NoSuchElementException("No alternative provider available for " + providerClass.getSimpleName());
     }
 
