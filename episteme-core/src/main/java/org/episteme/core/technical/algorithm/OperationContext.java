@@ -70,7 +70,11 @@ public final class OperationContext {
         /** Matrix Addition */
         MAT_ADD,
         /** Matrix Subtraction */
-        MAT_SUBTRACT
+        MAT_SUBTRACT,
+        /** QR Decomposition */
+        MAT_QR,
+        /** SVD Decomposition */
+        MAT_SVD
     }
 
     public static final OperationContext DEFAULT = new OperationContext.Builder().build();

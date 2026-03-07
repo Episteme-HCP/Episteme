@@ -65,27 +65,15 @@
         </dependency>
         <dependency>
             <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-native</artifactId>
+            <artifactId>nd4j-native-platform</artifactId>
             <version>${nd4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-native</artifactId>
-            <version>${nd4j.version}</version>
-            <classifier>${javacpp.platform}</classifier>
         </dependency>
 
         <!-- Apache Arrow (Native) -->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>arrow</artifactId>
+            <artifactId>arrow-platform</artifactId>
             <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>arrow</artifactId>
-            <version>${arrow.version}</version>
-            <classifier>${javacpp.platform}</classifier>
         </dependency>
 
         <!-- JOCL (OpenCL) -->
@@ -97,14 +85,8 @@
         
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>fftw</artifactId>
+            <artifactId>fftw-platform</artifactId>
             <version>3.3.10-${javacpp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>fftw</artifactId>
-            <version>3.3.10-${javacpp.version}</version>
-            <classifier>${javacpp.platform}</classifier>
         </dependency>
                 
         <!-- AutoService for SPI generation -->
@@ -130,14 +112,8 @@
         <!-- HDF5 Native Library -->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>hdf5</artifactId>
+            <artifactId>hdf5-platform</artifactId>
             <version>${hdf5.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>hdf5</artifactId>
-            <version>${hdf5.version}</version>
-            <classifier>${javacpp.platform}</classifier>
         </dependency>
 
         <!-- JavaCV / OpenCV for Vision -->

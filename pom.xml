@@ -80,7 +80,7 @@
     <resilience4j.version>2.2.0</resilience4j.version>
     <onnxruntime.version>1.17.1</onnxruntime.version>
     <nd4j.version>1.0.0-M2.1</nd4j.version>
-    <arrow.version>6.0.1-1.5.8</arrow.version>
+    <arrow.version>15.0.0-1.5.10</arrow.version>
     <ode4j.version>0.5.4</ode4j.version>
     <auto-service.version>1.1.1</auto-service.version>
     <jmh.version>1.37</jmh.version>

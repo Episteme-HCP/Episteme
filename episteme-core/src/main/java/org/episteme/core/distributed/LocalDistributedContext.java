@@ -126,19 +126,32 @@ public class LocalDistributedContext implements DistributedContext {
         }
     }
 
-    private final DoubleBuffer localMemory = DoubleBuffer.allocate(1000000);
+    private final java.util.concurrent.ConcurrentHashMap<Long, DoubleBuffer> localMemory = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Override
     public void put(DoubleBuffer source, int targetRank, long offset) {
+        // Create a copy of the source buffer to ensure data stability
+        DoubleBuffer copy = DoubleBuffer.allocate(source.remaining());
         int pos = source.position();
-        localMemory.put((int) offset, source, pos, source.remaining());
+        copy.put(source);
+        copy.flip();
+        source.position(pos); // Restore original position
+        localMemory.put(offset, copy);
     }
 
     @Override
     public void get(DoubleBuffer target, int sourceRank, long offset) {
-        int limit = target.remaining();
-        for (int i = 0; i < limit; i++) {
-            target.put(localMemory.get((int) offset + i));
+        DoubleBuffer source = localMemory.get(offset);
+        if (source != null) {
+            int pos = source.position();
+            target.put(source);
+            source.position(pos); // Restore original position
+        } else {
+            // Fill with zeros if not found
+            int remaining = target.remaining();
+            for (int i = 0; i < remaining; i++) {
+                target.put(0.0);
+            }
         }
     }
 
