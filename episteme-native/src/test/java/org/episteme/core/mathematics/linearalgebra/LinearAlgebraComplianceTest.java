@@ -209,6 +209,34 @@ public class LinearAlgebraComplianceTest {
                 verifyEigen(a, result);
             });
 
+            testOperation(res, "Determinant", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(SIZE, SIZE, rand);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                Real det = provider.determinant(a);
+                double expected = new SimpleMatrix(aData).determinant();
+                assertEquals(expected, det.doubleValue(), 1e-7);
+            });
+
+            testOperation(res, "Solve", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(SIZE, SIZE, rand);
+                double[] bData = new double[SIZE];
+                for (int i = 0; i < SIZE; i++) bData[i] = rand.nextGaussian();
+                
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                
+                Vector<Real> x = provider.solve(a, b);
+                SimpleMatrix matA = new SimpleMatrix(aData);
+                SimpleMatrix vecB = new SimpleMatrix(SIZE, 1, true, bData);
+                SimpleMatrix expectedX = matA.solve(vecB);
+                
+                for (int i = 0; i < SIZE; i++) {
+                    assertEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-7);
+                }
+            });
+
             results.add(res);
         }
 

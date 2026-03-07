@@ -252,6 +252,32 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
              throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Matrix<org.episteme.core.mathematics.numbers.real.Real> transpose(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
+        if (!IS_AVAILABLE || DOMATCOPY == null) return LinearAlgebraProvider.super.transpose(a);
+        
+        int rows = a.rows();
+        int cols = a.cols();
+        
+        org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix res = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.direct(cols, rows);
+        
+        try (Arena arena = Arena.ofConfined()) {
+            double[] arrA = toDoubleArray(a);
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, arrA.length);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
+            
+            MemorySegment segC = MemorySegment.ofBuffer(res.getBuffer());
+            
+            // cblas_domatcopy(layout, trans, rows, cols, alpha, A, lda, B, ldb)
+            // trans=CblasTrans (112)
+            DOMATCOPY.invokeExact(CblasRowMajor, 112, (long)rows, (long)cols, 1.0, segA, (long)cols, segC, (long)rows);
+            return res;
+        } catch (Throwable t) {
+            logger.error("FFM BLAS Transpose failed", t);
+            return LinearAlgebraProvider.super.transpose(a);
+        }
+    }
     
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> inverse(Matrix<org.episteme.core.mathematics.numbers.real.Real> A) {

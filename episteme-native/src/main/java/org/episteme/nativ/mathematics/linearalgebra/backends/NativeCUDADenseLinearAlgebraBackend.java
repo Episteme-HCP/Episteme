@@ -48,6 +48,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static MethodHandle CUBLAS_CREATE;
     private static MethodHandle CUBLAS_DESTROY;
     private static MethodHandle CUBLAS_DGEMM;
+    private static MethodHandle CUBLAS_DGEAM;
     private static MethodHandle CUDA_MALLOC;
     private static MethodHandle CUDA_FREE;
     private static MethodHandle CUDA_MEMCPY;
@@ -181,6 +182,53 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public boolean isCompatible(Ring<?> ring) { return ring instanceof Reals; }
+
+    @Override
+    public Matrix<Real> transpose(Matrix<Real> a) {
+        ensureInitialized();
+        int m = a.rows();
+        int n = a.cols();
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_A = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment d_C = arena.allocate(ValueLayout.ADDRESS);
+            
+            checkCuda(CUDA_MALLOC.invokeExact(d_A, (long)m * n * Double.BYTES));
+            checkCuda(CUDA_MALLOC.invokeExact(d_C, (long)m * n * Double.BYTES));
+            
+            try {
+                checkCuda(CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), h_A, (long)m * n * Double.BYTES, 1));
+                
+                MemorySegment handle = arena.allocate(ValueLayout.ADDRESS);
+                checkCublas(CUBLAS_CREATE.invokeExact(handle));
+                
+                try {
+                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
+                    MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
+                    
+                    // cublasDgeam(handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc)
+                    // We use CUBLAS_OP_T for transa to perform C = alpha * A^T + beta * B
+                    // Here B is null/not used as beta is 0.0
+                    checkCublas(CUBLAS_DGEAM.invokeExact(handle.get(ValueLayout.ADDRESS, 0), 
+                        1, 0, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), m, beta, MemorySegment.NULL, m, d_C.get(ValueLayout.ADDRESS, 0), n));
+                    
+                    double[] resultData = new double[m * n];
+                    checkCuda(CUDA_MEMCPY.invokeExact(MemorySegment.ofArray(resultData), d_C.get(ValueLayout.ADDRESS, 0), (long)m * n * Double.BYTES, 2));
+                    
+                    return fromDoubleArray(resultData, n, m);
+                } finally {
+                    checkCublas(CUBLAS_DESTROY.invokeExact(handle.get(ValueLayout.ADDRESS, 0)));
+                }
+            } finally {
+                checkCuda(CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0)));
+                checkCuda(CUDA_FREE.invokeExact(d_C.get(ValueLayout.ADDRESS, 0)));
+            }
+        } catch (Throwable t) {
+            logger.error("CUDA Transpose failed, falling back", t);
+            return fallback().transpose(a);
+        }
+    }
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {

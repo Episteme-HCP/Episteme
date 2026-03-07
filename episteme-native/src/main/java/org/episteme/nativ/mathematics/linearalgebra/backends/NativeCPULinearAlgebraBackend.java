@@ -405,5 +405,34 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         return LinearAlgebraProvider.super.transpose(a);
     }
 
+    @Override
+    public Real determinant(Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+            int n = a.rows();
+            RealDoubleMatrix copy = RealDoubleMatrix.direct(n, n);
+            copy.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            copy.getBuffer().position(0);
+
+            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
+                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+            
+            int info = dgetrf(n, n, copy.getBuffer(), n, ipiv);
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+            if (info > 0) return Real.ZERO; // Singular matrix
+
+            double det = 1.0;
+            int swaps = 0;
+            for (int i = 0; i < n; i++) {
+                det *= copy.get(i, i).doubleValue();
+                if (ipiv.get(i) != (i + 1)) {
+                    swaps++;
+                }
+            }
+            if (swaps % 2 != 0) det = -det;
+            return Real.of(det);
+        }
+        return LinearAlgebraProvider.super.determinant(a);
+    }
+
     // Other methods default to UnsupportedOperationException
 }

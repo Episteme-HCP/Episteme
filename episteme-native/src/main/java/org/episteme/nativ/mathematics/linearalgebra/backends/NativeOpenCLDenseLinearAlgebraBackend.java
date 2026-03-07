@@ -46,6 +46,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel vecSubKernel;
     private static cl_kernel vecScaleKernel;
     private static cl_kernel vecDotPartialKernel;
+    private static cl_kernel transposeKernel;
     private static cl_kernel gaussElimPhase1Kernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
@@ -80,6 +81,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "        for (int j = k + 1; j < n; j++) a[i*n + j] -= factor * a[k*n + j];\n" +
         "        a[i*n + k] = 0.0;\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void transpose(__global const double *a, __global double *b, const int rows, const int cols) {\n" +
+        "    int r = get_global_id(1); int c = get_global_id(0);\n" +
+        "    if (r < rows && c < cols) b[c * rows + r] = a[r * cols + c];\n" +
         "}\n";
 
     private static synchronized void init() {
@@ -126,6 +131,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clBuildProgram(program, 0, null, null, null, null);
             
             matMulKernel = clCreateKernel(program, "matrixMultiply", null);
+            transposeKernel = clCreateKernel(program, "transpose", null);
             vecAddKernel = clCreateKernel(program, "vec_add", null);
             vecSubKernel = clCreateKernel(program, "vec_sub", null);
             vecScaleKernel = clCreateKernel(program, "vec_scale", null);
@@ -156,6 +162,42 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     @Override public String getName() { return "Native OpenCL Dense Backend"; }
     @Override public int getPriority() { return 105; }
     @Override public boolean isCompatible(Ring<?> ring) { return ring instanceof Reals; }
+
+    @Override
+    public Matrix<Real> transpose(Matrix<Real> a) {
+        init();
+        if (!initialized) return fallback().transpose(a);
+
+        int rows = a.rows();
+        int cols = a.cols();
+        double[] srcData = toDoubleArray(a);
+        double[] dstData = new double[rows * cols];
+
+        try {
+            Pointer pSrc = Pointer.to(srcData);
+            Pointer pDst = Pointer.to(dstData);
+
+            cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * rows * cols, pSrc, null);
+            cl_mem memB = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * rows * cols, null, null);
+
+            clSetKernelArg(transposeKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(transposeKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(transposeKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{rows}));
+            clSetKernelArg(transposeKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{cols}));
+
+            long[] globalWorkSize = new long[]{cols, rows};
+            clEnqueueNDRangeKernel(commandQueue, transposeKernel, 2, null, globalWorkSize, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, memB, CL_TRUE, 0, rows * cols * Sizeof.cl_double, pDst, 0, null, null);
+
+            clReleaseMemObject(memA);
+            clReleaseMemObject(memB);
+
+            return fromDoubleArray(dstData, cols, rows);
+        } catch (Exception e) {
+            logger.error("OpenCL Transpose failed, falling back", e);
+            return fallback().transpose(a);
+        }
+    }
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
