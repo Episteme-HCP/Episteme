@@ -51,46 +51,24 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
             try {
                 Linker linker = Linker.nativeLinker();
                 
-                // Load miniaudio functions (assuming miniaudio symbols are exported)
-                // ma_result ma_device_init(ma_context* pContext, const ma_device_config* pConfig, ma_device* pDevice);
-                // simplified signature for now
-                try {
-                     MA_DEVICE_INIT = linker.downcallHandle(
-                            LOOKUP.find("ma_device_init").orElseThrow(),
-                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-                    );
-                    
-                    MA_DEVICE_START = linker.downcallHandle(
-                            LOOKUP.find("ma_device_start").orElseThrow(),
-                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-                    );
+                MA_DEVICE_INIT = NativeLibraryLoader.findSymbol(LOOKUP, "ma_device_init")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+                
+                MA_DEVICE_START = NativeLibraryLoader.findSymbol(LOOKUP, "ma_device_start")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                    MA_DEVICE_STOP = linker.downcallHandle(
-                            LOOKUP.find("ma_device_stop").orElseThrow(),
-                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-                    );
+                MA_DEVICE_STOP = NativeLibraryLoader.findSymbol(LOOKUP, "ma_device_stop")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                    // ma_result ma_decoder_init_file(const char* pFilePath, const ma_decoder_config* pConfig, ma_decoder* pDecoder);
-                     MA_DECODER_INIT_FILE = linker.downcallHandle(
-                            LOOKUP.find("ma_decoder_init_file").orElseThrow(),
-                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-                    );
-                    
-                     // ma_uint64 ma_decoder_get_length_in_pcm_frames(ma_decoder* pDecoder);
-                     MA_DECODER_GET_LENGTH = linker.downcallHandle(
-                            LOOKUP.find("ma_decoder_get_length_in_pcm_frames").orElseThrow(),
-                            FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS)
-                    );
+                MA_DECODER_INIT_FILE = NativeLibraryLoader.findSymbol(LOOKUP, "ma_decoder_init_file")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
+                
+                MA_DECODER_GET_LENGTH = NativeLibraryLoader.findSymbol(LOOKUP, "ma_decoder_get_length_in_pcm_frames")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS))).orElse(null);
 
-                    avail = true;
-                } catch (RuntimeException e) {
-                     // Symbols missing, partial loading
-                     logger.error("NativeAudioBackend: Symbols missing in native library. {}", e.getMessage());
-                     avail = false;
-                }
-
+                avail = (MA_DEVICE_INIT != null && MA_DEVICE_START != null);
             } catch (Throwable t) {
-                // If symbols missing, mark unavailable
+                logger.error("NativeAudioBackend: Initialization failed. {}", t.getMessage());
                 avail = false;
             }
         } else {

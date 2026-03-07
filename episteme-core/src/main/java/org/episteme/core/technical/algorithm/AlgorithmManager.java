@@ -202,8 +202,8 @@ public final class AlgorithmManager {
         if (index >= 0 && index < available.size() - 1) {
             for (int i = index + 1; i < available.size(); i++) {
                 P next = available.get(i);
-                // Skip if it's the same class to avoid infinite loops when operating on the same logic
-                if (!next.getClass().equals(current.getClass())) {
+                // Skip if it's the same class or same name to avoid infinite loops when operating on the same logic
+                if (!next.getClass().equals(current.getClass()) && !next.getName().equals(current.getName())) {
                     logger.debug("Falling back from {} to {} for {}", current.getName(), next.getName(), providerClass.getSimpleName());
                     return next;
                 }

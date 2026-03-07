@@ -32,18 +32,38 @@ public class NativeLibraryLoader {
     private static final java.util.Map<String, SymbolLookup> LOADED_LIBS = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
-     * Finds the "libs" directory by searching upwards from user.dir.
+     * Finds the "libs" directory by searching upwards and checking module paths.
      */
-    public static java.nio.file.Path findLibsDirectory() {
+    public static List<java.nio.file.Path> findLibsDirectories() {
+        List<java.nio.file.Path> paths = new ArrayList<>();
         java.nio.file.Path current = java.nio.file.Paths.get(System.getProperty("user.dir"));
-        while (current != null) {
-            java.nio.file.Path libs = current.resolve("libs");
+        
+        // 1. Search upwards for "libs"
+        java.nio.file.Path temp = current;
+        while (temp != null) {
+            java.nio.file.Path libs = temp.resolve("libs");
             if (java.nio.file.Files.exists(libs) && java.nio.file.Files.isDirectory(libs)) {
-                return libs.toAbsolutePath();
+                paths.add(libs.toAbsolutePath());
             }
-            current = current.getParent();
+            temp = temp.getParent();
         }
-        return null;
+
+        // 2. Check common module libs locations
+        String[] modules = {"episteme-native", "episteme-jni", "episteme-core", "episteme-natural"};
+        temp = current;
+        while (temp != null) {
+            for (String mod : modules) {
+                java.nio.file.Path modLibs = temp.resolve(mod).resolve("libs");
+                if (java.nio.file.Files.exists(modLibs) && java.nio.file.Files.isDirectory(modLibs)) {
+                    paths.add(modLibs.toAbsolutePath());
+                }
+            }
+            // If we find pom.xml, we are likely at root, stop or keep going? 
+            // Keep going just in case of nested structures.
+            temp = temp.getParent();
+        }
+        
+        return paths;
     }
 
     private static final java.util.Set<String> PRELOADED_RUNTIMES = new java.util.HashSet<>();
@@ -135,6 +155,9 @@ public class NativeLibraryLoader {
                 variants.add("parquet");
                 variants.add("arrow_dataset");
                 variants.add("arrow_acero");
+            } else if (libName.contains("bullet")) {
+                variants.add("bullet_capi");
+                variants.add("libbullet_capi");
             }
         }
 
@@ -158,16 +181,15 @@ public class NativeLibraryLoader {
                 variants.add("cudart");
                 variants.add("cudart.so.12");
                 variants.add("cudart.so.11");
-            } else if (libName.equals("cusolver")) {
-                variants.add("cusolver");
-                variants.add("cusolver.so.11");
-                variants.add("cusolver.so.10");
+            } else if (libName.contains("bullet")) {
+                variants.add("bullet_capi");
+                variants.add("bullet");
             }
         }
 
-        java.nio.file.Path discoveredLibs = findLibsDirectory();
-        if (discoveredLibs != null) {
-            preloadRuntimes(discoveredLibs, arena);
+        List<java.nio.file.Path> discoveredPaths = findLibsDirectories();
+        for (java.nio.file.Path p : discoveredPaths) {
+            preloadRuntimes(p, arena);
         }
 
         for (String variant : variants) {
@@ -201,7 +223,9 @@ public class NativeLibraryLoader {
 
             // 2. Try custom search paths
             List<String> searchPaths = new ArrayList<>();
-            if (discoveredLibs != null) searchPaths.add(discoveredLibs.toString());
+            for (java.nio.file.Path p : discoveredPaths) {
+                searchPaths.add(p.toString());
+            }
             
             String envCudaPath = System.getenv("CUDA_PATH");
             if (envCudaPath != null) {
@@ -217,7 +241,6 @@ public class NativeLibraryLoader {
             }
             
             searchPaths.add(System.getProperty("user.dir"));
-            searchPaths.add(System.getProperty("user.dir") + java.io.File.separator + "libs");
             
             for (String path : searchPaths) {
                 if (path == null || path.isEmpty()) continue; 
@@ -291,8 +314,13 @@ public class NativeLibraryLoader {
         for (String name : names) {
             Optional<MemorySegment> segment = lookup.find(name);
             if (segment.isPresent()) return segment;
-            segment = lookup.find("_" + name);
-            if (segment.isPresent()) return segment;
+            
+            // Try common suffixes/prefixes
+            String[] variants = {"_" + name, name + "_", "__" + name};
+            for (String v : variants) {
+                segment = lookup.find(v);
+                if (segment.isPresent()) return segment;
+            }
         }
         return Optional.empty();
     }
