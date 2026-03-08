@@ -89,8 +89,34 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 logger.warn("Native CUDA/cuBLAS libraries not found (cudart={}, cublas={})", cudaRtOpt.isPresent(), cublasOpt.isPresent());
                 return;
             }
-            
+
+            // CRITICAL: Verify actual GPU hardware presence via cudaGetDeviceCount
             SymbolLookup cudart = cudaRtOpt.get();
+            Optional<MemorySegment> deviceCountSym = NativeLibraryLoader.findSymbol(cudart, "cudaGetDeviceCount");
+            if (deviceCountSym.isPresent()) {
+                try {
+                    MethodHandle getDeviceCount = LINKER.downcallHandle(deviceCountSym.get(),
+                        FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                    try (Arena tempArena = Arena.ofConfined()) {
+                        MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
+                        int cudaResult = (int) getDeviceCount.invokeExact(countPtr);
+                        int deviceCount = countPtr.get(ValueLayout.JAVA_INT, 0);
+                        if (cudaResult != 0 || deviceCount <= 0) {
+                            logger.warn("No CUDA-capable GPU devices found (result={}, count={}). Backend disabled.", cudaResult, deviceCount);
+                            return;
+                        }
+                        logger.info("Found {} CUDA-capable GPU device(s).", deviceCount);
+                    }
+                } catch (Throwable t) {
+                    logger.warn("cudaGetDeviceCount check failed: {}. Backend disabled.", t.getMessage());
+                    return;
+                }
+            } else {
+                logger.warn("cudaGetDeviceCount symbol not found — cannot verify GPU presence. Backend disabled.");
+                return;
+            }
+            
+            // cudart already assigned above
             cublas = cublasOpt.get();
 
             // CUDA Runtime Memory Management
@@ -289,8 +315,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(res2);
             }
         } catch (Throwable t) {
-            logger.error("CUDA Transpose failed, falling back", t);
-            return fallback().transpose(a);
+            throw new RuntimeException("CUDA Transpose failed (no fallback in benchmark mode)", t);
         }
     }
 
@@ -375,7 +400,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) return LinearAlgebraProvider.super.solve(a, b);
+        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException("CUDA not available for solve()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for solve");
@@ -447,14 +472,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(resD);
             }
         } catch (Throwable t) {
-            logger.error("CUDA solve failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.solve(a, b);
+            throw new RuntimeException("CUDA solve failed (no fallback in benchmark mode)", t);
         }
     }
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) return LinearAlgebraProvider.super.inverse(a);
+        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException("CUDA not available for inverse()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for inverse");
@@ -538,14 +562,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(resD);
             }
         } catch (Throwable t) {
-            logger.error("CUDA inverse failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.inverse(a);
+            throw new RuntimeException("CUDA inverse failed (no fallback in benchmark mode)", t);
         }
     }
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) return LinearAlgebraProvider.super.determinant(a);
+        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException("CUDA not available for determinant()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for determinant");
@@ -618,8 +641,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(rdD);
             }
         } catch (Throwable t) {
-            logger.error("CUDA determinant failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.determinant(a);
+            throw new RuntimeException("CUDA determinant failed (no fallback in benchmark mode)", t);
         }
     }
 
@@ -657,7 +679,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGEQRF == null) return LinearAlgebraProvider.super.qr(a);
+        if (!IS_AVAILABLE || CUSOLVER_DGEQRF == null) throw new UnsupportedOperationException("CUDA not available for qr()");
 
         int m = a.rows();
         int n = a.cols();
@@ -752,14 +774,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            logger.error("CUDA QR failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.qr(a);
+            throw new RuntimeException("CUDA QR failed (no fallback in benchmark mode)", t);
         }
     }
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGESVD == null) return LinearAlgebraProvider.super.svd(a);
+        if (!IS_AVAILABLE || CUSOLVER_DGESVD == null) throw new UnsupportedOperationException("CUDA not available for svd()");
 
         int m = a.rows();
         int n = a.cols();
@@ -858,8 +879,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            logger.error("CUDA SVD failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.svd(a);
+            throw new RuntimeException("CUDA SVD failed (no fallback in benchmark mode)", t);
         }
     }
 
@@ -872,7 +892,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     @Override public void selectDevice(int deviceId) { }
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DPOTRF == null) return LinearAlgebraProvider.super.cholesky(a);
+        if (!IS_AVAILABLE || CUSOLVER_DPOTRF == null) throw new UnsupportedOperationException("CUDA not available for cholesky()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Cholesky");
@@ -934,14 +954,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            logger.error("CUDA Cholesky failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.cholesky(a);
+            throw new RuntimeException("CUDA Cholesky failed (no fallback in benchmark mode)", t);
         }
     }
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRF == null) return LinearAlgebraProvider.super.lu(a);
+        if (!IS_AVAILABLE || CUSOLVER_DGETRF == null) throw new UnsupportedOperationException("CUDA not available for lu()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for LU");
@@ -1042,13 +1061,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            logger.error("CUDA LU failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.lu(a);
+            throw new RuntimeException("CUDA LU failed (no fallback in benchmark mode)", t);
         }
     }
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DSYEVD == null) return LinearAlgebraProvider.super.eigen(a);
+        if (!IS_AVAILABLE || CUSOLVER_DSYEVD == null) throw new UnsupportedOperationException("CUDA not available for eigen()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Eigen");
@@ -1121,8 +1139,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            logger.error("CUDA Eigen failed: {}", t.getMessage());
-            return LinearAlgebraProvider.super.eigen(a);
+            throw new RuntimeException("CUDA Eigen failed (no fallback in benchmark mode)", t);
         }
     }
 
