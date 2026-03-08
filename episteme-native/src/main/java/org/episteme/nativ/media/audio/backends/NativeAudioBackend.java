@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Native Audio Backend using miniaudio (via Panama FFM) for low-latency playback.
- * This backend provides direct access to audio hardware, bypassing JavaSound limitations.
+ * Native Audio Backend using standalone miniaudio library (via Panama FFM).
+ * This backend provides direct access to audio hardware.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -47,6 +47,7 @@ public class NativeAudioBackend implements AudioBackend, NativeBackend, CPUBacke
     private static MethodHandle MA_DECODER_GET_LENGTH;
 
     static {
+        // Load standalone miniaudio library from /libs
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("miniaudio", Arena.global());
         if (lib.isEmpty()) {
             // Also try 'portaudio' as alternative if miniaudio is not bundled

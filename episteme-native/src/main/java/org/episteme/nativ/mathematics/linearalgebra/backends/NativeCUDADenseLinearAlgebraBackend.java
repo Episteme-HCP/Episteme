@@ -22,7 +22,9 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.core.technical.algorithm.ProviderExecutionMode;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
@@ -106,9 +108,19 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                             return;
                         }
                         logger.info("Found {} CUDA-capable GPU device(s).", deviceCount);
+
+                        // KICKSTART: Force CUDA context creation to avoid CUSOLVER_STATUS_NOT_INITIALIZED (Error 1)
+                        // This is a common trick: calling any CUDA function that requires a context.
+                        Optional<MemorySegment> freeSym = NativeLibraryLoader.findSymbol(cudart, "cudaFree");
+                        if (freeSym.isPresent()) {
+                            MethodHandle cudaFree = LINKER.downcallHandle(freeSym.get(), 
+                                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                            cudaFree.invokeExact(MemorySegment.NULL);
+                            logger.info("CUDA primary context kickstarted successfully.");
+                        }
                     }
                 } catch (Throwable t) {
-                    logger.warn("cudaGetDeviceCount check failed: {}. Backend disabled.", t.getMessage());
+                    logger.warn("CUDA initialization/kickstart check failed: {}. Backend disabled.", t.getMessage());
                     return;
                 }
             } else {
@@ -315,9 +327,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(res2);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA Transpose failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA Transpose failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA Transpose failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.transpose(a);
         }
     }
+
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
@@ -394,9 +411,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             return result;
 
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA GPU execution error", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA multiply failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA multiply failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.multiply(a, b);
         }
     }
+
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
@@ -472,9 +494,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(resD);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA solve failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA solve failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA solve failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.solve(a, b);
         }
     }
+
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
@@ -562,9 +589,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(resD);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA inverse failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA inverse failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA inverse failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.inverse(a);
         }
     }
+
 
     @Override
     public Real determinant(Matrix<Real> a) {
@@ -641,9 +673,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 checkCuda(rdD);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA determinant failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA determinant failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA determinant failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.determinant(a);
         }
     }
+
 
     private void checkCuda(int result) {
         if (result != 0) throw new RuntimeException("CUDA Error: " + result);
@@ -774,9 +811,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA QR failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA QR failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA QR failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.qr(a);
         }
     }
+
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
@@ -879,9 +921,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA SVD failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA SVD failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA SVD failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.svd(a);
         }
     }
+
 
     private Vector<Real> fromDoubleVec(double[] d) {
         return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
@@ -954,9 +1001,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA Cholesky failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA Cholesky failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA Cholesky failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.cholesky(a);
         }
     }
+
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
@@ -1061,9 +1113,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA LU failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA LU failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA LU failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.lu(a);
         }
     }
+
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
         if (!IS_AVAILABLE || CUSOLVER_DSYEVD == null) throw new UnsupportedOperationException("CUDA not available for eigen()");
@@ -1139,9 +1196,14 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA Eigen failed (no fallback in benchmark mode)", t);
+            if (!ProviderExecutionMode.isFallbackAllowed()) {
+                throw new RuntimeException("CUDA Eigen failed and fallback is disabled during benchmarking/autotuning", t);
+            }
+            logger.warn("CUDA Eigen failed, falling back to CPU implementation: {}", t.getMessage());
+            return LinearAlgebraProvider.super.eigen(a);
         }
     }
+
 
     @Override
     public void copyToGPU(long handle, java.nio.DoubleBuffer buffer, long count) {

@@ -26,6 +26,8 @@ package org.episteme.benchmarks.benchmark;
 import java.util.ArrayList;
 import java.util.List;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.technical.algorithm.ProviderExecutionMode;
+
 
 
 /**
@@ -58,7 +60,12 @@ public class BenchmarkRunner {
         org.episteme.core.technical.monitoring.DistributedMonitor monitor = 
                 org.episteme.core.technical.monitoring.DistributedMonitor.getInstance();
 
-        for (RunnableBenchmark b : benchmarks) {
+        // Disable provider fallbacks for the duration of the benchmark suite
+        ProviderExecutionMode.set(ProviderExecutionMode.Mode.BENCHMARK);
+        
+        try {
+            for (RunnableBenchmark b : benchmarks) {
+
             // Apply filter if present
             if (filter != null && !filter.isEmpty()) {
                 boolean matchId = b.getId().toLowerCase().contains(filter.toLowerCase());
@@ -118,7 +125,11 @@ public class BenchmarkRunner {
                 System.err.println(I18N.getInstance().get("benchmark.failed", b.getName(), e.getMessage()));
             }
         }
+        } finally {
+            ProviderExecutionMode.reset();
+        }
     }
+
 
     public void exportCharts() {
         // JFreeChart removed. Charts are now handled natively in the Episteme Studio GUI.

@@ -43,3 +43,13 @@ docs/benchmark-results/
 /tmp/
 build_log*.txt
 FETCH_HEAD
+
+# Native Build Artifacts
+build_vision/
+*.obj
+*.exp
+*.lib
+**/build/
+**/Release/
+**/Debug/
+**/x64/
