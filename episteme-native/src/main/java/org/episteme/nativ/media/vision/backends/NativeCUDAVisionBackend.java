@@ -41,7 +41,7 @@ public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, Nativ
         return "cuda";
     }
 
-    @Override public String getType() { return "vision"; }
+    @Override public String getType() { return "Computer Vision"; }
     @Override public String getId() { return "native-cuda-vision"; }
     @Override public String getDescription() { return "GPU-accelerated image processing using NVIDIA CUDA."; }
     @Override

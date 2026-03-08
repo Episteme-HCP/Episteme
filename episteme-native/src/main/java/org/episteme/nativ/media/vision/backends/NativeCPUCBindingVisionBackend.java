@@ -81,7 +81,7 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
 
     @Override
     public String getType() {
-        return "vision";
+        return "Computer Vision";
     }
 
     @Override
