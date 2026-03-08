@@ -80,8 +80,9 @@ public class JavaCVMediaBackend implements VideoBackend, AudioBackend, VisionBac
     @Override public <T> T grabFrame() {
         try {
             if (grabber != null) {
-                org.bytedeco.javacv.Java2DFrameConverter converter = new org.bytedeco.javacv.Java2DFrameConverter();
-                return (T) converter.convert(grabber.grabImage());
+                try (org.bytedeco.javacv.Java2DFrameConverter converter = new org.bytedeco.javacv.Java2DFrameConverter()) {
+                    return (T) converter.convert(grabber.grabImage());
+                }
             }
         } catch (Exception e) {}
         return null;
