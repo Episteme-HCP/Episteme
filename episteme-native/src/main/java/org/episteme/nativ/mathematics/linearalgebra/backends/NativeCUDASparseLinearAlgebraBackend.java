@@ -39,55 +39,50 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDASparseLinearAlgebraBackend.class);
     private static final Linker LINKER = Linker.nativeLinker();
-
-
-    private final SymbolLookup cuda;
-    private final SymbolLookup cublas;
     
     private MethodHandle cuDeviceGetCount;
     private MethodHandle cublasDgemm;
 
     public NativeCUDASparseLinearAlgebraBackend() {
-        SymbolLookup cudaLookup = null;
-        SymbolLookup cublasLookup = null;
         try {
-            cudaLookup = NativeLibraryLoader.loadLibrary("cuda");
-            cublasLookup = NativeLibraryLoader.loadLibrary("cublas");
+            SymbolLookup cudaLookup = NativeLibraryLoader.loadLibrary("cuda", Arena.global()).orElse(null);
+            SymbolLookup cublasLookup = NativeLibraryLoader.loadLibrary("cublas", Arena.global()).orElse(null);
             
-            cuDeviceGetCount = LINKER.downcallHandle(
-                cudaLookup.find("cuDeviceGetCount").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-            );
+            if (cudaLookup != null) {
+                cuDeviceGetCount = LINKER.downcallHandle(
+                    cudaLookup.find("cuDeviceGetCount").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                );
+            }
 
-            // CUBLAS DGEMM: cublasStatus_t cublasDgemm(cublasHandle_t handle, ...)
-            cublasDgemm = LINKER.downcallHandle(
-                cublasLookup.find("cublasDgemm_v2").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                    ValueLayout.ADDRESS, // handle
-                    ValueLayout.JAVA_INT, // transa
-                    ValueLayout.JAVA_INT, // transb
-                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, // m, n, k
-                    ValueLayout.ADDRESS, // alpha
-                    ValueLayout.ADDRESS, // A
-                    ValueLayout.JAVA_INT, // lda
-                    ValueLayout.ADDRESS, // B
-                    ValueLayout.JAVA_INT, // ldb
-                    ValueLayout.ADDRESS, // beta
-                    ValueLayout.ADDRESS, // C
-                    ValueLayout.JAVA_INT  // ldc
-                )
-            );
-            
+            if (cublasLookup != null) {
+                // CUBLAS DGEMM: cublasStatus_t cublasDgemm(cublasHandle_t handle, ...)
+                cublasDgemm = LINKER.downcallHandle(
+                    cublasLookup.find("cublasDgemm_v2").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, // handle
+                        ValueLayout.JAVA_INT, // transa
+                        ValueLayout.JAVA_INT, // transb
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, // m, n, k
+                        ValueLayout.ADDRESS, // alpha
+                        ValueLayout.ADDRESS, // A
+                        ValueLayout.JAVA_INT, // lda
+                        ValueLayout.ADDRESS, // B
+                        ValueLayout.JAVA_INT, // ldb
+                        ValueLayout.ADDRESS, // beta
+                        ValueLayout.ADDRESS, // C
+                        ValueLayout.JAVA_INT  // ldc
+                    )
+                );
+            }
         } catch (Exception e) {
             // Silently mark unavailable
         }
-        this.cuda = cudaLookup;
-        this.cublas = cublasLookup;
     }
 
     @Override
     public DeviceInfo[] getDevices() {
-        if (cuda == null) return new DeviceInfo[0];
+        if (cuDeviceGetCount == null) return new DeviceInfo[0];
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment countPtr = arena.allocate(ValueLayout.JAVA_INT);
             cuDeviceGetCount.invoke(countPtr);
@@ -161,13 +156,13 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     }
 
     @Override
-    public String getName() { return "Panama/CUDA Backend"; }
+    public String getName() { return "Panama/CUDA Backend (Legacy/Disabled)"; }
 
     @Override
-    public boolean isAvailable() { return cuda != null && cublas != null; }
+    public boolean isAvailable() { return false; }
 
     @Override
-    public boolean isLoaded() { return cuda != null && cublas != null; }
+    public boolean isLoaded() { return false; }
 
     @Override
     public String getNativeLibraryName() { return "cuda"; }

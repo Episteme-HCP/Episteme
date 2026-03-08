@@ -1,24 +1,27 @@
 # Script to compile episteme-native.dll via CMake and copy it to the libs directory
 
 $buildDir = "episteme-native\build_vision"
-$sourceDir = "episteme-native\src\main\cpp"
-$outputDir = "episteme-native\libs"
+$outputDir = "libs"
 
 if (Test-Path $buildDir) { Remove-Item -Recurse -Force $buildDir }
 New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
 Set-Location $buildDir
 
 Write-Host "Configuring CMake..."
+$vcvars = "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat"
 $absSourceDir = Join-Path $PSScriptRoot "episteme-native\src\main\cpp"
-cmake $absSourceDir -G "Visual Studio 18 2026" -A x64
+
+cmd /c "`"$vcvars`" x64 && cmake `"$absSourceDir`" -G `"Visual Studio 18 2026`" -A x64"
 
 Write-Host "Building Release..."
-cmake --build . --config Release
+cmd /c "`"$vcvars`" x64 && cmake --build . --config Release"
 
-Set-Location "../../.."
+Set-Location $PSScriptRoot
 
 if (!(Test-Path $outputDir)) { New-Item -ItemType Directory -Force -Path $outputDir | Out-Null }
 Write-Host "Copying episteme-native.dll to libs..."
-Copy-Item "$buildDir\Release\episteme-native.dll" -Destination "$outputDir\episteme-native.dll" -Force
+$absBuildRel = Join-Path $PSScriptRoot "$buildDir\Release\episteme-native.dll"
+$absDest = Join-Path $PSScriptRoot "$outputDir\episteme-native.dll"
+Copy-Item $absBuildRel -Destination $absDest -Force
 
 Write-Host "Done!"

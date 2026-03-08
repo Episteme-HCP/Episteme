@@ -17,6 +17,9 @@ import javafx.stage.FileChooser;
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.technical.algorithm.ProviderExecutionMode;
+import org.episteme.core.technical.algorithm.ProviderExecutionMode.Mode;
+
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -638,8 +641,13 @@ public class MainController {
             RunnableBenchmark b = item.getBenchmark();
             if (b == null) return;
             
-            // Check availability logic as requested
-            if (!b.isAvailable()) {
+            // Disable provider fallbacks for the duration of the benchmark run
+            ProviderExecutionMode.set(Mode.BENCHMARK);
+            
+            try {
+                // Check availability logic as requested
+                if (!b.isAvailable()) {
+
                 Platform.runLater(() -> {
                     item.statusProperty().set("Skipped (Unavailable)");
                     item.resultProperty().set("N/A");
@@ -648,7 +656,6 @@ public class MainController {
                 return;
             }
     
-            try {
                 Platform.runLater(() -> item.statusProperty().set("Running..."));
                 b.setup();
             
@@ -749,9 +756,12 @@ public class MainController {
                     updateCategoryStatuses(benchmarkTreeTable.getRoot());
                 });
             }
+        } finally {
+            ProviderExecutionMode.reset();
         }
       } // End synchronized
     }
+
 
     // Library-specific colors for visual distinction
     private static final String[] LIBRARY_COLORS = {
