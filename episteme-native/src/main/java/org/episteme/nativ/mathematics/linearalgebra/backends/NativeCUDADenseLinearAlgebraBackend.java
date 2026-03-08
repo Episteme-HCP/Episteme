@@ -115,8 +115,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                         if (freeSym.isPresent()) {
                             MethodHandle cudaFree = LINKER.downcallHandle(freeSym.get(), 
                                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                            cudaFree.invokeExact(MemorySegment.NULL);
-                            logger.info("CUDA primary context kickstarted successfully.");
+                            int res = (int) cudaFree.invokeExact(MemorySegment.NULL);
+                            logger.info("CUDA primary context kickstarted successfully (result={}).", res);
                         }
                     }
                 } catch (Throwable t) {
