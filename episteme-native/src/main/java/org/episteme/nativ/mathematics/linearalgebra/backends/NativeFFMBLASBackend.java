@@ -72,15 +72,13 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("openblas", arena);
         if (lib.isEmpty()) {
              lib = NativeLibraryLoader.loadLibrary("mkl_rt", arena);
-             if (lib.isEmpty()) {
-                 lib = NativeLibraryLoader.getSystemLookup();
-             }
         }
         
         if (lib.isPresent()) {
-             logger.debug("FFM: Successfully matched native library for FFM backend.");
+             logger.info("FFM: Successfully matched native library for FFM backend: {}", lib.get());
         } else {
-             logger.info("FFM: No suitable BLAS/LAPACK library found for FFM backend (OpenBLAS or MKL).");
+             logger.info("FFM: No local BLAS/LAPACK library found in libs/. Attempting system lookup (CAUTION: possible ABI mismatch).");
+             lib = NativeLibraryLoader.getSystemLookup();
         }
         
         LOOKUP = lib.orElse(null);
@@ -88,7 +86,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
         if (LOOKUP != null) {
             try {
-                // BLAS Handles
+                // BLAS Handles - Use JAVA_INT as standard, but we'll check availability
                 FunctionDescriptor dgemmDesc = FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
@@ -96,33 +94,35 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DGEMM = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dgemm")
-                    .map(s -> LINKER.downcallHandle(s, dgemmDesc)).orElse(null);
+                Optional<MemorySegment> dgemmSym = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dgemm", "dgemm_");
+                if (dgemmSym.isPresent()) {
+                    DGEMM = LINKER.downcallHandle(dgemmSym.get(), dgemmDesc);
+                }
 
                 FunctionDescriptor ddotDesc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DDOT = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_ddot")
+                DDOT = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_ddot", "ddot_")
                     .map(s -> LINKER.downcallHandle(s, ddotDesc)).orElse(null);
 
                 FunctionDescriptor dnrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DNRM2 = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dnrm2")
+                DNRM2 = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dnrm2", "dnrm2_")
                     .map(s -> LINKER.downcallHandle(s, dnrm2Desc)).orElse(null);
 
                 FunctionDescriptor daxpyDesc = FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DAXPY = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_daxpy")
+                DAXPY = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_daxpy", "daxpy_")
                     .map(s -> LINKER.downcallHandle(s, daxpyDesc)).orElse(null);
                 
                 FunctionDescriptor dscalDesc = FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DSCAL = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dscal")
+                DSCAL = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dscal", "dscal_")
                     .map(s -> LINKER.downcallHandle(s, dscalDesc)).orElse(null);
 
                 FunctionDescriptor dgemvDesc = FunctionDescriptor.ofVoid(
@@ -131,7 +131,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DGEMV = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dgemv")
+                DGEMV = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dgemv", "dgemv_")
                     .map(s -> LINKER.downcallHandle(s, dgemvDesc)).orElse(null);
 
                 FunctionDescriptor domatcopyDesc = FunctionDescriptor.ofVoid(
@@ -139,7 +139,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_LONG,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_LONG
                 );
-                DOMATCOPY = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_domatcopy", "mkl_domatcopy")
+                DOMATCOPY = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_domatcopy", "mkl_domatcopy", "domatcopy_")
                     .map(s -> LINKER.downcallHandle(s, domatcopyDesc)).orElse(null);
 
                 // LAPACK
@@ -155,14 +155,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
                 );
-                DGETRF = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgetrf")
+                DGETRF = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgetrf", "dgetrf_")
                     .map(s -> LINKER.downcallHandle(s, dgetrfDesc)).orElse(null);
 
                 FunctionDescriptor dgetriDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
                 );
-                DGETRI = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgetri")
+                DGETRI = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgetri", "dgetri_")
                     .map(s -> LINKER.downcallHandle(s, dgetriDesc)).orElse(null);
 
                 // QR Decomposition
