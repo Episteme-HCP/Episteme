@@ -5,14 +5,16 @@
 
 package org.episteme.nativ.media.vision.backends;
 
+import org.episteme.core.media.VisionBackend;
+import org.episteme.core.media.video.SceneTransitionDetector;
 import org.episteme.core.media.vision.ImageOp;
-import org.episteme.core.media.vision.VisionAlgorithmBackend;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 
+import java.awt.image.BufferedImage;
 import java.nio.DoubleBuffer;
 
 /**
@@ -26,8 +28,8 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
-public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, GPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, GPUBackend.class, NativeBackend.class})
+public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
 
     @Override
     public boolean isLoaded() {
@@ -58,27 +60,22 @@ public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, 
     }
 
     @Override
-    public Object apply(Object image, ImageOp<Object> op) {
-        if (!(image instanceof jcuda.driver.CUdeviceptr)) {
-            throw new IllegalArgumentException("Expected CUdeviceptr for NativeCUDAVisionBackend");
-        }
+    public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {
         return op.process(image);
     }
 
     @Override
-    public Object createImage(Object data, int width, int height) {
+    public BufferedImage createImage(Object data, int width, int height) {
         if (data instanceof int[]) {
-            int[] pixels = (int[]) data;
-            jcuda.driver.CUdeviceptr deviceData = new jcuda.driver.CUdeviceptr();
-            jcuda.driver.JCudaDriver.cuMemAlloc(deviceData, (long) pixels.length * 4);
-            jcuda.driver.JCudaDriver.cuMemcpyHtoD(deviceData, jcuda.Pointer.to(pixels), (long) pixels.length * 4);
-            return deviceData;
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            img.setRGB(0, 0, width, height, (int[]) data, 0, width);
+            return img;
         }
-        throw new UnsupportedOperationException("CUDA data upload only supported for int arrays for now.");
+        throw new UnsupportedOperationException("Standard VisionBackend only supports BufferedImage creation for now.");
     }
     
     @Override
-    public String getName() {
+    public String getBackendName() {
         return "CUDA Vision Backend";
     }
 
@@ -95,6 +92,10 @@ public class NativeCUDAVisionBackend implements VisionAlgorithmBackend<Object>, 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
+    }
+
+    public SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {
+        return null; // Implementation needed
     }
 
     @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }

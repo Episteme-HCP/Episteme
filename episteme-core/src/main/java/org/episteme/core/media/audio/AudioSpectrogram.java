@@ -25,6 +25,7 @@ package org.episteme.core.media.audio;
 
 import java.util.*;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
 
 /**
  * Convenience wrapper for frequency analysis using SignalFFT.
@@ -42,8 +43,13 @@ public final class AudioSpectrogram {
      * Uses the best available {@link org.episteme.core.mathematics.analysis.fft.FFTProvider}.
      */
     public static double[] calculateSpectrum(double[] buffer, WindowFunction window) {
+        AudioSpectrogramProvider provider = AlgorithmManager.getProvider(AudioSpectrogramProvider.class);
+        if (provider != null) {
+            return provider.calculateSpectrum(buffer, window);
+        }
+        
+        // Inline fallback if no provider found (should not happen if Default is registered)
         int n = buffer.length;
-        // FFT requires power of 2
         if ((n & (n - 1)) != 0) {
             int powerOfTwo = 1 << (31 - Integer.numberOfLeadingZeros(n));
             double[] truncated = new double[powerOfTwo];
@@ -54,31 +60,18 @@ public final class AudioSpectrogram {
         
         double[] real = buffer.clone();
         applyWindow(real, window);
-        double[] imag = new double[n]; // Init to 0
+        double[] imag = new double[n];
 
-        org.episteme.core.mathematics.analysis.fft.FFTProvider provider = findProvider();
-        double[][] result = provider.transform(real, imag);
+        // FFT lookup
+        org.episteme.core.mathematics.analysis.fft.FFTProvider fft = ServiceLoader.load(org.episteme.core.mathematics.analysis.fft.FFTProvider.class)
+                .findFirst().orElse(new org.episteme.core.mathematics.analysis.fft.providers.MulticoreFFTProvider());
         
-        double[] rReal = result[0];
-        double[] rImag = result[1];
-        
-        // Calculate magnitude
+        double[][] result = fft.transform(real, imag);
         double[] magnitude = new double[n / 2];
         for (int i = 0; i < n / 2; i++) {
-             // |z| = sqrt(a^2 + b^2)
-            magnitude[i] = Math.sqrt(rReal[i] * rReal[i] + rImag[i] * rImag[i]);
+            magnitude[i] = Math.sqrt(result[0][i] * result[0][i] + result[1][i] * result[1][i]);
         }
-        
         return magnitude;
-    }
-
-    private static org.episteme.core.mathematics.analysis.fft.FFTProvider findProvider() {
-        ServiceLoader<org.episteme.core.mathematics.analysis.fft.FFTProvider> loader = ServiceLoader.load(org.episteme.core.mathematics.analysis.fft.FFTProvider.class);
-        for (org.episteme.core.mathematics.analysis.fft.FFTProvider p : loader) {
-            return p;
-        }
-        // Fallback
-        return new org.episteme.core.mathematics.analysis.fft.providers.MulticoreFFTProvider();
     }
 
     private static void applyWindow(double[] data, WindowFunction type) {
@@ -98,9 +91,13 @@ public final class AudioSpectrogram {
      * Computes a full spectrogram (list of spectrums) for a long buffer.
      */
     public static List<double[]> computeSpectrogram(double[] audioData, int windowSize, int overlap, WindowFunction window) {
+        AudioSpectrogramProvider provider = AlgorithmManager.getProvider(AudioSpectrogramProvider.class);
+        if (provider != null) {
+            return provider.computeSpectrogram(audioData, windowSize, overlap, window);
+        }
+
         List<double[]> spectrogram = new ArrayList<>();
         int step = windowSize - overlap;
-
         for (int i = 0; i < audioData.length - windowSize; i += step) {
             double[] chunk = new double[windowSize];
             System.arraycopy(audioData, i, chunk, 0, windowSize);

@@ -5,6 +5,7 @@
 
 package org.episteme.core.media.backends;
 
+import org.episteme.core.media.backends.JavaCVMediaBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +21,7 @@ public class JavaCVBackendTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(JavaCVBackend.class);
+        assertNotNull(JavaCVMediaBackend.class);
     }
 }
 

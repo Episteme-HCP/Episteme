@@ -1,6 +1,6 @@
 package org.episteme.benchmarks;
 
-import org.episteme.core.media.vision.VisionBackendManager;
+import org.episteme.core.media.VisionBackendManager;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.natural.physics.quantum.QuantumBackendManager;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;

@@ -9,14 +9,19 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
 
 /**
- * Service Provider Interface (SPI) for computer vision algorithm backends.
+ * Service Provider Interface (SPI) for computer vision algorithm providers.
  *
  * @param <T> the type of image object handled (e.g. BufferedImage, Mat, CLImage).
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public interface VisionAlgorithmBackend<T> extends Backend, AlgorithmProvider {
+public interface VisionAlgorithmProvider<T> extends AlgorithmProvider {
+
+    @Override
+    default String getName() {
+        return getAlgorithmType();
+    }
 
     /**
      * Applies a generic operation to an image.

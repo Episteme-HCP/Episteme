@@ -8,10 +8,10 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.media.AudioBackend;
 import org.episteme.core.media.audio.AudioBuffer;
 import org.episteme.core.media.audio.AudioOp;
-import org.episteme.core.media.audio.AudioAlgorithmBackend;
+import org.episteme.core.media.audio.AudioAlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
-
 import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.Operation;
@@ -28,8 +28,8 @@ import java.io.File;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, AudioAlgorithmBackend.class})
-public class JavaSoundBackend implements AudioBackend, ComputeBackend, AudioAlgorithmBackend<AudioBuffer> {
+@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, CPUBackend.class})
+public class JavaSoundAudioBackend implements AudioBackend, CPUBackend {
 
     private Clip clip;
 
@@ -37,16 +37,17 @@ public class JavaSoundBackend implements AudioBackend, ComputeBackend, AudioAlgo
 
     @Override public String getType() { return "audio"; }
     @Override public String getId() { return "javasound"; }
-    @Override public String getName() { return "Standard JavaSound"; }
+    @Override
+    public String getName() {
+        return "Standard JavaSound";
+    }
     @Override public String getDescription() { return "Default JavaSound API backend for playback and basic processing."; }
     @Override public boolean isAvailable() { return true; }
     @Override public int getPriority() { return 100; }
     
     @Override 
     public Object createBackend() { 
-        // Return a new instance for usage, or this?
-        // Let's return new instance to be safe for playback state.
-        return new JavaSoundBackend(); 
+        return new JavaSoundAudioBackend(); 
     }
 
     @Override
@@ -93,20 +94,6 @@ public class JavaSoundBackend implements AudioBackend, ComputeBackend, AudioAlgo
         }
     }
 
-    // ---- AudioAlgorithmBackend Implementation (Processing) ----
-
-    @Override
-    public AudioBuffer apply(AudioBuffer audio, AudioOp<AudioBuffer> op) {
-        return op.process(audio);
-    }
-
-    @Override
-    public AudioBuffer createAudio(Object data, int channels, int sampleRate) {
-        if (data instanceof double[]) {
-            return new AudioBuffer((double[]) data, channels, sampleRate);
-        }
-        throw new IllegalArgumentException("Unsupported data type for JavaSoundBackend");
-    }
 
     private static class JavaSoundContext implements ExecutionContext {
         @Override

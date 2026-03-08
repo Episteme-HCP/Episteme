@@ -23,7 +23,7 @@ public class AutoTuningManager {
         ON, OFF, AUTO
     }
     private static final Logger logger = LoggerFactory.getLogger(AutoTuningManager.class);
-    private static final Map<String, BenchmarkResult> RESULTS = new ConcurrentHashMap<>();
+    private static final Map<String, AutoTuningResult> RESULTS = new ConcurrentHashMap<>();
     private static final ObjectMapper mapper = new ObjectMapper();
 
     static {
@@ -40,8 +40,8 @@ public class AutoTuningManager {
             if (!Files.exists(dir)) Files.createDirectories(dir);
             Path path = dir.resolve("benchmarks.json");
             if (Files.exists(path)) {
-                List<BenchmarkResult> list = mapper.readValue(path.toFile(), new TypeReference<List<BenchmarkResult>>() {});
-                for (BenchmarkResult res : list) {
+                List<AutoTuningResult> list = mapper.readValue(path.toFile(), new TypeReference<List<AutoTuningResult>>() {});
+                for (AutoTuningResult res : list) {
                     RESULTS.put(res.getProviderName(), res);
                 }
                 logger.debug("Loaded {} benchmark results for auto-tuning", RESULTS.size());
@@ -68,7 +68,7 @@ public class AutoTuningManager {
         
         double gflops = (ops / (durationMs / 1000.0)) / 1e9;
         
-        BenchmarkResult res = RESULTS.computeIfAbsent(providerName, k -> new BenchmarkResult(k, "Unknown", new java.util.concurrent.ConcurrentHashMap<>()));
+        AutoTuningResult res = RESULTS.computeIfAbsent(providerName, k -> new AutoTuningResult(k, "Unknown", new java.util.concurrent.ConcurrentHashMap<>()));
         res.getGflops().put(dim, gflops);
         
         // Background save periodically or on certain events? For now, save every 10 samples for simplicity.
@@ -88,7 +88,7 @@ public class AutoTuningManager {
         Mode mode = getMode();
         if (mode == Mode.OFF) return defaultPriority;
         
-        BenchmarkResult res = RESULTS.get(providerName);
+        AutoTuningResult res = RESULTS.get(providerName);
         if (res == null || res.getGflops() == null || res.getGflops().isEmpty()) {
             return defaultPriority;
         }

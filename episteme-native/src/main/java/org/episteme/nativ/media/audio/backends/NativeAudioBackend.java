@@ -7,7 +7,15 @@ package org.episteme.nativ.media.audio.backends;
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.AudioBackend;
 import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.Operation;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.media.audio.AudioAlgorithmProvider;
+import org.episteme.core.media.audio.AudioBuffer;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -24,8 +32,8 @@ import org.slf4j.LoggerFactory;
  * @since 1.2
  */
 @SuppressWarnings({"preview", "unused"})
-@AutoService({Backend.class})
-public class NativeAudioBackend implements AudioBackend { // Removed redundant Backend interface
+@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, NativeBackend.class, CPUBackend.class})
+public class NativeAudioBackend implements AudioBackend, NativeBackend, CPUBackend { 
 
     private static final Logger logger = LoggerFactory.getLogger(NativeAudioBackend.class);
     private static final SymbolLookup LOOKUP;
@@ -106,6 +114,61 @@ public class NativeAudioBackend implements AudioBackend { // Removed redundant B
     @Override
     public boolean isAvailable() {
         return IS_AVAILABLE_FLAG;
+    }
+
+    @Override
+    public String getType() {
+        return "audio";
+    }
+
+    @Override
+    public String getId() {
+        return "native-audio";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Native audio backend (miniaudio/FFM)";
+    }
+
+    @Override
+    public int getPriority() {
+        return 60;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return IS_AVAILABLE_FLAG;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return LOOKUP != null ? "miniaudio" : "unknown";
+    }
+
+    @Override
+    public ExecutionContext createContext() {
+        return new ExecutionContext() {
+            @Override
+            public <R> R execute(Operation<R> operation) {
+                return operation.compute(this);
+            }
+
+            @Override
+            public void close() {
+                // Device cleanup happens in stop/session close
+            }
+        };
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU; // miniaudio is CPU-based
+    }
+
+    @Override
+    public String getName() {
+        return getBackendName();
     }
 
     @Override

@@ -24,7 +24,7 @@
 package org.episteme.social.arts.music;
 
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.analysis.transform.SignalFFT;
+import org.episteme.core.media.audio.AudioSpectrogram;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,9 +50,12 @@ public final class AudioNoteExtractor {
     public List<Note> extractNotes(Real[] signal, int windowSize) {
         List<Note> detectedNotes = new ArrayList<>();
         
-        for (int i = 0; i < signal.length - windowSize; i += windowSize) {
-            Real[] chunk = new Real[windowSize];
-            System.arraycopy(signal, i, chunk, 0, windowSize);
+        double[] doubleSignal = new double[signal.length];
+        for (int i = 0; i < signal.length; i++) doubleSignal[i] = signal[i].doubleValue();
+
+        for (int i = 0; i < doubleSignal.length - windowSize; i += windowSize) {
+            double[] chunk = new double[windowSize];
+            System.arraycopy(doubleSignal, i, chunk, 0, windowSize);
             
             Real freq = findDominantFrequency(chunk);
             if (freq.compareTo(Real.of(20.0)) > 0) { // Filter out subsonic/noise
@@ -63,16 +66,15 @@ public final class AudioNoteExtractor {
         return detectedNotes;
     }
 
-    private Real findDominantFrequency(Real[] chunk) {
-        Real[][] spectrum = SignalFFT.fftReal(chunk);
-        Real[] magnitude = SignalFFT.magnitude(spectrum[0], spectrum[1]);
+    private Real findDominantFrequency(double[] chunk) {
+        double[] magnitude = AudioSpectrogram.calculateSpectrum(chunk, AudioSpectrogram.WindowFunction.HANNING);
         
         int maxIndex = -1;
-        Real maxMag = Real.of(-1.0);
+        double maxMag = -1.0;
         
-        // Only look at the first half (Nyquist)
-        for (int i = 1; i < magnitude.length / 2; i++) {
-            if (magnitude[i].compareTo(maxMag) > 0) {
+        // Only look at the first half (Nyquist is already handled by AudioSpectrogram returning n/2 bins)
+        for (int i = 1; i < magnitude.length; i++) {
+            if (magnitude[i] > maxMag) {
                 maxMag = magnitude[i];
                 maxIndex = i;
             }
@@ -81,7 +83,7 @@ public final class AudioNoteExtractor {
         if (maxIndex == -1) return Real.ZERO;
         
         // f = index * sampleRate / N
-        return Real.of(maxIndex).multiply(Real.of(sampleRate)).divide(Real.of(chunk.length));
+        return AudioSpectrogram.binToFrequency(maxIndex, chunk.length, sampleRate);
     }
 
     private Note frequencyToNote(Real frequency) {

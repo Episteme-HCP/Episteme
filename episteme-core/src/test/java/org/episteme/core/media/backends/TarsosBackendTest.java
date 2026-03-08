@@ -5,6 +5,7 @@
 
 package org.episteme.core.media.backends;
 
+import org.episteme.core.media.audio.backends.TarsosAudioBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +21,7 @@ public class TarsosBackendTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(TarsosBackend.class);
+        assertNotNull(TarsosAudioBackend.class);
     }
 }
 

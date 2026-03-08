@@ -2,7 +2,7 @@ package org.episteme.benchmarks.benchmark.benchmarks;
 
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.core.media.vision.ImageOp;
 
 /**
@@ -13,17 +13,17 @@ import org.episteme.core.media.vision.ImageOp;
  * @author Gemini AI (Google DeepMind)
  */
 @AutoService(RunnableBenchmark.class)
-public class SystematicVisionBenchmark implements SystematicBenchmark<VisionAlgorithmBackend<?>> {
+public class SystematicVisionBenchmark implements SystematicBenchmark<VisionAlgorithmProvider<?>> {
 
-    private VisionAlgorithmBackend<Object> provider;
+    private VisionAlgorithmProvider<Object> provider;
     private Object image;
     private final ImageOp<Object> identityOp = (img) -> img;
     private boolean dryRun = false;
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<VisionAlgorithmBackend<?>> getProviderClass() { 
-        return (Class<VisionAlgorithmBackend<?>>) (Class<?>) VisionAlgorithmBackend.class; 
+    public Class<VisionAlgorithmProvider<?>> getProviderClass() { 
+        return (Class<VisionAlgorithmProvider<?>>) (Class<?>) VisionAlgorithmProvider.class; 
     }
     @Override public String getIdPrefix() { return "vision-throughput"; }
     @Override public String getNameBase() { return "Computer Vision Throughput"; }
@@ -37,8 +37,8 @@ public class SystematicVisionBenchmark implements SystematicBenchmark<VisionAlgo
 
     @Override
     @SuppressWarnings("unchecked")
-    public void setProvider(VisionAlgorithmBackend<?> provider) {
-        this.provider = (VisionAlgorithmBackend<Object>) provider;
+    public void setProvider(VisionAlgorithmProvider<?> provider) {
+        this.provider = (VisionAlgorithmProvider<Object>) provider;
     }
 
     @Override

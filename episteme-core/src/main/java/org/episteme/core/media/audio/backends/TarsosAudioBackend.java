@@ -2,14 +2,14 @@
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.episteme.core.media.backends;
+package org.episteme.core.media.audio.backends;
 
 
 
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.AudioBackend;
-import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 
 import java.io.File;
 
@@ -17,8 +17,8 @@ import java.io.File;
 /**
  * TarsosDSP Backend (Scientific Analysis).
  */
-@AutoService({Backend.class, AudioBackend.class, AlgorithmProvider.class})
-public class TarsosBackend implements AudioBackend, AlgorithmProvider {
+@AutoService({Backend.class, AudioBackend.class, CPUBackend.class})
+public class TarsosAudioBackend implements AudioBackend, CPUBackend {
 
     private TarsosEngine engine;
     private float[] dummySpectrum = new float[128];
@@ -43,7 +43,7 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
     
     @Override 
     public Object createBackend() { 
-        return new TarsosBackend(); 
+        return new TarsosAudioBackend(); 
     }
 
     // ---- AudioBackend Implementation ----
@@ -102,7 +102,7 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
     // AlgorithmProvider methods
     @Override
     public String getAlgorithmType() {
-        return "Audio/Video Engine";
+        return "Audio Engine";
     }
 
     /**
@@ -158,5 +158,10 @@ public class TarsosBackend implements AudioBackend, AlgorithmProvider {
         public void stop() {
             if (dispatcher != null) dispatcher.stop();
         }
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }
 }

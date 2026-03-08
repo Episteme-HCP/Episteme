@@ -6,16 +6,23 @@ package org.episteme.core.media.backends;
 
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.AudioBackend;
-import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.media.VideoBackend;
+import org.episteme.core.media.VisionBackend;
+import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import java.awt.image.BufferedImage;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import java.util.List;
 
 /**
- * VLCJ (Native VLC) Backend for audio/video.
+ * VLCJ (Native VLC) Media Backend for multi-purpose usage (audio/video/vision).
  */
-@AutoService({Backend.class, AudioBackend.class, AlgorithmProvider.class})
-public class VLCJBackend implements AudioBackend, AlgorithmProvider {
+@AutoService({Backend.class, ComputeBackend.class, VideoBackend.class, AudioBackend.class, VisionBackend.class, CPUBackend.class})
+public class VLCJMediaBackend implements VideoBackend, AudioBackend, VisionBackend, CPUBackend {
 
     @Override
     public void shutdown() {
@@ -28,8 +35,21 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
     }
 
     @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.core.technical.backend.ExecutionContext() {
+            @Override public <R> R execute(org.episteme.core.technical.backend.Operation<R> op) { return op.compute(this); }
+            @Override public void close() {}
+        };
+    }
+
+    @Override
     public String getAlgorithmType() {
-        return "Audio/Video Engine";
+        return "Audio/Video/Vision Engine (VLCJ)";
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU;
     }
 
     private MediaPlayerFactory factory;
@@ -70,15 +90,7 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
         }
     }
 
-    public VLCJBackend() {
-        // Constructor logic if needed, but createBackend calls constructor.
-        // We should initialize heavy resources only if this is the actual backend instance,
-        // not the discovery instance.
-        // But discovery checks isAvailable().
-        // createBackend() returns new instance.
-        // So discovery instance is lightweight.
-        // Created instance will initialize factory?
-        // Let's initialize lazily or in constructor if called via createBackend.
+    public VLCJMediaBackend() {
     }
 
     private void initPlayer() {
@@ -118,10 +130,10 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
     
     @Override 
     public Object createBackend() { 
-        return new VLCJBackend(); 
+        return new VLCJMediaBackend(); 
     }
 
-    // ---- AudioBackend Implementation ----
+    // ---- Audio/Video Backend Implementation ----
 
     @Override public void load(String path) throws Exception {
         initPlayer();
@@ -134,5 +146,28 @@ public class VLCJBackend implements AudioBackend, AlgorithmProvider {
     @Override public double getTime() { return (mediaPlayer!=null) ? mediaPlayer.status().time() / 1000.0 : 0; }
     @Override public double getDuration() { return (mediaPlayer!=null) ? mediaPlayer.status().length() / 1000.0 : 0; }
     @Override public float[] getSpectrum() { return new float[128]; }
+    
+    @SuppressWarnings("unchecked")
+    @Override public <T> T grabFrame() {
+        // VLCJ frame grabbing requires a CallbackVideoSurface, which is complex to implement here
+        // For now, return null or implement if needed
+        return null;
+    }
+
+    @Override
+    public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {
+        return op.process(image);
+    }
+
+    @Override
+    public BufferedImage createImage(Object data, int width, int height) {
+        if (data instanceof int[]) {
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            img.setRGB(0, 0, width, height, (int[]) data, 0, width);
+            return img;
+        }
+        return null;
+    }
+
     @Override public String getBackendName() { return "VLCJ (Native VLC)"; }
 }

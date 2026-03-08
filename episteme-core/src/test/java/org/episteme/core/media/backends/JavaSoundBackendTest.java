@@ -5,7 +5,7 @@
 
 package org.episteme.core.media.backends;
 
-import org.episteme.core.media.audio.backends.JavaSoundBackend;
+import org.episteme.core.media.audio.backends.JavaSoundAudioBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,6 +21,6 @@ public class JavaSoundBackendTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(JavaSoundBackend.class);
+        assertNotNull(JavaSoundAudioBackend.class);
     }
 }

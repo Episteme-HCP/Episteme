@@ -23,10 +23,15 @@
 
 package org.episteme.core.media.video;
 
-import java.util.*;
+import org.episteme.core.media.VideoBackendSystem;
+import java.util.List;
 
 /**
- * Detects hard cuts and scene changes in video sequences.
+ * Utility for detecting scene transitions in video streams.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.2
  */
 public final class SceneTransitionDetector {
 
@@ -38,18 +43,10 @@ public final class SceneTransitionDetector {
      * Detects hard cuts using histogram differences.
      */
     public static List<Transition> detectCuts(List<float[][]> frames, double threshold) {
-        List<Transition> transitions = new ArrayList<>();
-        
-        for (int i = 1; i < frames.size(); i++) {
-            double diff = calculateHistogramDiff(frames.get(i-1), frames.get(i));
-            if (diff > threshold) {
-                transitions.add(new Transition(i, diff, "HARD_CUT"));
-            }
-        }
-        return transitions;
+        return VideoBackendSystem.getVideoBackend().detectTransitions(frames, threshold);
     }
 
-    private static double calculateHistogramDiff(float[][] f1, float[][] f2) {
+    public static double calculateHistogramDiff(float[][] f1, float[][] f2) {
         int[] h1 = buildHistogram(f1);
         int[] h2 = buildHistogram(f2);
         
@@ -57,6 +54,7 @@ public final class SceneTransitionDetector {
         for (int i = 0; i < h1.length; i++) {
             sum += Math.abs(h1[i] - h2[i]);
         }
+        
         return sum / (f1.length * f1[0].length);
     }
 
@@ -64,23 +62,22 @@ public final class SceneTransitionDetector {
         int[] hist = new int[256];
         for (float[] row : frame) {
             for (float val : row) {
-                int bin = Math.min(255, Math.max(0, (int)(val * 255)));
-                hist[bin]++;
+                int bin = (int) (val * 255);
+                hist[Math.max(0, Math.min(255, bin))]++;
             }
         }
         return hist;
     }
 
-    /**
-     * Estimates likelihood of a Fade-to-Black.
-     */
     public static double fadeToBlackIntensity(float[][] frame) {
-        double avg = 0;
-        for (float[] row : frame) {
-            for (float val : row) avg += val;
+        double sum = 0;
+        int w = frame.length;
+        int h = frame[0].length;
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                sum += frame[x][y];
+            }
         }
-        avg /= (frame.length * frame[0].length);
-        return 1.0 - avg; // 1.0 is pure black
+        return 1.0 - (sum / (w * h));
     }
 }
-

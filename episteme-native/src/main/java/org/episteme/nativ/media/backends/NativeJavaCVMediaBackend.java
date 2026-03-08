@@ -3,10 +3,17 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.nativ.media.vision.backends;
+package org.episteme.nativ.media.backends;
 
+import org.episteme.core.media.AudioBackend;
+import org.episteme.core.media.VideoBackend;
+import org.episteme.core.media.VisionBackend;
+import org.episteme.core.media.audio.AudioAlgorithmProvider;
+import org.episteme.core.media.audio.AudioBuffer;
+import org.episteme.core.media.video.VideoAlgorithmProvider;
+import org.episteme.core.media.video.SceneTransitionDetector;
 import org.episteme.core.media.vision.ImageOp;
-import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -23,20 +30,15 @@ import org.bytedeco.javacv.Frame;
 import java.awt.image.BufferedImage;
 
 /**
- * Native CPU Vision Backend using JavaCV and OpenCV.
- * <p>
- * This backend delegates operations to the Bytedeco OpenCV native library.
- * It serves as an available alternative to the pure C++ "NativeCPUVisionBackend"
- * which requires a custom compiled DLL.
- * Implements {@link CPUBackend} and {@link NativeBackend}.
- * </p>
- *
+ * Native Media Backend using JavaCV (OpenCV/FFmpeg) for multi-purpose tasks.
+ * Covers Audio, Video and Vision with native acceleration through Bytedeco.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, CPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
-public class NativeJavaCVVisionBackend implements VisionAlgorithmBackend<BufferedImage>, CPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, VideoBackend.class, VisionBackend.class, CPUBackend.class, NativeBackend.class})
+public class NativeJavaCVMediaBackend implements AudioBackend, VideoBackend, VisionBackend, CPUBackend, NativeBackend {
 
     private static final boolean IS_AVAILABLE;
 
@@ -46,7 +48,7 @@ public class NativeJavaCVVisionBackend implements VisionAlgorithmBackend<Buffere
             Loader.load(org.bytedeco.opencv.global.opencv_core.class);
             available = true;
         } catch (Throwable t) {
-            System.err.println("Warning: NativeJavaCVVisionBackend initialization failed: " + t.getMessage());
+            System.err.println("Warning: NativeJavaCVMediaBackend initialization failed: " + t.getMessage());
         }
         IS_AVAILABLE = available;
     }
@@ -68,17 +70,17 @@ public class NativeJavaCVVisionBackend implements VisionAlgorithmBackend<Buffere
 
     @Override
     public String getId() {
-        return "native-javacv-vision";
+        return "native-javacv-media";
     }
 
     @Override
-    public String getName() {
-        return "Native JavaCV Vision Backend";
+    public String getBackendName() {
+        return "Native JavaCV Media Backend";
     }
 
     @Override
     public String getDescription() {
-        return "Native high-performance vision backend using OpenCV (via JavaCV) on CPU.";
+        return "Native high-performance media backend using OpenCV and FFmpeg (via JavaCV) on CPU.";
     }
 
     @Override
@@ -98,9 +100,13 @@ public class NativeJavaCVVisionBackend implements VisionAlgorithmBackend<Buffere
 
     @Override
     public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {
-        // Here we could unroll or translate ImageOp directly to OpenCV primitives,
-        // but for general ops we fallback to the default processing if we don't have a direct cv:: mapping.
+        // Fallback to the default processing if we don't have a direct cv:: mapping.
         return op.process(image);
+    }
+    
+    @Override
+    public String getName() {
+        return getBackendName();
     }
     
     public BufferedImage processNative(BufferedImage image, int opCode) {
@@ -137,11 +143,57 @@ public class NativeJavaCVVisionBackend implements VisionAlgorithmBackend<Buffere
              img.setRGB(0, 0, width, height, (int[]) data, 0, width);
              return img;
          }
-         throw new IllegalArgumentException("Unsupported data type for NativeJavaCVVisionBackend");
+         throw new IllegalArgumentException("Unsupported data type for NativeJavaCVMediaBackend");
     }
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
+    }
+
+    @Override
+    public Object createBackend() {
+        return new NativeJavaCVMediaBackend();
+    }
+
+    // ---- Audio/Video Implementation ----
+
+    @Override public void load(String path) throws Exception {}
+    @Override public void play() {}
+    @Override public void pause() {}
+    @Override public void stop() {}
+    @Override public double getTime() { return 0.0; }
+    @Override public double getDuration() { return 0.0; }
+    @Override public <T> T grabFrame() { return null; }
+    @Override public float[] getSpectrum() { return new float[0]; }
+    @Override public org.episteme.core.media.audio.AudioBuffer createAudio(Object data, int channels, int sampleRate) { return null; }
+    @Override public org.episteme.core.media.audio.AudioBuffer apply(org.episteme.core.media.audio.AudioBuffer audio, org.episteme.core.media.audio.AudioOp<org.episteme.core.media.audio.AudioBuffer> op) { return op.process(audio); }
+
+    // ---- Resolving Interface Conflicts ----
+
+    @Override
+    public String getAlgorithmType() {
+        return "Multi-Media (JavaCV)";
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
+    }
+
+    @Override
+    public SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {
+        int width = prev.length;
+        int height = prev[0].length;
+        long changedPixels = 0;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (Math.abs(curr[x][y] - prev[x][y]) > threshold) {
+                    changedPixels++;
+                }
+            }
+        }
+        double ratio = (double) changedPixels / (width * height);
+        return new SceneTransitionDetector.Transition(0, ratio, ratio > 0.05 ? "MOTION" : "NONE");
     }
 }

@@ -5,6 +5,7 @@
 
 package org.episteme.core.media.backends;
 
+import org.episteme.core.media.audio.backends.MinimAudioBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +21,7 @@ public class MinimBackendTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(MinimBackend.class);
+        assertNotNull(MinimAudioBackend.class);
     }
 }
 

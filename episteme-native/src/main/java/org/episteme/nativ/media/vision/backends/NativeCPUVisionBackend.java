@@ -6,7 +6,8 @@
 package org.episteme.nativ.media.vision.backends;
 
 import org.episteme.core.media.vision.ImageOp;
-import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
+import org.episteme.core.media.VisionBackend;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -28,8 +29,8 @@ import java.lang.foreign.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, CPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
-public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedImage>, CPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, CPUBackend.class, NativeBackend.class})
+public class NativeCPUVisionBackend implements VisionBackend, CPUBackend, NativeBackend {
     private static final boolean IS_AVAILABLE = true;
 
     // No external C++ library to load (Pure Java Panama)
@@ -55,7 +56,7 @@ public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedIm
     }
 
     @Override
-    public String getName() {
+    public String getBackendName() {
         return "Native CPU Vision Backend (Pure Java FFM)";
     }
 
@@ -124,5 +125,10 @@ public class NativeCPUVisionBackend implements VisionAlgorithmBackend<BufferedIm
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }
 }

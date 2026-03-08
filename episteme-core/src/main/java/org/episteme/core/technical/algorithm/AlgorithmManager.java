@@ -55,12 +55,12 @@ public final class AlgorithmManager {
                 new Thread(() -> {
                     try {
                         Thread.sleep(5000); // Wait for system to stabilize
-                        BenchmarkRunner.runAll();
+                        AutoTuningRunner.runAll();
                         AutoTuningManager.loadResults();
                     } catch (Exception e) {
-                        logger.warn("Auto-benchmark failed: {}", e.getMessage());
+                        logger.warn("Auto-benchmark (tuning) failed: {}", e.getMessage());
                     }
-                }, "Episteme-AutoBenchmark").start();
+                }, "Episteme-AutoTuning").start();
             }
             Runtime.getRuntime().addShutdownHook(new Thread(AlgorithmManager::shutdown, "Episteme-Shutdown"));
         } catch (Throwable t) {

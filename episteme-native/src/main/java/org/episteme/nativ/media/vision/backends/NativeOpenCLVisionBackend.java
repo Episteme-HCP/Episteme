@@ -5,7 +5,8 @@
 
 package org.episteme.nativ.media.vision.backends;
 
-import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.media.VisionBackend;
+import org.episteme.core.media.video.SceneTransitionDetector;
 import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
@@ -13,6 +14,7 @@ import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 
+import java.awt.image.BufferedImage;
 import java.nio.DoubleBuffer;
 
 /**
@@ -26,8 +28,8 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, VisionAlgorithmBackend.class})
-public class NativeOpenCLVisionBackend implements VisionAlgorithmBackend<Object>, GPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, GPUBackend.class, NativeBackend.class})
+public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
 
     @Override
     public boolean isLoaded() {
@@ -57,30 +59,23 @@ public class NativeOpenCLVisionBackend implements VisionAlgorithmBackend<Object>
         // No explicit resources to release for OpenCL Vision backend.
     }
 
-    private org.jocl.cl_context context;
-
     @Override
-    public Object apply(Object image, ImageOp<Object> op) {
-        if (!(image instanceof org.jocl.cl_mem)) {
-            throw new IllegalArgumentException("Expected cl_mem for NativeOpenCLVisionBackend");
-        }
+    public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {
         return op.process(image);
     }
 
     @Override
-    public Object createImage(Object data, int width, int height) {
+    public BufferedImage createImage(Object data, int width, int height) {
         if (data instanceof int[]) {
-            int[] pixels = (int[]) data;
-            org.jocl.cl_mem mem = org.jocl.CL.clCreateBuffer(context, 
-                org.jocl.CL.CL_MEM_READ_WRITE | org.jocl.CL.CL_MEM_COPY_HOST_PTR, 
-                (long) pixels.length * 4, org.jocl.Pointer.to(pixels), null);
-            return mem;
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            img.setRGB(0, 0, width, height, (int[]) data, 0, width);
+            return img;
         }
-        throw new UnsupportedOperationException("OpenCL data upload only supported for int arrays for now.");
+        throw new UnsupportedOperationException("Standard VisionBackend only supports BufferedImage creation for now.");
     }
     
     @Override
-    public String getName() {
+    public String getBackendName() {
         return "OpenCL Vision Backend";
     }
 
@@ -97,6 +92,10 @@ public class NativeOpenCLVisionBackend implements VisionAlgorithmBackend<Object>
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return null;
+    }
+
+    public SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {
+        return null; // Implementation needed
     }
 
     @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }

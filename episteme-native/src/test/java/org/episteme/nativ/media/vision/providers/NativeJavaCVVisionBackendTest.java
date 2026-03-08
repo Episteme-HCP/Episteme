@@ -16,8 +16,8 @@ class NativeJavaCVVisionBackendTest {
 
     @Test
     void testProviderMetadata() {
-        org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend();
-        assertEquals("native-javacv-vision", provider.getId());
+        org.episteme.nativ.media.backends.NativeJavaCVMediaBackend provider = new org.episteme.nativ.media.backends.NativeJavaCVMediaBackend();
+        assertEquals("native-javacv-media", provider.getId());
         assertEquals("vision", provider.getType());
         assertNotNull(provider.getDescription());
     }
@@ -25,13 +25,13 @@ class NativeJavaCVVisionBackendTest {
     @Test
     void testIsAvailableDefaultsToTrue() {
         // Since JavaCV/OpenCV is on the classpath, it should be true.
-        org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend();
+        org.episteme.nativ.media.backends.NativeJavaCVMediaBackend provider = new org.episteme.nativ.media.backends.NativeJavaCVMediaBackend();
         assertTrue(provider.isAvailable(), "Provider should be available via JavaCV");
     }
 
     @Test
     void testApplyDelegates() {
-        org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend();
+        org.episteme.nativ.media.backends.NativeJavaCVMediaBackend provider = new org.episteme.nativ.media.backends.NativeJavaCVMediaBackend();
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         
         ImageOp<BufferedImage> op = input -> input;
@@ -42,7 +42,7 @@ class NativeJavaCVVisionBackendTest {
 
     @Test
     void testProcessNativeSucceeds() {
-        org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend provider = new org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend();
+        org.episteme.nativ.media.backends.NativeJavaCVMediaBackend provider = new org.episteme.nativ.media.backends.NativeJavaCVMediaBackend();
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
         
         if (provider.isAvailable()) {

@@ -23,87 +23,53 @@
 
 package org.episteme.core.media.video;
 
+import org.episteme.core.media.VideoBackendSystem;
 import org.episteme.core.mathematics.numbers.real.Real;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
- * Basic video motion detection and frame analysis.
+ * Utility for video analysis tasks (motion detection, frame sampling, etc).
  */
 public final class VideoAnalyzer {
 
     private VideoAnalyzer() {}
 
-    public record MotionResult(
-        double changeRatio, // 0-1
-        int centerX,
-        int centerY,
-        boolean isMotionDetected
-    ) {}
-
+    public record MotionResult(boolean isMotionDetected, double changeRatio) {}
+    
+    // Alias for transition to avoid breaking some API consumers, but moving towards SPI
+    public static SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {
+        return VideoBackendSystem.getVideoBackend().detectMotion(prev, curr, threshold);
+    }
+    
     /**
-     * Detects motion between two frames using absolute difference.
-     * 
-     * @param prev Gray frame
-     * @param curr Gray frame
-     * @param threshold Sensitivity threshold (0-1)
+     * Reference implementation of motion detection.
      */
-    public static MotionResult detectMotion(float[][] prev, float[][] curr, float threshold) {
+    public static MotionResult detectMotionReference(float[][] prev, float[][] curr, float threshold) {
         int width = prev.length;
         int height = prev[0].length;
-        int changedPixels = 0;
-        
-        long sumX = 0, sumY = 0;
-        
+        long changedPixels = 0;
+
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (Math.abs(curr[x][y] - prev[x][y]) > threshold) {
                     changedPixels++;
-                    sumX += x;
-                    sumY += y;
                 }
             }
         }
-        
+
         double ratio = (double) changedPixels / (width * height);
-        boolean detected = ratio > 0.01; // 1% change threshold
-        
-        int cx = detected ? (int) (sumX / changedPixels) : 0;
-        int cy = detected ? (int) (sumY / changedPixels) : 0;
-        
-        return new MotionResult(ratio, cx, cy, detected);
+        return new MotionResult(ratio > 0.05, ratio);
     }
 
-    /**
-     * Estimates Optical Flow magnitude (simplified).
-     */
-    public static Real averageFlowMagnitude(float[][] prev, float[][] curr) {
-        int width = prev.length;
-        int height = prev[0].length;
-        double sum = 0;
-        
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                sum += Math.abs(curr[x][y] - prev[x][y]);
-            }
-        }
-        
-        return Real.of(sum / (width * height));
-    }
-
-    /**
-     * Sample frames indices for a given duration and frame rate.
-     */
-    public static List<Integer> getSampleIndices(int totalFrames, int targetSampleCount) {
+    public static List<Integer> getSampleIndices(int totalFrames, int samples) {
         List<Integer> indices = new ArrayList<>();
-        if (targetSampleCount >= totalFrames) {
-            for (int i = 0; i < totalFrames; i++) indices.add(i);
-        } else {
-            double step = (double) totalFrames / targetSampleCount;
-            for (int i = 0; i < targetSampleCount; i++) {
-                indices.add((int) (i * step));
-            }
+        if (totalFrames <= 0 || samples <= 0) return indices;
+        
+        double step = (double) totalFrames / samples;
+        for (int i = 0; i < samples; i++) {
+            indices.add((int) (i * step));
         }
         return indices;
     }
 }
-

@@ -2,29 +2,29 @@
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.episteme.core.media.backends;
+package org.episteme.core.media.audio.backends;
 
 import com.google.auto.service.AutoService;
 import java.io.File;
 import org.episteme.core.media.AudioBackend;
-import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 
 /**
  * Minim Backend (Creative Coding).
  * Requires Minim library and Java wrapper logic.
  */
-@AutoService({Backend.class, AudioBackend.class, AlgorithmProvider.class})
-public class MinimBackend implements AudioBackend, AlgorithmProvider {
+@AutoService({Backend.class, AudioBackend.class, CPUBackend.class})
+public class MinimAudioBackend implements AudioBackend, CPUBackend {
 
     private MinimEngine engine;
 
     @Override
     public String getAlgorithmType() {
-        return "Audio/Video Engine";
+        return "Audio Engine";
     }
 
-    public MinimBackend() {
+    public MinimAudioBackend() {
         // Empty constructor, avoids initializing Minim unless used
     }
 
@@ -49,7 +49,7 @@ public class MinimBackend implements AudioBackend, AlgorithmProvider {
     
     @Override 
     public Object createBackend() { 
-        return new MinimBackend(); 
+        return new MinimAudioBackend(); 
     }
 
     // ---- AudioBackend Implementation ----
@@ -146,5 +146,10 @@ public class MinimBackend implements AudioBackend, AlgorithmProvider {
                 try { return new java.io.FileInputStream(fileName); } catch(Exception e) { return null; }
             }
         }
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }
 }

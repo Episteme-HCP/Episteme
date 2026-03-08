@@ -1,12 +1,11 @@
 package org.episteme.core.technical.algorithm;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
@@ -14,18 +13,19 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BenchmarkRunner {
-    private static final Logger logger = LoggerFactory.getLogger(BenchmarkRunner.class);
+public class AutoTuningRunner {
+    private static final Logger logger = LoggerFactory.getLogger(AutoTuningRunner.class);
     private static final int[] SIZES = {128, 512, 1024};
-    private static final int WARMUP = 1; // Reduced for speed
-    private static final int ITERATIONS = 2; // Reduced for speed
+    private static final int WARMUP = 1;
+    private static final int ITERATIONS = 2;
 
     public static void runAll() {
         if (Boolean.getBoolean("episteme.benchmark.skip")) return;
         logger.info("Starting Linear Algebra Auto-Benchmark...");
+        
         @SuppressWarnings({ "unchecked", "rawtypes" })
         List<LinearAlgebraProvider<Real>> providers = (List) AlgorithmManager.getProviders(LinearAlgebraProvider.class);
-        List<BenchmarkResult> results = new ArrayList<>();
+        List<AutoTuningResult> results = new ArrayList<>();
 
         for (LinearAlgebraProvider<Real> provider : providers) {
             if (!provider.isAvailable()) continue;
@@ -39,17 +39,14 @@ public class BenchmarkRunner {
                     gflopsMap.put(size, gflops);
                     logger.info("  Size {}: {} GFLOPS", size, String.format("%.2f", gflops));
                 }
-                results.add(new BenchmarkResult(provider.getName(), provider.getEnvironmentInfo(), gflopsMap));
+                results.add(new AutoTuningResult(provider.getName(), provider.getEnvironmentInfo(), gflopsMap));
             } catch (Throwable t) {
                 logger.warn("  Failed to benchmark {}: {}", provider.getName(), t.getMessage());
             }
         }
-
-        saveResults(results);
     }
 
     private static double benchmarkMultiply(LinearAlgebraProvider<Real> provider, int n) {
-        // Prepare data
         double[] aData = new double[n * n];
         double[] bData = new double[n * n];
         Random rand = new Random(42);
@@ -60,12 +57,10 @@ public class BenchmarkRunner {
         Matrix<Real> A = RealDoubleMatrix.of(aData, n, n);
         Matrix<Real> B = RealDoubleMatrix.of(bData, n, n);
 
-        // Warmup
         for (int i = 0; i < WARMUP; i++) {
             provider.multiply(A, B);
         }
 
-        // Measure
         long totalTime = 0;
         for (int i = 0; i < ITERATIONS; i++) {
             long start = System.nanoTime();
@@ -74,20 +69,7 @@ public class BenchmarkRunner {
         }
 
         double avgSeconds = (totalTime / (double) ITERATIONS) / 1_000_000_000.0;
-        double operations = 2.0 * n * n * n; // Matrix multiply complexity
-        return (operations / avgSeconds) / 1_000_000_000.0; // GFLOPS
-    }
-
-    private static void saveResults(List<BenchmarkResult> results) {
-        try {
-            Path path = Paths.get(System.getProperty("user.home"), ".episteme", "benchmarks.json");
-            Files.createDirectories(path.getParent());
-            
-            ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(path.toFile(), results);
-            logger.info("Benchmark results saved to {}", path);
-        } catch (Exception e) {
-            logger.error("Failed to save benchmark results", e);
-        }
+        double operations = 2.0 * n * n * n;
+        return (operations / avgSeconds) / 1_000_000_000.0;
     }
 }

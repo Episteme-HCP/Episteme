@@ -5,12 +5,18 @@
 
 package org.episteme.core.media;
 
-import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.media.audio.AudioAlgorithmProvider;
+import org.episteme.core.media.audio.AudioBuffer;
+import org.episteme.core.media.audio.AudioOp;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.Operation;
 
 /**
  * Universal interface for audio backends (standard, scientific, creative).
  * <p>
- * Extends {@link Backend} to integrate with the standard backend discovery
+ * Extends {@link ComputeBackend} to integrate with the standard backend discovery
  * system ({@link org.episteme.core.technical.backend.BackendDiscovery}).
  * </p>
  *
@@ -18,11 +24,29 @@ import org.episteme.core.technical.backend.Backend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface AudioBackend extends Backend {
+public interface AudioBackend extends ComputeBackend, AudioAlgorithmProvider<AudioBuffer> {
 
     @Override
     default String getType() {
         return "audio";
+    }
+
+    @Override
+    default ExecutionContext createContext() {
+        return new ExecutionContext() {
+            @Override
+            public <R> R execute(Operation<R> operation) {
+                return operation.compute(this);
+            }
+
+            @Override
+            public void close() {}
+        };
+    }
+
+    @Override
+    default HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU;
     }
 
     @Override
@@ -43,6 +67,15 @@ public interface AudioBackend extends Backend {
     @Override
     default boolean isAvailable() {
         return true;
+    }
+
+    @Override
+    default int getPriority() {
+        return 0;
+    }
+
+    @Override
+    default void shutdown() {
     }
 
     @Override
@@ -75,4 +108,17 @@ public interface AudioBackend extends Backend {
      * Returns the friendly name of this backend instance.
      */
     String getBackendName();
+
+    @Override
+    default AudioBuffer apply(AudioBuffer audio, AudioOp<AudioBuffer> op) {
+        return op.process(audio);
+    }
+
+    @Override
+    default AudioBuffer createAudio(Object data, int channels, int sampleRate) {
+        if (data instanceof double[] samples) {
+            return new AudioBuffer(samples, channels, sampleRate);
+        }
+        throw new IllegalArgumentException("Unsupported audio data type: " + (data != null ? data.getClass().getName() : "null"));
+    }
 }

@@ -49,6 +49,8 @@ public class BackendDiscovery {
     public static final String TYPE_NETWORK = "network";
     public static final String TYPE_IO = "io";
     public static final String TYPE_ML = "ml";
+    public static final String TYPE_VISION = "vision";
+    public static final String TYPE_VIDEO = "video";
 
     private static final Logger logger = LoggerFactory.getLogger(BackendDiscovery.class);
     private static final BackendDiscovery INSTANCE = new BackendDiscovery();

@@ -5,7 +5,7 @@
 
 package org.episteme.core.media;
 
-import org.episteme.core.media.audio.backends.JavaSoundBackend;
+import org.episteme.core.media.audio.backends.JavaSoundAudioBackend;
 import org.episteme.core.technical.backend.AbstractBackendManager;
 
 /**
@@ -38,7 +38,7 @@ public class AudioBackendManager extends AbstractBackendManager<AudioBackend> {
         try {
             return getInstance().managerDefault();
         } catch (IllegalStateException e) {
-            AudioBackend fallback = new JavaSoundBackend();
+            AudioBackend fallback = new JavaSoundAudioBackend();
             getInstance().managerRegister(fallback);
             getInstance().managerSetDefault(fallback.getBackendName());
             return fallback;

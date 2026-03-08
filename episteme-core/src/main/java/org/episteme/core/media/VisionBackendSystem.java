@@ -23,7 +23,7 @@
 
 package org.episteme.core.media;
 
-import org.episteme.core.media.audio.backends.JavaSoundAudioBackend;
+import org.episteme.core.media.VisionBackend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.backend.Backend;
 import java.util.List;
@@ -31,16 +31,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Manager for Audio Backends.
- * Discovers backends implementing Backend with type="audio".
+ * System manager for Vision Backends.
+ * Discovers backends implementing Backend with type="vision".
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 2.0
  */
-public class AudioBackendSystem {
+public class VisionBackendSystem {
 
-
-    private static AudioBackend currentBackend;
+    private static VisionBackend currentBackend;
 
     static {
         refresh();
@@ -48,36 +48,26 @@ public class AudioBackendSystem {
 
     public static void refresh() {
         Optional<Backend> provider = BackendDiscovery.getInstance()
-            .getPreferredProvider(BackendDiscovery.TYPE_AUDIO);
+            .getPreferredProvider(BackendDiscovery.TYPE_VISION);
         
         if (provider.isPresent()) {
             selectBackend(provider.get().getId());
-        } else {
-            // Default fallback
-            currentBackend = new JavaSoundAudioBackend();
         }
     }
 
     public static List<String> getAvailableBackends() {
         return BackendDiscovery.getInstance()
-            .getAvailableProvidersByType(BackendDiscovery.TYPE_AUDIO)
+            .getAvailableProvidersByType(BackendDiscovery.TYPE_VISION)
             .stream()
             .map(Backend::getName)
             .collect(Collectors.toList());
     }
 
-    public static AudioBackend getAudioBackend() {
-        // Ensure backend is current with preferences if changed externally
+    public static VisionBackend getVisionBackend() {
         Optional<Backend> pref = BackendDiscovery.getInstance()
-            .getPreferredProvider(BackendDiscovery.TYPE_AUDIO);
+            .getPreferredProvider(BackendDiscovery.TYPE_VISION);
             
         if (pref.isPresent() && (currentBackend == null || !currentBackend.getBackendName().equals(pref.get().getName()))) {
-            // This check is a bit loose (Name vs ID), but Backend mismatch implies change.
-            // Ideally we check ID. 
-            // For now, if preference exists, try to load it. 
-            // But createBackend() creates a NEW instance. reusing singletons?
-            // The Backend.createBackend() usually creates new.
-            // If we want a singleton audio engine, we should manage it here.
              selectBackend(pref.get().getId());
         }
         
@@ -86,8 +76,7 @@ public class AudioBackendSystem {
     }
 
     public static void selectBackend(String backendNameOrId) {
-        // Try finding by Name first (for UI compat) then ID
-        Optional<Backend> provider = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_AUDIO)
+        Optional<Backend> provider = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_VISION)
             .stream()
             .filter(p -> p.getName().equals(backendNameOrId) || p.getId().equals(backendNameOrId))
             .findFirst();
@@ -95,18 +84,13 @@ public class AudioBackendSystem {
         if (provider.isPresent()) {
             try {
                 Object backendObj = provider.get().createBackend();
-                if (backendObj instanceof AudioBackend) {
-                    currentBackend = (AudioBackend) backendObj;
-                    // Update preference if successful
-                    BackendDiscovery.getInstance().setPreferredProvider(BackendDiscovery.TYPE_AUDIO, provider.get().getId());
-                    System.out.println("Audio Backend switched to: " + currentBackend.getBackendName());
+                if (backendObj instanceof VisionBackend) {
+                    currentBackend = (VisionBackend) backendObj;
+                    BackendDiscovery.getInstance().setPreferredProvider(BackendDiscovery.TYPE_VISION, provider.get().getId());
                 }
             } catch (Exception e) {
-                System.err.println("Failed to initialize backend: " + backendNameOrId);
                 e.printStackTrace();
             }
         }
     }
 }
-
-

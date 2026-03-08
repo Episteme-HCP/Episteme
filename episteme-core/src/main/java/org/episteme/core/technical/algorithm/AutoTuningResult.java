@@ -5,14 +5,14 @@ import java.util.Map;
 /**
  * Represents the results of a benchmark for a specific provider.
  */
-public class BenchmarkResult {
+public class AutoTuningResult {
     private String providerName;
     private String environment;
     private Map<Integer, Double> gflops; // Size -> GFLOPS
 
-    public BenchmarkResult() {}
+    public AutoTuningResult() {}
 
-    public BenchmarkResult(String providerName, String environment, Map<Integer, Double> gflops) {
+    public AutoTuningResult(String providerName, String environment, Map<Integer, Double> gflops) {
         this.providerName = providerName;
         this.environment = environment;
         this.gflops = gflops;

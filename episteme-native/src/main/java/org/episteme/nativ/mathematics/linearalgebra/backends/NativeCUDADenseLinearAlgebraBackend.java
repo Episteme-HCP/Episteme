@@ -230,10 +230,6 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     @Override
     public boolean isLoaded() { return IS_AVAILABLE; }
 
-    @Override
-    public void shutdown() {
-        // cuBLAS/cuSolver and CUDA handles are managed by the NativeLibraryLoader and Arena.
-    }
 
     @Override
     public String getEnvironmentInfo() {

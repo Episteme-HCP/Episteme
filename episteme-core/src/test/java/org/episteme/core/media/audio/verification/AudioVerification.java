@@ -25,8 +25,8 @@ package org.episteme.core.media.audio.verification;
 
 import org.episteme.core.media.audio.AudioBuffer;
 import org.episteme.core.media.audio.AudioEqualizer;
-import org.episteme.core.media.audio.AudioAlgorithmBackend;
-import org.episteme.core.media.audio.backends.JavaSoundBackend;
+import org.episteme.core.media.AudioBackend;
+import org.episteme.core.media.audio.backends.JavaSoundAudioBackend;
 import org.episteme.core.media.audio.ops.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +38,7 @@ public class AudioVerification {
 
     @Test
     public void testAudioOps() {
-        AudioAlgorithmBackend<AudioBuffer> provider = new JavaSoundBackend();
+        AudioBackend provider = new JavaSoundAudioBackend();
         
         // Create a 1-second sine wave at 440Hz (mono, 44100Hz)
         int sampleRate = 44100;

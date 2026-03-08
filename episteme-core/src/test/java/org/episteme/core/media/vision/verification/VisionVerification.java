@@ -23,8 +23,8 @@
 
 package org.episteme.core.media.vision.verification;
 
-import org.episteme.core.media.vision.VisionContext;
-import org.episteme.core.media.vision.VisionAlgorithmBackend;
+import org.episteme.core.media.VisionBackendManager;
+import org.episteme.core.media.VisionBackend;
 import org.episteme.core.media.vision.ops.GrayscaleOp;
 import org.episteme.core.media.vision.ops.ResizeOp;
 import org.episteme.core.media.vision.ops.RotateOp;
@@ -41,9 +41,7 @@ public class VisionVerification {
 
     @Test
     public void testVisionOps() {
-        VisionContext ctx = VisionContext.current();
-        ctx.setBackend(VisionContext.Backend.JAVA_AWT);
-        VisionAlgorithmBackend<BufferedImage> backend = ctx.getBackendImplementation();
+        VisionBackend backend = VisionBackendManager.staticDefault();
         
         // Create a 100x100 dummy image (red)
         int[] data = new int[100 * 100];

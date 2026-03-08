@@ -2,7 +2,7 @@ package org.episteme.benchmarks;
 
 import org.episteme.nativ.media.vision.backends.NativeCPUCBindingVisionBackend;
 import org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend;
-import org.episteme.nativ.media.vision.backends.NativeJavaCVVisionBackend;
+import org.episteme.nativ.media.backends.NativeJavaCVMediaBackend;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -17,7 +17,7 @@ public class BenchmarkVisionBackends {
         System.out.println("=================================================");
 
         NativeCPUVisionBackend pureJava = new NativeCPUVisionBackend();
-        NativeJavaCVVisionBackend javaCv = new NativeJavaCVVisionBackend();
+        NativeJavaCVMediaBackend javaCv = new NativeJavaCVMediaBackend();
         
         // Debug explicit load
         String dllPath = "c:\\Silvere\\Encours\\Developpement\\Episteme\\episteme-native\\target\\classes\\win32-x86_64\\episteme_vision.dll";
@@ -79,7 +79,7 @@ public class BenchmarkVisionBackends {
         return System.currentTimeMillis() - start;
     }
 
-    private static long benchmarkJavaCV(NativeJavaCVVisionBackend backend, BufferedImage img, int iterations) {
+    private static long benchmarkJavaCV(NativeJavaCVMediaBackend backend, BufferedImage img, int iterations) {
         long start = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
             // Simulated operation mapping for JavaCV benchmark since it doesn't have an opCode router yet

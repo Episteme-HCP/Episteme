@@ -3,12 +3,13 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.core.media.vision;
+package org.episteme.core.media;
 
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.core.technical.backend.AbstractBackendManager;
 
 /**
- * Manager for {@link VisionAlgorithmBackend} instances.
+ * Manager for {@link VisionAlgorithmProvider} instances.
  * <p>
  * Provides standardized discovery and access to computer vision backends.
  * </p>
@@ -17,13 +18,13 @@ import org.episteme.core.technical.backend.AbstractBackendManager;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class VisionBackendManager extends AbstractBackendManager<VisionAlgorithmBackend<?>> {
+public class VisionBackendManager extends AbstractBackendManager<VisionBackend> {
 
     private static final VisionBackendManager INSTANCE = new VisionBackendManager();
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private VisionBackendManager() {
-        super((Class) VisionAlgorithmBackend.class);
+        super((Class) VisionBackend.class);
     }
 
     /**
@@ -42,7 +43,7 @@ public class VisionBackendManager extends AbstractBackendManager<VisionAlgorithm
      * 
      * @return the default backend
      */
-    public static VisionAlgorithmBackend<?> staticDefault() {
+    public static VisionBackend staticDefault() {
         return INSTANCE.managerDefault();
     }
 
@@ -52,7 +53,7 @@ public class VisionBackendManager extends AbstractBackendManager<VisionAlgorithm
      * @param nameOrId the backend name or ID
      * @return the selected backend
      */
-    public static VisionAlgorithmBackend<?> staticSelect(String nameOrId) {
+    public static VisionBackend staticSelect(String nameOrId) {
         return INSTANCE.managerSelect(nameOrId);
     }
 
@@ -61,14 +62,14 @@ public class VisionBackendManager extends AbstractBackendManager<VisionAlgorithm
      * 
      * @return collection of all backends
      */
-    public static java.util.Collection<VisionAlgorithmBackend<?>> staticAll() {
+    public static java.util.Collection<VisionBackend> staticAll() {
         return INSTANCE.managerAll();
     }
 
     /**
      * Alias for staticAll() to align with other managers.
      */
-    public static java.util.Collection<VisionAlgorithmBackend<?>> staticAllBackends() {
+    public static java.util.Collection<VisionBackend> staticAllBackends() {
         return staticAll();
     }
 }

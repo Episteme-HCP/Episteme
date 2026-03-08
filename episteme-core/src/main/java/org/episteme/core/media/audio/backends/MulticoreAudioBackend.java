@@ -6,21 +6,21 @@ package org.episteme.core.media.audio.backends;
 
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.audio.AudioBuffer;
-import org.episteme.core.media.audio.AudioOp;
-import org.episteme.core.media.audio.AudioAlgorithmBackend;
+import org.episteme.core.media.AudioBackend;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.Operation;
 import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 
 import java.util.stream.IntStream;
 
 /**
  * High-performance AudioBackend using Java Parallel Streams.
  */
-@AutoService({Backend.class, ComputeBackend.class, AudioAlgorithmBackend.class})
-public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBackend<AudioBuffer> {
+@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, CPUBackend.class})
+public class MulticoreAudioBackend implements org.episteme.core.media.AudioBackend, CPUBackend {
 
 
     @Override
@@ -30,12 +30,12 @@ public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBack
 
     @Override
     public String getId() {
-        return "native-multicore-audio";
+        return "multicore-audio";
     }
 
     @Override
     public String getName() {
-        return "Native Multicore Audio Backend";
+        return "Multicore Audio Backend";
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBack
 
     @Override
     public int getPriority() {
-        return 100; // High priority for native
+        return 100; // High priority for optimized multicore
     }
 
     @Override
@@ -63,18 +63,15 @@ public class MulticoreAudioBackend implements ComputeBackend, AudioAlgorithmBack
         return new MulticoreAudioContext();
     }
 
-    @Override
-    public AudioBuffer apply(AudioBuffer audio, AudioOp<AudioBuffer> op) {
-        return op.process(audio);
-    }
 
-    @Override
-    public AudioBuffer createAudio(Object data, int channels, int sampleRate) {
-        if (data instanceof double[]) {
-            return new AudioBuffer((double[]) data, channels, sampleRate);
-        }
-        throw new IllegalArgumentException("Unsupported data type for MulticoreAudioBackend");
-    }
+    @Override public void load(String path) throws Exception {}
+    @Override public void play() {}
+    @Override public void pause() {}
+    @Override public void stop() {}
+    @Override public double getTime() { return 0.0; }
+    @Override public double getDuration() { return 0.0; }
+    @Override public float[] getSpectrum() { return new float[0]; }
+    @Override public String getBackendName() { return getName(); }
 
     /**
      * Specialized parallel gain application.

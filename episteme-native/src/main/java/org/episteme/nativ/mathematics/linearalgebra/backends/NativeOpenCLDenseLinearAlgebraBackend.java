@@ -49,6 +49,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel transposeKernel;
     private static cl_kernel normalizeRowKernel;
     private static cl_kernel gaussJordanKernel;
+    private static cl_kernel normalizeRowInvKernel;
+    private static cl_kernel gaussJordanInvKernel;
     private static cl_kernel gaussElimPhase1Kernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
@@ -92,7 +94,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "    int j = get_global_id(0) + k + 1;\n" +
         "    double pivot = a[k * cols + k];\n" +
         "    if (j < cols) a[k * cols + j] /= pivot;\n" +
-        "    if (j == k + 1) a[k * cols + k] = 1.0;\n" + // Only one thread does this
+        "    if (j == k + 1) a[k * cols + k] = 1.0;\n" +
         "}\n" +
         "__kernel void gaussJordan(__global double *a, const int rows, const int cols, const int k) {\n" +
         "    int i = get_global_id(0);\n" +
@@ -100,6 +102,24 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "        double factor = a[i * cols + k];\n" +
         "        for (int j = k + 1; j < cols; j++) a[i * cols + j] -= factor * a[k * cols + j];\n" +
         "        a[i * cols + k] = 0.0;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void normalizeRowInv(__global double *a, __global double *inv, const int n, const int k) {\n" +
+        "    int j = get_global_id(0);\n" +
+        "    if (j < n) {\n" +
+        "        double pivot = a[k * n + k];\n" +
+        "        if (j > k) a[k * n + j] /= pivot;\n" +
+        "        inv[k * n + j] /= pivot;\n" +
+        "        if (j == k) a[k * n + k] = 1.0;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void gaussJordanInv(__global double *a, __global double *inv, const int n, const int k) {\n" +
+        "    int j = get_global_id(0); int i = get_global_id(1);\n" +
+        "    if (i < n && j < n && i != k) {\n" +
+        "        double factor = a[i * n + k];\n" +
+        "        if (j > k) a[i * n + j] -= factor * a[k * n + j];\n" +
+        "        inv[i * n + j] -= factor * inv[k * n + j];\n" +
+        "        if (j == k) a[i * n + k] = 0.0;\n" +
         "    }\n" +
         "}\n";
 
@@ -150,6 +170,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             transposeKernel = clCreateKernel(program, "transpose", null);
             normalizeRowKernel = clCreateKernel(program, "normalizeRow", null);
             gaussJordanKernel = clCreateKernel(program, "gaussJordan", null);
+            normalizeRowInvKernel = clCreateKernel(program, "normalizeRowInv", null);
+            gaussJordanInvKernel = clCreateKernel(program, "gaussJordanInv", null);
             vecAddKernel = clCreateKernel(program, "vec_add", null);
             vecSubKernel = clCreateKernel(program, "vec_sub", null);
             vecScaleKernel = clCreateKernel(program, "vec_scale", null);
@@ -346,49 +368,48 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
 
         cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        cl_mem memInv = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(inv), null);
+        
         try {
             for (int k = 0; k < n; k++) {
+                // Partial Pivoting
                 clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)(n - k) * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
                 int max = k;
                 for (int i = k + 1; i < n; i++) {
                     if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
                 }
                 if (k != max) {
+                    clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
+                    clEnqueueReadBuffer(commandQueue, memInv, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(inv), 0, null, null);
+                    
                     for (int j = 0; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
                     for (int j = 0; j < n; j++) { double t = inv[k * n + j]; inv[k * n + j] = inv[max * n + j]; inv[max * n + j] = t; }
+                    
                     clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
+                    clEnqueueWriteBuffer(commandQueue, memInv, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(inv), 0, null, null);
                 }
-                // 1. Normalize pivot row
-                clSetKernelArg(normalizeRowKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(normalizeRowKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(normalizeRowKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n})); // cols
-                clSetKernelArg(normalizeRowKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                clEnqueueNDRangeKernel(commandQueue, normalizeRowKernel, 1, null, new long[]{n - k}, null, 0, null, null);
 
-                // 2. Eliminate other rows (Gauss-Jordan)
-                clSetKernelArg(gaussJordanKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(gaussJordanKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(gaussJordanKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n})); // cols
-                clSetKernelArg(gaussJordanKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                clEnqueueNDRangeKernel(commandQueue, gaussJordanKernel, 1, null, new long[]{n}, null, 0, null, null);
+                // 1. Normalize pivot row on GPU
+                clSetKernelArg(normalizeRowInvKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(normalizeRowInvKernel, 1, Sizeof.cl_mem, Pointer.to(memInv));
+                clSetKernelArg(normalizeRowInvKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(normalizeRowInvKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(commandQueue, normalizeRowInvKernel, 1, null, new long[]{n}, null, 0, null, null);
 
-                // For now, we still handle the inverse matrix updates in Java to keep it simple,
-                // but A is being reduced to I on the GPU.
-                // TODO: Fully move J's updates to GPU
-                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)n * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
-                double pivotVal = h_A[k * n + k];
-                
-                for (int i = 0; i < n; i++) {
-                    if (i != k) {
-                        clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)i * n * Sizeof.cl_double, (long)Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)i * n * Sizeof.cl_double), 0, null, null);
-                        double factor = h_A[i * n + k];
-                        for (int j = 0; j < n; j++) inv[i * n + j] -= factor * inv[k * n + j];
-                    }
-                }
-                for (int j = 0; j < n; j++) inv[k * n + j] /= pivotVal;
+                // 2. Eliminate other rows (Gauss-Jordan) on GPU
+                clSetKernelArg(gaussJordanInvKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussJordanInvKernel, 1, Sizeof.cl_mem, Pointer.to(memInv));
+                clSetKernelArg(gaussJordanInvKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanInvKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(commandQueue, gaussJordanInvKernel, 2, null, new long[]{n, n}, null, 0, null, null);
             }
+            
+            clEnqueueReadBuffer(commandQueue, memInv, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(inv), 0, null, null);
             return fromDoubleArray(inv, n, n);
-        } finally { clReleaseMemObject(memA); }
+        } finally { 
+            clReleaseMemObject(memA);
+            clReleaseMemObject(memInv);
+        }
     }
 
     @Override
@@ -581,6 +602,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clReleaseKernel(transposeKernel);
             clReleaseKernel(normalizeRowKernel);
             clReleaseKernel(gaussJordanKernel);
+            clReleaseKernel(normalizeRowInvKernel);
+            clReleaseKernel(gaussJordanInvKernel);
             clReleaseKernel(gaussElimPhase1Kernel);
             clReleaseProgram(program);
             clReleaseCommandQueue(commandQueue);

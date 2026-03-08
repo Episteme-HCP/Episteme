@@ -2,7 +2,7 @@ package org.episteme.benchmarks.benchmark.benchmarks;
 
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import com.google.auto.service.AutoService;
-import org.episteme.core.media.audio.AudioAlgorithmBackend;
+import org.episteme.core.media.audio.AudioAlgorithmProvider;
 import org.episteme.core.media.audio.AudioOp;
 
 /**
@@ -13,16 +13,16 @@ import org.episteme.core.media.audio.AudioOp;
  * @author Gemini AI (Google DeepMind)
  */
 @AutoService(RunnableBenchmark.class)
-public class SystematicAudioBenchmark implements SystematicBenchmark<AudioAlgorithmBackend<?>> {
+public class SystematicAudioBenchmark implements SystematicBenchmark<AudioAlgorithmProvider<?>> {
 
-    private AudioAlgorithmBackend<Object> provider;
+    private AudioAlgorithmProvider<Object> provider;
     private Object audio;
     private final AudioOp<Object> identityOp = (aud) -> aud;
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<AudioAlgorithmBackend<?>> getProviderClass() { 
-        return (Class<AudioAlgorithmBackend<?>>) (Class<?>) AudioAlgorithmBackend.class; 
+    public Class<AudioAlgorithmProvider<?>> getProviderClass() { 
+        return (Class<AudioAlgorithmProvider<?>>) (Class<?>) AudioAlgorithmProvider.class; 
     }
     @Override public String getIdPrefix() { return "audio-throughput"; }
     @Override public String getNameBase() { return "Audio Processing Throughput"; }
@@ -36,8 +36,8 @@ public class SystematicAudioBenchmark implements SystematicBenchmark<AudioAlgori
 
     @Override
     @SuppressWarnings("unchecked")
-    public void setProvider(AudioAlgorithmBackend<?> provider) {
-        this.provider = (AudioAlgorithmBackend<Object>) provider;
+    public void setProvider(AudioAlgorithmProvider<?> provider) {
+        this.provider = (AudioAlgorithmProvider<Object>) provider;
     }
 
     @Override

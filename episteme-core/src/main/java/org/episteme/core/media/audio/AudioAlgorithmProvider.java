@@ -5,25 +5,25 @@
 
 package org.episteme.core.media.audio;
 
+import org.episteme.core.media.AudioBackend;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.technical.backend.Backend;
+
 
 /**
- * Service Provider Interface for scientific audio processing backends.
+ * Service Provider Interface for scientific audio processing providers.
  */
-public interface AudioAlgorithmBackend<T> extends Backend, AlgorithmProvider {
+public interface AudioAlgorithmProvider<T> extends AlgorithmProvider {
 
     @Override
-    default void shutdown() {}
+    default String getName() {
+        return getAlgorithmType();
+    }
 
     /**
      * Applies an operation to audio data.
      */
     T apply(T audio, AudioOp<T> op);
 
-    /**
-     * Creates an audio object from raw data.
-     */
     T createAudio(Object data, int channels, int sampleRate);
 
     @Override
