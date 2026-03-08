@@ -6,7 +6,6 @@
 package org.episteme.core.media.vision;
 
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.technical.backend.Backend;
 
 /**
  * Service Provider Interface (SPI) for computer vision algorithm providers.

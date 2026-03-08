@@ -6,9 +6,6 @@ package org.episteme.core.media.audio.backends;
 
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.AudioBackend;
-import org.episteme.core.media.audio.AudioBuffer;
-import org.episteme.core.media.audio.AudioOp;
-import org.episteme.core.media.audio.AudioAlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;

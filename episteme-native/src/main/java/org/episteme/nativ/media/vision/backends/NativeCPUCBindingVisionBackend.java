@@ -6,7 +6,6 @@
 package org.episteme.nativ.media.vision.backends;
 
 import org.episteme.core.media.vision.ImageOp;
-import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.core.media.VisionBackend;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
@@ -33,8 +32,8 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, CPUBackend.class, NativeBackend.class, VisionAlgorithmProvider.class})
-public class NativeCPUCBindingVisionBackend implements VisionBackend, VisionAlgorithmProvider<BufferedImage>, CPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, CPUBackend.class, NativeBackend.class})
+public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend, NativeBackend {
 
     private static final String LIB_NAME = "episteme-native";
     private static final SymbolLookup LOOKUP;

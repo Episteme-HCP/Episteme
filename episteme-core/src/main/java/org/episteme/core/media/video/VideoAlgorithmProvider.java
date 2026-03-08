@@ -6,7 +6,6 @@
 package org.episteme.core.media.video;
 
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.media.VideoBackend;
 
 
 /**

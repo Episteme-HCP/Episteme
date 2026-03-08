@@ -25,8 +25,6 @@ package org.episteme.core.media;
 
 import java.awt.image.BufferedImage;
 import org.episteme.core.media.vision.VisionAlgorithmProvider;
-import org.episteme.core.media.vision.ImageOp;
-import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 

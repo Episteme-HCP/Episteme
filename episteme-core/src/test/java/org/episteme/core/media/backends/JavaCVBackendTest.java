@@ -5,7 +5,6 @@
 
 package org.episteme.core.media.backends;
 
-import org.episteme.core.media.backends.JavaCVMediaBackend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

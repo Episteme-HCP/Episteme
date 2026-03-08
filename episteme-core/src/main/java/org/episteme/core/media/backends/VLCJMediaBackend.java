@@ -16,7 +16,6 @@ import org.episteme.core.technical.backend.HardwareAccelerator;
 import java.awt.image.BufferedImage;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
-import java.util.List;
 
 /**
  * VLCJ (Native VLC) Media Backend for multi-purpose usage (audio/video/vision).
@@ -147,7 +146,6 @@ public class VLCJMediaBackend implements VideoBackend, AudioBackend, VisionBacke
     @Override public double getDuration() { return (mediaPlayer!=null) ? mediaPlayer.status().length() / 1000.0 : 0; }
     @Override public float[] getSpectrum() { return new float[128]; }
     
-    @SuppressWarnings("unchecked")
     @Override public <T> T grabFrame() {
         // VLCJ frame grabbing requires a CallbackVideoSurface, which is complex to implement here
         // For now, return null or implement if needed

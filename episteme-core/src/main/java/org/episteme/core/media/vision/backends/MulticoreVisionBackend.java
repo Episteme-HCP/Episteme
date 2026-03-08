@@ -1,7 +1,6 @@
 package org.episteme.core.media.vision.backends;
 
 import org.episteme.core.media.VisionBackend;
-import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
@@ -9,7 +8,6 @@ import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import com.google.auto.service.AutoService;
 import java.awt.image.BufferedImage;
-import java.util.stream.IntStream;
 
 /**
  * Implementation of VisionBackend and VisionAlgorithmProvider using Java Parallel Streams (multicore CPU).

@@ -23,7 +23,6 @@
 
 package org.episteme.core.media;
 
-import org.episteme.core.media.VisionBackend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.backend.Backend;
 import java.util.List;

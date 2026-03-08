@@ -5,7 +5,6 @@
 
 package org.episteme.core.media.audio;
 
-import org.episteme.core.media.AudioBackend;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 

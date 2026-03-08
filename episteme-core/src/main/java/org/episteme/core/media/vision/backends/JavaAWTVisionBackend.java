@@ -5,7 +5,6 @@
 
 package org.episteme.core.media.vision.backends;
 
-import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.media.VisionBackend;
 import org.episteme.core.technical.backend.Backend;

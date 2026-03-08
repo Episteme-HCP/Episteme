@@ -30,7 +30,6 @@ import org.nd4j.linalg.inverse.InvertMatrix;
  * @author Silvere Martin-Michiellot
  * @since 1.0
  */
-@SuppressWarnings("rawtypes")
 @AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class})
 public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.episteme.nativ.technical.backend.nativ.NativeBackend, org.episteme.core.technical.backend.cpu.CPUBackend {
     @Override

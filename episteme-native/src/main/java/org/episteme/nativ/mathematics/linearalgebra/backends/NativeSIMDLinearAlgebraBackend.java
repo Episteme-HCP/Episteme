@@ -24,7 +24,6 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
-import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.Operation;
 
 /**

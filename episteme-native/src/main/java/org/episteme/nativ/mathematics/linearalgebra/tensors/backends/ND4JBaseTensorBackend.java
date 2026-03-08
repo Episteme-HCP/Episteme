@@ -10,7 +10,6 @@ import org.episteme.core.mathematics.linearalgebra.Tensor;
 import org.episteme.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.ExecutionContext;
-import org.episteme.core.technical.backend.cpu.CPUExecutionContext;
 import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend;
 
 /**

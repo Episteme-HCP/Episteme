@@ -24,7 +24,6 @@
 package org.episteme.core.media.video;
 
 import org.episteme.core.media.VideoBackendSystem;
-import org.episteme.core.mathematics.numbers.real.Real;
 import java.util.List;
 import java.util.ArrayList;
 

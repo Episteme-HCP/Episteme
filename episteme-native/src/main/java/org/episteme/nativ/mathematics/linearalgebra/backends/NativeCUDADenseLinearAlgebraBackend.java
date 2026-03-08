@@ -7,7 +7,6 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
-import java.nio.DoubleBuffer;
 import java.util.Optional;
 
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -38,7 +37,6 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, LinearAlgebraProvider.class})
 public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDADenseLinearAlgebraBackend.class);

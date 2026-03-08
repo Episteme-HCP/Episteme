@@ -7,7 +7,6 @@ package org.episteme.nativ.media.video.backends;
 
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.VideoBackend;
-import org.episteme.core.media.video.VideoAlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -20,8 +19,8 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, VideoBackend.class, CPUBackend.class, NativeBackend.class, VideoAlgorithmProvider.class})
-public class NativeVideoBackend implements VideoBackend, VideoAlgorithmProvider, CPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, VideoBackend.class, CPUBackend.class, NativeBackend.class})
+public class NativeVideoBackend implements VideoBackend, CPUBackend, NativeBackend {
 
     @Override
     public boolean isLoaded() {

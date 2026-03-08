@@ -5,7 +5,6 @@
 
 package org.episteme.core.media;
 
-import org.episteme.core.media.VideoBackend;
 import org.episteme.core.technical.backend.AbstractBackendManager;
 
 /**
