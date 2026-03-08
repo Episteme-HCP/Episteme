@@ -9,7 +9,6 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.media.VideoBackend;
 import org.episteme.core.media.video.SceneTransitionDetector;
 import org.episteme.core.media.video.VideoAlgorithmProvider;
-import org.episteme.core.media.video.VideoAnalyzer;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;

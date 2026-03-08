@@ -535,6 +535,30 @@
       </extension>
     </extensions>
     <plugins>
+      <!-- Globally ban conflicting Log4j bridges -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <id>ban-conflicting-log4j-bridges</id>
+            <goals><goal>enforce</goal></goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.apache.logging.log4j:log4j-slf4j-impl</exclude>
+                    <exclude>org.apache.logging.log4j:log4j-slf4j2-impl</exclude>
+                  </excludes>
+                  <message>log4j-slf4j-impl and log4j-slf4j2-impl are banned. Use SLF4J + Logback + log4j-to-slf4j instead.</message>
+                </bannedDependencies>
+              </rules>
+              <fail>false</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
