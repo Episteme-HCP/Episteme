@@ -32,6 +32,15 @@ module "eks" {
       instance_types = ["t3.xlarge"] # Cost effective general purpose
       capacity_type  = "SPOT"
     }
+
+    gpu = {
+      min_size     = 0
+      max_size     = 5
+      desired_size = 1
+
+      instance_types = ["g4dn.xlarge"] # GPU instances for CUDA/OpenCL
+      capacity_type  = "ON_DEMAND"     # GPUs are hard to get on SPOT
+    }
   }
 }
 
