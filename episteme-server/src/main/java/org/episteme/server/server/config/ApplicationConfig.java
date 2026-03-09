@@ -58,6 +58,7 @@ public class ApplicationConfig {
     private static ApplicationConfig INSTANCE;
 
     private final Properties properties = new Properties();
+    private org.episteme.server.server.service.ConfigurationService configurationService;
 
     /**
      * Private constructor - use getInstance() instead.
@@ -144,6 +145,9 @@ public class ApplicationConfig {
     // --- Generic Getters ---
 
     public String getString(String key, String defaultValue) {
+        if (configurationService != null) {
+            return configurationService.getProperty(key, properties.getProperty(key, defaultValue));
+        }
         return properties.getProperty(key, defaultValue);
     }
 
@@ -402,6 +406,11 @@ public class ApplicationConfig {
         LOG.info("OIDC: {}", isOidcEnabled() ? "enabled" : "disabled");
         LOG.info("mDNS Discovery: {}", isMdnsEnabled() ? "enabled" : "disabled");
         LOG.info("Circuit Breaker: {}", isCircuitBreakerEnabled() ? "enabled" : "disabled");
+        LOG.info("Dynamic Config: {}", configurationService != null ? "connected" : "standalone");
         LOG.info("=======================================");
+    }
+
+    public void setConfigurationService(org.episteme.server.server.service.ConfigurationService service) {
+        this.configurationService = service;
     }
 }

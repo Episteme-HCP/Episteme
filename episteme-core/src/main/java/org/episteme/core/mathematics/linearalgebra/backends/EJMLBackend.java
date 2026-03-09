@@ -86,7 +86,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 Class<?> clazz = Class.forName(innerName);
                 Constructor<?> ctor = clazz.getDeclaredConstructor(Field.class);
                 ctor.setAccessible(true);
-                this.ejmlImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this.field);
+                this.ejmlImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {
                 this.ejmlImpl = null;
             }
@@ -191,15 +191,21 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
      */
     @SuppressWarnings("unused")
     private static class EJMLImpl<E> implements LinearAlgebraProvider<E> {
+        private final EJMLBackend<E> parent;
         private final Field<E> field;
 
-        EJMLImpl(Field<E> field) {
+        EJMLImpl(EJMLBackend<E> parent, Field<E> field) {
+            this.parent = parent;
             this.field = field;
+        }
+
+        @Override public LinearAlgebraProvider<E> fallback() {
+            return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, parent);
         }
 
         @Override public String getName() { return "EJML (Inner)"; }
         @Override public boolean isAvailable() { return true; }
-        @Override public int getPriority() { return 80; }
+        @Override public int getPriority() { return parent.getPriority(); }
 
         private org.ejml.simple.SimpleMatrix toEjmlMatrix(Matrix<E> m) {
             org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(m.rows(), m.cols());

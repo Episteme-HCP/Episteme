@@ -83,7 +83,7 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 Class<?> clazz = Class.forName(innerName);
                 Constructor<?> ctor = clazz.getDeclaredConstructor(Field.class);
                 ctor.setAccessible(true);
-                this.coltImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this.field);
+                this.coltImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {
                 this.coltImpl = null;
             }
@@ -167,15 +167,21 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
      */
     @SuppressWarnings("unused")
     private static class ColtImpl<E> implements LinearAlgebraProvider<E> {
+        private final ColtBackend<E> parent;
         private final Field<E> field;
 
-        ColtImpl(Field<E> field) {
+        ColtImpl(ColtBackend<E> parent, Field<E> field) {
+            this.parent = parent;
             this.field = field;
+        }
+
+        @Override public LinearAlgebraProvider<E> fallback() {
+            return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, parent);
         }
 
         @Override public String getName() { return "Colt (Inner)"; }
         @Override public boolean isAvailable() { return true; }
-        @Override public int getPriority() { return 70; }
+        @Override public int getPriority() { return parent.getPriority(); }
 
         private cern.colt.matrix.DoubleMatrix2D toColtMatrix(Matrix<E> m) {
             cern.colt.matrix.impl.DenseDoubleMatrix2D colt = new cern.colt.matrix.impl.DenseDoubleMatrix2D(m.rows(), m.cols());

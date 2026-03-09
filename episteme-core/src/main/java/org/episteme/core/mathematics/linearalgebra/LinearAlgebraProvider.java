@@ -66,6 +66,9 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      */
     @SuppressWarnings("unchecked")
     default LinearAlgebraProvider<E> fallback() {
+        if (Boolean.getBoolean("episteme.fallback.disabled")) {
+            throw new org.episteme.core.technical.algorithm.FallbackDisabledException("Fallback blocked: Benchmark isolation active. Provider failed: " + getName());
+        }
         return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, this);
     }
 

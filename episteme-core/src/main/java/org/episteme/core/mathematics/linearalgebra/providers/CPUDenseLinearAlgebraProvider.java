@@ -892,7 +892,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 }
 
                 double pivot = mat[col * n + col];
-                if (Math.abs(pivot) < 1e-18) return (E) (Object) Real.ZERO;
+                if (Math.abs(pivot) < 1e-60) return (E) (Object) Real.ZERO;
 
                 det *= pivot;
                 for (int i = col + 1; i < n; i++) {

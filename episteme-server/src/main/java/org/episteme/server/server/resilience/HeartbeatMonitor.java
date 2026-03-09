@@ -26,10 +26,16 @@ package org.episteme.server.server.resilience;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.episteme.server.server.repository.WorkerRepository;
+import org.episteme.server.server.model.WorkerEntity;
+import java.time.LocalDateTime;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
+import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Worker Heartbeat Monitor - tracks worker liveness and removes dead workers.
@@ -48,6 +54,7 @@ public class HeartbeatMonitor {
     private final Duration heartbeatTimeout;
     private final Duration checkInterval;
     private final ScheduledExecutorService scheduler;
+    private final WorkerRepository workerRepository;
     private Consumer<String> onWorkerDead;
     private Consumer<String> onWorkerRecovered;
 
@@ -101,14 +108,15 @@ public class HeartbeatMonitor {
      * - 30 second timeout
      * - 10 second check interval
      */
-    public HeartbeatMonitor() {
-        this(Duration.ofSeconds(30), Duration.ofSeconds(10));
+    public HeartbeatMonitor(WorkerRepository workerRepository) {
+        this(workerRepository, Duration.ofSeconds(30), Duration.ofSeconds(10));
     }
 
     /**
      * Create heartbeat monitor with custom settings.
      */
-    public HeartbeatMonitor(Duration heartbeatTimeout, Duration checkInterval) {
+    public HeartbeatMonitor(WorkerRepository workerRepository, Duration heartbeatTimeout, Duration checkInterval) {
+        this.workerRepository = workerRepository;
         this.heartbeatTimeout = heartbeatTimeout;
         this.checkInterval = checkInterval;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -141,6 +149,7 @@ public class HeartbeatMonitor {
      */
     public void registerWorker(String workerId) {
         workers.put(workerId, new WorkerInfo(workerId));
+        persistWorker(workerId, true);
         LOG.info("Ã°Å¸â€â€” Worker registered: {}", workerId);
     }
 
@@ -184,6 +193,20 @@ public class HeartbeatMonitor {
                 onWorkerRecovered.accept(workerId);
             }
         }
+        persistWorker(workerId, true);
+    }
+
+    private void persistWorker(String workerId, boolean alive) {
+        if (workerRepository == null) return;
+        WorkerInfo info = workers.get(workerId);
+        if (info == null) return;
+
+        WorkerEntity entity = new WorkerEntity(workerId, "unknown", 0); // Need to get actual hostname/cores if possible
+        entity.setAlive(alive);
+        entity.setLastHeartbeat(LocalDateTime.now());
+        entity.setLoad(info.load);
+        entity.setActiveTasks(info.activeTasks);
+        workerRepository.save(entity);
     }
 
     /**

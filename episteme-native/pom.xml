@@ -194,6 +194,11 @@
                     <environmentVariables>
                         <AWT_TOOLKIT>headless</AWT_TOOLKIT>
                     </environmentVariables>
+                    <excludes>
+                        <exclude>${cuda.exclude.1}</exclude>
+                        <exclude>${cuda.exclude.2}</exclude>
+                        <exclude>${cuda.exclude.3}</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>
