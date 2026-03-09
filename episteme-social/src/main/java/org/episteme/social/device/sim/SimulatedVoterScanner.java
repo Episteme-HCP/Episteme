@@ -21,39 +21,48 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.device.sim;
+package org.episteme.social.device.sim;
 
 import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
 import org.episteme.core.measure.quantity.Dimensionless;
-import org.episteme.natural.device.sensors.Seismograph;
 import org.episteme.core.util.identity.Identification;
-
+import org.episteme.social.device.sensors.VoterScanner;
 import java.io.IOException;
-import java.util.Random;
 
 /**
- * Simulated seismograph.
+ * Simulated voter scanner.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.2
  */
-public class SimulatedSeismograph extends AbstractSimulatedSensor<Dimensionless> implements Seismograph {
+public class SimulatedVoterScanner extends AbstractSimulatedSensor<Dimensionless> implements VoterScanner {
 
-    private final Random random = new Random();
+    private Identification currentVoter;
 
-    public SimulatedSeismograph(Identification id) {
-        super(id);
-        this.currentValue = Quantities.create(0.0, Units.ONE);
+    public SimulatedVoterScanner(String name) {
+        super(name);
     }
 
     @Override
-    public Quantity<Dimensionless> readMagnitude() {
-        double v = random.nextDouble() * 9.0;
-        return Quantities.create(v, Units.ONE);
+    public boolean isVoterDetected() {
+        return currentVoter != null;
+    }
+
+    @Override
+    public Identification scanVoter() {
+        return currentVoter;
+    }
+
+    public void setDetectedVoter(Identification voter) {
+        this.currentVoter = voter;
     }
 
     @Override
     public Quantity<Dimensionless> readValue() throws IOException {
-        return readMagnitude();
+        return Quantities.create(isVoterDetected() ? 1.0 : 0.0, Units.ONE);
     }
 }

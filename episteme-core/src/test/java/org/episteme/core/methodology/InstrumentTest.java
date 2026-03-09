@@ -5,6 +5,7 @@
 
 package org.episteme.core.methodology;
 
+import org.episteme.core.device.ComplexInstrument;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +21,7 @@ public class InstrumentTest {
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(Instrument.class);
+        assertNotNull(ComplexInstrument.class);
     }
 }
 

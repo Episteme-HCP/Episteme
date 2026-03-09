@@ -1625,7 +1625,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
 
         // Create simulated device instances (Sorted)
-        Map<String, org.episteme.core.device.sim.SimulatedDevice> devices = new TreeMap<>();
+        Map<String, org.episteme.core.device.sim.AbstractSimulatedDevice> devices = new TreeMap<>();
         devices.put("Generic GPIB Device", new org.episteme.core.device.sim.SimulatedGPIBDevice());
         devices.put("Generic USB Device", new org.episteme.core.device.sim.SimulatedUSBDevice());
 
@@ -1636,8 +1636,8 @@ public class EpistemeMasterControl extends Application {
             if (!devices.containsKey(info.simpleName)) {
                 try {
                     Class<?> cls = Class.forName(info.fullName);
-                    if (org.episteme.core.device.sim.SimulatedDevice.class.isAssignableFrom(cls)) {
-                        org.episteme.core.device.sim.SimulatedDevice dev = (org.episteme.core.device.sim.SimulatedDevice) cls
+                    if (org.episteme.core.device.sim.AbstractSimulatedDevice.class.isAssignableFrom(cls)) {
+                        org.episteme.core.device.sim.AbstractSimulatedDevice dev = (org.episteme.core.device.sim.AbstractSimulatedDevice) cls
                                 .getDeclaredConstructor().newInstance();
                         devices.put(info.simpleName, dev);
                     }
@@ -1656,7 +1656,7 @@ public class EpistemeMasterControl extends Application {
 
         deviceList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                org.episteme.core.device.sim.SimulatedDevice dev = devices.get(newVal);
+                org.episteme.core.device.sim.AbstractSimulatedDevice dev = devices.get(newVal);
                 if (dev != null)
                     details.setText(dev.getFormattedInfo()); // Rich info using metadata
                 // Persist selection

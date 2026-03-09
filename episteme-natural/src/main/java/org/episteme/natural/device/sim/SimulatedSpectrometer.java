@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -38,7 +38,7 @@ import java.io.IOException;
 /**
  * Simulated spectrometer.
  */
-public class SimulatedSpectrometer extends SimulatedDevice implements Spectrometer {
+public class SimulatedSpectrometer extends AbstractSimulatedSensor<Dimensionless> implements Spectrometer {
 
     private final SpectroscopyType type;
     private final Quantity<Length> minWavelength;

@@ -23,36 +23,66 @@
 
 package org.episteme.social.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.Sensor;
+import org.episteme.core.device.Actuator;
+import org.episteme.core.device.sim.AbstractSimulatedDevice;
 import org.episteme.social.device.actuators.VotingMachine;
+import org.episteme.social.device.sensors.VoterScanner;
+import org.episteme.social.device.actuators.BallotCaster;
+import java.util.List;
+import java.io.IOException;
 
 /**
  * A simulated voting machine for testing social systems.
+ * Implemented as a complex instrument with a scanner and a caster.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SimulatedVotingMachine extends SimulatedDevice implements VotingMachine {
+public class SimulatedVotingMachine extends AbstractSimulatedDevice implements VotingMachine {
 
-    private int voteCount = 0;
+    private final SimulatedVoterScanner scanner;
+    private final SimulatedBallotCaster caster;
 
     public SimulatedVotingMachine(String name) {
         super(name);
+        this.scanner = new SimulatedVoterScanner(name + " Scanner");
+        this.caster = new SimulatedBallotCaster(name + " Caster");
     }
 
     @Override
-    public void castVote() {
-        if (!isConnected()) {
-            // Maybe throw exception or ignore? Simulating behavior.
-            return;
-        }
-        voteCount++;
+    public VoterScanner getVoterScanner() {
+        return scanner;
     }
 
     @Override
-    public int getVoteCount() {
-        return voteCount;
+    public BallotCaster getBallotCaster() {
+        return caster;
+    }
+
+    @Override
+    public List<Sensor<?>> getSensors() {
+        return List.of(scanner);
+    }
+
+    @Override
+    public List<Actuator<?>> getActuators() {
+        return List.of(caster);
+    }
+
+    @Override
+    public void connect() throws IOException {
+        super.connect();
+        scanner.connect();
+        caster.connect();
+    }
+
+    @Override
+    public void disconnect() throws IOException {
+        scanner.disconnect();
+        caster.disconnect();
+        super.disconnect();
     }
 }
 

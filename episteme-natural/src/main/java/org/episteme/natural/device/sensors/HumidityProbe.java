@@ -21,39 +21,29 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.device.sim;
+package org.episteme.natural.device.sensors;
 
-import org.episteme.core.device.sim.AbstractSimulatedSensor;
+import org.episteme.core.device.Sensor;
 import org.episteme.core.measure.Quantity;
-import org.episteme.core.measure.Quantities;
-import org.episteme.core.measure.Units;
 import org.episteme.core.measure.quantity.Dimensionless;
-import org.episteme.natural.device.sensors.Seismograph;
-import org.episteme.core.util.identity.Identification;
-
-import java.io.IOException;
-import java.util.Random;
 
 /**
- * Simulated seismograph.
+ * Interface for humidity probes.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
-public class SimulatedSeismograph extends AbstractSimulatedSensor<Dimensionless> implements Seismograph {
+public interface HumidityProbe extends Sensor<Dimensionless> {
+    
+    /**
+     * @return the relative humidity in percent (0-100).
+     */
+    Quantity<Dimensionless> getRelativeHumidity();
 
-    private final Random random = new Random();
-
-    public SimulatedSeismograph(Identification id) {
-        super(id);
-        this.currentValue = Quantities.create(0.0, Units.ONE);
-    }
-
-    @Override
-    public Quantity<Dimensionless> readMagnitude() {
-        double v = random.nextDouble() * 9.0;
-        return Quantities.create(v, Units.ONE);
-    }
-
-    @Override
-    public Quantity<Dimensionless> readValue() throws IOException {
-        return readMagnitude();
-    }
+    /**
+     * Measures the humidity given a physical actual humidity.
+     * Useful for simulation or calibration.
+     */
+    Quantity<Dimensionless> measure(Quantity<Dimensionless> actualHumidity);
 }

@@ -21,39 +21,22 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.device.sim;
+package org.episteme.core.device;
 
-import org.episteme.core.device.sim.AbstractSimulatedSensor;
+import java.util.Optional;
 import org.episteme.core.measure.Quantity;
-import org.episteme.core.measure.Quantities;
-import org.episteme.core.measure.Units;
-import org.episteme.core.measure.quantity.Dimensionless;
-import org.episteme.natural.device.sensors.Seismograph;
 import org.episteme.core.util.identity.Identification;
 
-import java.io.IOException;
-import java.util.Random;
-
 /**
- * Simulated seismograph.
+ * Base implementation for actuator devices.
+ *
+ * @param <C> the type of command accepted by the actuator
+ * @author Silvere Martin-Michiellot
+ * @since 1.0
  */
-public class SimulatedSeismograph extends AbstractSimulatedSensor<Dimensionless> implements Seismograph {
+public abstract class AbstractActuator<C> extends AbstractDevice implements Actuator<C> {
 
-    private final Random random = new Random();
-
-    public SimulatedSeismograph(Identification id) {
-        super(id);
-        this.currentValue = Quantities.create(0.0, Units.ONE);
-    }
-
-    @Override
-    public Quantity<Dimensionless> readMagnitude() {
-        double v = random.nextDouble() * 9.0;
-        return Quantities.create(v, Units.ONE);
-    }
-
-    @Override
-    public Quantity<Dimensionless> readValue() throws IOException {
-        return readMagnitude();
+    protected AbstractActuator(Identification identification) {
+        super(identification);
     }
 }

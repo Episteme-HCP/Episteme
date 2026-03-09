@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SimulatedGPIBDevice extends SimulatedDevice {
+public class SimulatedGPIBDevice extends AbstractSimulatedDevice {
 
     private int gpibAddress;
     private int boardIndex = 0;
@@ -49,14 +49,14 @@ public class SimulatedGPIBDevice extends SimulatedDevice {
             String.format("GPIB0::%d::INSTR", gpibAddress)));
         this.gpibAddress = gpibAddress;
         setTrait("name", name);
-        setDriverClass("org.episteme.core.device.sim.SimulatedGPIBDevice");
+        support.setDriverClass("org.episteme.core.device.sim.SimulatedGPIBDevice");
 
         // GPIB-specific capabilities
-        setCapability("SCPI Commands", true);
-        setCapability("IEEE-488.2 Compliant", true);
-        setCapability("Remote Programming", true);
-        setCapability("Status Byte Polling", true);
-        setCapability("Service Request", true);
+        support.setCapability("SCPI Commands", true);
+        support.setCapability("IEEE-488.2 Compliant", true);
+        support.setCapability("Remote Programming", true);
+        support.setCapability("Status Byte Polling", true);
+        support.setCapability("Service Request", true);
     }
 
     public int getGpibAddress() {

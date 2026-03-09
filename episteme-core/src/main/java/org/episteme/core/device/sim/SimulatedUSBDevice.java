@@ -38,7 +38,7 @@ import java.util.Random;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SimulatedUSBDevice extends SimulatedDevice {
+public class SimulatedUSBDevice extends AbstractSimulatedDevice {
 
     public enum DeviceType {
         SENSOR, ACTUATOR, BIDIRECTIONAL
@@ -68,25 +68,25 @@ public class SimulatedUSBDevice extends SimulatedDevice {
         this.vendorId = vendorId;
         this.productId = productId;
         setTrait("name", name);
-        setDriverClass("org.episteme.core.device.sim.SimulatedUSBDevice");
+        support.setDriverClass("org.episteme.core.device.sim.SimulatedUSBDevice");
 
         // USB device capabilities
-        setCapability("Data Logging", true);
-        setCapability("Continuous Sampling", true);
-        setCapability("Auto-Calibration", true);
-        setCapability("USB 2.0 High-Speed", true);
-        setCapability("Bidirectional I/O", false);
+        support.setCapability("Data Logging", true);
+        support.setCapability("Continuous Sampling", true);
+        support.setCapability("Auto-Calibration", true);
+        support.setCapability("USB 2.0 High-Speed", true);
+        support.setCapability("Bidirectional I/O", false);
     }
 
     public SimulatedUSBDevice(String name, DeviceType type) {
         this(name);
         this.deviceType = type;
         if (type == DeviceType.ACTUATOR) {
-            setCapability("Continuous Sampling", false);
-            setCapability("Output Control", true);
+            support.setCapability("Continuous Sampling", false);
+            support.setCapability("Output Control", true);
         } else if (type == DeviceType.BIDIRECTIONAL) {
-            setCapability("Bidirectional I/O", true);
-            setCapability("Output Control", true);
+            support.setCapability("Bidirectional I/O", true);
+            support.setCapability("Output Control", true);
         }
     }
 

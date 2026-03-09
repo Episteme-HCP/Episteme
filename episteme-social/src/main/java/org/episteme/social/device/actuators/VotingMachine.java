@@ -23,19 +23,43 @@
 
 package org.episteme.social.device.actuators;
 
-import org.episteme.core.device.Device;
+import org.episteme.core.device.ComplexInstrument;
+import org.episteme.social.device.sensors.VoterScanner;
+import org.episteme.social.device.actuators.BallotCaster;
 
 /**
  * A Voting Machine device for electronic voting.
+ * It is a complex instrument containing a voter scanner and a ballot caster.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface VotingMachine extends Device {
-    void castVote();
+public interface VotingMachine extends ComplexInstrument {
+    
+    /**
+     * @return The voter identification scanner.
+     */
+    VoterScanner getVoterScanner();
 
-    int getVoteCount();
+    /**
+     * @return The ballot caster component.
+     */
+    BallotCaster getBallotCaster();
+
+    /**
+     * Convenience method to cast a vote.
+     */
+    default void castVote(String selection) {
+        getBallotCaster().castBallot(selection);
+    }
+
+    /**
+     * Convenience method to get the vote count.
+     */
+    default int getVoteCount() {
+        return getBallotCaster().getBallotCount();
+    }
 }
 
 

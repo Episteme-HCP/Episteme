@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * Simulated pressure gauge.
  */
-public class SimulatedPressureGauge extends AbstractDevice implements PressureGauge {
+public class SimulatedPressureGauge extends AbstractSimulatedSensor<Pressure> implements PressureGauge {
 
     private final GaugeType type;
     private final Quantity<Pressure> minPressure;
@@ -68,30 +68,10 @@ public class SimulatedPressureGauge extends AbstractDevice implements PressureGa
     }
 
     @Override
-    public void connect() throws IOException {
-        setStatus(Status.OPERATIONAL);
-    }
-
-    @Override
-    public void disconnect() throws IOException {
-        setStatus(Status.DISCONNECTED);
-    }
-
-    @Override
-    public boolean isConnected() {
-        return getDeviceStatus() == Status.OPERATIONAL;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public Quantity<Pressure> readValue() throws IOException {
         double v = 101325 + (random.nextDouble() * 1000 - 500);
         setCurrentValue(Quantities.create(v, Units.PASCAL));
         return (Quantity<Pressure>) currentValue;
-    }
-
-    @Override
-    public void close() throws Exception {
-        disconnect();
     }
 }

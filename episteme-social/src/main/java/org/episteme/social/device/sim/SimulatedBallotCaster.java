@@ -21,39 +21,42 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.device.sim;
+package org.episteme.social.device.sim;
 
-import org.episteme.core.device.sim.AbstractSimulatedSensor;
-import org.episteme.core.measure.Quantity;
-import org.episteme.core.measure.Quantities;
-import org.episteme.core.measure.Units;
-import org.episteme.core.measure.quantity.Dimensionless;
-import org.episteme.natural.device.sensors.Seismograph;
-import org.episteme.core.util.identity.Identification;
-
+import org.episteme.core.device.sim.AbstractSimulatedActuator;
+import org.episteme.social.device.actuators.BallotCaster;
 import java.io.IOException;
-import java.util.Random;
 
 /**
- * Simulated seismograph.
+ * Simulated ballot caster.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.2
  */
-public class SimulatedSeismograph extends AbstractSimulatedSensor<Dimensionless> implements Seismograph {
+public class SimulatedBallotCaster extends AbstractSimulatedActuator<String> implements BallotCaster {
 
-    private final Random random = new Random();
+    private int ballotCount = 0;
 
-    public SimulatedSeismograph(Identification id) {
-        super(id);
-        this.currentValue = Quantities.create(0.0, Units.ONE);
+    public SimulatedBallotCaster(String name) {
+        super(name);
     }
 
     @Override
-    public Quantity<Dimensionless> readMagnitude() {
-        double v = random.nextDouble() * 9.0;
-        return Quantities.create(v, Units.ONE);
+    public void castBallot(String candidate) {
+        if (isConnected()) {
+            ballotCount++;
+            System.out.println("Ballot cast for: " + candidate);
+        }
     }
 
     @Override
-    public Quantity<Dimensionless> readValue() throws IOException {
-        return readMagnitude();
+    public int getBallotCount() {
+        return ballotCount;
+    }
+
+    @Override
+    public void send(String command) throws IOException {
+        castBallot(command);
     }
 }
