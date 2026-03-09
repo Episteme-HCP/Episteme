@@ -213,7 +213,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Vector<org.episteme.core.mathematics.numbers.real.Real> solve(Matrix<org.episteme.core.mathematics.numbers.real.Real> A, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE || DGESV == null) return LinearAlgebraProvider.super.solve(A, b);
+        if (!IS_AVAILABLE || DGESV == null) throw new UnsupportedOperationException(getName() + ": solve() not available");
         org.episteme.core.ComputeContext.checkCurrentCancelled();
         
         int n = A.rows();
@@ -252,7 +252,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> transpose(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
-        if (!IS_AVAILABLE || DOMATCOPY == null) return LinearAlgebraProvider.super.transpose(a);
+        if (!IS_AVAILABLE || DOMATCOPY == null) throw new UnsupportedOperationException(getName() + ": transpose() not available");
         
         int rows = a.rows();
         int cols = a.cols();
@@ -271,14 +271,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             DOMATCOPY.invokeExact(CblasRowMajor, 112, (long)rows, (long)cols, 1.0, segA, (long)cols, segC, (long)rows);
             return res;
         } catch (Throwable t) {
-            logger.error("FFM BLAS Transpose failed", t);
-            return LinearAlgebraProvider.super.transpose(a);
+            logger.error("FFM BLAS Transpose failed: {}", t.getMessage());
+            throw new RuntimeException("FFM Transpose Operation Failed", t);
         }
     }
     
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> inverse(Matrix<org.episteme.core.mathematics.numbers.real.Real> A) {
-         if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) return LinearAlgebraProvider.super.inverse(A);
+         if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) throw new UnsupportedOperationException(getName() + ": inverse() not available");
          int n = A.rows();
          if (n <= 0) throw new IllegalArgumentException("Matrix dimension must be positive");
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
@@ -319,7 +319,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public org.episteme.core.mathematics.numbers.real.Real determinant(Matrix<org.episteme.core.mathematics.numbers.real.Real> A) {
-         if (!IS_AVAILABLE || DGETRF == null) return LinearAlgebraProvider.super.determinant(A);
+         if (!IS_AVAILABLE || DGETRF == null) throw new UnsupportedOperationException(getName() + ": determinant() not available");
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
@@ -343,7 +343,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
              return org.episteme.core.mathematics.numbers.real.Real.of(det);
          } catch (Throwable e) {
              logger.warn("FFM Determinant failed: {}", e.getMessage());
-             return LinearAlgebraProvider.super.determinant(A);
+             throw new RuntimeException("FFM Determinant Operation Failed", e);
          }
     }
     
@@ -365,7 +365,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     @Override
     public QRResult<org.episteme.core.mathematics.numbers.real.Real> qr(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE || DGEQRF == null || DORGQR == null) {
-            return LinearAlgebraProvider.super.qr(a);
+            throw new UnsupportedOperationException(getName() + ": qr() not available");
         }
         int m = a.rows();
         int n = a.cols();
@@ -413,7 +413,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     @Override
     public SVDResult<org.episteme.core.mathematics.numbers.real.Real> svd(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE || DGESVD == null) {
-            return LinearAlgebraProvider.super.svd(a);
+            throw new UnsupportedOperationException(getName() + ": svd() not available");
         }
         int m = a.rows();
         int n = a.cols();
@@ -503,7 +503,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> A, Matrix<org.episteme.core.mathematics.numbers.real.Real> B) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(A, B);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": multiply() not available");
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();
@@ -527,7 +527,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                                   m, n, k, 1.0, segA, k, segB, n, 0.0, segC, n);
             } catch (Throwable e) {
                 logger.warn("FFM DGEMM failed: {}", e.getMessage());
-                return LinearAlgebraProvider.super.multiply(A, B);
+                throw new RuntimeException("FFM Multiply Operation Failed", e);
             }
 
             double[] result = new double[m * n];
@@ -538,7 +538,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public org.episteme.core.mathematics.numbers.real.Real dot(Vector<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
-         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.dot(a, b);
+         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": dot() not available");
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -551,7 +551,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     
     @Override
     public org.episteme.core.mathematics.numbers.real.Real norm(Vector<org.episteme.core.mathematics.numbers.real.Real> a) {
-         if (!IS_AVAILABLE) return LinearAlgebraProvider.super.norm(a);
+         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": norm() not available");
          int n = a.dimension();
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -562,7 +562,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Vector<org.episteme.core.mathematics.numbers.real.Real> add(Vector<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.add(a, b);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Vector add() not available");
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -580,7 +580,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Vector<org.episteme.core.mathematics.numbers.real.Real> subtract(Vector<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.subtract(a, b);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Vector subtract() not available");
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -598,7 +598,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Vector<org.episteme.core.mathematics.numbers.real.Real> multiply(Vector<org.episteme.core.mathematics.numbers.real.Real> vector, org.episteme.core.mathematics.numbers.real.Real scalar) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(vector, scalar);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Vector multiply() not available");
         int n = vector.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
@@ -612,7 +612,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> add(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Matrix<org.episteme.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.add(a, b);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Matrix add() not available");
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
@@ -631,7 +631,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> subtract(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Matrix<org.episteme.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.subtract(a, b);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Matrix subtract() not available");
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
@@ -650,7 +650,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> scale(org.episteme.core.mathematics.numbers.real.Real scalar, Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.scale(scalar, a);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": scale() not available");
         int m = a.rows(), n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
@@ -676,7 +676,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public Vector<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) return LinearAlgebraProvider.super.multiply(a, b);
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Matrix-Vector multiply() not available");
         int m = a.rows(), k = a.cols();
         try (Arena arena = Arena.ofConfined()) {
             int lenA = m * k;

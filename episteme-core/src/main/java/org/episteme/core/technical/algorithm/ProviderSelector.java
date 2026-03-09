@@ -71,7 +71,7 @@ public final class ProviderSelector {
                 .max(Comparator.comparingDouble(p -> p.score(context)))
                 .orElseThrow(() -> new NoSuchElementException("No provider satisfying filter for: " + providerClass.getSimpleName()));
 
-        logger.debug("Selected {} (score={}) for {}", best.getName(), best.score(context), providerClass.getSimpleName());
+        logger.info("Selected Provider: {} (Score: {}) for {}", best.getName(), best.score(context), providerClass.getSimpleName());
         return best;
     }
 
@@ -99,10 +99,12 @@ public final class ProviderSelector {
             try {
                 return operation.apply(provider);
             } catch (Throwable t) {
-                logger.warn("Provider {} failed: {}. Attempting fallback...", provider.getName(), t.getMessage());
+                logger.info("Provider {} failed, attempting fallback... (Reason: {})", 
+                    provider.getName(), t.getMessage());
                 lastError = t;
             }
         }
+        logger.error("All {} providers failed for {} operation", providers.size(), providerClass.getSimpleName());
 
         throw new RuntimeException("All " + providers.size() + " providers for " + providerClass.getSimpleName() + " failed.", lastError);
     }

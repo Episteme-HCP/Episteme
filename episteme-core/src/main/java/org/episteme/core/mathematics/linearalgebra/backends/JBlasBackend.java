@@ -26,7 +26,6 @@ package org.episteme.core.mathematics.linearalgebra.backends;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
@@ -231,17 +230,12 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { return fromJBlasMatrix(toJBlasMatrix(a).mmul(toJBlasMatrix(b))); }
         @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { return fromJBlasVector(toJBlasMatrix(a).mmul(toJBlasVector(b))); }
         @Override public Matrix<E> inverse(Matrix<E> a) { return fromJBlasMatrix(org.jblas.Solve.pinv(toJBlasMatrix(a))); }
-        @Override public E determinant(Matrix<E> a) { return LinearAlgebraProvider.super.determinant(a); }
+
         @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromJBlasVector(org.jblas.Solve.solve(toJBlasMatrix(a), toJBlasVector(b))); }
         @Override public Matrix<E> transpose(Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).transpose()); }
         @Override public Matrix<E> scale(E s, Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).mul(((Real) s).doubleValue())); }
         @Override @SuppressWarnings("unchecked")
         public E norm(Vector<E> a) { return (E) org.episteme.core.mathematics.numbers.real.Real.of(toJBlasVector(a).norm2()); }
 
-        @Override public QRResult<E> qr(Matrix<E> a) { return LinearAlgebraProvider.super.qr(a); }
-        @Override public SVDResult<E> svd(Matrix<E> a) { return LinearAlgebraProvider.super.svd(a); }
-        @Override public EigenResult<E> eigen(Matrix<E> a) { return LinearAlgebraProvider.super.eigen(a); }
-        @Override public LUResult<E> lu(Matrix<E> a) { return LinearAlgebraProvider.super.lu(a); }
-        @Override public CholeskyResult<E> cholesky(Matrix<E> a) { return LinearAlgebraProvider.super.cholesky(a); }
     }
 }

@@ -137,6 +137,7 @@ public final class AlgorithmManager {
         }
 
         available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
+        logger.info("Discovered and prioritized {} providers for {}", available.size(), providerClass.getSimpleName());
         return available;
     }
 
@@ -257,11 +258,12 @@ public final class AlgorithmManager {
             try {
                 return operation.apply(provider);
             } catch (UnsupportedOperationException e) {
-                logger.debug("Provider {} does not support operation, trying next: {}", 
+                logger.info("Operation not supported by {}, falling back (Cause: {})", 
                     provider.getName(), e.getMessage());
                 lastException = e;
             }
         }
+        logger.error("All providers failed for {} operation", providerClass.getSimpleName());
         throw lastException != null ? lastException : 
             new UnsupportedOperationException("No provider supports this operation for " + providerClass.getSimpleName());
     }

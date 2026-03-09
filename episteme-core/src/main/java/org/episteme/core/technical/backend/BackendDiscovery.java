@@ -77,6 +77,7 @@ public class BackendDiscovery {
                     logger.warn("Skipping bad Backend provider: {}", e.getMessage());
                 }
             }
+            logger.info("Backend Discovery complete. {} backends loaded.", cachedProviders.size());
         }
         return cachedProviders;
     }
