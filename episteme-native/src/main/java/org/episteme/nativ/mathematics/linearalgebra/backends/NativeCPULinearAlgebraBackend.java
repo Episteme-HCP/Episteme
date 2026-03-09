@@ -55,6 +55,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     private static final MethodHandle DGETRF_HANDLE;
     private static final MethodHandle DGETRI_HANDLE;
     private static final MethodHandle DSYEV_HANDLE;
+    private static final MethodHandle DPOTRF_HANDLE;
     
     private static final boolean AVAILABLE;
 
@@ -70,6 +71,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         MethodHandle dgetrf = null;
         MethodHandle dgetri = null;
         MethodHandle dsyev = null;
+        MethodHandle dpotrf = null;
         
         boolean avail = false;
 
@@ -123,6 +125,10 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
                     dsyev = lookup.find("LAPACKE_dsyev").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
+                    // dpotrf(matrix_layout, uplo, n, a, lda)
+                    dpotrf = lookup.find("LAPACKE_dpotrf").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
                     avail = true;
                 }
             }
@@ -135,6 +141,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         DGETRF_HANDLE = dgetrf;
         DGETRI_HANDLE = dgetri;
         DSYEV_HANDLE = dsyev;
+        DPOTRF_HANDLE = dpotrf;
         
         AVAILABLE = avail;
     }
@@ -246,6 +253,15 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             return (int) DSYEV_HANDLE.invokeExact(CblasRowMajor, (byte) 'V', (byte) 'L', n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(W));
         } catch (Throwable t) {
             throw new RuntimeException("LAPACK dsyev failed", t);
+        }
+    }
+
+    public int dpotrf(int n, DoubleBuffer A, int lda) {
+        if (!AVAILABLE || DPOTRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dpotrf not available");
+        try {
+            return (int) DPOTRF_HANDLE.invokeExact(CblasRowMajor, (byte) 'L', n, MemorySegment.ofBuffer(A), lda);
+        } catch (Throwable t) {
+            throw new RuntimeException("LAPACK dpotrf failed", t);
         }
     }
 
@@ -525,5 +541,31 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             );
         }
         throw new UnsupportedOperationException(getName() + ": eigen() not available for these types");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+            int n = a.rows();
+            RealDoubleMatrix lMat = RealDoubleMatrix.direct(n, n);
+            lMat.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            lMat.getBuffer().position(0);
+
+            int info = dpotrf(n, lMat.getBuffer(), n);
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dpotrf: " + info);
+            if (info > 0) throw new ArithmeticException("Matrix is not positive definite (info=" + info + ")");
+
+            // Zero out upper part
+            double[] data = lMat.toDoubleArray();
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    data[i * n + j] = 0.0;
+                }
+            }
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+                RealDoubleMatrix.of(data, n, n)
+            );
+        }
+        throw new UnsupportedOperationException(getName() + ": cholesky() not available for these types");
     }
 }

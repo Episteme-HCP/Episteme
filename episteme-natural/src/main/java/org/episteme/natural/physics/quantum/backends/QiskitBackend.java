@@ -34,7 +34,7 @@ public class QiskitBackend implements QuantumBackend, QuantumAlgorithmProvider {
     @Override
     public boolean isAvailable() {
         try {
-            Process p = new ProcessBuilder("python", "-c", "import qiskit").start();
+            Process p = new ProcessBuilder(PythonResolver.resolve(), "-c", "import qiskit").start();
             return p.waitFor() == 0;
         } catch (Exception e) { return false; }
     }
@@ -66,7 +66,7 @@ public class QiskitBackend implements QuantumBackend, QuantumAlgorithmProvider {
                 throw new UnsupportedOperationException("Qiskit runner script (tools/qiskit_runner.py) missing");
             }
  
-            ProcessBuilder pb = new ProcessBuilder("python", runnerScript.getAbsolutePath(), qasmFile.toAbsolutePath().toString());
+            ProcessBuilder pb = new ProcessBuilder(PythonResolver.resolve(), runnerScript.getAbsolutePath(), qasmFile.toAbsolutePath().toString());
             pb.redirectErrorStream(true);
             Process p = pb.start();
  

@@ -11,6 +11,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -378,5 +379,30 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector P =
             org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pivots);
         return new LUResult<>(fromINDArray(L), fromINDArray(U), P);
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int n = a.rows();
+        INDArray mat = toINDArray(a).dup();
+        INDArray L = Nd4j.zeros(n, n);
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j <= i; j++) {
+                double sum = 0;
+                for (int k = 0; k < j; k++) {
+                    sum += L.getDouble(i, k) * L.getDouble(j, k);
+                }
+                if (i == j) {
+                    double val = mat.getDouble(i, i) - sum;
+                    if (val <= 0) throw new ArithmeticException("Matrix is not positive definite");
+                    L.putScalar(i, j, Math.sqrt(val));
+                } else {
+                    L.putScalar(i, j, (mat.getDouble(i, j) - sum) / L.getDouble(j, j));
+                }
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromINDArray(L));
     }
 }
