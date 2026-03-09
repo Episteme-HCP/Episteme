@@ -257,7 +257,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             dgemm(m, n, k, aBuf, k, bBuf, n, cdm.getBuffer(), n, 1.0, 0.0);
             return cdm;
         }
-        return LinearAlgebraProvider.super.multiply(a, b);
+        throw new UnsupportedOperationException(getName() + ": multiply() not available for these matrix types");
     }
 
     @Override
@@ -283,7 +283,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             
             return res;
         }
-        return LinearAlgebraProvider.super.inverse(a);
+        throw new UnsupportedOperationException(getName() + ": inverse() not available for these matrix types");
     }
 
     private DoubleBuffer ensureDirect(RealDoubleMatrix m) {
@@ -324,7 +324,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             x.getBuffer().get(result);
             return RealDoubleVector.of(result);
         }
-        return LinearAlgebraProvider.super.solve(a, b);
+        throw new UnsupportedOperationException(getName() + ": solve() not available for these matrix types");
     }
 
     @Override
@@ -336,7 +336,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
             return RealDoubleVector.of(rd);
         }
-        return LinearAlgebraProvider.super.add(a, b);
+        throw new UnsupportedOperationException(getName() + ": Vector add() not available for these types");
     }
 
     @Override
@@ -348,7 +348,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
             return RealDoubleVector.of(rd);
         }
-        return LinearAlgebraProvider.super.subtract(a, b);
+        throw new UnsupportedOperationException(getName() + ": Vector subtract() not available for these types");
     }
 
     @Override
@@ -362,7 +362,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
             return RealDoubleMatrix.of(rd, rows, cols);
         }
-        return LinearAlgebraProvider.super.add(a, b);
+        throw new UnsupportedOperationException(getName() + ": Matrix add() not available for these types");
     }
 
     @Override
@@ -376,7 +376,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
             return RealDoubleMatrix.of(rd, rows, cols);
         }
-        return LinearAlgebraProvider.super.subtract(a, b);
+        throw new UnsupportedOperationException(getName() + ": Matrix subtract() not available for these types");
     }
 
     @Override
@@ -390,7 +390,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
             return RealDoubleMatrix.of(rd, rows, cols);
         }
-        return LinearAlgebraProvider.super.scale(scalar, a);
+        throw new UnsupportedOperationException(getName() + ": scale() not available for these types");
     }
 
     @Override
@@ -407,7 +407,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             }
             return RealDoubleMatrix.of(rd, cols, rows);
         }
-        return LinearAlgebraProvider.super.transpose(a);
+        throw new UnsupportedOperationException(getName() + ": transpose() not available for these types");
     }
 
     @Override
@@ -436,7 +436,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             if (swaps % 2 != 0) det = -det;
             return Real.of(det);
         }
-        return LinearAlgebraProvider.super.determinant(a);
+        throw new UnsupportedOperationException(getName() + ": determinant() not available for these types");
     }
 
     // Other methods default to UnsupportedOperationException

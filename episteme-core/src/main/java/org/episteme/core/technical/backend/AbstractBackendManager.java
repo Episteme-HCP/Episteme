@@ -117,7 +117,8 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * @param backend the backend to register
      */
     public void managerRegister(T backend) {
-        logger.trace("Registering backend: {} for {}", backend.getName(), backendClass.getSimpleName());
+        logger.info("Registered Backend: {} (Type: {}, Priority: {})", 
+            backend.getName(), backend.getType(), backend.getPriority());
         backends.put(backend.getName(), backend);
     }
 

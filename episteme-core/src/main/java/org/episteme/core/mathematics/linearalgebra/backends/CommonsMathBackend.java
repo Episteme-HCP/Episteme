@@ -26,7 +26,6 @@ package org.episteme.core.mathematics.linearalgebra.backends;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
@@ -232,10 +231,5 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
         @Override @SuppressWarnings("unchecked")
         public E norm(Vector<E> a) { return (E) org.episteme.core.mathematics.numbers.real.Real.of(toCommonsVector(a).getNorm()); }
 
-        @Override public QRResult<E> qr(Matrix<E> a) { return LinearAlgebraProvider.super.qr(a); }
-        @Override public SVDResult<E> svd(Matrix<E> a) { return LinearAlgebraProvider.super.svd(a); }
-        @Override public EigenResult<E> eigen(Matrix<E> a) { return LinearAlgebraProvider.super.eigen(a); }
-        @Override public LUResult<E> lu(Matrix<E> a) { return LinearAlgebraProvider.super.lu(a); }
-        @Override public CholeskyResult<E> cholesky(Matrix<E> a) { return LinearAlgebraProvider.super.cholesky(a); }
     }
 }
