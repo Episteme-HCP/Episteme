@@ -175,6 +175,11 @@
                         <exclude>${cuda.exclude.3}</exclude>
                         <exclude>module-info.java</exclude>
                     </excludes>
+                    <testExcludes>
+                        <exclude>${cuda.exclude.1}</exclude>
+                        <exclude>${cuda.exclude.2}</exclude>
+                        <exclude>${cuda.exclude.3}</exclude>
+                    </testExcludes>
                 </configuration>
             </plugin>
             <plugin>

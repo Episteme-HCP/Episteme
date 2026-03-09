@@ -54,6 +54,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static MethodHandle CUDA_FREE;
     private static MethodHandle CUDA_MEMCPY;
     private static MethodHandle CUDA_DEVICE_SYNCHRONIZE;
+    private static MethodHandle CUBLAS_DDOT;
+    private static MethodHandle CUBLAS_DNRM2;
 
     // cuSolver Handles
     private static MethodHandle CUSOLVER_CREATE;
@@ -177,6 +179,17 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                 ValueLayout.JAVA_INT
             ));
+
+            Optional<MemorySegment> ddotSym = NativeLibraryLoader.findSymbol(cublas, "cublasDdot_v2", "cublasDdot");
+            Optional<MemorySegment> dnrm2Sym = NativeLibraryLoader.findSymbol(cublas, "cublasDnrm2_v2", "cublasDnrm2");
+            if (ddotSym.isPresent()) {
+                CUBLAS_DDOT = LINKER.downcallHandle(ddotSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            }
+            if (dnrm2Sym.isPresent()) {
+                CUBLAS_DNRM2 = LINKER.downcallHandle(dnrm2Sym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            }
 
             // cuSolver
             Optional<SymbolLookup> cusolverOpt = NativeLibraryLoader.loadLibrary("cusolver", Arena.global());
@@ -421,6 +434,150 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
 
     @Override
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Matrix add()");
+        return geam(a, b, 1.0, 1.0);
+    }
+
+    @Override
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Matrix subtract()");
+        return geam(a, b, 1.0, -1.0);
+    }
+
+    @Override
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Matrix scale()");
+        return geam(a, null, scalar.doubleValue(), 0.0);
+    }
+
+    private Matrix<Real> geam(Matrix<Real> a, Matrix<Real> b, double alphaVal, double betaVal) {
+        int m = a.rows(); int n = a.cols();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment d_B = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment d_C = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) m * n * 8));
+            checkCuda((int) CUDA_MALLOC.invokeExact(d_C, (long) m * n * 8));
+            
+            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), segA, (long) m * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+            
+            if (b != null) {
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_B, (long) m * n * 8));
+                MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B.get(ValueLayout.ADDRESS, 0), segB, (long) m * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+            } else {
+                d_B = arena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
+            }
+
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+            
+            MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, alphaVal);
+            MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, betaVal);
+            
+            // DGEAM: C = alpha * op(A) + beta * op(B). Use col-major swap for row-major.
+            checkCublas((int) CUBLAS_DGEAM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), n, beta, d_B.get(ValueLayout.ADDRESS, 0), n, d_C.get(ValueLayout.ADDRESS, 0), n));
+            
+            double[] h_C = new double[m * n];
+            MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+            checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C.get(ValueLayout.ADDRESS, 0), (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+            MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
+            
+            CUBLAS_DESTROY.invokeExact(handle);
+            CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0));
+            if (b != null) CUDA_FREE.invokeExact(d_B.get(ValueLayout.ADDRESS, 0));
+            CUDA_FREE.invokeExact(d_C.get(ValueLayout.ADDRESS, 0));
+            
+            return fromDoubleArray(h_C, m, n);
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> x) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for multiply(Mat, Vec)");
+        // Treat x as n x 1 matrix
+        int m = a.rows(); int k = a.cols();
+        Matrix<Real> xMat = fromDoubleArray(toDoubleVec(x), k, 1);
+        Matrix<Real> resMat = multiply(a, xMat);
+        double[] resData = new double[m];
+        for(int i=0; i<m; i++) resData[i] = resMat.get(i, 0).doubleValue();
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(resData);
+    }
+
+    @Override
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Vector add()");
+        Matrix<Real> ma = fromDoubleArray(toDoubleVec(a), 1, a.dimension());
+        Matrix<Real> mb = fromDoubleArray(toDoubleVec(b), 1, b.dimension());
+        Matrix<Real> mc = add(ma, mb);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(toDoubleArray(mc));
+    }
+
+    @Override
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Vector subtract()");
+        Matrix<Real> ma = fromDoubleArray(toDoubleVec(a), 1, a.dimension());
+        Matrix<Real> mb = fromDoubleArray(toDoubleVec(b), 1, b.dimension());
+        Matrix<Real> mc = subtract(ma, mb);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(toDoubleArray(mc));
+    }
+
+    @Override
+    public Vector<Real> multiply(Vector<Real> v, Real s) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Vector scale()");
+        Matrix<Real> mv = fromDoubleArray(toDoubleVec(v), 1, v.dimension());
+        Matrix<Real> mc = scale(s, mv);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(toDoubleArray(mc));
+    }
+
+    @Override
+    public Real dot(Vector<Real> a, Vector<Real> b) {
+        if (!IS_AVAILABLE || CUBLAS_DDOT == null) throw new UnsupportedOperationException(getName() + ": CUDA dot not available");
+        int n = a.dimension();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment d_B = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_DOUBLE);
+            checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) n * 8));
+            checkCuda((int) CUDA_MALLOC.invokeExact(d_B, (long) n * 8));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(a)), (long) n * 8, 1));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_B.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b)), (long) n * 8, 1));
+            
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
+            checkCublas((int) CUBLAS_DDOT.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0), n, d_A.get(ValueLayout.ADDRESS, 0), 1, d_B.get(ValueLayout.ADDRESS, 0), 1, d_Res));
+            double res = d_Res.get(ValueLayout.JAVA_DOUBLE, 0);
+            CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
+            CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0));
+            CUDA_FREE.invokeExact(d_B.get(ValueLayout.ADDRESS, 0));
+            return Real.of(res);
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public Real norm(Vector<Real> v) {
+        if (!IS_AVAILABLE || CUBLAS_DNRM2 == null) throw new UnsupportedOperationException(getName() + ": CUDA norm not available");
+        int n = v.dimension();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment d_V = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_DOUBLE);
+            checkCuda((int) CUDA_MALLOC.invokeExact(d_V, (long) n * 8));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_V.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(v)), (long) n * 8, 1));
+            
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
+            checkCublas((int) CUBLAS_DNRM2.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0), n, d_V.get(ValueLayout.ADDRESS, 0), 1, d_Res));
+            double res = d_Res.get(ValueLayout.JAVA_DOUBLE, 0);
+            CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
+            CUDA_FREE.invokeExact(d_V.get(ValueLayout.ADDRESS, 0));
+            return Real.of(res);
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for solve()");
 
@@ -485,13 +642,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return fromDoubleVec(h_X);
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
-                if (!segB.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segB); }
-                if (!segIpiv.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segIpiv); }
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
-                int resD = (int) CUSOLVER_DESTROY.invokeExact(handle);
-                checkCuda(resD);
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
+                if (!segB.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segB);
+                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
+                CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             if (!ProviderExecutionMode.isFallbackAllowed()) {
@@ -580,13 +736,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return fromDoubleArray(h_Inv, n, n);
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
-                if (!segB.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segB); }
-                if (!segIpiv.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segIpiv); }
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
-                int resD = (int) CUSOLVER_DESTROY.invokeExact(handle);
-                checkCuda(resD);
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
+                if (!segB.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segB);
+                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
+                CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             if (!ProviderExecutionMode.isFallbackAllowed()) {
@@ -665,12 +820,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return Real.of(det);
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
-                if (!segIpiv.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segIpiv); }
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
-                int rdD = (int) CUSOLVER_DESTROY.invokeExact(handle);
-                checkCuda(rdD);
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
+                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
+                CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             if (!ProviderExecutionMode.isFallbackAllowed()) {
@@ -706,6 +860,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
         Real[] reals = new Real[data.length];
         for(int i=0; i<data.length; i++) reals[i] = Real.of(data[i]);
         return new DenseMatrix<Real>(reals, rows, cols, Reals.getInstance());
+    }
+
+    private Vector<Real> fromDoubleVec(double[] data) {
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
     }
 
     private double[] toDoubleVec(Vector<Real> v) {
@@ -804,10 +962,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
 
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
                 if (!segTau.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segTau);
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
@@ -912,12 +1070,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 );
 
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
                 if (!segS.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segS);
                 if (!segU.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segU);
                 if (!segVT.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segVT);
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
@@ -930,9 +1088,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     }
 
 
-    private Vector<Real> fromDoubleVec(double[] d) {
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
-    }
+    // toDoubleVec is already defined above at line 868 (duplicated at line 1090)
+    // Removing the duplicated copy.
 
     @Override public String getNativeLibraryName() { return "cuda"; }
     @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }
@@ -995,9 +1152,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromDoubleArray(lData, n, n));
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
@@ -1106,10 +1263,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     fromDoubleVec(pData)
                 );
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
-                if (!segIpiv.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segIpiv); }
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
+                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
@@ -1189,10 +1346,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     fromDoubleVec(h_W)
                 );
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
                 if (!segW.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segW);
-                if (!segInfo.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segInfo); }
-                if (!segWork.equals(MemorySegment.NULL)) { int res = (int) CUDA_FREE.invokeExact(segWork); }
+                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
+                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
                 CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {

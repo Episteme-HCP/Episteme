@@ -25,7 +25,6 @@ package org.episteme.natural.ui.viewers.devices;
 
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -185,16 +184,7 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
         } catch (Exception e) {}
     }
 
-    private void updatePosition(Double ra, Double dec) {
-        Platform.runLater(() -> {
-            displayRA = ra;
-            displayDec = dec;
-            raLabel.setText(String.format("%.2fh", ra));
-            decLabel.setText(String.format("%.2fÃ‚Â°", dec));
-            updateStatusDisplay();
-            drawSkyView();
-        });
-    }
+
 
     @Override
     public void update() {

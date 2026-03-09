@@ -44,7 +44,6 @@ public class SimulatedCentrifuge extends AbstractSimulatedActuator<Quantity<Freq
     private final Quantity<Dimensionless> maxRCF;
     private final RotorType rotorType;
     private Quantity<Frequency> currentRPM = Quantities.create(0.0, Units.HERTZ);
-    private Quantity<Frequency> targetRPM = Quantities.create(0.0, Units.HERTZ);
     private boolean running = false;
 
     public SimulatedCentrifuge(Identification id, Quantity<Frequency> maxRPM, Quantity<Dimensionless> maxRCF, RotorType rotorType) {
@@ -93,7 +92,6 @@ public class SimulatedCentrifuge extends AbstractSimulatedActuator<Quantity<Freq
         if (rpm.compareTo(maxRPM) > 0) {
             throw new IllegalArgumentException("RPM exceeds maximum");
         }
-        this.targetRPM = rpm;
         this.currentRPM = rpm;
         this.running = true;
     }

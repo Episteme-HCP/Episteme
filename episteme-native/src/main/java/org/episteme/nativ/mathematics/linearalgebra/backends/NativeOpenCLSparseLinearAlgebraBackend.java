@@ -96,6 +96,16 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         "        }\n" +
         "        c[row * n + col] = sum;\n" +
         "    }\n" +
+        "}\n" +
+        "\n" +
+        "__kernel void transpose(__global const double *a, __global double *b, const int rows, const int cols) {\n" +
+        "    int r = get_global_id(1); int c = get_global_id(0);\n" +
+        "    if (r < rows && c < cols) b[c * rows + r] = a[r * cols + c];\n" +
+        "}\n" +
+        "\n" +
+        "__kernel void dot_partial(__global const double *a, __global const double *b, __global double *out, const int n) {\n" +
+        "    int i = get_global_id(0);\n" +
+        "    if (i < n) out[i] = a[i] * b[i];\n" +
         "}\n";
 
     @Override
@@ -365,7 +375,57 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
     }
 
-    // Matrix add, subtract, scale, transpose: not implemented — default throws from interface
+    @Override
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for Matrix add()");
+        }
+        return elementWiseVec(toDoubleArray(a), toDoubleArray(b), "vectorAdd", a.rows(), a.cols());
+    }
+
+    @Override
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for Matrix subtract()");
+        }
+        return elementWiseVec(toDoubleArray(a), toDoubleArray(b), "vectorSubtract", a.rows(), a.cols());
+    }
+
+    @Override
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for Matrix scale()");
+        }
+        double[] data = toDoubleArray(a);
+        double s = scalar.doubleValue();
+        return fromDoubleArray(scaleVec(data, s), a.rows(), a.cols());
+    }
+
+    @Override
+    public Matrix<Real> transpose(Matrix<Real> a) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for transpose()");
+        }
+        int rows = a.rows(); int cols = a.cols();
+        double[] src = toDoubleArray(a);
+        double[] dst = new double[rows * cols];
+        
+        cl_mem memA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * src.length, Pointer.to(src), null);
+        cl_mem memB = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, Sizeof.cl_double * src.length, null, null);
+        cl_kernel k = clCreateKernel(denseProgram, "transpose", null);
+        try {
+            clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(k, 2, Sizeof.cl_int, Pointer.to(new int[]{rows}));
+            clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{cols}));
+            clEnqueueNDRangeKernel(staticCommandQueue, k, 2, null, new long[]{cols, rows}, null, 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, memB, CL_TRUE, 0, Sizeof.cl_double * src.length, Pointer.to(dst), 0, null, null);
+        } finally {
+            clReleaseKernel(k); clReleaseMemObject(memA); clReleaseMemObject(memB);
+        }
+        return fromDoubleArray(dst, cols, rows);
+    }
+
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> x) {
         return multiplyCSR(a, x);
@@ -441,5 +501,117 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(res), Reals.getInstance());
     }
 
-    // Vector ops + decompositions: not implemented — default throws from interface
+    @Override
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for Vector add()");
+        }
+        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), "vectorAdd"));
+    }
+
+    @Override
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for Vector subtract()");
+        }
+        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), "vectorSubtract"));
+    }
+
+    @Override
+    public Vector<Real> multiply(Vector<Real> v, Real s) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for Vector scale()");
+        }
+        return toRealVector(scaleVec(toDoubleVec(v), s.doubleValue()));
+    }
+
+    @Override
+    public Real dot(Vector<Real> v1, Vector<Real> v2) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for dot()");
+        }
+        double[] products = vecOp(toDoubleVec(v1), toDoubleVec(v2), "dot_partial");
+        double sum = 0; for(double d : products) sum += d;
+        return Real.of(sum);
+    }
+
+    @Override
+    public Real norm(Vector<Real> v) {
+        if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for norm()");
+        }
+        double[] d = toDoubleVec(v);
+        double[] sq = vecOp(d, d, "dot_partial");
+        double sum = 0; for(double s : sq) sum += s;
+        return Real.of(Math.sqrt(sum));
+    }
+
+    // Helper methods (internal)
+    private Matrix<Real> elementWiseVec(double[] a, double[] b, String kernelName, int rows, int cols) {
+        return fromDoubleArray(vecOp(a, b, kernelName), rows, cols);
+    }
+
+    private double[] vecOp(double[] a, double[] b, String kernelName) {
+        int n = a.length;
+        double[] result = new double[n];
+        cl_mem mA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+        cl_mem mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(b), null);
+        cl_mem mC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+        cl_kernel k = clCreateKernel(denseProgram, kernelName, null);
+        try {
+            clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mA));
+            clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(mB));
+            clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mC));
+            clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+        } finally {
+            clReleaseKernel(k); clReleaseMemObject(mA); clReleaseMemObject(mB); clReleaseMemObject(mC);
+        }
+        return result;
+    }
+
+    private double[] scaleVec(double[] a, double s) {
+        int n = a.length;
+        double[] result = new double[n];
+        cl_mem mA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+        cl_mem mC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+        cl_kernel k = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
+        try {
+            clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mA));
+            clSetKernelArg(k, 1, Sizeof.cl_double, Pointer.to(new double[]{s}));
+            clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mC));
+            clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+        } finally {
+            clReleaseKernel(k); clReleaseMemObject(mA); clReleaseMemObject(mC);
+        }
+        return result;
+    }
+
+    private double[] toDoubleArray(Matrix<Real> m) {
+        int rows = m.rows(); int cols = m.cols();
+        double[] data = new double[rows * cols];
+        for(int i=0; i<rows; i++) for(int j=0; j<cols; j++) data[i*cols + j] = m.get(i, j).doubleValue();
+        return data;
+    }
+
+    private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
+        Real[] reals = new Real[data.length];
+        for(int i=0; i<data.length; i++) reals[i] = Real.of(data[i]);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(reals, rows, cols, Reals.getInstance());
+    }
+
+    private double[] toDoubleVec(Vector<Real> v) {
+        double[] data = new double[v.dimension()];
+        for(int i=0; i<v.dimension(); i++) data[i] = v.get(i).doubleValue();
+        return data;
+    }
+
+    private Vector<Real> toRealVector(double[] data) {
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
+    }
+
+    // Decompositions: not implemented — default throws from interface
 }
