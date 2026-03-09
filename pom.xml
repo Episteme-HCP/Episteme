@@ -832,6 +832,27 @@
   </repositories>
   <profiles>
     <profile>
+      <id>minimal</id>
+      <properties>
+        <distribution>minimal</distribution>
+      </properties>
+    </profile>
+    <profile>
+      <id>optimal</id>
+      <properties>
+        <distribution>optimal</distribution>
+      </properties>
+    </profile>
+    <profile>
+      <id>benchmark</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <distribution>benchmark</distribution>
+      </properties>
+    </profile>
+    <profile>
       <id>macos-arm64-classifier</id>
       <activation>
         <os>

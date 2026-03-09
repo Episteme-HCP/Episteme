@@ -365,10 +365,10 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
     }
 
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL add not implemented"); }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { throw new UnsupportedOperationException("OpenCL subtract not implemented"); }
-    @Override public Matrix<Real> scale(Real s, Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL scale not implemented"); }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) { throw new UnsupportedOperationException("OpenCL transpose not implemented"); }
+    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return SparseLinearAlgebraProvider.super.add(a, b); }
+    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return SparseLinearAlgebraProvider.super.subtract(a, b); }
+    @Override public Matrix<Real> scale(Real s, Matrix<Real> a) { return SparseLinearAlgebraProvider.super.scale(s, a); }
+    @Override public Matrix<Real> transpose(Matrix<Real> a) { return SparseLinearAlgebraProvider.super.transpose(a); }
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> x) {
         return multiplyCSR(a, x);
@@ -444,9 +444,9 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(res), Reals.getInstance());
     }
 
-    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL vector add not implemented"); }
-    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL vector subtract not implemented"); }
-    @Override public Vector<Real> multiply(Vector<Real> v, Real s) { throw new UnsupportedOperationException("OpenCL vector scale not implemented"); }
-    @Override public Real dot(Vector<Real> a, Vector<Real> b) { throw new UnsupportedOperationException("OpenCL dot not implemented"); }
-    @Override public Real norm(Vector<Real> a) { throw new UnsupportedOperationException("OpenCL norm not implemented"); }
+    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return SparseLinearAlgebraProvider.super.add(a, b); }
+    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return SparseLinearAlgebraProvider.super.subtract(a, b); }
+    @Override public Vector<Real> multiply(Vector<Real> v, Real s) { return SparseLinearAlgebraProvider.super.multiply(v, s); }
+    @Override public Real dot(Vector<Real> a, Vector<Real> b) { return SparseLinearAlgebraProvider.super.dot(a, b); }
+    @Override public Real norm(Vector<Real> a) { return SparseLinearAlgebraProvider.super.norm(a); }
 }

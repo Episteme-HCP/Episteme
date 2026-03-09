@@ -84,7 +84,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             try {
                 String innerName = EJMLBackend.class.getName() + "$EJMLImpl";
                 Class<?> clazz = Class.forName(innerName);
-                Constructor<?> ctor = clazz.getDeclaredConstructor(Field.class);
+                Constructor<?> ctor = clazz.getDeclaredConstructor(EJMLBackend.class, Field.class);
                 ctor.setAccessible(true);
                 this.ejmlImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {

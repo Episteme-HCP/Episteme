@@ -29,7 +29,7 @@ public class Quantum4JBackend implements QuantumBackend, QuantumAlgorithmProvide
     @Override
     public boolean isAvailable() {
         try {
-            Class.forName("io.quantum4j.core.QuantumProgram");
+            Class.forName("com.quantum4j.core.circuit.QuantumCircuit");
             return true;
         } catch (ClassNotFoundException e) { return false; }
     }

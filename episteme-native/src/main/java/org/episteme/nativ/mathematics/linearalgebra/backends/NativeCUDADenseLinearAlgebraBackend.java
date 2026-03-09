@@ -338,7 +338,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA not available");
+        if (!IS_AVAILABLE) return fallback().multiply(a, b);
 
         logger.debug("Entering CUDA multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         long start = System.nanoTime();
@@ -422,7 +422,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException("CUDA not available for solve()");
+        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) return fallback().solve(a, b);
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for solve");
@@ -505,7 +505,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException("CUDA not available for inverse()");
+        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) return fallback().inverse(a);
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for inverse");
@@ -600,7 +600,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException("CUDA not available for determinant()");
+        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) return fallback().determinant(a);
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for determinant");
@@ -716,7 +716,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGEQRF == null) throw new UnsupportedOperationException("CUDA not available for qr()");
+        if (!IS_AVAILABLE || CUSOLVER_DGEQRF == null) return fallback().qr(a);
 
         int m = a.rows();
         int n = a.cols();
@@ -822,7 +822,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGESVD == null) throw new UnsupportedOperationException("CUDA not available for svd()");
+        if (!IS_AVAILABLE || CUSOLVER_DGESVD == null) return fallback().svd(a);
 
         int m = a.rows();
         int n = a.cols();
@@ -939,7 +939,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     @Override public void selectDevice(int deviceId) { }
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DPOTRF == null) throw new UnsupportedOperationException("CUDA not available for cholesky()");
+        if (!IS_AVAILABLE || CUSOLVER_DPOTRF == null) return fallback().cholesky(a);
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Cholesky");
@@ -1012,7 +1012,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRF == null) throw new UnsupportedOperationException("CUDA not available for lu()");
+        if (!IS_AVAILABLE || CUSOLVER_DGETRF == null) return fallback().lu(a);
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for LU");
@@ -1123,7 +1123,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DSYEVD == null) throw new UnsupportedOperationException("CUDA not available for eigen()");
+        if (!IS_AVAILABLE || CUSOLVER_DSYEVD == null) return fallback().eigen(a);
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Eigen");
