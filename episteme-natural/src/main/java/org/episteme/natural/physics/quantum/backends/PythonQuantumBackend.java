@@ -36,8 +36,9 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
     private final String pythonExecutable;
 
     public PythonQuantumBackend() { 
-        this(System.getenv("EPISTEME_PYTHON") != null ? System.getenv("EPISTEME_PYTHON") : "python"); 
+        this(PythonResolver.resolve()); 
     }
+
     public PythonQuantumBackend(String pythonExecutable) { this.pythonExecutable = pythonExecutable; }
 
     @Override

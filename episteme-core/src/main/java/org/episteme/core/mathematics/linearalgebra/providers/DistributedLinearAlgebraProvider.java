@@ -50,8 +50,9 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
             return 0; 
         }
         
-        // Only prioritize if explicitly configured or potentially useful
-        return 200; 
+        // Only prioritize if explicitly configured or potentially useful.
+        // Lower to 50 to avoid stealing local high-perf backends (Native=90, ND4J=100)
+        return 50; 
     }
     
     @Override

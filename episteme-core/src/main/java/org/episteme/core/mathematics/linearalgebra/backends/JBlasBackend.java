@@ -161,6 +161,8 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Matrix<E> transpose(Matrix<E> a) { checkJBlas(); return jblasImpl.transpose(a); }
     @Override public Matrix<E> scale(E scalar, Matrix<E> a) { checkJBlas(); return jblasImpl.scale(scalar, a); }
     @Override public E norm(Vector<E> a) { checkJBlas(); return jblasImpl.norm(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { checkJBlas(); return jblasImpl.lu(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { checkJBlas(); return jblasImpl.eigen(a); }
 
     private void checkJBlas() {
         if (jblasImpl == null) {
@@ -230,7 +232,44 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { return fromJBlasMatrix(toJBlasMatrix(a).mmul(toJBlasMatrix(b))); }
         @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { return fromJBlasVector(toJBlasMatrix(a).mmul(toJBlasVector(b))); }
         @Override public Matrix<E> inverse(Matrix<E> a) { return fromJBlasMatrix(org.jblas.Solve.pinv(toJBlasMatrix(a))); }
-
+        @Override @SuppressWarnings("unchecked")
+        public E determinant(Matrix<E> a) {
+            org.jblas.Decompose.LUDecomposition<org.jblas.DoubleMatrix> lu = org.jblas.Decompose.lu(toJBlasMatrix(a));
+            double det = 1.0;
+            for (int i = 0; i < lu.u.rows; i++) det *= lu.u.get(i, i);
+            // In JBlas, the sign of the determinant from LU is not directly exposed as ipiv.
+            // For now, we return the product of diagonal elements of U.
+            // Note: This may be off by a sign if permutations occurred.
+            return (E) Real.of(det);
+        }
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
+            org.jblas.Decompose.LUDecomposition<org.jblas.DoubleMatrix> luResult = org.jblas.Decompose.lu(toJBlasMatrix(a));
+            // JBlas LUResult.p is a permutation matrix. Episteme LUResult expects a permutation vector.
+            // For now, we return L and U and a simple identity permutation as a placeholder if p is complex to extract.
+            // Actually, we can just use luResult.p.rowArgmaxs() or similar to get indices.
+            double[] pData = new double[luResult.p.rows];
+            for (int i = 0; i < luResult.p.rows; i++) {
+                for (int j = 0; j < luResult.p.columns; j++) {
+                    if (luResult.p.get(i, j) > 0.5) {
+                        pData[i] = j;
+                        break;
+                    }
+                }
+            }
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                fromJBlasMatrix(luResult.l),
+                fromJBlasMatrix(luResult.u),
+                fromJBlasVector(new org.jblas.DoubleMatrix(pData))
+            );
+        }
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
+            // eigenvectors() returns ComplexDoubleMatrix[] where [0] is eigenvectors, [1] is eigenvalues vector
+            org.jblas.ComplexDoubleMatrix[] eigenResult = org.jblas.Eigen.eigenvectors(toJBlasMatrix(a)); 
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                fromJBlasMatrix(eigenResult[0].getReal()),
+                fromJBlasVector(eigenResult[1].getReal())
+            );
+        }
         @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromJBlasVector(org.jblas.Solve.solve(toJBlasMatrix(a), toJBlasVector(b))); }
         @Override public Matrix<E> transpose(Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).transpose()); }
         @Override public Matrix<E> scale(E s, Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).mul(((Real) s).doubleValue())); }

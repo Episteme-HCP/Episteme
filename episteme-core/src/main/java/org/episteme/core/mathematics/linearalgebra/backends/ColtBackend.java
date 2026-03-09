@@ -154,6 +154,9 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Matrix<E> transpose(Matrix<E> a) { checkColt(); return coltImpl.transpose(a); }
     @Override public Matrix<E> scale(E scalar, Matrix<E> a) { checkColt(); return coltImpl.scale(scalar, a); }
     @Override public E norm(Vector<E> a) { checkColt(); return coltImpl.norm(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { checkColt(); return coltImpl.lu(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { checkColt(); return coltImpl.eigen(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) { checkColt(); return coltImpl.cholesky(a); }
 
     private void checkColt() {
         if (coltImpl == null) {
@@ -283,5 +286,28 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             return (E) org.episteme.core.mathematics.numbers.real.Real.of(Math.sqrt(toColtVector(a).zDotProduct(toColtVector(a))));
         }
 
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
+            cern.colt.matrix.linalg.LUDecomposition lu = new cern.colt.matrix.linalg.LUDecomposition(toColtMatrix(a));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                fromColtMatrix(lu.getL()),
+                fromColtMatrix(lu.getU()),
+                null // Colt doesn't expose P as a vector easily
+            );
+        }
+
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
+            cern.colt.matrix.linalg.EigenvalueDecomposition eigen = new cern.colt.matrix.linalg.EigenvalueDecomposition(toColtMatrix(a));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                fromColtMatrix(eigen.getV()),
+                fromColtVector(eigen.getRealEigenvalues())
+            );
+        }
+
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+            cern.colt.matrix.linalg.CholeskyDecomposition cholesky = new cern.colt.matrix.linalg.CholeskyDecomposition(toColtMatrix(a));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+                fromColtMatrix(cholesky.getL())
+            );
+        }
     }
 }

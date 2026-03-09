@@ -17,7 +17,7 @@ public class QiskitAerBackend extends QiskitBackend {
     @Override
     public boolean isAvailable() {
         try {
-            Process p = new ProcessBuilder("python", "-c", "import qiskit_aer").start();
+            Process p = new ProcessBuilder(PythonResolver.resolve(), "-c", "import qiskit_aer").start();
             return p.waitFor() == 0;
         } catch (Exception e) { return false; }
     }
