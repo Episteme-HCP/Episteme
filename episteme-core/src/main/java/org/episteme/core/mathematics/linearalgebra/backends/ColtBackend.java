@@ -154,6 +154,7 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { checkColt(); return coltImpl.solve(a, b); }
     @Override public Matrix<E> transpose(Matrix<E> a) { checkColt(); return coltImpl.transpose(a); }
     @Override public Matrix<E> scale(E scalar, Matrix<E> a) { checkColt(); return coltImpl.scale(scalar, a); }
+    @Override public LinearAlgebraProvider<E> fallback() { checkColt(); return coltImpl.fallback(); }
     @Override public E norm(Vector<E> a) { checkColt(); return coltImpl.norm(a); }
 
     private void checkColt() {

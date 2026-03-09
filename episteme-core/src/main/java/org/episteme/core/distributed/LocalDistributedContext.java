@@ -64,6 +64,7 @@ public class LocalDistributedContext implements DistributedContext {
 
     @Override
     public <T extends Serializable> Future<T> submit(Callable<T> task) {
+        if (task == null) throw new IllegalArgumentException("Task cannot be null");
         // Capture current MathContext
         org.episteme.core.mathematics.context.MathContext capturedContext = org.episteme.core.mathematics.context.MathContext
                 .getCurrent();
@@ -86,6 +87,7 @@ public class LocalDistributedContext implements DistributedContext {
 
     @Override
     public <T extends Serializable> List<Future<T>> invokeAll(List<Callable<T>> tasks) {
+        if (tasks == null || tasks.isEmpty()) return java.util.Collections.emptyList();
         // Capture current MathContext
         org.episteme.core.mathematics.context.MathContext capturedContext = org.episteme.core.mathematics.context.MathContext
                 .getCurrent();
@@ -130,13 +132,17 @@ public class LocalDistributedContext implements DistributedContext {
 
     @Override
     public void put(DoubleBuffer source, int targetRank, long offset) {
+        if (source == null) return;
         // Create a copy of the source buffer to ensure data stability
         DoubleBuffer copy = DoubleBuffer.allocate(source.remaining());
         int pos = source.position();
-        copy.put(source);
-        copy.flip();
-        source.position(pos); // Restore original position
-        localMemory.put(offset, copy);
+        try {
+            copy.put(source);
+            copy.flip();
+            localMemory.put(offset, copy);
+        } finally {
+            source.position(pos); // Restore original position
+        }
     }
 
     @Override
@@ -157,7 +163,11 @@ public class LocalDistributedContext implements DistributedContext {
 
     @Override
     public void fence() {
-        // No-op for local memory
+        // No-op for local memory, but we could use this as a hint to clear 
+        // older entries if memory is tight.
+        if (localMemory.size() > 1000) {
+            localMemory.clear(); // Simple eviction for simulation
+        }
     }
 
     @Override

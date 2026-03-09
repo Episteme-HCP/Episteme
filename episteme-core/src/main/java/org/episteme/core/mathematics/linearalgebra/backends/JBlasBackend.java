@@ -161,6 +161,7 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.solve(a, b); }
     @Override public Matrix<E> transpose(Matrix<E> a) { checkJBlas(); return jblasImpl.transpose(a); }
     @Override public Matrix<E> scale(E scalar, Matrix<E> a) { checkJBlas(); return jblasImpl.scale(scalar, a); }
+    @Override public LinearAlgebraProvider<E> fallback() { checkJBlas(); return jblasImpl.fallback(); }
     @Override public E norm(Vector<E> a) { checkJBlas(); return jblasImpl.norm(a); }
 
     private void checkJBlas() {

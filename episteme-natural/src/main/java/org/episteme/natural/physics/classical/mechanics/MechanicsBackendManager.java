@@ -49,22 +49,6 @@ public class MechanicsBackendManager extends AbstractBackendManager<MechanicsBac
         return INSTANCE.managerAll();
     }
 
-    /**
-     * @deprecated Use staticSelect
-     */
-    @Deprecated
-    public static MechanicsBackend select(String name) {
-        return staticSelect(name);
-    }
-
-    /**
-     * @deprecated Use staticAllBackends
-     */
-    @Deprecated
-    public static java.util.Collection<MechanicsBackend> getAllBackends() {
-        return staticAllBackends();
-    }
-
     private String preferredId = "auto";
 
     private MechanicsBackendManager() {

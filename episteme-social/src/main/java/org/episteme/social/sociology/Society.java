@@ -49,17 +49,6 @@ public class Society extends Population<Person> {
 
     private static final long serialVersionUID = 2L;
 
-    @Deprecated
-    public enum Type {
-        @Deprecated HUNTER_GATHERER, @Deprecated PASTORAL, @Deprecated HORTICULTURAL, @Deprecated AGRICULTURAL,
-        @Deprecated INDUSTRIAL, @Deprecated POST_INDUSTRIAL, @Deprecated INFORMATION;
-        
-        @Deprecated
-        public SocietyType toSocietyType() {
-            return SocietyType.valueOf(this.name());
-        }
-    }
-
     @Attribute
     private SocietyType type;
     

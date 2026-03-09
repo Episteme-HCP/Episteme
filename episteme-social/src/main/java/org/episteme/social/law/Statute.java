@@ -61,41 +61,6 @@ public class Statute implements ComprehensiveIdentification {
     @Attribute
     private final Map<String, Object> traits = new HashMap<>();
 
-    /**
-     * @deprecated Use {@link StatuteType} instead.
-     */
-    @Deprecated
-    public enum Type {
-        @Deprecated CONSTITUTION, @Deprecated FEDERAL_LAW, @Deprecated STATE_LAW, @Deprecated REGULATION, @Deprecated ORDINANCE,
-        @Deprecated TREATY, @Deprecated DIRECTIVE, @Deprecated DECREE, @Deprecated ACT;
-        
-        @Deprecated
-        public StatuteType toStatuteType() {
-             try {
-                return StatuteType.valueOf(this.name());
-            } catch (IllegalArgumentException e) {
-                return StatuteType.OTHER;
-            }
-        }
-    }
-
-    /**
-     * @deprecated Use {@link StatuteStatus} instead.
-     */
-    @Deprecated
-    public enum Status {
-        @Deprecated PROPOSED, @Deprecated ENACTED, @Deprecated AMENDED, @Deprecated REPEALED;
-        
-        @Deprecated
-        public StatuteStatus toStatuteStatus() {
-             try {
-                return StatuteStatus.valueOf(this.name());
-            } catch (IllegalArgumentException e) {
-                return StatuteStatus.PROPOSED;
-            }
-        }
-    }
-
     @Attribute
     private final String code;
     
@@ -126,12 +91,6 @@ public class Statute implements ComprehensiveIdentification {
         this.status = Objects.requireNonNull(status);
     }
 
-    @Deprecated
-    public Statute(String code, String title, Type type, String jurisdiction,
-            int yearEnacted, Status status) {
-        this(code, title, type != null ? type.toStatuteType() : StatuteType.OTHER, 
-             jurisdiction, yearEnacted, status != null ? status.toStatuteStatus() : StatuteStatus.PROPOSED);
-    }
 
     @Override
     public Identification getId() {

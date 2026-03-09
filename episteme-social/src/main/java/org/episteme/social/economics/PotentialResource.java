@@ -157,16 +157,6 @@ public class PotentialResource implements ComprehensiveIdentification {
         this.kind = Objects.requireNonNull(kind);
     }
 
-    @Deprecated
-    public int getLegacyKind() {
-        return kind != null ? kind.ordinal() : -1;
-    }
-
-    @Deprecated
-    public void setLegacyKind(int legacyKind) {
-        this.kind = ResourceKind.valueOf(legacyKind);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

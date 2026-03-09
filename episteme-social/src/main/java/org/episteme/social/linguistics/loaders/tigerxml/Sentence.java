@@ -263,17 +263,6 @@ public class Sentence
         return nts.size();
     }
 
-    /**
-     * Returns the number of NT objects in the sentence.
-     *
-     * @return An <code>integer</code> denoting the number of non-terminals in
-     *         this sentence.
-     * @deprecated As of org.episteme.social.ml.tigerxml 1.1 - use {@link #getNTCount()} instead.
-     */
-    public int getNoOfNTs() {
-        return nts.size();
-    }
-
     public NT getNT(int i) {
         if (nts.size() == 0) {
             return null;
@@ -453,16 +442,6 @@ public class Sentence
      */
     public int getTCount() {
         return this.ts.size();
-    }
-
-    /**
-     * Returns the number of T objects in the sentence.
-     *
-     * @return An integer denoting the number of terminals in this sentence.
-     * @deprecated As of org.episteme.social.ml.tigerxml 1.1 - use {@link #getTCount()} instead.
-     */
-    public int getNoOfTs() {
-        return ts.size();
     }
 
     public T getT(int i) {
