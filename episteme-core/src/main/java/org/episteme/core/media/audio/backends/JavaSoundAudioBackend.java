@@ -41,6 +41,11 @@ public class JavaSoundAudioBackend implements AudioBackend, CPUBackend {
     @Override public String getDescription() { return "Default JavaSound API backend for playback and basic processing."; }
     @Override public boolean isAvailable() { return true; }
     @Override public int getPriority() { return 100; }
+
+    @Override
+    public String getAlgorithmType() {
+        return "Audio Processing";
+    }
     
     @Override 
     public Object createBackend() { 

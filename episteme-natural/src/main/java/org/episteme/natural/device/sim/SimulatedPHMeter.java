@@ -23,103 +23,78 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Dimensionless;
 import org.episteme.natural.device.sensors.PHMeter;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.util.identity.Identification;
+
 import java.io.IOException;
+import java.util.Random;
 
 /**
- * Simulated implementation of PHMeter.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Simulated pH meter.
  */
-public class SimulatedPHMeter extends SimulatedDevice implements PHMeter {
+public class SimulatedPHMeter extends AbstractDevice implements PHMeter {
 
-    private final Real accuracy;
-    private Real lastReading = PHMeter.NEUTRAL_PH;
+    private final Random random = new Random();
 
-    public SimulatedPHMeter() {
-        this("pH Meter", Real.of(0.01));
-    }
-
-    public SimulatedPHMeter(String name, Real accuracy) {
-        super(name);
-        this.accuracy = accuracy;
+    public SimulatedPHMeter(Identification id) {
+        super(id);
+        this.currentValue = Quantities.create(7.0, Units.ONE);
     }
 
     @Override
-    public Real getAccuracy() {
-        return accuracy;
-    }
-
-    private Real calibrationOffset = Real.ZERO;
-
-    @Override
-    public Real measure(Real actualPH) {
-        if (!isConnected())
-            throw new IllegalStateException("Device not connected");
-
-        if (actualPH.compareTo(PHMeter.MIN_PH) < 0 || actualPH.compareTo(PHMeter.MAX_PH) > 0) {
-            throw new IllegalArgumentException("pH must be between 0 and 14");
-        }
-
-        // Add some noise and apply calibration offset
-        double noise = (Math.random() - 0.5) * accuracy.doubleValue();
-        lastReading = actualPH.add(Real.of(noise)).add(calibrationOffset);
-        return lastReading;
+    public void connect() throws IOException {
+        setStatus(Status.OPERATIONAL);
     }
 
     @Override
-    public Real readValue() throws IOException {
-        if (!isConnected())
-            throw new IOException("Device not connected");
-        // Add a tiny bit of electronic noise even on stable reading
-        double drift = (Math.random() - 0.5) * 0.005;
-        return lastReading.add(Real.of(drift));
-    }
-
-    /**
-     * Calibrates the meter using a known buffer.
-     * 
-     * @param bufferPH the known pH of the calibration buffer
-     */
-    public void calibrate(Real bufferPH) {
-        // Simple 1-point calibration: adjust offset to match buffer
-        double diff = bufferPH.doubleValue() - lastReading.doubleValue();
-        this.calibrationOffset = Real.of(diff);
+    public void disconnect() throws IOException {
+        setStatus(Status.DISCONNECTED);
     }
 
     @Override
-    public String classify(Real pH) {
-        double val = pH.doubleValue();
-        if (val < 7.0) {
-            if (val < 3.0)
-                return "Strongly Acidic";
-            if (val < 5.0)
-                return "Moderately Acidic";
-            return "Weakly Acidic";
-        } else if (val > 7.0) {
-            if (val > 11.0)
-                return "Strongly Alkaline";
-            if (val > 9.0)
-                return "Moderately Alkaline";
-            return "Weakly Alkaline";
-        }
+    public boolean isConnected() {
+        return getDeviceStatus() == Status.OPERATIONAL;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Quantity<Dimensionless> readValue() throws IOException {
+        double v = 7.0 + (random.nextDouble() * 2 - 1);
+        setCurrentValue(Quantities.create(v, Units.ONE));
+        return (Quantity<Dimensionless>) currentValue;
+    }
+
+    @Override
+    public Quantity<Dimensionless> measure(Quantity<Dimensionless> actualPH) {
+        double actual = actualPH.getValue().doubleValue();
+        double measured = actual + (random.nextDouble() - 0.5) * 0.2;
+        measured = Math.max(0, Math.min(14, measured));
+        Quantity<Dimensionless> result = Quantities.create(measured, Units.ONE);
+        setCurrentValue(result);
+        return result;
+    }
+
+    @Override
+    public String classify(Quantity<Dimensionless> pH) {
+        double v = pH.getValue().doubleValue();
+        if (v < 6.5) return "Acidic";
+        if (v > 7.5) return "Alkaline";
         return "Neutral";
     }
 
     @Override
-    public Real getHydrogenConcentration(Real pH) {
-        return Real.of(Math.pow(10, -pH.doubleValue()));
+    public Quantity<Dimensionless> getHydrogenConcentration(Quantity<Dimensionless> pH) {
+        double v = pH.getValue().doubleValue();
+        return Quantities.create(Math.pow(10, -v), Units.ONE);
+    }
+
+    @Override
+    public void close() throws Exception {
+        disconnect();
     }
 }
-
-
-
-
-
-
-

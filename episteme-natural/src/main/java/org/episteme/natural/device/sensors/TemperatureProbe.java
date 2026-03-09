@@ -24,7 +24,8 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Temperature;
 
 /**
  * Interface for temperature probes.
@@ -33,7 +34,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface TemperatureProbe extends Sensor<Real> {
+public interface TemperatureProbe extends Sensor<Temperature> {
     enum ProbeType {
         THERMOCOUPLE,
         RTD,
@@ -43,18 +44,7 @@ public interface TemperatureProbe extends Sensor<Real> {
 
     ProbeType getType();
 
-    Real getAccuracy();
+    Quantity<Temperature> getMinTemp();
 
-    Real getMinTemp();
-
-    Real getMaxTemp();
-
-    /**
-     * Measures the temperature given a physical actual temperature.
-     * Useful for simulation or calibration.
-     */
-    Real measure(Real actualTemp);
+    Quantity<Temperature> getMaxTemp();
 }
-
-
-

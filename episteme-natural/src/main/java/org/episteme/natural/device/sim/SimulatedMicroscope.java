@@ -24,33 +24,31 @@
 package org.episteme.natural.device.sim;
 
 import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Dimensionless;
+import org.episteme.core.measure.quantity.Length;
 import org.episteme.natural.device.sensors.Microscope;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.util.identity.Identification;
+
+import java.io.IOException;
 
 /**
  * Simulated implementation of Microscope.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
 
     private final Type type;
-    private final Real maxMagnification;
-    private final Real resolution;
-    private Real currentMagnification = Real.ONE;
+    private final Quantity<Dimensionless> maxMagnification;
+    private final Quantity<Length> opticalResolution;
+    private Quantity<Dimensionless> currentMagnification = Quantities.create(1.0, Units.ONE);
 
-    public SimulatedMicroscope() {
-        this("Microscope", Type.OPTICAL, Real.of(1000), Real.of(0.0002));
-    }
-
-    public SimulatedMicroscope(String name, Type type, Real maxMagnification, Real resolution) {
-        super(name);
+    public SimulatedMicroscope(Identification id, Type type, double maxMag, double resNm) {
+        super(id);
         this.type = type;
-        this.maxMagnification = maxMagnification;
-        this.resolution = resolution;
+        this.maxMagnification = Quantities.create(maxMag, Units.ONE);
+        this.opticalResolution = Quantities.create(resNm, Units.NANOMETER);
     }
 
     @Override
@@ -59,69 +57,38 @@ public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
     }
 
     @Override
-    public Real getMaxMagnification() {
+    public Quantity<Dimensionless> getMaxMagnification() {
         return maxMagnification;
     }
 
     @Override
-    public Real getResolution() {
-        return resolution;
+    public Quantity<Length> getOpticalResolution() {
+        return opticalResolution;
     }
 
     @Override
-    public Real getCurrentMagnification() {
+    public Quantity<Dimensionless> getCurrentMagnification() {
         return currentMagnification;
     }
 
     @Override
-    public void setMagnification(Real magnification) {
-        if (magnification.compareTo(maxMagnification) > 0) {
-            throw new IllegalArgumentException("Magnification exceeds maximum");
-        }
+    public void setMagnification(Quantity<Dimensionless> magnification) {
         this.currentMagnification = magnification;
     }
 
-    private double focus = 0.5;
-    private double lightingLevel = 0.8;
-
     @Override
-    public Real getApparentSize(Real actualSize) {
-        return actualSize.multiply(currentMagnification);
+    public Quantity<Length> getApparentSize(Quantity<Length> actualSize) {
+        double mag = currentMagnification.getValue().doubleValue();
+        return actualSize.multiply(mag);
     }
 
     @Override
-    public boolean isResolvable(Real featureSize) {
-        // Feature is resolvable if it's larger than resolution,
-        // but also depends on focus and lighting.
-        double effectiveResolution = resolution.doubleValue();
-
-        // Poor focus increases the minimum resolvable size
-        effectiveResolution /= (0.1 + 0.9 * focus);
-
-        // Poor lighting decreases contrast and prevents resolution
-        if (lightingLevel < 0.2)
-            return false;
-
-        return featureSize.doubleValue() >= effectiveResolution;
-    }
-
-    public void setFocus(double focus) {
-        this.focus = Math.max(0, Math.min(1.0, focus));
-    }
-
-    public void setLightingLevel(double level) {
-        this.lightingLevel = Math.max(0, Math.min(1.0, level));
+    public boolean isResolvable(Quantity<Length> featureSize) {
+        return featureSize.compareTo(opticalResolution) >= 0;
     }
 
     @Override
-    public Real readValue() throws java.io.IOException {
-        // Return current magnification as the "value" for now, or could be image data
-        // in future
+    public Quantity<Dimensionless> readValue() throws IOException {
         return currentMagnification;
     }
 }
-
-
-
-
-

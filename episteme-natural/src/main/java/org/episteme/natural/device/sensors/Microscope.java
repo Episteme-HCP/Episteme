@@ -24,7 +24,9 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Dimensionless;
+import org.episteme.core.measure.quantity.Length;
 
 /**
  * Interface for microscopes.
@@ -33,7 +35,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Microscope extends Sensor<Real> {
+public interface Microscope extends Sensor<Dimensionless> {
     enum Type {
         OPTICAL,
         ELECTRON_SCANNING,
@@ -45,18 +47,15 @@ public interface Microscope extends Sensor<Real> {
 
     Type getType();
 
-    Real getMaxMagnification();
+    Quantity<Dimensionless> getMaxMagnification();
 
-    Real getResolution();
+    Quantity<Length> getOpticalResolution();
 
-    Real getCurrentMagnification();
+    Quantity<Dimensionless> getCurrentMagnification();
 
-    void setMagnification(Real magnification);
+    void setMagnification(Quantity<Dimensionless> magnification);
 
-    Real getApparentSize(Real actualSize);
+    Quantity<Length> getApparentSize(Quantity<Length> actualSize);
 
-    boolean isResolvable(Real featureSize);
+    boolean isResolvable(Quantity<Length> featureSize);
 }
-
-
-

@@ -24,7 +24,7 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real; // Standardizing on Real
+import org.episteme.core.measure.quantity.Dimensionless;
 
 /**
  * Interface for multimeter devices.
@@ -33,7 +33,7 @@ import org.episteme.core.mathematics.numbers.real.Real; // Standardizing on Real
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Multimeter extends Sensor<Real> {
+public interface Multimeter extends Sensor<Dimensionless> {
     enum Function {
         DC_VOLTAGE("device.multimeter.func.dcv"),
         AC_VOLTAGE("device.multimeter.func.acv"),
@@ -61,11 +61,4 @@ public interface Multimeter extends Sensor<Real> {
     Function getFunction();
 
     void setFunction(Function function);
-
-    // Additional methods for unit support or ranges could go here
 }
-
-
-
-
-

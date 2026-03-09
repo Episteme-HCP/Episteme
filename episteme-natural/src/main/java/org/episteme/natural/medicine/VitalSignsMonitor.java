@@ -23,33 +23,26 @@
 
 package org.episteme.natural.medicine;
 
-import org.episteme.core.device.Sensor;
+import org.episteme.core.device.Device;
 
 /**
  * Interface for vital signs monitoring devices (e.g., bedside monitors).
  * <p>
  * Provides streamable access to real-time vital signs data and associated waveforms.
  * </p>
- * * @see VitalSigns
+ * @see VitalSigns
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface VitalSignsMonitor extends Sensor<VitalSigns> {
+public interface VitalSignsMonitor extends Device {
 
     /**
      * Gets the current vital signs readings.
-     * Shortcut for {@code readValue()}.
      *
      * @return current vital signs
      */
-    default VitalSigns getVitalSigns() {
-        try {
-            return readValue();
-        } catch (Exception e) {
-            return null;
-        }
-    }
+    VitalSigns getVitalSigns();
 
     /**
      * Gets the ECG (Electrocardiogram) waveform data.

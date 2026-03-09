@@ -24,7 +24,10 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Dimensionless;
+import org.episteme.core.measure.quantity.Length;
+import org.episteme.core.measure.quantity.Time;
 
 /**
  * Interface for spectrometer devices.
@@ -33,7 +36,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Spectrometer extends Sensor<Real> {
+public interface Spectrometer extends Sensor<Dimensionless> {
     enum SpectroscopyType {
         UV_VIS,
         INFRARED,
@@ -46,22 +49,19 @@ public interface Spectrometer extends Sensor<Real> {
 
     SpectroscopyType getType();
 
-    double getMinWavelength();
+    Quantity<Length> getMinWavelength();
 
-    double getMaxWavelength();
+    Quantity<Length> getMaxWavelength();
 
-    double getResolution();
+    Quantity<Length> getSpectralResolution();
 
-    void setIntegrationTime(double milliseconds);
+    void setIntegrationTime(Quantity<Time> time);
 
-    double getIntegrationTime();
+    Quantity<Time> getIntegrationTime();
 
     double[][] captureSpectrum();
 
-    double getIntensityAt(double wavelengthNm);
+    Quantity<Dimensionless> getIntensityAt(Quantity<Length> wavelength);
 
-    void calibrate(double[] referenceWavelengths, double[] measuredWavelengths);
+    void calibrate(Quantity<Length>[] referenceWavelengths, Quantity<Length>[] measuredWavelengths);
 }
-
-
-

@@ -32,7 +32,8 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.episteme.natural.device.sensors.TemperatureProbe;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Temperature;
 import org.episteme.core.ui.AbstractDeviceViewer;
 
 /**
@@ -51,7 +52,7 @@ public class ThermometerViewer extends AbstractDeviceViewer<TemperatureProbe> {
     private Canvas canvas;
     private double minTemp = -20; // Celsius
     private double maxTemp = 120; // Celsius
-    private Real currentValue;
+    private Quantity<Temperature> currentValue;
 
     public ThermometerViewer(TemperatureProbe device) {
         super(device);
@@ -110,7 +111,7 @@ public class ThermometerViewer extends AbstractDeviceViewer<TemperatureProbe> {
         // Mercury level
         double temp = 25; // Default
         if (currentValue != null) {
-            temp = currentValue.doubleValue(); 
+            temp = currentValue.getValue().doubleValue(); 
             // Assume the sensor might provide Kelvin or Celsius depending on impl, 
             // but for this viewer we'll assume Celsius for the scale.
             // If the probe returns Absolute temp, we convert:

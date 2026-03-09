@@ -1244,24 +1244,7 @@ public class EpistemeMasterControl extends Application {
 
         int r = 0;
         for (Backend provider : providers) {
-            String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
-            String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
-            boolean available = provider.isAvailable();
-
-            Label nameLabel = new Label(name);
-            nameLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
-
-            Label descLabel = new Label(providerDesc);
-            descLabel.getStyleClass().add("mastercontrol-description");
-            descLabel.setWrapText(true);
-            descLabel.setMaxWidth(500);
-
-            Label statusLabel = new Label(available
-                    ? i18n.get("mastercontrol.libraries.available", "Available")
-                    : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-            statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
-
-            grid.addRow(r++, nameLabel, statusLabel, descLabel);
+            addBackendRow(grid, r++, provider, i18n);
         }
 
         if (providers.isEmpty()) {
@@ -1709,19 +1692,25 @@ public class EpistemeMasterControl extends Application {
         boolean available = provider.isAvailable();
 
         Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
+        nameLabel.getStyleClass().add("font-bold");
 
         Label descLabel = new Label(providerDesc);
         descLabel.getStyleClass().add("mastercontrol-description");
         descLabel.setWrapText(true);
-        descLabel.setMaxWidth(500);
+        descLabel.setMaxWidth(400);
 
         Label statusLabel = new Label(available
                 ? i18n.get("mastercontrol.libraries.available", "Available")
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
         statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
 
-        grid.addRow(row, nameLabel, statusLabel, descLabel);
+        CheckBox deactivateBox = new CheckBox(i18n.get("mastercontrol.libraries.deactivate", "Deactivate"));
+        deactivateBox.setSelected(PREFS.isBackendDeactivated(provider.getId()));
+        deactivateBox.setOnAction(e -> {
+            PREFS.setBackendDeactivated(provider.getId(), deactivateBox.isSelected());
+        });
+
+        grid.addRow(row, nameLabel, statusLabel, descLabel, deactivateBox);
     }
 
 

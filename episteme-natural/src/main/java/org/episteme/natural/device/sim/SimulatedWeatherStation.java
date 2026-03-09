@@ -24,53 +24,70 @@
 package org.episteme.natural.device.sim;
 
 import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.device.Sensor;
 import org.episteme.natural.device.instruments.WeatherStation;
+import org.episteme.natural.device.sensors.HumidityProbe;
+import org.episteme.natural.device.sensors.PressureGauge;
+import org.episteme.natural.device.sensors.TemperatureProbe;
+import org.episteme.core.util.identity.Identification;
+import org.episteme.core.util.identity.SimpleIdentification;
 
-import java.util.Random;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Simulated implementation of WeatherStation.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * A WeatherStation is a complex instrument aggregating temperature, humidity and pressure sensors.
  */
 public class SimulatedWeatherStation extends SimulatedDevice implements WeatherStation {
 
-    private final Random random = new Random();
+    private final TemperatureProbe temperatureProbe;
+    private final HumidityProbe humidityProbe;
+    private final PressureGauge pressureGauge;
 
-    public SimulatedWeatherStation(String name) {
-        super(name, "MeteoSim Corp.");
-    }
-
-    public SimulatedWeatherStation() {
-        this("Simulated Weather Station");
-    }
-
-    @Override
-    public double getTemperatureCelsius() {
-        if (!isConnected())
-            return 0;
-        return 20.0 + random.nextGaussian() * 2.0;
+    public SimulatedWeatherStation(Identification id) {
+        super(id);
+        String baseId = id.toString();
+        this.temperatureProbe = new SimulatedTemperatureProbe(new SimpleIdentification(baseId + "-temp"), TemperatureProbe.ProbeType.THERMISTOR, 233.15, 358.15);
+        this.humidityProbe = new SimulatedHumidityProbe(new SimpleIdentification(baseId + "-humidity"));
+        this.pressureGauge = new SimulatedPressureGauge(new SimpleIdentification(baseId + "-pressure"), PressureGauge.GaugeType.BOURDON, 80000, 120000);
+        
+        setManufacturer("MeteoSim Corp.");
     }
 
     @Override
-    public double getHumidityPercent() {
-        if (!isConnected())
-            return 0;
-        return 50.0 + random.nextGaussian() * 5.0;
+    public void connect() throws IOException {
+        super.connect();
+        temperatureProbe.connect();
+        humidityProbe.connect();
+        pressureGauge.connect();
     }
 
     @Override
-    public double getPressureHPa() {
-        if (!isConnected())
-            return 0;
-        return 1013.0 + random.nextGaussian() * 10.0;
+    public void disconnect() throws IOException {
+        super.disconnect();
+        temperatureProbe.disconnect();
+        humidityProbe.disconnect();
+        pressureGauge.disconnect();
+    }
+
+    @Override
+    public TemperatureProbe getTemperatureProbe() {
+        return temperatureProbe;
+    }
+
+    @Override
+    public HumidityProbe getHumidityProbe() {
+        return humidityProbe;
+    }
+
+    @Override
+    public PressureGauge getPressureGauge() {
+        return pressureGauge;
+    }
+
+    @Override
+    public List<Sensor<?>> getSensors() {
+        return List.of(temperatureProbe, humidityProbe, pressureGauge);
     }
 }
-
-
-
-
-

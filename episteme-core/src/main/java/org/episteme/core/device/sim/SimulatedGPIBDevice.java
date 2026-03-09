@@ -45,8 +45,10 @@ public class SimulatedGPIBDevice extends SimulatedDevice {
     }
 
     public SimulatedGPIBDevice(String name, int gpibAddress) {
-        super(name);
+        super(new org.episteme.core.util.identity.SimpleIdentification(
+            String.format("GPIB0::%d::INSTR", gpibAddress)));
         this.gpibAddress = gpibAddress;
+        setTrait("name", name);
         setDriverClass("org.episteme.core.device.sim.SimulatedGPIBDevice");
 
         // GPIB-specific capabilities
@@ -114,11 +116,6 @@ public class SimulatedGPIBDevice extends SimulatedDevice {
     public String query(String command) throws IOException {
         write(command);
         return read();
-    }
-
-    @Override
-    public String getId() {
-        return String.format("GPIB%d::%d::INSTR", boardIndex, gpibAddress);
     }
 
     @Override

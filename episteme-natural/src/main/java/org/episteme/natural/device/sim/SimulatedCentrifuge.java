@@ -24,31 +24,31 @@
 package org.episteme.natural.device.sim;
 
 import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Dimensionless;
+import org.episteme.core.measure.quantity.Frequency;
+import org.episteme.core.measure.quantity.Length;
 import org.episteme.natural.device.actuators.Centrifuge;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.util.identity.Identification;
+
+import java.io.IOException;
 
 /**
  * Simulated implementation of Centrifuge.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
 
-    private final Real maxRPM;
-    private final Real maxRCF;
-    private final Centrifuge.RotorType rotorType;
-    private Real currentRPM = Real.ZERO;
+    private final Quantity<Frequency> maxRPM;
+    private final Quantity<Dimensionless> maxRCF;
+    private final RotorType rotorType;
+    private Quantity<Frequency> currentRPM = Quantities.create(0.0, Units.HERTZ);
+    private Quantity<Frequency> targetRPM = Quantities.create(0.0, Units.HERTZ);
     private boolean running = false;
 
-    public SimulatedCentrifuge() {
-        this("Centrifuge", Real.of(15000), Real.of(25000), Centrifuge.RotorType.FIXED_ANGLE);
-    }
-
-    public SimulatedCentrifuge(String name, Real maxRPM, Real maxRCF, Centrifuge.RotorType rotorType) {
-        super(name);
+    public SimulatedCentrifuge(Identification id, Quantity<Frequency> maxRPM, Quantity<Dimensionless> maxRCF, RotorType rotorType) {
+        super(id);
         this.maxRPM = maxRPM;
         this.maxRCF = maxRCF;
         this.rotorType = rotorType;
@@ -56,25 +56,25 @@ public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
 
     @Override
     public void stop() {
-        this.currentRPM = Real.ZERO;
+        this.currentRPM = Quantities.create(0.0, Units.HERTZ);
         this.running = false;
     }
 
     @Override
-    public Real calculateRCF(Real radiusCm) {
-        // RCF = 1.118e-5 * r * rpm^2
-        double r = radiusCm.doubleValue();
-        double rpm = currentRPM.doubleValue();
-        return Real.of(1.118e-5 * r * rpm * rpm);
+    public Quantity<Dimensionless> calculateRCF(Quantity<Length> radius) {
+        // RCF = 1.118e-5 * r_cm * (rpm)^2
+        double r_cm = radius.to(Units.CENTIMETER).getValue().doubleValue();
+        double rpm = currentRPM.to(Units.HERTZ).getValue().doubleValue() * 60.0;
+        return Quantities.create(1.118e-5 * r_cm * rpm * rpm, Units.ONE);
     }
 
     @Override
-    public Real getMaxRPM() {
+    public Quantity<Frequency> getMaxRPM() {
         return maxRPM;
     }
 
     @Override
-    public Real getMaxRCF() {
+    public Quantity<Dimensionless> getMaxRCF() {
         return maxRCF;
     }
 
@@ -84,44 +84,27 @@ public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
     }
 
     @Override
-    public Real getCurrentRPM() {
-        if (running && currentRPM.doubleValue() < targetRPM.doubleValue()) {
-            // Mock acceleration: 50 RPM per call for simulation speed
-            double next = Math.min(targetRPM.doubleValue(), currentRPM.doubleValue() + 50);
-            currentRPM = Real.of(next);
-        } else if (!running && currentRPM.doubleValue() > 0) {
-            // Mock deceleration
-            double next = Math.max(0, currentRPM.doubleValue() - 50);
-            currentRPM = Real.of(next);
-        }
+    public Quantity<Frequency> getCurrentRPM() {
         return currentRPM;
     }
 
-    private Real targetRPM = Real.ZERO;
-
     @Override
-    public void start(Real rpm) {
+    public void start(Quantity<Frequency> rpm) {
         if (rpm.compareTo(maxRPM) > 0) {
-            throw new IllegalArgumentException("RPM exceeds maximum: " + maxRPM);
+            throw new IllegalArgumentException("RPM exceeds maximum");
         }
         this.targetRPM = rpm;
+        this.currentRPM = rpm;
         this.running = true;
     }
 
     @Override
     public boolean isRunning() {
-        return running || currentRPM.doubleValue() > 0;
+        return running || currentRPM.getValue().doubleValue() > 0;
     }
 
     @Override
-    public void send(Real command) throws java.io.IOException {
+    public void send(Quantity<Frequency> command) throws IOException {
         start(command);
     }
 }
-
-
-
-
-
-
-

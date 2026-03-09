@@ -24,10 +24,6 @@
 package org.episteme.core.util.identity;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import org.episteme.core.util.Commented;
-import org.episteme.core.util.Named;
 
 /**
  * Base class for all identification schemes.
@@ -35,28 +31,12 @@ import org.episteme.core.util.Named;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-public abstract class Identification implements Identified<Identification>, Named, Commented, Serializable {
+public abstract class Identification implements Identified<Identification>, Serializable {
     
     private final String value;
-    private final Map<String, Object> traits = new HashMap<>();
 
     protected Identification(String value) {
         this.value = value;
-    }
-
-    @Override
-    public Map<String, Object> getTraits() {
-        return traits;
-    }
-
-    @Override
-    public String getName() {
-        String name = (String) getTrait("name");
-        return name != null ? name : toString();
-    }
-
-    public void setName(String name) {
-        setTrait("name", name);
     }
 
     /**

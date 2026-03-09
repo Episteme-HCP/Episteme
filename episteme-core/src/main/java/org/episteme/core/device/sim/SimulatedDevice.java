@@ -23,7 +23,10 @@
 
 package org.episteme.core.device.sim;
 
+import org.episteme.core.device.AbstractDevice;
 import org.episteme.core.device.Device;
+import org.episteme.core.util.identity.Identification;
+import org.episteme.core.util.identity.SimpleIdentification;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,14 +38,9 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class SimulatedDevice implements Device {
+public abstract class SimulatedDevice extends AbstractDevice {
 
-    private final String name;
-    private final String id;
-    private boolean connected;
     private long connectTime;
-    private String manufacturer = "Episteme Sims Inc.";
-    private String firmware = "v2.1.4";
     private String driverClass;
     private boolean powerOn = true;
     private int errorCode = 0x00;
@@ -50,15 +48,20 @@ public abstract class SimulatedDevice implements Device {
     protected final Map<String, Boolean> capabilities = new LinkedHashMap<>();
 
     protected SimulatedDevice(String name) {
-        this.name = name;
-        this.id = String.format("%08X", Math.abs(name.hashCode()));
+        this(new SimpleIdentification(String.format("%08X", Math.abs(name.hashCode()))));
+        setTrait("name", name);
         this.driverClass = "org.episteme.core.device.sim." + name.replace(" ", "");
+    }
+
+    protected SimulatedDevice(Identification identification) {
+        super(identification);
         initDefaultCapabilities();
     }
 
+
     protected SimulatedDevice(String name, String manufacturer) {
         this(name);
-        this.manufacturer = manufacturer;
+        setManufacturer(manufacturer);
     }
 
     private void initDefaultCapabilities() {
@@ -70,44 +73,20 @@ public abstract class SimulatedDevice implements Device {
 
     @Override
     public void connect() throws IOException {
-        this.connected = true;
+        setStatus(Device.Status.OPERATIONAL);
         this.connectTime = System.currentTimeMillis();
         this.powerOn = true;
     }
 
     @Override
     public void disconnect() throws IOException {
-        this.connected = false;
+        setStatus(Device.Status.DISCONNECTED);
         this.powerOn = false;
     }
 
     @Override
     public boolean isConnected() {
-        return connected;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    @Override
-    public String getFirmware() {
-        return firmware;
-    }
-
-    public void setFirmware(String firmware) {
-        this.firmware = firmware;
+        return getDeviceStatus() != Device.Status.DISCONNECTED && getDeviceStatus() != Device.Status.OFFLINE;
     }
 
     public String getDriverClass() {
@@ -138,7 +117,7 @@ public abstract class SimulatedDevice implements Device {
      * Returns uptime in seconds since connection.
      */
     public long getUptimeSeconds() {
-        if (!connected)
+        if (!isConnected())
             return 0;
         return (System.currentTimeMillis() - connectTime) / 1000;
     }
@@ -172,8 +151,9 @@ public abstract class SimulatedDevice implements Device {
     /**
      * Returns the device status for display.
      */
+    @Override
     public String getStatus() {
-        return connected ? "Connected (Simulated)" : "Disconnected";
+        return isConnected() ? "Connected (Simulated)" : "Disconnected";
     }
 
     /**
@@ -185,19 +165,20 @@ public abstract class SimulatedDevice implements Device {
     public String getFormattedInfo() {
         org.episteme.core.ui.i18n.I18N i18n = org.episteme.core.ui.i18n.I18N.getInstance();
         StringBuilder sb = new StringBuilder();
-        sb.append(i18n.get("dashboard.tab.devices", "Device")).append(": ").append(name).append("\n");
+        sb.append(i18n.get("dashboard.devices.title", "Simulated Device")).append(": ").append(getName()).append("\n");
 
-        String statusStr = connected
+        String statusStr = isConnected()
                 ? i18n.get("dashboard.devices.connected", "Connected") + " ("
                         + i18n.get("dashboard.devices.simulated", "Simulated") + ")"
                 : i18n.get("dashboard.devices.disconnected", "Disconnected");
 
         sb.append(i18n.get("dashboard.devices.status", "Status")).append(": ").append(statusStr).append("\n");
         sb.append(i18n.get("dashboard.devices.driver", "Driver")).append(": ").append(driverClass).append("\n");
-        sb.append(i18n.get("dashboard.devices.id", "ID")).append(": ").append(id).append("\n");
-        sb.append(i18n.get("dashboard.devices.manufacturer", "Manufacturer")).append(": ").append(manufacturer)
+        sb.append(i18n.get("dashboard.devices.id", "ID")).append(": ").append(getId().toString()).append("\n");
+
+        sb.append(i18n.get("dashboard.devices.manufacturer", "Manufacturer")).append(": ").append(getManufacturer())
                 .append("\n");
-        sb.append(i18n.get("dashboard.devices.firmware", "Firmware")).append(": ").append(firmware).append("\n\n");
+        sb.append(i18n.get("dashboard.devices.firmware", "Firmware")).append(": ").append(getFirmware()).append("\n\n");
 
         sb.append("=== ").append(i18n.get("dashboard.devices.capabilities", "Capabilities")).append(" ===\n");
         for (Map.Entry<String, Boolean> cap : capabilities.entrySet()) {

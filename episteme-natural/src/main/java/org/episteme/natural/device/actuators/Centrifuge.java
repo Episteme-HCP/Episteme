@@ -24,7 +24,10 @@
 package org.episteme.natural.device.actuators;
 
 import org.episteme.core.device.Actuator;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Dimensionless;
+import org.episteme.core.measure.quantity.Frequency;
+import org.episteme.core.measure.quantity.Length;
 
 /**
  * Interface for centrifuges.
@@ -33,29 +36,26 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Centrifuge extends Actuator<Real> {
+public interface Centrifuge extends Actuator<Quantity<Frequency>> {
     enum RotorType {
         FIXED_ANGLE,
         SWINGING_BUCKET,
         VERTICAL;
     }
 
-    void start(Real rpm);
+    void start(Quantity<Frequency> rpm);
 
     void stop();
 
-    Real calculateRCF(Real radiusCm);
+    Quantity<Dimensionless> calculateRCF(Quantity<Length> radius);
 
-    Real getMaxRPM();
+    Quantity<Frequency> getMaxRPM();
 
-    Real getMaxRCF();
+    Quantity<Dimensionless> getMaxRCF();
 
     RotorType getRotorType();
 
-    Real getCurrentRPM();
+    Quantity<Frequency> getCurrentRPM();
 
     boolean isRunning();
 }
-
-
-

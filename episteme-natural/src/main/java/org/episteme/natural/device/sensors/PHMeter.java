@@ -24,7 +24,8 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Dimensionless;
 
 /**
  * Interface for pH meters.
@@ -33,24 +34,19 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface PHMeter extends Sensor<Real> {
-    Real NEUTRAL_PH = Real.of(7.0);
-    Real MIN_PH = Real.ZERO;
-    Real MAX_PH = Real.of(14.0);
-
-    Real getAccuracy();
-
+public interface PHMeter extends Sensor<Dimensionless> {
+    
     /**
      * Measure the pH given an actual physical pH value.
      */
-    Real measure(Real actualPH);
+    Quantity<Dimensionless> measure(Quantity<Dimensionless> actualPH);
 
     /**
      * Classifies the pH value (Acidic, Alkaline, Neutral).
      */
-    String classify(Real pH);
+    String classify(Quantity<Dimensionless> pH);
 
-    Real getHydrogenConcentration(Real pH);
+    Quantity<Dimensionless> getHydrogenConcentration(Quantity<Dimensionless> pH);
 }
 
 

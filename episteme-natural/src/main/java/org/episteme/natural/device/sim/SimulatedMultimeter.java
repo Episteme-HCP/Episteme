@@ -24,29 +24,25 @@
 package org.episteme.natural.device.sim;
 
 import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Dimensionless;
 import org.episteme.natural.device.sensors.Multimeter;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.util.identity.Identification;
+
 import java.io.IOException;
 
 /**
  * Simulated implementation of Multimeter.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class SimulatedMultimeter extends SimulatedDevice implements Multimeter {
 
     private Function function = Function.DC_VOLTAGE;
-    private Real currentValue = Real.ZERO;
 
-    public SimulatedMultimeter() {
-        this("Multimeter");
-    }
-
-    public SimulatedMultimeter(String name) {
-        super(name);
+    public SimulatedMultimeter(Identification id) {
+        super(id);
+        this.currentValue = Quantities.create(0.0, Units.ONE);
     }
 
     @Override
@@ -60,29 +56,15 @@ public class SimulatedMultimeter extends SimulatedDevice implements Multimeter {
     }
 
     @Override
-    public Real readValue() throws IOException {
-        if (!isConnected())
-            throw new IOException("Not connected");
-
-        if (currentValue.doubleValue() == 0.0) {
-            // Simulate background noise if not probing anything
-            double noise = (Math.random() - 0.5) * 0.01; // +/- 10mV noise
-            return Real.of(noise);
-        }
-        return currentValue;
+    @SuppressWarnings("unchecked")
+    public Quantity<Dimensionless> readValue() throws IOException {
+        return (Quantity<Dimensionless>) currentValue;
     }
 
     /**
      * Mocks probing a value.
      */
-    public void probe(Real value) {
-        this.currentValue = value;
+    public void probe(Quantity<Dimensionless> value) {
+        setCurrentValue(value);
     }
 }
-
-
-
-
-
-
-

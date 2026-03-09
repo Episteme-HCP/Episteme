@@ -54,6 +54,11 @@ public class MulticoreAudioBackend implements org.episteme.core.media.AudioBacke
     }
 
     @Override
+    public String getAlgorithmType() {
+        return "Audio Processing";
+    }
+
+    @Override
     public void shutdown() {
         // Multicore Java Streams backend does not require explicit shutdown
     }

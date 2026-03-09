@@ -60,7 +60,14 @@ public class SimulatedUSBDevice extends SimulatedDevice {
     }
 
     public SimulatedUSBDevice(String name) {
-        super(name);
+        this(name, 0x1234, 0x5678);
+    }
+
+    public SimulatedUSBDevice(String name, int vendorId, int productId) {
+        super(new org.episteme.core.util.identity.SimpleIdentification(String.format("USB:%04X:%04X", vendorId, productId)));
+        this.vendorId = vendorId;
+        this.productId = productId;
+        setTrait("name", name);
         setDriverClass("org.episteme.core.device.sim.SimulatedUSBDevice");
 
         // USB device capabilities
@@ -69,12 +76,6 @@ public class SimulatedUSBDevice extends SimulatedDevice {
         setCapability("Auto-Calibration", true);
         setCapability("USB 2.0 High-Speed", true);
         setCapability("Bidirectional I/O", false);
-    }
-
-    public SimulatedUSBDevice(String name, int vendorId, int productId) {
-        this(name);
-        this.vendorId = vendorId;
-        this.productId = productId;
     }
 
     public SimulatedUSBDevice(String name, DeviceType type) {
@@ -171,9 +172,10 @@ public class SimulatedUSBDevice extends SimulatedDevice {
     /**
      * Simulates sensor calibration.
      */
-    public void calibrate() throws IOException {
+    @Override
+    public void calibrate() {
         if (!isConnected()) {
-            throw new IOException("Device not connected");
+            throw new IllegalStateException("Device not connected");
         }
         // Simulate calibration delay
         try {
@@ -207,10 +209,6 @@ public class SimulatedUSBDevice extends SimulatedDevice {
         return actuatorValue;
     }
 
-    @Override
-    public String getId() {
-        return String.format("USB:%04X:%04X", vendorId, productId);
-    }
 
     @Override
     protected void addCustomReadings(Map<String, String> readings) {

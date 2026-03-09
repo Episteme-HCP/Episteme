@@ -23,7 +23,8 @@
 
 package org.episteme.natural.ui.viewers.devices;
 
-import org.episteme.natural.device.sim.SimulatedTelescope;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -157,9 +158,6 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
     private void connectTelescope() {
         try {
             device.connect();
-            if (device instanceof SimulatedTelescope simulated) {
-                simulated.setPositionCallback(this::updatePosition);
-            }
             updateStatusDisplay();
         } catch (Exception e) {
             statusLabel.setText("ERROR");
@@ -168,8 +166,13 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
 
     private void slewToTarget() {
         try {
-            device.slewTo(targetRA, targetDec);
+            device.slewTo(Quantities.create(targetRA, Units.DEGREE_ANGLE), Quantities.create(targetDec, Units.DEGREE_ANGLE));
             updateStatusDisplay();
+            displayRA = targetRA;
+            displayDec = targetDec;
+            raLabel.setText(String.format("%.2fh", targetRA));
+            decLabel.setText(String.format("%.2f°", targetDec));
+            drawSkyView();
         } catch (Exception e) {
             statusLabel.setText("SLEW ERROR");
         }

@@ -23,7 +23,8 @@
 
 package org.episteme.core.ui;
 
-import org.episteme.core.device.Device;
+import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.util.identity.SimpleIdentification;
 import java.io.IOException;
 
 /**
@@ -32,33 +33,27 @@ import java.io.IOException;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class TestDevice implements Device {
+public class TestDevice extends AbstractDevice {
+    
+    public TestDevice() {
+        super(new SimpleIdentification("test-01"));
+        setTrait("name", "Test Device");
+        setManufacturer("Test Inc");
+    }
+
     @Override
     public void connect() throws IOException {
+        // Mock connection
     }
 
     @Override
     public void disconnect() throws IOException {
+        // Mock disconnection
     }
 
     @Override
     public boolean isConnected() {
         return false;
-    }
-
-    @Override
-    public String getName() {
-        return "Test Device";
-    }
-
-    @Override
-    public String getId() {
-        return "test-01";
-    }
-
-    @Override
-    public String getManufacturer() {
-        return "Test Inc";
     }
 
     @Override

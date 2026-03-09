@@ -23,18 +23,18 @@
 
 package org.episteme.core.device;
 
+import org.episteme.core.measure.Quantity;
 import java.io.IOException;
 
 /**
  * Represents a sensor device that produces data.
  *
- * Martin-Michiellot
- *
+ * @param <Q> the type of quantity produced by the sensor
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Sensor<D> extends Device {
+public interface Sensor<Q extends Quantity<Q>> extends Device {
 
     /**
      * Reads a value from the sensor.
@@ -42,7 +42,7 @@ public interface Sensor<D> extends Device {
      * @return the measured value
      * @throws IOException if the read operation fails
      */
-    D readValue() throws IOException;
+    Quantity<Q> readValue() throws IOException;
 }
 
 

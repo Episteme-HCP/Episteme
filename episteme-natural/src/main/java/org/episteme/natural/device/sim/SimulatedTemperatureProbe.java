@@ -23,90 +23,75 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Temperature;
 import org.episteme.natural.device.sensors.TemperatureProbe;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.util.identity.Identification;
+
 import java.io.IOException;
+import java.util.Random;
 
 /**
- * Simulated implementation of TemperatureProbe.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Simulated temperature probe.
  */
-public class SimulatedTemperatureProbe extends SimulatedDevice implements TemperatureProbe {
+public class SimulatedTemperatureProbe extends AbstractDevice implements TemperatureProbe {
 
-    private final TemperatureProbe.ProbeType type;
-    private final Real accuracy;
-    private final Real minTemp;
-    private final Real maxTemp;
-    private Real lastReading = Real.of(293.15); // 20 C
+    private final ProbeType type;
+    private final Quantity<Temperature> minTemp;
+    private final Quantity<Temperature> maxTemp;
+    private final Random random = new Random();
 
-    public SimulatedTemperatureProbe() {
-        this("Temperature Probe", TemperatureProbe.ProbeType.THERMOCOUPLE, Real.of(0.1), Real.of(200), Real.of(1500));
-    }
-
-    public SimulatedTemperatureProbe(String name, TemperatureProbe.ProbeType type, Real accuracy, Real minTemp,
-            Real maxTemp) {
-        super(name);
+    public SimulatedTemperatureProbe(Identification id, ProbeType type, double min, double max) {
+        super(id);
         this.type = type;
-        this.accuracy = accuracy;
-        this.minTemp = minTemp;
-        this.maxTemp = maxTemp;
+        this.minTemp = Quantities.create(min, Units.KELVIN);
+        this.maxTemp = Quantities.create(max, Units.KELVIN);
+        this.currentValue = Quantities.create(273.15, Units.KELVIN);
     }
 
     @Override
-    public TemperatureProbe.ProbeType getType() {
+    public ProbeType getType() {
         return type;
     }
 
     @Override
-    public Real getAccuracy() {
-        return accuracy;
-    }
-
-    @Override
-    public Real getMinTemp() {
+    public Quantity<Temperature> getMinTemp() {
         return minTemp;
     }
 
     @Override
-    public Real getMaxTemp() {
+    public Quantity<Temperature> getMaxTemp() {
         return maxTemp;
     }
 
-    private final double thermalInertia = 0.2; // 0.2 means it takes a few steps to reach target
-
     @Override
-    public Real measure(Real actualTemp) {
-        if (!isConnected())
-            throw new IllegalStateException("Device not connected");
-
-        // Thermal inertia simulation: lastReading moves toward actualTemp
-        double current = lastReading.doubleValue();
-        double target = actualTemp.doubleValue();
-        double next = current + (target - current) * thermalInertia;
-
-        // Add measurement noise
-        double noise = (Math.random() - 0.5) * accuracy.doubleValue();
-        lastReading = Real.of(next + noise);
-
-        return lastReading;
+    public void connect() throws IOException {
+        setStatus(Status.OPERATIONAL);
     }
 
     @Override
-    public Real readValue() throws IOException {
-        if (!isConnected())
-            throw new IOException("Device not connected");
-        return lastReading;
+    public void disconnect() throws IOException {
+        setStatus(Status.DISCONNECTED);
+    }
+
+    @Override
+    public boolean isConnected() {
+        return getDeviceStatus() == Status.OPERATIONAL;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Quantity<Temperature> readValue() throws IOException {
+        double v = 273.15 + (random.nextDouble() * 20 - 10);
+        setCurrentValue(Quantities.create(v, Units.KELVIN));
+        return (Quantity<Temperature>) currentValue;
+    }
+
+    @Override
+    public void close() throws Exception {
+        disconnect();
     }
 }
-
-
-
-
-
-
-

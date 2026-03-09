@@ -23,52 +23,57 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Dimensionless;
 import org.episteme.natural.device.sensors.Seismograph;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.util.identity.Identification;
+
+import java.io.IOException;
 import java.util.Random;
 
 /**
- * Simulated Seismograph device.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Simulated seismograph.
  */
-public class SimulatedSeismograph extends SimulatedDevice implements Seismograph {
+public class SimulatedSeismograph extends AbstractDevice implements Seismograph {
 
     private final Random random = new Random();
-    private double currentMagnitude = 0;
 
-    public SimulatedSeismograph(String name) {
-        super(name, "GeoSim Systems");
-    }
-
-    public SimulatedSeismograph() {
-        this("Seismograph");
+    public SimulatedSeismograph(Identification id) {
+        super(id);
+        this.currentValue = Quantities.create(0.0, Units.ONE);
     }
 
     @Override
-    public double readMagnitude() {
-        if (!isConnected())
-            return 0;
-        // Simulate random tremors
-        double noise = (random.nextGaussian() * 0.5);
-        if (random.nextDouble() > 0.95) {
-            currentMagnitude = 3.0 + random.nextDouble() * 4.0; // Earthquake spike
-        }
-        currentMagnitude *= 0.9; // Decay
-        return Math.max(0, currentMagnitude + noise);
+    public void connect() throws IOException {
+        setStatus(Status.OPERATIONAL);
     }
 
     @Override
-    public Real readValue() throws java.io.IOException {
-        return Real.of(readMagnitude());
+    public void disconnect() throws IOException {
+        setStatus(Status.DISCONNECTED);
+    }
+
+    @Override
+    public boolean isConnected() {
+        return getDeviceStatus() == Status.OPERATIONAL;
+    }
+
+    @Override
+    public Quantity<Dimensionless> readMagnitude() {
+        double v = random.nextDouble() * 9.0;
+        return Quantities.create(v, Units.ONE);
+    }
+
+    @Override
+    public Quantity<Dimensionless> readValue() throws IOException {
+        return readMagnitude();
+    }
+
+    @Override
+    public void close() throws Exception {
+        disconnect();
     }
 }
-
-
-
-
-

@@ -24,16 +24,17 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Pressure;
 
 /**
- * Interface for pressure gauge devices.
+ * Interface for pressure gauges.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface PressureGauge extends Sensor<Real> {
+public interface PressureGauge extends Sensor<Pressure> {
     enum GaugeType {
         BOURDON,
         DIAPHRAGM,
@@ -43,23 +44,7 @@ public interface PressureGauge extends Sensor<Real> {
 
     GaugeType getType();
 
-    Real getAccuracy();
+    Quantity<Pressure> getMinPressure();
 
-    Real getMinPressure();
-
-    Real getMaxPressure();
-
-    /**
-     * Gets the pressure unit (e.g., "Pa", "bar", "psi").
-     */
-    String getPressureUnit();
-
-    /**
-     * Measures the pressure given a physical actual pressure.
-     * Useful for simulation or calibration.
-     */
-    Real measure(Real actualPressure);
+    Quantity<Pressure> getMaxPressure();
 }
-
-
-

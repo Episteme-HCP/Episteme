@@ -21,7 +21,7 @@ public class MinimAudioBackend implements AudioBackend, CPUBackend {
 
     @Override
     public String getAlgorithmType() {
-        return "Audio Engine";
+        return "Audio Processing";
     }
 
     public MinimAudioBackend() {
@@ -45,7 +45,8 @@ public class MinimAudioBackend implements AudioBackend, CPUBackend {
         }
     }
     
-    @Override public int getPriority() { return 20; }
+    @Override public int getPriority() { return 50; }
+
     
     @Override 
     public Object createBackend() { 

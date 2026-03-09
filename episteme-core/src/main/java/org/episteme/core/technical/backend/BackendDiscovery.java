@@ -88,9 +88,17 @@ public class BackendDiscovery {
     }
 
     public List<Backend> getAvailableProvidersByType(String type) {
+        org.episteme.core.io.UserPreferences prefs = org.episteme.core.io.UserPreferences.getInstance();
         return getProvidersByType(type).stream()
                 .filter(Backend::isAvailable)
-                .sorted(Comparator.comparingInt(Backend::getPriority).reversed())
+                .filter(p -> !prefs.isBackendDeactivated(p.getId()))
+                .sorted((p1, p2) -> {
+                    // Use autotuning scores if available, otherwise fallback to static priority.
+                    // We use a default size of 1024 for generic comparison.
+                    double s1 = org.episteme.core.technical.algorithm.AutoTuningManager.getDynamicScore(p1.getName(), 1024, p1.getPriority());
+                    double s2 = org.episteme.core.technical.algorithm.AutoTuningManager.getDynamicScore(p2.getName(), 1024, p2.getPriority());
+                    return Double.compare(s2, s1);
+                })
                 .collect(Collectors.toList());
     }
 
