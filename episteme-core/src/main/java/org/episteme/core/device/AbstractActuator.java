@@ -23,8 +23,6 @@
 
 package org.episteme.core.device;
 
-import java.util.Optional;
-import org.episteme.core.measure.Quantity;
 import org.episteme.core.util.identity.Identification;
 
 /**

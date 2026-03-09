@@ -47,6 +47,7 @@ public class SimulatedHumidityProbe extends AbstractSimulatedSensor<Dimensionles
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Quantity<Dimensionless> getRelativeHumidity() {
         try {
             return readValue();

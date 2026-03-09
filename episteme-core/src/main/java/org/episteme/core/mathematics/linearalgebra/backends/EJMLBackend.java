@@ -199,10 +199,6 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             this.field = field;
         }
 
-        @Override public LinearAlgebraProvider<E> fallback() {
-            return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, parent);
-        }
-
         @Override public String getName() { return "EJML (Inner)"; }
         @Override public boolean isAvailable() { return true; }
         @Override public int getPriority() { return parent.getPriority(); }

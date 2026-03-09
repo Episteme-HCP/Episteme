@@ -33,9 +33,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
-import java.util.Map;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Worker Heartbeat Monitor - tracks worker liveness and removes dead workers.

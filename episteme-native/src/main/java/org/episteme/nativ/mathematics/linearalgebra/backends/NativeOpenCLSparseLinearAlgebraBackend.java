@@ -345,7 +345,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
-            return SparseLinearAlgebraProvider.super.multiply(a, b);
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for multiply()");
         }
         logger.debug("Entering OpenCL Dense multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         
@@ -365,10 +365,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
     }
 
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) { return SparseLinearAlgebraProvider.super.add(a, b); }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) { return SparseLinearAlgebraProvider.super.subtract(a, b); }
-    @Override public Matrix<Real> scale(Real s, Matrix<Real> a) { return SparseLinearAlgebraProvider.super.scale(s, a); }
-    @Override public Matrix<Real> transpose(Matrix<Real> a) { return SparseLinearAlgebraProvider.super.transpose(a); }
+    // Matrix add, subtract, scale, transpose: not implemented — default throws from interface
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> x) {
         return multiplyCSR(a, x);
@@ -376,7 +373,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     public Vector<Real> multiplyCSR(Matrix<Real> a, Vector<Real> x) {
         if (!isAvailable() || (!isInitialized && !attemptInitialization())) {
-            return SparseLinearAlgebraProvider.super.multiply(a, x);
+            throw new UnsupportedOperationException(getName() + ": OpenCL Sparse not available for multiplyCSR()");
         }
         logger.debug("Entering OpenCL Sparse multiplyCSR: [{}x{}] * [{}]", a.rows(), a.cols(), x.dimension());
 
@@ -444,9 +441,5 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(res), Reals.getInstance());
     }
 
-    @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) { return SparseLinearAlgebraProvider.super.add(a, b); }
-    @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) { return SparseLinearAlgebraProvider.super.subtract(a, b); }
-    @Override public Vector<Real> multiply(Vector<Real> v, Real s) { return SparseLinearAlgebraProvider.super.multiply(v, s); }
-    @Override public Real dot(Vector<Real> a, Vector<Real> b) { return SparseLinearAlgebraProvider.super.dot(a, b); }
-    @Override public Real norm(Vector<Real> a) { return SparseLinearAlgebraProvider.super.norm(a); }
+    // Vector ops + decompositions: not implemented — default throws from interface
 }

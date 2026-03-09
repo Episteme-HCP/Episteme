@@ -10,23 +10,25 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.core.technical.algorithm.FallbackDisabledException;
 
 
 /**
  * Service provider interface for linear algebra operations.
+ * <p>
+ * Each provider implements only the operations it supports. Unsupported operations
+ * throw {@link UnsupportedOperationException}. The {@code AlgorithmManager} is
+ * responsible for selecting the best available provider and falling back to the
+ * next one if the selected provider does not support a given operation.
+ * </p>
  * <p>
  * This interface is parameterized by element type {@code E}. Two main
  * parameterizations exist in the codebase:
  * </p>
  * <ul>
  *   <li><strong>{@code LinearAlgebraProvider<Real>}</strong> — Public-facing API.
- *       Users and high-level code operate through this type. Providers like
- *       {@code ND4JLinearAlgebraProvider} and {@code NativeMulticoreLinearAlgebraProvider}
- *       implement this interface and bridge to native backends internally.</li>
+ *       Users and high-level code operate through this type.</li>
  *   <li><strong>{@code LinearAlgebraProvider<Double>}</strong> — Internal optimization layer.
- *       Used by native BLAS backends (e.g., {@code NativeFFMBLASBackend}) that operate
- *       directly on raw {@code double} arrays via FFM/Panama for maximum performance.</li>
+ *       Used by native BLAS backends that operate directly on raw {@code double} arrays.</li>
  * </ul>
  * 
  * @param <E> the element type (typically {@code Real} for public API or {@code Double} for native)
@@ -45,7 +47,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
 
     /**
      * Priority of this provider (higher means more preferred).
-     * Used for automatic backend selection and fallbacks.
+     * Used for automatic backend selection.
      */
     default int getPriority() {
         return 0;
@@ -59,99 +61,85 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
         // No-op by default
     }
 
-    /**
-     * Returns a fallback provider for this instance.
-     * <p>
-     * Defaults to the next-best available provider in priority order.
-     * </p>
-     */
-    @SuppressWarnings("unchecked")
-    default LinearAlgebraProvider<E> fallback() {
-        if (Boolean.getBoolean("episteme.fallback.disabled")) {
-            throw new org.episteme.core.technical.algorithm.FallbackDisabledException("Fallback blocked: Benchmark isolation active. Provider failed: " + getName());
-        }
-        return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, this);
-    }
-
     // --- Vector Operations ---
     default Vector<E> add(Vector<E> a, Vector<E> b) {
-        return fallback().add(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support Vector add()");
     }
     default Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        return fallback().subtract(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support Vector subtract()");
     }
     default Vector<E> multiply(Vector<E> vector, E scalar) {
-        return fallback().multiply(vector, scalar);
+        throw new UnsupportedOperationException(getName() + " does not support Vector multiply()");
     }
     default E dot(Vector<E> a, Vector<E> b) {
-        return fallback().dot(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support dot()");
     }
     default E norm(Vector<E> a) {
-        return fallback().norm(a);
+        throw new UnsupportedOperationException(getName() + " does not support norm()");
     }
 
     // --- Matrix Operations ---
     default Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        return fallback().add(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support Matrix add()");
     }
     default Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        return fallback().subtract(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support Matrix subtract()");
     }
     default Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        return fallback().multiply(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support Matrix multiply()");
     }
     default Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        return fallback().multiply(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support Matrix-Vector multiply()");
     }
     default Matrix<E> inverse(Matrix<E> a) {
-        return fallback().inverse(a);
+        throw new UnsupportedOperationException(getName() + " does not support inverse()");
     }
     default E determinant(Matrix<E> a) {
-        return fallback().determinant(a);
+        throw new UnsupportedOperationException(getName() + " does not support determinant()");
     }
     default Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return fallback().solve(a, b);
+        throw new UnsupportedOperationException(getName() + " does not support solve()");
     }
     default Matrix<E> transpose(Matrix<E> a) {
-        return fallback().transpose(a);
+        throw new UnsupportedOperationException(getName() + " does not support transpose()");
     }
     default Matrix<E> scale(E scalar, Matrix<E> a) {
-        return fallback().scale(scalar, a);
+        throw new UnsupportedOperationException(getName() + " does not support scale()");
     }
 
     /**
      * Computes the QR decomposition of the specified matrix.
      */
     default QRResult<E> qr(Matrix<E> a) {
-        return fallback().qr(a);
+        throw new UnsupportedOperationException(getName() + " does not support qr()");
     }
 
     /**
      * Computes the Singular Value Decomposition (SVD) of the specified matrix.
      */
     default SVDResult<E> svd(Matrix<E> a) {
-        return fallback().svd(a);
+        throw new UnsupportedOperationException(getName() + " does not support svd()");
     }
 
     /**
      * Computes the eigenvalue decomposition of the specified matrix.
      */
     default EigenResult<E> eigen(Matrix<E> a) {
-        return fallback().eigen(a);
+        throw new UnsupportedOperationException(getName() + " does not support eigen()");
     }
 
     /**
      * Computes the LU decomposition of the specified matrix.
      */
     default LUResult<E> lu(Matrix<E> a) {
-        return fallback().lu(a);
+        throw new UnsupportedOperationException(getName() + " does not support lu()");
     }
 
     /**
      * Computes the Cholesky decomposition of the specified matrix.
      */
     default CholeskyResult<E> cholesky(Matrix<E> a) {
-        return fallback().cholesky(a);
+        throw new UnsupportedOperationException(getName() + " does not support cholesky()");
     }
 
     @Override

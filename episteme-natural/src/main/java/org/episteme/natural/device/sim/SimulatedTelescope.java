@@ -91,11 +91,13 @@ public class SimulatedTelescope extends AbstractSimulatedDevice implements Teles
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Quantity<Angle>[] getTopLeftFOV() {
         return new Quantity[]{ra.subtract(Quantities.create(0.5, Units.DEGREE_ANGLE)), dec.add(Quantities.create(0.5, Units.DEGREE_ANGLE))};
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Quantity<Angle>[] getBottomRightFOV() {
         return new Quantity[]{ra.add(Quantities.create(0.5, Units.DEGREE_ANGLE)), dec.subtract(Quantities.create(0.5, Units.DEGREE_ANGLE))};
     }
