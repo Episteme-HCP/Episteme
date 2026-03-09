@@ -76,11 +76,16 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
                         .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS))).orElse(null);
 
                 avail = (MA_DEVICE_INIT != null && MA_DEVICE_START != null);
+                if (!avail) {
+                    logger.warn("NativeMiniAudioBackend: Required symbols missing (ma_device_init={}, ma_device_start={})", 
+                        MA_DEVICE_INIT != null, MA_DEVICE_START != null);
+                }
             } catch (Throwable t) {
                 logger.error("NativeMiniAudioBackend: Initialization failed. {}", t.getMessage());
                 avail = false;
             }
         } else {
+            logger.warn("NativeMiniAudioBackend: miniaudio library not found by NativeLibraryLoader");
             LOOKUP = null;
             avail = false;
         }
@@ -115,6 +120,13 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
     @Override
     public boolean isAvailable() {
         return IS_AVAILABLE_FLAG;
+    }
+
+    @Override
+    public String getStatusMessage() {
+        if (IS_AVAILABLE_FLAG) return "Ready (miniaudio)";
+        if (LOOKUP == null) return "Native library 'miniaudio' not found";
+        return "Native library found, but symbols missing (ma_device_init)";
     }
 
     @Override

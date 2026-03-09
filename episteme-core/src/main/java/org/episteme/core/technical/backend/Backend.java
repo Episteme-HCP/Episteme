@@ -81,6 +81,16 @@ public interface Backend {
     }
 
     /**
+     * Returns a human-readable status message for this backend.
+     * Useful for debugging "Unavailable" states.
+     * 
+     * @return status message (e.g., "Ready", "Native library missing", etc.)
+     */
+    default String getStatusMessage() {
+        return isAvailable() ? "Available" : "Unavailable";
+    }
+
+    /**
      * Called when the application is shutting down or the backend is being
      * replaced.
      * Use this to release hardware resources, close file handles, or stop

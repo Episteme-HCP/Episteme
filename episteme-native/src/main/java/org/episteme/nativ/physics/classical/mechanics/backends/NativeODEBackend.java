@@ -66,6 +66,12 @@ public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CP
     }
 
     @Override
+    public String getStatusMessage() {
+        if (isAvailable()) return "Ready (ODE)";
+        return "Native library 'ode' not found or failed to load";
+    }
+
+    @Override
     public void shutdown() {
         // Native ODE library lifecycle is managed by this wrapper.
     }

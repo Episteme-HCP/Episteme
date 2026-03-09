@@ -35,6 +35,12 @@ public class Quantum4JBackend implements QuantumBackend, QuantumAlgorithmProvide
     }
 
     @Override
+    public String getStatusMessage() {
+        if (isAvailable()) return "Ready (Quantum4J)";
+        return "Quantum4J library missing from classpath";
+    }
+
+    @Override
     public void shutdown() {
         // No explicit resources to release for Quantum4J backend.
     }

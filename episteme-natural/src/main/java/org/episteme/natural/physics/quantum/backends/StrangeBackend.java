@@ -48,6 +48,12 @@ public class StrangeBackend implements QuantumBackend, QuantumAlgorithmProvider 
     }
 
     @Override
+    public String getStatusMessage() {
+        if (isAvailable()) return "Ready (Strange)";
+        return "Strange library (strange.jar) missing from classpath";
+    }
+
+    @Override
     public void shutdown() {
         // No explicit resources to release for Strange (Local) simulator.
     }

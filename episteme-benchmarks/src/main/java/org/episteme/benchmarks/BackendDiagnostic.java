@@ -18,7 +18,7 @@ public class BackendDiagnostic {
         System.out.println("\n--- Quantum Backends ---");
         try {
             QuantumBackendManager.staticAllBackends().forEach(b -> {
-                checkAvailability(b.getName(), b::isAvailable);
+                checkAvailability(b.getName(), b);
             });
         } catch (ServiceConfigurationError e) {
             System.err.println("Critical failure loading Quantum backends: " + e.getMessage());
@@ -27,7 +27,7 @@ public class BackendDiagnostic {
         System.out.println("\n--- Vision Backends ---");
         try {
             VisionBackendManager.staticAllBackends().forEach(b -> {
-                checkAvailability(b.getName(), b::isAvailable);
+                checkAvailability(b.getName(), b);
             });
         } catch (ServiceConfigurationError e) {
             System.err.println("Critical failure loading Vision backends: " + e.getMessage());
@@ -35,19 +35,21 @@ public class BackendDiagnostic {
 
         System.out.println("\n--- Linear Algebra Backends ---");
         safeIterate(ServiceLoader.load(LinearAlgebraProvider.class), b -> {
-            checkAvailability(b.getName(), b::isAvailable);
+            if (b instanceof Backend) {
+                checkAvailability(b.getName(), (Backend) b);
+            }
         });
 
         System.out.println("\n--- Compute Backends (SPI) ---");
         safeIterate(ServiceLoader.load(ComputeBackend.class), b -> {
             if (b.getName().contains("Arrow") || b.getName().contains("ND4J") || b.getName().contains("FFM")) {
-                checkAvailability(b.getName(), b::isAvailable);
+                checkAvailability(b.getName(), b);
             }
         });
 
         safeIterate(ServiceLoader.load(Backend.class), b -> {
             if (b.getName().contains("Arrow") || b.getName().contains("FFM")) {
-                 checkAvailability(b.getName(), b::isAvailable);
+                 checkAvailability(b.getName(), b);
             }
         });
 
@@ -69,11 +71,13 @@ public class BackendDiagnostic {
         }
     }
 
-    private static void checkAvailability(String name, java.util.function.BooleanSupplier supplier) {
+    private static void checkAvailability(String name, Backend backend) {
         boolean available = false;
+        String status = "";
         String error = "";
         try {
-            available = supplier.getAsBoolean();
+            available = backend.isAvailable();
+            status = backend.getStatusMessage();
         } catch (ExceptionInInitializerError e) {
             error = " [INIT ERROR: " + (e.getCause() != null ? e.getCause().toString() : e.toString()) + "]";
         } catch (LinkageError e) {
@@ -81,7 +85,7 @@ public class BackendDiagnostic {
         } catch (Throwable t) {
             error = " [ERROR: " + t.getClass().getSimpleName() + ": " + t.getMessage() + "]";
         }
-        System.out.printf("%-45s | Available: %-5b%s\n", name, available, error);
+        System.out.printf("%-45s | Available: %-5b | Status: %-40s%s\n", name, available, status, error);
     }
 
     private static void printNativeFailureDetails() {

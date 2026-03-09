@@ -50,7 +50,21 @@ public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, Nativ
             Class.forName("jcuda.driver.JCudaDriver");
             return true; 
         } catch (Throwable t) {
+            // Silently fail for availability check, but we could log here if needed
             return false;
+        }
+    }
+
+    @Override
+    public String getStatusMessage() {
+        if (isAvailable()) return "Running on NVIDIA CUDA";
+        try {
+            Class.forName("jcuda.driver.JCudaDriver");
+            return "JCuda classes found, but driver failed to initialize";
+        } catch (ClassNotFoundException e) {
+            return "JCuda library (jcuda.jar) missing from classpath";
+        } catch (Throwable t) {
+            return "CUDA Error: " + t.getMessage();
         }
     }
 
@@ -75,8 +89,13 @@ public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, Nativ
     }
     
     @Override
+    public String getName() {
+        return "Native CUDA Vision Backend";
+    }
+
+    @Override
     public String getBackendName() {
-        return "CUDA Vision Backend";
+        return getName();
     }
 
     @Override

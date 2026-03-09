@@ -51,6 +51,18 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
     }
 
     @Override
+    public String getStatusMessage() {
+        if (isAvailable()) return "Ready (Python/Qiskit)";
+        try {
+            Process p = new ProcessBuilder(pythonExecutable, "--version").start();
+            if (p.waitFor() != 0) return "Python executable '" + pythonExecutable + "' not functional";
+            return "Python found, but qiskit/qiskit-nature packages missing (run: pip install qiskit qiskit-nature)";
+        } catch (Exception e) {
+            return "Python executable '" + pythonExecutable + "' not found in PATH";
+        }
+    }
+
+    @Override
     public void shutdown() {
         // No explicit resources to release for Python Quantum (Hybrid) backend.
     }

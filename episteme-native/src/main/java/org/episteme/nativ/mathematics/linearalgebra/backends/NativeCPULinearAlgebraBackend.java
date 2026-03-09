@@ -54,6 +54,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     private static final MethodHandle DGESV_HANDLE;
     private static final MethodHandle DGETRF_HANDLE;
     private static final MethodHandle DGETRI_HANDLE;
+    private static final MethodHandle DSYEV_HANDLE;
     
     private static final boolean AVAILABLE;
 
@@ -68,6 +69,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         MethodHandle dgesv = null;
         MethodHandle dgetrf = null;
         MethodHandle dgetri = null;
+        MethodHandle dsyev = null;
         
         boolean avail = false;
 
@@ -114,9 +116,12 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
                     dgesv = lookup.find("LAPACKE_dgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                     */
                     // LAPACKE
-                    dgesv = lookup.find("LAPACKE_dgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                     dgetrf = lookup.find("LAPACKE_dgetrf").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                     dgetri = lookup.find("LAPACKE_dgetri").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                    
+                    // dsyev(matrix_layout, jobz, uplo, n, a, lda, w)
+                    dsyev = lookup.find("LAPACKE_dsyev").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                     avail = true;
                 }
@@ -129,6 +134,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         DGESV_HANDLE = dgesv;
         DGETRF_HANDLE = dgetrf;
         DGETRI_HANDLE = dgetri;
+        DSYEV_HANDLE = dsyev;
         
         AVAILABLE = avail;
     }
@@ -146,6 +152,12 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     @Override
     public boolean isAvailable() {
         return AVAILABLE;
+    }
+
+    @Override
+    public String getStatusMessage() {
+        if (AVAILABLE) return "Ready (Native CPU/BLAS)";
+        return "Native library (episteme-jni, openblas, or mkl_rt) not found or CBLAS symbols missing";
     }
 
     @Override
@@ -225,6 +237,15 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             return (int) DGESV_HANDLE.invokeExact(CblasRowMajor, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv), MemorySegment.ofBuffer(B), ldb);
         } catch (Throwable t) {
             throw new RuntimeException("LAPACK dgesv failed", t);
+        }
+    }
+
+    public int dsyev(int n, DoubleBuffer A, int lda, DoubleBuffer W) {
+        if (!AVAILABLE || DSYEV_HANDLE == null) throw new UnsupportedOperationException("LAPACK dsyev not available");
+        try {
+            return (int) DSYEV_HANDLE.invokeExact(CblasRowMajor, (byte) 'V', (byte) 'L', n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(W));
+        } catch (Throwable t) {
+            throw new RuntimeException("LAPACK dsyev failed", t);
         }
     }
 
@@ -439,5 +460,70 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         throw new UnsupportedOperationException(getName() + ": determinant() not available for these types");
     }
 
-    // Other methods default to UnsupportedOperationException
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+            int n = a.rows();
+            RealDoubleMatrix luMat = RealDoubleMatrix.direct(n, n);
+            luMat.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            luMat.getBuffer().position(0);
+
+            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
+                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+
+            int info = dgetrf(n, n, luMat.getBuffer(), n, ipiv);
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+
+            double[] lData = new double[n * n];
+            double[] uData = new double[n * n];
+            double[] luArr = luMat.toDoubleArray();
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    double val = luArr[i * n + j];
+                    if (i > j) {
+                        lData[i * n + j] = val;
+                        uData[i * n + j] = 0.0;
+                    } else if (i == j) {
+                        lData[i * n + j] = 1.0;
+                        uData[i * n + j] = val;
+                    } else {
+                        lData[i * n + j] = 0.0;
+                        uData[i * n + j] = val;
+                    }
+                }
+            }
+
+            double[] pData = new double[n];
+            for (int i = 0; i < n; i++) pData[i] = ipiv.get(i);
+
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                RealDoubleMatrix.of(lData, n, n),
+                RealDoubleMatrix.of(uData, n, n),
+                RealDoubleVector.of(pData)
+            );
+        }
+        throw new UnsupportedOperationException(getName() + ": lu() not available for these types");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+            int n = a.rows();
+            RealDoubleMatrix vMat = RealDoubleMatrix.direct(n, n);
+            vMat.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            vMat.getBuffer().position(0);
+
+            RealDoubleMatrix wVec = RealDoubleMatrix.direct(n, 1);
+            
+            int info = dsyev(n, vMat.getBuffer(), n, wVec.getBuffer());
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dsyev: " + info);
+            if (info > 0) throw new ArithmeticException("Eigenvalue decomposition failed to converge");
+
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                vMat, RealDoubleVector.of(wVec.toDoubleArray())
+            );
+        }
+        throw new UnsupportedOperationException(getName() + ": eigen() not available for these types");
+    }
 }
