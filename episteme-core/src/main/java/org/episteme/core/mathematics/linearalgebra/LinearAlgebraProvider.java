@@ -10,6 +10,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.algorithm.FallbackDisabledException;
 
 
 /**

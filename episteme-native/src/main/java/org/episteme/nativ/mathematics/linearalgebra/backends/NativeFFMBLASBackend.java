@@ -232,7 +232,12 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
             
             int info = (int) DGESV.invokeExact(LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
-            if (info != 0) throw new ArithmeticException("Linear solve failed (singular matrix). Info: " + info);
+            if (info != 0) {
+                if (info > 0) {
+                    throw new ArithmeticException("Linear solve failed: Matrix is singular (U(" + info + "," + info + ") is zero).");
+                }
+                throw new IllegalArgumentException("Linear solve failed: Illegal value in parameter " + (-info));
+            }
             
             double[] result = new double[n];
             MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
@@ -294,12 +299,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                  throw new ArithmeticException("LU Factorization failed with illegal argument at position " + (-info));
              }
              
-             // 2. Inverse using LU Factorization
-             info = (int) DGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
-             if (info != 0) {
-                 if (info > 0) throw new ArithmeticException("Matrix is singular during inversion. Cannot compute inverse.");
-                 throw new ArithmeticException("Inverse failed with illegal argument at position " + (-info));
-             }
+            // 2. Inverse using LU Factorization
+            info = (int) DGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
+            if (info != 0) {
+                if (info > 0) {
+                    throw new ArithmeticException("Inversion failed: Matrix is singular (U(" + info + "," + info + ") is zero).");
+                }
+                throw new IllegalArgumentException("Inversion failed: Illegal value in parameter " + (-info));
+            }
              
              double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
              

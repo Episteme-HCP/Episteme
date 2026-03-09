@@ -127,7 +127,7 @@ public class Situation implements ComprehensiveIdentification, Positioned<Place>
      */
     @Deprecated
     public Role addParticipant(Individual individual, String roleName, int kind) {
-        Role role = new Role(individual, roleName, this, kind);
+        Role role = new Role(individual, roleName, this, org.episteme.social.sociology.RoleKind.fromInt(kind));
         roles.add(role);
         return role;
     }

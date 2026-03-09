@@ -55,22 +55,6 @@ public class QuantumBackendManager extends AbstractBackendManager<QuantumBackend
         return INSTANCE.managerAll();
     }
 
-    /**
-     * @deprecated Use staticSelect
-     */
-    @Deprecated
-    public static QuantumBackend select(String name) {
-        return staticSelect(name);
-    }
-
-    /**
-     * @deprecated Use staticAllBackends
-     */
-    @Deprecated
-    public static java.util.Collection<QuantumBackend> getAllBackends() {
-        return staticAllBackends();
-    }
-
     private String preferredId = "auto";
 
     private QuantumBackendManager() {

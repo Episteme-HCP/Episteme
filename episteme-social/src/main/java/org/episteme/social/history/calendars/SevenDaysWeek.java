@@ -66,10 +66,6 @@ public abstract class SevenDaysWeek extends AlternateCalendar {
         "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
     };
 
-    /** @deprecated Use {@link #DAY_NAMES} instead. */
-    @Deprecated
-    public static final String[] DAYNAMES = DAY_NAMES;
-
     /**
      * Default constructor.
      */

@@ -57,33 +57,11 @@ public abstract class Question implements ComprehensiveIdentification {
     @Attribute
     private boolean required;
 
-    @Deprecated
-    public enum Type {
-        @Deprecated TEXT,
-        @Deprecated PARAGRAPH,
-        @Deprecated MULTIPLE_CHOICE,
-        @Deprecated CHECKBOXES,
-        @Deprecated DROPDOWN,
-        @Deprecated LINEAR_SCALE,
-        @Deprecated DATE,
-        @Deprecated TIME;
-        
-        @Deprecated
-        public QuestionType toQuestionType() {
-            return QuestionType.valueOf(name());
-        }
-    }
-
     public Question(String text, QuestionType type) {
         this.id = new UUIDIdentification();
         setName(text);
         this.type = type;
         this.required = false;
-    }
-
-    @Deprecated
-    public Question(String text, Type type) {
-        this(text, type.toQuestionType());
     }
 
     @Override
@@ -108,15 +86,6 @@ public abstract class Question implements ComprehensiveIdentification {
         return type;
     }
     
-    @Deprecated
-    public Type getLegacyType() {
-        try {
-            return Type.valueOf(type.name());
-        } catch (IllegalArgumentException e) {
-            return Type.TEXT;
-        }
-    }
-
     public boolean isRequired() {
         return required;
     }

@@ -163,7 +163,7 @@ public class ModifiedFrenchCalendar extends MonthDayYear {
 
         modfrench.set(1, 1, super.year);
         @SuppressWarnings("deprecation")
-        long m = AlternateCalendar.fldiv(super.rd -
+        long m = AlternateCalendar.floorDiv(super.rd -
                 modfrench.toRD(), 30L);
         super.month = (int)m + 1;
         modfrench.set(super.month, 1, super.year);

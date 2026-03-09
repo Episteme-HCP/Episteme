@@ -65,18 +65,6 @@ public class OMSymbol extends OMObject {
     /**
      * Gets the CD for this OpenMath symbol.<p></p>
      *
-     * @return the CD of the symbol.
-     *
-     * @deprecated use the getCd method instead.
-     */
-    @Deprecated
-    public String getCD() {
-        return getCd();
-    }
-
-    /**
-     * Gets the CD for this OpenMath symbol.<p></p>
-     *
      * @return the CD of the symbol, or <b>null</b> if not set.
      */
     public String getCd() {

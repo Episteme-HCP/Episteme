@@ -125,14 +125,6 @@ public abstract class AlternateCalendar implements Serializable {
     }
 
     /**
-     * @deprecated Use {@link #floorDiv(long, long)} instead.
-     */
-    @Deprecated
-    public static long fldiv(long dividend, long divisor) {
-        return floorDiv(dividend, divisor);
-    }
-
-    /**
      * Sets this calendar to the specified Rata Die and recomputes the calendar fields.
      *
      * @param rataDie the new Rata Die value
@@ -195,24 +187,6 @@ public abstract class AlternateCalendar implements Serializable {
      */
     public boolean isAfter(AlternateCalendar other) {
         return toRD() > other.toRD();
-    }
-
-    /**
-     * @deprecated Use {@link #isBefore(AlternateCalendar)} instead.
-     * Note: Original implementation had inverted logic.
-     */
-    @Deprecated
-    public boolean before(AlternateCalendar other) {
-        return toRD() > other.toRD(); // Preserving original (incorrect) behavior
-    }
-
-    /**
-     * @deprecated Use {@link #isAfter(AlternateCalendar)} instead.
-     * Note: Original implementation had inverted logic.
-     */
-    @Deprecated
-    public boolean after(AlternateCalendar other) {
-        return toRD() < other.toRD(); // Preserving original (incorrect) behavior
     }
 
     /**

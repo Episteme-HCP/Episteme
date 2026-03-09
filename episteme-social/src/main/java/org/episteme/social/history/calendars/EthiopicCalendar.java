@@ -96,7 +96,7 @@ public class EthiopicCalendar extends CopticCalendar {
      */
     protected synchronized void recomputeRD() {
         @SuppressWarnings("deprecation")
-        long q = AlternateCalendar.fldiv(super.year, 4L);
+        long q = AlternateCalendar.floorDiv(super.year, 4L);
         super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
             q +
             (long) (30 * (super.month - 1)) + (long) super.day;
@@ -107,10 +107,10 @@ public class EthiopicCalendar extends CopticCalendar {
      */
     protected synchronized void recomputeFromRD() {
         @SuppressWarnings("deprecation")
-        long y = AlternateCalendar.fldiv((4L * (super.rd - EPOCH)) + 1463L, 1461L);
+        long y = AlternateCalendar.floorDiv((4L * (super.rd - EPOCH)) + 1463L, 1461L);
         super.year = (int)y;
         @SuppressWarnings("deprecation")
-        long m = AlternateCalendar.fldiv(super.rd -
+        long m = AlternateCalendar.floorDiv(super.rd -
                 (new EthiopicCalendar(1, 1, super.year)).toRD(), 30L);
         super.month = (int)m + 1;
         super.day = (int) ((super.rd + 1L) -

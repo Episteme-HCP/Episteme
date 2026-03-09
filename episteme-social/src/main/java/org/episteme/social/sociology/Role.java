@@ -108,15 +108,6 @@ public class Role implements ComprehensiveIdentification, Temporal<TimeCoordinat
         this.timestamp = org.episteme.social.history.time.TimePoint.now();
     }
 
-    /**
-     * Deprecated constructor for backward compatibility with integer-based role kinds.
-     * @deprecated Use {@link #Role(Individual, String, Situation, RoleKind)} instead
-     */
-    @Deprecated
-    public Role(Individual individual, String name, Situation situation, int kind) {
-        this(individual, name, situation, org.episteme.social.sociology.RoleKind.fromInt(kind));
-    }
-
     @Override
     public Identification getId() {
         return id;

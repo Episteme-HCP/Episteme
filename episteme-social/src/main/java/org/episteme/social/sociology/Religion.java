@@ -64,17 +64,6 @@ public class Religion implements ComprehensiveIdentification {
     @Attribute
     protected final Map<String, Object> traits = new HashMap<>();
 
-    @Deprecated
-    public enum Type {
-        @Deprecated MONOTHEISTIC, @Deprecated POLYTHEISTIC, @Deprecated PANTHEISTIC, @Deprecated ATHEISTIC,
-        @Deprecated ANIMISTIC, @Deprecated SHAMANISTIC, @Deprecated PHILOSOPHICAL;
-        
-        @Deprecated
-        public ReligionType toReligionType() {
-            return ReligionType.valueOf(this.name());
-        }
-    }
-
     public static final Religion BUDDHISM = new Religion("Buddhism", ReligionType.PHILOSOPHICAL);
 
     @Attribute
@@ -139,11 +128,6 @@ public class Religion implements ComprehensiveIdentification {
         this.type = type;
     }
 
-    @Deprecated
-    public Religion(String name, Type type) {
-        this(name, type != null ? type.toReligionType() : ReligionType.OTHER);
-    }
-
     @Override
     public Identification getId() {
         return id;
@@ -168,15 +152,6 @@ public class Religion implements ComprehensiveIdentification {
      */
     public void setType(ReligionType type) {
         this.type = type;
-    }
-
-    @Deprecated
-    public Type getLegacyType() {
-        try {
-            return Type.valueOf(type.name());
-        } catch (Exception e) {
-            return Type.PHILOSOPHICAL;
-        }
     }
 
     public long getFollowers() {

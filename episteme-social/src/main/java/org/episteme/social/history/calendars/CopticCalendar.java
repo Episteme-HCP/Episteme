@@ -105,7 +105,7 @@ public class CopticCalendar extends JulianCalendar {
      */
     protected synchronized void recomputeRD() {
             @SuppressWarnings("deprecation")
-            long q = AlternateCalendar.fldiv(super.year, 4L);
+            long q = AlternateCalendar.floorDiv(super.year, 4L);
             super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
             q +
             (long) (30 * (super.month - 1)) + (long) super.day;
