@@ -32,8 +32,9 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * Intended to allow fetching the latest CODATA values from NIST archives.
  * </p>
  * * <p>
- * <b>Reference:</b><br>
- * Mohr, P. J., et al. (2016). CODATA Recommended Values of the Fundamental Physical Constants. <i>Reviews of Modern Physics</i>.
+ * <b>References:</b><br>
+ * Mohr, P. J., et al. (2016). CODATA Recommended Values of the Fundamental Physical Constants. <i>Reviews of Modern Physics</i>.<br>
+ * Data Source: NIST Reference on Constants, Units, and Uncertainty (https://physics.nist.gov/cuu/Constants/Table/allascii.txt).
  * </p>
  *
  * @author Silvere Martin-Michiellot

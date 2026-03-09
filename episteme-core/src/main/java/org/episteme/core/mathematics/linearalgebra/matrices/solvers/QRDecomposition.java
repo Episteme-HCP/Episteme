@@ -35,6 +35,10 @@ import java.util.ArrayList;
  * <p>
  * Uses Householder reflections for maximum numerical stability.
  * Essential for least squares and eigenvalues.
+ * <p>
+ * <b>Algorithm Reference:</b><br>
+ * Golub, G. H., & Van Loan, C. F. (2013). <i>Matrix Computations</i> (4th ed.). Johns Hopkins University Press.
+ * (Chapter 5: Orthogonalization and Least Squares)
  * </p>
  *
  * @author Silvere Martin-Michiellot

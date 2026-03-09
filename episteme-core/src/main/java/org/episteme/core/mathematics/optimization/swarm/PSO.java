@@ -28,6 +28,11 @@ import java.util.function.ToDoubleFunction;
 
 /**
  * Particle Swarm Optimization (PSO) Engine.
+ * <p>
+ * <b>Algorithm Reference:</b><br>
+ * Kennedy, J., and Eberhart, R. (1995). "Particle swarm optimization". 
+ * <i>Proceedings of ICNN'95 - International Conference on Neural Networks</i>.
+ * </p>
  */
 public class PSO {
     private final List<Particle> swarm;

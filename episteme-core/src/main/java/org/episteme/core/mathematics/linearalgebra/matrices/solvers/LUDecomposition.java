@@ -35,6 +35,10 @@ import java.util.ArrayList;
  * <p>
  * Used for solving linear systems, computing determinants, and matrix
  * inversion.
+ * <p>
+ * <b>Algorithm Reference:</b><br>
+ * Golub, G. H., & Van Loan, C. F. (2013). <i>Matrix Computations</i> (4th ed.). Johns Hopkins University Press.
+ * (Chapter 3: General Linear Systems)
  * </p>
  *
  * @author Silvere Martin-Michiellot
