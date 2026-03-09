@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedActuator;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -38,7 +38,7 @@ import java.io.IOException;
 /**
  * Simulated implementation of Centrifuge.
  */
-public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
+public class SimulatedCentrifuge extends AbstractSimulatedActuator<Quantity<Frequency>> implements Centrifuge {
 
     private final Quantity<Frequency> maxRPM;
     private final Quantity<Dimensionless> maxRCF;

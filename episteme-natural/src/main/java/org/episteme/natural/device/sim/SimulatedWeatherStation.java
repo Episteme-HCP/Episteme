@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedDevice;
 import org.episteme.core.device.Sensor;
 import org.episteme.natural.device.instruments.WeatherStation;
 import org.episteme.natural.device.sensors.HumidityProbe;
@@ -39,7 +39,7 @@ import java.util.List;
  * Simulated implementation of WeatherStation.
  * A WeatherStation is a complex instrument aggregating temperature, humidity and pressure sensors.
  */
-public class SimulatedWeatherStation extends SimulatedDevice implements WeatherStation {
+public class SimulatedWeatherStation extends AbstractSimulatedDevice implements WeatherStation {
 
     private final TemperatureProbe temperatureProbe;
     private final HumidityProbe humidityProbe;

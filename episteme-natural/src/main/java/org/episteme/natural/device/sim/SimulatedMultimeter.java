@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -36,7 +36,7 @@ import java.io.IOException;
 /**
  * Simulated implementation of Multimeter.
  */
-public class SimulatedMultimeter extends SimulatedDevice implements Multimeter {
+public class SimulatedMultimeter extends AbstractSimulatedSensor<Dimensionless> implements Multimeter {
 
     private Function function = Function.DC_VOLTAGE;
 

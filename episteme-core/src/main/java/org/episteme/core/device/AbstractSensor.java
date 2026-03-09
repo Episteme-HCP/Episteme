@@ -21,39 +21,32 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.device.sim;
-
-import org.episteme.core.device.sim.AbstractSimulatedSensor;
-import org.episteme.core.measure.Quantity;
-import org.episteme.core.measure.Quantities;
-import org.episteme.core.measure.Units;
-import org.episteme.core.measure.quantity.Dimensionless;
-import org.episteme.natural.device.sensors.Seismograph;
-import org.episteme.core.util.identity.Identification;
+package org.episteme.core.device;
 
 import java.io.IOException;
-import java.util.Random;
+import java.util.Optional;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.util.identity.Identification;
 
 /**
- * Simulated seismograph.
+ * Base implementation for sensor devices.
+ *
+ * @param <Q> the type of quantity produced by the sensor
+ * @author Silvere Martin-Michiellot
+ * @since 1.0
  */
-public class SimulatedSeismograph extends AbstractSimulatedSensor<Dimensionless> implements Seismograph {
+public abstract class AbstractSensor<Q extends Quantity<Q>> extends AbstractDevice implements Sensor<Q> {
 
-    private final Random random = new Random();
-
-    public SimulatedSeismograph(Identification id) {
-        super(id);
-        this.currentValue = Quantities.create(0.0, Units.ONE);
+    protected AbstractSensor(Identification identification) {
+        super(identification);
     }
 
     @Override
-    public Quantity<Dimensionless> readMagnitude() {
-        double v = random.nextDouble() * 9.0;
-        return Quantities.create(v, Units.ONE);
-    }
-
-    @Override
-    public Quantity<Dimensionless> readValue() throws IOException {
-        return readMagnitude();
+    public Optional<Quantity<?>> getValue() {
+        try {
+            return Optional.ofNullable(readValue());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 }

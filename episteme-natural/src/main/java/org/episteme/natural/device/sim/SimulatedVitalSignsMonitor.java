@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedDevice;
 import org.episteme.core.util.identity.Identification;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * Simulated vital signs monitor producing realistic medical data.
  */
-public class SimulatedVitalSignsMonitor extends SimulatedDevice implements VitalSignsMonitor {
+public class SimulatedVitalSignsMonitor extends AbstractSimulatedDevice implements VitalSignsMonitor {
 
     private final Random random = new Random();
     private final double sampleRate = 250.0;

@@ -55,8 +55,8 @@ public class MassSpectra extends AbstractDevice implements Spectrometer {
     }
 
     @Override
-    public SpectroscopyType getType() {
-        return SpectroscopyType.MASS;
+    public Spectrometer.SpectroscopyType getType() {
+        return Spectrometer.SpectroscopyType.MASS;
     }
 
     @Override

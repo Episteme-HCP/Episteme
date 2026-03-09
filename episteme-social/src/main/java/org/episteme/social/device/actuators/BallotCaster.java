@@ -21,39 +21,26 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.device.sim;
+package org.episteme.social.device.actuators;
 
-import org.episteme.core.device.sim.AbstractSimulatedSensor;
-import org.episteme.core.measure.Quantity;
-import org.episteme.core.measure.Quantities;
-import org.episteme.core.measure.Units;
-import org.episteme.core.measure.quantity.Dimensionless;
-import org.episteme.natural.device.sensors.Seismograph;
-import org.episteme.core.util.identity.Identification;
-
-import java.io.IOException;
-import java.util.Random;
+import org.episteme.core.device.Actuator;
 
 /**
- * Simulated seismograph.
+ * Interface for a ballot caster component.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.2
  */
-public class SimulatedSeismograph extends AbstractSimulatedSensor<Dimensionless> implements Seismograph {
+public interface BallotCaster extends Actuator<String> {
+    /**
+     * Casts a ballot for the specified candidate.
+     * @param candidate The candidate name or identifier.
+     */
+    void castBallot(String candidate);
 
-    private final Random random = new Random();
-
-    public SimulatedSeismograph(Identification id) {
-        super(id);
-        this.currentValue = Quantities.create(0.0, Units.ONE);
-    }
-
-    @Override
-    public Quantity<Dimensionless> readMagnitude() {
-        double v = random.nextDouble() * 9.0;
-        return Quantities.create(v, Units.ONE);
-    }
-
-    @Override
-    public Quantity<Dimensionless> readValue() throws IOException {
-        return readMagnitude();
-    }
+    /**
+     * @return The total number of ballots cast through this component.
+     */
+    int getBallotCount();
 }

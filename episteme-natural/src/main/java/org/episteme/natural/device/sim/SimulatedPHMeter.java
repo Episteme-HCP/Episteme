@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -37,28 +37,13 @@ import java.util.Random;
 /**
  * Simulated pH meter.
  */
-public class SimulatedPHMeter extends AbstractDevice implements PHMeter {
+public class SimulatedPHMeter extends AbstractSimulatedSensor<Dimensionless> implements PHMeter {
 
     private final Random random = new Random();
 
     public SimulatedPHMeter(Identification id) {
         super(id);
         this.currentValue = Quantities.create(7.0, Units.ONE);
-    }
-
-    @Override
-    public void connect() throws IOException {
-        setStatus(Status.OPERATIONAL);
-    }
-
-    @Override
-    public void disconnect() throws IOException {
-        setStatus(Status.DISCONNECTED);
-    }
-
-    @Override
-    public boolean isConnected() {
-        return getDeviceStatus() == Status.OPERATIONAL;
     }
 
     @Override
@@ -91,10 +76,5 @@ public class SimulatedPHMeter extends AbstractDevice implements PHMeter {
     public Quantity<Dimensionless> getHydrogenConcentration(Quantity<Dimensionless> pH) {
         double v = pH.getValue().doubleValue();
         return Quantities.create(Math.pow(10, -v), Units.ONE);
-    }
-
-    @Override
-    public void close() throws Exception {
-        disconnect();
     }
 }

@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * Simulated temperature probe.
  */
-public class SimulatedTemperatureProbe extends AbstractDevice implements TemperatureProbe {
+public class SimulatedTemperatureProbe extends AbstractSimulatedSensor<Temperature> implements TemperatureProbe {
 
     private final ProbeType type;
     private final Quantity<Temperature> minTemp;
@@ -68,30 +68,10 @@ public class SimulatedTemperatureProbe extends AbstractDevice implements Tempera
     }
 
     @Override
-    public void connect() throws IOException {
-        setStatus(Status.OPERATIONAL);
-    }
-
-    @Override
-    public void disconnect() throws IOException {
-        setStatus(Status.DISCONNECTED);
-    }
-
-    @Override
-    public boolean isConnected() {
-        return getDeviceStatus() == Status.OPERATIONAL;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public Quantity<Temperature> readValue() throws IOException {
         double v = 273.15 + (random.nextDouble() * 20 - 10);
         setCurrentValue(Quantities.create(v, Units.KELVIN));
         return (Quantity<Temperature>) currentValue;
-    }
-
-    @Override
-    public void close() throws Exception {
-        disconnect();
     }
 }

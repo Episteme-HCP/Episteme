@@ -28,32 +28,49 @@ import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
 import org.episteme.core.measure.quantity.Dimensionless;
-import org.episteme.natural.device.sensors.Seismograph;
+import org.episteme.natural.device.sensors.HumidityProbe;
 import org.episteme.core.util.identity.Identification;
 
 import java.io.IOException;
 import java.util.Random;
 
 /**
- * Simulated seismograph.
+ * Simulated humidity probe.
  */
-public class SimulatedSeismograph extends AbstractSimulatedSensor<Dimensionless> implements Seismograph {
+public class SimulatedHumidityProbe extends AbstractSimulatedSensor<Dimensionless> implements HumidityProbe {
 
     private final Random random = new Random();
 
-    public SimulatedSeismograph(Identification id) {
+    public SimulatedHumidityProbe(Identification id) {
         super(id);
-        this.currentValue = Quantities.create(0.0, Units.ONE);
+        this.currentValue = Quantities.create(50.0, Units.PERCENT);
     }
 
     @Override
-    public Quantity<Dimensionless> readMagnitude() {
-        double v = random.nextDouble() * 9.0;
-        return Quantities.create(v, Units.ONE);
+    public Quantity<Dimensionless> getRelativeHumidity() {
+        try {
+            return readValue();
+        } catch (IOException e) {
+            return (Quantity<Dimensionless>) currentValue;
+        }
     }
 
     @Override
+    public Quantity<Dimensionless> measure(Quantity<Dimensionless> actualHumidity) {
+        // Simulate measurement noise around actual humidity
+        double actual = actualHumidity.getValue().doubleValue();
+        double measured = actual + (random.nextDouble() - 0.5) * 2.0;
+        measured = Math.max(0, Math.min(100, measured));
+        Quantity<Dimensionless> result = Quantities.create(measured, Units.PERCENT);
+        setCurrentValue(result);
+        return result;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public Quantity<Dimensionless> readValue() throws IOException {
-        return readMagnitude();
+        double v = 50.0 + (random.nextDouble() * 10 - 5);
+        setCurrentValue(Quantities.create(v, Units.PERCENT));
+        return (Quantity<Dimensionless>) currentValue;
     }
 }

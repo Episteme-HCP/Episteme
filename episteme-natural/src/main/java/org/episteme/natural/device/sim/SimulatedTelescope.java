@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedDevice;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -32,11 +32,12 @@ import org.episteme.natural.device.transducers.Telescope;
 import org.episteme.core.util.identity.Identification;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Simulated telescope.
  */
-public class SimulatedTelescope extends SimulatedDevice implements Telescope {
+public class SimulatedTelescope extends AbstractSimulatedDevice implements Telescope {
 
     protected Quantity<Angle> ra;
     protected Quantity<Angle> dec;
@@ -97,5 +98,10 @@ public class SimulatedTelescope extends SimulatedDevice implements Telescope {
     @Override
     public Quantity<Angle>[] getBottomRightFOV() {
         return new Quantity[]{ra.add(Quantities.create(0.5, Units.DEGREE_ANGLE)), dec.subtract(Quantities.create(0.5, Units.DEGREE_ANGLE))};
+    }
+    @Override
+    protected void addCustomReadings(Map<String, String> readings) {
+        readings.put("Right Ascension", ra.toString());
+        readings.put("Declination", dec.toString());
     }
 }

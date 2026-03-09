@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -38,7 +38,7 @@ import java.io.IOException;
 /**
  * Simulated oscilloscope.
  */
-public class SimulatedOscilloscope extends SimulatedDevice implements Oscilloscope {
+public class SimulatedOscilloscope extends AbstractSimulatedSensor<ElectricPotential> implements Oscilloscope {
 
     private int channels = 2;
     private Quantity<Frequency> sampleRate = Quantities.create(1e6, Units.HERTZ);

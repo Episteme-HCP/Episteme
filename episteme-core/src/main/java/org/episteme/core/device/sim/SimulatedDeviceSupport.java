@@ -26,42 +26,31 @@ package org.episteme.core.device.sim;
 import org.episteme.core.device.AbstractDevice;
 import org.episteme.core.device.Device;
 import org.episteme.core.util.identity.Identification;
-import org.episteme.core.util.identity.SimpleIdentification;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Abstract base class for simulated devices with full metadata support.
+ * Helper class to provide common logic for simulated devices.
+ * This avoids code duplication between SimulatedDevice, SimulatedSensor, and SimulatedActuator.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.2
  */
-public abstract class SimulatedDevice extends AbstractDevice {
+public class SimulatedDeviceSupport {
 
+    private final AbstractDevice owner;
     private long connectTime;
     private String driverClass;
     private boolean powerOn = true;
     private int errorCode = 0x00;
+    private final Map<String, Boolean> capabilities = new LinkedHashMap<>();
 
-    protected final Map<String, Boolean> capabilities = new LinkedHashMap<>();
-
-    protected SimulatedDevice(String name) {
-        this(new SimpleIdentification(String.format("%08X", Math.abs(name.hashCode()))));
-        setTrait("name", name);
-        this.driverClass = "org.episteme.core.device.sim." + name.replace(" ", "");
-    }
-
-    protected SimulatedDevice(Identification identification) {
-        super(identification);
+    public SimulatedDeviceSupport(AbstractDevice owner) {
+        this.owner = owner;
         initDefaultCapabilities();
-    }
-
-
-    protected SimulatedDevice(String name, String manufacturer) {
-        this(name);
-        setManufacturer(manufacturer);
+        this.driverClass = "org.episteme.core.device.sim." + owner.getName().replace(" ", "");
     }
 
     private void initDefaultCapabilities() {
@@ -71,58 +60,33 @@ public abstract class SimulatedDevice extends AbstractDevice {
         capabilities.put("High Voltage Protection", false);
     }
 
-    @Override
     public void connect() throws IOException {
-        setStatus(Device.Status.OPERATIONAL);
+        owner.setStatus(Device.Status.OPERATIONAL);
         this.connectTime = System.currentTimeMillis();
         this.powerOn = true;
     }
 
-    @Override
     public void disconnect() throws IOException {
-        setStatus(Device.Status.DISCONNECTED);
+        owner.setStatus(Device.Status.DISCONNECTED);
         this.powerOn = false;
     }
 
-    @Override
     public boolean isConnected() {
-        return getDeviceStatus() != Device.Status.DISCONNECTED && getDeviceStatus() != Device.Status.OFFLINE;
+        return owner.getDeviceStatus() != Device.Status.DISCONNECTED && owner.getDeviceStatus() != Device.Status.OFFLINE;
     }
 
-    public String getDriverClass() {
-        return driverClass;
-    }
+    public String getDriverClass() { return driverClass; }
+    public void setDriverClass(String driverClass) { this.driverClass = driverClass; }
+    public boolean isPowerOn() { return powerOn; }
+    public void setPowerOn(boolean powerOn) { this.powerOn = powerOn; }
+    public int getErrorCode() { return errorCode; }
+    public void setErrorCode(int errorCode) { this.errorCode = errorCode; }
 
-    public void setDriverClass(String driverClass) {
-        this.driverClass = driverClass;
-    }
-
-    public boolean isPowerOn() {
-        return powerOn;
-    }
-
-    public void setPowerOn(boolean powerOn) {
-        this.powerOn = powerOn;
-    }
-
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(int errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    /**
-     * Returns uptime in seconds since connection.
-     */
     public long getUptimeSeconds() {
-        if (!isConnected())
-            return 0;
+        if (!isConnected()) return 0;
         return (System.currentTimeMillis() - connectTime) / 1000;
     }
 
-    @Override
     public Map<String, Boolean> getCapabilities() {
         return new LinkedHashMap<>(capabilities);
     }
@@ -131,41 +95,14 @@ public abstract class SimulatedDevice extends AbstractDevice {
         capabilities.put(name, enabled);
     }
 
-    @Override
-    public Map<String, String> getReadings() {
-        Map<String, String> readings = new LinkedHashMap<>();
-        readings.put("Power", powerOn ? "ON" : "OFF");
-        readings.put("Uptime", getUptimeSeconds() + "s");
-        readings.put("Error Code", String.format("0x%02X", errorCode));
-        addCustomReadings(readings);
-        return readings;
-    }
-
-    /**
-     * Subclasses can override to add custom readings.
-     */
-    protected void addCustomReadings(Map<String, String> readings) {
-        // Default: no extra readings
-    }
-
-    /**
-     * Returns the device status for display.
-     */
-    @Override
     public String getStatus() {
         return isConnected() ? "Connected (Simulated)" : "Disconnected";
     }
 
-    /**
-     * Generates a formatted info string for dashboard display.
-     */
-    /**
-     * Generates a formatted info string for dashboard display.
-     */
     public String getFormattedInfo() {
         org.episteme.core.ui.i18n.I18N i18n = org.episteme.core.ui.i18n.I18N.getInstance();
         StringBuilder sb = new StringBuilder();
-        sb.append(i18n.get("dashboard.devices.title", "Simulated Device")).append(": ").append(getName()).append("\n");
+        sb.append(i18n.get("dashboard.devices.title", "Simulated Device")).append(": ").append(owner.getName()).append("\n");
 
         String statusStr = isConnected()
                 ? i18n.get("dashboard.devices.connected", "Connected") + " ("
@@ -174,11 +111,11 @@ public abstract class SimulatedDevice extends AbstractDevice {
 
         sb.append(i18n.get("dashboard.devices.status", "Status")).append(": ").append(statusStr).append("\n");
         sb.append(i18n.get("dashboard.devices.driver", "Driver")).append(": ").append(driverClass).append("\n");
-        sb.append(i18n.get("dashboard.devices.id", "ID")).append(": ").append(getId().toString()).append("\n");
+        sb.append(i18n.get("dashboard.devices.id", "ID")).append(": ").append(owner.getId().toString()).append("\n");
 
-        sb.append(i18n.get("dashboard.devices.manufacturer", "Manufacturer")).append(": ").append(getManufacturer())
+        sb.append(i18n.get("dashboard.devices.manufacturer", "Manufacturer")).append(": ").append(owner.getManufacturer())
                 .append("\n");
-        sb.append(i18n.get("dashboard.devices.firmware", "Firmware")).append(": ").append(getFirmware()).append("\n\n");
+        sb.append(i18n.get("dashboard.devices.firmware", "Firmware")).append(": ").append(owner.getFirmware()).append("\n\n");
 
         sb.append("=== ").append(i18n.get("dashboard.devices.capabilities", "Capabilities")).append(" ===\n");
         for (Map.Entry<String, Boolean> cap : capabilities.entrySet()) {
@@ -194,11 +131,11 @@ public abstract class SimulatedDevice extends AbstractDevice {
         return sb.toString();
     }
 
-    @Override
-    public void close() throws Exception {
-        disconnect();
+    public Map<String, String> getReadings() {
+        Map<String, String> readings = new LinkedHashMap<>();
+        readings.put("Power", powerOn ? "ON" : "OFF");
+        readings.put("Uptime", getUptimeSeconds() + "s");
+        readings.put("Error Code", String.format("0x%02X", errorCode));
+        return readings;
     }
 }
-
-
-

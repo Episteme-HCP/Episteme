@@ -23,7 +23,7 @@
 
 package org.episteme.natural.device.sim;
 
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.device.sim.AbstractSimulatedSensor;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.Units;
@@ -37,7 +37,7 @@ import java.io.IOException;
 /**
  * Simulated implementation of Microscope.
  */
-public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
+public class SimulatedMicroscope extends AbstractSimulatedSensor<Dimensionless> implements Microscope {
 
     private final Type type;
     private final Quantity<Dimensionless> maxMagnification;
