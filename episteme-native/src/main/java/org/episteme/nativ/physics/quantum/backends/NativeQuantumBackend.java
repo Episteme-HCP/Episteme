@@ -93,6 +93,12 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
     }
 
     @Override
+    public String getStatusMessage() {
+        if (isAvailable()) return "Ready (QuEST)";
+        return "Native library 'QuEST' not found or failed to load (check libs/QuEST.dll)";
+    }
+
+    @Override
     public void shutdown() {
         // Quest handles its own lifecycle in this wrapper.
     }

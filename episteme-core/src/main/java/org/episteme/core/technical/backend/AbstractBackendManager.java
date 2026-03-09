@@ -59,7 +59,10 @@ public abstract class AbstractBackendManager<T extends Backend> {
         if (defaultBackend == null) {
             defaultBackend = selectBestBackend();
             if (defaultBackend != null) {
-                logger.info("Auto-selected best backend: {} for {}", defaultBackend.getName(), backendClass.getSimpleName());
+                logger.info("Auto-selected best backend: {} ({}) for {}", 
+                    defaultBackend.getName(), defaultBackend.getStatusMessage(), backendClass.getSimpleName());
+            } else {
+                logger.warn("No available backends found for {}. Check diagnostic logs.", backendClass.getSimpleName());
             }
         }
     }
@@ -117,8 +120,13 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * @param backend the backend to register
      */
     public void managerRegister(T backend) {
-        logger.info("Registered Backend: {} (Type: {}, Priority: {})", 
-            backend.getName(), backend.getType(), backend.getPriority());
+        if (backend.isAvailable()) {
+            logger.info("Registered Backend: {} (Type: {}, Priority: {}, Status: {})", 
+                backend.getName(), backend.getType(), backend.getPriority(), backend.getStatusMessage());
+        } else {
+            logger.warn("Registered Unavailable Backend: {} (Cause: {})", 
+                backend.getName(), backend.getStatusMessage());
+        }
         backends.put(backend.getName(), backend);
     }
 

@@ -100,6 +100,19 @@
             <artifactId>jbullet</artifactId>
         </dependency>
 
+        <!-- Quantum Computing: Strange -->
+        <dependency>
+            <groupId>org.redfx</groupId>
+            <artifactId>strange</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
+        <!-- Quantum Computing: Quantum4J -->
+        <dependency>
+            <groupId>com.quantum4j</groupId>
+            <artifactId>quantum4j</artifactId>
+            <version>1.3.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -194,24 +207,9 @@
     </build>
     <profiles>
         <profile>
-            <id>benchmark</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>optimal</id>
             <dependencies>
-                <!-- Quantum Computing: Strange -->
-                <dependency>
-                    <groupId>org.redfx</groupId>
-                    <artifactId>strange</artifactId>
-                    <version>0.1.3</version>
-                </dependency>
-        
-                <!-- Quantum Computing: Quantum4J -->
-                <dependency>
-                    <groupId>com.quantum4j</groupId>
-                    <artifactId>quantum4j</artifactId>
-                    <version>1.3.2</version>
-                </dependency>
+               <!-- ... other optimal deps ... -->
             </dependencies>
         </profile>
     </profiles>
