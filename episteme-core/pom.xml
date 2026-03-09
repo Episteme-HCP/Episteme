@@ -173,7 +173,8 @@
         <!-- ND4J (Tensor Operations) -->
         <dependency>
             <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-native</artifactId>
+            <artifactId>nd4j-api</artifactId>
+            <version>${nd4j.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -295,7 +296,7 @@
         <!-- JavaCV -->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>javacv-platform</artifactId>
+            <artifactId>javacv</artifactId>
             <version>1.5.10</version>
         </dependency>
         <dependency>
@@ -430,6 +431,29 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>benchmark</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.nd4j</groupId>
+                    <artifactId>nd4j-native</artifactId>
+                    <version>${nd4j.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.nd4j</groupId>
+                    <artifactId>nd4j-native-platform</artifactId>
+                    <version>${nd4j.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>javacv-platform</artifactId>
+                    <version>1.5.10</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

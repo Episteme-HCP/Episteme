@@ -81,7 +81,7 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
             try {
                 String innerName = CommonsMathBackend.class.getName() + "$CommonsImpl";
                 Class<?> clazz = Class.forName(innerName);
-                Constructor<?> ctor = clazz.getDeclaredConstructor(Field.class);
+                Constructor<?> ctor = clazz.getDeclaredConstructor(CommonsMathBackend.class, Field.class);
                 ctor.setAccessible(true);
                 this.commonsImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {

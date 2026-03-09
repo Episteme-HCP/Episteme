@@ -241,7 +241,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().multiply(a, b);
 
         logger.debug("Entering OpenCL multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         long start = System.nanoTime();
@@ -299,7 +299,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().solve(a, b);
         int n = a.rows();
         if (n != a.cols() || b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
 
@@ -358,7 +358,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().inverse(a);
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         
@@ -414,7 +414,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().determinant(a);
         int n = a.rows();
         double[] h_A = toDoubleArray(a);
         double det = 1.0;
@@ -453,44 +453,44 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     /** Matrix add via element-wise OpenCL. */
     @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().add(a, b);
         return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecAddKernel, a.rows(), a.cols());
     }
     @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().subtract(a, b);
         return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecSubKernel, a.rows(), a.cols());
     }
     @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().scale(scalar, a);
         return fromDoubleArray(scaleVec(toDoubleArray(a), scalar.doubleValue()), a.rows(), a.cols());
     }
     @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
         // Mv = A * (b as column matrix) — reuse GPU matmul kernel
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().multiply(a, b);
         double[] av = toDoubleArray(a), bv = toDoubleVec(b);
         double[] result = matVecMul(av, bv, a.rows(), a.cols());
         return toRealVector(result);
     }
     @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().add(a, b);
         return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecAddKernel));
     }
     @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().subtract(a, b);
         return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecSubKernel));
     }
     @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().multiply(vector, scalar);
         return toRealVector(scaleVec(toDoubleVec(vector), scalar.doubleValue()));
     }
     @Override public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().dot(a, b);
         double[] products = vecOp(toDoubleVec(a), toDoubleVec(b), vecDotPartialKernel);
         double sum = 0; for (double v : products) sum += v;
         return Real.of(sum);
     }
     @Override public Real norm(Vector<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL not available");
+        if (!isAvailable()) return fallback().norm(a);
         double[] av = toDoubleVec(a);
         double[] sq = scaleVecElementWise(av, av); // a[i]*a[i] via dot kernel
         double sum = 0; for (double v : sq) sum += v;
