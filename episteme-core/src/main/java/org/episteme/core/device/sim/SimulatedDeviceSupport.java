@@ -25,7 +25,6 @@ package org.episteme.core.device.sim;
 
 import org.episteme.core.device.AbstractDevice;
 import org.episteme.core.device.Device;
-import org.episteme.core.util.identity.Identification;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;

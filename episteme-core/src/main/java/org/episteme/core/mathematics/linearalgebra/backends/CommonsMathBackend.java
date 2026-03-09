@@ -154,7 +154,6 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
     @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { checkCommons(); return commonsImpl.solve(a, b); }
     @Override public Matrix<E> transpose(Matrix<E> a) { checkCommons(); return commonsImpl.transpose(a); }
     @Override public Matrix<E> scale(E s, Matrix<E> a) { checkCommons(); return commonsImpl.scale(s, a); }
-    @Override public LinearAlgebraProvider<E> fallback() { checkCommons(); return commonsImpl.fallback(); }
     @Override public E norm(Vector<E> a) { checkCommons(); return commonsImpl.norm(a); }
 
     private void checkCommons() {
@@ -174,10 +173,6 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
         CommonsImpl(CommonsMathBackend<E> parent, Field<E> field) {
             this.parent = parent;
             this.field = field;
-        }
-
-        @Override public LinearAlgebraProvider<E> fallback() {
-            return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, parent);
         }
 
         @Override public String getName() { return "Commons Math (Inner)"; }

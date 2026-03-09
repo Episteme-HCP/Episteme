@@ -231,6 +231,42 @@ public final class AlgorithmManager {
     }
 
     /**
+     * Executes an operation using the best available provider, automatically falling back
+     * to the next provider if the current one throws {@link UnsupportedOperationException}.
+     * <p>
+     * In benchmark mode ({@code episteme.fallback.disabled=true}), only the best provider
+     * is tried — no fallback chain.
+     * </p>
+     *
+     * @param <P> the provider type
+     * @param <R> the return type of the operation
+     * @param providerClass the interface class of the provider
+     * @param operation the operation to execute on a provider
+     * @return the result of the operation
+     * @throws UnsupportedOperationException if no provider supports the operation
+     */
+    public static <P extends AlgorithmProvider, R> R executeWithFallback(
+            Class<P> providerClass, java.util.function.Function<P, R> operation) {
+        if (Boolean.getBoolean("episteme.fallback.disabled")) {
+            P best = getProvider(providerClass);
+            return operation.apply(best); // Benchmark mode: fail fast, no chain
+        }
+        List<P> providers = getProviders(providerClass);
+        UnsupportedOperationException lastException = null;
+        for (P provider : providers) {
+            try {
+                return operation.apply(provider);
+            } catch (UnsupportedOperationException e) {
+                logger.debug("Provider {} does not support operation, trying next: {}", 
+                    provider.getName(), e.getMessage());
+                lastException = e;
+            }
+        }
+        throw lastException != null ? lastException : 
+            new UnsupportedOperationException("No provider supports this operation for " + providerClass.getSimpleName());
+    }
+
+    /**
      * Returns the provider registry for operational selection.
      */
     public static ProviderRegistry getRegistry() {
