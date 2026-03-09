@@ -39,7 +39,12 @@ public class TarsosAudioBackend implements AudioBackend, CPUBackend {
             return false;
         }
     } 
-    @Override public int getPriority() { return 50; }
+    @Override public int getPriority() { return 70; }
+
+    @Override
+    public String getAlgorithmType() {
+        return "Audio Processing";
+    }
     
     @Override 
     public Object createBackend() { 
@@ -99,11 +104,6 @@ public class TarsosAudioBackend implements AudioBackend, CPUBackend {
         }
     }
     
-    // AlgorithmProvider methods
-    @Override
-    public String getAlgorithmType() {
-        return "Audio Engine";
-    }
 
     /**
      * Isolated engine to prevent NoClassDefFoundError during class loading of TarsosBackend.

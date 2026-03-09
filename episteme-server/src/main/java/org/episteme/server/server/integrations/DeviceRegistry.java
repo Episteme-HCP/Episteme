@@ -73,7 +73,7 @@ public class DeviceRegistry {
             try {
                 Class<?> cls = Class.forName(info.fullName);
                 Device device = (Device) cls.getDeclaredConstructor().newInstance();
-                String deviceId = device.getId();
+                String deviceId = device.getId().toString();
                 devices.put(deviceId, device);
                 deviceClasses.put(deviceId, info);
                 LOG.info("Registered device: {} ({})", device.getName(), deviceId);
@@ -104,7 +104,7 @@ public class DeviceRegistry {
      * Registers a device manually.
      */
     public void registerDevice(Device device) {
-        devices.put(device.getId(), device);
+        devices.put(device.getId().toString(), device);
         LOG.info("Manually registered device: {} ({})", device.getName(), device.getId());
     }
 

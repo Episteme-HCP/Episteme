@@ -23,122 +23,75 @@
 
 package org.episteme.natural.device.sim;
 
+import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Pressure;
 import org.episteme.natural.device.sensors.PressureGauge;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.device.sim.SimulatedDevice;
+import org.episteme.core.util.identity.Identification;
+
 import java.io.IOException;
+import java.util.Random;
 
 /**
- * Simulated pressure gauge for testing pressure measurement workflows.
- * Generates realistic pressure readings with optional drift and noise.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Simulated pressure gauge.
  */
-public class SimulatedPressureGauge extends SimulatedDevice implements PressureGauge {
+public class SimulatedPressureGauge extends AbstractDevice implements PressureGauge {
 
-    private final PressureGauge.GaugeType type;
-    private final Real accuracy;
-    private Real basePressure = Real.of(101.325); // 1 atm in kPa
-    private Real minPressure = Real.of(0.0);
-    private Real maxPressure = Real.of(1000.0); // 1000 kPa = 10 bar
-    private Real lastReading = Real.of(101.325);
-    private String pressureUnit = "kPa";
+    private final GaugeType type;
+    private final Quantity<Pressure> minPressure;
+    private final Quantity<Pressure> maxPressure;
+    private final Random random = new Random();
 
-    public SimulatedPressureGauge() {
-        this("Simulated PressureGauge");
-    }
-
-    public SimulatedPressureGauge(String name) {
-        super(name);
-        this.type = PressureGauge.GaugeType.PIEZOELECTRIC;
-        this.accuracy = Real.of(0.5);
-    }
-
-    public SimulatedPressureGauge(String name, PressureGauge.GaugeType type, Real accuracy, Real minPressure,
-            Real maxPressure) {
-        super(name);
+    public SimulatedPressureGauge(Identification id, GaugeType type, double min, double max) {
+        super(id);
         this.type = type;
-        this.accuracy = accuracy;
-        this.minPressure = minPressure;
-        this.maxPressure = maxPressure;
+        this.minPressure = Quantities.create(min, Units.PASCAL);
+        this.maxPressure = Quantities.create(max, Units.PASCAL);
+        this.currentValue = Quantities.create(101325, Units.PASCAL);
     }
 
     @Override
-    public PressureGauge.GaugeType getType() {
+    public GaugeType getType() {
         return type;
     }
 
     @Override
-    public Real getAccuracy() {
-        return accuracy;
-    }
-
-    @Override
-    public Real getMinPressure() {
+    public Quantity<Pressure> getMinPressure() {
         return minPressure;
     }
 
     @Override
-    public Real getMaxPressure() {
+    public Quantity<Pressure> getMaxPressure() {
         return maxPressure;
     }
 
     @Override
-    public String getPressureUnit() {
-        return pressureUnit;
+    public void connect() throws IOException {
+        setStatus(Status.OPERATIONAL);
     }
 
     @Override
-    public Real measure(Real actualPressure) {
-        if (!isConnected()) {
-            throw new IllegalStateException("Device not connected");
-        }
-        // Simple noise simulation
-        double noise = (Math.random() - 0.5) * accuracy.doubleValue();
-        lastReading = actualPressure.add(Real.of(noise));
-        return lastReading;
+    public void disconnect() throws IOException {
+        setStatus(Status.DISCONNECTED);
     }
 
     @Override
-    public Real readValue() throws IOException {
-        if (!isConnected()) {
-            throw new IOException("Device not connected");
-        }
-
-        // Simulating environmental fluctuations (atmospheric tides, wind etc)
-        // A slowly varying sine component + measurement noise
-        double time = System.currentTimeMillis() / 10000.0; // Very slow
-        double fluctuation = 0.2 * Math.sin(time); // +/- 0.2 kPa
-
-        double noise = (Math.random() - 0.5) * accuracy.doubleValue();
-        lastReading = basePressure.add(Real.of(fluctuation + noise));
-        return lastReading;
+    public boolean isConnected() {
+        return getDeviceStatus() == Status.OPERATIONAL;
     }
 
-    /**
-     * Sets the base pressure for simulation.
-     */
-    public void setBasePressure(Real pressure) {
-        this.basePressure = pressure;
+    @Override
+    @SuppressWarnings("unchecked")
+    public Quantity<Pressure> readValue() throws IOException {
+        double v = 101325 + (random.nextDouble() * 1000 - 500);
+        setCurrentValue(Quantities.create(v, Units.PASCAL));
+        return (Quantity<Pressure>) currentValue;
     }
 
-    /**
-     * Gets the current base pressure.
-     */
-    public Real getBasePressure() {
-        return basePressure;
-    }
-
-    /**
-     * Sets the pressure unit.
-     */
-    public void setPressureUnit(String unit) {
-        this.pressureUnit = unit;
+    @Override
+    public void close() throws Exception {
+        disconnect();
     }
 }
-
-
-
-

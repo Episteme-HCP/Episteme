@@ -25,28 +25,58 @@ package org.episteme.natural.device.transducers;
 
 import org.episteme.core.device.Actuator;
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
-import java.io.IOException;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Angle;
 
 /**
- * Interface for telescope devices (Transducer: Sensor + Actuator).
+ * Interface for telescopes.
+ * A telescope is both a sensor (for observing coordinates or images)
+ * and an actuator (for slewing to specific coordinates).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Telescope extends Sensor<Real>, Actuator<String> {
-    
-    void slewTo(double ra, double dec) throws IOException;
-    
-    void syncTo(double ra, double dec) throws IOException;
-    
-    double getRightAscension() throws IOException;
-    
-    double getDeclination() throws IOException;
-    
-    void abort() throws IOException;
+public interface Telescope extends Sensor<Angle>, Actuator<String> {
+
+    /**
+     * Slews the telescope to the given Right Ascension and Declination.
+     */
+    void slewTo(Quantity<Angle> ra, Quantity<Angle> dec);
+
+    /**
+     * Synchronizes the telescope to the given Right Ascension and Declination.
+     */
+    void syncTo(Quantity<Angle> ra, Quantity<Angle> dec);
+
+    /**
+     * Returns the current Right Ascension.
+     */
+    Quantity<Angle> getRightAscension();
+
+    /**
+     * Returns the current Declination.
+     */
+    Quantity<Angle> getDeclination();
+
+    /**
+     * Aborts any ongoing slew operation.
+     */
+    void abort();
+
+    /**
+     * Captures a 2D image/intensity map from the current position.
+     * @return 2D array of intensity values.
+     */
+    double[][] getImage();
+
+    /**
+     * Returns the top-left coordinate of the current field of view.
+     */
+    Quantity<Angle>[] getTopLeftFOV();
+
+    /**
+     * Returns the bottom-right coordinate of the current field of view.
+     */
+    Quantity<Angle>[] getBottomRightFOV();
 }
-
-
-

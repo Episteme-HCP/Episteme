@@ -71,7 +71,7 @@ public class DeviceServiceImpl extends DeviceServiceGrpc.DeviceServiceImplBase {
             String deviceType = inferDeviceType(device);
 
             DeviceInfo info = DeviceInfo.newBuilder()
-                    .setDeviceId(device.getId())
+                    .setDeviceId(device.getId().toString())
                     .setName(device.getName())
                     .setType(deviceType)
                     .setConnected(device.isConnected())

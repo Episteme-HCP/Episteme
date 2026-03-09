@@ -24,6 +24,11 @@
 package org.episteme.core.device;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.episteme.core.util.identity.Identification;
+import org.episteme.core.util.identity.SimpleIdentification;
+
 
 /**
  * Abstract base class for GPIB (IEEE-488) devices.
@@ -45,6 +50,8 @@ public abstract class GPIBDevice implements Device {
     protected String name;
     protected String manufacturer = "Unknown";
     protected String firmware = "N/A";
+    protected final Map<String, Object> traits = new HashMap<>();
+
 
     protected GPIBDevice(String name, int gpibAddress) {
         this.name = name;
@@ -132,9 +139,15 @@ public abstract class GPIBDevice implements Device {
     }
 
     @Override
-    public String getId() {
-        return String.format("GPIB%d::%d::INSTR", boardIndex, gpibAddress);
+    public Identification getId() {
+        return new SimpleIdentification(String.format("GPIB%d::%d::INSTR", boardIndex, gpibAddress));
     }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
 
     @Override
     public String getManufacturer() {

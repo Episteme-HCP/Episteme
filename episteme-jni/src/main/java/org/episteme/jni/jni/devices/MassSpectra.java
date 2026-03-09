@@ -24,9 +24,15 @@
 package org.episteme.jni.jni.devices;
 
 import org.episteme.natural.device.sensors.Spectrometer;
-
+import org.episteme.core.device.AbstractDevice;
+import org.episteme.core.util.identity.SimpleIdentification;
 import org.episteme.jni.jni.NativeDeviceBridge;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.Dimensionless;
+import org.episteme.core.measure.quantity.Length;
+import org.episteme.core.measure.quantity.Time;
 
 /**
  * Implementation of a Mass Spectrometer interacting via JNI.
@@ -35,15 +41,17 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MassSpectra implements Spectrometer {
+public class MassSpectra extends AbstractDevice implements Spectrometer {
 
     private final NativeDeviceBridge bridge;
     private final int deviceId;
-    private double integrationTime = 100.0; // Default 100ms
+    private Quantity<Time> integrationTime = Quantities.create(100.0, Units.MILLISECOND);
 
     public MassSpectra(int deviceId) {
+        super(new SimpleIdentification("JNI-MS-" + deviceId));
         this.deviceId = deviceId;
         this.bridge = new NativeDeviceBridge();
+        getTraits().put("name", getName());
     }
 
     @Override
@@ -52,37 +60,33 @@ public class MassSpectra implements Spectrometer {
     }
 
     @Override
-    public double getMinWavelength() {
-        return 0; // Mass Spec doesn't use wavelength in the same way (m/z)
+    public Quantity<Length> getMinWavelength() {
+        return Quantities.create(0, Units.NANOMETER); // Mass Spec uses m/z, mapped to wavelength domain
     }
 
     @Override
-    public double getMaxWavelength() {
-        return 2000;
+    public Quantity<Length> getMaxWavelength() {
+        return Quantities.create(2000, Units.NANOMETER);
     }
 
     @Override
-    public double getResolution() {
-        return 0.1;
+    public Quantity<Length> getSpectralResolution() {
+        return Quantities.create(0.1, Units.NANOMETER);
     }
 
     @Override
-    public void setIntegrationTime(double milliseconds) {
-        this.integrationTime = milliseconds;
+    public void setIntegrationTime(Quantity<Time> time) {
+        this.integrationTime = time;
     }
 
     @Override
-    public double getIntegrationTime() {
+    public Quantity<Time> getIntegrationTime() {
         return integrationTime;
     }
 
     @Override
     public double[][] captureSpectrum() {
         // Native call to acquire data
-        // For mass spec, we might need a different native signature, taking int time
-        // return bridge.acquireMassSpectrum(deviceId, integrationTime);
-
-        // Using the generic spectrum acquisition added previously
         double[] linearData = bridge.acquireSpectrum(deviceId);
 
         // Convert to 2D array [mz, intensity]
@@ -95,30 +99,25 @@ public class MassSpectra implements Spectrometer {
     }
 
     @Override
-    public double getIntensityAt(double unitInfo) {
-        // Simple interpolation or lookup
-        return 0.0;
+    public Quantity<Dimensionless> getIntensityAt(Quantity<Length> wavelength) {
+        // Simple stub - would do interpolation on actual spectrum data
+        return Quantities.create(0.0, Units.ONE);
     }
 
     @Override
-    public void calibrate(double[] referenceUnits, double[] measuredUnits) {
-        // Calibration logic
+    public void calibrate(Quantity<Length>[] referenceWavelengths, Quantity<Length>[] measuredWavelengths) {
+        // Calibration logic - would send to native side
     }
 
     @Override
-    public Real readValue() throws java.io.IOException {
-        // Sensor<Real> method - maybe return total ion count?
-        return Real.ZERO;
+    public Quantity<Dimensionless> readValue() throws java.io.IOException {
+        // Sensor<Dimensionless> method - returns total ion count as dimensionless
+        return Quantities.create(0.0, Units.ONE);
     }
 
     @Override
     public String getName() {
         return "MassSpectra Model X (JNI)";
-    }
-
-    @Override
-    public String getId() {
-        return "JNI-MS-" + deviceId;
     }
 
     @Override
@@ -146,4 +145,3 @@ public class MassSpectra implements Spectrometer {
         disconnect();
     }
 }
-

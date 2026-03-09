@@ -32,7 +32,8 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.episteme.natural.device.sensors.PressureGauge;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Pressure;
 import org.episteme.core.ui.AbstractDeviceViewer;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.NumericParameter;
@@ -55,7 +56,7 @@ public class PressureGaugeViewer extends AbstractDeviceViewer<PressureGauge> {
     private double minPressure = 0;
     private double maxPressure = 10;
     private String unitLabel = "bar";
-    private Real currentValue;
+    private Quantity<Pressure> currentValue;
     private final List<Parameter<?>> parameters = new ArrayList<>();
 
     public PressureGaugeViewer(PressureGauge device) {
@@ -94,7 +95,7 @@ public class PressureGaugeViewer extends AbstractDeviceViewer<PressureGauge> {
             gc.strokeLine(cx + Math.cos(angle) * radius * 0.65, cy - Math.sin(angle) * radius * 0.65, cx + Math.cos(angle) * radius * 0.8, cy - Math.sin(angle) * radius * 0.8);
             gc.fillText(String.format("%.0f", minPressure + (i * (maxPressure - minPressure) / divisions)), cx + Math.cos(angle) * radius * 0.5, cy - Math.sin(angle) * radius * 0.5 + 4);
         }
-        double pressure = currentValue != null ? currentValue.doubleValue() : 0;
+        double pressure = currentValue != null ? currentValue.getValue().doubleValue() : 0;
         double ratio = Math.max(0, Math.min(1, (pressure - minPressure) / (maxPressure - minPressure)));
         double needleAngle = Math.toRadians(startAngle - ratio * sweepAngle);
         gc.setStroke(Color.RED); gc.setLineWidth(3);

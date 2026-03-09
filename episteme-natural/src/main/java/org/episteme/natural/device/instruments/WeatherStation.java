@@ -23,22 +23,38 @@
 
 package org.episteme.natural.device.instruments;
 
-import org.episteme.core.device.Device;
+import org.episteme.core.device.ComplexInstrument;
+import org.episteme.natural.device.sensors.HumidityProbe;
+import org.episteme.natural.device.sensors.PressureGauge;
+import org.episteme.natural.device.sensors.TemperatureProbe;
 
 /**
  * Interface for a weather station instrument.
+ * A weather station is a complex instrument aggregating temperature, humidity and pressure sensors.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface WeatherStation extends Device {
+public interface WeatherStation extends ComplexInstrument {
 
-    double getTemperatureCelsius();
+    TemperatureProbe getTemperatureProbe();
 
-    double getHumidityPercent();
+    HumidityProbe getHumidityProbe();
 
-    double getPressureHPa();
+    PressureGauge getPressureGauge();
+
+    default double getTemperatureCelsius() {
+        return getTemperatureProbe().getValue().map(v -> ((Number) v).doubleValue()).orElse(0.0);
+    }
+
+    default double getHumidityPercent() {
+        return getHumidityProbe().getValue().map(v -> ((Number) v).doubleValue()).orElse(0.0);
+    }
+
+    default double getPressureHPa() {
+        return getPressureGauge().getValue().map(v -> ((Number) v).doubleValue()).orElse(0.0);
+    }
 }
 
 

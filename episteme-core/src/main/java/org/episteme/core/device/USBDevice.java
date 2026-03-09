@@ -23,6 +23,7 @@
 
 package org.episteme.core.device;
 
+import org.episteme.core.util.identity.SimpleIdentification;
 import java.io.IOException;
 
 /**
@@ -36,22 +37,20 @@ import java.io.IOException;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class USBDevice implements Device {
+public abstract class USBDevice extends AbstractDevice {
 
-    protected String name;
     protected int vendorId;
     protected int productId;
     protected String serialNumber;
-    protected boolean connected = false;
-    protected String manufacturer = "Unknown";
-    protected String firmware = "N/A";
 
     protected USBDevice(String name) {
-        this.name = name;
+        super(new SimpleIdentification("USB:UNKNOWN"));
+        super.setTrait("name", name);
     }
 
     protected USBDevice(String name, int vendorId, int productId) {
-        this.name = name;
+        super(new SimpleIdentification(String.format("USB:%04X:%04X", vendorId, productId)));
+        super.setTrait("name", name);
         this.vendorId = vendorId;
         this.productId = productId;
     }
@@ -83,26 +82,16 @@ public abstract class USBDevice implements Device {
 
     /**
      * Sends raw bytes to the USB device.
-     *
-     * @param data the bytes to send
-     * @throws IOException if communication fails
      */
     public abstract void write(byte[] data) throws IOException;
 
     /**
      * Reads raw bytes from the USB device.
-     *
-     * @param length maximum number of bytes to read
-     * @return the bytes read
-     * @throws IOException if communication fails
      */
     public abstract byte[] read(int length) throws IOException;
 
     /**
      * Sends a command string to the device.
-     *
-     * @param command the command to send
-     * @throws IOException if communication fails
      */
     public void sendCommand(String command) throws IOException {
         write(command.getBytes());
@@ -110,10 +99,6 @@ public abstract class USBDevice implements Device {
 
     /**
      * Reads a response string from the device.
-     *
-     * @param maxLength maximum response length
-     * @return the response string
-     * @throws IOException if communication fails
      */
     public String readResponse(int maxLength) throws IOException {
         byte[] data = read(maxLength);
@@ -121,31 +106,8 @@ public abstract class USBDevice implements Device {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getId() {
-        if (serialNumber != null && !serialNumber.isEmpty()) {
-            return String.format("USB:%04X:%04X:%s", vendorId, productId, serialNumber);
-        }
-        return String.format("USB:%04X:%04X", vendorId, productId);
-    }
-
-    @Override
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    @Override
-    public String getFirmware() {
-        return firmware;
-    }
-
-    @Override
     public boolean isConnected() {
-        return connected;
+        return getDeviceStatus() != Device.Status.DISCONNECTED && getDeviceStatus() != Device.Status.OFFLINE;
     }
 
     @Override

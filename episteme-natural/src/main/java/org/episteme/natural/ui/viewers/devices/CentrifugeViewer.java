@@ -25,7 +25,8 @@ package org.episteme.natural.ui.viewers.devices;
 
 import javafx.scene.control.Label;
 import org.episteme.natural.device.actuators.Centrifuge;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
 import org.episteme.core.ui.AbstractDeviceViewer;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.NumericParameter;
@@ -59,11 +60,11 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
     private void setupParameters() {
         double maxRPM = 5000;
         try {
-            maxRPM = device.getMaxRPM().doubleValue();
+            maxRPM = device.getMaxRPM().getValue().doubleValue();
         } catch (Exception e) {}
 
         parameters.add(new NumericParameter("centrifuge.rpm", I18N.getInstance().get("centrifuge.rpm", "Target RPM"), 0, maxRPM, 10, 0, v -> {
-            device.start(Real.of(v));
+            device.start(Quantities.create(v, Units.HERTZ));
             rpmLabel.setText(String.format("%.0f RPM", v));
         }));
     }

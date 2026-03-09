@@ -24,32 +24,30 @@
 package org.episteme.natural.device.sim;
 
 import org.episteme.core.device.sim.SimulatedDevice;
-
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.Quantities;
+import org.episteme.core.measure.Units;
+import org.episteme.core.measure.quantity.ElectricPotential;
+import org.episteme.core.measure.quantity.Frequency;
+import org.episteme.core.measure.quantity.Time;
 import org.episteme.natural.device.sensors.Oscilloscope;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.util.identity.Identification;
+
 import java.io.IOException;
 
 /**
- * Simulated implementation of Oscilloscope.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Simulated oscilloscope.
  */
 public class SimulatedOscilloscope extends SimulatedDevice implements Oscilloscope {
 
     private int channels = 2;
-    private double sampleRate = 1e6;
-    private double timeBase = 1e-3;
-    private Oscilloscope.TriggerMode triggerMode = Oscilloscope.TriggerMode.AUTO;
-    private double triggerLevel = 0.0;
+    private Quantity<Frequency> sampleRate = Quantities.create(1e6, Units.HERTZ);
+    private Quantity<Time> timeBase = Quantities.create(1e-3, Units.SECOND);
+    private TriggerMode triggerMode = TriggerMode.AUTO;
+    private Quantity<ElectricPotential> triggerLevel = Quantities.create(0.0, Units.VOLT);
 
-    public SimulatedOscilloscope() {
-        this("Oscilloscope");
-    }
-
-    public SimulatedOscilloscope(String name) {
-        super(name);
+    public SimulatedOscilloscope(Identification id) {
+        super(id);
     }
 
     @Override
@@ -58,100 +56,77 @@ public class SimulatedOscilloscope extends SimulatedDevice implements Oscillosco
     }
 
     @Override
-    public double getSampleRate() {
+    public Quantity<Frequency> getSampleRate() {
         return sampleRate;
     }
 
     @Override
-    public void setSampleRate(double samplesPerSecond) {
+    public void setSampleRate(Quantity<Frequency> samplesPerSecond) {
         this.sampleRate = samplesPerSecond;
     }
 
     @Override
-    public double getTimeBase() {
+    public Quantity<Time> getTimeBase() {
         return timeBase;
     }
 
     @Override
-    public void setTimeBase(double secondsPerDivision) {
+    public void setTimeBase(Quantity<Time> secondsPerDivision) {
         this.timeBase = secondsPerDivision;
     }
 
     @Override
-    public double getVoltageScale(int channel) {
-        return 1.0;
+    public Quantity<ElectricPotential> getVoltageScale(int channel) {
+        return Quantities.create(1.0, Units.VOLT);
     }
 
     @Override
-    public void setVoltageScale(int channel, double voltsPerDivision) {
+    public void setVoltageScale(int channel, Quantity<ElectricPotential> voltsPerDivision) {
+        // No-op
     }
 
     @Override
-    public Oscilloscope.TriggerMode getTriggerMode() {
+    public TriggerMode getTriggerMode() {
         return triggerMode;
     }
 
     @Override
-    public void setTriggerMode(Oscilloscope.TriggerMode mode) {
+    public void setTriggerMode(TriggerMode mode) {
         this.triggerMode = mode;
     }
 
     @Override
-    public double getTriggerLevel() {
+    public Quantity<ElectricPotential> getTriggerLevel() {
         return triggerLevel;
     }
 
     @Override
-    public void setTriggerLevel(double volts) {
+    public void setTriggerLevel(Quantity<ElectricPotential> volts) {
         this.triggerLevel = volts;
-    }
-
-    private double frequency = 1000.0; // 1 kHz default
-    private double amplitude = 1.0;
-    private double phase = 0.0;
-
-    public void setSignal(double freq, double amp) {
-        this.frequency = freq;
-        this.amplitude = amp;
     }
 
     @Override
     public double[] captureWaveform(int channel) {
-        if (!isConnected())
-            throw new IllegalStateException("Not connected");
-
         int points = 500;
         double[] wave = new double[points];
-        double dt = timeBase / 10.0 / points; // 10 divisions wide?
+        double freqVal = 1000.0;
+        double ampVal = 1.0;
+        double dt = timeBase.to(Units.SECOND).getValue().doubleValue() / 10.0 / points;
 
         for (int i = 0; i < points; i++) {
-            double t = i * dt + phase;
-            // Add some noise and harmonics
-            double signal = amplitude * Math.sin(2 * Math.PI * frequency * t);
-            signal += 0.05 * Math.sin(2 * Math.PI * frequency * 3 * t); // 3rd harmonic
-            signal += (Math.random() - 0.5) * 0.02 * amplitude; // noise
-            wave[i] = signal;
+            double t = i * dt;
+            wave[i] = ampVal * Math.sin(2 * Math.PI * freqVal * t);
         }
-        // Advance phase for next capture to simulate "moving" wave if not triggered
-        phase += dt * points * 1.5;
-
         return wave;
     }
 
     @Override
-    public double getBandwidth() {
-        return 20e6;
-    } // 20 MHz default
+    public Quantity<Frequency> getBandwidth() {
+        return Quantities.create(20e6, Units.HERTZ);
+    }
 
     @Override
-    public Real readValue() throws IOException {
-        return Real.ZERO;
+    public Quantity<ElectricPotential> readValue() throws IOException {
+        return triggerLevel; // Placeholder
     }
 }
-
-
-
-
-
-
-

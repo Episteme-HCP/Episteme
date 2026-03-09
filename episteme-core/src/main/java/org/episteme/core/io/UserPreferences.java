@@ -43,8 +43,9 @@ public class UserPreferences {
     public static final String KEY_PLOTTING_BACKEND = "backend.plotting";
     public static final String KEY_MOLECULAR_BACKEND = "backend.molecular";
     public static final String KEY_QUANTUM_BACKEND = "backend.quantum";
-    public static final String KEY_MATH_BACKEND = "backend.math";
+    public static final String KEY_BACKEND_DEACTIVATED = "backend.deactivated";
     public static final String KEY_AUTO_TUNING_MODE = "compute.autotuning.mode";
+    public static final String KEY_AUTO_TUNING_ENABLED = "compute.autotuning.enabled";
     
     // UI preference keys
     public static final String KEY_LANGUAGE = "ui.language";
@@ -275,6 +276,46 @@ public class UserPreferences {
     /** Sets the auto-tuning mode. */
     public void setAutoTuningMode(String mode) {
         set(KEY_AUTO_TUNING_MODE, mode);
+    }
+
+    /** Checks if a backend is manually deactivated. */
+    public boolean isBackendDeactivated(String id) {
+        String deactivated = get(KEY_BACKEND_DEACTIVATED, "");
+        if (deactivated.isEmpty()) return false;
+        String[] ids = deactivated.split(",");
+        for (String dId : ids) {
+            if (dId.trim().equalsIgnoreCase(id)) return true;
+        }
+        return false;
+    }
+
+    /** Sets whether a backend is manually deactivated. */
+    public synchronized void setBackendDeactivated(String id, boolean deactivate) {
+        String deactivated = get(KEY_BACKEND_DEACTIVATED, "");
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        if (!deactivated.isEmpty()) {
+            for (String s : deactivated.split(",")) {
+                ids.add(s.trim());
+            }
+        }
+
+        if (deactivate) {
+            ids.add(id);
+        } else {
+            ids.remove(id);
+        }
+
+        set(KEY_BACKEND_DEACTIVATED, String.join(",", ids));
+    }
+
+    /** Gets whether auto-tuning is enabled. */
+    public boolean isAutoTuningEnabled() {
+        return "true".equalsIgnoreCase(get(KEY_AUTO_TUNING_ENABLED, "true"));
+    }
+
+    /** Sets whether auto-tuning is enabled. */
+    public void setAutoTuningEnabled(boolean enabled) {
+        set(KEY_AUTO_TUNING_ENABLED, String.valueOf(enabled));
     }
 }
 

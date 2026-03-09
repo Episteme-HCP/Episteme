@@ -25,43 +25,42 @@ package org.episteme.natural.device.impl.sim;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.Map;
 import org.episteme.natural.device.sim.SimulatedPressureGauge;
+import org.episteme.natural.device.sensors.PressureGauge;
+import org.episteme.core.util.identity.SimpleIdentification;
 
 public class SimulatedPressureGaugeTest {
 
+    private SimulatedPressureGauge createGauge() {
+        return new SimulatedPressureGauge(
+                new SimpleIdentification("test-pressure-gauge"),
+                PressureGauge.GaugeType.BOURDON,
+                80000, 120000);
+    }
+
     @Test
     public void testDeviceMetadata() throws Exception {
-        try (SimulatedPressureGauge gauge = new SimulatedPressureGauge()) {
-            assertEquals("Simulated PressureGauge", gauge.getName());
-            assertEquals("Episteme Sims Inc.", gauge.getManufacturer());
-            assertEquals("v2.1.4", gauge.getFirmware());
+        try (SimulatedPressureGauge gauge = createGauge()) {
             assertNotNull(gauge.getId());
         }
     }
 
     @Test
     public void testReadings() throws Exception {
-        try (SimulatedPressureGauge gauge = new SimulatedPressureGauge()) {
-            Map<String, String> readings = gauge.getReadings();
-            assertTrue(readings.containsKey("Power"), "Should have Power reading");
-            assertTrue(readings.containsKey("Uptime"), "Should have Uptime reading");
-            assertTrue(readings.containsKey("Error Code"), "Should have Error Code reading");
-
-            assertEquals("ON", readings.get("Power"));
+        try (SimulatedPressureGauge gauge = createGauge()) {
+            gauge.connect();
+            var value = gauge.readValue();
+            assertNotNull(value, "Should produce a pressure reading");
+            assertTrue(value.getValue().doubleValue() > 0, "Pressure should be positive");
         }
     }
 
     @Test
-    public void testCapabilities() throws Exception {
-        try (SimulatedPressureGauge gauge = new SimulatedPressureGauge()) {
-            java.util.Map<String, Boolean> caps = gauge.getCapabilities();
-            assertTrue(caps.getOrDefault("Data Logging", false));
-            assertTrue(caps.getOrDefault("Remote Control", false));
-            assertFalse(caps.getOrDefault("High Voltage Protection", true));
+    public void testPressureRange() throws Exception {
+        try (SimulatedPressureGauge gauge = createGauge()) {
+            assertNotNull(gauge.getMinPressure());
+            assertNotNull(gauge.getMaxPressure());
+            assertTrue(gauge.getMinPressure().getValue().doubleValue() < gauge.getMaxPressure().getValue().doubleValue());
         }
     }
 }
-
-
-

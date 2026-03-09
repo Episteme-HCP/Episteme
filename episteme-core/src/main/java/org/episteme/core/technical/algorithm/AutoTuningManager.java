@@ -38,7 +38,7 @@ public class AutoTuningManager {
         try {
             Path dir = Paths.get(System.getProperty("user.home"), ".episteme");
             if (!Files.exists(dir)) Files.createDirectories(dir);
-            Path path = dir.resolve("benchmarks.json");
+            Path path = dir.resolve("autotuning_performance.json");
             if (Files.exists(path)) {
                 List<AutoTuningResult> list = mapper.readValue(path.toFile(), new TypeReference<List<AutoTuningResult>>() {});
                 for (AutoTuningResult res : list) {
@@ -53,7 +53,7 @@ public class AutoTuningManager {
 
     public static void saveResults() {
         try {
-            Path path = Paths.get(System.getProperty("user.home"), ".episteme", "benchmarks.json");
+            Path path = Paths.get(System.getProperty("user.home"), ".episteme", "autotuning_performance.json");
             mapper.writerWithDefaultPrettyPrinter().writeValue(path.toFile(), new ArrayList<>(RESULTS.values()));
         } catch (Exception e) {
             logger.error("Failed to save benchmark results: {}", e.getMessage());
@@ -85,6 +85,8 @@ public class AutoTuningManager {
      * @return dynamic score
      */
     public static double getDynamicScore(String providerName, int dim, int defaultPriority) {
+        if (!org.episteme.core.io.UserPreferences.getInstance().isAutoTuningEnabled()) return defaultPriority;
+        
         Mode mode = getMode();
         if (mode == Mode.OFF) return defaultPriority;
         

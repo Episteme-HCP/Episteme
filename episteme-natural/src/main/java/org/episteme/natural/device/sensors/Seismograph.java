@@ -24,7 +24,8 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.Dimensionless;
 
 /**
  * Interface for a seismograph sensor.
@@ -33,15 +34,12 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Seismograph extends Sensor<Real> {
+public interface Seismograph extends Sensor<Dimensionless> {
 
     /**
      * Reads the current magnitude.
      * 
      * @return magnitude value
      */
-    double readMagnitude();
+    Quantity<Dimensionless> readMagnitude();
 }
-
-
-

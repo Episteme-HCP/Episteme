@@ -24,7 +24,10 @@
 package org.episteme.natural.device.sensors;
 
 import org.episteme.core.device.Sensor;
-import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.measure.Quantity;
+import org.episteme.core.measure.quantity.ElectricPotential;
+import org.episteme.core.measure.quantity.Frequency;
+import org.episteme.core.measure.quantity.Time;
 
 /**
  * Interface for oscilloscope devices.
@@ -33,7 +36,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Oscilloscope extends Sensor<Real> {
+public interface Oscilloscope extends Sensor<ElectricPotential> {
     enum TriggerMode {
         AUTO("device.oscilloscope.trigger.auto"),
         NORMAL("device.oscilloscope.trigger.normal"),
@@ -53,32 +56,27 @@ public interface Oscilloscope extends Sensor<Real> {
 
     int getChannelCount();
 
-    double getSampleRate();
+    Quantity<Frequency> getSampleRate();
 
-    void setSampleRate(double samplesPerSecond);
+    void setSampleRate(Quantity<Frequency> samplesPerSecond);
 
-    double getTimeBase();
+    Quantity<Time> getTimeBase();
 
-    void setTimeBase(double secondsPerDivision);
+    void setTimeBase(Quantity<Time> secondsPerDivision);
 
-    double getVoltageScale(int channel);
+    Quantity<ElectricPotential> getVoltageScale(int channel);
 
-    void setVoltageScale(int channel, double voltsPerDivision);
+    void setVoltageScale(int channel, Quantity<ElectricPotential> voltsPerDivision);
 
     TriggerMode getTriggerMode();
 
     void setTriggerMode(TriggerMode mode);
 
-    double getTriggerLevel();
+    Quantity<ElectricPotential> getTriggerLevel();
 
-    void setTriggerLevel(double volts);
+    void setTriggerLevel(Quantity<ElectricPotential> volts);
 
     double[] captureWaveform(int channel);
 
-    double getBandwidth();
+    Quantity<Frequency> getBandwidth();
 }
-
-
-
-
-
