@@ -83,7 +83,7 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
                 Class<?> clazz = Class.forName(innerName);
                 Constructor<?> ctor = clazz.getDeclaredConstructor(Field.class);
                 ctor.setAccessible(true);
-                this.commonsImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this.field);
+                this.commonsImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {
                 this.commonsImpl = null;
             }
@@ -167,15 +167,21 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
      */
     @SuppressWarnings("unused")
     private static class CommonsImpl<E> implements LinearAlgebraProvider<E> {
+        private final CommonsMathBackend<E> parent;
         private final Field<E> field;
 
-        CommonsImpl(Field<E> field) {
+        CommonsImpl(CommonsMathBackend<E> parent, Field<E> field) {
+            this.parent = parent;
             this.field = field;
+        }
+
+        @Override public LinearAlgebraProvider<E> fallback() {
+            return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, parent);
         }
 
         @Override public String getName() { return "Commons Math (Inner)"; }
         @Override public boolean isAvailable() { return true; }
-        @Override public int getPriority() { return 50; }
+        @Override public int getPriority() { return parent.getPriority(); }
 
         private org.apache.commons.math3.linear.RealMatrix toCommonsMatrix(Matrix<E> m) {
             double[][] data = new double[m.rows()][m.cols()];

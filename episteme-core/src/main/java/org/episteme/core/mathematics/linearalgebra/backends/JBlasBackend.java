@@ -89,7 +89,7 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 Class<?> clazz = Class.forName(innerName);
                 Constructor<?> ctor = clazz.getDeclaredConstructor(Field.class);
                 ctor.setAccessible(true);
-                this.jblasImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this.field);
+                this.jblasImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {
                 this.jblasImpl = null;
             }
@@ -174,15 +174,21 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
      */
     @SuppressWarnings("unused")
     private static class JBlasImpl<E> implements LinearAlgebraProvider<E> {
+        private final JBlasBackend<E> parent;
         private final Field<E> field;
 
-        JBlasImpl(Field<E> field) {
+        JBlasImpl(JBlasBackend<E> parent, Field<E> field) {
+            this.parent = parent;
             this.field = field;
+        }
+
+        @Override public LinearAlgebraProvider<E> fallback() {
+            return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.AlgorithmManager.getNextProvider(LinearAlgebraProvider.class, parent);
         }
 
         @Override public String getName() { return "JBlas (Inner)"; }
         @Override public boolean isAvailable() { return true; }
-        @Override public int getPriority() { return 90; }
+        @Override public int getPriority() { return parent.getPriority(); }
 
         private org.jblas.DoubleMatrix toJBlasMatrix(Matrix<E> m) {
             double[][] data = new double[m.rows()][m.cols()];

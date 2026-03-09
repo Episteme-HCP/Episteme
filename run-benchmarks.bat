@@ -47,48 +47,21 @@ echo ==========================================
 echo Running Episteme Benchmarks
 echo ==========================================
 
-rem --- Native Libraries Setup ---
-set "NATIVE_ROOT=C:\Episteme-Native"
-set "LIBS_DIR=%~dp0libs"
-
-rem --- Python (Qiskit) Integration ---
-if not defined EPISTEME_PYTHON (
-    set "EPISTEME_PYTHON=C:\Users\silve\AppData\Local\Programs\Python\Python314\python.exe"
-)
-
-rem --- CUDA Setup ---
-if not defined CUDA_PATH (
-    set "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1"
-)
-set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
-
-rem --- VLC ---
-if exist "C:\Program Files\VideoLAN\VLC" (
-    echo [INFO] Adding VLC to PATH...
-    set "PATH=C:\Program Files\VideoLAN\VLC;%PATH%"
-    set "VLC_PLUGIN_PATH=C:\Program Files\VideoLAN\VLC\plugins"
-)
-
-rem --- Project libs directory (ODE, QuEST, oneDNN, lz4, etc.) ---
-if exist "%LIBS_DIR%" (
-    echo [INFO] Adding libs/ to PATH...
-    set "PATH=%LIBS_DIR%;%PATH%"
-)
-
-if exist "%NATIVE_ROOT%\OpenBLAS\bin" (
-    echo [INFO] Adding OpenBLAS to PATH...
-    set "PATH=%NATIVE_ROOT%\OpenBLAS\bin;%PATH%"
-)
-if exist "%NATIVE_ROOT%\HDF5\bin" (
-    echo [INFO] Adding HDF5 to PATH...
-    set "PATH=%NATIVE_ROOT%\HDF5\bin;%PATH%"
-) else if exist "C:\Program Files\HDF_Group\HDF5\2.0.0\bin" (
-    echo [INFO] Adding HDF5 ^(official install^) to PATH...
-    set "PATH=C:\Program Files\HDF_Group\HDF5\2.0.0\bin;%PATH%"
-)
-if exist "%NATIVE_ROOT%\FFTW3" (
-    echo [INFO] Adding FFTW3 to PATH...
-    set "PATH=%NATIVE_ROOT%\FFTW3;%PATH%"
+rem --- Environment Setup ---
+if exist "launchers\env_setup.bat" (
+    call "launchers\env_setup.bat"
+) else (
+    echo [WARN] env_setup.bat not found, using legacy path logic.
+    set "NATIVE_ROOT=C:\Episteme-Native"
+    set "LIBS_DIR=%~dp0libs"
+    if not defined EPISTEME_PYTHON (
+        set "EPISTEME_PYTHON=C:\Users\silve\AppData\Local\Programs\Python\Python314\python.exe"
+    )
+    if not defined CUDA_PATH (
+        set "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1"
+    )
+    set "PATH=%CUDA_PATH%\bin;%CUDA_PATH%\libnvvp;%PATH%"
+    if exist "%LIBS_DIR%" set "PATH=%LIBS_DIR%;%PATH%"
 )
 
 if defined USE_SHADED_JAR (
