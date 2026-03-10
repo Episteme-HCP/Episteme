@@ -225,21 +225,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        int m = a.rows();
-        int k = a.cols();
-        int n = b.cols();
-        
-        if (k != b.rows()) throw new IllegalArgumentException("Dimension mismatch");
-        
-        logger.debug("Entering CUDA multiply: [{}x{}] * [{}x{}]", m, k, k, n);
-        
-        DoubleBuffer da = toDoubleBuffer(a);
-        DoubleBuffer db = toDoubleBuffer(b);
-        DoubleBuffer dc = DoubleBuffer.allocate(m * n);
-        
-        matrixMultiply(da, db, dc, m, n, k);
-        
-        return fromDoubleBuffer(dc, m, n);
+        throw new UnsupportedOperationException("Not implemented in legacy backend");
     }
 
     private DoubleBuffer toDoubleBuffer(Matrix<Real> m) {

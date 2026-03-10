@@ -47,6 +47,7 @@ public final class BondType extends ExtensibleEnum {
     public static final BondType DOUBLE = new BondType("DOUBLE", 2.0, true);
     public static final BondType TRIPLE = new BondType("TRIPLE", 3.0, true);
     public static final BondType AROMATIC = new BondType("AROMATIC", 1.5, true);
+    public static final BondType MOBIUS_AROMATIC = new BondType("MOBIUS_AROMATIC", 1.5, true);
     public static final BondType COORDINATION = new BondType("COORDINATION", 1.0, true);
     public static final BondType HYDROGEN = new BondType("HYDROGEN", 0.1, true);
     public static final BondType IONIC = new BondType("IONIC", 1.0, true);

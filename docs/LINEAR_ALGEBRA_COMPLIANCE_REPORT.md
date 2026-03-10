@@ -2,21 +2,22 @@
 
 | Provider | Environment | Transpose | Dot | Norm | Add | Subtract | Scale | Multiply | Inverse | LU | QR | SVD | Cholesky | Eigen | Determinant | Solve |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ND4J (Native Wrapper) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
-| Native CPU/BLAS Linear Algebra Backend | CPU (Native/Panama) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native CUDA Dense Backend | N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
-| Panama/CUDA Backend (Legacy/Disabled) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ⚠️ FAIL (Assertion) | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
-| Native BLAS Provider (FFM) | CPU (FFM/BLAS) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
-| Native OpenCL Dense Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
-| Native OpenCL Sparse Linear Algebra Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
-| Native SIMD Linear Algebra Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Colt (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| ND4J (Native Wrapper) | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native CPU/BLAS Linear Algebra Backend | CPU (Native/Panama) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A |
+| Native CUDA Dense Backend | N/A | ⚠️ FAIL (RuntimeException) | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Panama/CUDA Backend (Legacy/Disabled) | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native BLAS Provider (FFM) | CPU (FFM/BLAS) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Native OpenCL Dense Backend | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native OpenCL Sparse Linear Algebra Backend | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native SIMD Linear Algebra Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
+| Colt (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Apache Commons Math (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | EJML (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| JBlas (Optimized) | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
 | Episteme (CARMA) | CPU (CARMA) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Episteme CPU (Dense) | CPU (Standard JVM) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Distributed Linear Algebra Provider (LocalDistributedContext) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS |
+| Distributed Linear Algebra Provider (LocalDistributedContext) | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
 | Episteme (Standard) | CPU (Standard) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Episteme (Strassen) | CPU (Strassen) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 
-*Generated by LinearAlgebraComplianceTest on Mon Mar 09 20:45:13 CET 2026*
+*Generated by LinearAlgebraComplianceTest on Tue Mar 10 15:40:54 CET 2026*

@@ -432,6 +432,18 @@
         <optional>true</optional>
       </dependency>
 
+      <!-- Quantum Computing Overrides -->
+      <dependency>
+        <groupId>org.redfx</groupId>
+        <artifactId>strange</artifactId>
+        <version>0.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.quantum4j</groupId>
+        <artifactId>quantum4j</artifactId>
+        <version>1.3.2</version>
+      </dependency>
+
       <!-- JavaCPP and OpenBLAS alignment -->
       <dependency>
         <groupId>org.bytedeco</groupId>

@@ -287,11 +287,19 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
-            cern.colt.matrix.linalg.LUDecomposition lu = new cern.colt.matrix.linalg.LUDecomposition(toColtMatrix(a));
+            cern.colt.matrix.DoubleMatrix2D cmat = toColtMatrix(a);
+            cern.colt.matrix.linalg.LUDecomposition lu = new cern.colt.matrix.linalg.LUDecomposition(cmat);
+            int[] pivot = lu.getPivot();
+            if (pivot == null) throw new ArithmeticException("Colt LU: Matrix is singular or decomposition failed");
+            cern.colt.matrix.DoubleMatrix1D pv = new cern.colt.matrix.impl.DenseDoubleMatrix1D(pivot.length);
+            for (int i = 0; i < pivot.length; i++) pv.set(i, pivot[i]);
+            cern.colt.matrix.DoubleMatrix2D l = lu.getL();
+            cern.colt.matrix.DoubleMatrix2D u = lu.getU();
+            if (l == null || u == null) throw new ArithmeticException("Colt LU: Failed to extract factors");
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
-                fromColtMatrix(lu.getL()),
-                fromColtMatrix(lu.getU()),
-                null // Colt doesn't expose P as a vector easily
+                fromColtMatrix(l),
+                fromColtMatrix(u),
+                fromColtVector(pv)
             );
         }
 
