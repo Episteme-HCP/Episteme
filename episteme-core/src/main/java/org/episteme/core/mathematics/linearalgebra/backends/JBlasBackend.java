@@ -261,10 +261,10 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             // JBlas P is such that P*A = L*U. 
             // The compliance test expects a permutation vector p such that PA[i] = A[p[i]].
             double[] pData = new double[luResult.p.rows];
-            for (int i = 0; i < luResult.p.rows; i++) {
-                for (int j = 0; j < luResult.p.columns; j++) {
+            for (int j = 0; j < luResult.p.columns; j++) {
+                for (int i = 0; i < luResult.p.rows; i++) {
                     if (luResult.p.get(i, j) > 0.5) {
-                        pData[i] = j; // Row i of PA is row j of A
+                        pData[i] = j; 
                         break;
                     }
                 }
@@ -307,6 +307,7 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             );
         }
         @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+            // JBlas cholesky returns L such that A = L*L'
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
                 fromJBlasMatrix(org.jblas.Decompose.cholesky(toJBlasMatrix(a)))
             );

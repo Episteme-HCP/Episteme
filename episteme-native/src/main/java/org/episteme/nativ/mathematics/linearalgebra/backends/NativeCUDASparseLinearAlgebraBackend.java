@@ -44,6 +44,10 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private MethodHandle cublasDgemm;
     private MethodHandle cusparseCreate;
     private MethodHandle cusparseDestroy;
+    private MethodHandle cusparseCreateDnMat;
+    private MethodHandle cusparseCreateCsr;
+    private MethodHandle cusparseSpMM_bufferSize;
+    private MethodHandle cusparseSpMM;
 
     private boolean available = false;
     private boolean loaded = false;
@@ -79,6 +83,37 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 cusparseDestroy = LINKER.downcallHandle(
                     cusparseLookup.find("cusparseDestroy").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                );
+                cusparseCreateDnMat = LINKER.downcallHandle(
+                    cusparseLookup.find("cusparseCreateDnMat").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
+                        ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                        ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                );
+                cusparseCreateCsr = LINKER.downcallHandle(
+                    cusparseLookup.find("cusparseCreateCsr").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
+                        ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                );
+                cusparseSpMM_bufferSize = LINKER.downcallHandle(
+                    cusparseLookup.find("cusparseSpMM_bufferSize").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.ADDRESS)
+                );
+                cusparseSpMM = LINKER.downcallHandle(
+                    cusparseLookup.find("cusparseSpMM").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.ADDRESS)
                 );
 
                 available = true;
@@ -134,7 +169,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             freeGPUMemory(d_B);
             freeGPUMemory(d_C);
         } catch (Throwable t) {
-            throw new RuntimeException("CUDA execution error", t);
+            throw new UnsupportedOperationException("CUDA sparse execution error", t);
         }
     }
 
