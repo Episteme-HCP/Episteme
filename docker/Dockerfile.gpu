@@ -131,7 +131,7 @@ COPY --from=builder /build/libs /app/libs
 COPY --from=builder /build/episteme-benchmarks/target/episteme-benchmarks-*.jar /app/benchmarks.jar
 COPY --from=builder /build/episteme-benchmarks/target/lib /app/lib/
 
-COPY run_diagnostic.sh run-benchmarks.sh /app/
+COPY run_diagnostic.sh run_benchmarks.sh /app/
 RUN chmod +x /app/*.sh
 
 ENV LD_LIBRARY_PATH="/app/libs:/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
@@ -142,5 +142,5 @@ ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 EXPOSE 50051
 
 ENV JAVA_OPTS="-Xlog:library=info -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -ea"
-ENTRYPOINT ["./run-benchmarks.sh"]
+ENTRYPOINT ["./run_benchmarks.sh"]
 CMD ["--cli"]

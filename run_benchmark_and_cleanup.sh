@@ -59,7 +59,7 @@ docker build --progress=plain -t episteme-gpu -f docker/Dockerfile.gpu . 2>&1 | 
 
 echo "--- [4/4] Lancement des Benchmarks ---"
 echo "Exécution des diagnostics..."
-docker run --rm --gpus all episteme-gpu ./run-diagnostic.sh > "$LOG_DIR/diagnostic_output.txt" 2>&1
+docker run --rm --gpus all episteme-gpu ./run_diagnostic.sh > "$LOG_DIR/diagnostic_output.txt" 2>&1
 
 # Gestion des arguments par défaut en utilisant un tableau pour préserver les espaces
 if [ "$#" -eq 0 ]; then

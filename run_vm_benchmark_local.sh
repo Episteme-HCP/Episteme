@@ -32,10 +32,10 @@ export PATH="$JAVA_HOME/bin:$PATH"
 export CUDA_PATH="/usr/local/cuda"
 
 # Compilation C++ Vision
-chmod +x build_vision.sh
-./build_vision.sh 2>&1 | tee -a "$LOG_DIR/console.txt"
+chmod +x build_episteme_native.sh
+./build_episteme_native.sh 2>&1 | tee -a "$LOG_DIR/console.txt"
 # Copy vision lib to shared libs directory
-cp episteme-native/src/main/resources/linux-x86_64/libepisteme_vision.so libs/ 2>/dev/null
+cp episteme-native/libs/libepisteme-native.so libs/ 2>/dev/null
 
 # Compilation JNI
 cd episteme-jni
@@ -72,9 +72,9 @@ fi
 # Variables environnement requises pour le natif
 export LD_LIBRARY_PATH="$(pwd)/libs:/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
 
-# On exécute run-benchmarks.sh en local avec capture de la console
-chmod +x run-benchmarks.sh
-./run-benchmarks.sh "${BENCH_ARGS[@]}" 2>&1 | tee -a "$LOG_DIR/console.txt"
+# On exécute run_benchmarks.sh en local avec capture de la console
+chmod +x run_benchmarks.sh
+./run_benchmarks.sh "${BENCH_ARGS[@]}" 2>&1 | tee -a "$LOG_DIR/console.txt"
 
 echo "==========================================" | tee -a "$LOG_DIR/console.txt"
 echo "Benchmark Session Complete" | tee -a "$LOG_DIR/console.txt"
