@@ -14,8 +14,11 @@ public class TestFFMMain {
             org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend cpuVision = new org.episteme.nativ.media.vision.backends.NativeCPUVisionBackend();
             System.out.println("NativeCPUVisionBackend available: " + cpuVision.isAvailable());
             
+/*
             org.episteme.nativ.media.vision.backends.NativeCUDAVisionBackend cudaVision = new org.episteme.nativ.media.vision.backends.NativeCUDAVisionBackend();
             System.out.println("NativeCUDAVisionBackend available: " + cudaVision.isAvailable());
+*/
+            System.out.println("NativeCUDAVisionBackend: SKIPPED (Source missing)");
             
             org.episteme.nativ.media.vision.backends.NativeOpenCLVisionBackend oclVision = new org.episteme.nativ.media.vision.backends.NativeOpenCLVisionBackend();
             System.out.println("NativeOpenCLVisionBackend available: " + oclVision.isAvailable());

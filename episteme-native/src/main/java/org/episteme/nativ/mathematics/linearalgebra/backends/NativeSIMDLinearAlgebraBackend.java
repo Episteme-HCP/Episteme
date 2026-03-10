@@ -446,4 +446,177 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         }
         return new SIMDRealDoubleMatrix(rows, cols, data);
     }
+
+    private double[] toMatrixDoubleArray(Matrix<Real> m) {
+        int r = m.rows(), c = m.cols();
+        double[] d = new double[r * c];
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++)
+                d[i * c + j] = m.get(i, j).doubleValue();
+        return d;
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for LU");
+        double[] data = toMatrixDoubleArray(a);
+        double[] L = new double[n * n];
+        double[] U = java.util.Arrays.copyOf(data, data.length);
+        int[] piv = new int[n];
+        for (int i = 0; i < n; i++) piv[i] = i;
+        var species = DoubleVector.SPECIES_PREFERRED;
+
+        for (int k = 0; k < n; k++) {
+            // Partial pivoting
+            int maxRow = k;
+            for (int i = k + 1; i < n; i++) {
+                if (Math.abs(U[i * n + k]) > Math.abs(U[maxRow * n + k])) maxRow = i;
+            }
+            if (maxRow != k) {
+                for (int j = 0; j < n; j++) { double t = U[k*n+j]; U[k*n+j] = U[maxRow*n+j]; U[maxRow*n+j] = t; }
+                for (int j = 0; j < k; j++) { double t = L[k*n+j]; L[k*n+j] = L[maxRow*n+j]; L[maxRow*n+j] = t; }
+                int t = piv[k]; piv[k] = piv[maxRow]; piv[maxRow] = t;
+            }
+            L[k * n + k] = 1.0;
+            double pivot = U[k * n + k];
+            if (Math.abs(pivot) < 1e-15) continue;
+            for (int i = k + 1; i < n; i++) {
+                double factor = U[i * n + k] / pivot;
+                L[i * n + k] = factor;
+                int j = k;
+                for (; j + species.length() <= n; j += species.length()) {
+                    var vK = DoubleVector.fromArray(species, U, k * n + j);
+                    var vI = DoubleVector.fromArray(species, U, i * n + j);
+                    vI.sub(vK.mul(factor)).intoArray(U, i * n + j);
+                }
+                for (; j < n; j++) U[i * n + j] -= factor * U[k * n + j];
+            }
+        }
+        double[] pivD = new double[n];
+        for (int i = 0; i < n; i++) pivD[i] = piv[i];
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+            fromDoubleArray(L, n, n), fromDoubleArray(U, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pivD)
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
+        int m = a.rows(), n = a.cols();
+        double[] R = toMatrixDoubleArray(a);
+        double[] Q = new double[m * m];
+        for (int i = 0; i < m; i++) Q[i * m + i] = 1.0;
+
+        int min = Math.min(m, n);
+        for (int k = 0; k < min; k++) {
+            // Compute Householder vector
+            double normx = 0;
+            for (int i = k; i < m; i++) normx += R[i * n + k] * R[i * n + k];
+            normx = Math.sqrt(normx);
+            if (normx < 1e-15) continue;
+            double sign = R[k * n + k] >= 0 ? 1.0 : -1.0;
+            double alpha = -sign * normx;
+            double[] v = new double[m];
+            v[k] = R[k * n + k] - alpha;
+            for (int i = k + 1; i < m; i++) v[i] = R[i * n + k];
+            double vnorm = 0;
+            for (int i = k; i < m; i++) vnorm += v[i] * v[i];
+            if (vnorm < 1e-30) continue;
+            double beta = 2.0 / vnorm;
+
+            // Apply H to R: R = R - beta * v * (v^T * R)
+            for (int j = k; j < n; j++) {
+                double dot = 0;
+                for (int i = k; i < m; i++) dot += v[i] * R[i * n + j];
+                for (int i = k; i < m; i++) R[i * n + j] -= beta * v[i] * dot;
+            }
+            // Apply H to Q: Q = Q - beta * (Q * v) * v^T
+            for (int i = 0; i < m; i++) {
+                double dot = 0;
+                for (int j2 = k; j2 < m; j2++) dot += Q[i * m + j2] * v[j2];
+                for (int j2 = k; j2 < m; j2++) Q[i * m + j2] -= beta * dot * v[j2];
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
+            fromDoubleArray(Q, m, m), fromDoubleArray(R, m, n)
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
+        // Delegate to Apache Commons Math for SVD (always on classpath)
+        int m = a.rows(), n = a.cols();
+        double[][] data = new double[m][n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                data[i][j] = a.get(i, j).doubleValue();
+        org.apache.commons.math3.linear.SingularValueDecomposition svd =
+            new org.apache.commons.math3.linear.SingularValueDecomposition(
+                org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data));
+        double[] sVals = svd.getSingularValues();
+        org.apache.commons.math3.linear.RealMatrix uMat = svd.getU();
+        org.apache.commons.math3.linear.RealMatrix vMat = svd.getV();
+        double[] uData = new double[uMat.getRowDimension() * uMat.getColumnDimension()];
+        for (int i = 0; i < uMat.getRowDimension(); i++)
+            for (int j = 0; j < uMat.getColumnDimension(); j++)
+                uData[i * uMat.getColumnDimension() + j] = uMat.getEntry(i, j);
+        double[] vData = new double[vMat.getRowDimension() * vMat.getColumnDimension()];
+        for (int i = 0; i < vMat.getRowDimension(); i++)
+            for (int j = 0; j < vMat.getColumnDimension(); j++)
+                vData[i * vMat.getColumnDimension() + j] = vMat.getEntry(i, j);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+            fromDoubleArray(uData, uMat.getRowDimension(), uMat.getColumnDimension()),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sVals),
+            fromDoubleArray(vData, vMat.getRowDimension(), vMat.getColumnDimension())
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Cholesky");
+        double[] L = new double[n * n];
+        var species = DoubleVector.SPECIES_PREFERRED;
+
+        for (int j = 0; j < n; j++) {
+            double sum = 0;
+            for (int k = 0; k < j; k++) sum += L[j * n + k] * L[j * n + k];
+            double diag = a.get(j, j).doubleValue() - sum;
+            if (diag <= 0) throw new ArithmeticException("Matrix is not positive definite");
+            L[j * n + j] = Math.sqrt(diag);
+
+            for (int i = j + 1; i < n; i++) {
+                double s = 0;
+                for (int k = 0; k < j; k++) s += L[i * n + k] * L[j * n + k];
+                L[i * n + j] = (a.get(i, j).doubleValue() - s) / L[j * n + j];
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+            fromDoubleArray(L, n, n)
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
+        // Delegate to Apache Commons Math for Eigen (always on classpath)
+        int n = a.rows();
+        double[][] data = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                data[i][j] = a.get(i, j).doubleValue();
+        org.apache.commons.math3.linear.EigenDecomposition eig =
+            new org.apache.commons.math3.linear.EigenDecomposition(
+                org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data));
+        double[] eigenvals = eig.getRealEigenvalues();
+        org.apache.commons.math3.linear.RealMatrix vMat = eig.getV();
+        double[] vData = new double[n * n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                vData[i * n + j] = vMat.getEntry(i, j);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+            fromDoubleArray(vData, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvals)
+        );
+    }
 }

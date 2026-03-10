@@ -23,11 +23,13 @@
 
 package org.episteme.core.mathematics.linearalgebra.backends;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
@@ -55,6 +57,8 @@ import java.lang.reflect.Constructor;
  */
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
 public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
+
+    private static final Logger logger = LoggerFactory.getLogger(JBlasBackend.class);
 
     private static boolean jblasAvailable = false;
     private final Field<E> field;
@@ -86,10 +90,11 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             try {
                 String innerName = JBlasBackend.class.getName() + "$JBlasImpl";
                 Class<?> clazz = Class.forName(innerName);
-                Constructor<?> ctor = clazz.getDeclaredConstructor(Field.class);
+                Constructor<?> ctor = clazz.getDeclaredConstructor(JBlasBackend.class, Field.class);
                 ctor.setAccessible(true);
                 this.jblasImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {
+                logger.error("Failed to initialize JBlas implementation: {}", t.getMessage(), t);
                 this.jblasImpl = null;
             }
         }
@@ -163,6 +168,9 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public E norm(Vector<E> a) { checkJBlas(); return jblasImpl.norm(a); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { checkJBlas(); return jblasImpl.lu(a); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { checkJBlas(); return jblasImpl.eigen(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) { checkJBlas(); return jblasImpl.qr(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) { checkJBlas(); return jblasImpl.svd(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) { checkJBlas(); return jblasImpl.cholesky(a); }
 
     private void checkJBlas() {
         if (jblasImpl == null) {
@@ -188,22 +196,28 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public int getPriority() { return parent.getPriority(); }
 
         private org.jblas.DoubleMatrix toJBlasMatrix(Matrix<E> m) {
-            double[][] data = new double[m.rows()][m.cols()];
-            for (int i = 0; i < m.rows(); i++)
-                for (int j = 0; j < m.cols(); j++)
-                    data[i][j] = ((Real) m.get(i, j)).doubleValue();
-            return new org.jblas.DoubleMatrix(data);
+            int rows = m.rows();
+            int cols = m.cols();
+            org.jblas.DoubleMatrix jm = new org.jblas.DoubleMatrix(rows, cols);
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    jm.put(i, j, ((Real) m.get(i, j)).doubleValue());
+                }
+            }
+            return jm;
         }
 
         @SuppressWarnings("unchecked")
         private Matrix<E> fromJBlasMatrix(org.jblas.DoubleMatrix jm) {
             int rows = jm.rows;
             int cols = jm.columns;
-            DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, (E) Real.ZERO);
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    storage.set(i, j, (E) Real.of(jm.get(i, j)));
-            return new GenericMatrix<>(storage, this, field);
+            double[] data = new double[rows * cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    data[i * cols + j] = jm.get(i, j);
+                }
+            }
+            return (Matrix<E>) RealDoubleMatrix.of(data, rows, cols);
         }
 
         private org.jblas.DoubleMatrix toJBlasVector(Vector<E> v) {
@@ -244,14 +258,13 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
         @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
             org.jblas.Decompose.LUDecomposition<org.jblas.DoubleMatrix> luResult = org.jblas.Decompose.lu(toJBlasMatrix(a));
-            // JBlas LUResult.p is a permutation matrix. Episteme LUResult expects a permutation vector.
-            // For now, we return L and U and a simple identity permutation as a placeholder if p is complex to extract.
-            // Actually, we can just use luResult.p.rowArgmaxs() or similar to get indices.
+            // JBlas P is such that P*A = L*U. 
+            // The compliance test expects a permutation vector p such that PA[i] = A[p[i]].
             double[] pData = new double[luResult.p.rows];
             for (int i = 0; i < luResult.p.rows; i++) {
                 for (int j = 0; j < luResult.p.columns; j++) {
                     if (luResult.p.get(i, j) > 0.5) {
-                        pData[i] = j;
+                        pData[i] = j; // Row i of PA is row j of A
                         break;
                     }
                 }
@@ -263,11 +276,39 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             );
         }
         @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
-            // eigenvectors() returns ComplexDoubleMatrix[] where [0] is eigenvectors, [1] is eigenvalues vector
+            // eigenvectors() returns [V, D] where D is a diagonal matrix of eigenvalues
             org.jblas.ComplexDoubleMatrix[] eigenResult = org.jblas.Eigen.eigenvectors(toJBlasMatrix(a)); 
+            org.jblas.DoubleMatrix V = eigenResult[0].getReal();
+            org.jblas.DoubleMatrix D = eigenResult[1].getReal();
+            
+            // Extract diagonal of D as a vector
+            double[] eigenvalues = new double[D.rows];
+            for (int i = 0; i < D.rows; i++) {
+                eigenvalues[i] = D.get(i, i);
+            }
+            
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-                fromJBlasMatrix(eigenResult[0].getReal()),
-                fromJBlasVector(eigenResult[1].getReal())
+                fromJBlasMatrix(V),
+                fromJBlasVector(new org.jblas.DoubleMatrix(eigenvalues))
+            );
+        }
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
+            org.jblas.Decompose.QRDecomposition<org.jblas.DoubleMatrix> qr = org.jblas.Decompose.qr(toJBlasMatrix(a));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
+                fromJBlasMatrix(qr.q), fromJBlasMatrix(qr.r)
+            );
+        }
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
+            org.jblas.DoubleMatrix[] svd = org.jblas.Singular.fullSVD(toJBlasMatrix(a));
+            // JBlas returns [U, S (diagonal), V]. 
+            // Compliance test expects V such that A = U * S * V.transpose().
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+                fromJBlasMatrix(svd[0]), fromJBlasVector(svd[1]), fromJBlasMatrix(svd[2])
+            );
+        }
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+                fromJBlasMatrix(org.jblas.Decompose.cholesky(toJBlasMatrix(a)))
             );
         }
         @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromJBlasVector(org.jblas.Solve.solve(toJBlasMatrix(a), toJBlasVector(b))); }

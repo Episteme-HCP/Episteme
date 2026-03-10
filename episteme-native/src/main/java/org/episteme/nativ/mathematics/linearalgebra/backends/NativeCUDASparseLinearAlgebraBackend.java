@@ -42,41 +42,52 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     
     private MethodHandle cuDeviceGetCount;
     private MethodHandle cublasDgemm;
+    private MethodHandle cusparseCreate;
+    private MethodHandle cusparseDestroy;
+
+    private boolean available = false;
+    private boolean loaded = false;
 
     public NativeCUDASparseLinearAlgebraBackend() {
         try {
             SymbolLookup cudaLookup = NativeLibraryLoader.loadLibrary("cuda", Arena.global()).orElse(null);
             SymbolLookup cublasLookup = NativeLibraryLoader.loadLibrary("cublas", Arena.global()).orElse(null);
+            SymbolLookup cusparseLookup = NativeLibraryLoader.loadLibrary("cusparse", Arena.global()).orElse(null);
             
-            if (cudaLookup != null) {
+            if (cudaLookup != null && cublasLookup != null && cusparseLookup != null) {
                 cuDeviceGetCount = LINKER.downcallHandle(
                     cudaLookup.find("cuDeviceGetCount").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
                 );
-            }
 
-            if (cublasLookup != null) {
-                // CUBLAS DGEMM: cublasStatus_t cublasDgemm(cublasHandle_t handle, ...)
+                // CUBLAS DGEMM
                 cublasDgemm = LINKER.downcallHandle(
                     cublasLookup.find("cublasDgemm_v2").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, // handle
-                        ValueLayout.JAVA_INT, // transa
-                        ValueLayout.JAVA_INT, // transb
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, // m, n, k
-                        ValueLayout.ADDRESS, // alpha
-                        ValueLayout.ADDRESS, // A
-                        ValueLayout.JAVA_INT, // lda
-                        ValueLayout.ADDRESS, // B
-                        ValueLayout.JAVA_INT, // ldb
-                        ValueLayout.ADDRESS, // beta
-                        ValueLayout.ADDRESS, // C
-                        ValueLayout.JAVA_INT  // ldc
-                    )
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT)
                 );
+
+                // CUSPARSE
+                cusparseCreate = LINKER.downcallHandle(
+                    cusparseLookup.find("cusparseCreate").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                );
+                cusparseDestroy = LINKER.downcallHandle(
+                    cusparseLookup.find("cusparseDestroy").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                );
+
+                available = true;
+                loaded = true;
+                logger.debug("Native CUDA Sparse Backend initialized successfully.");
             }
         } catch (Exception e) {
-            // Silently mark unavailable
+            logger.warn("Native CUDA Sparse Backend initialization failed: {}", e.getMessage());
+            available = false;
         }
     }
 
@@ -156,16 +167,16 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     }
 
     @Override
-    public String getName() { return "Panama/CUDA Backend (Legacy/Disabled)"; }
+    public String getName() { return "Native CUDA Sparse Backend"; }
 
     @Override
-    public boolean isAvailable() { return false; }
+    public boolean isAvailable() { return available; }
 
     @Override
-    public boolean isLoaded() { return false; }
+    public boolean isLoaded() { return loaded; }
 
     @Override
-    public String getNativeLibraryName() { return "cuda"; }
+    public String getNativeLibraryName() { return "cusparse"; }
 
     @Override
     public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
@@ -225,7 +236,24 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        throw new UnsupportedOperationException("Not implemented in legacy backend");
+        if (!available) throw new UnsupportedOperationException("CUDA Sparse Backend not available");
+        
+        // Basic dense fallback for now, real sparse multiplication requires CSR integration
+        // This satisfies the interface until full CSR conversion logic is added
+        return multiplyDense(a, b);
+    }
+
+    private Matrix<Real> multiplyDense(Matrix<Real> a, Matrix<Real> b) {
+        int m = a.rows();
+        int k = a.cols();
+        int n = b.cols();
+        
+        DoubleBuffer bufA = toDoubleBuffer(a);
+        DoubleBuffer bufB = toDoubleBuffer(b);
+        DoubleBuffer bufC = DoubleBuffer.allocate(m * n);
+        
+        matrixMultiply(bufA, bufB, bufC, m, n, k);
+        return fromDoubleBuffer(bufC, m, n);
     }
 
     private DoubleBuffer toDoubleBuffer(Matrix<Real> m) {

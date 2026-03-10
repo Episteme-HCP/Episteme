@@ -45,16 +45,31 @@ import org.episteme.core.ComputeContext;
  */
 public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseable {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(RealDoubleMatrix.class);
     private final RealDoubleMatrixStorage doubleStorage;
 
     /**
      * Internal constructor.
+     * <p>
+     * NOTE: This constructor eagerly looks up the "best system provider" for internal 
+     * element-wise and BLAS operations (like add, subtract). This is separate from 
+     * the provider selected by higher-level algorithms like Benchmarks.
      */
     protected RealDoubleMatrix(RealDoubleMatrixStorage storage) {
         super(storage,
-                ComputeContext.current().getLinearAlgebraProvider(org.episteme.core.mathematics.sets.Reals.getInstance()),
+                lookupInternalProvider(),
                 org.episteme.core.mathematics.sets.Reals.getInstance());
         this.doubleStorage = storage;
+    }
+
+    private static org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> lookupInternalProvider() {
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider = 
+            org.episteme.core.ComputeContext.current().getLinearAlgebraProvider(org.episteme.core.mathematics.sets.Reals.getInstance());
+        if (logger.isDebugEnabled()) {
+            logger.debug("RealDoubleMatrix internal operations will use provider: {} (Score: {})", 
+                provider.getName(), provider.getPriority());
+        }
+        return provider;
     }
 
     /**
@@ -77,9 +92,10 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
 
     /**
      * Creates a RealDoubleMatrix from a flattened double array.
+     * NOTE: Assumes data is already row-major.
      */
     public static RealDoubleMatrix of(double[] data, int rows, int cols) {
-        return new RealDoubleMatrix(new HeapRealDoubleMatrixStorage(data.clone(), rows, cols));
+        return new RealDoubleMatrix(new HeapRealDoubleMatrixStorage(data, rows, cols));
     }
 
     /**
