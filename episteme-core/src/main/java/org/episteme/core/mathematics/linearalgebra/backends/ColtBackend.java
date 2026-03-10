@@ -23,6 +23,9 @@
 
 package org.episteme.core.mathematics.linearalgebra.backends;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -55,6 +58,8 @@ import java.lang.reflect.Constructor;
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
 public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
+    private static final Logger logger = LoggerFactory.getLogger(ColtBackend.class);
+
     private static boolean coltAvailable = false;
     private final Field<E> field;
     private LinearAlgebraProvider<E> coltImpl;
@@ -84,6 +89,7 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 ctor.setAccessible(true);
                 this.coltImpl = (LinearAlgebraProvider<E>) ctor.newInstance(this, this.field);
             } catch (Throwable t) {
+                logger.error("Failed to initialize Colt implementation: {}", t.getMessage(), t);
                 this.coltImpl = null;
             }
         }
@@ -157,6 +163,8 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { checkColt(); return coltImpl.lu(a); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { checkColt(); return coltImpl.eigen(a); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) { checkColt(); return coltImpl.cholesky(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) { checkColt(); return coltImpl.qr(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) { checkColt(); return coltImpl.svd(a); }
 
     private void checkColt() {
         if (coltImpl == null) {
@@ -315,6 +323,27 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             cern.colt.matrix.linalg.CholeskyDecomposition cholesky = new cern.colt.matrix.linalg.CholeskyDecomposition(toColtMatrix(a));
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
                 fromColtMatrix(cholesky.getL())
+            );
+        }
+
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
+            cern.colt.matrix.DoubleMatrix2D cm = toColtMatrix(a);
+            cern.colt.matrix.linalg.QRDecomposition qr = new cern.colt.matrix.linalg.QRDecomposition(cm);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
+                fromColtMatrix(qr.getQ()),
+                fromColtMatrix(qr.getR())
+            );
+        }
+
+        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
+            cern.colt.matrix.DoubleMatrix2D cm = toColtMatrix(a);
+            cern.colt.matrix.linalg.SingularValueDecomposition svd = new cern.colt.matrix.linalg.SingularValueDecomposition(cm);
+            double[] sValues = svd.getSingularValues();
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sValues);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+                fromColtMatrix(svd.getU()),
+                (Vector<E>) S,
+                fromColtMatrix(svd.getV())
             );
         }
     }

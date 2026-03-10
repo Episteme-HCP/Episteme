@@ -210,8 +210,12 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 DSYEV = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dsyev")
                     .map(s -> LINKER.downcallHandle(s, dsyevDesc)).orElse(null);
 
-                available = true;
-                logger.info("FFM: Backend initialized successfully. Handles: DGEMM={}, DGESV={}, DGETRI={}", (DGEMM != null), (DGESV != null), (DGETRI != null));
+                available = (DGEMM != null && DGEMV != null && DDOT != null);
+                if (available) {
+                    logger.info("FFM: Backend initialized successfully. Handles: DGEMM={}, DGESV={}, DGETRI={}", (DGEMM != null), (DGESV != null), (DGETRI != null));
+                } else {
+                    logger.warn("FFM: Native library found but essential BLAS handles (DGEMM, DGEMV) are missing.");
+                }
             } catch (Throwable t) {
                 logger.warn("FFM: Failed to link native symbols: {}", t.getMessage());
                 available = false;

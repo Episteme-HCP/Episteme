@@ -86,11 +86,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
         SymbolLookup cusolver = null;
 
         try { // Test loading
-            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", Arena.global());
-            Optional<SymbolLookup> cublasOpt = NativeLibraryLoader.loadLibrary("cublas", Arena.global());
-            
-            if (cudaRtOpt.isEmpty() || cublasOpt.isEmpty()) {
-                logger.warn("Native CUDA/cuBLAS libraries not found (cudart={}, cublas={})", cudaRtOpt.isPresent(), cublasOpt.isPresent());
+            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cuda", "cudart", "nvcuda", "cudart64_13", "cudart64_12", "cudart64_11");
+            Optional<SymbolLookup> cublasOpt = NativeLibraryLoader.loadLibrary("cublas", "libcublas", "cublas64_13", "cublas64_12", "cublas64_11");
+            Optional<SymbolLookup> cusolverOpt = NativeLibraryLoader.loadLibrary("cusolver", "libcusolver", "cusolver64_13", "cusolver64_12", "cusolver64_11");
+
+            if (cudaRtOpt.isEmpty() || cublasOpt.isEmpty() || cusolverOpt.isEmpty()) {
+                logger.warn("Native CUDA/cuBLAS/cuSolver libraries not found (cudart={}, cublas={}, cusolver={})", 
+                    cudaRtOpt.isPresent(), cublasOpt.isPresent(), cusolverOpt.isPresent());
                 return;
             }
 
@@ -134,9 +136,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             cublas = cublasOpt.get();
 
             // CUDA Runtime Memory Management
-            Optional<MemorySegment> mallocSym = NativeLibraryLoader.findSymbol(cudart, "cudaMalloc");
+            Optional<MemorySegment> mallocSym = NativeLibraryLoader.findSymbol(cudart, "cudaMalloc_v2", "cudaMalloc");
             Optional<MemorySegment> freeSym = NativeLibraryLoader.findSymbol(cudart, "cudaFree");
-            Optional<MemorySegment> memcpySym = NativeLibraryLoader.findSymbol(cudart, "cudaMemcpy");
+            Optional<MemorySegment> memcpySym = NativeLibraryLoader.findSymbol(cudart, "cudaMemcpy_v2", "cudaMemcpy");
             Optional<MemorySegment> syncSym = NativeLibraryLoader.findSymbol(cudart, "cudaDeviceSynchronize");
             
             if (mallocSym.isEmpty() || freeSym.isEmpty() || memcpySym.isEmpty() || syncSym.isEmpty()) {
@@ -296,7 +298,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        ensureInitialized();
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for transpose()");
         int m = a.rows();
         int n = a.cols();
         
@@ -319,9 +321,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
                     MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
                     
-                    // cublasDgeam(handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc)
+                    // lda = n (rows of A in column-major memory)
+                    // ldb = n
+                    // ldc = n (rows of C in column-major memory)
                     checkCublas((int) CUBLAS_DGEAM.invokeExact(handle.get(ValueLayout.ADDRESS, 0), 
-                        1, 0, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), m, beta, d_A.get(ValueLayout.ADDRESS, 0), m, d_C.get(ValueLayout.ADDRESS, 0), n));
+                        1, 0, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), n, beta, MemorySegment.NULL, n, d_C.get(ValueLayout.ADDRESS, 0), n));
                     
                     double[] resultData = new double[m * n];
                     MemorySegment h_Result = arena.allocate(ValueLayout.JAVA_DOUBLE, (long)m * n);
@@ -573,7 +577,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for solve()");
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for solve()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for solve");
@@ -652,7 +656,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for inverse()");
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for inverse()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for inverse");
@@ -743,7 +747,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRS == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for determinant()");
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for determinant()");
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for determinant");

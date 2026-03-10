@@ -83,9 +83,11 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         if (!Boolean.getBoolean("episteme.nd4j.skip")) {
             try {
                 Class.forName("org.nd4j.linalg.factory.Nd4j");
+                // Test actual ND4J initialization
+                org.nd4j.linalg.factory.Nd4j.zeros(1);
                 avail = true;
             } catch (Throwable th) {
-                // Not available
+                System.err.println("[ND4J] Initialization failed: " + th.getClass().getSimpleName() + ": " + th.getMessage());
             }
         }
         IS_AVAILABLE = avail;
