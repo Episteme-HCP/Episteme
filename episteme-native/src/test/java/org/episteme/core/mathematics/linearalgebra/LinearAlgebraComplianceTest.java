@@ -61,9 +61,10 @@ public class LinearAlgebraComplianceTest {
         Set<String> seen = new HashSet<>();
         for (LinearAlgebraProvider<Real> p : rawProviders) {
             String name = p.getName();
-            if (name.contains("JBlas")) {
-                continue; // Skip JBlas to avoid JVM hangs during temp DLL cleanup
-            }
+            // JBlas skip disabled for verification
+            // if (name.contains("JBlas")) {
+            //     continue; 
+            // }
             if (seen.add(name)) {
                 providers.add(p);
             }

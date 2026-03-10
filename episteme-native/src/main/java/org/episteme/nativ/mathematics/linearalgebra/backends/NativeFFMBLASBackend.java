@@ -64,6 +64,8 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     private static MethodHandle DGEQRF;
     private static MethodHandle DORGQR;
     private static MethodHandle DGESVD;
+    private static MethodHandle DPOTRF;
+    private static MethodHandle DSYEV;
     
     private static final int LAPACK_ROW_MAJOR = 101;
 
@@ -190,6 +192,23 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 );
                 DGESVD = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgesvd")
                     .map(s -> LINKER.downcallHandle(s, dgesvdDesc)).orElse(null);
+
+                // Cholesky
+                FunctionDescriptor dpotrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DPOTRF = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dpotrf")
+                    .map(s -> LINKER.downcallHandle(s, dpotrfDesc)).orElse(null);
+
+                // Eigen
+                FunctionDescriptor dsyevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE,
+                        ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS
+                );
+                DSYEV = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dsyev")
+                    .map(s -> LINKER.downcallHandle(s, dsyevDesc)).orElse(null);
 
                 available = true;
                 logger.info("FFM: Backend initialized successfully. Handles: DGEMM={}, DGESV={}, DGETRI={}", (DGEMM != null), (DGESV != null), (DGETRI != null));
@@ -459,6 +478,123 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             Matrix<org.episteme.core.mathematics.numbers.real.Real> V = new DenseMatrix<>(vObj, (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing());
 
             return new SVDResult<>(U, S, V);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    @Override
+    public LUResult<org.episteme.core.mathematics.numbers.real.Real> lu(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
+        if (!IS_AVAILABLE || DGETRF == null) throw new UnsupportedOperationException(getName() + ": lu() not available");
+        int m = a.rows();
+        int n = a.cols();
+        int k = Math.min(m, n);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+            double[] arrA = toDoubleArray(a);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
+            
+            MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) k);
+            
+            int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, ipiv);
+            if (info < 0) throw new IllegalArgumentException("DGETRF failed with info: " + info);
+
+            double[] lData = new double[m * k];
+            double[] uData = new double[k * n];
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    double val = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
+                    if (i > j) {
+                        lData[i * k + j] = val;
+                        if (i < k) uData[i * n + j] = 0.0;
+                    } else if (i == j) {
+                        lData[i * k + j] = 1.0;
+                        uData[i * n + j] = val;
+                    } else {
+                        if (j < k) lData[i * k + j] = 0.0;
+                        uData[i * n + j] = val;
+                    }
+                }
+            }
+
+            double[] pData = new double[m];
+            for (int i = 0; i < m; i++) pData[i] = i;
+
+            for (int i = 0; i < k; i++) {
+                int ip = ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) - 1; // 1-indexed SWAP
+                if (ip != i) {
+                    double tmp = pData[i];
+                    pData[i] = pData[ip];
+                    pData[ip] = tmp;
+                }
+            }
+
+            return new LUResult<>(
+                createDenseMatrix(lData, m, k, a),
+                createDenseMatrix(uData, k, n, a),
+                new DenseVector<>(java.util.Arrays.stream(pData).mapToObj(org.episteme.core.mathematics.numbers.real.Real::of).toList(), (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing())
+            );
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    @Override
+    public CholeskyResult<org.episteme.core.mathematics.numbers.real.Real> cholesky(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
+        if (!IS_AVAILABLE || DPOTRF == null) throw new UnsupportedOperationException(getName() + ": cholesky() not available");
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+            double[] arrA = toDoubleArray(a);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
+            
+            int info = (int) DPOTRF.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+            if (info != 0) throw new ArithmeticException("Matrix is not positive definite (DPOTRF info: " + info + ")");
+
+            double[] lData = new double[n * n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (j <= i) lData[i * n + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
+                    else lData[i * n + j] = 0.0;
+                }
+            }
+
+            return new CholeskyResult<>(createDenseMatrix(lData, n, n, a));
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    @Override
+    public EigenResult<org.episteme.core.mathematics.numbers.real.Real> eigen(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
+        if (!IS_AVAILABLE || DSYEV == null) throw new UnsupportedOperationException(getName() + ": eigen() not available");
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+            double[] arrA = toDoubleArray(a);
+            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
+            
+            MemorySegment w = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+            
+            int info = (int) DSYEV.invokeExact(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
+            if (info != 0) throw new RuntimeException("DSYEV failed with info: " + info);
+
+            double[] vData = new double[n * n];
+            MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0L, vData, 0, n * n);
+
+            double[] wData = new double[n];
+            MemorySegment.copy(w, ValueLayout.JAVA_DOUBLE, 0L, wData, 0, n);
+
+            return new EigenResult<>(
+                createDenseMatrix(vData, n, n, a),
+                new DenseVector<>(java.util.Arrays.stream(wData).mapToObj(org.episteme.core.mathematics.numbers.real.Real::of).toList(), (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing())
+            );
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }

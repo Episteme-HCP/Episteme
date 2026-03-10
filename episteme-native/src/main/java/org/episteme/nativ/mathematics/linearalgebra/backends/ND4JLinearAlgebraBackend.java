@@ -300,51 +300,6 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     }
 
     /**
-     * Eigendecomposition via power iteration + deflation (Wielandt deflation).
-     * Works for symmetric matrices. Self-contained, uses only ND4J array ops.
-     */
-    @Override
-    public EigenResult<Real> eigen(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        int n = a.rows();
-        INDArray mat = toINDArray(a).dup();
-        double[] eigenvalues = new double[n];
-        double[][] eigenvectors = new double[n][n];
-
-        INDArray deflated = mat.dup();
-        for (int k = 0; k < n; k++) {
-            // Power iteration to find dominant eigenvector
-            INDArray v = Nd4j.rand(n, 1).sub(0.5);
-            v = v.div(v.norm2Number().doubleValue());
-            for (int iter = 0; iter < 500; iter++) {
-                INDArray w = deflated.mmul(v);
-                double norm = w.norm2Number().doubleValue();
-                if (norm < 1e-14) break;
-                v = w.div(norm);
-            }
-            // Rayleigh quotient for eigenvalue
-            INDArray Av = deflated.mmul(v);
-            double lambda = v.transpose().mmul(Av).getDouble(0);
-            eigenvalues[k] = lambda;
-            double[] evArr = v.data().asDouble();
-            for (int i = 0; i < n; i++) eigenvectors[i][k] = evArr[i];
-
-            // Deflate: A = A - lambda * v * v^T
-            deflated = deflated.sub(v.mmul(v.transpose()).mul(lambda));
-        }
-
-        // Build result
-        org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector D =
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues);
-        double[] vFlat = new double[n * n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                vFlat[i * n + j] = eigenvectors[i][j];
-        Matrix<Real> V = RealDoubleMatrix.of(vFlat, n, n);
-        return new EigenResult<Real>(V, D);
-    }
-
-    /**
      * LU decomposition via Gaussian elimination on ND4J arrays.
      * Returns L (lower triangular), U (upper triangular), and pivot vector P.
      */
@@ -404,5 +359,18 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
             }
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromINDArray(L));
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        // ND4J's Eigen.eigenvectors returns [eigenvectors, eigenvalues_matrix]
+        // result[0] is eigenvectors (matrix), result[1] is eigenvalues (diagonal matrix)
+        INDArray[] result = org.nd4j.linalg.eigen.Eigen.eig(toINDArray(a));
+        // result[0] is eigenvalues, result[1] is eigenvectors
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+            fromINDArray(result[1]),
+            fromINDArrayVector(result[0])
+        );
     }
 }

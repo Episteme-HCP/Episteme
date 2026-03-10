@@ -154,6 +154,11 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
     @Override public Matrix<E> transpose(Matrix<E> a) { checkCommons(); return commonsImpl.transpose(a); }
     @Override public Matrix<E> scale(E s, Matrix<E> a) { checkCommons(); return commonsImpl.scale(s, a); }
     @Override public E norm(Vector<E> a) { checkCommons(); return commonsImpl.norm(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { checkCommons(); return commonsImpl.lu(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) { checkCommons(); return commonsImpl.qr(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) { checkCommons(); return commonsImpl.svd(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) { checkCommons(); return commonsImpl.cholesky(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { checkCommons(); return commonsImpl.eigen(a); }
 
     private void checkCommons() {
         if (commonsImpl == null) {
@@ -231,5 +236,58 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
         @Override @SuppressWarnings("unchecked")
         public E norm(Vector<E> a) { return (E) org.episteme.core.mathematics.numbers.real.Real.of(toCommonsVector(a).getNorm()); }
 
+        @Override
+        public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
+            org.apache.commons.math3.linear.LUDecomposition lu = new org.apache.commons.math3.linear.LUDecomposition(toCommonsMatrix(a));
+            int[] pivotInfo = lu.getPivot();
+            double[] pData = new double[pivotInfo.length];
+            for (int i = 0; i < pivotInfo.length; i++) pData[i] = pivotInfo[i];
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector P = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pData);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                fromCommonsMatrix(lu.getL()),
+                fromCommonsMatrix(lu.getU()),
+                (Vector<E>) P
+            );
+        }
+
+        @Override
+        public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
+            org.apache.commons.math3.linear.QRDecomposition qr = new org.apache.commons.math3.linear.QRDecomposition(toCommonsMatrix(a));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
+                fromCommonsMatrix(qr.getQ()),
+                fromCommonsMatrix(qr.getR())
+            );
+        }
+
+        @Override
+        public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
+            org.apache.commons.math3.linear.SingularValueDecomposition svd = new org.apache.commons.math3.linear.SingularValueDecomposition(toCommonsMatrix(a));
+            double[] sData = svd.getSingularValues();
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sData);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+                fromCommonsMatrix(svd.getU()),
+                (Vector<E>) S,
+                fromCommonsMatrix(svd.getV()) 
+            );
+        }
+
+        @Override
+        public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+            org.apache.commons.math3.linear.CholeskyDecomposition chol = new org.apache.commons.math3.linear.CholeskyDecomposition(toCommonsMatrix(a));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+                fromCommonsMatrix(chol.getL())
+            );
+        }
+
+        @Override
+        public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
+            org.apache.commons.math3.linear.EigenDecomposition eig = new org.apache.commons.math3.linear.EigenDecomposition(toCommonsMatrix(a));
+            double[] dData = eig.getRealEigenvalues();
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector D = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(dData);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                fromCommonsMatrix(eig.getV()),
+                (Vector<E>) D
+            );
+        }
     }
 }

@@ -511,7 +511,17 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             }
 
             double[] pData = new double[n];
-            for (int i = 0; i < n; i++) pData[i] = ipiv.get(i);
+            if (n > 0) {
+                for (int i = 0; i < n; i++) pData[i] = i;
+                for (int i = 0; i < n; i++) {
+                    int ip = ipiv.get(i) - 1;
+                    if (ip != i) {
+                        double tmp = pData[i];
+                        pData[i] = pData[ip];
+                        pData[ip] = tmp;
+                    }
+                }
+            }
 
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
                 RealDoubleMatrix.of(lData, n, n),
@@ -567,5 +577,28 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             );
         }
         throw new UnsupportedOperationException(getName() + ": cholesky() not available for these types");
+    }
+    @Override
+    public Real dot(Vector<Real> a, Vector<Real> b) {
+        if (AVAILABLE && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
+            double[] ad = ((RealDoubleVector) a).toDoubleArray();
+            double[] bd = ((RealDoubleVector) b).toDoubleArray();
+            if (ad.length != bd.length) throw new IllegalArgumentException("Dimension mismatch");
+            double sum = 0.0;
+            for (int i = 0; i < ad.length; i++) sum += ad[i] * bd[i];
+            return Real.of(sum);
+        }
+        throw new UnsupportedOperationException(getName() + ": dot() not available for these types");
+    }
+
+    @Override
+    public Real norm(Vector<Real> v) {
+        if (AVAILABLE && v instanceof RealDoubleVector) {
+            double[] vd = ((RealDoubleVector) v).toDoubleArray();
+            double sumSq = 0.0;
+            for (double val : vd) sumSq += val * val;
+            return Real.of(Math.sqrt(sumSq));
+        }
+        throw new UnsupportedOperationException(getName() + ": norm() not available for these types");
     }
 }

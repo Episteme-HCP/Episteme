@@ -321,7 +321,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     
                     // cublasDgeam(handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc)
                     checkCublas((int) CUBLAS_DGEAM.invokeExact(handle.get(ValueLayout.ADDRESS, 0), 
-                        1, 0, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), m, beta, MemorySegment.NULL, m, d_C.get(ValueLayout.ADDRESS, 0), n));
+                        1, 0, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), m, beta, d_A.get(ValueLayout.ADDRESS, 0), m, d_C.get(ValueLayout.ADDRESS, 0), n));
                     
                     double[] resultData = new double[m * n];
                     MemorySegment h_Result = arena.allocate(ValueLayout.JAVA_DOUBLE, (long)m * n);

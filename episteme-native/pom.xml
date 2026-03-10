@@ -191,7 +191,7 @@
                     <argLine>--enable-preview --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector</argLine>
                     <systemPropertyVariables>
                         <episteme.benchmark.skip>true</episteme.benchmark.skip>
-                        <episteme.nd4j.skip>true</episteme.nd4j.skip>
+                        <episteme.nd4j.skip>false</episteme.nd4j.skip>
                         <episteme.jblas.skip>false</episteme.jblas.skip>
                         <org.jblas.util.LibraryLoader.deletedll>false</org.jblas.util.LibraryLoader.deletedll>
                         <java.awt.headless>true</java.awt.headless>
