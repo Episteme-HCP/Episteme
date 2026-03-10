@@ -118,6 +118,12 @@ public interface AudioBackend extends ComputeBackend, AudioAlgorithmProvider<Aud
     default AudioBuffer createAudio(Object data, int channels, int sampleRate) {
         if (data instanceof double[] samples) {
             return new AudioBuffer(samples, channels, sampleRate);
+        } else if (data instanceof float[] fSamples) {
+            double[] dSamples = new double[fSamples.length];
+            for (int i = 0; i < fSamples.length; i++) {
+                dSamples[i] = fSamples[i];
+            }
+            return new AudioBuffer(dSamples, channels, sampleRate);
         }
         throw new IllegalArgumentException("Unsupported audio data type: " + (data != null ? data.getClass().getName() : "null"));
     }

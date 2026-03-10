@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @since 1.2
  */
 @SuppressWarnings({"preview", "unused"})
-@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, NativeBackend.class, CPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, NativeBackend.class, CPUBackend.class, AudioAlgorithmProvider.class})
 public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUBackend { 
 
     private static final Logger logger = LoggerFactory.getLogger(NativeMiniAudioBackend.class);

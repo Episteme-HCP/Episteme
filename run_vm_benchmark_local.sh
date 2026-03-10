@@ -31,17 +31,17 @@ export JAVA_HOME="/usr/lib/jvm/java-25-openjdk-amd64"
 export PATH="$JAVA_HOME/bin:$PATH"
 export CUDA_PATH="/usr/local/cuda"
 
-# Compilation C++ Vision
-chmod +x build_episteme_native.sh
-./build_episteme_native.sh 2>&1 | tee -a "$LOG_DIR/console.txt"
+# Compilation C++ Native
+chmod +x build_native.sh
+./build_native.sh 2>&1 | tee -a "$LOG_DIR/console.txt"
 # Copy vision lib to shared libs directory
 cp episteme-native/libs/libepisteme-native.so libs/ 2>/dev/null
 
 # Compilation JNI
-cd episteme-jni
-chmod +x compile_jni_linux.sh
-./compile_jni_linux.sh 2>&1 | tee -a "$LOG_DIR/console.txt"
-cd ..
+chmod +x build_jni.sh
+./build_jni.sh 2>&1 | tee -a "$LOG_DIR/console.txt"
+# Copy JNI lib to shared libs directory
+cp episteme-jni/libs/libepisteme-jni.so libs/ 2>/dev/null
 
 # Compilation Java Maven
 mvn install -DskipTests -Pheadless 2>&1 | tee -a "$LOG_DIR/console.txt"

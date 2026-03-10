@@ -70,13 +70,15 @@ RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline -B -Dmdep.skip
 # 4. Compile Episteme Native Vision & Java Project
 COPY . /build/
 RUN mkdir -p /tmp/miniaudio && \
-    cp /build/episteme-native/src/main/resources/native/miniaudio/miniaudio-master/miniaudio.c /tmp/miniaudio/ && \
-    cp /build/episteme-native/src/main/resources/native/miniaudio/miniaudio-master/miniaudio.h /tmp/miniaudio/ && \
+    cp /build/episteme-native/src/main/cpp/audio/miniaudio.c /tmp/miniaudio/ && \
+    cp /build/episteme-native/src/main/cpp/audio/miniaudio.h /tmp/miniaudio/ && \
     cd /tmp/miniaudio && \
     gcc -O3 -shared -fPIC miniaudio.c -o /build/libs/libminiaudio.so -lpthread -lm -ldl && \
     rm -rf /tmp/miniaudio && \
-    --mount=type=cache,target=/root/.m2 chmod +x /build/build_vision.sh && ./build_vision.sh && \
-    find episteme-native -name "libepisteme_vision.so" -exec cp {} /build/libs/ \; && \
+    --mount=type=cache,target=/root/.m2 chmod +x /build/build_native.sh && ./build_native.sh && \
+    chmod +x /build/build_jni.sh && ./build_jni.sh && \
+    find episteme-native -name "libepisteme-native.so" -exec cp {} /build/libs/ \; && \
+    find episteme-jni -name "libepisteme-jni.so" -exec cp {} /build/libs/ \; && \
     mvn install -DskipTests -Dmdep.skip=true -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
     mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
     for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-server/target/lib/; done && \

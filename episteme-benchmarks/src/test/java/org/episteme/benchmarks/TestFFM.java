@@ -3,7 +3,6 @@ package org.episteme.benchmarks;
 import org.junit.jupiter.api.Test;
 import org.episteme.nativ.mathematics.tensors.backends.NativeCPUTensorBackend;
 import org.episteme.nativ.io.backends.NativeArrowBackend;
-import org.episteme.nativ.mathematics.linearalgebra.tensors.backends.ND4JCUDATensorBackend;
 
 public class TestFFM {
     @Test
@@ -26,8 +25,13 @@ public class TestFFM {
         }
 
         try {
-            ND4JCUDATensorBackend nd4jCuda = new ND4JCUDATensorBackend();
-            System.out.println("ND4JCUDATensorBackend available: " + nd4jCuda.isAvailable());
+            System.out.println("Testing ND4JCUDATensorBackend (via reflection)...");
+            Class<?> cudaClass = Class.forName("org.episteme.nativ.mathematics.linearalgebra.tensors.backends.ND4JCUDATensorBackend");
+            Object nd4jCuda = cudaClass.getDeclaredConstructor().newInstance();
+            java.lang.reflect.Method isAvailableMethod = cudaClass.getMethod("isAvailable");
+            System.out.println("ND4JCUDATensorBackend available: " + isAvailableMethod.invoke(nd4jCuda));
+        } catch (ClassNotFoundException e) {
+            System.out.println("ND4JCUDATensorBackend not found on classpath (expected on non-CUDA platforms like macOS).");
         } catch (Throwable t) {
             t.printStackTrace(System.out);
         }
