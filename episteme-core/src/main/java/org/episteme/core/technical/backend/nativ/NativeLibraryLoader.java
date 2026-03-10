@@ -128,21 +128,17 @@ public class NativeLibraryLoader {
             // Specialized Windows naming
             if (libName.equals("cuda")) {
                 variants.add("nvcuda");
-            } else if (libName.equals("cublas")) {
-                variants.add("cublas64_13");
-                variants.add("cublas64_12");
-                variants.add("cublas64_013");
-                variants.add("cublas64_11");
-                variants.add("cublas64_10"); 
-            } else if (libName.equals("cusolver")) {
-                variants.add("cusolver64_13");
-                variants.add("cusolver64_12");
-                variants.add("cusolver64_11"); 
-            } else if (libName.equals("cudart")) {
-                variants.add("cudart64_130");
-                variants.add("cudart64_120");
-                variants.add("cudart64_13"); 
-                variants.add("cudart64_110"); 
+            } else if (libName.startsWith("cu")) {
+                logger.debug("[NativeLoader] Detected CUDA-like library: {}", libName);
+                // Bulk handle CUDA libraries with 64_13, 64_12 conventions
+                variants.add(libName + "64_13");
+                variants.add(libName + "64_12");
+                variants.add(libName + "64_11");
+                if (libName.equals("cudart")) {
+                    variants.add("cudart64_130");
+                    variants.add("cudart64_120");
+                    variants.add("cudart64_110");
+                }
             } else if (libName.equals("sndfile")) {
                 variants.add("libsndfile-1");
             } else if (libName.equals("vlc")) {
