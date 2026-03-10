@@ -38,19 +38,7 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 @SuppressWarnings("preview")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
-    private Matrix<Real> multiplyDense(Matrix<Real> a, Matrix<Real> b) {
-        int m = a.rows();
-        int k = a.cols();
-        int n = b.cols();
-        
-        DoubleBuffer bufA = toDoubleBuffer(a);
-        DoubleBuffer bufB = toDoubleBuffer(b);
-        DoubleBuffer bufC = DoubleBuffer.allocate(m * n);
-        
-        matrixMultiply(bufA, bufB, bufC, m, n, k);
-        return fromDoubleBuffer(bufC, m, n);
-    }
-
+    
     @Override
     public boolean isAvailable() {
         return IS_AVAILABLE;
@@ -64,13 +52,13 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             logger.error("Failed to free GPU memory: {}", t.getMessage());
         }
     }
+
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDASparseLinearAlgebraBackend.class);
     private static final Linker LINKER = Linker.nativeLinker();
     
     // CUDA Runtime / cuSPARSE State
     private static boolean IS_AVAILABLE = false;
     private static SymbolLookup cusparse_lookup;
-    private static SymbolLookup cublas_lookup;
 
     // CUDA Handles
     private static MethodHandle CUDA_MALLOC;
@@ -85,15 +73,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUSPARSE_CREATE_DN_MAT;
     private static MethodHandle CUSPARSE_SPMM_BUFFER_SIZE;
     private static MethodHandle CUSPARSE_SPMM;
-    private static MethodHandle CUSPARSE_SPMV_BUFFER_SIZE;
-    private static MethodHandle CUSPARSE_SPMV;
 
     // Constants
     private static final int CUSPARSE_INDEX_32BIT = 0;
     private static final int CUSPARSE_INDEX_BASE_ZERO = 0;
     private static final int CUDA_R_64F = 1; // Double
     private static final int CUSPARSE_SPMM_ALG_DEFAULT = 0;
-    private static final int CUSPARSE_SPMV_ALG_DEFAULT = 0;
     private static final int CUDA_MEMCPY_HOST_TO_DEVICE = 1;
     private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
 
@@ -106,18 +91,16 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
         try {
             Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", Arena.global());
-            Optional<SymbolLookup> cublasOpt = NativeLibraryLoader.loadLibrary("cublas", Arena.global());
             Optional<SymbolLookup> cusparseOpt = NativeLibraryLoader.loadLibrary("cusparse", Arena.global());
 
-            if (cudaRtOpt.isEmpty() || cublasOpt.isEmpty() || cusparseOpt.isEmpty()) {
-                logger.warn("Native CUDA Sparse libraries not found (cudart={}, cublas={}, cusparse={})", 
-                    cudaRtOpt.isPresent(), cublasOpt.isPresent(), cusparseOpt.isPresent());
+            if (cudaRtOpt.isEmpty() || cusparseOpt.isEmpty()) {
+                logger.warn("Native CUDA Sparse libraries not found (cudart={}, cusparse={})", 
+                    cudaRtOpt.isPresent(), cusparseOpt.isPresent());
                 return;
             }
 
             SymbolLookup cudart = cudaRtOpt.get();
             cusparse_lookup = cusparseOpt.get();
-            cublas_lookup = cublasOpt.get();
 
             // Verify GPU Presence
             Optional<MemorySegment> deviceCountSym = NativeLibraryLoader.findSymbol(cudart, "cudaGetDeviceCount");
@@ -166,14 +149,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUSPARSE_SPMV_BUFFER_SIZE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseSpMV_bufferSize").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-            CUSPARSE_SPMV = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseSpMV").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
             IS_AVAILABLE = true;
             logger.info("Native CUDA Sparse Backend initialized successfully.");
         } catch (Throwable t) {
@@ -212,8 +187,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA Sparse Backend not available");
-        // For now, this dense-only signature is a no-op or fallback to CUBLAS
-        // Real sparse logic is in multiply(Matrix, Matrix)
     }
 
     @Override
@@ -275,8 +248,20 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             return multiplySparseDense((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b);
         }
         
-        // Fallback to dense multiplication if 'a' is not sparse
         return multiplyDense(a, b);
+    }
+
+    private Matrix<Real> multiplyDense(Matrix<Real> a, Matrix<Real> b) {
+        int m = a.rows();
+        int k = a.cols();
+        int n = b.cols();
+        
+        DoubleBuffer bufA = toDoubleBuffer(a);
+        DoubleBuffer bufB = toDoubleBuffer(b);
+        DoubleBuffer bufC = DoubleBuffer.allocate(m * n);
+        
+        matrixMultiply(bufA, bufB, bufC, m, n, k);
+        return fromDoubleBuffer(bufC, m, n);
     }
 
     private Matrix<Real> multiplySparseDense(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> a, Matrix<Real> b) {
@@ -375,7 +360,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public void shutdown() {
-        // No-op. Resources are managed by Arena or NativeLibraryLoader.
     }
 
     @Override
@@ -405,12 +389,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     }
 
     private double[] toDoubleArray(Matrix<Real> m) {
-        int rows = m.rows();
-        int cols = m.cols();
-        double[] data = new double[rows * cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = m.get(i, j).doubleValue();
+        int rCount = m.rows();
+        int cCount = m.cols();
+        double[] data = new double[rCount * cCount];
+        for (int i = 0; i < rCount; i++) {
+            for (int j = 0; j < cCount; j++) {
+                data[i * cCount + j] = m.get(i, j).doubleValue();
             }
         }
         return data;
@@ -423,8 +407,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     }
 
     private DoubleBuffer toDoubleBuffer(Matrix<Real> m) {
-        int rows = m.rows();
-        int cols = m.cols();
         double[] data = toDoubleArray(m);
         return DoubleBuffer.wrap(data);
     }

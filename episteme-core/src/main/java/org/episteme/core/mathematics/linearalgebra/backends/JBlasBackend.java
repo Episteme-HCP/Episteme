@@ -258,20 +258,24 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
         @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
             org.jblas.Decompose.LUDecomposition<org.jblas.DoubleMatrix> luResult = org.jblas.Decompose.lu(toJBlasMatrix(a));
-            // JBlas P is such that P*A = L*U. 
-            // The compliance test expects a permutation vector p such that PA[i] = A[p[i]].
-            double[] pData = new double[luResult.p.rows];
-            for (int j = 0; j < luResult.p.columns; j++) {
-                for (int i = 0; i < luResult.p.rows; i++) {
-                    if (luResult.p.get(i, j) > 0.5) {
-                        pData[i] = j; 
+            // JBlas LU returns L, U, P such that A = P * L * U
+            // ComplianceTest expects PA = LU (where P applied to A swaps rows)
+            // If A = PLU, then P^T A = LU. So our result p should represent P^T.
+            // p[i] = j if (P^T)[i,j] = 1, i.e., P[j,i] = 1.
+            int n = luResult.p.rows;
+            double[] pData = new double[n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (luResult.p.get(j, i) > 0.5) {
+                        pData[i] = j;
                         break;
                     }
                 }
             }
+
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
-                fromJBlasMatrix(luResult.l),
-                fromJBlasMatrix(luResult.u),
+                fromJBlasMatrix(luResult.l), 
+                fromJBlasMatrix(luResult.u), 
                 fromJBlasVector(new org.jblas.DoubleMatrix(pData))
             );
         }
@@ -306,12 +310,14 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
                 fromJBlasMatrix(svd[0]), fromJBlasVector(svd[1]), fromJBlasMatrix(svd[2])
             );
         }
-        @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
-            // JBlas cholesky returns L such that A = L*L'
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
-                fromJBlasMatrix(org.jblas.Decompose.cholesky(toJBlasMatrix(a)))
-            );
-        }
+        @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+        org.jblas.DoubleMatrix res = org.jblas.Decompose.cholesky(toJBlasMatrix(a));
+        // JBlas returns U such that A = U' U. Episteme expects L such that A = L L'.
+        // L = U'.
+        org.jblas.DoubleMatrix l = res.transpose();
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromJBlasMatrix(l));
+    }
         @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromJBlasVector(org.jblas.Solve.solve(toJBlasMatrix(a), toJBlasVector(b))); }
         @Override public Matrix<E> transpose(Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).transpose()); }
         @Override public Matrix<E> scale(E s, Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).mul(((Real) s).doubleValue())); }
