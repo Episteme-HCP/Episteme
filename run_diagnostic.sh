@@ -7,6 +7,7 @@ echo "Episteme Diagnostic Tool (Linux)"
 echo "=========================================="
 
 # --- Environment Info ---
+echo "[INFO] Hostname: $(hostname)"
 echo "[INFO] OS: $(uname -a)"
 JAVA_CMD="java"
 if [ -n "$JAVA_HOME" ]; then
