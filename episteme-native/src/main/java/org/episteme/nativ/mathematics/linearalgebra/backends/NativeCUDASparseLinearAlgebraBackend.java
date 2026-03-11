@@ -118,8 +118,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 try (Arena tempArena = Arena.ofConfined()) {
                     MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
                     int resCount = (int) getDeviceCount.invokeExact(countPtr);
-                    if (res != 0 || countPtr.get(ValueLayout.JAVA_INT, 0) <= 0) {
-                        logger.warn("No CUDA-capable GPU found or error result ({}). Backend disabled.", res);
+                    if (resCount != 0 || countPtr.get(ValueLayout.JAVA_INT, 0) <= 0) {
+                        logger.warn("No CUDA-capable GPU found or error result ({}). Backend disabled.", resCount);
                         return;
                     }
                 }
@@ -362,11 +362,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
                 return fromDoubleArray(resHost, m, 1);
             } finally {
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrRowPtr));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrColIdx));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrVal));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_vecX));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_vecY));
+                int rf1 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrRowPtr));
+                int rf2 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrColIdx));
+                int rf3 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrVal));
+                int rf4 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_vecX));
+                int rf5 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_vecY));
             }
         } catch (Throwable t) {
             logger.error("cuSPARSE SpMV failed: {}", t.getMessage());
@@ -464,11 +464,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
                 return fromDoubleArray(resHost, m, n);
             } finally {
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrRowPtr));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrColIdx));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrVal));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_denseB));
-                CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_denseC));
+                int rf31 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrRowPtr));
+                int rf32 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrColIdx));
+                int rf33 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrVal));
+                int rf34 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_denseB));
+                int rf35 = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_denseC));
             }
         } catch (Throwable t) {
             logger.error("cuSPARSE SpMM failed: {}", t.getMessage());

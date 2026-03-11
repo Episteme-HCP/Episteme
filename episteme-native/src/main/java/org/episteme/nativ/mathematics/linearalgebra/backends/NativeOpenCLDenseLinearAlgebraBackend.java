@@ -432,11 +432,12 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                     clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
                 }
                 det *= h_A[k * n + k];
-                clSetKernelArg(gaussJordanKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(gaussJordanKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(gaussJordanKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(gaussJordanKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                clEnqueueNDRangeKernel(commandQueue, gaussJordanKernel, 1, null, new long[]{n}, null, 0, null, null);
+                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                if (n - k - 1 > 0) {
+                    clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+                }
                 clFinish(commandQueue); // Synchronize loop
             }
             return Real.of(det);
