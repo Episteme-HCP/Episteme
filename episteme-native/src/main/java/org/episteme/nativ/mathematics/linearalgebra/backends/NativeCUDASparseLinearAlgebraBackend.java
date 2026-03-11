@@ -344,11 +344,15 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
                 
                 int rS4 = (int) CUSPARSE_SPMV_BUFFER_SIZE.invokeExact(handle, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr);
+                checkCuda(rS4);
                 long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
+                if (logger.isDebugEnabled()) logger.debug("[CUDA Sparse] SpMV Buffer Size: {}", bufferSize);
                 long d_buffer = bufferSize > 0 ? allocateGPUMemory(bufferSize) : 0;
 
                 // Execution
                 int rS5 = (int) CUSPARSE_SPMV.invokeExact(handle, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer));
+                if (logger.isDebugEnabled()) logger.debug("[CUDA Sparse] SpMV Result: {}", rS5);
+                checkCuda(rS5);
 
                 // 4. Result (D2H)
                 double[] resHost = new double[m];
