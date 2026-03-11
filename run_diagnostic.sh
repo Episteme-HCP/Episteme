@@ -58,7 +58,7 @@ if [ -f "server.jar" ]; then
     java -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.BackendDiagnostic "$@"
 else
     # Local Development Execution
-    java --enable-preview --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED \
+    java --enable-preview --add-modules jdk.incubator.vector \
          -cp "episteme-benchmarks/target/classes:episteme-core/target/classes:episteme-native/target/classes:episteme-natural/target/classes:episteme-benchmarks/target/lib/*" \
          org.episteme.benchmarks.BackendDiagnostic "$@"
 fi
