@@ -1,32 +1,23 @@
-# Linear Algebra Compliance Report (Linux VM)
+# Episteme Linear Algebra Provider Compliance Report
 
-## Summary
-The `LinearAlgebraComplianceTest` was executed on the Linux GPU VM (`episteme-gpu-test-vm`) using Java 25.
+| Provider | Environment | Transpose | Dot | Norm | Add | Subtract | Scale | Multiply | Inverse | LU | QR | SVD | Cholesky | Eigen | Determinant | Solve |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ND4J (Native Wrapper) | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native CPU-BLAS Linear Algebra Backend | CPU (Native/Panama) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native CUDA Dense Backend | GPU (CUDA) | ✅ PASS | ✅ PASS | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) | ❌ N/A |
+| Native CUDA Sparse Backend | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ⚠️ FAIL (Assertion) | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native BLAS Provider FFM | CPU (FFM-BLAS) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native OpenCL Dense Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ⚠️ FAIL (Assertion) | ⚠️ FAIL (Assertion) |
+| Native OpenCL Sparse Linear Algebra Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native SIMD Linear Algebra Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Colt (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Apache Commons Math (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| EJML (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| JBlas (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Episteme (CARMA) | CPU (CARMA) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Episteme CPU (Dense) | CPU (Standard JVM) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Distributed Linear Algebra Provider (LocalDistributedContext) | Generic JVM | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Episteme (Standard) | CPU (Standard) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Episteme (Strassen) | CPU (Strassen) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 
-**Result: PASSED**
-
-| Test | Status | Note |
-| --- | --- | --- |
-| `LinearAlgebraComplianceTest` | ✅ Pass | 1 test run, 0 failures, 0 errors |
-| `Solve` operation | ✅ Confirmed | Verified via FFM DGESV handle |
-
-## Backend Status on VM
-
-- **Native CPU-BLAS (FFM)**: ✅ Ready. LAPACK `dgesv`, `dgemm` etc. fully functional.
-- **Native OpenCL Dense**: ✅ Ready. Passed reliability and score sanity checks.
-- **Native SIMD**: ✅ Ready. Panama incubator module detected and active.
-- **Native CUDA Dense**: ❌ Disabled. Linkage error: `handle's method type (MemorySegment)int but found (MemorySegment)void`. Needs a signature fix in the FFM mapping.
-- **Native Audio (miniaudio)**: ⚠️ Missing. `libminiaudio.so` not found in `/usr/lib` or `./libs`.
-
-## Discussion & Observations
-- **Solve Fix**: The `DGESV_HANDLE` initialization in `NativeCPULinearAlgebraBackend` is now robust.
-- **Java 25 Migration**: The VM is fully compatible with OpenJDK 25.
-- **CUDA Fix**: The CUDA Dense backend requires a small update to the MethodHandle signature for `cublasCreate`.
-
-## Detailed Observations
-- The `solve` operation for the `NativeCPULinearAlgebraBackend` is now correctly mapped to `LAPACKE_dgesv` and verified.
-- The project successfully uses Java 25 (OpenJDK 25) with preview features enabled.
-- CUDA Sparse multiplication logic was verified to work correctly in the tests.
-
----
-*Report generated on Mar 11, 2026*
+*Generated by LinearAlgebraComplianceTest on Wed Mar 11 20:15:20 UTC 2026*

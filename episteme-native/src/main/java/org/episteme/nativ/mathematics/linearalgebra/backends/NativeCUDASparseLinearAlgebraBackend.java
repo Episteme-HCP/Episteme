@@ -357,8 +357,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 MemorySegment.copy(h_res, ValueLayout.JAVA_DOUBLE, 0, resHost, 0, m);
 
                 // Cleanup GPU
-                if (d_buffer != 0) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer));
-                CUSPARSE_DESTROY.invokeExact(handle);
+                if (d_buffer != 0) { int rF = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer)); }
+                int rD = (int) CUSPARSE_DESTROY.invokeExact(handle);
 
                 return fromDoubleArray(resHost, m, 1);
             } finally {
@@ -422,7 +422,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
                 // 3. cuSPARSE Handles
                 MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-                CUSPARSE_CREATE.invokeExact(handlePtr);
+                int rHC = (int) CUSPARSE_CREATE.invokeExact(handlePtr);
                 MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
                 // Descriptors
@@ -517,7 +517,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             MemorySegment ptr = arena.allocate(ValueLayout.ADDRESS);
             int res = (int) CUDA_MALLOC.invokeExact(ptr, size);
             if (res != 0) throw new RuntimeException("cudaMalloc failed with code " + res);
-            return ptr.get(ValueLayout.ADDRESS, 0).address();
+            MemorySegment addr = ptr.get(ValueLayout.ADDRESS, 0);
+            return addr.address();
         } catch (Throwable t) {
             throw new RuntimeException("GPU Allocation failed", t);
         }
