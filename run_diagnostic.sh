@@ -53,12 +53,20 @@ done
 
 # --- Run Java Diagnostics ---
 echo "[INFO] Running Java Diagnostic Class..."
+JVM_OPTS="--enable-preview"
+if java --list-modules | grep -q "jdk.incubator.vector"; then
+    echo "[INFO] Enabling jdk.incubator.vector"
+    JVM_OPTS="$JVM_OPTS --add-modules jdk.incubator.vector"
+else
+    echo "[WARN] jdk.incubator.vector not found, SIMD backends may be disabled."
+fi
+
 if [ -f "server.jar" ]; then
     # Docker Container Execution
-    java -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.BackendDiagnostic "$@"
+    java $JVM_OPTS -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.BackendDiagnostic "$@"
 else
     # Local Development Execution
-    java --enable-preview --add-modules jdk.incubator.vector \
+    java $JVM_OPTS \
          -cp "episteme-benchmarks/target/classes:episteme-core/target/classes:episteme-native/target/classes:episteme-natural/target/classes:episteme-benchmarks/target/lib/*" \
          org.episteme.benchmarks.BackendDiagnostic "$@"
 fi
