@@ -310,8 +310,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
         try {
             for (int k = 0; k < n; k++) {
-                // Pivoting on CPU for simplicity (avoiding complex GPU sync)
-                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)(n - k) * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                // Read back full matrix for correct pivoting on CPU
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
                 
                 int max = k;
                 for (int i = k + 1; i < n; i++) {
@@ -374,7 +374,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         try {
             for (int k = 0; k < n; k++) {
                 // Partial Pivoting
-                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)(n - k) * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                // Read back full matrix for correct pivoting on CPU
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
                 int max = k;
                 for (int i = k + 1; i < n; i++) {
                     if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
@@ -422,7 +423,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
         try {
             for (int k = 0; k < n; k++) {
-                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)(n - k) * Sizeof.cl_double, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                // Read back full matrix for correct pivoting on CPU
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
                 int max = k;
                 for (int i = k + 1; i < n; i++) if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
                 if (k != max) {
