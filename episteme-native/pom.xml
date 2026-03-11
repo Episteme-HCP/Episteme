@@ -78,6 +78,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native-platform</artifactId>
+            <version>${nd4j.version}</version>
+        </dependency>
 
         <!-- Apache Arrow (Native) -->
         <dependency>
@@ -298,11 +303,6 @@
                     <groupId>org.bytedeco</groupId>
                     <artifactId>openblas-platform</artifactId>
                     <version>${openblas.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.nd4j</groupId>
-                    <artifactId>nd4j-native-platform</artifactId>
-                    <version>${nd4j.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.bytedeco</groupId>
