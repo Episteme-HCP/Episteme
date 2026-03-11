@@ -346,12 +346,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 int rS4 = (int) CUSPARSE_SPMV_BUFFER_SIZE.invokeExact(handle, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr);
                 checkCuda(rS4);
                 long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
-                logger.info("[CUDA Sparse] SpMV m={}, k={}, nnz={}, bufferSize={}", m, k, nnz, bufferSize);
+                System.out.println("[CUDA Sparse] SpMV m=" + m + ", k=" + k + ", nnz=" + nnz + ", bufferSize=" + bufferSize);
                 long d_buffer = bufferSize > 0 ? allocateGPUMemory(bufferSize) : 0;
 
                 // Execution
                 int rS5 = (int) CUSPARSE_SPMV.invokeExact(handle, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer));
-                logger.info("[CUDA Sparse] SpMV Result Code: {}", rS5);
+                System.out.println("[CUDA Sparse] SpMV Result Code: " + rS5);
                 checkCuda(rS5);
 
                 // 4. Result (D2H)
