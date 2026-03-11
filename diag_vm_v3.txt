@@ -1,0 +1,28 @@
+==========================================
+Episteme Diagnostic Tool (Linux)
+==========================================
+[INFO] Hostname: episteme-gpu-test-vm
+[INFO] OS: Linux episteme-gpu-test-vm 5.10.0-38-cloud-amd64 #1 SMP Debian 5.10.249-1 (2026-02-10) x86_64 GNU/Linux
+[INFO] Java: openjdk version "11.0.30" 2026-01-20
+[INFO] Python: /usr/bin/python3
+Python 3.9.2
+[INFO] Checking libs directory: /home/spinradnorman/Episteme/libs
+-rwxrwxrwx 1 silve silve 17K Mar  6 16:50 /home/spinradnorman/Episteme/libs/libepisteme-jni.so
+-rwxr-xr-x 1 silve silve 16K Mar 10 23:10 /home/spinradnorman/Episteme/libs/libepisteme-native.so
+-rwxrwxrwx 1 silve silve 16K Mar 10 21:43 /home/spinradnorman/Episteme/libs/libepisteme_vision.so
+[INFO] CUDA_PATH: /usr/local/cuda
+[INFO] nvcc: Cuda compilation tools, release 11.3, V11.3.109
+[INFO] Checking NVIDIA GPU visibility...
+GPU 0: Tesla T4 (UUID: GPU-8e4979f3-7158-5ee4-56ef-9145edfdc106)
+[INFO] Checking library dependencies (ldd)...
+Dependencies for /usr/lib/x86_64-linux-gnu/libOpenCL.so:
+  All dependencies satisfied.
+[WARN] Library /usr/lib/x86_64-linux-gnu/libhdf5.so not found for ldd check.
+Dependencies for /usr/local/cuda/lib64/libcudart.so:
+  All dependencies satisfied.
+[INFO] Running Java Diagnostic Class...
+[WARN] jdk.incubator.vector not found, SIMD backends may be disabled.
+Error: LinkageError occurred while loading main class org.episteme.benchmarks.BackendDiagnostic
+	java.lang.UnsupportedClassVersionError: org/episteme/benchmarks/BackendDiagnostic has been compiled by a more recent version of the Java Runtime (class file version 69.0), this version of the Java Runtime only recognizes class file versions up to 55.0
+==========================================
+Diagnostic Complete.

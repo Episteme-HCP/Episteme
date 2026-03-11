@@ -45,7 +45,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public void freeGPUMemory(long handle) {
         try {
-            int resFree = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(handle));
+            (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(handle));
         } catch (Throwable t) {
             logger.error("Failed to free GPU memory: {}", t.getMessage());
         }
@@ -202,7 +202,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment countPtr = arena.allocate(ValueLayout.JAVA_INT);
-                    int rCount = (int) getDeviceCount.invokeExact(countPtr);
+                    (int) getDeviceCount.invokeExact(countPtr);
                     int count = countPtr.get(ValueLayout.JAVA_INT, 0);
                     DeviceInfo[] devices = new DeviceInfo[count];
                     for (int i = 0; i < count; i++) {
@@ -234,7 +234,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_B, B, (long) k * n);
 
             MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            int rHCreate = (int) CUBLAS_CREATE.invokeExact(handlePtr);
+            (int) CUBLAS_CREATE.invokeExact(handlePtr);
             MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
@@ -245,7 +245,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             // To get row-major C = A*B using col-major DGEMM:
             // C^T = B^T * A^T
             // So we call DGEMM(handle, N, N, n, m, k, alpha, d_B, n, d_A, k, beta, d_C, n)
-            int rGemm = (int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, alpha, 
+            (int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, alpha, 
                 MemorySegment.ofAddress(d_B), n, MemorySegment.ofAddress(d_A), k, beta, MemorySegment.ofAddress(d_C), n);
 
             copyFromGPU(d_C, C, (long) m * n);
