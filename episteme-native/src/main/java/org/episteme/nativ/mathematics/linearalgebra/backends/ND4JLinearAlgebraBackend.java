@@ -87,6 +87,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
                 org.nd4j.linalg.factory.Nd4j.zeros(1);
                 avail = true;
             } catch (Throwable th) {
+                logger.error("[ND4J] Initialization failed: {}: {}", th.getClass().getSimpleName(), th.getMessage(), th);
                 System.err.println("[ND4J] Initialization failed: " + th.getClass().getSimpleName() + ": " + th.getMessage());
             }
         }
