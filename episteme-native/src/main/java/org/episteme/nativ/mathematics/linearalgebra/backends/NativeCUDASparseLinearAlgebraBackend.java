@@ -325,7 +325,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
                 // Descriptors
                 MemorySegment matAPtr = arena.allocate(ValueLayout.ADDRESS);
-                CUSPARSE_CREATE_CSR.invokeExact(matAPtr, (long)m, (long)k, (long)nnz, 
+                int rA = (int) CUSPARSE_CREATE_CSR.invokeExact(matAPtr, (long)m, (long)k, (long)nnz, 
                     MemorySegment.ofAddress(d_csrRowPtr), MemorySegment.ofAddress(d_csrColIdx), MemorySegment.ofAddress(d_csrVal),
                     CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
                 MemorySegment matA = matAPtr.get(ValueLayout.ADDRESS, 0);
@@ -427,7 +427,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
                 // Descriptors
                 MemorySegment matAPtr = arena.allocate(ValueLayout.ADDRESS);
-                CUSPARSE_CREATE_CSR.invokeExact(matAPtr, (long)m, (long)k, (long)nnz, 
+                int rA = (int) CUSPARSE_CREATE_CSR.invokeExact(matAPtr, (long)m, (long)k, (long)nnz, 
                     MemorySegment.ofAddress(d_csrRowPtr), MemorySegment.ofAddress(d_csrColIdx), MemorySegment.ofAddress(d_csrVal),
                     CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
                 MemorySegment matA = matAPtr.get(ValueLayout.ADDRESS, 0);
@@ -459,8 +459,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 MemorySegment.copy(h_res, ValueLayout.JAVA_DOUBLE, 0, resHost, 0, m * n);
 
                 // Cleanup GPU
-                if (d_buffer != 0) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer));
-                CUSPARSE_DESTROY.invokeExact(handle);
+                if (d_buffer != 0) { int rF = (int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer)); }
+                int rD = (int) CUSPARSE_DESTROY.invokeExact(handle);
 
                 return fromDoubleArray(resHost, m, n);
             } finally {
