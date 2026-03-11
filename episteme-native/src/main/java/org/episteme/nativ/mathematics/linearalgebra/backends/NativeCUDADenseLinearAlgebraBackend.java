@@ -578,8 +578,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
             checkCublas((int) CUBLAS_DNRM2.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0), n, d_V.get(ValueLayout.ADDRESS, 0), 1, d_Res));
             double res = d_Res.get(ValueLayout.JAVA_DOUBLE, 0);
-            CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
-            CUDA_FREE.invokeExact(d_V.get(ValueLayout.ADDRESS, 0));
+            int rD3 = (int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
+            int rF6 = (int) CUDA_FREE.invokeExact(d_V.get(ValueLayout.ADDRESS, 0));
             return Real.of(res);
         } catch (Throwable t) {
             if (t instanceof UnsupportedOperationException) throw (UnsupportedOperationException) t;
@@ -652,12 +652,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return fromDoubleVec(h_X);
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segB.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segB);
-                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r1 = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segB.equals(MemorySegment.NULL)) { int r2 = (int) CUDA_FREE.invokeExact(segB); }
+                if (!segIpiv.equals(MemorySegment.NULL)) { int r3 = (int) CUDA_FREE.invokeExact(segIpiv); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r4 = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r5 = (int) CUDA_FREE.invokeExact(segWork); }
+                int r6 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             if (t instanceof UnsupportedOperationException) throw (UnsupportedOperationException) t;
@@ -824,11 +824,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return Real.of(det);
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segIpiv.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segIpiv); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segWork); }
+                int r2 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             logger.error("CUDA determinant failed: {}", t.getMessage());
@@ -942,7 +942,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 int lworkQ = p_Lwork.get(ValueLayout.JAVA_INT, 0);
                 
                 if (lworkQ > lwork) {
-                    CUDA_FREE.invokeExact(segWork);
+                    int rFree = (int) CUDA_FREE.invokeExact(segWork);
                     MemorySegment d_WorkQ = arena.allocate(ValueLayout.ADDRESS);
                     checkCuda((int) CUDA_MALLOC.invokeExact(d_WorkQ, (long) lworkQ * 8));
                     segWork = d_WorkQ.get(ValueLayout.ADDRESS, 0);
@@ -963,11 +963,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
 
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segTau.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segTau);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segTau.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segTau); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segWork); }
+                int r2 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             logger.error("CUDA QR failed: {}", t.getMessage());
@@ -1068,13 +1068,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 );
 
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segS.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segS);
-                if (!segU.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segU);
-                if (!segVT.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segVT);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segS.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segS); }
+                if (!segU.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segU); }
+                if (!segVT.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segVT); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segWork); }
+                int r2 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             logger.error("CUDA SVD failed: {}", t.getMessage());
@@ -1147,10 +1147,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromDoubleArray(lData, n, n));
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segWork); }
+                int r2 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             logger.error("CUDA Cholesky failed: {}", t.getMessage());
@@ -1255,11 +1255,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     fromDoubleVec(pData)
                 );
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segIpiv.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segIpiv); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segWork); }
+                int r2 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             logger.error("CUDA LU failed: {}", t.getMessage());
@@ -1335,11 +1335,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     fromDoubleVec(h_W)
                 );
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segW.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segW);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segW.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segW); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segWork); }
+                int r2 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             logger.error("CUDA Eigen failed: {}", t.getMessage());
