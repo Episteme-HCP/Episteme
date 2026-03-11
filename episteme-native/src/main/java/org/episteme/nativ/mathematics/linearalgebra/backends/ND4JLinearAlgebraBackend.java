@@ -352,8 +352,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         logger.info("[ND4J] Cholesky decomposition for matrix of size {}x{}", n, n);
         System.out.println("[ND4J] Cholesky decomposition for matrix of size " + n + "x" + n);
         if (n > 0) {
-            logger.info("[ND4J] Input matrix 'a' (top-left): {}", mat.getScalar(0, 0).doubleValue());
-            System.out.println("[ND4J] Input matrix 'a' (top-left): " + mat.getScalar(0, 0).doubleValue());
+            logger.info("[ND4J] Input matrix 'a' (top-left): {}", mat.getDouble(0, 0));
+            System.out.println("[ND4J] Input matrix 'a' (top-left): " + mat.getDouble(0, 0));
         }
 
         for (int i = 0; i < n; i++) {
@@ -375,7 +375,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
                 }
             }
         }
-        logger.info("[ND4J] Cholesky decomposition completed. Resulting L matrix (top-left): {}", L.getScalar(0, 0).doubleValue());
+        logger.info("[ND4J] Cholesky decomposition completed. Resulting L matrix (top-left): {}", L.getDouble(0, 0));
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromINDArray(L));
     }
 
