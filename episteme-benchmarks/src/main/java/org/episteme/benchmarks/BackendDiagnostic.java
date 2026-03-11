@@ -149,10 +149,10 @@ public class BackendDiagnostic {
             }
         } catch (ExceptionInInitializerError e) {
             error = " [INIT ERROR: " + (e.getCause() != null ? e.getCause().toString() : e.toString()) + "]";
-        } catch (LinkageError e) {
-            error = " [LINKAGE ERROR: Missing native library or ABI mismatch: " + e.getMessage() + "]";
         } catch (NoClassDefFoundError e) {
              error = " [CLASS ERROR: Missing dependency: " + e.getMessage() + "]";
+        } catch (LinkageError e) {
+            error = " [LINKAGE ERROR: Missing native library or ABI mismatch: " + e.getMessage() + "]";
         } catch (Throwable t) {
             error = " [ERROR: " + t.getClass().getSimpleName() + ": " + t.getMessage() + "]";
         }
