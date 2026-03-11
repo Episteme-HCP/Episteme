@@ -743,12 +743,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
                 return fromDoubleArray(h_Inv, n, n);
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segA);
-                if (!segB.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segB);
-                if (!segIpiv.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segIpiv);
-                if (!segInfo.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segInfo);
-                if (!segWork.equals(MemorySegment.NULL)) CUDA_FREE.invokeExact(segWork);
-                CUSOLVER_DESTROY.invokeExact(handle);
+                if (!segA.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segA); }
+                if (!segB.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segB); }
+                if (!segIpiv.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segIpiv); }
+                if (!segInfo.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segInfo); }
+                if (!segWork.equals(MemorySegment.NULL)) { int r = (int) CUDA_FREE.invokeExact(segWork); }
+                int r2 = (int) CUSOLVER_DESTROY.invokeExact(handle);
             }
         } catch (Throwable t) {
             logger.error("CUDA inverse failed: {}", t.getMessage());

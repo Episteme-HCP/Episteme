@@ -321,8 +321,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                     // Swap on CPU and write back or use a swap kernel. CPU swap for small n is fine.
                     for (int j = k; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
                     double tb = h_B[k]; h_B[k] = h_B[max]; h_B[max] = tb;
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
                 }
 
                 double pivot = h_A[k * n + k];
@@ -430,8 +430,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 if (k != max) {
                     for (int j = k; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
                     det = -det;
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * (n - k), Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
+                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
                 }
                 det *= h_A[k * n + k];
                 clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
