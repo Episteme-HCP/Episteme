@@ -528,7 +528,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         try {
             MemorySegment h_seg = MemorySegment.ofBuffer(hostBuf);
             int rcm6 = (int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_ptr), h_seg, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
-            if (res != 0) throw new RuntimeException("cudaMemcpy H2D failed with code " + res);
+            if (rcm6 != 0) throw new RuntimeException("cudaMemcpy H2D failed with code " + rcm6);
         } catch (Throwable t) {
             throw new RuntimeException("GPU Copy H2D failed", t);
         }
@@ -539,7 +539,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         try {
             MemorySegment h_seg = MemorySegment.ofBuffer(hostBuf);
             int rcm7 = (int) CUDA_MEMCPY.invokeExact(h_seg, MemorySegment.ofAddress(d_ptr), count * 8, CUDA_MEMCPY_DEVICE_TO_HOST);
-            if (res != 0) throw new RuntimeException("cudaMemcpy D2H failed with code " + res);
+            if (rcm7 != 0) throw new RuntimeException("cudaMemcpy D2H failed with code " + rcm7);
         } catch (Throwable t) {
             throw new RuntimeException("GPU Copy D2H failed", t);
         }
