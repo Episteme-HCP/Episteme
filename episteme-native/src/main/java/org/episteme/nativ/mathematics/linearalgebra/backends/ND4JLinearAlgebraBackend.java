@@ -136,9 +136,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int rows = (int) contiguous.rows();
         int cols = (int) contiguous.columns();
         double[] data = contiguous.data().asDouble();
-        if (logger.isInfoEnabled() && data.length > 0) {
-            logger.info("[ND4J] fromINDArray: {}x{}, first element: {}", rows, cols, data[0]);
-        }
+        System.out.println("[ND4J] fromINDArray: " + rows + "x" + cols + ", first element: " + (data.length > 0 ? data[0] : "N/A") + ", ordering: " + contiguous.ordering());
         return RealDoubleMatrix.of(data, rows, cols);
     }
 
@@ -352,8 +350,10 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray L = Nd4j.zeros(n, n);
 
         logger.info("[ND4J] Cholesky decomposition for matrix of size {}x{}", n, n);
+        System.out.println("[ND4J] Cholesky decomposition for matrix of size " + n + "x" + n);
         if (n > 0) {
             logger.info("[ND4J] Input matrix 'a' (top-left): {}", mat.getScalar(0, 0).doubleValue());
+            System.out.println("[ND4J] Input matrix 'a' (top-left): " + mat.getScalar(0, 0).doubleValue());
         }
 
         for (int i = 0; i < n; i++) {
@@ -366,6 +366,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
                     double val = mat.getDouble(i, i) - sum;
                     if (val <= 0) {
                         logger.info("[ND4J] Cholesky: Matrix is not positive definite at diagonal element ({},{}) with value {}", i, j, val);
+                        System.out.println("[ND4J] Cholesky: Matrix is not positive definite at diagonal element (" + i + "," + j + ") with value " + val);
                         throw new ArithmeticException("Matrix is not positive definite");
                     }
                     L.putScalar(i, j, Math.sqrt(val));
