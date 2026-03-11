@@ -1,0 +1,5 @@
+﻿total 12
+drwxr-xr-x 3 silve silve 4096 Mar  8 13:05 .
+drwxr-xr-x 3 silve silve 4096 Mar  8 13:05 ..
+drwxr-xr-x 9 silve silve 4096 Mar  8 13:05 25.0.2-open
+lrwxrwxrwx 1 silve silve   11 Mar  8 13:05 current -> 25.0.2-open

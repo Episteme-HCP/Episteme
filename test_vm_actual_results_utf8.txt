@@ -1,0 +1,35 @@
+﻿gcloud.cmd : hint: Pulling without specifying how to reconcile 
+divergent branches is
+Au caractère Ligne:1 : 1
++ & 'C:\Users\silve\AppData\Local\Google\Cloud 
+SDK\google-cloud-sdk\bin ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo          : NotSpecified: (hint: Pulling w.. 
+   .ent branches is:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+hint: discouraged. You can squelch this message by running one 
+of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default 
+strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" 
+to set a default
+hint: preference for all repositories. You can also pass 
+--rebase, --no-rebase,
+hint: or --ff-only on the command line to override the 
+configured default per
+hint: invocation.
+Already up to date.
+[INFO] Adding libs/ to library path...
+Running Linear Algebra Compliance Tests...
+Unrecognized option: --enable-native-access=ALL-UNNAMED
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+
+Tests completed. View report at docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md
