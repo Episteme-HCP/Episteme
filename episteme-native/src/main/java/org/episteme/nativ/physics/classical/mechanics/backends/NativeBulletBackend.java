@@ -64,6 +64,9 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
         java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
 
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("bullet_capi", arena);
+        if (lib.isEmpty()) {
+            lib = NativeLibraryLoader.loadLibrary("bulletc", arena);
+        }
         lookup = lib.orElse(null);
 
         if (lookup != null) {
@@ -108,6 +111,14 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
             BT_SPHERE_SHAPE_NEW = BT_DEFAULT_MOTION_STATE_NEW = BT_RIGID_BODY_NEW = BT_DYNAMICS_WORLD_ADD_RIGID_BODY = BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY = BT_COLLISION_SHAPE_CALCULATE_INERTIA = null;
             IS_AVAILABLE_FLAG = false;
         }
+    }
+
+    @Override
+    public String getStatusMessage() {
+        if (IS_AVAILABLE_FLAG) return "Ready (Bullet Native)";
+        String cause = NativeLibraryLoader.getFailureCause("bullet_capi");
+        if (cause.contains("Not found")) cause = NativeLibraryLoader.getFailureCause("bulletc");
+        return "Native library load failed: " + cause;
     }
 
     @Override

@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Silvere/Encours/Developpement/Episteme/episteme-native/build_native/cmake_install.cmake",
+		"C:/Silvere/Encours/Developpement/Episteme/episteme-native/build_native/vision/cmake_install.cmake",
+		"C:/Silvere/Encours/Developpement/Episteme/episteme-native/build_native/audio/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

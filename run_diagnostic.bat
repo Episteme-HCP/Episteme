@@ -9,4 +9,4 @@ if exist "%LIBS_DIR%" (
 set "EPISTEME_PYTHON=C:\Users\silve\AppData\Local\Programs\Python\Python314\python.exe"
 
 
-java --enable-preview --enable-native-access=ALL-UNNAMED -cp "%CP%" org.episteme.benchmarks.BackendDiagnostic
+java --enable-preview --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%CP%" org.episteme.benchmarks.BackendDiagnostic

@@ -377,12 +377,12 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
 
     @Override
     public String getEnvironmentInfo() {
-        return IS_AVAILABLE ? "CPU (FFM/BLAS)" : "N/A";
+        return IS_AVAILABLE ? "CPU (FFM-BLAS)" : "N/A";
     }
 
     @Override
     public String getName() {
-        return "Native BLAS Provider (FFM)";
+        return "Native BLAS Provider FFM";
     }
 
     @Override
