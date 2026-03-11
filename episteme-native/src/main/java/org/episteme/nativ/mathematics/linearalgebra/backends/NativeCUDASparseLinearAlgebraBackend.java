@@ -84,6 +84,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static final int CUSPARSE_INDEX_32BIT = 0;
     private static final int CUSPARSE_INDEX_BASE_ZERO = 0;
     private static final int CUDA_R_64F = 1; // Double
+    private static final int CUSPARSE_ORDER_COL = 1;
+    private static final int CUSPARSE_ORDER_ROW = 2;
     private static final int CUSPARSE_SPMM_ALG_DEFAULT = 0;
     private static final int CUDA_MEMCPY_HOST_TO_DEVICE = 1;
     private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
@@ -431,11 +433,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 MemorySegment matA = matAPtr.get(ValueLayout.ADDRESS, 0);
 
                 MemorySegment matBPtr = arena.allocate(ValueLayout.ADDRESS);
-                CUSPARSE_CREATE_DN_MAT.invokeExact(matBPtr, (long)k, (long)n, (long)n, MemorySegment.ofAddress(d_denseB), CUDA_R_64F, 1); // Order: Row-Major (1)
+                CUSPARSE_CREATE_DN_MAT.invokeExact(matBPtr, (long)k, (long)n, (long)n, MemorySegment.ofAddress(d_denseB), CUDA_R_64F, CUSPARSE_ORDER_ROW);
                 MemorySegment matB = matBPtr.get(ValueLayout.ADDRESS, 0);
 
                 MemorySegment matCPtr = arena.allocate(ValueLayout.ADDRESS);
-                CUSPARSE_CREATE_DN_MAT.invokeExact(matCPtr, (long)m, (long)n, (long)n, MemorySegment.ofAddress(d_denseC), CUDA_R_64F, 1);
+                CUSPARSE_CREATE_DN_MAT.invokeExact(matCPtr, (long)m, (long)n, (long)n, MemorySegment.ofAddress(d_denseC), CUDA_R_64F, CUSPARSE_ORDER_ROW);
                 MemorySegment matC = matCPtr.get(ValueLayout.ADDRESS, 0);
 
                 // Buffer allocation for SpMM

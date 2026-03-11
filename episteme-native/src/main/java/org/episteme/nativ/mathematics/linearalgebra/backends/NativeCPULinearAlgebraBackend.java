@@ -163,7 +163,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public String getStatusMessage() {
-        if (AVAILABLE) return "Ready (Native CPU/BLAS)";
+        if (AVAILABLE) return "Ready (Native CPU-BLAS)";
         return "Native library (episteme-jni, openblas, or mkl_rt) not found or CBLAS symbols missing";
     }
 
@@ -174,7 +174,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public String getName() {
-        return "Native CPU/BLAS Linear Algebra Backend";
+        return "Native CPU-BLAS Linear Algebra Backend";
     }
 
     @Override

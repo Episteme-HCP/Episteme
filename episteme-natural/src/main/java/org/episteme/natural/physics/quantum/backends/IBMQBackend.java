@@ -17,8 +17,16 @@ public class IBMQBackend extends QiskitBackend {
     @Override
     public boolean isAvailable() {
         try {
-            Process p = new ProcessBuilder("python", "-c", "import qiskit_ibm_runtime").start();
-            return p.waitFor() == 0;
+            String python = PythonResolver.resolve();
+            Process p = new ProcessBuilder(python, "-c", "import qiskit_ibm_runtime").start();
+            boolean success = p.waitFor() == 0;
+            return success;
         } catch (Exception e) { return false; }
+    }
+
+    @Override
+    public String getStatusMessage() {
+        if (isAvailable()) return "Ready (qiskit_ibm_runtime)";
+        return "Missing 'qiskit-ibm-runtime' Python package. Try: python -m pip install qiskit-ibm-runtime";
     }
 }

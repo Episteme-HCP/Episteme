@@ -99,7 +99,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "__kernel void gaussJordan(__global double *a, const int rows, const int cols, const int k) {\n" +
         "    int i = get_global_id(0);\n" +
         "    if (i < rows && i != k) {\n" +
-        "        double factor = a[i * cols + k];\n" +
+        "        double pivot = a[k * cols + k];\n" +
+        "        if (fabs(pivot) < 1e-15) return;\n" +
+        "        double factor = a[i * cols + k] / pivot;\n" +
         "        for (int j = k + 1; j < cols; j++) a[i * cols + j] -= factor * a[k * cols + j];\n" +
         "        a[i * cols + k] = 0.0;\n" +
         "    }\n" +
@@ -435,6 +437,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 clSetKernelArg(gaussJordanKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
                 clSetKernelArg(gaussJordanKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
                 clEnqueueNDRangeKernel(commandQueue, gaussJordanKernel, 1, null, new long[]{n}, null, 0, null, null);
+                clFinish(commandQueue); // Synchronize loop
             }
             return Real.of(det);
         } finally { clReleaseMemObject(memA); }

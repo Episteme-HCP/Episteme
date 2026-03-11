@@ -10,6 +10,8 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.technical.backend.Backend;
 import com.google.auto.service.AutoService;
 
 /**
@@ -23,8 +25,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({LinearAlgebraProvider.class})
-public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+@AutoService({LinearAlgebraProvider.class, Backend.class})
+public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvider<E>, Backend {
 
     public DistributedLinearAlgebraProvider() {
     }
@@ -76,12 +78,71 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
                 return (Matrix<E>) (Matrix<?>) result;
             } catch (Exception e) {
                // Fallback on error
-               System.err.println("Distributed multiplication failed, falling back to local: " + e.getMessage());
+                System.err.println("Distributed multiplication failed, falling back to local: " + e.getMessage());
             }
         }
         
         return LinearAlgebraProvider.super.multiply(a, b);
     }
+    @Override
+    public Matrix<E> inverse(Matrix<E> a) {
+        if (a instanceof TiledMatrix) {
+            // Future implementation: Block-cyclic inversion
+            // For now, fallback to local if context is local
+            return LinearAlgebraProvider.super.inverse(a);
+        }
+        return LinearAlgebraProvider.super.inverse(a);
+    }
 
-    // All other methods are handled by LinearAlgebraProvider's default UnsupportedOperationException
+    @Override
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (a instanceof TiledMatrix) {
+            // Future implementation: Distributed LU/Backsubstitution
+            return LinearAlgebraProvider.super.solve(a, b);
+        }
+        return LinearAlgebraProvider.super.solve(a, b);
+    }
+
+    @Override
+    public E determinant(Matrix<E> a) {
+        return LinearAlgebraProvider.super.determinant(a);
+    }
+
+    @Override
+    public String getStatusMessage() {
+        if (DistributedCompute.getContext() != null) {
+            return "Active (" + DistributedCompute.getContext().getClass().getSimpleName() + ")";
+        }
+        return "Inactive - No Distributed Context";
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return DistributedCompute.getContext() != null;
+    }
+
+    @Override
+    public String getType() {
+        return "math";
+    }
+
+    @Override
+    public String getId() {
+        return "distributed";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Linear algebra provider delegating to distributed computation contexts";
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
+    }
+
+    @Override
+    public void shutdown() {
+        Backend.super.shutdown();
+    }
 }

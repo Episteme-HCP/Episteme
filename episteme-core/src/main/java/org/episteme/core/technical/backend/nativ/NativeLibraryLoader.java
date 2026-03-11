@@ -73,7 +73,7 @@ public class NativeLibraryLoader {
      */
     private static void preloadRuntimes(java.nio.file.Path libsDir, Arena arena) {
         if (libsDir == null || !java.nio.file.Files.exists(libsDir)) return;
-        String[] runtimes = {"libwinpthread-1", "libgcc_s_seh-1", "libstdc++-6", "zlib1", "msvcp140", "vcruntime140"};
+        String[] runtimes = {"libwinpthread-1", "libgcc_s_seh-1", "libstdc++-6", "zlib1", "msvcp140", "vcruntime140", "libgfortran-5", "libquadmath-0"};
         for (String rt : runtimes) {
             if (PRELOADED_RUNTIMES.contains(rt)) continue;
             try {
@@ -154,6 +154,10 @@ public class NativeLibraryLoader {
             } else if (libName.contains("bullet")) {
                 variants.add("bullet_capi");
                 variants.add("libbullet_capi");
+                variants.add("libbulletc"); // Fallback
+            } else if (libName.equals("openblas")) {
+                variants.add("libopenblas");
+                variants.add("libgfortran-5"); // Often a dependency
             }
         }
 
@@ -180,6 +184,11 @@ public class NativeLibraryLoader {
             } else if (libName.contains("bullet")) {
                 variants.add("bullet_capi");
                 variants.add("bullet");
+            } else if (libName.equals("openblas")) {
+                variants.add("openblas");
+                variants.add("libopenblas.so.3");
+                variants.add("libopenblas.so.0");
+                variants.add("libopenblas.so");
             }
         }
 
@@ -281,7 +290,7 @@ public class NativeLibraryLoader {
                 } catch (Throwable t) {
                     FAILURE_CAUSES.put(fullPath.toString(), t.toString());
                     String msg = "Dependency resolution failed for " + fullPath + ": " + t.getMessage();
-                    logger.debug(msg);
+                    logger.warn(msg); // Increased level for visibility
                     System.err.println("[NativeLoader] " + msg);
                 }
             }
@@ -318,6 +327,7 @@ public class NativeLibraryLoader {
                 if (segment.isPresent()) return segment;
             }
         }
+        logger.debug("[NativeLoader] Symbol(s) {} NOT found in lookup.", (Object)names);
         return Optional.empty();
     }
 
