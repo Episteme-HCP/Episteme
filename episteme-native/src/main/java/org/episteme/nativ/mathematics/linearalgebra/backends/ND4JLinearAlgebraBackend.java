@@ -132,9 +132,10 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     }
 
     private Matrix<Real> fromINDArray(INDArray arr) {
-        int rows = (int) arr.rows();
-        int cols = (int) arr.columns();
-        double[] data = arr.data().asDouble();
+        INDArray contiguous = arr.isView() || arr.ordering() != 'c' ? arr.dup('c') : arr;
+        int rows = (int) contiguous.rows();
+        int cols = (int) contiguous.columns();
+        double[] data = contiguous.data().asDouble();
         return RealDoubleMatrix.of(data, rows, cols);
     }
 
@@ -147,7 +148,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     }
 
     private Vector<Real> fromINDArrayVector(INDArray arr) {
-        double[] data = arr.data().asDouble();
+        INDArray contiguous = arr.isView() || arr.ordering() != 'c' ? arr.dup('c') : arr;
+        double[] data = contiguous.data().asDouble();
         return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
     }
 
