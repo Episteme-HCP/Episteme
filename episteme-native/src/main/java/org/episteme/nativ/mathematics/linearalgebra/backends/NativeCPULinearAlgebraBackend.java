@@ -51,6 +51,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     // private static final MethodHandle DSCAL_HANDLE;
     
     // LAPACK (via LAPACKE interface)
+    private static final MethodHandle DGESV_HANDLE;
     private static final MethodHandle DGETRF_HANDLE;
     private static final MethodHandle DGETRI_HANDLE;
     private static final MethodHandle DSYEV_HANDLE;
