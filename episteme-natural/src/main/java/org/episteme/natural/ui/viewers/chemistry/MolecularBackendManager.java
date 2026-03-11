@@ -41,6 +41,10 @@ public class MolecularBackendManager extends AbstractBackendManager<MolecularBac
         return INSTANCE;
     }
 
+    public static java.util.Collection<MolecularBackend> staticAllBackends() {
+        return INSTANCE.managerAll();
+    }
+
     private String preferredId = "auto";
 
     private MolecularBackendManager() {
