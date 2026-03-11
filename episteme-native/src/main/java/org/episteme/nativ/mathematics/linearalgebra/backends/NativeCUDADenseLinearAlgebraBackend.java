@@ -120,7 +120,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                         if (freeSym.isPresent()) {
                             MethodHandle cudaFree = LINKER.downcallHandle(freeSym.get(), 
                                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                            (int) cudaFree.invokeExact(MemorySegment.NULL);
+                            int rFree = (int) cudaFree.invokeExact(MemorySegment.NULL);
                         }
                     }
                 } catch (Throwable t) {
@@ -485,12 +485,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C.get(ValueLayout.ADDRESS, 0), (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
             MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
             
-            checkCublas((int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0)));
-            checkCuda((int) CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0)));
+            int rD = (int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
+            int rF1 = (int) CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0));
             if (b != null) {
-                checkCuda((int) CUDA_FREE.invokeExact(d_B.get(ValueLayout.ADDRESS, 0)));
+                int rF2 = (int) CUDA_FREE.invokeExact(d_B.get(ValueLayout.ADDRESS, 0));
             }
-            checkCuda((int) CUDA_FREE.invokeExact(d_C.get(ValueLayout.ADDRESS, 0)));
+            int rF3 = (int) CUDA_FREE.invokeExact(d_C.get(ValueLayout.ADDRESS, 0));
             
             return fromDoubleArray(h_C, m, n);
         } catch (Throwable t) {
@@ -554,9 +554,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
             checkCublas((int) CUBLAS_DDOT.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0), n, d_A.get(ValueLayout.ADDRESS, 0), 1, d_B.get(ValueLayout.ADDRESS, 0), 1, d_Res));
             double res = d_Res.get(ValueLayout.JAVA_DOUBLE, 0);
-            checkCublas((int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0)));
-            checkCuda((int) CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0)));
-            checkCuda((int) CUDA_FREE.invokeExact(d_B.get(ValueLayout.ADDRESS, 0)));
+            int rD2 = (int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
+            int rF4 = (int) CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0));
+            int rF5 = (int) CUDA_FREE.invokeExact(d_B.get(ValueLayout.ADDRESS, 0));
             return Real.of(res);
         } catch (Throwable t) {
             if (t instanceof UnsupportedOperationException) throw (UnsupportedOperationException) t;

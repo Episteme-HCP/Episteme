@@ -1,0 +1,6 @@
+﻿total 20
+drwxr-xr-x  5 root          root          4096 Mar  7 20:58 .
+drwxr-xr-x 18 root          root          4096 Mar  6 21:17 ..
+drwxr-xr-x  8 jupyter       jupyter       4096 Mar  3 13:08 jupyter
+drwxr-xr-x 12 silve         silve         4096 Mar  8 14:34 silve
+drwxr-xr-x 15 spinradnorman spinradnorman 4096 Mar  7 00:57 spinradnorman
