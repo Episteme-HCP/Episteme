@@ -8,7 +8,11 @@ echo "=========================================="
 
 # --- Environment Info ---
 echo "[INFO] OS: $(uname -a)"
-echo "[INFO] Java: $(java -version 2>&1 | head -n 1)"
+JAVA_CMD="java"
+if [ -n "$JAVA_HOME" ]; then
+    JAVA_CMD="$JAVA_HOME/bin/java"
+fi
+echo "[INFO] Java: $($JAVA_CMD -version 2>&1 | head -n 1)"
 echo "[INFO] Python: ${EPISTEME_PYTHON:-$(which python3)}"
 ${EPISTEME_PYTHON:-python3} --version 2>&1
 
@@ -63,10 +67,10 @@ fi
 
 if [ -f "server.jar" ]; then
     # Docker Container Execution
-    java $JVM_OPTS -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.BackendDiagnostic "$@"
+    $JAVA_CMD $JVM_OPTS -cp "benchmarks.jar:server.jar:lib/*" org.episteme.benchmarks.BackendDiagnostic "$@"
 else
     # Local Development Execution
-    java $JVM_OPTS \
+    $JAVA_CMD $JVM_OPTS \
          -cp "episteme-benchmarks/target/classes:episteme-core/target/classes:episteme-native/target/classes:episteme-natural/target/classes:episteme-benchmarks/target/lib/*" \
          org.episteme.benchmarks.BackendDiagnostic "$@"
 fi
