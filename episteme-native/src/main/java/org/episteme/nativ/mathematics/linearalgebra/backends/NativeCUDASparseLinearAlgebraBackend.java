@@ -581,4 +581,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         buf.get(data);
         return fromDoubleArray(data, rows, cols);
     }
+
+    private void checkCuda(int result) {
+        if (result != 0) throw new RuntimeException("CUDA Error: " + result);
+    }
 }
