@@ -136,6 +136,9 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int rows = (int) contiguous.rows();
         int cols = (int) contiguous.columns();
         double[] data = contiguous.data().asDouble();
+        if (logger.isInfoEnabled() && data.length > 0) {
+            logger.info("[ND4J] fromINDArray: {}x{}, first element: {}", rows, cols, data[0]);
+        }
         return RealDoubleMatrix.of(data, rows, cols);
     }
 
@@ -348,6 +351,11 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray mat = toINDArray(a).dup();
         INDArray L = Nd4j.zeros(n, n);
 
+        logger.info("[ND4J] Cholesky decomposition for matrix of size {}x{}", n, n);
+        if (n > 0) {
+            logger.info("[ND4J] Input matrix 'a' (top-left): {}", mat.getScalar(0, 0).doubleValue());
+        }
+
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= i; j++) {
                 double sum = 0;
@@ -356,13 +364,17 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
                 }
                 if (i == j) {
                     double val = mat.getDouble(i, i) - sum;
-                    if (val <= 0) throw new ArithmeticException("Matrix is not positive definite");
+                    if (val <= 0) {
+                        logger.info("[ND4J] Cholesky: Matrix is not positive definite at diagonal element ({},{}) with value {}", i, j, val);
+                        throw new ArithmeticException("Matrix is not positive definite");
+                    }
                     L.putScalar(i, j, Math.sqrt(val));
                 } else {
                     L.putScalar(i, j, (mat.getDouble(i, j) - sum) / L.getDouble(j, j));
                 }
             }
         }
+        logger.info("[ND4J] Cholesky decomposition completed. Resulting L matrix (top-left): {}", L.getScalar(0, 0).doubleValue());
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromINDArray(L));
     }
 
