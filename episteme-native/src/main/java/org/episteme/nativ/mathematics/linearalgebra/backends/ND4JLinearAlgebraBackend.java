@@ -231,10 +231,10 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         // but it has LU through LAPACK. 
         // Det = Product of diagonal elements of U * (-1 ^ number of swaps)
         
-        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT, n);
+        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
         INDArray lu = m.dup();
         
-        Nd4j.getBlasWrapper().lapack().getrf(n, n, lu, n, ipiv, 0);
+        Nd4j.getBlasWrapper().lapack().getrf(lu);
         
         double det = 1.0;
         for (int i = 0; i < n; i++) {
@@ -314,9 +314,9 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int n = a.rows();
         INDArray A = toINDArray(a);
         INDArray lu = A.dup();
-        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT, n);
+        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
         
-        Nd4j.getBlasWrapper().lapack().getrf(n, n, lu, n, ipiv, 0);
+        Nd4j.getBlasWrapper().lapack().getrf(lu);
         
         // Extract L and U
         INDArray L = Nd4j.zeros(n, n);
@@ -356,8 +356,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray mat = toINDArray(a);
         INDArray L = mat.dup();
         
-        // 'L' for lower, 'U' for upper. Episteme expects L.
-        Nd4j.getBlasWrapper().lapack().potrf('L', n, L, n, 0);
+        // potrf in ND4J typically takes (matrix, isUpper)
+        Nd4j.getBlasWrapper().lapack().potrf(L, false);
         
         // Zero out the upper part explicitly as LAPACK only touches the specified triangle
         for (int i = 0; i < n; i++) {
