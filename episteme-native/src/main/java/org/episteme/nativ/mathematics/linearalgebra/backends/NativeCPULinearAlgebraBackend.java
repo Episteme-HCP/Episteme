@@ -40,7 +40,7 @@ import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
+// @AutoService({ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, AlgorithmProvider.class})
 public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final MethodHandle DGEMM_HANDLE;

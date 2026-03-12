@@ -137,9 +137,9 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                     .map(s -> LINKER.downcallHandle(s, dgemvDesc)).orElse(null);
 
                 FunctionDescriptor domatcopyDesc = FunctionDescriptor.ofVoid(
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG,
-                        ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_LONG,
-                        AddressLayout.ADDRESS, ValueLayout.JAVA_LONG
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
                 DOMATCOPY = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_domatcopy", "mkl_domatcopy", "domatcopy_")
                     .map(s -> LINKER.downcallHandle(s, domatcopyDesc)).orElse(null);
@@ -291,7 +291,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             
             // cblas_domatcopy(layout, trans, rows, cols, alpha, A, lda, B, ldb)
             // trans=CblasTrans (112)
-            DOMATCOPY.invokeExact(CblasRowMajor, 112, (long)rows, (long)cols, 1.0, segA, (long)cols, segC, (long)rows);
+            DOMATCOPY.invokeExact(CblasRowMajor, 112, rows, cols, 1.0, segA, cols, segC, rows);
             return res;
         } catch (Throwable t) {
             logger.error("FFM BLAS Transpose failed: {}", t.getMessage());
