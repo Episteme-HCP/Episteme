@@ -227,10 +227,28 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
         @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { return fromCommonsMatrix(toCommonsMatrix(a).subtract(toCommonsMatrix(b))); }
         @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { return fromCommonsMatrix(toCommonsMatrix(a).multiply(toCommonsMatrix(b))); }
         @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { return fromCommonsVector(toCommonsMatrix(a).operate(toCommonsVector(b))); }
-        @Override public Matrix<E> inverse(Matrix<E> a) { return fromCommonsMatrix(new org.apache.commons.math3.linear.LUDecomposition(toCommonsMatrix(a)).getSolver().getInverse()); }
+        @Override public Matrix<E> inverse(Matrix<E> a) {
+            org.apache.commons.math3.linear.RealMatrix m = toCommonsMatrix(a);
+            if (a.rows() == a.cols()) {
+                return fromCommonsMatrix(new org.apache.commons.math3.linear.LUDecomposition(m).getSolver().getInverse());
+            } else {
+                // Use SVD solver to solve A * X = I to get the pseudo-inverse
+                org.apache.commons.math3.linear.SingularValueDecomposition svd = new org.apache.commons.math3.linear.SingularValueDecomposition(m);
+                return fromCommonsMatrix(svd.getSolver().solve(org.apache.commons.math3.linear.MatrixUtils.createRealIdentityMatrix(m.getRowDimension())));
+            }
+        }
         @Override @SuppressWarnings("unchecked")
         public E determinant(Matrix<E> a) { return (E) Real.of(new org.apache.commons.math3.linear.LUDecomposition(toCommonsMatrix(a)).getDeterminant()); }
-        @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromCommonsVector(new org.apache.commons.math3.linear.LUDecomposition(toCommonsMatrix(a)).getSolver().solve(toCommonsVector(b))); }
+        @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+            org.apache.commons.math3.linear.RealMatrix ma = toCommonsMatrix(a);
+            org.apache.commons.math3.linear.RealVector vb = toCommonsVector(b);
+            if (a.rows() == a.cols()) {
+                return fromCommonsVector(new org.apache.commons.math3.linear.LUDecomposition(ma).getSolver().solve(vb));
+            } else {
+                // QR or SVD for least squares. SVD is more robust for rank-deficient.
+                return fromCommonsVector(new org.apache.commons.math3.linear.SingularValueDecomposition(ma).getSolver().solve(vb));
+            }
+        }
         @Override public Matrix<E> transpose(Matrix<E> a) { return fromCommonsMatrix(toCommonsMatrix(a).transpose()); }
         @Override public Matrix<E> scale(E s, Matrix<E> a) { return fromCommonsMatrix(toCommonsMatrix(a).scalarMultiply(((Real) s).doubleValue())); }
         @Override @SuppressWarnings("unchecked")

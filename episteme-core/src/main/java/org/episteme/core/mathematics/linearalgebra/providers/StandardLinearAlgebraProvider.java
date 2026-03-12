@@ -32,9 +32,6 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (a.cols() != b.rows()) {
-            throw new IllegalArgumentException("Matrix inner dimensions must match");
-        }
         // Force standard multiply (O(n^3)) via static utility
         return CPUDenseLinearAlgebraProvider.standardMultiply(a, b, field, this);
     }

@@ -8,16 +8,15 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.technical.backend.ComputeBackend;
-import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.inverse.InvertMatrix;
@@ -323,7 +322,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray contiguousU = U.isView() || U.ordering() != 'c' ? U.dup('c') : U;
         INDArray contiguousVt = Vt.isView() || Vt.ordering() != 'c' ? Vt.dup('c') : Vt;
         
-        return new SVDResult<>(fromINDArray(contiguousU), fromINDArrayVector(S), fromINDArray(contiguousVt));
+        // SVDResult expects V, but gesvd returns Vt. So we transpose Vt back to V.
+        return new SVDResult<>(fromINDArray(contiguousU), fromINDArrayVector(S), fromINDArray(contiguousVt.transpose()));
     }
 
     /**
@@ -336,6 +336,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int n = a.rows();
         INDArray lu = toINDArray(a);
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
+        // ND4J Lapack.getrf only takes A in this interface version. 
+        // Pivots are unfortunately not exposed in this high-level call.
         Nd4j.getBlasWrapper().lapack().getrf(lu);
         
         // Extract L and U
@@ -355,16 +357,19 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         }
         
         // Convert IPIV to full permutation vector
-        // In LAPACK, IPIV(i) = j means row i was swapped with row j.
-        // These swaps are applied sequentially: swap(1, ipiv(1)), swap(2, ipiv(2)), ..., swap(n, ipiv(n)).
         double[] p = new double[n];
         for (int i = 0; i < n; i++) p[i] = i;
+        
+        // Only attempt to process ipiv if it was somehow populated (though currently not expected)
         for (int i = 0; i < n; i++) {
-            int swapIdx = ipiv.getInt(i) - 1; // 1-based to 0-based
-            if (swapIdx != i) {
-                double tmp = p[i];
-                p[i] = p[swapIdx];
-                p[swapIdx] = tmp;
+            int ipivVal = ipiv.getInt(i);
+            if (ipivVal > 0) { // Check for valid 1-based index
+                int swapIdx = ipivVal - 1;
+                if (swapIdx >= 0 && swapIdx < n && swapIdx != i) {
+                    double tmp = p[i];
+                    p[i] = p[swapIdx];
+                    p[swapIdx] = tmp;
+                }
             }
         }
         

@@ -274,11 +274,27 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
         @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) {
             cern.colt.matrix.linalg.Algebra algebra = new cern.colt.matrix.linalg.Algebra();
+            cern.colt.matrix.DoubleMatrix2D ma = toColtMatrix(a);
             cern.colt.matrix.DoubleMatrix2D bMatrix = new cern.colt.matrix.impl.DenseDoubleMatrix2D(b.dimension(), 1);
             for (int i = 0; i < b.dimension(); i++) bMatrix.set(i, 0, ((Real) b.get(i)).doubleValue());
-            cern.colt.matrix.DoubleMatrix2D xMatrix = algebra.solve(toColtMatrix(a), bMatrix);
-            cern.colt.matrix.impl.DenseDoubleMatrix1D result = new cern.colt.matrix.impl.DenseDoubleMatrix1D(b.dimension());
-            for (int i = 0; i < b.dimension(); i++) result.set(i, xMatrix.get(i, 0));
+            
+            cern.colt.matrix.DoubleMatrix2D xMatrix;
+            if (a.rows() == a.cols()) {
+                xMatrix = algebra.solve(ma, bMatrix);
+            } else {
+                // QR solver in Colt handles M x N where M >= N
+                if (a.rows() >= a.cols()) {
+                    xMatrix = new cern.colt.matrix.linalg.QRDecomposition(ma).solve(bMatrix);
+                } else {
+                    // Underdetermined: Colt doesn't provide a direct SVD solver for M < N in this way.
+                    // Fallback to Algebra.solve() which should attempt it or throw.
+                    xMatrix = algebra.solve(ma, bMatrix);
+                }
+            }
+            
+            int n = a.cols();
+            cern.colt.matrix.impl.DenseDoubleMatrix1D result = new cern.colt.matrix.impl.DenseDoubleMatrix1D(n);
+            for (int i = 0; i < n; i++) result.set(i, xMatrix.get(i, 0));
             return fromColtVector(result);
         }
         @Override public Matrix<E> transpose(Matrix<E> a) {

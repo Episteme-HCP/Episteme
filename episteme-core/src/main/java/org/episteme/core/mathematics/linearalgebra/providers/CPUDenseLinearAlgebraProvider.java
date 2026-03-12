@@ -666,78 +666,40 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings("unchecked")
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (isReal(a) && b.dimension() == a.cols()) {
-            int rows = a.rows();
-            int cols = a.cols();
+        if (a.cols() != b.dimension()) {
+            throw new IllegalArgumentException("Matrix columns must match vector dimension");
+        }
+        int rows = a.rows();
+        int cols = a.cols();
+        
+        if (isReal(a)) {
             double[] mat = toDoubleArray(a);
             double[] vec = new double[cols];
-            for (int i = 0; i < cols; i++) vec[i] = ((Real) b.get(i)).doubleValue();
+            for (int i = 0; i < cols; i++) vec[i] = ((Real)b.get(i)).doubleValue();
             
             double[] res = new double[rows];
             for (int i = 0; i < rows; i++) {
                 double sum = 0;
-                int offset = i * cols;
+                int rowOffset = i * cols;
                 for (int j = 0; j < cols; j++) {
-                    sum += mat[offset + j] * vec[j];
+                    sum += mat[rowOffset + j] * vec[j];
                 }
                 res[i] = sum;
             }
-            
-            E[] resArray = (E[]) new Real[rows];
-            for (int i = 0; i < rows; i++) resArray[i] = (E) (Object) Real.of(res[i]);
-            return new GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
+            return (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(res);
         }
-
-        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
-            try {
-                return (Vector<E>) a.getClass().getMethod("multiply", Vector.class).invoke(a, b);
-            } catch (Exception e) {
-                // Fallback handled below
+        
+        java.util.List<E> result = new java.util.ArrayList<>(rows);
+        for (int i = 0; i < rows; i++) {
+            E sum = field.zero();
+            for (int j = 0; j < cols; j++) {
+                sum = field.add(sum, field.multiply(a.get(i, j), b.get(j)));
             }
+            result.add(sum);
         }
-
-        if (a.cols() != b.dimension()) {
-             throw new IllegalArgumentException("Matrix columns must match vector dimension");
-        }
-
-        if (a.rows() < PARALLEL_THRESHOLD) {
-            List<E> result = new ArrayList<>(a.rows());
-            for (int i = 0; i < a.rows(); i++) {
-                E sum = field.zero();
-                for (int j = 0; j < a.cols(); j++) {
-                    E product = field.multiply(a.get(i, j), b.get(j));
-                    sum = field.add(sum, product);
-                }
-                result.add(sum);
-            }
-            return new GenericVector<>(
-                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
-                    field);
-        } else {
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
-            return IntStream.range(0, a.rows())
-                    .parallel()
-                    .mapToObj(i -> {
-                        if (i % 64 == 0) ctx.checkCancelled();
-                        E sum = field.zero();
-                        for (int j = 0; j < a.cols(); j++) {
-                            E product = field.multiply(a.get(i, j), b.get(j));
-                            sum = field.add(sum, product);
-                        }
-                        return sum;
-                    })
-                    .collect(Collectors.collectingAndThen(
-                            Collectors.toList(),
-                            list -> {
-                                E[] arr = (E[]) list.toArray();
-                                return new GenericVector<>(
-                                        new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
-                                                arr),
-                                        this, field);
-                            }));
-        }
+        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(result, field);
     }
 
     @Override
@@ -1158,14 +1120,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     private Matrix<E> pseudoInverse(Matrix<E> a) {
         if (a.getScalarRing() instanceof Reals) {
              SVDResult<E> svd = svd(a);
-             // A+ = V * S+ * UT
+             // A+ = V * S+ * UT (using economy dimensions)
              int m = a.rows();
              int n = a.cols();
              int k = svd.S().dimension();
              
-             // Create S+ (pseudo-inverse of diagonal S)
-             // We use a simple dense matrix for S+ for simplicity in this generic provider
-             DenseMatrixStorage<E> sPlusStorage = new DenseMatrixStorage<>(n, m, field.zero());
+             // Create S+ (pseudo-inverse of diagonal S) as k x k
+             DenseMatrixStorage<E> sPlusStorage = new DenseMatrixStorage<>(k, k, field.zero());
              for (int i = 0; i < k; i++) {
                  double sVal = ((Real) svd.S().get(i)).doubleValue();
                  if (sVal > 1e-12) {
@@ -1173,7 +1134,14 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                  }
              }
              Matrix<E> sPlus = new GenericMatrix<>(sPlusStorage, this, field);
-             return multiply(multiply(svd.V(), sPlus), transpose(svd.U()));
+             
+             // V is n x n, we need first k columns to match sPlus (k x k)
+             Matrix<E> vEco = svd.V().getSubMatrix(0, n, 0, k);
+             
+             // U is m x m, we need first k columns (m x k) so UT is (k x m)
+             Matrix<E> uEco = svd.U().getSubMatrix(0, m, 0, k);
+             
+             return multiply(multiply(vEco, sPlus), transpose(uEco));
         }
         throw new UnsupportedOperationException("Pseudo-inverse not supported for generic field: " + field.getClass().getSimpleName());
     }
