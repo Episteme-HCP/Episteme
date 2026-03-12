@@ -40,6 +40,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     private static final Logger logger = LoggerFactory.getLogger(NativeFFMBLASBackend.class);
 
     private static final SymbolLookup LOOKUP;
+    private static final SymbolLookup LAPACK_LOOKUP;
     private static final boolean IS_AVAILABLE;
     private static final Linker LINKER = NativeLibraryLoader.getLinker();
 
@@ -69,6 +70,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     
     private static final int LAPACK_ROW_MAJOR = 101;
 
+    private static Optional<MemorySegment> findLapackSymbol(String name) {
+        Optional<MemorySegment> sym = NativeLibraryLoader.findSymbol(LOOKUP, name);
+        if (sym.isEmpty() && LAPACK_LOOKUP != null) {
+            sym = NativeLibraryLoader.findSymbol(LAPACK_LOOKUP, name);
+        }
+        return sym;
+    }
+
     static {
         Arena arena = Arena.global();
         Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("openblas", arena);
@@ -84,6 +93,13 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         }
         
         LOOKUP = lib.orElse(null);
+        
+        Optional<SymbolLookup> lapackLib = NativeLibraryLoader.loadLibrary("lapacke", arena);
+        if (lapackLib.isEmpty()) {
+            lapackLib = NativeLibraryLoader.loadLibrary("lapack", arena);
+        }
+        LAPACK_LOOKUP = lapackLib.orElse(null);
+        
         boolean available = false;
 
         if (LOOKUP != null) {
@@ -150,21 +166,21 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DGESV = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgesv")
+                DGESV = findLapackSymbol("LAPACKE_dgesv")
                     .map(s -> LINKER.downcallHandle(s, dgesvDesc)).orElse(null);
 
                 FunctionDescriptor dgetrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
                 );
-                DGETRF = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgetrf")
+                DGETRF = findLapackSymbol("LAPACKE_dgetrf")
                     .map(s -> LINKER.downcallHandle(s, dgetrfDesc)).orElse(null);
 
                 FunctionDescriptor dgetriDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
                 );
-                DGETRI = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgetri")
+                DGETRI = findLapackSymbol("LAPACKE_dgetri")
                     .map(s -> LINKER.downcallHandle(s, dgetriDesc)).orElse(null);
 
                 // QR Decomposition
@@ -172,14 +188,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
                 );
-                DGEQRF = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgeqrf")
+                DGEQRF = findLapackSymbol("LAPACKE_dgeqrf")
                     .map(s -> LINKER.downcallHandle(s, dgeqrfDesc)).orElse(null);
 
                 FunctionDescriptor dorgqrDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
                 );
-                DORGQR = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dorgqr")
+                DORGQR = findLapackSymbol("LAPACKE_dorgqr")
                     .map(s -> LINKER.downcallHandle(s, dorgqrDesc)).orElse(null);
 
                 // Singular Value Decomposition
@@ -190,7 +206,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         AddressLayout.ADDRESS
                 );
-                DGESVD = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dgesvd")
+                DGESVD = findLapackSymbol("LAPACKE_dgesvd")
                     .map(s -> LINKER.downcallHandle(s, dgesvdDesc)).orElse(null);
 
                 // Cholesky
@@ -198,7 +214,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DPOTRF = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dpotrf")
+                DPOTRF = findLapackSymbol("LAPACKE_dpotrf")
                     .map(s -> LINKER.downcallHandle(s, dpotrfDesc)).orElse(null);
 
                 // Eigen
@@ -207,7 +223,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS
                 );
-                DSYEV = NativeLibraryLoader.findSymbol(LOOKUP, "LAPACKE_dsyev")
+                DSYEV = findLapackSymbol("LAPACKE_dsyev")
                     .map(s -> LINKER.downcallHandle(s, dsyevDesc)).orElse(null);
 
                 available = (DGEMM != null && DGEMV != null && DDOT != null);
