@@ -320,7 +320,15 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         org.jblas.DoubleMatrix l = res.transpose();
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromJBlasMatrix(l));
     }
-        @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromJBlasVector(org.jblas.Solve.solve(toJBlasMatrix(a), toJBlasVector(b))); }
+        @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+            org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+            org.jblas.DoubleMatrix jb = toJBlasVector(b);
+            if (ja.rows == ja.columns) {
+                return fromJBlasVector(org.jblas.Solve.solve(ja, jb));
+            } else {
+                return fromJBlasVector(org.jblas.Solve.solveLeastSquares(ja, jb));
+            }
+        }
         @Override public Matrix<E> transpose(Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).transpose()); }
         @Override public Matrix<E> scale(E s, Matrix<E> a) { return fromJBlasMatrix(toJBlasMatrix(a).mul(((Real) s).doubleValue())); }
         @Override @SuppressWarnings("unchecked")

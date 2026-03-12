@@ -242,6 +242,80 @@ public class LinearAlgebraComplianceTest {
                 }
             });
 
+            testOperation(res, "Transpose (Rect)", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(15, 25, rand);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                Matrix<Real> result = provider.transpose(a);
+                SimpleMatrix expected = new SimpleMatrix(aData).transpose();
+                verifyMatrix(expected, result, TOLERANCE);
+            });
+
+            testOperation(res, "Multiply (Rect)", () -> {
+                Random rand = new Random(42);
+                int m = 20, k = 15, n = 25;
+                double[][] aData = randomData(m, k, rand);
+                double[][] bData = randomData(k, n, rand);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                RealDoubleMatrix b = RealDoubleMatrix.of(bData);
+                Matrix<Real> result = provider.multiply(a, b);
+                SimpleMatrix expected = new SimpleMatrix(aData).mult(new SimpleMatrix(bData));
+                verifyMatrix(expected, result, TOLERANCE);
+            });
+
+            testOperation(res, "Inverse (Rect)", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(25, 20, rand);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                Matrix<Real> result = provider.inverse(a);
+                SimpleMatrix expected = new SimpleMatrix(aData).pseudoInverse();
+                verifyMatrix(expected, result, 1e-4);
+            });
+
+            testOperation(res, "Solve (Rect)", () -> {
+                Random rand = new Random(42);
+                int rows = 30, cols = 20;
+                double[][] aData = randomData(rows, cols, rand);
+                double[] bData = new double[rows];
+                for (int i = 0; i < rows; i++) bData[i] = rand.nextGaussian();
+                
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                
+                Vector<Real> x = provider.solve(a, b);
+                SimpleMatrix matA = new SimpleMatrix(aData);
+                SimpleMatrix vecB = new SimpleMatrix(rows, 1, true, bData);
+                SimpleMatrix expectedX = matA.solve(vecB); // Least squares
+                
+                for (int i = 0; i < cols; i++) {
+                    assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-4);
+                }
+            });
+
+            testOperation(res, "Solve (Triangular)", () -> {
+                Random rand = new Random(42);
+                double[][] aData = randomData(SIZE, SIZE, rand);
+                // Make U (upper triangular)
+                for (int i = 0; i < SIZE; i++) {
+                    for (int j = 0; j < i; j++) aData[i][j] = 0.0;
+                    aData[i][i] += 2.0; // Ensure non-singular
+                }
+                double[] bData = new double[SIZE];
+                for (int i = 0; i < SIZE; i++) bData[i] = rand.nextGaussian();
+                
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                
+                Vector<Real> x = provider.solve(a, b);
+                SimpleMatrix matA = new SimpleMatrix(aData);
+                SimpleMatrix vecB = new SimpleMatrix(SIZE, 1, true, bData);
+                SimpleMatrix expectedX = matA.solve(vecB);
+                
+                for (int i = 0; i < SIZE; i++) {
+                    assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-5);
+                }
+            });
+
             results.add(res);
         }
 
