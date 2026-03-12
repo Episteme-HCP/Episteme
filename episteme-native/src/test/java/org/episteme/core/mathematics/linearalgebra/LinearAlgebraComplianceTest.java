@@ -59,12 +59,13 @@ public class LinearAlgebraComplianceTest {
                 
         List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
         Set<String> seen = new HashSet<>();
+        String exclude = System.getProperty("org.episteme.exclude.provider", "");
         for (LinearAlgebraProvider<Real> p : rawProviders) {
             String name = p.getName();
-            // JBlas skip disabled for verification
-            // if (name.contains("JBlas")) {
-            //     continue; 
-            // }
+            if (!exclude.isEmpty() && name.contains(exclude)) {
+                System.out.println("Skipping excluded provider: " + name);
+                continue;
+            }
             if (seen.add(name)) {
                 providers.add(p);
             }
