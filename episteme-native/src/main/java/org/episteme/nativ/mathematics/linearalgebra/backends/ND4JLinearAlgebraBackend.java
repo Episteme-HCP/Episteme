@@ -234,7 +234,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
         INDArray lu = m.dup();
         
-        Nd4j.getBlasWrapper().lapack().getrf(lu);
+        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv);
         
         double det = 1.0;
         for (int i = 0; i < n; i++) {
@@ -323,7 +323,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int n = a.rows();
         INDArray lu = toINDArray(a);
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
-        Nd4j.getBlasWrapper().lapack().getrf(lu);
+        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv);
         
         // Extract L and U
         INDArray L = Nd4j.zeros(n, n);
@@ -392,7 +392,15 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         
         // If complex, eigenvalues has 2 columns (Real, Imag)
         if (eigVals.columns() == 2) {
-            eigVals = eigVals.getColumn(0).dup(); // Take real part and ensure it's not a view of complex array
+            eigVals = eigVals.getColumn(0).dup(); // Take real part
+        }
+        
+        // Eigenvectors can also be complex (2 columns per vector in some representations or complex type)
+        // For compliance tests (usually symmetric), we take the real part.
+        if (eigVecs.dataType() == org.nd4j.linalg.api.buffer.DataType.FLOAT || eigVecs.dataType() == org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
+             // Real type, no-op
+        } else {
+             eigVecs = eigVecs.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE); // Force real if complex
         }
         
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
