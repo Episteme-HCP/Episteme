@@ -76,6 +76,9 @@ public class EnvironmentController {
             ServiceLoader.load(AlgorithmProvider.class).forEach(allProviders::add);
             ServiceLoader.load(org.episteme.core.technical.backend.Backend.class).forEach(b -> allProviders.addAll(b.getAlgorithmProviders()));
             ServiceLoader.load(org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend.class).forEach(allProviders::add);
+            ServiceLoader.load(org.episteme.core.media.VisionBackend.class).forEach(allProviders::add);
+            ServiceLoader.load(org.episteme.core.media.AudioBackend.class).forEach(allProviders::add);
+            ServiceLoader.load(org.episteme.natural.physics.classical.mechanics.MechanicsBackend.class).forEach(allProviders::add);
 
             for (AlgorithmProvider p : allProviders) {
                 if (!seenClasses.add(p.getClass().getName())) {

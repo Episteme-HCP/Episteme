@@ -95,10 +95,13 @@ public class VLCJMediaBackend implements VideoBackend, AudioBackend, VisionBacke
     private void initPlayer() {
         if (factory == null) {
             try {
+                System.out.println("[INFO] VLCJBackend: Initializing MediaPlayerFactory...");
                 factory = new MediaPlayerFactory();
                 mediaPlayer = factory.mediaPlayers().newMediaPlayer();
+                System.out.println("[INFO] VLCJBackend: MediaPlayerFactory initialized.");
             } catch (Throwable t) {
-                // Silently suppress during discovery
+                System.err.println("[ERROR] VLCJBackend: Failed to initialize MediaPlayerFactory: " + t.getMessage());
+                // Silently suppress during discovery if necessary, but log now
             }
         }
     }

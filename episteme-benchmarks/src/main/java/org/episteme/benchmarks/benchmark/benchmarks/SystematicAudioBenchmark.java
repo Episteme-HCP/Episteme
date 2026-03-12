@@ -28,7 +28,7 @@ public class SystematicAudioBenchmark implements SystematicBenchmark<AudioAlgori
     @Override public String getNameBase() { return "Audio Processing Throughput"; }
 
     @Override public String getId() { return getIdPrefix() + "-default"; }
-    @Override public String getName() { return getNameBase(); }
+    @Override public String getName() { return getNameBase() + (provider != null ? " (" + provider.getName() + ")" : ""); }
     @Override public String getDescription() { return "Measures basic audio processing throughput on " + (provider != null ? provider.getName() : "default backend"); }
     @Override public String getDomain() { return "Audio"; }
     @Override public String getAlgorithmType() { return "Signal Processing"; }

@@ -709,7 +709,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.11.0</version>
+          <version>3.13.0</version>
           <configuration>
             <release>25</release>
             <compilerArgs>
@@ -732,7 +732,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.2.5</version>
           <configuration>
-            <argLine>${argLine} --enable-preview --add-modules jdk.incubator.vector -Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+            <argLine>${argLine} --enable-preview --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Dnet.bytebuddy.experimental=true --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
             <systemPropertyVariables>
               <episteme.benchmark.skip>true</episteme.benchmark.skip>
             </systemPropertyVariables>

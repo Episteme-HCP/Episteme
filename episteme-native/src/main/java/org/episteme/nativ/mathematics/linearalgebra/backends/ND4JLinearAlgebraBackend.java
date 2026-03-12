@@ -295,13 +295,22 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray A = toINDArray(a);
         
         // LAPACK gesvd: 'A' for all columns of U, 'A' for all columns of V
-        INDArray S = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, Math.min(m, n));
-        INDArray U = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, m, m);
-        INDArray Vt = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, n, n);
+        INDArray S = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, new long[]{Math.min(m, n)});
+        INDArray U = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, new long[]{m, m});
+        INDArray Vt = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, new long[]{n, n});
         
-        Nd4j.getBlasWrapper().lapack().gesvd(A.dup(), S, U, Vt);
+        try {
+            Nd4j.getBlasWrapper().lapack().gesvd(A.dup(), S, U, Vt);
+        } catch (Exception e) {
+            logger.error("[ND4J] SVD failed: {}", e.getMessage());
+            // Fallback or rethrow with more context
+            throw new RuntimeException("ND4J SVD Failed", e);
+        }
         
-        return new SVDResult<>(fromINDArray(U), fromINDArrayVector(S), fromINDArray(Vt));
+        INDArray contiguousU = U.isView() || U.ordering() != 'c' ? U.dup('c') : U;
+        INDArray contiguousVt = Vt.isView() || Vt.ordering() != 'c' ? Vt.dup('c') : Vt;
+        
+        return new SVDResult<>(fromINDArray(contiguousU), fromINDArrayVector(S), fromINDArray(contiguousVt));
     }
 
     /**
@@ -312,10 +321,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     public LUResult<Real> lu(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
-        INDArray A = toINDArray(a);
-        INDArray lu = A.dup();
+        INDArray lu = toINDArray(a);
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
-        
         Nd4j.getBlasWrapper().lapack().getrf(lu);
         
         // Extract L and U
@@ -335,6 +342,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         }
         
         // Convert IPIV to full permutation vector
+        // In LAPACK, IPIV(i) = j means row i was swapped with row j.
+        // These swaps are applied sequentially: swap(1, ipiv(1)), swap(2, ipiv(2)), ..., swap(n, ipiv(n)).
         double[] p = new double[n];
         for (int i = 0; i < n; i++) p[i] = i;
         for (int i = 0; i < n; i++) {
@@ -383,7 +392,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         
         // If complex, eigenvalues has 2 columns (Real, Imag)
         if (eigVals.columns() == 2) {
-            eigVals = eigVals.getColumn(0); // Take real part
+            eigVals = eigVals.getColumn(0).dup(); // Take real part and ensure it's not a view of complex array
         }
         
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(

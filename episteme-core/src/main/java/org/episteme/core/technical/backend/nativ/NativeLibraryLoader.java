@@ -189,6 +189,10 @@ public class NativeLibraryLoader {
                 variants.add("libopenblas.so.3");
                 variants.add("libopenblas.so.0");
                 variants.add("libopenblas.so");
+            } else if (libName.equals("lapacke")) {
+                variants.add("lapacke");
+                variants.add("liblapacke.so.3");
+                variants.add("liblapacke.so");
             }
         }
 

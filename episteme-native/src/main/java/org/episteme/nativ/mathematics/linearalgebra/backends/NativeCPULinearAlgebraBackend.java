@@ -56,6 +56,9 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     private static final MethodHandle DGETRI_HANDLE;
     private static final MethodHandle DSYEV_HANDLE;
     private static final MethodHandle DPOTRF_HANDLE;
+    private static final MethodHandle DGEQRF_HANDLE;
+    private static final MethodHandle DORGQR_HANDLE;
+    private static final MethodHandle DGESVD_HANDLE;
     
     private static final boolean AVAILABLE;
 
@@ -72,30 +75,44 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         MethodHandle dgetri = null;
         MethodHandle dsyev = null;
         MethodHandle dpotrf = null;
+        MethodHandle dgeqrf = null;
+        MethodHandle dorgqr = null;
+        MethodHandle dgesvd = null;
         
         boolean avail = false;
 
         try {
             Linker linker = NativeLibraryLoader.getLinker();
-            Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("episteme-jni", java.lang.foreign.Arena.global());
-            if (lookupOpt.isEmpty() || lookupOpt.get().find("cblas_dgemm").isEmpty()) {
-                lookupOpt = NativeLibraryLoader.loadLibrary("openblas", java.lang.foreign.Arena.global());
-                if (lookupOpt.isEmpty() || lookupOpt.get().find("cblas_dgemm").isEmpty()) {
-                    lookupOpt = NativeLibraryLoader.loadLibrary("mkl_rt", java.lang.foreign.Arena.global());
-                }
+            java.util.List<SymbolLookup> lookups = new java.util.ArrayList<>();
+            
+            // Try common libraries
+            String[] commonLibs = {"episteme-jni", "openblas", "lapacke", "lapack", "mkl_rt"};
+            for (String lib : commonLibs) {
+                NativeLibraryLoader.loadLibrary(lib, java.lang.foreign.Arena.global()).ifPresent(lookups::add);
             }
             
-            if (lookupOpt.isPresent()) {
-                SymbolLookup lookup = lookupOpt.get();
-                if (lookup.find("cblas_dgemm").isPresent()) {
-                    MemorySegment symbol = lookup.find("cblas_dgemm").get();
-                    dgemm = linker.downcallHandle(symbol, FunctionDescriptor.ofVoid(
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                        ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
-                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE,
-                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT
-                    ));
+            // Add system lookup as fallback
+            lookups.add(SymbolLookup.loaderLookup());
+
+            SymbolLookup combinedLookup = name -> {
+                for (SymbolLookup l : lookups) {
+                    Optional<MemorySegment> s = l.find(name);
+                    if (s.isPresent()) return s;
+                }
+                return Optional.empty();
+            };
+            
+            Optional<MemorySegment> dgemmTarget = combinedLookup.find("cblas_dgemm");
+            if (dgemmTarget.isPresent()) {
+                dgemm = linker.downcallHandle(dgemmTarget.get(), FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+                ));
+                
+                SymbolLookup lookup = combinedLookup;
                     
                     /*
                     MemorySegment mvSymbol = lookup.find("cblas_dgemv").orElse(null);
@@ -116,23 +133,33 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
                     dscal = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                     */
 
-                    // LAPACKE
-                    dgesv = lookup.find("LAPACKE_dgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                    // LAPACKE
-                    dgetrf = lookup.find("LAPACKE_dgetrf").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                    dgetri = lookup.find("LAPACKE_dgetri").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                    // LAPACKE (Standard C interface names)
+                    dgesv = lookup.find("LAPACKE_dgesv")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                     
-                    // dsyev(matrix_layout, jobz, uplo, n, a, lda, w)
-                    dsyev = lookup.find("LAPACKE_dsyev").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                    dgetrf = lookup.find("LAPACKE_dgetrf")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                    
+                    dgetri = lookup.find("LAPACKE_dgetri")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                    
+                    dsyev = lookup.find("LAPACKE_dsyev")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                    // dpotrf(matrix_layout, uplo, n, a, lda)
-                    dpotrf = lookup.find("LAPACKE_dpotrf").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                    dpotrf = lookup.find("LAPACKE_dpotrf")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
+                    dgeqrf = lookup.find("LAPACKE_dgeqrf")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+
+                    dorgqr = lookup.find("LAPACKE_dorgqr")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+
+                    dgesvd = lookup.find("LAPACKE_dgesvd")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                     avail = true;
                 }
-            }
         } catch (Throwable t) {
             // Silently mark unavailable
         }
@@ -143,6 +170,9 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         DGETRI_HANDLE = dgetri;
         DSYEV_HANDLE = dsyev;
         DPOTRF_HANDLE = dpotrf;
+        DGEQRF_HANDLE = dgeqrf;
+        DORGQR_HANDLE = dorgqr;
+        DGESVD_HANDLE = dgesvd;
         
         AVAILABLE = avail;
     }
@@ -263,6 +293,33 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             return (int) DPOTRF_HANDLE.invokeExact(CblasRowMajor, (byte) 'L', n, MemorySegment.ofBuffer(A), lda);
         } catch (Throwable t) {
             throw new RuntimeException("LAPACK dpotrf failed", t);
+        }
+    }
+
+    public int dgeqrf(int m, int n, DoubleBuffer A, int lda, DoubleBuffer tau) {
+        if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgeqrf not available");
+        try {
+            return (int) DGEQRF_HANDLE.invokeExact(CblasRowMajor, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        } catch (Throwable t) {
+            throw new RuntimeException("LAPACK dgeqrf failed", t);
+        }
+    }
+
+    public int dorgqr(int m, int n, int k, DoubleBuffer A, int lda, DoubleBuffer tau) {
+        if (!AVAILABLE || DORGQR_HANDLE == null) throw new UnsupportedOperationException("LAPACK dorgqr not available");
+        try {
+            return (int) DORGQR_HANDLE.invokeExact(CblasRowMajor, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        } catch (Throwable t) {
+            throw new RuntimeException("LAPACK dorgqr failed", t);
+        }
+    }
+
+    public int dgesvd(byte jobu, byte jobvt, int m, int n, DoubleBuffer A, int lda, DoubleBuffer S, DoubleBuffer U, int ldu, DoubleBuffer VT, int ldvt, DoubleBuffer superb) {
+        if (!AVAILABLE || DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesvd not available");
+        try {
+            return (int) DGESVD_HANDLE.invokeExact(CblasRowMajor, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
+        } catch (Throwable t) {
+            throw new RuntimeException("LAPACK dgesvd failed", t);
         }
     }
 
@@ -590,6 +647,104 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             return Real.of(sum);
         }
         throw new UnsupportedOperationException(getName() + ": dot() not available for these types");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix) {
+            int m = a.rows();
+            int n = a.cols();
+            int k = Math.min(m, n);
+
+            RealDoubleMatrix A = (RealDoubleMatrix) a;
+            RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); // Used temporarily to hold A
+            qMat.getBuffer().put(A.toDoubleArray());
+            qMat.getBuffer().position(0);
+
+            DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+
+            // 1. DGEQRF
+            int info = dgeqrf(m, n, qMat.getBuffer(), n, tau);
+            if (info != 0) throw new RuntimeException("dgeqrf failed with info: " + info);
+
+            // 2. Extract R
+            double[] rData = new double[k * n];
+            double[] aFactored = qMat.toDoubleArray();
+            for (int i = 0; i < k; i++) {
+                for (int j = i; j < n; j++) {
+                    rData[i * n + j] = aFactored[i * n + j];
+                }
+            }
+            Matrix<Real> R = RealDoubleMatrix.of(rData, k, n);
+
+            // 3. DORGQR (Economy Q: m x k)
+            info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
+            if (info != 0) throw new RuntimeException("dorgqr failed with info: " + info);
+
+            double[] qDataFull = qMat.toDoubleArray();
+            double[] qDataEconomy = new double[m * k];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < k; j++) {
+                    qDataEconomy[i * k + j] = qDataFull[i * n + j];
+                }
+            }
+            Matrix<Real> Q = RealDoubleMatrix.of(qDataEconomy, m, k);
+
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
+        }
+        throw new UnsupportedOperationException(getName() + ": qr() not available for these types");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix) {
+            int m = a.rows();
+            int n = a.cols();
+            int k = Math.min(m, n);
+
+            RealDoubleMatrix A = (RealDoubleMatrix) a;
+            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            aBuf.put(A.toDoubleArray());
+            aBuf.flip();
+
+            DoubleBuffer sBuf = java.nio.ByteBuffer.allocateDirect(k * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer uBuf = java.nio.ByteBuffer.allocateDirect(m * m * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer vtBuf = java.nio.ByteBuffer.allocateDirect(n * n * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer superb = java.nio.ByteBuffer.allocateDirect(Math.max(1, k - 1) * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+
+            int info = dgesvd((byte)'A', (byte)'A', m, n, aBuf, n, sBuf, uBuf, m, vtBuf, n, superb);
+            if (info != 0) throw new RuntimeException("dgesvd failed with info: " + info);
+
+            double[] sArr = new double[k];
+            sBuf.get(sArr);
+            
+            double[] uArr = new double[m * m];
+            uBuf.get(uArr);
+            
+            double[] vtArr = new double[n * n];
+            vtBuf.get(vtArr);
+            
+            // Transpose VT to get V
+            double[] vArr = new double[n * n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    vArr[i * n + j] = vtArr[j * n + i];
+                }
+            }
+
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+                RealDoubleMatrix.of(uArr, m, m),
+                RealDoubleVector.of(sArr),
+                RealDoubleMatrix.of(vArr, n, n)
+            );
+        }
+        throw new UnsupportedOperationException(getName() + ": svd() not available for these types");
     }
 
     @Override

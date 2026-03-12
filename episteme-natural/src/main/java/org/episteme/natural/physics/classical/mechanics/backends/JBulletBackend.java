@@ -43,7 +43,7 @@ import org.episteme.natural.physics.classical.mechanics.RigidBody;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({MechanicsBackend.class, CollisionProvider.class})
+@AutoService({MechanicsBackend.class, CollisionProvider.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class, org.episteme.core.technical.backend.Backend.class})
 public class JBulletBackend implements MechanicsBackend, CPUBackend, CollisionProvider {
 
     @Override
