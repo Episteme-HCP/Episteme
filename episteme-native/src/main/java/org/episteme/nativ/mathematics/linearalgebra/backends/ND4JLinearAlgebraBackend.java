@@ -335,9 +335,11 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         INDArray lu = toINDArray(a);
-        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
-        // ND4J Lapack.getrf only takes A in this interface version. 
-        // Pivots are unfortunately not exposed in this high-level call.
+        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, new long[]{n});
+        
+        // ND4J Lapack.getrf signature varies by version.
+        // Some take (INDArray), others (m, n, A, lda, IPIV, INFO).
+        // Standard high-level ND4J wrapper usually takes only A.
         Nd4j.getBlasWrapper().lapack().getrf(lu);
         
         // Extract L and U
@@ -360,12 +362,12 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         double[] p = new double[n];
         for (int i = 0; i < n; i++) p[i] = i;
         
-        // Only attempt to process ipiv if it was somehow populated (though currently not expected)
+        // Process ipiv (LAPACK swap sequence)
         for (int i = 0; i < n; i++) {
             int ipivVal = ipiv.getInt(i);
-            if (ipivVal > 0) { // Check for valid 1-based index
-                int swapIdx = ipivVal - 1;
-                if (swapIdx >= 0 && swapIdx < n && swapIdx != i) {
+            if (ipivVal > 0) { 
+                int swapIdx = ipivVal - 1; // 1-based to 0-based
+                if (swapIdx != i) {
                     double tmp = p[i];
                     p[i] = p[swapIdx];
                     p[swapIdx] = tmp;
@@ -409,7 +411,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray eigVecs = result[1];
         
         // If complex, eigenvalues has 2 columns (Real, Imag)
-        if (eigVals.columns() == 2) {
+        if (eigVals.rank() == 2 && eigVals.columns() == 2) {
             eigVals = eigVals.getColumn(0).dup(); // Take real part
         }
         
