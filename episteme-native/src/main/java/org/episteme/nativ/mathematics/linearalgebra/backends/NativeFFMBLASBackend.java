@@ -67,6 +67,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     private static MethodHandle DGESVD;
     private static MethodHandle DPOTRF;
     private static MethodHandle DSYEV;
+    private static MethodHandle DGELS;
     
     private static final int LAPACK_ROW_MAJOR = 101;
 
@@ -226,6 +227,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 DSYEV = findLapackSymbol("LAPACKE_dsyev")
                     .map(s -> LINKER.downcallHandle(s, dsyevDesc)).orElse(null);
 
+                FunctionDescriptor dgelsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, AddressLayout.ADDRESS,
+                        ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DGELS = findLapackSymbol("LAPACKE_dgels")
+                    .map(s -> LINKER.downcallHandle(s, dgelsDesc)).orElse(null);
+
                 available = (DGEMM != null && DGEMV != null && DDOT != null);
                 if (available) {
                     logger.info("FFM: Backend initialized successfully. Handles: DGEMM={}, DGESV={}, DGETRI={}", (DGEMM != null), (DGESV != null), (DGETRI != null));
@@ -255,38 +264,55 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         if (!IS_AVAILABLE || DGESV == null) throw new UnsupportedOperationException(getName() + ": solve() not available");
         org.episteme.core.ComputeContext.checkCurrentCancelled();
         
-        int n = A.rows();
-        if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
-        if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        int m = A.rows();
+        int n = A.cols();
+        if (m == n) {
+             if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        } else {
+             // For rectangular, DGELS handles least squares
+             if (m != b.dimension()) throw new IllegalArgumentException("Dimension mismatch (m != b.dim)");
+        }
         
         try (Arena arena = Arena.ofConfined()) {
-            int len = (int) ((long) n * n);
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-            double[] arrA = toDoubleArray(A);
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, len));
-            
-            MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-            for(int i=0; i<n; i++) segB.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i, b.get(i).doubleValue());
-            
-            MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-            
-            int info = (int) DGESV.invokeExact(LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
-            if (info != 0) {
-                if (info > 0) {
-                    throw new ArithmeticException("Linear solve failed: Matrix is singular (U(" + info + "," + info + ") is zero).");
-                }
-                throw new IllegalArgumentException("Linear solve failed: Illegal value in parameter " + (-info));
+            if (m == n) {
+                // Square system via DGESV
+                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
+                MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+                MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+                
+                int info = (int) DGESV.invokeExact(LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
+                if (info != 0) throw new ArithmeticException("DGESV failed with info: " + info);
+                
+                double[] result = segB.toArray(ValueLayout.JAVA_DOUBLE);
+                return createDenseVector(result, n, A);
+            } else {
+                // Rectangular system via DGELS (Least Squares)
+                if (DGELS == null) throw new UnsupportedOperationException(getName() + ": dgels() (least squares) not available");
+                
+                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
+                // B must be large enough to hold the result (max(m, n))
+                int maxDim = Math.max(m, n);
+                double[] bPad = new double[maxDim];
+                for(int i=0; i<m; i++) bPad[i] = b.get(i).doubleValue();
+                MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bPad);
+                
+                // dgels(layout, trans, m, n, nrhs, A, lda, B, ldb)
+                int info = (int) DGELS.invokeExact(LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, segA, n, segB, 1);
+                if (info != 0) throw new RuntimeException("DGELS failed with info: " + info);
+                
+                double[] result = new double[n];
+                MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
+                return createDenseVector(result, n, A);
             }
-            
-            double[] result = new double[n];
-            MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
-            
-            List<org.episteme.core.mathematics.numbers.real.Real> list = new ArrayList<>(n);
-            for(double v : result) list.add(org.episteme.core.mathematics.numbers.real.Real.of(v));
-            return new DenseVector<>(list, (Ring<org.episteme.core.mathematics.numbers.real.Real>) A.getScalarRing());
         } catch (Throwable e) {
-             throw new RuntimeException(e);
+             throw new RuntimeException("FFM Solve failed", e);
         }
+    }
+
+    private Vector<org.episteme.core.mathematics.numbers.real.Real> createDenseVector(double[] data, int n, Matrix<org.episteme.core.mathematics.numbers.real.Real> ref) {
+        List<org.episteme.core.mathematics.numbers.real.Real> list = new ArrayList<>(n);
+        for (double v : data) list.add(org.episteme.core.mathematics.numbers.real.Real.of(v));
+        return new DenseVector<>(list, (Ring<org.episteme.core.mathematics.numbers.real.Real>) ref.getScalarRing());
     }
 
     @Override
@@ -318,7 +344,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> inverse(Matrix<org.episteme.core.mathematics.numbers.real.Real> A) {
          if (!IS_AVAILABLE || DGETRF == null || DGETRI == null) throw new UnsupportedOperationException(getName() + ": inverse() not available");
-         int n = A.rows();
+         int m = A.rows();
+         int n = A.cols();
+         if (m != n) {
+              return pseudoInverse(A);
+         }
          if (n <= 0) throw new IllegalArgumentException("Matrix dimension must be positive");
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
 
@@ -331,15 +361,24 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
              MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
              
-             // 1. LU Factorization
-             int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
-             if (info != 0) {
-                 if (info > 0) throw new ArithmeticException("Matrix is singular (U(" + info + "," + info + ") is exactly zero). Cannot compute inverse.");
-                 throw new ArithmeticException("LU Factorization failed with illegal argument at position " + (-info));
+              // 1. LU Factorization
+              int info;
+              try {
+                  info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+              } catch (Throwable t) {
+                  throw new RuntimeException("DGETRF failed", t);
+              }
+              if (info != 0) {
+                  if (info > 0) throw new ArithmeticException("Matrix is singular (U(" + info + "," + info + ") is exactly zero). Cannot compute inverse.");
+                  throw new ArithmeticException("LU Factorization failed with illegal argument at position " + (-info));
+              }
+              
+             // 2. Inverse using LU Factorization
+             try {
+                info = (int) DGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
+             } catch (Throwable t) {
+                 throw new RuntimeException("DGETRI failed", t);
              }
-             
-            // 2. Inverse using LU Factorization
-            info = (int) DGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
             if (info != 0) {
                 if (info > 0) {
                     throw new ArithmeticException("Inversion failed: Matrix is singular (U(" + info + "," + info + ") is zero).");
@@ -350,10 +389,29 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
              double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
              
              return createDenseMatrix(result, n, n, A);
-         } catch (Throwable e) {
-             logger.error("FFM: Inversion failed for {}x{} matrix. Cause: {}", n, n, e.getMessage());
-             throw new RuntimeException("FFM Inverse Operation Failed", e);
          }
+    }
+
+    private Matrix<org.episteme.core.mathematics.numbers.real.Real> pseudoInverse(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
+        SVDResult<org.episteme.core.mathematics.numbers.real.Real> svd = svd(a);
+        // A+ = V * S+ * UT
+        int m = a.rows();
+        int n = a.cols();
+        int k = svd.S().dimension();
+        
+        double[][] sInvData = new double[n][m];
+        for (int i = 0; i < k; i++) {
+            double sVal = svd.S().get(i).doubleValue();
+            if (sVal > 1e-12) { // Tolerance for non-zero singular value
+                sInvData[i][i] = 1.0 / sVal;
+            }
+        }
+        Matrix<org.episteme.core.mathematics.numbers.real.Real> sInv = new DenseMatrix<>(
+            java.util.Arrays.stream(sInvData).map(row -> java.util.Arrays.stream(row).mapToObj(org.episteme.core.mathematics.numbers.real.Real::of).toArray(org.episteme.core.mathematics.numbers.real.Real[]::new)).toArray(org.episteme.core.mathematics.numbers.real.Real[][]::new),
+            (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing()
+        );
+        
+        return svd.V().multiply(sInv).multiply(svd.U().transpose());
     }
 
     @Override
@@ -802,6 +860,18 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0L, result, 0, len);
             return createDenseMatrix(result, m, n, a);
         }
+    }
+
+    private double[] toDoubleArray(Vector<org.episteme.core.mathematics.numbers.real.Real> vector) {
+        if (vector instanceof org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) {
+            return ((org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) vector).toDoubleArray();
+        }
+        int n = vector.dimension();
+        double[] result = new double[n];
+        for (int i = 0; i < n; i++) {
+            result[i] = vector.get(i).doubleValue();
+        }
+        return result;
     }
 
     @Override

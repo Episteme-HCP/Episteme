@@ -322,9 +322,22 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for solve()");
-        int n = a.rows();
-        if (n != a.cols() || b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
-
+        int m = a.rows();
+        int n = a.cols();
+        if (m == n) {
+            if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
+        } else {
+            // Rectangular solve (Least Squares) via Apache Commons fallback
+            double[][] aData = new double[m][n];
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) aData[i][j] = a.get(i, j).doubleValue();
+            double[] bData = new double[m];
+            for (int i = 0; i < m; i++) bData[i] = b.get(i).doubleValue();
+            org.apache.commons.math3.linear.RealMatrix am = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(aData);
+            org.apache.commons.math3.linear.RealVector bv = org.apache.commons.math3.linear.MatrixUtils.createRealVector(bData);
+            org.apache.commons.math3.linear.DecompositionSolver solver = new org.apache.commons.math3.linear.QRDecomposition(am).getSolver();
+            return toRealVector(solver.solve(bv).toArray());
+        }
+        
         double[] h_A = toDoubleArray(a);
         double[] h_B = toDoubleVec(b);
         double[] pivotCol = new double[n];
@@ -390,8 +403,19 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for inverse()");
-        int n = a.rows();
-        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        int m = a.rows();
+        int n = a.cols();
+        if (m != n) {
+             // Rectangular inverse (Pseudo-inverse) via Apache Commons fallback
+             double[][] aData = new double[m][n];
+             for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) aData[i][j] = a.get(i, j).doubleValue();
+             org.apache.commons.math3.linear.RealMatrix am = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(aData);
+             org.apache.commons.math3.linear.SingularValueDecomposition svd = new org.apache.commons.math3.linear.SingularValueDecomposition(am);
+             org.apache.commons.math3.linear.RealMatrix pinv = svd.getSolver().getInverse();
+             double[] pinvData = new double[n * m];
+             for (int i = 0; i < n; i++) for (int j = 0; j < m; j++) pinvData[i * m + j] = pinv.getEntry(i, j);
+             return fromDoubleArray(pinvData, n, m);
+        }
         
         double[] h_A = toDoubleArray(a);
         double[] inv = new double[n * n];

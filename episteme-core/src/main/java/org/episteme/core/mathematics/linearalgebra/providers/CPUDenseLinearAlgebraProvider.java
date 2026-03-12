@@ -743,8 +743,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @Override
     @SuppressWarnings({"unchecked", "preview", "restricted"})
     public Matrix<E> inverse(Matrix<E> a) {
-        if (a.rows() != a.cols())
-            throw new ArithmeticException("Must be square");
+        if (a.rows() != a.cols()) {
+            return pseudoInverse(a);
+        }
         int n = a.rows();
 
         if (isReal(a)) {
@@ -955,8 +956,10 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (a.rows() != a.cols())
-            throw new ArithmeticException("Must be square");
+        if (a.rows() != a.cols()) {
+            // Rectangular: Least Squares via pseudo-inverse x = A+ * b
+            return multiply(pseudoInverse(a), b);
+        }
         int n = a.rows();
 
         if (isReal(a)) {
@@ -1150,6 +1153,29 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new CholeskyResult<E>((Matrix<E>) decomp.getL());
         }
         return LinearAlgebraProvider.super.cholesky(a);
+    }
+
+    private Matrix<E> pseudoInverse(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+             SVDResult<E> svd = svd(a);
+             // A+ = V * S+ * UT
+             int m = a.rows();
+             int n = a.cols();
+             int k = svd.S().dimension();
+             
+             // Create S+ (pseudo-inverse of diagonal S)
+             // We use a simple dense matrix for S+ for simplicity in this generic provider
+             DenseMatrixStorage<E> sPlusStorage = new DenseMatrixStorage<>(n, m, field.zero());
+             for (int i = 0; i < k; i++) {
+                 double sVal = ((Real) svd.S().get(i)).doubleValue();
+                 if (sVal > 1e-12) {
+                     sPlusStorage.set(i, i, (E)(Object) Real.of(1.0 / sVal));
+                 }
+             }
+             Matrix<E> sPlus = new GenericMatrix<>(sPlusStorage, this, field);
+             return multiply(multiply(svd.V(), sPlus), transpose(svd.U()));
+        }
+        throw new UnsupportedOperationException("Pseudo-inverse not supported for generic field: " + field.getClass().getSimpleName());
     }
 }
 

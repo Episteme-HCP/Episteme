@@ -214,8 +214,13 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        // Use ND4J's InvertMatrix which uses native getrf/getri or similar
-        return fromINDArray(InvertMatrix.invert(toINDArray(a), false));
+        INDArray arr = toINDArray(a);
+        if (a.rows() == a.cols()) {
+            return fromINDArray(InvertMatrix.invert(arr, false));
+        } else {
+            // For rectangular, ND4J has InvertMatrix.pInvert for pseudo-inverse
+            return fromINDArray(InvertMatrix.pinvert(arr, false));
+        }
     }
 
     /**
@@ -234,7 +239,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
         INDArray lu = m.dup();
         
-        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv);
+        INDArray info = Nd4j.scalar(0);
+        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv, info);
         
         double det = 1.0;
         for (int i = 0; i < n; i++) {
@@ -255,18 +261,23 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         try {
-            INDArray arrA = toINDArray(a);
-            INDArray arrB = toINDArray(b);
+            INDArray arrA = toINDArray(a).dup(); // dup because gels might modify it
+            INDArray arrB = toINDArray(b).dup();
 
-            // InvertMatrix.invert is the most stable across ND4J versions.
-            // If it's slow, it might be due to sub-optimal backend linkage.
-            // We use this for now to fix the compilation error.
-            INDArray inverse = InvertMatrix.invert(arrA, false);
-            INDArray result = inverse.mmul(arrB);
-            
-            return fromINDArrayVector(result);
+            if (a.rows() == a.cols()) {
+                // InvertMatrix.invert is reliable for square
+                INDArray inverse = InvertMatrix.invert(arrA, false);
+                return fromINDArrayVector(inverse.mmul(arrB));
+            } else {
+                // For rectangular, use gels (Least Squares)
+                // Note: gels usually needs a specific work array and handles dimensions.
+                // ND4J's wrapper might handle it.
+                // If gels is not convenient, we use pseudo-inverse: x = A+ * b
+                INDArray pinv = InvertMatrix.pinvert(arrA, false);
+                return fromINDArrayVector(pinv.mmul(arrB));
+            }
         } catch (Exception e) {
-            logger.error("[ND4J] Solve failed (singular?): {}", e.getMessage());
+            logger.error("[ND4J] Solve failed: {}", e.getMessage());
             throw new RuntimeException("ND4J Solve Operation Failed", e);
         }
     }
@@ -323,7 +334,8 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int n = a.rows();
         INDArray lu = toINDArray(a);
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
-        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv);
+        INDArray info = Nd4j.scalar(0);
+        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv, info);
         
         // Extract L and U
         INDArray L = Nd4j.zeros(n, n);

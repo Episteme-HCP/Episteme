@@ -59,6 +59,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     private static final MethodHandle DGEQRF_HANDLE;
     private static final MethodHandle DORGQR_HANDLE;
     private static final MethodHandle DGESVD_HANDLE;
+    private static final MethodHandle DGELS_HANDLE;
     
     private static final boolean AVAILABLE;
 
@@ -78,6 +79,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         MethodHandle dgeqrf = null;
         MethodHandle dorgqr = null;
         MethodHandle dgesvd = null;
+        MethodHandle dgels = null;
         
         boolean avail = false;
 
@@ -158,6 +160,9 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
                     dgesvd = lookup.find("LAPACKE_dgesvd")
                         .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
+                    dgels = lookup.find("LAPACKE_dgels")
+                        .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
                     avail = true;
                 }
         } catch (Throwable t) {
@@ -173,6 +178,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         DGEQRF_HANDLE = dgeqrf;
         DORGQR_HANDLE = dorgqr;
         DGESVD_HANDLE = dgesvd;
+        DGELS_HANDLE = dgels;
         
         AVAILABLE = avail;
     }
@@ -323,6 +329,15 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         }
     }
 
+    public int dgels(char trans, int m, int n, int nrhs, DoubleBuffer A, int lda, DoubleBuffer B, int ldb) {
+        if (!AVAILABLE || DGELS_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgels not available");
+        try {
+            return (int) DGELS_HANDLE.invokeExact(CblasRowMajor, (byte) trans, m, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb);
+        } catch (Throwable t) {
+            throw new RuntimeException("LAPACK dgels failed", t);
+        }
+    }
+
     // --- LinearAlgebraProvider Implementation (Merged logic) ---
 
 
@@ -357,8 +372,14 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
-            int n = a.rows();
+        if (!AVAILABLE) throw new UnsupportedOperationException(getName() + ": inverse() not available");
+        int m = a.rows();
+        int n = a.cols();
+        if (m != n) {
+             return pseudoInverse(a);
+        }
+        if (a instanceof RealDoubleMatrix && m == n) {
+            n = a.rows();
             RealDoubleMatrix res = RealDoubleMatrix.direct(n, n);
             RealDoubleMatrix src = (RealDoubleMatrix) a;
             
@@ -379,6 +400,23 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             return res;
         }
         throw new UnsupportedOperationException(getName() + ": inverse() not available for these matrix types");
+    }
+
+    private Matrix<Real> pseudoInverse(Matrix<Real> a) {
+        org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd = svd(a);
+        int m = a.rows();
+        int n = a.cols();
+        int k = svd.S().dimension();
+        
+        RealDoubleMatrix sInv = RealDoubleMatrix.direct(n, m);
+        for (int i = 0; i < k; i++) {
+            double sVal = svd.S().get(i).doubleValue();
+            if (sVal > 1e-12) {
+                sInv.set(i, i, Real.of(1.0 / sVal));
+            }
+        }
+        
+        return svd.V().multiply(sInv).multiply(svd.U().transpose());
     }
 
     private DoubleBuffer ensureDirect(RealDoubleMatrix m) {
@@ -410,10 +448,29 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
                 .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
             
             int info = dgesv(n, 1, aDecomp.getBuffer(), n, ipiv, x.getBuffer(), 1);
-            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgesv: " + info);
-            if (info > 0) throw new ArithmeticException("Matrix is singular");
+            if (info != 0) throw new ArithmeticException("dgesv failed: " + info);
             
             // Extract vector from result matrix
+            double[] result = new double[n];
+            x.getBuffer().position(0);
+            x.getBuffer().get(result);
+            return RealDoubleVector.of(result);
+        } else if (AVAILABLE && a instanceof RealDoubleMatrix && b.dimension() == a.rows()) {
+            // Rectangular solve (Least Squares)
+            int m = a.rows();
+            int n = a.cols();
+            int maxDim = Math.max(m, n);
+            
+            RealDoubleMatrix x = RealDoubleMatrix.direct(maxDim, 1);
+            for(int i=0; i<m; i++) x.set(i, 0, b.get(i));
+            
+            RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
+            aCopy.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            aCopy.getBuffer().position(0);
+            
+            int info = dgels('N', m, n, 1, aCopy.getBuffer(), n, x.getBuffer(), 1);
+            if (info != 0) throw new RuntimeException("dgels failed: " + info);
+            
             double[] result = new double[n];
             x.getBuffer().position(0);
             x.getBuffer().get(result);
