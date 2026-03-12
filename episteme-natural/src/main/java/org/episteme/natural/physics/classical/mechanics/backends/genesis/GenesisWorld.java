@@ -24,7 +24,9 @@ import java.util.List;
  */
 public class GenesisWorld implements PhysicsWorldBridge {
 
-    private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
+    private static VectorSpecies<Double> getSpecies() {
+        return DoubleVector.SPECIES_PREFERRED;
+    }
 
     /** Wrapped Episteme bodies for state sync. */
     private final List<GenesisRigidBody> bodies = new ArrayList<>();
@@ -116,35 +118,35 @@ public class GenesisWorld implements PhysicsWorldBridge {
 
     /**
      * SIMD-accelerated Euler-Cromer integration using JDK Vector API.
-     * Processes bodies in SPECIES.length() lanes simultaneously.
+     * Processes bodies in getSpecies().length() lanes simultaneously.
      */
     private void integrateVectorized(double dt) {
-        int len = SPECIES.length();
+        int len = getSpecies().length();
 
         // Broadcast scalars into vectors
-        DoubleVector vGx = DoubleVector.broadcast(SPECIES, gx);
-        DoubleVector vGy = DoubleVector.broadcast(SPECIES, gy);
-        DoubleVector vGz = DoubleVector.broadcast(SPECIES, gz);
-        DoubleVector vDt = DoubleVector.broadcast(SPECIES, dt);
+        DoubleVector vGx = DoubleVector.broadcast(getSpecies(), gx);
+        DoubleVector vGy = DoubleVector.broadcast(getSpecies(), gy);
+        DoubleVector vGz = DoubleVector.broadcast(getSpecies(), gz);
+        DoubleVector vDt = DoubleVector.broadcast(getSpecies(), dt);
 
         int i = 0;
         // Vectorized loop (full lanes)
         for (; i <= n - len; i += len) {
             // Load velocity
-            DoubleVector vVx = DoubleVector.fromArray(SPECIES, vx, i);
-            DoubleVector vVy = DoubleVector.fromArray(SPECIES, vy, i);
-            DoubleVector vVz = DoubleVector.fromArray(SPECIES, vz, i);
+            DoubleVector vVx = DoubleVector.fromArray(getSpecies(), vx, i);
+            DoubleVector vVy = DoubleVector.fromArray(getSpecies(), vy, i);
+            DoubleVector vVz = DoubleVector.fromArray(getSpecies(), vz, i);
 
             // Load position
-            DoubleVector vPx = DoubleVector.fromArray(SPECIES, px, i);
-            DoubleVector vPy = DoubleVector.fromArray(SPECIES, py, i);
-            DoubleVector vPz = DoubleVector.fromArray(SPECIES, pz, i);
+            DoubleVector vPx = DoubleVector.fromArray(getSpecies(), px, i);
+            DoubleVector vPy = DoubleVector.fromArray(getSpecies(), py, i);
+            DoubleVector vPz = DoubleVector.fromArray(getSpecies(), pz, i);
 
             // Load forces and mass
-            DoubleVector vFx = DoubleVector.fromArray(SPECIES, fx, i);
-            DoubleVector vFy = DoubleVector.fromArray(SPECIES, fy, i);
-            DoubleVector vFz = DoubleVector.fromArray(SPECIES, fz, i);
-            DoubleVector vM  = DoubleVector.fromArray(SPECIES, mass, i);
+            DoubleVector vFx = DoubleVector.fromArray(getSpecies(), fx, i);
+            DoubleVector vFy = DoubleVector.fromArray(getSpecies(), fy, i);
+            DoubleVector vFz = DoubleVector.fromArray(getSpecies(), fz, i);
+            DoubleVector vM  = DoubleVector.fromArray(getSpecies(), mass, i);
 
             // Apply gravity (F += g * m)
             vFx = vFx.add(vGx.mul(vM));
@@ -152,7 +154,7 @@ public class GenesisWorld implements PhysicsWorldBridge {
             vFz = vFz.add(vGz.mul(vM));
 
             // Semi-implicit Euler: v += (F/m) * dt
-            DoubleVector invM = DoubleVector.broadcast(SPECIES, 1.0).div(vM);
+            DoubleVector invM = DoubleVector.broadcast(getSpecies(), 1.0).div(vM);
             vVx = vVx.add(vFx.mul(invM).mul(vDt));
             vVy = vVy.add(vFy.mul(invM).mul(vDt));
             vVz = vVz.add(vFz.mul(invM).mul(vDt));
@@ -167,7 +169,7 @@ public class GenesisWorld implements PhysicsWorldBridge {
             vPx.intoArray(px, i); vPy.intoArray(py, i); vPz.intoArray(pz, i);
 
             // Clear forces
-            DoubleVector zero = DoubleVector.zero(SPECIES);
+            DoubleVector zero = DoubleVector.zero(getSpecies());
             zero.intoArray(fx, i); zero.intoArray(fy, i); zero.intoArray(fz, i);
         }
 

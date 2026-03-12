@@ -115,8 +115,9 @@ public final class AlgorithmManager {
                 if (provider.isAvailable() && seenKeys.add(key)) {
                     available.add(provider);
                 }
-            } catch (ServiceConfigurationError | RuntimeException e) {
-                logger.warn("Skipping bad provider for {}: {}", providerClass.getSimpleName(), e.getMessage());
+            } catch (Throwable t) {
+                logger.warn("Skipping bad provider for {}: {} ({})", 
+                    providerClass.getSimpleName(), t.getMessage(), t.getClass().getSimpleName());
             }
         }
 

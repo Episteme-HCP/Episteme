@@ -37,7 +37,10 @@ import org.episteme.core.technical.backend.Operation;
 public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSIMDLinearAlgebraBackend.class);
-    private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
+    
+    private static VectorSpecies<Double> getSpecies() {
+        return DoubleVector.SPECIES_PREFERRED;
+    }
 
     @Override
     public boolean isAvailable() {
@@ -103,12 +106,12 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
 
     @Override
     public String getSimdLevel() {
-        return SPECIES.toString();
+        return getSpecies().toString();
     }
 
     @Override
     public int getPreferredVectorWidth() {
-        return SPECIES.vectorBitSize();
+        return getSpecies().vectorBitSize();
     }
 
     @Override
@@ -167,7 +170,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         for(int i=0; i<n; i++) x[i] = b.get(i).doubleValue();
         
         double[] data = simdA.getInternalData();
-        var species = DoubleVector.SPECIES_PREFERRED;
+        var species = getSpecies();
         
         for (int k = 0; k < n; k++) {
             int max = k;
@@ -232,10 +235,10 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         double[] cData = new double[n];
         
         int i = 0;
-        int loopBound = SPECIES.loopBound(n);
-        for (; i < loopBound; i += SPECIES.length()) {
-            DoubleVector va = DoubleVector.fromArray(SPECIES, aData, i);
-            DoubleVector vb = DoubleVector.fromArray(SPECIES, bData, i);
+        int loopBound = getSpecies().loopBound(n);
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
             va.add(vb).intoArray(cData, i);
         }
         for (; i < n; i++) {
@@ -253,10 +256,10 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         double[] cData = new double[n];
         
         int i = 0;
-        int loopBound = SPECIES.loopBound(n);
-        for (; i < loopBound; i += SPECIES.length()) {
-            DoubleVector va = DoubleVector.fromArray(SPECIES, aData, i);
-            DoubleVector vb = DoubleVector.fromArray(SPECIES, bData, i);
+        int loopBound = getSpecies().loopBound(n);
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
             va.sub(vb).intoArray(cData, i);
         }
         for (; i < n; i++) {
@@ -272,9 +275,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         double[] cData = new double[n];
         
         int i = 0;
-        int loopBound = SPECIES.loopBound(n);
-        for (; i < loopBound; i += SPECIES.length()) {
-            DoubleVector va = DoubleVector.fromArray(SPECIES, aData, i);
+        int loopBound = getSpecies().loopBound(n);
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
             va.mul(s).intoArray(cData, i);
         }
         for (; i < n; i++) {
@@ -291,12 +294,12 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         double[] bData = toDoubleArray(b);
         
         int i = 0;
-        int loopBound = SPECIES.loopBound(n);
-        DoubleVector sum = DoubleVector.zero(SPECIES);
+        int loopBound = getSpecies().loopBound(n);
+        DoubleVector sum = DoubleVector.zero(getSpecies());
         
-        for (; i < loopBound; i += SPECIES.length()) {
-            DoubleVector va = DoubleVector.fromArray(SPECIES, aData, i);
-            DoubleVector vb = DoubleVector.fromArray(SPECIES, bData, i);
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
             sum = sum.add(va.mul(vb));
         }
         double res = sum.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
@@ -334,7 +337,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         double[] inv = new double[n * n];
         for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
         
-        var species = DoubleVector.SPECIES_PREFERRED;
+        var species = getSpecies();
         
         for (int k = 0; k < n; k++) {
             // Pivoting
@@ -399,8 +402,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         
         SIMDRealDoubleMatrix simdA = asSIMD(a);
         double[] data = simdA.getInternalData();
+        double[] inv = new double[n * n];
         double det = 1.0;
-        var species = DoubleVector.SPECIES_PREFERRED;
+        var species = getSpecies();
         
         for (int k = 0; k < n; k++) {
             int max = k;
@@ -465,7 +469,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         double[] U = java.util.Arrays.copyOf(data, data.length);
         int[] piv = new int[n];
         for (int i = 0; i < n; i++) piv[i] = i;
-        var species = DoubleVector.SPECIES_PREFERRED;
+        var species = getSpecies();
 
         for (int k = 0; k < n; k++) {
             // Partial pivoting
@@ -577,7 +581,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Cholesky");
         double[] L = new double[n * n];
-        var species = DoubleVector.SPECIES_PREFERRED;
+        var species = getSpecies();
 
         for (int j = 0; j < n; j++) {
             double sum = 0;
