@@ -52,6 +52,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel normalizeRowInvKernel;
     private static cl_kernel gaussJordanInvKernel;
     private static cl_kernel gaussElimPhase1Kernel;
+    private static cl_kernel gaussElimPhase1WithBKernel;
+    private static cl_kernel swapRowsKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -123,6 +125,23 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "        inv[i * n + j] -= factor * inv[k * n + j];\n" +
         "        if (j == k) a[i * n + k] = 0.0;\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void swapRows(__global double *a, const int n, const int r1, const int r2) {\n" +
+        "    int j = get_global_id(0);\n" +
+        "    if (j < n) {\n" +
+        "        double temp = a[r1 * n + j];\n" +
+        "        a[r1 * n + j] = a[r2 * n + j];\n" +
+        "        a[r2 * n + j] = temp;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void gaussElimPhase1WithB(__global double *a, __global double *b, const int n, const int k) {\n" +
+        "    int i = get_global_id(0) + k + 1;\n" +
+        "    if (i < n) {\n" +
+        "        double factor = a[i*n + k] / a[k*n + k];\n" +
+        "        for (int j = k + 1; j < n; j++) a[i*n + j] -= factor * a[k*n + j];\n" +
+        "        b[i] -= factor * b[k];\n" +
+        "        a[i*n + k] = 0.0;\n" +
+        "    }\n" +
         "}\n";
 
     private static synchronized void init() {
@@ -179,6 +198,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             vecScaleKernel = clCreateKernel(program, "vec_scale", null);
             vecDotPartialKernel = clCreateKernel(program, "vec_dot_partial", null);
             gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
+            swapRowsKernel = clCreateKernel(program, "swapRows", null);
+            gaussElimPhase1WithBKernel = clCreateKernel(program, "gaussElimPhase1WithB", null);
 
             initialized = true;
             logger.info("Native OpenCL Dense Backend initialized successfully.");
@@ -306,45 +327,53 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
         double[] h_A = toDoubleArray(a);
         double[] h_B = toDoubleVec(b);
+        double[] pivotCol = new double[n];
 
         cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        cl_mem memB = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(h_B), null);
+
         try {
             for (int k = 0; k < n; k++) {
-                // Read back full matrix for correct pivoting on CPU
-                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
+                // Read back ONLY the pivot column
+                for (int i = k; i < n; i++) {
+                    clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)(i * n + k) * Sizeof.cl_double, (long)Sizeof.cl_double, Pointer.to(pivotCol).withByteOffset((long)i * Sizeof.cl_double), 0, null, null);
+                }
                 
                 int max = k;
                 for (int i = k + 1; i < n; i++) {
-                    if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
-                }
-                if (k != max) {
-                    // Swap on CPU and write back or use a swap kernel. CPU swap for small n is fine.
-                    for (int j = k; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
-                    double tb = h_B[k]; h_B[k] = h_B[max]; h_B[max] = tb;
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
+                    if (Math.abs(pivotCol[i]) > Math.abs(pivotCol[max])) max = i;
                 }
 
-                double pivot = h_A[k * n + k];
+                if (k != max) {
+                    // Swap rows on GPU for A
+                    clSetKernelArg(swapRowsKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                    clSetKernelArg(swapRowsKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                    clSetKernelArg(swapRowsKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                    clSetKernelArg(swapRowsKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{max}));
+                    clEnqueueNDRangeKernel(commandQueue, swapRowsKernel, 1, null, new long[]{n}, null, 0, null, null);
+
+                    // Swap B elements on CPU (or GPU, but CPU is fine here as it's just two doubles)
+                    double tb = h_B[k]; h_B[k] = h_B[max]; h_B[max] = tb;
+                    clEnqueueWriteBuffer(commandQueue, memB, CL_TRUE, 0, (long)n * Sizeof.cl_double, Pointer.to(h_B), 0, null, null);
+                }
+
+                double pivot = pivotCol[max];
                 if (Math.abs(pivot) < 1e-15) throw new ArithmeticException("Singular matrix");
 
                 // Vectorized elimination on GPU
-                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clSetKernelArg(gaussElimPhase1WithBKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussElimPhase1WithBKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+                clSetKernelArg(gaussElimPhase1WithBKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussElimPhase1WithBKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
                 
                 if (n - k - 1 > 0) {
-                    clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
-                }
-                
-                // Update B on CPU (small enough)
-                for (int i = k + 1; i < n; i++) {
-                    h_B[i] -= (h_A[i * n + k] / pivot) * h_B[k];
+                    clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1WithBKernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
                 }
             }
             
             // Back substitution on CPU
             clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
+            clEnqueueReadBuffer(commandQueue, memB, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(h_B), 0, null, null);
             double[] x = new double[n];
             for (int i = n - 1; i >= 0; i--) {
                 double sum = 0;
@@ -354,6 +383,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             return toRealVector(x);
         } finally {
             clReleaseMemObject(memA);
+            clReleaseMemObject(memB);
         }
     }
 
@@ -363,32 +393,36 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         
-        // Identity matrix as B, solve AX = I
         double[] h_A = toDoubleArray(a);
         double[] inv = new double[n * n];
         for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
+        double[] pivotCol = new double[n];
 
         cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
         cl_mem memInv = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(inv), null);
         
         try {
             for (int k = 0; k < n; k++) {
-                // Partial Pivoting
-                // Read back full matrix for correct pivoting on CPU
-                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
+                // Read back only pivot column
+                for (int i = k; i < n; i++) {
+                    clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)(i * n + k) * Sizeof.cl_double, (long)Sizeof.cl_double, Pointer.to(pivotCol).withByteOffset((long)i * Sizeof.cl_double), 0, null, null);
+                }
+
                 int max = k;
                 for (int i = k + 1; i < n; i++) {
-                    if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
+                    if (Math.abs(pivotCol[i]) > Math.abs(pivotCol[max])) max = i;
                 }
                 if (k != max) {
-                    clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
-                    clEnqueueReadBuffer(commandQueue, memInv, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(inv), 0, null, null);
-                    
-                    for (int j = 0; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
-                    for (int j = 0; j < n; j++) { double t = inv[k * n + j]; inv[k * n + j] = inv[max * n + j]; inv[max * n + j] = t; }
-                    
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
-                    clEnqueueWriteBuffer(commandQueue, memInv, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(inv), 0, null, null);
+                    // Swap rows on GPU for A
+                    clSetKernelArg(swapRowsKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                    clSetKernelArg(swapRowsKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                    clSetKernelArg(swapRowsKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                    clSetKernelArg(swapRowsKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{max}));
+                    clEnqueueNDRangeKernel(commandQueue, swapRowsKernel, 1, null, new long[]{n}, null, 0, null, null);
+
+                    // Swap rows on GPU for Inv
+                    clSetKernelArg(swapRowsKernel, 0, Sizeof.cl_mem, Pointer.to(memInv));
+                    clEnqueueNDRangeKernel(commandQueue, swapRowsKernel, 1, null, new long[]{n}, null, 0, null, null);
                 }
 
                 // 1. Normalize pivot row on GPU

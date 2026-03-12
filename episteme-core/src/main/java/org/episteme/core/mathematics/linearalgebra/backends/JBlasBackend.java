@@ -196,6 +196,10 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public int getPriority() { return parent.getPriority(); }
 
         private org.jblas.DoubleMatrix toJBlasMatrix(Matrix<E> m) {
+            if (m instanceof RealDoubleMatrix) {
+                RealDoubleMatrix rdm = (RealDoubleMatrix) m;
+                return new org.jblas.DoubleMatrix(rdm.rows(), rdm.cols(), rdm.toDoubleArray());
+            }
             int rows = m.rows();
             int cols = m.cols();
             org.jblas.DoubleMatrix jm = new org.jblas.DoubleMatrix(rows, cols);
@@ -209,15 +213,7 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
         @SuppressWarnings("unchecked")
         private Matrix<E> fromJBlasMatrix(org.jblas.DoubleMatrix jm) {
-            int rows = jm.rows;
-            int cols = jm.columns;
-            double[] data = new double[rows * cols];
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    data[i * cols + j] = jm.get(i, j);
-                }
-            }
-            return (Matrix<E>) RealDoubleMatrix.of(data, rows, cols);
+            return (Matrix<E>) RealDoubleMatrix.of(jm.data, jm.rows, jm.columns);
         }
 
         private org.jblas.DoubleMatrix toJBlasVector(Vector<E> v) {
@@ -245,7 +241,13 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { return fromJBlasMatrix(toJBlasMatrix(a).sub(toJBlasMatrix(b))); }
         @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { return fromJBlasMatrix(toJBlasMatrix(a).mmul(toJBlasMatrix(b))); }
         @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { return fromJBlasVector(toJBlasMatrix(a).mmul(toJBlasVector(b))); }
-        @Override public Matrix<E> inverse(Matrix<E> a) { return fromJBlasMatrix(org.jblas.Solve.pinv(toJBlasMatrix(a))); }
+        @Override public Matrix<E> inverse(Matrix<E> a) {
+            org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+            if (ja.rows == ja.columns) {
+                return fromJBlasMatrix(org.jblas.Solve.solve(ja, org.jblas.DoubleMatrix.eye(ja.rows)));
+            }
+            return fromJBlasMatrix(org.jblas.Solve.pinv(ja));
+        }
         @Override @SuppressWarnings("unchecked")
         public E determinant(Matrix<E> a) {
             org.jblas.Decompose.LUDecomposition<org.jblas.DoubleMatrix> lu = org.jblas.Decompose.lu(toJBlasMatrix(a));
