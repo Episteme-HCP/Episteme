@@ -37,10 +37,6 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (a.cols() != b.rows()) {
-            throw new IllegalArgumentException("Matrix inner dimensions must match");
-        }
-        
         // SIMD fast path
         if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
             return (Matrix<E>) RealDoubleStrassenAlgorithm.multiply(

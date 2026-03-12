@@ -247,7 +247,17 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) { return fromEjmlMatrix(toEjmlMatrix(a).minus(toEjmlMatrix(b))); }
         @Override public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) { return fromEjmlMatrix(toEjmlMatrix(a).mult(toEjmlMatrix(b))); }
         @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { return fromEjmlVector(toEjmlMatrix(a).mult(toEjmlVector(b))); }
-        @Override public Matrix<E> inverse(Matrix<E> a) { return fromEjmlMatrix(toEjmlMatrix(a).invert()); }
+        @Override public Matrix<E> inverse(Matrix<E> a) {
+            org.ejml.simple.SimpleMatrix m = toEjmlMatrix(a);
+            if (a.rows() == a.cols()) {
+                return fromEjmlMatrix(m.invert());
+            } else {
+                // Explicitly use pseudo Inverse with SVD
+                org.ejml.data.DMatrixRMaj pinv = new org.ejml.data.DMatrixRMaj(a.cols(), a.rows());
+                org.ejml.dense.row.CommonOps_DDRM.pinv(m.getDDRM(), pinv);
+                return fromEjmlMatrix(org.ejml.simple.SimpleMatrix.wrap(pinv));
+            }
+        }
         @Override @SuppressWarnings("unchecked")
         public E determinant(Matrix<E> a) { return (E) Real.of(toEjmlMatrix(a).determinant()); }
         @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromEjmlVector(toEjmlMatrix(a).solve(toEjmlVector(b))); }

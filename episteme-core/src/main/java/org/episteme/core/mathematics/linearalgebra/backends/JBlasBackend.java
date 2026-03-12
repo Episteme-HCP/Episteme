@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
@@ -196,10 +198,6 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @Override public int getPriority() { return parent.getPriority(); }
 
         private org.jblas.DoubleMatrix toJBlasMatrix(Matrix<E> m) {
-            if (m instanceof RealDoubleMatrix) {
-                RealDoubleMatrix rdm = (RealDoubleMatrix) m;
-                return new org.jblas.DoubleMatrix(rdm.rows(), rdm.cols(), rdm.toDoubleArray());
-            }
             int rows = m.rows();
             int cols = m.cols();
             org.jblas.DoubleMatrix jm = new org.jblas.DoubleMatrix(rows, cols);
@@ -213,7 +211,15 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
         @SuppressWarnings("unchecked")
         private Matrix<E> fromJBlasMatrix(org.jblas.DoubleMatrix jm) {
-            return (Matrix<E>) RealDoubleMatrix.of(jm.data, jm.rows, jm.columns);
+            int rows = jm.rows;
+            int cols = jm.columns;
+            DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, (E) Real.ZERO);
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    storage.set(i, j, (E) Real.of(jm.get(i, j)));
+                }
+            }
+            return new GenericMatrix<>(storage, this, field);
         }
 
         private org.jblas.DoubleMatrix toJBlasVector(Vector<E> v) {
