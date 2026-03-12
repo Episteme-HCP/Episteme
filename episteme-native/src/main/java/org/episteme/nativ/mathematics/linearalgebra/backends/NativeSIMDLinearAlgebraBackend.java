@@ -440,13 +440,17 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
 
     private SIMDRealDoubleMatrix asSIMD(Matrix<Real> m) {
         if (m instanceof SIMDRealDoubleMatrix) return (SIMDRealDoubleMatrix) m;
+        if (m instanceof RealDoubleMatrix) {
+            RealDoubleMatrix rdm = (RealDoubleMatrix) m;
+            return new SIMDRealDoubleMatrix(rdm.rows(), rdm.cols(), rdm.toDoubleArray());
+        }
         int rows = m.rows();
         int cols = m.cols();
         double[] data = new double[rows * cols];
-        for(int i=0; i<rows; i++) {
-             for(int j=0; j<cols; j++) {
-                 data[i*cols + j] = m.get(i, j).doubleValue();
-             }
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i * cols + j] = m.get(i, j).doubleValue();
+            }
         }
         return new SIMDRealDoubleMatrix(rows, cols, data);
     }
