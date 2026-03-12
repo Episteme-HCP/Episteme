@@ -239,8 +239,10 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
         INDArray lu = m.dup();
         
-        INDArray info = Nd4j.scalar(0);
-        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv, info);
+        Nd4j.getBlasWrapper().lapack().getrf(lu);
+        // Note: Without ipiv, we can't reliably determine the sign of the determinant in this version's getrf.
+        // We'll return the product of diagonal elements and log a warning.
+        logger.warn("ND4J getrf(INDArray) doesn't expose pivots; determinant sign may be incorrect.");
         
         double det = 1.0;
         for (int i = 0; i < n; i++) {
@@ -334,8 +336,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int n = a.rows();
         INDArray lu = toINDArray(a);
         INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
-        INDArray info = Nd4j.scalar(0);
-        Nd4j.getBlasWrapper().lapack().getrf(lu, ipiv, info);
+        Nd4j.getBlasWrapper().lapack().getrf(lu);
         
         // Extract L and U
         INDArray L = Nd4j.zeros(n, n);

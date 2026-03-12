@@ -12,6 +12,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
