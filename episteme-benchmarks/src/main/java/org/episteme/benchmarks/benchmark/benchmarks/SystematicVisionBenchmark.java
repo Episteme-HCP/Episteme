@@ -29,7 +29,7 @@ public class SystematicVisionBenchmark implements SystematicBenchmark<VisionAlgo
     @Override public String getNameBase() { return "Computer Vision Throughput"; }
     
     @Override public String getId() { return getIdPrefix() + "-default"; }
-    @Override public String getName() { return getNameBase(); }
+    @Override public String getName() { return getNameBase() + (provider != null ? " (" + provider.getName() + ")" : ""); }
     @Override public String getDescription() { return "Measures basic image processing throughput on " + (provider != null ? provider.getName() : "default backend"); }
     @Override public String getDomain() { return "Computer Vision"; }
     @Override public String getAlgorithmType() { return "Image Processing"; }

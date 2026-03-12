@@ -1,5 +1,0 @@
-﻿origin	https://github.com/silveremartin-dev/Episteme.git (fetch)
-origin	https://github.com/silveremartin-dev/Episteme.git (push)
-* main
-  master
-a5b842e308e5dd629304650fbdfdf80847d8a02a

@@ -1,1 +1,0 @@
-bash: line 1: ./run_diagnostic.sh: Permission denied
