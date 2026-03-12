@@ -11,7 +11,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,29 +228,43 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     public Real determinant(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
-        INDArray m = toINDArray(a);
-        
-        // ND4J doesn't have a direct determinant op in the high-level API usually,
-        // but it has LU through LAPACK. 
-        // Det = Product of diagonal elements of U * (-1 ^ number of swaps)
-        
-        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, n);
-        INDArray lu = m.dup();
-        
-        Nd4j.getBlasWrapper().lapack().getrf(lu);
-        // Note: Without ipiv, we can't reliably determine the sign of the determinant in this version's getrf.
-        // We'll return the product of diagonal elements and log a warning.
-        logger.warn("ND4J getrf(INDArray) doesn't expose pivots; determinant sign may be incorrect.");
+        INDArray m = toINDArray(a).dup();
         
         double det = 1.0;
-        for (int i = 0; i < n; i++) {
-            det *= lu.getDouble(i, i);
-            // IPIV elements are 1-based indices in LAPACK
-            if (ipiv.getInt(i) != (i + 1)) {
-                det *= -1;
+        int swaps = 0;
+        
+        for (int k = 0; k < n; k++) {
+            // Find pivot
+            int maxIdx = k;
+            double maxVal = Math.abs(m.getDouble(k, k));
+            for (int i = k + 1; i < n; i++) {
+                double v = Math.abs(m.getDouble(i, k));
+                if (v > maxVal) { maxVal = v; maxIdx = i; }
+            }
+            
+            if (maxVal < 1e-15) return Real.of(0.0); // Singular
+            
+            if (maxIdx != k) {
+                // Swap rows k and maxIdx
+                INDArray rowK = m.getRow(k).dup();
+                m.putRow(k, m.getRow(maxIdx));
+                m.putRow(maxIdx, rowK);
+                swaps++;
+            }
+            
+            det *= m.getDouble(k, k);
+            
+            // Eliminate below
+            for (int i = k + 1; i < n; i++) {
+                double factor = m.getDouble(i, k) / m.getDouble(k, k);
+                for (int j = k + 1; j < n; j++) {
+                    m.putScalar(i, j, m.getDouble(i, j) - factor * m.getDouble(k, j));
+                }
+                m.putScalar(i, k, 0.0);
             }
         }
         
+        if (swaps % 2 != 0) det = -det;
         return Real.of(det);
     }
 
@@ -334,46 +347,61 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     public LUResult<Real> lu(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
-        INDArray lu = toINDArray(a);
-        INDArray ipiv = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.INT32, new long[]{n});
+        INDArray work = toINDArray(a).dup();
         
-        // ND4J Lapack.getrf signature varies by version.
-        // Some take (INDArray), others (m, n, A, lda, IPIV, INFO).
-        // Standard high-level ND4J wrapper usually takes only A.
-        Nd4j.getBlasWrapper().lapack().getrf(lu);
+        // Manual partial-pivoting LU decomposition
+        // since ND4J's getrf(INDArray) single-arg doesn't expose pivot information.
+        int[] perm = new int[n];
+        for (int i = 0; i < n; i++) perm[i] = i;
         
-        // Extract L and U
+        for (int k = 0; k < n; k++) {
+            // Find pivot
+            int maxIdx = k;
+            double maxVal = Math.abs(work.getDouble(k, k));
+            for (int i = k + 1; i < n; i++) {
+                double v = Math.abs(work.getDouble(i, k));
+                if (v > maxVal) { maxVal = v; maxIdx = i; }
+            }
+            
+            if (maxIdx != k) {
+                // Swap rows in work matrix and perm array
+                INDArray rowK = work.getRow(k).dup();
+                work.putRow(k, work.getRow(maxIdx));
+                work.putRow(maxIdx, rowK);
+                int tmp = perm[k]; perm[k] = perm[maxIdx]; perm[maxIdx] = tmp;
+            }
+            
+            // Gaussian elimination
+            double pivot = work.getDouble(k, k);
+            if (Math.abs(pivot) > 1e-15) {
+                for (int i = k + 1; i < n; i++) {
+                    double factor = work.getDouble(i, k) / pivot;
+                    work.putScalar(i, k, factor); // Store L factor in lower part
+                    for (int j = k + 1; j < n; j++) {
+                        work.putScalar(i, j, work.getDouble(i, j) - factor * work.getDouble(k, j));
+                    }
+                }
+            }
+        }
+        
+        // Extract L and U from the work matrix
         INDArray L = Nd4j.zeros(n, n);
         INDArray U = Nd4j.zeros(n, n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i > j) {
-                    L.putScalar(i, j, lu.getDouble(i, j));
+                    L.putScalar(i, j, work.getDouble(i, j));
                 } else if (i == j) {
                     L.putScalar(i, j, 1.0);
-                    U.putScalar(i, j, lu.getDouble(i, j));
+                    U.putScalar(i, j, work.getDouble(i, j));
                 } else {
-                    U.putScalar(i, j, lu.getDouble(i, j));
+                    U.putScalar(i, j, work.getDouble(i, j));
                 }
             }
         }
         
-        // Convert IPIV to full permutation vector
         double[] p = new double[n];
-        for (int i = 0; i < n; i++) p[i] = i;
-        
-        // Process ipiv (LAPACK swap sequence)
-        for (int i = 0; i < n; i++) {
-            int ipivVal = ipiv.getInt(i);
-            if (ipivVal > 0) { 
-                int swapIdx = ipivVal - 1; // 1-based to 0-based
-                if (swapIdx != i) {
-                    double tmp = p[i];
-                    p[i] = p[swapIdx];
-                    p[swapIdx] = tmp;
-                }
-            }
-        }
+        for (int i = 0; i < n; i++) p[i] = perm[i];
         
         return new LUResult<>(fromINDArray(L), fromINDArray(U), org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p));
     }
