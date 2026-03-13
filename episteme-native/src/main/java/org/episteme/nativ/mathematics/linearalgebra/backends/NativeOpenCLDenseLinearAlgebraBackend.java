@@ -559,7 +559,75 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double sum = 0; for (double v : sq) sum += v;
         return Real.of(Math.sqrt(sum));
     }
-    // LU, Eigen, Cholesky, QR, SVD: not implemented in OpenCL Dense — default throws from interface
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
+        double[][] data = toDoubleArray2D(a);
+        org.apache.commons.math3.linear.RealMatrix m = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
+        org.apache.commons.math3.linear.LUDecomposition lu = new org.apache.commons.math3.linear.LUDecomposition(m);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+            toRealMatrix(lu.getL().getData()),
+            toRealMatrix(lu.getU().getData()),
+            toRealVector(java.util.Arrays.stream(lu.getPivot()).mapToDouble(i -> (double)i).toArray())
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
+        double[][] data = toDoubleArray2D(a);
+        org.apache.commons.math3.linear.RealMatrix m = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
+        org.apache.commons.math3.linear.QRDecomposition qr = new org.apache.commons.math3.linear.QRDecomposition(m);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
+            toRealMatrix(qr.getQ().getData()),
+            toRealMatrix(qr.getR().getData())
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
+        double[][] data = toDoubleArray2D(a);
+        org.apache.commons.math3.linear.RealMatrix m = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
+        org.apache.commons.math3.linear.SingularValueDecomposition svd = new org.apache.commons.math3.linear.SingularValueDecomposition(m);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+            toRealMatrix(svd.getU().getData()),
+            toRealVector(svd.getSingularValues()),
+            toRealMatrix(svd.getV().getData())
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
+        double[][] data = toDoubleArray2D(a);
+        org.apache.commons.math3.linear.RealMatrix m = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
+        org.apache.commons.math3.linear.CholeskyDecomposition cholesky = new org.apache.commons.math3.linear.CholeskyDecomposition(m);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+            toRealMatrix(cholesky.getL().getData())
+        );
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
+        double[][] data = toDoubleArray2D(a);
+        org.apache.commons.math3.linear.RealMatrix m = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
+        org.apache.commons.math3.linear.EigenDecomposition eigen = new org.apache.commons.math3.linear.EigenDecomposition(m);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+            toRealMatrix(eigen.getV().getData()),
+            toRealVector(eigen.getRealEigenvalues())
+        );
+    }
+
+    private double[][] toDoubleArray2D(Matrix<Real> m) {
+        double[][] data = new double[m.rows()][m.cols()];
+        for (int i = 0; i < m.rows(); i++) for (int j = 0; j < m.cols(); j++) data[i][j] = m.get(i, j).doubleValue();
+        return data;
+    }
+
+    private Matrix<Real> toRealMatrix(double[][] data) {
+        int rows = data.length;
+        int cols = data[0].length;
+        double[] flat = new double[rows * cols];
+        for (int i = 0; i < rows; i++) System.arraycopy(data[i], 0, flat, i * cols, cols);
+        return fromDoubleArray(flat, rows, cols);
+    }
 
     @Override public double score(OperationContext context) {
         if (!isAvailable()) return -1.0;

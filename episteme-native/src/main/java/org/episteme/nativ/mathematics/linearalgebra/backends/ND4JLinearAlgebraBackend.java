@@ -446,30 +446,29 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         
-        // ND4J eig returns complex eigenvalues and right eigenvectors
-        // We assume real eigenvalues for now as the compliance test uses symmetric matrices
         INDArray[] result = org.nd4j.linalg.eigen.Eigen.eig(toINDArray(a));
-        
-        // result[0] is eigenvalues, result[1] is eigenvectors
         INDArray eigVals = result[0];
         INDArray eigVecs = result[1];
         
-        // If complex, eigenvalues has 2 columns (Real, Imag)
-        if (eigVals.rank() == 2 && eigVals.columns() == 2) {
-            eigVals = eigVals.getColumn(0).dup(); // Take real part
-        }
-        
-        // Eigenvectors can also be complex (2 columns per vector in some representations or complex type)
-        // For compliance tests (usually symmetric), we take the real part.
-        if (eigVecs.dataType() == org.nd4j.linalg.api.buffer.DataType.FLOAT || eigVecs.dataType() == org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
-             // Real type, no-op
+        // If complex, eigenvalues has 2 columns (Real, Imag) or is complex type
+        if (eigVals.columns() == 2 && eigVals.rank() == 2) {
+             eigVals = eigVals.getColumn(0).dup(); // Take real part
+        } else if (eigVals.dataType() == org.nd4j.linalg.api.buffer.DataType.FLOAT || eigVals.dataType() == org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
+             // Already real
         } else {
-             eigVecs = eigVecs.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE); // Force real if complex
+             eigVals = eigVals.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
+        }
+
+        if (eigVecs.columns() == 2 && eigVecs.rank() == 3) {
+            // Complex eigenvectors representation in some ND4J versions [n, n, 2]
+            eigVecs = eigVecs.slice(0, 2).dup(); 
+        } else if (eigVecs.dataType() != org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
+            eigVecs = eigVecs.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
         }
         
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
             fromINDArray(eigVecs),
-            fromINDArrayVector(eigVals)
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigVals.data().asDouble())
         );
     }
 }
