@@ -287,8 +287,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clEnqueueNDRangeKernel(commandQueue, transposeKernel, 2, null, globalWorkSize, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, memB, CL_TRUE, 0, rows * cols * Sizeof.cl_double, pDst, 0, null, null);
 
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memB);
+            if (memA != null) clReleaseMemObject(memA);
+            if (memB != null) clReleaseMemObject(memB);
 
             return fromDoubleArray(dstData, cols, rows);
         } catch (Exception e) {
@@ -340,10 +340,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 logger.debug("OpenCL multiply finished successfully.");
                 return result;
             } finally {
-                logger.debug("Releasing mem objects...");
-                clReleaseMemObject(memA);
-                clReleaseMemObject(memB);
-                clReleaseMemObject(memC);
+                if (memA != null) { logger.debug("Releasing memA..."); clReleaseMemObject(memA); }
+                if (memB != null) { logger.debug("Releasing memB..."); clReleaseMemObject(memB); }
+                if (memC != null) { logger.debug("Releasing memC..."); clReleaseMemObject(memC); }
             }
         } catch (Exception e) {
             logger.error("OpenCL multiply operation failed: {}", e.getMessage(), e);
@@ -442,8 +441,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             }
             return toRealVector(x);
         } finally {
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memB);
+            if (memA != null) clReleaseMemObject(memA);
+            if (memB != null) clReleaseMemObject(memB);
         }
     }
 
@@ -518,8 +517,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clEnqueueReadBuffer(commandQueue, memInv, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(inv), 0, null, null);
             return fromDoubleArray(inv, n, n);
         } finally { 
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memInv);
+            if (memA != null) clReleaseMemObject(memA);
+            if (memInv != null) clReleaseMemObject(memInv);
         }
     }
 
@@ -552,7 +551,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 clFinish(commandQueue); // Synchronize loop
             }
             return Real.of(det);
-        } finally { clReleaseMemObject(memA); }
+        } finally { if (memA != null) clReleaseMemObject(memA); }
     }
 
     @Override public String getNativeLibraryName() { return "opencl"; }
@@ -677,7 +676,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 toRealVector(pData)
             );
         } finally {
-            clReleaseMemObject(memA);
+            if (memA != null) clReleaseMemObject(memA);
         }
     }
     @Override
@@ -737,8 +736,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 fromDoubleArray(h_A, m, n)
             );
         } finally {
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memQ);
+            if (memA != null) clReleaseMemObject(memA);
+            if (memQ != null) clReleaseMemObject(memQ);
         }
     }
 
@@ -814,7 +813,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) h_A[i * n + j] = 0.0;
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromDoubleArray(h_A, n, n));
         } finally {
-            clReleaseMemObject(memA);
+            if (memA != null) clReleaseMemObject(memA);
         }
     }
 
@@ -898,8 +897,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 toRealVector(eigenvalues)
             );
         } finally {
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memV);
+            if (memA != null) clReleaseMemObject(memA);
+            if (memV != null) clReleaseMemObject(memV);
         }
     }
 
@@ -953,7 +952,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(commandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
-        } finally { clReleaseMemObject(mA); clReleaseMemObject(mB); clReleaseMemObject(mC); }
+        } finally { 
+            if (mA != null) clReleaseMemObject(mA); 
+            if (mB != null) clReleaseMemObject(mB); 
+            if (mC != null) clReleaseMemObject(mC); 
+        }
         return result;
     }
 
@@ -969,7 +972,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clSetKernelArg(vecScaleKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(commandQueue, vecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
-        } finally { clReleaseMemObject(mA); clReleaseMemObject(mC); }
+        } finally { 
+            if (mA != null) clReleaseMemObject(mA); 
+            if (mC != null) clReleaseMemObject(mC); 
+        }
         return result;
     }
 
@@ -1004,7 +1010,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             long[] globalWorkSize = new long[]{1, rows};
             clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * rows, Pointer.to(c), 0, null, null);
-        } finally { clReleaseMemObject(mA); clReleaseMemObject(mB); clReleaseMemObject(mC); }
+        } finally { 
+            if (mA != null) clReleaseMemObject(mA); 
+            if (mB != null) clReleaseMemObject(mB); 
+            if (mC != null) clReleaseMemObject(mC); 
+        }
         return c;
     }
 

@@ -158,7 +158,7 @@ public final class AlgorithmManager {
         if (!includes.isEmpty()) {
             boolean found = false;
             for (String inc : includes) {
-                if (name.contains(inc.trim())) {
+                if (name.toLowerCase().contains(inc.trim().toLowerCase())) { // Case-insensitive check
                     found = true;
                     break;
                 }
@@ -170,7 +170,8 @@ public final class AlgorithmManager {
 
         // Then check excludes
         for (String exc : excludes) {
-            if (name.contains(exc.trim())) {
+            String trimmedExc = exc.trim();
+            if (!trimmedExc.isEmpty() && name.toLowerCase().contains(trimmedExc.toLowerCase())) {
                 return true;
             }
         }
