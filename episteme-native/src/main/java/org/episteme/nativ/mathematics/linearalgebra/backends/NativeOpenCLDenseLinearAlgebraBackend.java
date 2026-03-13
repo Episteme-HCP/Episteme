@@ -142,6 +142,19 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "        b[i] -= factor * b[k];\n" +
         "        a[i*n + k] = 0.0;\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void mat_copy(__global const double *src, __global double *dst, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) dst[i] = src[i];\n" +
+        "}\n" +
+        "__kernel void lu_decompose_step(__global double *a, const int n, const int k) {\n" +
+        "    int i = get_global_id(1) + k + 1;\n" +
+        "    int j = get_global_id(0) + k + 1;\n" +
+        "    if (i < n && j < n) {\n" +
+        "        if (j == k + 1) {\n" +
+        "            a[i * n + k] /= a[k * n + k];\n" +
+        "        }\n" +
+        "        a[i * n + j] -= a[i * n + k] * a[k * n + j];\n" +
+        "    }\n" +
         "}\n";
 
     private static synchronized void init() {
@@ -200,6 +213,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
             swapRowsKernel = clCreateKernel(program, "swapRows", null);
             gaussElimPhase1WithBKernel = clCreateKernel(program, "gaussElimPhase1WithB", null);
+            cl_kernel matCopyKernel = clCreateKernel(program, "mat_copy", null);
+            cl_kernel luDecomposeStepKernel = clCreateKernel(program, "lu_decompose_step", null);
 
             initialized = true;
             logger.info("Native OpenCL Dense Backend initialized successfully.");
@@ -342,15 +357,12 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         if (m == n) {
             if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
         } else {
-            // Rectangular solve (Least Squares) via Apache Commons fallback
-            double[][] aData = new double[m][n];
-            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) aData[i][j] = a.get(i, j).doubleValue();
-            double[] bData = new double[m];
-            for (int i = 0; i < m; i++) bData[i] = b.get(i).doubleValue();
-            org.apache.commons.math3.linear.RealMatrix am = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(aData);
-            org.apache.commons.math3.linear.RealVector bv = org.apache.commons.math3.linear.MatrixUtils.createRealVector(bData);
-            org.apache.commons.math3.linear.DecompositionSolver solver = new org.apache.commons.math3.linear.QRDecomposition(am).getSolver();
-            return toRealVector(solver.solve(bv).toArray());
+            // Rectangular solve (Least Squares) via Normal Equations: A^T A x = A^T b
+            logger.debug("Rectangular solve via Normal Equations on GPU: [{}x{}]", m, n);
+            Matrix<Real> at = transpose(a);
+            Matrix<Real> ata = at.multiply(a);
+            Vector<Real> atb = at.multiply(b);
+            return solve(ata, atb); // ata is square, uses native square solver
         }
         
         double[] h_A = toDoubleArray(a);
@@ -576,14 +588,75 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     }
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        double[][] data = toDoubleArray2D(a);
-        org.apache.commons.math3.linear.RealMatrix m = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
-        org.apache.commons.math3.linear.LUDecomposition lu = new org.apache.commons.math3.linear.LUDecomposition(m);
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
-            toRealMatrix(lu.getL().getData()),
-            toRealMatrix(lu.getU().getData()),
-            toRealVector(java.util.Arrays.stream(lu.getPivot()).mapToDouble(i -> (double)i).toArray())
-        );
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for LU decomposition");
+        int m = a.rows();
+        int n = a.cols();
+        if (m != n) throw new UnsupportedOperationException("Non-square LU decomposition not yet implemented natively in OpenCL");
+
+        double[] h_A = toDoubleArray(a);
+        double[] pData = new double[n];
+        for (int i = 0; i < n; i++) pData[i] = i;
+
+        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        
+        try {
+            cl_kernel luStepKernel = clCreateKernel(program, "lu_decompose_step", null);
+            for (int k = 0; k < n; k++) {
+                // Pivoting on CPU
+                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
+                int max = k;
+                for (int i = k + 1; i < n; i++) if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
+                
+                if (max != k) {
+                    // Swap rows on GPU
+                    clSetKernelArg(swapRowsKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                    clSetKernelArg(swapRowsKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                    clSetKernelArg(swapRowsKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                    clSetKernelArg(swapRowsKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{max}));
+                    clEnqueueNDRangeKernel(commandQueue, swapRowsKernel, 1, null, new long[]{n}, null, 0, null, null);
+                    
+                    double tp = pData[k]; pData[k] = pData[max]; pData[max] = tp;
+                }
+
+                if (Math.abs(h_A[max * n + k]) < 1e-15) throw new ArithmeticException("Singular matrix in LU decomposition");
+
+                // Decompose step on GPU
+                clSetKernelArg(luStepKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(luStepKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(luStepKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                
+                int remaining = n - k - 1;
+                if (remaining > 0) {
+                    clEnqueueNDRangeKernel(commandQueue, luStepKernel, 2, null, new long[]{remaining, remaining}, null, 0, null, null);
+                }
+            }
+            clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
+            clReleaseKernel(luStepKernel);
+
+            // Extract L and U from h_A
+            double[] lData = new double[n * n];
+            double[] uData = new double[n * n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i > j) {
+                        lData[i * n + j] = h_A[i * n + j];
+                    } else if (i == j) {
+                        lData[i * n + j] = 1.0;
+                        uData[i * n + j] = h_A[i * n + j];
+                    } else {
+                        uData[i * n + j] = h_A[i * n + j];
+                    }
+                }
+            }
+
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                fromDoubleArray(lData, n, n),
+                fromDoubleArray(uData, n, n),
+                toRealVector(pData)
+            );
+        } finally {
+            clReleaseMemObject(memA);
+        }
     }
 
     @Override
