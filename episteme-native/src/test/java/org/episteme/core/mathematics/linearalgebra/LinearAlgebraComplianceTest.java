@@ -102,6 +102,17 @@ public class LinearAlgebraComplianceTest {
                      break;
                  }
             }
+            // Additional checks for specific backends via system properties
+            if (p.getName().contains("ND4J") && Boolean.getBoolean("episteme.nd4j.skip")) {
+                isExcluded = true;
+            }
+            if (p.getName().contains("CUDA") && Boolean.getBoolean("episteme.cuda.skip")) {
+                isExcluded = true;
+            }
+            if (p.getName().contains("OpenCL") && Boolean.getBoolean("episteme.opencl.skip")) {
+                isExcluded = true;
+            }
+
             if (isExcluded) {
                 System.out.println("Skipping excluded provider: " + name);
                 continue;
