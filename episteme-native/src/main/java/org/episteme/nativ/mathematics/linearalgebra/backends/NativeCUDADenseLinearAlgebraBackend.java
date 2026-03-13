@@ -80,7 +80,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static MethodHandle CUSOLVER_DSYEVD;
     private static MethodHandle CUDA_GET_DEVICE_COUNT;
     private static MethodHandle CUDA_GET_ERROR_STRING;
-    private static MethodHandle CUBLAS_GET_ERROR_STRING;
+    private static MethodHandle CUBLAS_STATUS_GET_STRING;
 
     // Constants
     private static final int CUBLAS_OP_N = 0;
@@ -130,7 +130,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             // Bind basic symbols
             CUDA_GET_DEVICE_COUNT = lookup(cudart, "cudaGetDeviceCount", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             CUDA_GET_ERROR_STRING = lookup(cudart, "cudaGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-            CUBLAS_GET_ERROR_STRING = lookup(cublas_lookup, "cublasGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+            CUBLAS_STATUS_GET_STRING = lookup(cublas_lookup, "cublasGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
             if (CUDA_GET_DEVICE_COUNT != null) {
                 MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
@@ -188,10 +188,22 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                 ValueLayout.JAVA_INT
             ));
+            if (CUBLAS_DGEAM == null) CUBLAS_DGEAM = lookup(cublas_lookup, "cublasDgeam", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT
+            ));
 
             CUBLAS_DDOT = lookup(cublas_lookup, "cublasDdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            if (CUBLAS_DDOT == null) CUBLAS_DDOT = lookup(cublas_lookup, "cublasDdot", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
             CUBLAS_DNRM2 = lookup(cublas_lookup, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            if (CUBLAS_DNRM2 == null) CUBLAS_DNRM2 = lookup(cublas_lookup, "cublasDnrm2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
             // cuSolver Core
