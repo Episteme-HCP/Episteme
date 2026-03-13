@@ -41,23 +41,22 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLDenseLinearAlgebraBackend.class);
     private static cl_context context;
     private static cl_command_queue commandQueue;
-    private static cl_kernel matMulKernel;
+    // Kernels
+    private static cl_kernel transposeKernel;
     private static cl_kernel vecAddKernel;
     private static cl_kernel vecSubKernel;
     private static cl_kernel vecScaleKernel;
     private static cl_kernel vecDotPartialKernel;
-    private static cl_kernel transposeKernel;
+    private static cl_kernel matMulKernel;
     private static cl_kernel normalizeRowKernel;
     private static cl_kernel gaussJordanKernel;
     private static cl_kernel normalizeRowInvKernel;
     private static cl_kernel gaussJordanInvKernel;
     private static cl_kernel gaussElimPhase1Kernel;
-    private static cl_kernel gaussElimPhase1WithBKernel;
     private static cl_kernel swapRowsKernel;
     private static cl_kernel luDecomposeStepKernel;
     private static cl_kernel choleskyDecomposeStepKernel;
     private static cl_kernel qrHouseholderApplyKernel;
-    private static cl_kernel matCopyKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -231,8 +230,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             gaussJordanInvKernel = clCreateKernel(program, "gaussJordanInv", null);
             gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
             swapRowsKernel = clCreateKernel(program, "swapRows", null);
-            gaussElimPhase1WithBKernel = clCreateKernel(program, "gaussElimPhase1WithB", null);
-            matCopyKernel = clCreateKernel(program, "mat_copy", null);
             luDecomposeStepKernel = clCreateKernel(program, "lu_decompose_step", null);
             choleskyDecomposeStepKernel = clCreateKernel(program, "cholesky_decompose_step", null);
             qrHouseholderApplyKernel = clCreateKernel(program, "qr_householder_apply", null);
@@ -703,7 +700,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             for (int k = 0; k < Math.min(m, n); k++) {
                 // Read sub-column for Householder vector calculation on CPU
                 double[] col = new double[m - k];
-                clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double + (long)k * Sizeof.cl_double, (long)(m - k) * Sizeof.cl_double, Pointer.to(col), 0, null, null); // This is wrong for flat row-major
                 // Correct read: need to read element by element if row-major
                 for (int i = k; i < m; i++) {
                     clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)(i * n + k) * Sizeof.cl_double, (long)Sizeof.cl_double, Pointer.to(col).withByteOffset((long)(i - k) * Sizeof.cl_double), 0, null, null);
@@ -910,19 +906,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         }
     }
 
-    private double[][] toDoubleArray2D(Matrix<Real> m) {
-        double[][] data = new double[m.rows()][m.cols()];
-        for (int i = 0; i < m.rows(); i++) for (int j = 0; j < m.cols(); j++) data[i][j] = m.get(i, j).doubleValue();
-        return data;
-    }
-
-    private Matrix<Real> toRealMatrix(double[][] data) {
-        int rows = data.length;
-        int cols = data[0].length;
-        double[] flat = new double[rows * cols];
-        for (int i = 0; i < rows; i++) System.arraycopy(data[i], 0, flat, i * cols, cols);
-        return fromDoubleArray(flat, rows, cols);
-    }
 
     @Override public double score(OperationContext context) {
         if (!isAvailable()) return -1.0;
@@ -1002,7 +985,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     }
 
     private Vector<Real> toRealVector(Real[] d) {
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
+        double[] vals = new double[d.length];
+        for(int i=0; i<d.length; i++) vals[i] = d[i].doubleValue();
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(vals);
     }
 
     private double[] matVecMul(double[] a, double[] b, int rows, int cols) {

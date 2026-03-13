@@ -40,7 +40,7 @@ public class LinearAlgebraComplianceTest {
                 if (!it.hasNext()) break;
                 LinearAlgebraProvider<?> p = it.next();
                 System.out.println("[ComplianceTest] Discovered via SPI: " + p.getClass().getName());
-                if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+                if (((LinearAlgebraProvider)p).isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                     @SuppressWarnings("unchecked")
                     LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
                     rawProviders.add(typed);
@@ -56,7 +56,7 @@ public class LinearAlgebraComplianceTest {
                 for (org.episteme.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (ap instanceof LinearAlgebraProvider<?> p) {
                         System.out.println("[ComplianceTest]   Found provider: " + ap.getClass().getName());
-                        if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+                        if (((LinearAlgebraProvider)p).isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                             @SuppressWarnings("unchecked")
                             LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
                             rawProviders.add(typed);
