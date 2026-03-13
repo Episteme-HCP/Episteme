@@ -112,6 +112,9 @@ public class LinearAlgebraComplianceTest {
             if (p.getName().contains("OpenCL") && Boolean.getBoolean("episteme.opencl.skip")) {
                 isExcluded = true;
             }
+            if (p.getName().contains("FFM") && Boolean.getBoolean("episteme.ffm.skip")) {
+                isExcluded = true;
+            }
 
             if (isExcluded) {
                 System.out.println("Skipping excluded provider: " + name);
