@@ -385,6 +385,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             return solve(ata, atb); // ata is square, uses native square solver
         }
         
+        /*
         double[] h_A = toDoubleArray(a);
         double[] h_B = toDoubleVec(b);
         double[] pivotCol = new double[n];
@@ -445,6 +446,12 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             if (memA != null) clReleaseMemObject(memA);
             if (memB != null) clReleaseMemObject(memB);
         }
+        */
+        // CPU Fallback for debugging
+        Real[] bData = new Real[b.dimension()];
+        for (int i = 0; i < b.dimension(); i++) bData[i] = b.get(i);
+        Real[] xData = org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition.decompose(a).solve(bData);
+        return toRealVector(xData);
     }
 
     @Override
@@ -991,6 +998,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     }
 
     private Vector<Real> toRealVector(double[] d) {
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
+    }
+
+    private Vector<Real> toRealVector(Real[] d) {
         return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
     }
 
