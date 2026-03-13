@@ -26,7 +26,7 @@ The Episteme architecture is designed for portability first, with transparent pe
 | EJML           | CPU (Java/Optimized) | 1.422 |
 | JBlas (Native) | CPU (Native/JNI) | 0.482 |
 
-![Matrix Multiplication Comparison](benchmarksresults/id_chart_de_benchmark_matrix_multiplication_throughput.png)
+![Matrix Multiplication Comparison](benchmark-results/id_chart_de_benchmark_matrix_multiplication_throughput.png)
 
 ### Linear System Solve (Ops/sec, 800x800)
 
@@ -38,7 +38,7 @@ The Episteme architecture is designed for portability first, with transparent pe
 | EJML           | 0.392 |
 | JBlas (Native) | 0.627 |
 
-![Linear Solve Comparison](benchmarksresults/id_chart_de_benchmark_linear_system_solve_throughput.png)
+![Linear Solve Comparison](benchmark-results/id_chart_de_benchmark_linear_system_solve_throughput.png)
 
 ### Matrix Inversion (Ops/sec, 500x500)
 
@@ -49,7 +49,7 @@ The Episteme architecture is designed for portability first, with transparent pe
 | Native BLAS (FFM) | **0.480** |
 | EJML           | 0.341 |
 
-![Matrix Inversion Comparison](benchmarksresults/id_chart_de_benchmark_matrix_inversion_throughput.png)
+![Matrix Inversion Comparison](benchmark-results/id_chart_de_benchmark_matrix_inversion_throughput.png)
 
 ## Analysis of Recent Optimizations
 

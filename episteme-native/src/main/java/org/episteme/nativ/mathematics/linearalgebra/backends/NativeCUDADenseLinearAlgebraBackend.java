@@ -7,6 +7,8 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -76,6 +78,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static MethodHandle CUSOLVER_DPOTRF;
     private static MethodHandle CUSOLVER_DSYEVD_BUFFER_SIZE;
     private static MethodHandle CUSOLVER_DSYEVD;
+    private static MethodHandle CUDA_GET_DEVICE_COUNT;
+    private static MethodHandle CUDA_GET_ERROR_STRING;
+    private static MethodHandle CUBLAS_GET_ERROR_STRING;
 
     // Constants
     private static final int CUBLAS_OP_N = 0;
@@ -85,97 +90,98 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static synchronized void ensureInitialized() {
         if (IS_AVAILABLE) return;
 
+        try (Arena tempArena = Arena.ofConfined()) {
+            // Try loading cudart
+            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", tempArena);
+            if (cudaRtOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
+                Path linuxPath = Path.of("/usr/local/cuda/lib64/libcudart.so");
+                if (Files.exists(linuxPath)) {
+                    cudaRtOpt = NativeLibraryLoader.loadLibrary(linuxPath.toString(), tempArena);
+                }
+            }
+            SymbolLookup cudart = cudaRtOpt.orElse(null);
 
-        try { // Test loading
-            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", Arena.global());
-            Optional<SymbolLookup> cublasOpt = NativeLibraryLoader.loadLibrary("cublas", Arena.global());
-            Optional<SymbolLookup> cusolverOptLocal = NativeLibraryLoader.loadLibrary("cusolver", Arena.global());
+            // Try loading cublas
+            Optional<SymbolLookup> cublasOptLocal = NativeLibraryLoader.loadLibrary("cublas", tempArena);
+            if (cublasOptLocal.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
+                Path linuxPath = Path.of("/usr/local/cuda/lib64/libcublas.so");
+                if (Files.exists(linuxPath)) {
+                    cublasOptLocal = NativeLibraryLoader.loadLibrary(linuxPath.toString(), tempArena);
+                }
+            }
+            cublas_lookup = cublasOptLocal.orElse(null);
 
-            if (cudaRtOpt.isEmpty() || cublasOpt.isEmpty() || cusolverOptLocal.isEmpty()) {
+            // Try loading cusolver
+            Optional<SymbolLookup> cusolverOpt = NativeLibraryLoader.loadLibrary("cusolver", tempArena);
+            if (cusolverOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
+                Path linuxPath = Path.of("/usr/local/cuda/lib64/libcusolver.so");
+                if (Files.exists(linuxPath)) {
+                    cusolverOpt = NativeLibraryLoader.loadLibrary(linuxPath.toString(), tempArena);
+                }
+            }
+            cusolver_lookup = cusolverOpt.orElse(null);
+
+            if (cudart == null || cublas_lookup == null || cusolver_lookup == null) {
                 logger.warn("Native CUDA/cuBLAS/cuSolver libraries not found (cudart={}, cublas={}, cusolver={})", 
-                    cudaRtOpt.isPresent(), cublasOpt.isPresent(), cusolverOptLocal.isPresent());
+                    cudart != null, cublas_lookup != null, cusolver_lookup != null);
                 return;
             }
 
-            // CRITICAL: Verify actual GPU hardware presence via cudaGetDeviceCount
-            SymbolLookup cudart = cudaRtOpt.get();
-            Optional<MemorySegment> deviceCountSym = NativeLibraryLoader.findSymbol(cudart, "cudaGetDeviceCount");
-            if (deviceCountSym.isPresent()) {
-                try {
-                    MethodHandle getDeviceCount = LINKER.downcallHandle(deviceCountSym.get(),
-                        FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    try (Arena tempArena = Arena.ofConfined()) {
-                        MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
-                        int cudaResult = (int) getDeviceCount.invokeExact(countPtr);
-                        int deviceCount = countPtr.get(ValueLayout.JAVA_INT, 0);
-                        if (cudaResult != 0 || deviceCount <= 0) {
-                            logger.warn("No CUDA-capable GPU devices found (result={}, count={}). Backend disabled.", cudaResult, deviceCount);
-                            return;
-                        }
-                        logger.info("Found {} CUDA-capable GPU device(s).", deviceCount);
+            // Bind basic symbols
+            CUDA_GET_DEVICE_COUNT = lookup(cudart, "cudaGetDeviceCount", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUDA_GET_ERROR_STRING = lookup(cudart, "cudaGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+            CUBLAS_GET_ERROR_STRING = lookup(cublas_lookup, "cublasGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
-                        // KICKSTART: Force CUDA context creation to avoid CUSOLVER_STATUS_NOT_INITIALIZED
-                        Optional<MemorySegment> freeSym = NativeLibraryLoader.findSymbol(cudart, "cudaFree");
-                        if (freeSym.isPresent()) {
-                            MethodHandle cudaFree = LINKER.downcallHandle(freeSym.get(), 
-                                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                            int rFree = (int) cudaFree.invokeExact(MemorySegment.NULL);
-            checkCuda(rFree);
-                        }
-                    }
-                } catch (Throwable t) {
-                    logger.warn("CUDA initialization/kickstart check failed: {}. Backend disabled.", t.getMessage());
+            if (CUDA_GET_DEVICE_COUNT != null) {
+                MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
+                int cudaResult = (int) CUDA_GET_DEVICE_COUNT.invokeExact(countPtr);
+                int deviceCount = countPtr.get(ValueLayout.JAVA_INT, 0);
+                if (cudaResult != 0 || deviceCount <= 0) {
+                    logger.warn("No CUDA-capable GPU devices found (result={}, count={}). Backend disabled.", cudaResult, deviceCount);
                     return;
                 }
-            } else {
-                logger.warn("cudaGetDeviceCount symbol not found. Backend disabled.");
-                return;
+                logger.info("Found {} CUDA-capable GPU device(s).", deviceCount);
+
+                // KICKSTART: Force CUDA context creation
+                CUDA_FREE = lookup(cudart, "cudaFree", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                if (CUDA_FREE != null) {
+                    int rFree = (int) CUDA_FREE.invokeExact(MemorySegment.NULL);
+                    if (rFree != 0) logger.warn("CUDA kickstart returned code {}", rFree);
+                }
             }
             
-            // Assign static lookups for later use in cuSolver section
-            NativeCUDADenseLinearAlgebraBackend.cublas_lookup = cublasOpt.get();
-            NativeCUDADenseLinearAlgebraBackend.cusolver_lookup = cusolverOptLocal.get();
-
             // CUDA Runtime Memory Management
-            Optional<MemorySegment> mallocSym = NativeLibraryLoader.findSymbol(cudart, "cudaMalloc_v2", "cudaMalloc");
-            Optional<MemorySegment> freeSym = NativeLibraryLoader.findSymbol(cudart, "cudaFree");
-            Optional<MemorySegment> memcpySym = NativeLibraryLoader.findSymbol(cudart, "cudaMemcpy_v2", "cudaMemcpy");
-            Optional<MemorySegment> syncSym = NativeLibraryLoader.findSymbol(cudart, "cudaDeviceSynchronize");
+            CUDA_MALLOC = lookup(cudart, "cudaMalloc", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+            CUDA_MEMCPY = lookup(cudart, "cudaMemcpy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
+            CUDA_DEVICE_SYNCHRONIZE = lookup(cudart, "cudaDeviceSynchronize", FunctionDescriptor.of(ValueLayout.JAVA_INT));
             
-            if (mallocSym.isEmpty() || freeSym.isEmpty() || memcpySym.isEmpty() || syncSym.isEmpty()) {
-                logger.warn("Required CUDA runtime symbols missing (malloc={}, free={}, memcpy={}, sync={}). Backend disabled.", 
-                    mallocSym.isPresent(), freeSym.isPresent(), memcpySym.isPresent(), syncSym.isPresent());
+            if (CUDA_MALLOC == null || CUDA_FREE == null || CUDA_MEMCPY == null) {
+                logger.warn("Required CUDA runtime symbols missing. Backend disabled.");
                 return;
             }
 
-            CUDA_MALLOC = LINKER.downcallHandle(mallocSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
-            CUDA_FREE = LINKER.downcallHandle(freeSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUDA_MEMCPY = LINKER.downcallHandle(memcpySym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
-            CUDA_DEVICE_SYNCHRONIZE = LINKER.downcallHandle(syncSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT));
-
-            if (cublas_lookup != null) {
-                Optional<MemorySegment> createSym = NativeLibraryLoader.findSymbol(cublas_lookup, "cublasCreate_v2", "cublasCreate");
-                Optional<MemorySegment> destroySym = NativeLibraryLoader.findSymbol(cublas_lookup, "cublasDestroy_v2", "cublasDestroy");
-                Optional<MemorySegment> dgemmSym = NativeLibraryLoader.findSymbol(cublas_lookup, "cublasDgemm_v2", "cublasDgemm");
-                Optional<MemorySegment> dgeamSym = NativeLibraryLoader.findSymbol(cublas_lookup, "cublasDgeam_v2", "cublasDgeam");
-
-            if (createSym.isEmpty() || destroySym.isEmpty() || dgemmSym.isEmpty() || dgeamSym.isEmpty()) {
-                logger.warn("Required cuBLAS symbols missing (create={}, destroy={}, dgemm={}, dgeam={}). Backend disabled.", 
-                    createSym.isPresent(), destroySym.isPresent(), dgemmSym.isPresent(), dgeamSym.isPresent());
-                return;
-            }
-
-            CUBLAS_CREATE = LINKER.downcallHandle(createSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUBLAS_DESTROY = LINKER.downcallHandle(destroySym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUBLAS_DGEMM = LINKER.downcallHandle(dgemmSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            // cuBLAS Core
+            CUBLAS_CREATE = lookup(cublas_lookup, "cublasCreate_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            if (CUBLAS_CREATE == null) CUBLAS_CREATE = lookup(cublas_lookup, "cublasCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUBLAS_DESTROY = lookup(cublas_lookup, "cublasDestroy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            if (CUBLAS_DESTROY == null) CUBLAS_DESTROY = lookup(cublas_lookup, "cublasDestroy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            CUBLAS_DGEMM = lookup(cublas_lookup, "cublasDgemm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT
             ));
-            
-            CUBLAS_DGEAM = LINKER.downcallHandle(dgeamSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
+            if (CUBLAS_DGEMM == null) CUBLAS_DGEMM = lookup(cublas_lookup, "cublasDgemm", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+            ));
+
+            CUBLAS_DGEAM = lookup(cublas_lookup, "cublasDgeam_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
@@ -183,97 +189,58 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 ValueLayout.JAVA_INT
             ));
 
-            Optional<MemorySegment> ddotSym = NativeLibraryLoader.findSymbol(cublas_lookup, "cublasDdot_v2", "cublasDdot");
-            Optional<MemorySegment> dnrm2Sym = NativeLibraryLoader.findSymbol(cublas_lookup, "cublasDnrm2_v2", "cublasDnrm2");
-            if (ddotSym.isPresent()) {
-                CUBLAS_DDOT = LINKER.downcallHandle(ddotSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            }
-            if (dnrm2Sym.isPresent()) {
-                CUBLAS_DNRM2 = LINKER.downcallHandle(dnrm2Sym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            }
-            }
+            CUBLAS_DDOT = lookup(cublas_lookup, "cublasDdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUBLAS_DNRM2 = lookup(cublas_lookup, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-
-            // cuSolver handles
-            if (cusolver_lookup != null) {
-                Optional<MemorySegment> createSolverSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnCreate");
-                Optional<MemorySegment> destroySolverSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDestroy");
-                Optional<MemorySegment> getrfBufferSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDgetrf_bufferSize");
-                Optional<MemorySegment> getrfSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDgetrf");
-                Optional<MemorySegment> getrsSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDgetrs");
-                
-                Optional<MemorySegment> geqrfBufferSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDgeqrf_bufferSize");
-                Optional<MemorySegment> geqrfSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDgeqrf");
-                Optional<MemorySegment> orgqrBufferSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDorgqr_bufferSize");
-                Optional<MemorySegment> orgqrSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDorgqr");
-                Optional<MemorySegment> gesvdBufferSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDgesvd_bufferSize");
-                Optional<MemorySegment> gesvdSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDgesvd");
-                Optional<MemorySegment> potrfBufferSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDpotrf_bufferSize");
-                Optional<MemorySegment> potrfSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDpotrf");
-                Optional<MemorySegment> syevdBufferSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDsyevd_bufferSize");
-                Optional<MemorySegment> syevdSym = NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverDnDsyevd");
-
-                if (createSolverSym.isPresent() && destroySolverSym.isPresent() && getrfBufferSym.isPresent() && 
-                    getrfSym.isPresent() && getrsSym.isPresent()) {
-                    
-                    CUSOLVER_CREATE = LINKER.downcallHandle(createSolverSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    CUSOLVER_DESTROY = LINKER.downcallHandle(destroySolverSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    CUSOLVER_DGETRF_BUFFER_SIZE = LINKER.downcallHandle(getrfBufferSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    CUSOLVER_DGETRF = LINKER.downcallHandle(getrfSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-                    CUSOLVER_DGETRS = LINKER.downcallHandle(getrsSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    
-                    if (geqrfBufferSym.isPresent() && geqrfSym.isPresent() && orgqrBufferSym.isPresent() && orgqrSym.isPresent()) {
-                        CUSOLVER_DGEQRF_BUFFER_SIZE = LINKER.downcallHandle(geqrfBufferSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                        CUSOLVER_DGEQRF = LINKER.downcallHandle(geqrfSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                        CUSOLVER_DORGQR_BUFFER_SIZE = LINKER.downcallHandle(orgqrBufferSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-                        CUSOLVER_DORGQR = LINKER.downcallHandle(orgqrSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    }
-
-                    if (gesvdBufferSym.isPresent() && gesvdSym.isPresent()) {
-                         CUSOLVER_DGESVD_BUFFER_SIZE = LINKER.downcallHandle(gesvdBufferSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                         CUSOLVER_DGESVD = LINKER.downcallHandle(gesvdSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-                    }
-                    
-                    if (potrfBufferSym.isPresent() && potrfSym.isPresent()) {
-                         CUSOLVER_DPOTRF_BUFFER_SIZE = LINKER.downcallHandle(potrfBufferSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                         CUSOLVER_DPOTRF = LINKER.downcallHandle(potrfSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    }
-                    
-                    if (syevdBufferSym.isPresent() && syevdSym.isPresent()) {
-                         CUSOLVER_DSYEVD_BUFFER_SIZE = LINKER.downcallHandle(syevdBufferSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-                         CUSOLVER_DSYEVD = LINKER.downcallHandle(syevdSym.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                    }
-
-                    logger.info("Native cuSolver functionality linked successfully.");
-                } else {
-                    logger.warn("Some cuSolver symbols missing. Solver operations will be disabled.");
-                }
-            } else {
-                logger.warn("cuSolver library not found. Solver operations will be disabled.");
-            }
+            // cuSolver Core
+            CUSOLVER_CREATE = lookup(cusolver_lookup, "cusolverDnCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DESTROY = lookup(cusolver_lookup, "cusolverDnDestroy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DGETRF_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnDgetrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DGETRF = lookup(cusolver_lookup, "cusolverDnDgetrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            CUSOLVER_DGETRS = lookup(cusolver_lookup, "cusolverDnDgetrs", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            CUSOLVER_DGEQRF_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnDgeqrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DGEQRF = lookup(cusolver_lookup, "cusolverDnDgeqrf", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DORGQR_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnDorgqr_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            CUSOLVER_DORGQR = lookup(cusolver_lookup, "cusolverDnDorgqr", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DGESVD_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnDgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DGESVD = lookup(cusolver_lookup, "cusolverDnDgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            
+            CUSOLVER_DPOTRF_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnDpotrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_DPOTRF = lookup(cusolver_lookup, "cusolverDnDpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            CUSOLVER_DSYEVD_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnDsyevd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            CUSOLVER_DSYEVD = lookup(cusolver_lookup, "cusolverDnDsyevd", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
             IS_AVAILABLE = true;
-            logger.info("Native CUDA/cuBLAS Backend initialized successfully.");
+            logger.info("Native CUDA/cuBLAS/cuSolver Backend initialized successfully.");
         } catch (Throwable t) {
             logger.warn("Failed to initialize CUDA/cuBLAS Backend: {} - {}", t.getClass().getSimpleName(), t.getMessage());
             logger.debug("Stack trace:", t);
         }
+    }
+
+    private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor desc) {
+        if (lookup == null) return null;
+        return NativeLibraryLoader.findSymbol(lookup, name)
+            .map(s -> LINKER.downcallHandle(s, desc))
+            .orElse(null);
     }
 
     @Override
@@ -312,7 +279,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             checkCuda((int) CUDA_MALLOC.invokeExact(d_C, (long)m * n * Double.BYTES));
             
             try {
-                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), h_A, (long)m * n * Double.BYTES, 1));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), h_A, (long)m * n * Double.BYTES, CUDA_MEMCPY_HOST_TO_DEVICE));
                 
                 MemorySegment handle = arena.allocate(ValueLayout.ADDRESS);
                 int res = (int) CUBLAS_CREATE.invokeExact(handle);
@@ -392,18 +359,30 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
             int resH = (int) CUBLAS_CREATE.invokeExact(p_Handle);
             checkCublas(resH);
-            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+            MemorySegment cublasHandle = p_Handle.get(ValueLayout.ADDRESS, 0);
 
             // cuBLAS DGEMM Setup (Alpha, Beta)
-            MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
-            MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
+            MemorySegment segAlpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
+            MemorySegment segBeta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
 
             // Call DGEMM
-            // Note: cuBLAS is Column Major by default. 
-            // To compute C = A * B in Row Major, we can compute C_T = B_T * A_T.
-            // Or just use cuBLAS's column-major logic with swapped arguments.
-            checkCublas((int) CUBLAS_DGEMM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, 
-                n, m, k, alpha, d_B, n, d_A, k, beta, d_C, n));
+            // To compute C = A * B for Row-Major matrices A(m,k) and B(k,n) in CUBLAS (Column-Major):
+            // We use C^T = B^T * A^T. 
+            // Since Row-Major storage of A is identical to Column-Major storage of A^T (size k x m):
+            // B^T is n x k, A^T is k x m, C^T is n x m.
+            // cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, alpha, B, n, A, k, beta, C, n)
+            int lda = n; // Leading dimension of B^T (n x k)
+            int ldb = k; // Leading dimension of A^T (k x m)
+            int ldc = n; // Leading dimension of C^T (n x m)
+
+            checkCublas((int) CUBLAS_DGEMM.invokeExact(
+                cublasHandle, 
+                CUBLAS_OP_N, CUBLAS_OP_N, // Transpose flags for B^T and A^T
+                n, m, k, // Dimensions for C^T = B^T * A^T
+                segAlpha, d_B, lda, // B^T (stored as B row-major)
+                d_A, ldb, // A^T (stored as A row-major)
+                segBeta, d_C, ldc // C^T (stored as C row-major)
+            ));
 
             // Copy back
             double[] h_C = new double[m * n];
@@ -412,7 +391,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
 
             // Cleanup
-            int rD = (int) CUBLAS_DESTROY.invokeExact(handle);
+            int rD = (int) CUBLAS_DESTROY.invokeExact(cublasHandle);
             checkCublas(rD);
             int rA = (int) CUDA_FREE.invokeExact(d_A);
             checkCuda(rA);
@@ -551,8 +530,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_DOUBLE);
             checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) n * 8));
             checkCuda((int) CUDA_MALLOC.invokeExact(d_B, (long) n * 8));
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(a)), (long) n * 8, 1));
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_B.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b)), (long) n * 8, 1));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(a)), (long) n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_B.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b)), (long) n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
             
             MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
             checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
@@ -579,7 +558,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
             MemorySegment d_V = arena.allocate(ValueLayout.ADDRESS);
             MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_DOUBLE);
             checkCuda((int) CUDA_MALLOC.invokeExact(d_V, (long) n * 8));
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_V.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(v)), (long) n * 8, 1));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_V.get(ValueLayout.ADDRESS, 0), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(v)), (long) n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
             
             MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
             checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
@@ -846,13 +825,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     }
 
 
-    private static void checkCuda(int result) {
-        if (result != 0) throw new RuntimeException("CUDA Error: " + result);
-    }
 
-    private static void checkCublas(int result) {
-        if (result != 0) throw new RuntimeException("cuBLAS Error: " + result);
-    }
 
     private double[] toDoubleArray(Matrix<Real> m) {
         int rows = m.rows();
@@ -1462,5 +1435,37 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
         meta.put("solver", "cusolver");
         meta.put("optimized_size", ">256");
         return meta;
+    }
+
+    private static void checkCuda(int result) {
+        if (result != 0) {
+            if (CUDA_GET_ERROR_STRING == null) {
+                throw new RuntimeException("CUDA Error " + result + " (Error string lookup not initialized)");
+            }
+            try {
+                MemorySegment seg = (MemorySegment) CUDA_GET_ERROR_STRING.invokeExact(result);
+                String msg = seg.reinterpret(1024).getString(0);
+                logger.error("CUDA Error {}: {}", result, msg);
+                throw new RuntimeException("CUDA Error " + result + ": " + msg);
+            } catch (Throwable t) {
+                throw new RuntimeException("CUDA Error " + result, t);
+            }
+        }
+    }
+
+    private static void checkCublas(int result) {
+        if (result != 0) {
+            if (CUBLAS_GET_ERROR_STRING == null) {
+                throw new RuntimeException("CUBLAS Error " + result + " (Error string lookup not initialized)");
+            }
+            try {
+                MemorySegment seg = (MemorySegment) CUBLAS_GET_ERROR_STRING.invokeExact(result);
+                String msg = seg.reinterpret(1024).getString(0);
+                logger.error("CUBLAS Error {}: {}", result, msg);
+                throw new RuntimeException("CUBLAS Error " + result + ": " + msg);
+            } catch (Throwable t) {
+                throw new RuntimeException("CUBLAS Error " + result, t);
+            }
+        }
     }
 }
