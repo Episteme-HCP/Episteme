@@ -57,7 +57,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel luDecomposeStepKernel;
     private static cl_kernel choleskyDecomposeStepKernel;
     private static cl_kernel qrHouseholderApplyKernel;
-    private static cl_kernel matCopyKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -231,7 +230,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
             swapRowsKernel = clCreateKernel(program, "swapRows", null);
             gaussElimPhase1WithBKernel = clCreateKernel(program, "gaussElimPhase1WithB", null);
-            matCopyKernel = clCreateKernel(program, "mat_copy", null);
             luDecomposeStepKernel = clCreateKernel(program, "lu_decompose_step", null);
             choleskyDecomposeStepKernel = clCreateKernel(program, "cholesky_decompose_step", null);
             qrHouseholderApplyKernel = clCreateKernel(program, "qr_householder_apply", null);
