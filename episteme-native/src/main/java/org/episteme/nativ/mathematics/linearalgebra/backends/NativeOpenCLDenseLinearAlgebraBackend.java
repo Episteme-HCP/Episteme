@@ -275,29 +275,44 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] h_B = toDoubleArray(b);
         double[] h_C = new double[m * n];
 
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * k, Pointer.to(h_A), null);
-        cl_mem memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * k * n, Pointer.to(h_B), null);
-        cl_mem memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * m * n, null, null);
-
         try {
-            clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-            clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
-            clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
-            clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
-            clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
-            clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+            logger.debug("Creating memA...");
+            cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * k, Pointer.to(h_A), null);
+            logger.debug("Creating memB...");
+            cl_mem memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * k * n, Pointer.to(h_B), null);
+            logger.debug("Creating memC...");
+            cl_mem memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * m * n, null, null);
 
-            long[] globalWorkSize = new long[]{n, m};
-            clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
-            clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(h_C), 0, null, null);
-            
-            Matrix<Real> result = fromDoubleArray(h_C, m, n);
-            org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/OpenCL", System.nanoTime() - start);
-            return result;
-        } finally {
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memB);
-            clReleaseMemObject(memC);
+            try {
+                logger.debug("Setting kernel args...");
+                clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+                clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+                clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+
+                long[] globalWorkSize = new long[]{n, m};
+                logger.debug("Enqueuing NDRangeKernel...");
+                clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
+                
+                logger.debug("Enqueuing ReadBuffer...");
+                clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(h_C), 0, null, null);
+                
+                logger.debug("Creating result matrix from array...");
+                Matrix<Real> result = fromDoubleArray(h_C, m, n);
+                org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/OpenCL", System.nanoTime() - start);
+                logger.debug("OpenCL multiply finished successfully.");
+                return result;
+            } finally {
+                logger.debug("Releasing mem objects...");
+                clReleaseMemObject(memA);
+                clReleaseMemObject(memB);
+                clReleaseMemObject(memC);
+            }
+        } catch (Exception e) {
+            logger.error("OpenCL multiply operation failed: {}", e.getMessage(), e);
+            throw new RuntimeException("OpenCL Multiply failed", e);
         }
     }
 
