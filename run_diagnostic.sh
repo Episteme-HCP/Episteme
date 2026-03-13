@@ -58,7 +58,7 @@ done
 
 # --- Run Java Diagnostics ---
 echo "[INFO] Running Java Diagnostic Class..."
-JVM_OPTS="--enable-preview"
+JVM_OPTS="--enable-preview --enable-native-access=ALL-UNNAMED"
 if java --list-modules | grep -q "jdk.incubator.vector"; then
     echo "[INFO] Enabling jdk.incubator.vector"
     JVM_OPTS="$JVM_OPTS --add-modules jdk.incubator.vector"
