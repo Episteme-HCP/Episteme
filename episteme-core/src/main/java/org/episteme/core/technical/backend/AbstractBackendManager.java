@@ -150,8 +150,10 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * Selects the best available backend based on priority.
      */
     protected T selectBestBackend() {
+        org.episteme.core.io.UserPreferences prefs = org.episteme.core.io.UserPreferences.getInstance();
         return backends.values().stream()
                 .filter(Backend::isAvailable)
+                .filter(p -> !prefs.isBackendDeactivated(p.getId()))
                 .max(Comparator.comparingInt(Backend::getPriority))
                 .orElse(null);
     }
