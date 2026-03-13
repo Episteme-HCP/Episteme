@@ -53,3 +53,6 @@ build_vision/
 **/Release/
 **/Debug/
 **/x64/
+
+# Local Automation
+episteme-vm-test.ps1
