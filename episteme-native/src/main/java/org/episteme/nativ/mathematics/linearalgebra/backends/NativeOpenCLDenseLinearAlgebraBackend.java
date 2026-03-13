@@ -453,15 +453,19 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         int m = a.rows();
         int n = a.cols();
         if (m != n) {
-             // Rectangular inverse (Pseudo-inverse) via Apache Commons fallback
-             double[][] aData = new double[m][n];
-             for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) aData[i][j] = a.get(i, j).doubleValue();
-             org.apache.commons.math3.linear.RealMatrix am = org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(aData);
-             org.apache.commons.math3.linear.SingularValueDecomposition svd = new org.apache.commons.math3.linear.SingularValueDecomposition(am);
-             org.apache.commons.math3.linear.RealMatrix pinv = svd.getSolver().getInverse();
-             double[] pinvData = new double[n * m];
-             for (int i = 0; i < n; i++) for (int j = 0; j < m; j++) pinvData[i * m + j] = pinv.getEntry(i, j);
-             return fromDoubleArray(pinvData, n, m);
+             // Rectangular inverse (Pseudo-inverse) via Normal Equations on GPU
+             logger.debug("Rectangular pseudo-inverse via Normal Equations: [{}x{}]", m, n);
+             if (m > n) {
+                 // A+ = (A^T A)^-1 * A^T
+                 Matrix<Real> at = transpose(a);
+                 Matrix<Real> ata = at.multiply(a);
+                 return ata.inverse().multiply(at);
+             } else {
+                 // A+ = A^T * (A A^T)^-1
+                 Matrix<Real> at = transpose(a);
+                 Matrix<Real> aat = a.multiply(at);
+                 return at.multiply(aat.inverse());
+             }
         }
         
         double[] h_A = toDoubleArray(a);
