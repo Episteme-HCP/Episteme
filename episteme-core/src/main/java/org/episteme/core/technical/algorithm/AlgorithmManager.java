@@ -43,9 +43,8 @@ import org.episteme.core.io.UserPreferences;
 public final class AlgorithmManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AlgorithmManager.class);
-    private static final Map<Class<?>, AlgorithmProvider> BEST_PROVIDERS = new ConcurrentHashMap<>();
-    private static final Map<Class<?>, List<? extends AlgorithmProvider>> PROVIDER_CACHE = new ConcurrentHashMap<>();
     private static final ProviderRegistry REGISTRY = new ProviderRegistry();
+    private static AlgorithmService service = new StandardAlgorithmService();
 
     static {
         try {
@@ -82,162 +81,46 @@ public final class AlgorithmManager {
     private AlgorithmManager() {}
 
     /**
-     * Finds and returns the best available provider for the given interface.
-     * 
-     * @param <P> the provider type
-     * @param providerClass the interface class of the provider
-     * @return the best available provider
-     * @throws NoSuchElementException if no provider is found
+     * Sets the AlgorithmService to use.
      */
-    @SuppressWarnings("unchecked")
+    public static void setService(AlgorithmService newService) {
+        service = newService;
+    }
+
+    /**
+     * Gets the current AlgorithmService.
+     */
+    public static AlgorithmService getService() {
+        return service;
+    }
+
+    /**
+     * Finds and returns the best available provider for the given interface.
+     */
     public static <P extends AlgorithmProvider> P getProvider(Class<P> providerClass) {
-        return (P) BEST_PROVIDERS.computeIfAbsent(providerClass, k -> findBestProvider((Class<P>) k));
+        return service.getProvider(providerClass);
     }
 
     /**
      * Finds and returns all available providers for the given interface, sorted by priority.
-     * <p>
-     * Merges providers from both the AlgorithmProvider SPI and the Backend SPI
-     * (via {@link Backend#getAlgorithmProviders()}).
-     * </p>
-     * 
-     * @param <P> the provider type
-     * @param providerClass the interface class of the provider
-     * @return list of available providers sorted by priority (descending)
      */
-    @SuppressWarnings("unchecked")
     public static <P extends AlgorithmProvider> List<P> getProviders(Class<P> providerClass) {
-        return (List<P>) PROVIDER_CACHE.computeIfAbsent(providerClass, k -> discoverProviders((Class<P>) k));
-    }
-
-    private static final Set<String> GLOBAL_EXCLUDES;
-    private static final Set<String> GLOBAL_INCLUDES;
-
-    static {
-        String ex = System.getProperty("org.episteme.exclude.provider", "");
-        String in = System.getProperty("org.episteme.include.provider", "");
-        GLOBAL_EXCLUDES = ex.isEmpty() ? Set.of() : Arrays.stream(ex.split(",")).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
-        GLOBAL_INCLUDES = in.isEmpty() ? Set.of() : Arrays.stream(in.split(",")).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
-    }
-
-    private static <P extends AlgorithmProvider> List<P> discoverProviders(Class<P> providerClass) {
-        Set<String> seenKeys = new HashSet<>();
-        List<P> available = new ArrayList<>();
-
-        // DEBUG: Log global filters
-        // System.err.println("[AlgorithmManager] Active Excludes: " + GLOBAL_EXCLUDES);
-
-        // Path 1: Direct SPI discovery
-        ServiceLoader<P> loader = ServiceLoader.load(providerClass);
-        for (P provider : loader) {
-            try {
-                if (isFiltered(provider.getName())) {
-                    // System.err.println("[AlgorithmManager] Filtering out SPI provider: " + provider.getName());
-                    continue;
-                }
-                String key = provider.getClass().getName() + ":" + provider.getName();
-                if (provider.isAvailable() && seenKeys.add(key)) {
-                    available.add(provider);
-                }
-            } catch (Throwable t) {
-                logger.warn("Skipping bad provider: {}", t.getMessage());
-            }
-        }
-
-        try {
-            for (Backend backend : BackendDiscovery.getInstance().getProviders()) {
-                for (AlgorithmProvider ap : backend.getAlgorithmProviders()) {
-                    if (providerClass.isInstance(ap)) {
-                        P provider = providerClass.cast(ap);
-                        if (isFiltered(provider.getName()) || UserPreferences.getInstance().isBackendDeactivated(backend.getId())) {
-                            // System.err.println("[AlgorithmManager] Filtering out backend provider: " + provider.getName());
-                            continue;
-                        }
-                        String key = provider.getClass().getName() + ":" + provider.getName();
-                        if (provider.isAvailable() && seenKeys.add(key)) {
-                            available.add(provider);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {}
-
-        available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
-        logger.info("Discovered and prioritized {} providers for {}", available.size(), providerClass.getSimpleName());
-        return available;
-    }
-
-    public static boolean isFiltered(String name) {
-        if (name == null) return false;
-        String lowerName = name.trim().toLowerCase();
-        
-        // CHECK INCLUDES (Whitelist mode)
-        if (!GLOBAL_INCLUDES.isEmpty()) {
-            boolean matchesInclude = false;
-            for (String inc : GLOBAL_INCLUDES) {
-                if (lowerName.contains(inc)) {
-                    matchesInclude = true;
-                    break;
-                }
-            }
-            if (!matchesInclude) return true;
-        }
-        
-        // CHECK EXCLUDES (Blacklist mode)
-        for (String exc : GLOBAL_EXCLUDES) {
-            if (!exc.isEmpty() && lowerName.contains(exc)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static <P extends AlgorithmProvider> P findBestProvider(Class<P> providerClass) {
-        List<P> available = getProviders(providerClass);
-
-        if (available.isEmpty()) {
-            logger.error("No available provider found for: {}", providerClass.getSimpleName());
-            throw new NoSuchElementException("No available provider found for: " + providerClass.getSimpleName());
-        }
-        
-        P best = available.get(0);
-        logger.info("Selected best provider {} for {} (Priority: {})", best.getName(), providerClass.getSimpleName(), best.getPriority());
-        return best;
+        return service.getProviders(providerClass);
     }
 
     /**
      * Finds and returns the reference (baseline) provider for the given interface.
-     * <p>
-     * The reference provider is defined as the available provider with the lowest priority.
-     * </p>
-     * 
-     * @param <P> the provider type
-     * @param providerClass the interface class of the provider
-     * @return the reference provider
-     * @throws NoSuchElementException if no provider is available
      */
     public static <P extends AlgorithmProvider> P getReferenceProvider(Class<P> providerClass) {
         List<P> available = getProviders(providerClass);
-
         if (available.isEmpty()) {
             throw new NoSuchElementException("No available provider found for: " + providerClass.getSimpleName());
         }
-
-        // Return the one with lowest priority (likely the standard JVM implementation)
         return available.get(available.size() - 1);
     }
 
     /**
      * Finds and returns the next-best available provider after the given one.
-     * <p>
-     * Useful for chained fallbacks where a provider is available but an operation 
-     * is not supported or fails.
-     * </p>
-     * 
-     * @param <P> the provider type
-     * @param providerClass the interface class of the provider
-     * @param current the current provider attempting to fall back
-     * @return the next provider in priority order, or the reference provider if no better option exists
      */
     public static <P extends AlgorithmProvider> P getNextProvider(Class<P> providerClass, AlgorithmProvider current) {
         List<P> available = getProviders(providerClass);
@@ -248,7 +131,6 @@ public final class AlgorithmManager {
         String currentName = current.getName().trim();
         Class<?> currentClass = current.getClass();
 
-        // Find the position of 'current' in the priority list
         int index = -1;
         for (int i = 0; i < available.size(); i++) {
             P p = available.get(i);
@@ -258,69 +140,29 @@ public final class AlgorithmManager {
             }
         }
 
-        // Try to find a successor that is NOT basically the same as 'current'
-        // We look forward in the priority list first.
         for (int i = index + 1; i < available.size(); i++) {
             P next = available.get(i);
             if (!next.getClass().equals(currentClass) && !next.getName().trim().equals(currentName)) {
-                logger.debug("Falling back from {} to {} for {}", currentName, next.getName(), providerClass.getSimpleName());
                 return next;
             }
         }
 
-        // Emergency: if we can't find a forward successor, try any alternative that is actually DIFFERENT.
-        // This handles cases where 'current' might not have been in the priority list somehow.
         for (P alternative : available) {
             if (!alternative.getClass().equals(currentClass) && !alternative.getName().trim().equals(currentName)) {
-                logger.debug("Non-sequential fallback from {} to {} for {}", currentName, alternative.getName(), providerClass.getSimpleName());
                 return alternative;
             }
         }
 
-        logger.error("No alternative provider available for {} after {}. Total available: {}. Loop detected if we return {}.", 
-            providerClass.getSimpleName(), currentName, available.size(), currentName);
         throw new NoSuchElementException("No alternative provider available for " + providerClass.getSimpleName());
     }
 
     /**
      * Executes an operation using the best available provider, automatically falling back
      * to the next provider if the current one throws {@link UnsupportedOperationException}.
-     * <p>
-     * In benchmark mode ({@code episteme.fallback.disabled=true}), only the best provider
-     * is tried — no fallback chain.
-     * </p>
-     *
-     * @param <P> the provider type
-     * @param <R> the return type of the operation
-     * @param providerClass the interface class of the provider
-     * @param operation the operation to execute on a provider
-     * @return the result of the operation
-     * @throws UnsupportedOperationException if no provider supports the operation
      */
     public static <P extends AlgorithmProvider, R> R executeWithFallback(
             Class<P> providerClass, java.util.function.Function<P, R> operation) {
-        if (Boolean.getBoolean("episteme.fallback.disabled")) {
-            P best = getProvider(providerClass);
-            return operation.apply(best); // Benchmark mode: fail fast, no chain
-        }
-        List<P> providers = AlgorithmManager.getProviders(providerClass).stream()
-                .filter(p -> !AlgorithmManager.isFiltered(p.getName()))
-                .sorted(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed())
-                .collect(java.util.stream.Collectors.toList());
-
-        UnsupportedOperationException lastError = null;
-        for (P provider : providers) {
-            try {
-                return operation.apply(provider);
-            } catch (UnsupportedOperationException e) {
-                logger.info("Operation not supported by {}, falling back (Cause: {})", 
-                    provider.getName(), e.getMessage());
-                lastError = e;
-            }
-        }
-        logger.error("All providers failed for {} operation", providerClass.getSimpleName());
-        throw lastError != null ? lastError : 
-            new UnsupportedOperationException("No provider supports this operation for " + providerClass.getSimpleName());
+        return service.executeWithFallback(providerClass, operation);
     }
 
     /**
@@ -331,11 +173,17 @@ public final class AlgorithmManager {
     }
 
     /**
+     * Checks if a provider with the given name is filtered out by global configuration.
+     */
+    public static boolean isFiltered(String name) {
+        return service.isFiltered(name);
+    }
+
+    /**
      * Forces a refresh of the discovered providers.
      */
     public static void refresh() {
-        BEST_PROVIDERS.clear();
-        PROVIDER_CACHE.clear();
+        service.refresh();
     }
 
     /**
@@ -343,23 +191,9 @@ public final class AlgorithmManager {
      */
     public static void shutdown() {
         logger.info("Universal AlgorithmManager shutting down...");
-
-        // Shutdown all discovered AlgorithmProviders currently in cache
-        Set<AlgorithmProvider> allProviders = new HashSet<>();
-        for (List<? extends AlgorithmProvider> providers : PROVIDER_CACHE.values()) {
-            allProviders.addAll(providers);
-        }
-        allProviders.addAll(BEST_PROVIDERS.values());
-
-        for (AlgorithmProvider provider : allProviders) {
-            try {
-                provider.shutdown();
-            } catch (Exception e) {
-                logger.warn("Error shutting down provider {}: {}", provider.getName(), e.getMessage());
-            }
-        }
-
-        // Shutdown all discovered Backends
+        service.shutdown();
+        
+        // Also shutdown all discovered Backends (Backend SPI)
         try {
             for (Backend backend : BackendDiscovery.getInstance().getProviders()) {
                 try {
@@ -368,11 +202,7 @@ public final class AlgorithmManager {
                     logger.warn("Error shutting down backend {}: {}", backend.getName(), e.getMessage());
                 }
             }
-        } catch (Exception e) {
-            // BackendDiscovery might not be initialized or accessible
-        }
-
-        refresh();
+        } catch (Exception e) {}
     }
 }
 
