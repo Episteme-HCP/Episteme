@@ -141,13 +141,13 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         int rows = (int) array.rows();
         int cols = (int) array.columns();
         logger.debug("[ND4J] fromINDArray: {}x{}, first element: {}, ordering: {}", rows, cols, array.getDouble(0), array.ordering());
-        Real[] data = new Real[rows * cols];
+        double[] data = new double[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = Real.of(array.getDouble(i, j));
+                data[i * cols + j] = array.getDouble(i, j);
             }
         }
-        return new RealDoubleMatrix(data, rows, cols);
+        return RealDoubleMatrix.of(data, rows, cols);
     }
 
     private INDArray toINDArray(Vector<Real> v) {
