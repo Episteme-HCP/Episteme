@@ -123,11 +123,15 @@ public final class AlgorithmManager {
         Set<String> seenKeys = new HashSet<>();
         List<P> available = new ArrayList<>();
 
+        // DEBUG: Log global filters
+        // System.err.println("[AlgorithmManager] Active Excludes: " + GLOBAL_EXCLUDES);
+
         // Path 1: Direct SPI discovery
         ServiceLoader<P> loader = ServiceLoader.load(providerClass);
         for (P provider : loader) {
             try {
                 if (isFiltered(provider.getName())) {
+                    // System.err.println("[AlgorithmManager] Filtering out SPI provider: " + provider.getName());
                     continue;
                 }
                 String key = provider.getClass().getName() + ":" + provider.getName();
@@ -145,6 +149,7 @@ public final class AlgorithmManager {
                     if (providerClass.isInstance(ap)) {
                         P provider = providerClass.cast(ap);
                         if (isFiltered(provider.getName())) {
+                            // System.err.println("[AlgorithmManager] Filtering out backend provider: " + provider.getName());
                             continue;
                         }
                         String key = provider.getClass().getName() + ":" + provider.getName();
@@ -162,11 +167,28 @@ public final class AlgorithmManager {
     }
 
     private static boolean isFiltered(String name) {
-        String lowerName = name.toLowerCase();
+        if (name == null) return false;
+        String lowerName = name.trim().toLowerCase();
+        
+        // CHECK INCLUDES (Whitelist mode)
         if (!GLOBAL_INCLUDES.isEmpty()) {
-            if (GLOBAL_INCLUDES.stream().noneMatch(lowerName::contains)) return true;
+            boolean matchesInclude = false;
+            for (String inc : GLOBAL_INCLUDES) {
+                if (lowerName.contains(inc)) {
+                    matchesInclude = true;
+                    break;
+                }
+            }
+            if (!matchesInclude) return true;
         }
-        return GLOBAL_EXCLUDES.stream().anyMatch(lowerName::contains);
+        
+        // CHECK EXCLUDES (Blacklist mode)
+        for (String exc : GLOBAL_EXCLUDES) {
+            if (!exc.isEmpty() && lowerName.contains(exc)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static <P extends AlgorithmProvider> P findBestProvider(Class<P> providerClass) {
@@ -280,19 +302,23 @@ public final class AlgorithmManager {
             P best = getProvider(providerClass);
             return operation.apply(best); // Benchmark mode: fail fast, no chain
         }
-        List<P> providers = getProviders(providerClass);
-        UnsupportedOperationException lastException = null;
+        List<P> providers = AlgorithmManager.getProviders(providerClass).stream()
+                .filter(p -> !AlgorithmManager.isFiltered(p.getName()))
+                .sorted(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed())
+                .collect(java.util.stream.Collectors.toList());
+
+        UnsupportedOperationException lastError = null;
         for (P provider : providers) {
             try {
                 return operation.apply(provider);
             } catch (UnsupportedOperationException e) {
                 logger.info("Operation not supported by {}, falling back (Cause: {})", 
                     provider.getName(), e.getMessage());
-                lastException = e;
+                lastError = e;
             }
         }
         logger.error("All providers failed for {} operation", providerClass.getSimpleName());
-        throw lastException != null ? lastException : 
+        throw lastError != null ? lastError : 
             new UnsupportedOperationException("No provider supports this operation for " + providerClass.getSimpleName());
     }
 

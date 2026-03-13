@@ -66,10 +66,19 @@ public final class ProviderSelector {
             throw new NoSuchElementException("No available provider for: " + providerClass.getSimpleName());
         }
 
-        P best = providers.stream()
+        // Apply global filters and optional filter
+        List<P> filtered = providers.stream()
+                .filter(p -> !AlgorithmManager.isFiltered(p.getName()))
                 .filter(p -> filter == null || filter.test(p))
+                .toList();
+
+        if (filtered.isEmpty()) {
+            throw new NoSuchElementException("No provider satisfying filters for: " + providerClass.getSimpleName());
+        }
+
+        P best = filtered.stream()
                 .max(Comparator.comparingDouble(p -> p.score(context)))
-                .orElseThrow(() -> new NoSuchElementException("No provider satisfying filter for: " + providerClass.getSimpleName()));
+                .orElseThrow();
 
         logger.info("Selected Provider: {} (Score: {}) for {}", best.getName(), best.score(context), providerClass.getSimpleName());
         return best;
