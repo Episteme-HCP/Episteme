@@ -101,9 +101,14 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         }
         LAPACK_LOOKUP = lapackLib.orElse(null);
         
+        boolean disabled = Boolean.getBoolean("episteme.linearalgebra.disable.ffm");
+        if (disabled) {
+            logger.warn("FFM BLAS Backend disabled via system property.");
+        }
+
         boolean available = false;
 
-        if (LOOKUP != null) {
+        if (LOOKUP != null && !disabled) {
             try {
                 // BLAS Handles - Use JAVA_INT as standard, but we'll check availability
                 FunctionDescriptor dgemmDesc = FunctionDescriptor.ofVoid(
