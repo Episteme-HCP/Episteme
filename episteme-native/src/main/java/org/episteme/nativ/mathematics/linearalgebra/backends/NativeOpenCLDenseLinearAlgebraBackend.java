@@ -220,14 +220,15 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clBuildProgram(program, 0, null, null, null, null);
             
             matMulKernel = clCreateKernel(program, "matrixMultiply", null);
+            vecAddKernel = clCreateKernel(program, "vec_add", null);
+            vecSubKernel = clCreateKernel(program, "vec_sub", null);
+            vecScaleKernel = clCreateKernel(program, "vec_scale", null);
+            vecDotPartialKernel = clCreateKernel(program, "vec_dot_partial", null);
             transposeKernel = clCreateKernel(program, "transpose", null);
             normalizeRowKernel = clCreateKernel(program, "normalizeRow", null);
             gaussJordanKernel = clCreateKernel(program, "gaussJordan", null);
             normalizeRowInvKernel = clCreateKernel(program, "normalizeRowInv", null);
             gaussJordanInvKernel = clCreateKernel(program, "gaussJordanInv", null);
-            vecAddKernel = clCreateKernel(program, "vec_add", null);
-            vecSubKernel = clCreateKernel(program, "vec_sub", null);
-            vecScaleKernel = clCreateKernel(program, "vec_scale", null);
             gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
             swapRowsKernel = clCreateKernel(program, "swapRows", null);
             gaussElimPhase1WithBKernel = clCreateKernel(program, "gaussElimPhase1WithB", null);
