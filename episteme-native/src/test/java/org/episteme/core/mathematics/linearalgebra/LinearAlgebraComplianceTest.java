@@ -59,13 +59,43 @@ public class LinearAlgebraComplianceTest {
                 
         List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
         Set<String> seen = new HashSet<>();
-        String exclude = System.getProperty("org.episteme.exclude.provider", "");
+        String excludeProp = System.getProperty("org.episteme.exclude.provider", "");
+        String includeProp = System.getProperty("org.episteme.include.provider", "");
+        
+        Set<String> excludes = excludeProp.isEmpty() ? Set.of() : Set.of(excludeProp.split(","));
+        Set<String> includes = includeProp.isEmpty() ? Set.of() : Set.of(includeProp.split(","));
+
         for (LinearAlgebraProvider<Real> p : rawProviders) {
             String name = p.getName();
-            if (!exclude.isEmpty() && name.contains(exclude)) {
+            
+            // Check includes first
+            if (!includes.isEmpty()) {
+                boolean found = false;
+                for (String inc : includes) {
+                    if (name.contains(inc)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    System.out.println("Skipping non-included provider: " + name);
+                    continue;
+                }
+            }
+
+            // Then check excludes
+            boolean isExcluded = false;
+            for (String exc : excludes) {
+                 if (name.contains(exc)) {
+                     isExcluded = true;
+                     break;
+                 }
+            }
+            if (isExcluded) {
                 System.out.println("Skipping excluded provider: " + name);
                 continue;
             }
+
             if (seen.add(name)) {
                 providers.add(p);
             }
@@ -74,6 +104,7 @@ public class LinearAlgebraComplianceTest {
         List<ComplianceResult> results = new ArrayList<>();
 
         for (LinearAlgebraProvider<Real> provider : providers) {
+            System.out.println("Starting compliance tests for provider: " + provider.getName());
             ComplianceResult res = new ComplianceResult();
             res.providerName = provider.getName();
             res.environment = provider.getEnvironmentInfo();

@@ -105,12 +105,20 @@ public final class AlgorithmManager {
         Set<String> seenKeys = new HashSet<>();
         List<P> available = new ArrayList<>();
 
+        String excludeProp = System.getProperty("org.episteme.exclude.provider", "");
+        String includeProp = System.getProperty("org.episteme.include.provider", "");
+        Set<String> excludes = excludeProp.isEmpty() ? Set.of() : Set.of(excludeProp.split(","));
+        Set<String> includes = includeProp.isEmpty() ? Set.of() : Set.of(includeProp.split(","));
+
         // Path 1: Direct SPI discovery
         ServiceLoader<P> loader = ServiceLoader.load(providerClass);
         Iterator<P> iterator = loader.iterator();
         while (iterator.hasNext()) {
             try {
                 P provider = iterator.next();
+                if (isFiltered(provider.getName(), excludes, includes)) {
+                    continue;
+                }
                 String key = provider.getClass().getName() + ":" + provider.getName();
                 if (provider.isAvailable() && seenKeys.add(key)) {
                     available.add(provider);
@@ -126,6 +134,9 @@ public final class AlgorithmManager {
                 for (AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (providerClass.isInstance(ap)) {
                         P provider = providerClass.cast(ap);
+                        if (isFiltered(provider.getName(), excludes, includes)) {
+                            continue;
+                        }
                         String key = provider.getClass().getName() + ":" + provider.getName();
                         if (provider.isAvailable() && seenKeys.add(key)) {
                             available.add(provider);
@@ -140,6 +151,30 @@ public final class AlgorithmManager {
         available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
         logger.info("Discovered and prioritized {} providers for {}", available.size(), providerClass.getSimpleName());
         return available;
+    }
+
+    private static boolean isFiltered(String name, Set<String> excludes, Set<String> includes) {
+        // Check includes first
+        if (!includes.isEmpty()) {
+            boolean found = false;
+            for (String inc : includes) {
+                if (name.contains(inc.trim())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return true;
+            }
+        }
+
+        // Then check excludes
+        for (String exc : excludes) {
+            if (name.contains(exc.trim())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static <P extends AlgorithmProvider> P findBestProvider(Class<P> providerClass) {
