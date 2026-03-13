@@ -8,8 +8,17 @@ package org.episteme.core.technical.algorithm;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.core.technical.backend.Backend;
@@ -100,23 +109,25 @@ public final class AlgorithmManager {
         return (List<P>) PROVIDER_CACHE.computeIfAbsent(providerClass, k -> discoverProviders((Class<P>) k));
     }
 
+    private static final Set<String> GLOBAL_EXCLUDES;
+    private static final Set<String> GLOBAL_INCLUDES;
+
+    static {
+        String ex = System.getProperty("org.episteme.exclude.provider", "");
+        String in = System.getProperty("org.episteme.include.provider", "");
+        GLOBAL_EXCLUDES = ex.isEmpty() ? Set.of() : Arrays.stream(ex.split(",")).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
+        GLOBAL_INCLUDES = in.isEmpty() ? Set.of() : Arrays.stream(in.split(",")).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
+    }
+
     private static <P extends AlgorithmProvider> List<P> discoverProviders(Class<P> providerClass) {
-        // Key for deduplication: Class + Name
         Set<String> seenKeys = new HashSet<>();
         List<P> available = new ArrayList<>();
 
-        String excludeProp = System.getProperty("org.episteme.exclude.provider", "");
-        String includeProp = System.getProperty("org.episteme.include.provider", "");
-        Set<String> excludes = excludeProp.isEmpty() ? Set.of() : Set.of(excludeProp.split(","));
-        Set<String> includes = includeProp.isEmpty() ? Set.of() : Set.of(includeProp.split(","));
-
         // Path 1: Direct SPI discovery
         ServiceLoader<P> loader = ServiceLoader.load(providerClass);
-        Iterator<P> iterator = loader.iterator();
-        while (iterator.hasNext()) {
+        for (P provider : loader) {
             try {
-                P provider = iterator.next();
-                if (isFiltered(provider.getName(), excludes, includes)) {
+                if (isFiltered(provider.getName())) {
                     continue;
                 }
                 String key = provider.getClass().getName() + ":" + provider.getName();
@@ -124,8 +135,7 @@ public final class AlgorithmManager {
                     available.add(provider);
                 }
             } catch (Throwable t) {
-                logger.warn("Skipping bad provider for {}: {} ({})", 
-                    providerClass.getSimpleName(), t.getMessage(), t.getClass().getSimpleName());
+                logger.warn("Skipping bad provider: {}", t.getMessage());
             }
         }
 
@@ -134,7 +144,7 @@ public final class AlgorithmManager {
                 for (AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (providerClass.isInstance(ap)) {
                         P provider = providerClass.cast(ap);
-                        if (isFiltered(provider.getName(), excludes, includes)) {
+                        if (isFiltered(provider.getName())) {
                             continue;
                         }
                         String key = provider.getClass().getName() + ":" + provider.getName();
@@ -144,38 +154,19 @@ public final class AlgorithmManager {
                     }
                 }
             }
-        } catch (Exception e) {
-            logger.trace("BackendDiscovery not available for provider bridge: {}", e.getMessage());
-        }
+        } catch (Exception e) {}
 
         available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
         logger.info("Discovered and prioritized {} providers for {}", available.size(), providerClass.getSimpleName());
         return available;
     }
 
-    private static boolean isFiltered(String name, Set<String> excludes, Set<String> includes) {
-        // Check includes first
-        if (!includes.isEmpty()) {
-            boolean found = false;
-            for (String inc : includes) {
-                if (name.toLowerCase().contains(inc.trim().toLowerCase())) { // Case-insensitive check
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return true;
-            }
+    private static boolean isFiltered(String name) {
+        String lowerName = name.toLowerCase();
+        if (!GLOBAL_INCLUDES.isEmpty()) {
+            if (GLOBAL_INCLUDES.stream().noneMatch(lowerName::contains)) return true;
         }
-
-        // Then check excludes
-        for (String exc : excludes) {
-            String trimmedExc = exc.trim();
-            if (!trimmedExc.isEmpty() && name.toLowerCase().contains(trimmedExc.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
+        return GLOBAL_EXCLUDES.stream().anyMatch(lowerName::contains);
     }
 
     private static <P extends AlgorithmProvider> P findBestProvider(Class<P> providerClass) {
