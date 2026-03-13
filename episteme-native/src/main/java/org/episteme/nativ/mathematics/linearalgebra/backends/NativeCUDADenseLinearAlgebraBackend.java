@@ -1467,11 +1467,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     private static void checkCublas(int result) {
         if (result != 0) {
-            if (CUBLAS_GET_ERROR_STRING == null) {
+            if (CUBLAS_STATUS_GET_STRING == null) {
                 throw new RuntimeException("CUBLAS Error " + result + " (Error string lookup not initialized)");
             }
             try {
-                MemorySegment seg = (MemorySegment) CUBLAS_GET_ERROR_STRING.invokeExact(result);
+                MemorySegment seg = (MemorySegment) CUBLAS_STATUS_GET_STRING.invokeExact(result);
                 String msg = seg.reinterpret(1024).getString(0);
                 logger.error("CUBLAS Error {}: {}", result, msg);
                 throw new RuntimeException("CUBLAS Error " + result + ": " + msg);
