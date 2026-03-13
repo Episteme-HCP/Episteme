@@ -462,7 +462,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         if (eigVecs.rank() == 3) {
             // Complex eigenvectors representation in some ND4J versions [n, n, 2]
             // Slicing to get [n, n, 0] which is the real part
-            eigVecs = eigVecs.get(org.nd4j.linalg.factory.Nd4j.all(), org.nd4j.linalg.factory.Nd4j.all(), org.nd4j.linalg.indexing.NDArrayIndex.point(0)).dup(); 
+            eigVecs = eigVecs.get(org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.point(0)).dup(); 
         } else if (eigVecs.dataType() != org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
             eigVecs = eigVecs.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
         }
