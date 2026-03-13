@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
+import org.episteme.core.io.UserPreferences;
 
 /**
  * Universal manager for algorithm providers.
@@ -148,7 +149,7 @@ public final class AlgorithmManager {
                 for (AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (providerClass.isInstance(ap)) {
                         P provider = providerClass.cast(ap);
-                        if (isFiltered(provider.getName())) {
+                        if (isFiltered(provider.getName()) || UserPreferences.getInstance().isBackendDeactivated(backend.getId())) {
                             // System.err.println("[AlgorithmManager] Filtering out backend provider: " + provider.getName());
                             continue;
                         }
@@ -166,7 +167,7 @@ public final class AlgorithmManager {
         return available;
     }
 
-    private static boolean isFiltered(String name) {
+    public static boolean isFiltered(String name) {
         if (name == null) return false;
         String lowerName = name.trim().toLowerCase();
         
