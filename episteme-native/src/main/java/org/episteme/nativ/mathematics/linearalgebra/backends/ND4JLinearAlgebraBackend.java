@@ -129,13 +129,25 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         return Nd4j.create(data);
     }
 
-    private Matrix<Real> fromINDArray(INDArray arr) {
-        INDArray contiguous = arr.isView() || arr.ordering() != 'c' ? arr.dup('c') : arr;
-        int rows = (int) contiguous.rows();
-        int cols = (int) contiguous.columns();
-        double[] data = contiguous.data().asDouble();
-        System.out.println("[ND4J] fromINDArray: " + rows + "x" + cols + ", first element: " + (data.length > 0 ? data[0] : "N/A") + ", ordering: " + contiguous.ordering());
-        return RealDoubleMatrix.of(data, rows, cols);
+    private Matrix<Real> fromINDArray(INDArray array) {
+        if (array == null) return null;
+        if (array.rank() > 2) {
+            logger.debug("fromINDArray: Slicing array of rank {} to rank 2", array.rank());
+            while (array.rank() > 2) array = array.slice(0);
+        }
+        if (array.rank() == 1) {
+            array = array.reshape(1, array.length());
+        }
+        int rows = (int) array.rows();
+        int cols = (int) array.columns();
+        logger.debug("[ND4J] fromINDArray: {}x{}, first element: {}, ordering: {}", rows, cols, array.getDouble(0), array.ordering());
+        Real[] data = new Real[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i * cols + j] = Real.of(array.getDouble(i, j));
+            }
+        }
+        return new RealDoubleMatrix(data, rows, cols);
     }
 
     private INDArray toINDArray(Vector<Real> v) {
@@ -246,9 +258,11 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
             
             if (maxIdx != k) {
                 // Swap rows k and maxIdx
-                INDArray rowK = m.getRow(k).dup();
-                m.putRow(k, m.getRow(maxIdx));
-                m.putRow(maxIdx, rowK);
+                for (int j = 0; j < n; j++) {
+                    double tmp = m.getDouble(k, j);
+                    m.putScalar(k, j, m.getDouble(maxIdx, j));
+                    m.putScalar(maxIdx, j, tmp);
+                }
                 swaps++;
             }
             
@@ -365,10 +379,12 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
             
             if (maxIdx != k) {
                 // Swap rows in work matrix and perm array
-                INDArray rowK = work.getRow(k).dup();
-                work.putRow(k, work.getRow(maxIdx));
-                work.putRow(maxIdx, rowK);
-                int tmp = perm[k]; perm[k] = perm[maxIdx]; perm[maxIdx] = tmp;
+                for (int j = 0; j < n; j++) {
+                    double tmp = work.getDouble(k, j);
+                    work.putScalar(k, j, work.getDouble(maxIdx, j));
+                    work.putScalar(maxIdx, j, tmp);
+                }
+                int tmpP = perm[k]; perm[k] = perm[maxIdx]; perm[maxIdx] = tmpP;
             }
             
             // Gaussian elimination
