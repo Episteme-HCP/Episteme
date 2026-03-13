@@ -34,17 +34,28 @@ public class LinearAlgebraComplianceTest {
         List<LinearAlgebraProvider<Real>> rawProviders = new ArrayList<>();
         @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-        for (LinearAlgebraProvider<?> p : loader) {
-            if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
-                @SuppressWarnings("unchecked")
-                LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
-                rawProviders.add(typed);
+        Iterator<LinearAlgebraProvider> it = loader.iterator();
+        while(true) {
+            try {
+                if (!it.hasNext()) break;
+                LinearAlgebraProvider<?> p = it.next();
+                System.out.println("[ComplianceTest] Discovered via SPI: " + p.getClass().getName());
+                if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
+                    rawProviders.add(typed);
+                }
+            } catch (Throwable e) {
+                System.err.println("Error loading SPI provider: " + e.getMessage());
             }
         }
         try {
+            System.out.println("[ComplianceTest] Discovering via BackendDiscovery...");
             for (org.episteme.core.technical.backend.Backend backend : org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders()) {
+                System.out.println("[ComplianceTest] Probing backend: " + backend.getName());
                 for (org.episteme.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (ap instanceof LinearAlgebraProvider<?> p) {
+                        System.out.println("[ComplianceTest]   Found provider: " + ap.getClass().getName());
                         if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                             @SuppressWarnings("unchecked")
                             LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
