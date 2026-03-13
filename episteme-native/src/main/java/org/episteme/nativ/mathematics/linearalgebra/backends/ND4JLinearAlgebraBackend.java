@@ -451,7 +451,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray eigVecs = result[1];
         
         // If complex, eigenvalues has 2 columns (Real, Imag) or is complex type
-        if (eigVals.columns() == 2 && eigVals.rank() == 2) {
+        if (eigVals.rank() == 2 && eigVals.columns() == 2) {
              eigVals = eigVals.getColumn(0).dup(); // Take real part
         } else if (eigVals.dataType() == org.nd4j.linalg.api.buffer.DataType.FLOAT || eigVals.dataType() == org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
              // Already real
@@ -459,9 +459,10 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
              eigVals = eigVals.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
         }
 
-        if (eigVecs.columns() == 2 && eigVecs.rank() == 3) {
+        if (eigVecs.rank() == 3) {
             // Complex eigenvectors representation in some ND4J versions [n, n, 2]
-            eigVecs = eigVecs.slice(0, 2).dup(); 
+            // Slicing to get [n, n, 0] which is the real part
+            eigVecs = eigVecs.get(org.nd4j.linalg.factory.Nd4j.all(), org.nd4j.linalg.factory.Nd4j.all(), org.nd4j.linalg.indexing.NDArrayIndex.point(0)).dup(); 
         } else if (eigVecs.dataType() != org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
             eigVecs = eigVecs.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
         }
