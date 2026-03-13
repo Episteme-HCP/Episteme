@@ -57,6 +57,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel luDecomposeStepKernel;
     private static cl_kernel choleskyDecomposeStepKernel;
     private static cl_kernel qrHouseholderApplyKernel;
+    private static cl_kernel matCopyKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -230,6 +231,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
             swapRowsKernel = clCreateKernel(program, "swapRows", null);
             gaussElimPhase1WithBKernel = clCreateKernel(program, "gaussElimPhase1WithB", null);
+            matCopyKernel = clCreateKernel(program, "mat_copy", null);
             luDecomposeStepKernel = clCreateKernel(program, "lu_decompose_step", null);
             choleskyDecomposeStepKernel = clCreateKernel(program, "cholesky_decompose_step", null);
             qrHouseholderApplyKernel = clCreateKernel(program, "qr_householder_apply", null);
@@ -742,9 +744,43 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        // Fallback to simpler method or unimplemented for SVDecomposition if too complex
-        // For now, let's keep it as is or throw if truly "native only" is required without EJML/Commons
-        throw new UnsupportedOperationException("SVD decomposition not yet implemented natively in OpenCL");
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for SVD");
+        
+        int m = a.rows();
+        int n = a.cols();
+        
+        // Economy SVD via Eigen decomposition of A^T A (for m >= n)
+        // A = U S V^T  => A^T A = V S^2 V^T
+        logger.debug("Entering OpenCL SVD (Economy via A^T A): [{}x{}]", m, n);
+        Matrix<Real> at = transpose(a);
+        Matrix<Real> ata = at.multiply(a);
+        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen = eigen(ata);
+        
+        Matrix<Real> V = eigen.V();
+        Vector<Real> D = eigen.D();
+        
+        double[] sData = new double[n];
+        for (int i = 0; i < n; i++) {
+            sData[i] = Math.sqrt(Math.max(0, D.get(i).doubleValue()));
+        }
+        Vector<Real> S = toRealVector(sData);
+        
+        // U = A * V * inv(S)
+        Matrix<Real> AV = a.multiply(V);
+        double[] avData = toDoubleArray(AV);
+        for (int j = 0; j < n; j++) {
+            double sVal = sData[j];
+            if (sVal > 1e-12) {
+                double invS = 1.0 / sVal;
+                for (int i = 0; i < m; i++) avData[i * n + j] *= invS;
+            } else {
+                for (int i = 0; i < m; i++) avData[i * n + j] = 0.0;
+            }
+        }
+        Matrix<Real> U = fromDoubleArray(avData, m, n);
+        
+        logger.debug("OpenCL SVD finished successfully.");
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
     }
 
     @Override
