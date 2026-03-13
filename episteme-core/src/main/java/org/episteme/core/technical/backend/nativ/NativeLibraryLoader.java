@@ -25,11 +25,22 @@ import org.slf4j.LoggerFactory;
 public class NativeLibraryLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeLibraryLoader.class);
-    private static final Linker LINKER = Linker.nativeLinker();
+    private static final Linker LINKER;
     private static final java.util.Set<String> FAILED_LIBS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final java.util.Set<String> FAILED_VARIANTS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final java.util.Map<String, String> FAILURE_CAUSES = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.Map<String, SymbolLookup> LOADED_LIBS = new java.util.concurrent.ConcurrentHashMap<>();
+
+    static {
+        Linker temp = null;
+        try {
+            temp = Linker.nativeLinker();
+        } catch (Throwable t) {
+            System.err.println("[NativeLibraryLoader] CRITICAL: Linker.nativeLinker() failed: " + t.getMessage());
+            t.printStackTrace();
+        }
+        LINKER = temp;
+    }
 
     /**
      * Finds the "libs" directory by searching upwards and checking module paths.
