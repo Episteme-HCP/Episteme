@@ -175,6 +175,113 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
         return buildCSRFromMaps(rowMaps, rows, cols, r);
     }
 
+    @Override
+    public Vector<E> subtract(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != b.dimension()) {
+            throw new IllegalArgumentException("Vector dimensions must match");
+        }
+        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        int dim = a.dimension();
+        
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, r.zero());
+        
+        // Populate from a
+        if (a.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
+            ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) a.getStorage())
+                .getNonZeros().forEach((Integer idx, E val) -> storage.set(idx.intValue(), val));
+        } else {
+            for (int i = 0; i < dim; i++) {
+                storage.set(i, a.get(i));
+            }
+        }
+        
+        // Subtract from b
+        if (b.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
+            ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) b.getStorage())
+                .getNonZeros().forEach((Integer idx, E val) -> {
+                    E existing = storage.get(idx);
+                    storage.set(idx, r.subtract(existing, val));
+                });
+        } else {
+            for (int i = 0; i < dim; i++) {
+                E val = b.get(i);
+                if (!val.equals(r.zero())) {
+                    E existing = storage.get(i);
+                    storage.set(i, r.subtract(existing, val));
+                }
+            }
+        }
+        
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
+    }
+
+    @Override
+    public Vector<E> multiply(Vector<E> vector, E scalar) {
+        Ring<E> r = (this.ring != null) ? this.ring : vector.getScalarRing();
+        if (scalar.equals(r.zero())) {
+            return org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(vector.dimension(), r);
+        }
+        
+        int dim = vector.dimension();
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, r.zero());
+            
+        if (vector.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
+            ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) vector.getStorage())
+                .getNonZeros().forEach((idx, val) -> storage.set(idx, r.multiply(val, scalar)));
+        } else {
+            for (int i = 0; i < dim; i++) {
+                E val = vector.get(i);
+                if (!val.equals(r.zero())) {
+                    storage.set(i, r.multiply(val, scalar));
+                }
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
+    }
+
+    @Override
+    public E dot(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimensions must match");
+        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        E sum = r.zero();
+        
+        if (a.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
+            ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) a.getStorage())
+                .getNonZeros().forEach((idx, val) -> {
+                    // sum = sum + val * b.get(idx)
+                    // We need to use recursion or a container because of lambda final restriction
+                });
+            // Let's use old fashioned loop for dot to avoid overhead and lambda issues
+             Map<Integer, E> nz = ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) a.getStorage()).getNonZeros();
+            for (Map.Entry<Integer, E> entry : nz.entrySet()) {
+                sum = r.add(sum, r.multiply(entry.getValue(), b.get(entry.getKey())));
+            }
+        } else if (b.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
+             Map<Integer, E> nz = ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) b.getStorage()).getNonZeros();
+            for (Map.Entry<Integer, E> entry : nz.entrySet()) {
+                sum = r.add(sum, r.multiply(a.get(entry.getKey()), entry.getValue()));
+            }
+        } else {
+            for (int i = 0; i < a.dimension(); i++) {
+                sum = r.add(sum, r.multiply(a.get(i), b.get(i)));
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public E norm(Vector<E> a) {
+        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        E d = dot(a, a);
+        if (r instanceof org.episteme.core.mathematics.sets.Reals) {
+             return (E) ((Real) d).sqrt();
+        }
+        throw new UnsupportedOperationException("Norm requires sqrt support on scalars (Reals supported)");
+    }
+
     @SuppressWarnings("unchecked")
     private void computeRowMultiplication(int i, TreeMap<Integer, E> rowMap,
             int[] aRowPtrs, int[] aCols, Object[] aVals,
@@ -209,6 +316,48 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
             return multiplySparse((SparseMatrix<E>) a, (SparseMatrix<E>) b);
         }
         return SparseLinearAlgebraProvider.super.multiply(a, b);
+    }
+
+    @Override
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        if (a.cols() != b.dimension()) {
+            throw new IllegalArgumentException("Matrix columns must match vector dimension");
+        }
+        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        int rows = a.rows();
+
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(rows, r.zero());
+
+        if (a instanceof SparseMatrix) {
+            SparseMatrix<E> s = (SparseMatrix<E>) a;
+            int[] rowPtrs = s.getRowPointers();
+            int[] colIdxs = s.getColIndices();
+            Object[] values = s.getValues();
+
+            for (int i = 0; i < rows; i++) {
+                E rowSum = r.zero();
+                for (int j = rowPtrs[i]; j < rowPtrs[i + 1]; j++) {
+                    E val = (E) values[j];
+                    E bVal = b.get(colIdxs[j]);
+                    rowSum = r.add(rowSum, r.multiply(val, bVal));
+                }
+                if (!rowSum.equals(r.zero())) {
+                    storage.set(i, rowSum);
+                }
+            }
+        } else {
+            for (int i = 0; i < rows; i++) {
+                E rowSum = r.zero();
+                for (int j = 0; j < a.cols(); j++) {
+                    rowSum = r.add(rowSum, r.multiply(a.get(i, j), b.get(j)));
+                }
+                if (!rowSum.equals(r.zero())) {
+                    storage.set(i, rowSum);
+                }
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
     }
 
     /**

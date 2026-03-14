@@ -613,5 +613,45 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
     }
 
-    // Decompositions: not implemented — default throws from interface
+    // Decompositions and advanced operations (Fallbacks removed as per requirements)
+
+    @Override
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
+        throw new UnsupportedOperationException("Native OpenCL solver implementation pending");
+    }
+
+    @Override
+    public Matrix<Real> inverse(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native OpenCL inverse implementation pending");
+    }
+
+    @Override
+    public Real determinant(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native OpenCL determinant implementation pending");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native OpenCL LU implementation pending");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native OpenCL QR implementation pending");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native OpenCL SVD implementation pending");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native OpenCL Cholesky implementation pending");
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native OpenCL Eigen implementation pending");
+    }
 }

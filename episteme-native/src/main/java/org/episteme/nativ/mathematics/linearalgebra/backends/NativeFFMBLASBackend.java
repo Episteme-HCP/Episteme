@@ -778,6 +778,28 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     }
 
     @Override
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
+        if (!IS_AVAILABLE || DGEMV == null) throw new UnsupportedOperationException(getName() + ": matrix-vector multiply() not available");
+        int m = a.rows();
+        int n = a.cols();
+        if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
+            
+            // cblas_dgemv(layout, trans, m, n, alpha, A, lda, x, incx, beta, y, incy)
+            DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, n, 1.0, segA, n, segX, 1, 0.0, segY, 1);
+            
+            double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
+            return createDenseVector(result, m, a);
+        } catch (Throwable t) {
+            throw new RuntimeException("DGEMV failed", t);
+        }
+    }
+
+    @Override
     public org.episteme.core.mathematics.numbers.real.Real dot(Vector<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
          if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": dot() not available");
          int n = a.dimension();
