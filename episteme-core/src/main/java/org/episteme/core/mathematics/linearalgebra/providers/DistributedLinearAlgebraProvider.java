@@ -12,6 +12,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import com.google.auto.service.AutoService;
 
 /**
@@ -112,7 +113,7 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
     @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         // Check heuristics for distribution
-        boolean isLarge = (long)a.rows() * a.cols() * b.cols() > 1_000_000;
+        boolean isLarge = (long)a.rows() * a.cols() * b.cols() > 100_000_000;
         
         if (isLarge && a instanceof TiledMatrix && b instanceof TiledMatrix) {
             try {
@@ -135,21 +136,53 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
     }
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        if (a instanceof TiledMatrix) {
-            // Future implementation: Block-cyclic inversion
-            // For now, fallback to local
-            return getLocalProvider(a.getScalarRing()).inverse(a);
-        }
         return getLocalProvider(a.getScalarRing()).inverse(a);
     }
 
     @Override
+    public LUResult<E> lu(Matrix<E> a) {
+        return getLocalProvider(a.getScalarRing()).lu(a);
+    }
+
+    @Override
+    public QRResult<E> qr(Matrix<E> a) {
+        return getLocalProvider(a.getScalarRing()).qr(a);
+    }
+
+    @Override
+    public SVDResult<E> svd(Matrix<E> a) {
+        return getLocalProvider(a.getScalarRing()).svd(a);
+    }
+
+    @Override
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        return getLocalProvider(a.getScalarRing()).cholesky(a);
+    }
+
+    @Override
+    public EigenResult<E> eigen(Matrix<E> a) {
+        return getLocalProvider(a.getScalarRing()).eigen(a);
+    }
+
+    @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (a instanceof TiledMatrix) {
-            // Future implementation: Distributed LU/Backsubstitution
-            return getLocalProvider(a.getScalarRing()).solve(a, b);
-        }
         return getLocalProvider(a.getScalarRing()).solve(a, b);
+    }
+
+    @Override
+    public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
+        // Fallback to local
+        return getLocalProvider(null).solve(lu, b); 
+    }
+
+    @Override
+    public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
+        return getLocalProvider(null).solve(qr, b);
+    }
+
+    @Override
+    public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
+        return getLocalProvider(null).solve(cholesky, b);
     }
 
     @Override

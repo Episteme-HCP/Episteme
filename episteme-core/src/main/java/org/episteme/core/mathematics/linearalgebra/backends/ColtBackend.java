@@ -355,10 +355,10 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             cern.colt.matrix.DoubleMatrix2D cm = toColtMatrix(a);
             cern.colt.matrix.linalg.SingularValueDecomposition svd = new cern.colt.matrix.linalg.SingularValueDecomposition(cm);
             double[] sValues = svd.getSingularValues();
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sValues);
+            Vector<E> vecS = fromColtVector(new cern.colt.matrix.impl.DenseDoubleMatrix1D(sValues));
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
                 fromColtMatrix(svd.getU()),
-                (Vector<E>) S,
+                vecS,
                 fromColtMatrix(svd.getV())
             );
         }

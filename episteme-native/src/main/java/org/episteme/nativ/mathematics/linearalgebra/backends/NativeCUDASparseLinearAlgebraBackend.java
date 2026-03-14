@@ -26,6 +26,8 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.algorithm.OperationContext.Hint;
 
 /**
  * Robust CUDA acceleration backend using Project Panama to interface with CUDA and CUBLAS.
@@ -956,6 +958,26 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
         throw new UnsupportedOperationException("Native CUDA Cholesky implementation pending");
+    }
+
+    @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1.0;
+        double base = getPriority();
+
+        if (context.hasHint(Hint.SPARSE)) {
+            base += 40.0;
+        }
+        if (context.hasHint(Hint.GPU_RESIDENT)) {
+            base += 50.0;
+        }
+        
+        // Penalize very small data which is better handled on CPU due to overhead
+        if (context.getDataSize() < 500) {
+            base -= 200.0;
+        }
+
+        return base;
     }
 
     @Override

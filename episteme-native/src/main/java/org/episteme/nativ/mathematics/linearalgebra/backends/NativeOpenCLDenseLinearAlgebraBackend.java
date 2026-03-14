@@ -26,7 +26,6 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
-import org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -998,12 +997,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         List<Real> reals = new ArrayList<>(d.length);
         for(double v : d) reals.add(Real.of(v));
         return new DenseVector<>(reals, (Ring<Real>) reference.getScalarRing());
-    }
-
-    private Vector<Real> toRealVector(Real[] d) {
-        double[] vals = new double[d.length];
-        for(int i=0; i<d.length; i++) vals[i] = d[i].doubleValue();
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(vals);
     }
 
     private double[] matVecMul(double[] a, double[] b, int rows, int cols) {

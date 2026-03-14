@@ -31,19 +31,13 @@ import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
-import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
-import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.real.RealDouble;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.core.util.PerformanceLogger;
-import org.episteme.core.technical.algorithm.AlgorithmManager;
 import com.google.auto.service.AutoService;
 
 
@@ -1128,6 +1122,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         throw new UnsupportedOperationException("Generic Cholesky solve not yet implemented in CPUDenseLinearAlgebraProvider");
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<E> pseudoInverse(Matrix<E> a) {
         if (a.getScalarRing() instanceof Reals) {
              SVDResult<E> svd = svd(a);

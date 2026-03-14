@@ -4,16 +4,14 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraBackend;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeND4JLinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+
 
 public class IsolatedComplianceTest {
 
-    private static final double TOLERANCE = 1e-7;
     private static final int SIZE = 20;
 
     private static class ComplianceResult {
