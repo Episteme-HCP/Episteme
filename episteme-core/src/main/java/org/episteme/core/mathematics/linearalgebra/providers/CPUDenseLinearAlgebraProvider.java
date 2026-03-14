@@ -28,22 +28,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.episteme.core.mathematics.structures.rings.Field;
-
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
-import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.sets.Reals;
-
-import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRDecomposition;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition;
+import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.real.RealDouble;
+import org.episteme.core.mathematics.sets.Reals;
+import org.episteme.core.util.PerformanceLogger;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import com.google.auto.service.AutoService;
 
 
 /**
@@ -1059,8 +1060,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @SuppressWarnings("unchecked")
     public QRResult<E> qr(Matrix<E> a) {
         if (a.getScalarRing() instanceof Reals) {
-            QRDecomposition decomp = QRDecomposition.decompose((Matrix<Real>) a);
-            return new QRResult<E>((Matrix<E>) decomp.getQ(), (Matrix<E>) decomp.getR());
+            return (QRResult<E>) JavaQR.decompose((Matrix<Real>) a);
         }
         return LinearAlgebraProvider.super.qr(a);
     }
@@ -1069,12 +1069,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @SuppressWarnings("unchecked")
     public SVDResult<E> svd(Matrix<E> a) {
         if (a.getScalarRing() instanceof Reals) {
-            SVDDecomposition decomp = SVDDecomposition.decompose((Matrix<Real>) a);
-            Real[] sigmas = decomp.getSingularValues();
-            List<Real> sList = new ArrayList<>(sigmas.length);
-            for (Real r : sigmas) sList.add(r);
-            Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(sList, (Field<Real>) a.getScalarRing());
-            return new SVDResult<E>((Matrix<E>) decomp.getU(), (Vector<E>) S, (Matrix<E>) decomp.getV());
+            return (SVDResult<E>) JavaSVD.decompose((Matrix<Real>) a);
         }
         return LinearAlgebraProvider.super.svd(a);
     }
@@ -1083,12 +1078,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @SuppressWarnings("unchecked")
     public EigenResult<E> eigen(Matrix<E> a) {
         if (a.getScalarRing() instanceof Reals) {
-            EigenDecomposition decomp = EigenDecomposition.decompose((Matrix<Real>) a);
-            Real[] values = decomp.getEigenvalues();
-            List<Real> vList = new ArrayList<>(values.length);
-            for (Real r : values) vList.add(r);
-            Vector<Real> D = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(vList, (Field<Real>) a.getScalarRing());
-            return new EigenResult<E>((Matrix<E>) decomp.getEigenvectors(), (Vector<E>) D);
+            return (EigenResult<E>) JavaEigen.decompose((Matrix<Real>) a);
         }
         return LinearAlgebraProvider.super.eigen(a);
     }
@@ -1097,12 +1087,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @SuppressWarnings("unchecked")
     public LUResult<E> lu(Matrix<E> a) {
         if (a.getScalarRing() instanceof Reals) {
-            LUDecomposition decomp = LUDecomposition.decompose((Matrix<Real>) a);
-            int[] perm = decomp.getPermutation();
-            List<Real> pList = new ArrayList<>(perm.length);
-            for (int i : perm) pList.add(Real.of(i));
-            Vector<Real> P = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(pList, (Field<Real>) a.getScalarRing());
-            return new LUResult<E>((Matrix<E>) decomp.getL(), (Matrix<E>) decomp.getU(), (Vector<E>) P);
+            return (LUResult<E>) JavaLU.decompose((Matrix<Real>) a);
         }
         return LinearAlgebraProvider.super.lu(a);
     }
@@ -1111,10 +1096,36 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @SuppressWarnings("unchecked")
     public CholeskyResult<E> cholesky(Matrix<E> a) {
         if (a.getScalarRing() instanceof Reals) {
-            CholeskyDecomposition decomp = CholeskyDecomposition.decompose((Matrix<Real>) a);
-            return new CholeskyResult<E>((Matrix<E>) decomp.getL());
+            return (CholeskyResult<E>) JavaCholesky.decompose((Matrix<Real>) a);
         }
         return LinearAlgebraProvider.super.cholesky(a);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
+        if (field instanceof Reals) {
+            return (Vector<E>) JavaLU.solve((LUResult<Real>) lu, (Vector<Real>) b);
+        }
+        throw new UnsupportedOperationException("Generic LU solve not yet implemented in CPUDenseLinearAlgebraProvider");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
+        if (field instanceof Reals) {
+            return (Vector<E>) JavaQR.solve((QRResult<Real>) qr, (Vector<Real>) b);
+        }
+        throw new UnsupportedOperationException("Generic QR solve not yet implemented in CPUDenseLinearAlgebraProvider");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
+        if (field instanceof Reals) {
+            return (Vector<E>) JavaCholesky.solve((CholeskyResult<Real>) cholesky, (Vector<Real>) b);
+        }
+        throw new UnsupportedOperationException("Generic Cholesky solve not yet implemented in CPUDenseLinearAlgebraProvider");
     }
 
     private Matrix<E> pseudoInverse(Matrix<E> a) {
@@ -1144,6 +1155,508 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
              return multiply(multiply(vEco, sPlus), transpose(uEco));
         }
         throw new UnsupportedOperationException("Pseudo-inverse not supported for generic field: " + field.getClass().getSimpleName());
+    }
+
+    // --- Autonomous Java Solver Foundations ---
+
+    private static class JavaLU {
+        public static LUResult<Real> decompose(Matrix<Real> matrix) {
+            int n = matrix.rows();
+            if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+            Real[][] data = new Real[n][n];
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = matrix.get(i, j);
+
+            int[] perm = new int[n];
+            for (int i = 0; i < n; i++) perm[i] = i;
+
+            for (int k = 0; k < n; k++) {
+                int maxRow = k;
+                Real maxVal = data[k][k].abs();
+                for (int i = k + 1; i < n; i++) {
+                    Real val = data[i][k].abs();
+                    if (val.compareTo(maxVal) > 0) {
+                        maxVal = val;
+                        maxRow = i;
+                    }
+                }
+
+                if (maxRow != k) {
+                    Real[] temp = data[k];
+                    data[k] = data[maxRow];
+                    data[maxRow] = temp;
+                    int tempPerm = perm[k];
+                    perm[k] = perm[maxRow];
+                    perm[maxRow] = tempPerm;
+                }
+
+                for (int i = k + 1; i < n; i++) {
+                    if (!data[k][k].isZero()) {
+                        Real factor = data[i][k].divide(data[k][k]);
+                        data[i][k] = factor;
+                        for (int j = k + 1; j < n; j++) {
+                            data[i][j] = data[i][j].subtract(factor.multiply(data[k][j]));
+                        }
+                    }
+                }
+            }
+
+            Real[][] lData = new Real[n][n];
+            Real[][] uData = new Real[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i > j) { lData[i][j] = data[i][j]; uData[i][j] = Real.ZERO; }
+                    else if (i == j) { lData[i][j] = Real.ONE; uData[i][j] = data[i][j]; }
+                    else { lData[i][j] = Real.ZERO; uData[i][j] = data[i][j]; }
+                }
+            }
+
+            double[] pDouble = new double[n];
+            for(int i=0; i<n; i++) pDouble[i] = perm[i];
+
+            return new LUResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(lData, Reals.getInstance()),
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(uData, Reals.getInstance()),
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble)
+            );
+        }
+
+        public static Vector<Real> solve(LUResult<Real> lu, Vector<Real> b) {
+            int n = lu.L().rows();
+            Real[] x = new Real[n];
+            Real[] pb = new Real[n];
+
+            for (int i = 0; i < n; i++) {
+                pb[i] = b.get((int) lu.P().get(i).doubleValue());
+            }
+
+            Real[] y = new Real[n];
+            for (int i = 0; i < n; i++) {
+                Real sum = Real.ZERO;
+                for (int j = 0; j < i; j++) {
+                    sum = sum.add(lu.L().get(i, j).multiply(y[j]));
+                }
+                y[i] = pb[i].subtract(sum);
+            }
+
+            for (int i = n - 1; i >= 0; i--) {
+                Real sum = Real.ZERO;
+                for (int j = i + 1; j < n; j++) {
+                    sum = sum.add(lu.U().get(i, j).multiply(x[j]));
+                }
+                x[i] = y[i].subtract(sum).divide(lu.U().get(i, i));
+            }
+
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), Reals.getInstance());
+        }
+    }
+
+    private static class JavaQR {
+        public static QRResult<Real> decompose(Matrix<Real> matrix) {
+            int m = matrix.rows();
+            int n = matrix.cols();
+
+            Real[][] A = new Real[m][n];
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
+
+            Real[][] Q = new Real[m][m];
+            for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) Q[i][j] = (i == j) ? Real.ONE : Real.ZERO;
+
+            for (int k = 0; k < Math.min(m, n); k++) {
+                Real norm = Real.ZERO;
+                for (int i = k; i < m; i++) norm = norm.add(A[i][k].multiply(A[i][k]));
+                norm = norm.sqrt();
+                if (norm.isZero()) {
+                    continue;
+                }
+
+                Real a1 = A[k][k];
+                Real alpha = (a1.compareTo(Real.ZERO) >= 0) ? norm.negate() : norm;
+                
+                Real[] v = new Real[m - k];
+                v[0] = A[k][k].subtract(alpha);
+                for (int i = 1; i < v.length; i++) v[i] = A[k + i][k];
+
+                Real vNorm = Real.ZERO;
+                for (Real val : v) vNorm = vNorm.add(val.multiply(val));
+                vNorm = vNorm.sqrt();
+                if (vNorm.isZero()) continue;
+                for (int i = 0; i < v.length; i++) v[i] = v[i].divide(vNorm);
+
+                for (int j = k; j < n; j++) {
+                    Real vDotA = Real.ZERO;
+                    for (int i = 0; i < v.length; i++) vDotA = vDotA.add(v[i].multiply(A[k + i][j]));
+                    Real twoVDotA = vDotA.add(vDotA);
+                    for (int i = 0; i < v.length; i++) A[k + i][j] = A[k + i][j].subtract(twoVDotA.multiply(v[i]));
+                }
+
+                for (int i = 0; i < m; i++) {
+                    Real qDotV = Real.ZERO;
+                    for (int j = 0; j < v.length; j++) qDotV = qDotV.add(Q[i][k + j].multiply(v[j]));
+                    Real twoQDotV = qDotV.add(qDotV);
+                    for (int j = 0; j < v.length; j++) Q[i][k + j] = Q[i][k + j].subtract(twoQDotV.multiply(v[j]));
+                }
+            }
+
+            for (int i = 0; i < m; i++) for (int j = 0; j < Math.min(i, n); j++) A[i][j] = Real.ZERO;
+            return new QRResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q, Reals.getInstance()), 
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(A, Reals.getInstance())
+            );
+        }
+
+        public static Vector<Real> solve(QRResult<Real> qr, Vector<Real> b) {
+            int m = qr.Q().rows();
+            int n = qr.R().cols();
+            Real[] qtb = new Real[m];
+            for (int i = 0; i < m; i++) {
+                Real sum = Real.ZERO;
+                for (int j = 0; j < m; j++) sum = sum.add(qr.Q().get(j, i).multiply(b.get(j)));
+                qtb[i] = sum;
+            }
+            Real[] x = new Real[n];
+            for (int i = n - 1; i >= 0; i--) {
+                Real sum = qtb[i];
+                for (int j = i + 1; j < n; j++) sum = sum.subtract(qr.R().get(i, j).multiply(x[j]));
+                Real rii = qr.R().get(i, i);
+                if (rii.abs().compareTo(Real.of(1e-15)) < 0) x[i] = Real.ZERO;
+                else x[i] = sum.divide(rii);
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), Reals.getInstance());
+        }
+    }
+
+    private static class JavaCholesky {
+        public static CholeskyResult<Real> decompose(Matrix<Real> matrix) {
+            int n = matrix.rows();
+            Real[][] L = new Real[n][n];
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) L[i][j] = Real.ZERO;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j <= i; j++) {
+                    Real sum = Real.ZERO;
+                    if (j == i) {
+                        for (int k = 0; k < j; k++) sum = sum.add(L[j][k].multiply(L[j][k]));
+                        Real diag = matrix.get(j, j).subtract(sum);
+                        if (diag.compareTo(Real.ZERO) <= 0) throw new IllegalArgumentException("Not positive definite");
+                        L[j][j] = diag.sqrt();
+                    } else {
+                        for (int k = 0; k < j; k++) sum = sum.add(L[i][k].multiply(L[j][k]));
+                        L[i][j] = matrix.get(i, j).subtract(sum).divide(L[j][j]);
+                    }
+                }
+            }
+            return new CholeskyResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(L, Reals.getInstance()));
+        }
+
+        public static Vector<Real> solve(CholeskyResult<Real> cholesky, Vector<Real> b) {
+            int n = cholesky.L().rows();
+            Real[] y = new Real[n];
+            Real[] x = new Real[n];
+            for (int i = 0; i < n; i++) {
+                Real sum = Real.ZERO;
+                for (int j = 0; j < i; j++) sum = sum.add(cholesky.L().get(i, j).multiply(y[j]));
+                y[i] = b.get(i).subtract(sum).divide(cholesky.L().get(i, i));
+            }
+            for (int i = n - 1; i >= 0; i--) {
+                Real sum = Real.ZERO;
+                for (int j = i + 1; j < n; j++) sum = sum.add(cholesky.L().get(j, i).multiply(x[j]));
+                x[i] = y[i].subtract(sum).divide(cholesky.L().get(i, i));
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), Reals.getInstance());
+        }
+    }
+
+    private static class JavaSVD {
+        public static SVDResult<Real> decompose(Matrix<Real> matrix) {
+            int m = matrix.rows();
+            int n = matrix.cols();
+            double[][] A = new double[m][n];
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j).doubleValue();
+
+            int nu = Math.min(m, n);
+            double[] s = new double[Math.min(m + 1, n)];
+            double[][] U = new double[m][nu];
+            double[][] V = new double[n][n];
+            double[] e = new double[n];
+            double[] work = new double[m];
+
+            int nct = Math.min(m - 1, n);
+            int nrt = Math.max(0, Math.min(n - 2, m));
+            for (int k = 0; k < Math.max(nct, nrt); k++) {
+                if (k < nct) {
+                    s[k] = 0;
+                    for (int i = k; i < m; i++) s[k] = Math.hypot(s[k], A[i][k]);
+                    if (s[k] != 0.0) {
+                        if (A[k][k] < 0.0) s[k] = -s[k];
+                        for (int i = k; i < m; i++) A[i][k] /= s[k];
+                        A[k][k] += 1.0;
+                    }
+                    s[k] = -s[k];
+                }
+                for (int j = k + 1; j < n; j++) {
+                    if ((k < nct) && (s[k] != 0.0)) {
+                        double t = 0;
+                        for (int i = k; i < m; i++) t += A[i][k] * A[i][j];
+                        t = -t / A[k][k];
+                        for (int i = k; i < m; i++) A[i][j] += t * A[i][k];
+                    }
+                    e[j] = A[k][j];
+                }
+                if (k < nct) {
+                    for (int i = k; i < m; i++) U[i][k] = A[i][k];
+                }
+                if (k < nrt) {
+                    e[k] = 0;
+                    for (int i = k + 1; i < n; i++) e[k] = Math.hypot(e[k], e[i]);
+                    if (e[k] != 0.0) {
+                        if (e[k + 1] < 0.0) e[k] = -e[k];
+                        for (int i = k + 1; i < n; i++) e[i] /= e[k];
+                        e[k + 1] += 1.0;
+                    }
+                    e[k] = -e[k];
+                    if ((k + 1 < m) && (e[k] != 0.0)) {
+                        for (int i = k + 1; i < m; i++) work[i] = 0.0;
+                        for (int j = k + 1; j < n; j++) {
+                            for (int i = k + 1; i < m; i++) work[i] += e[j] * A[i][j];
+                        }
+                        for (int j = k + 1; j < n; j++) {
+                            double t = -e[j] / e[k + 1];
+                            for (int i = k + 1; i < m; i++) A[i][j] += t * work[i];
+                        }
+                    }
+                    for (int i = k + 1; i < n; i++) V[i][k] = e[i];
+                }
+            }
+
+            int p = Math.min(n, m + 1);
+            if (nct < n) s[nct] = A[nct][nct];
+            if (m < p) s[p - 1] = 0.0;
+            if (nrt + 1 < p) e[nrt] = A[nrt][p - 1];
+            e[p - 1] = 0.0;
+
+            for (int j = nct; j < nu; j++) {
+                for (int i = 0; i < m; i++) U[i][j] = 0.0;
+                U[j][j] = 1.0;
+            }
+            for (int k = nct - 1; k >= 0; k--) {
+                if (s[k] != 0.0) {
+                    for (int j = k + 1; j < nu; j++) {
+                        double t = 0;
+                        for (int i = k; i < m; i++) t += U[i][k] * U[i][j];
+                        t = -t / U[k][k];
+                        for (int i = k; i < m; i++) U[i][j] += t * U[i][k];
+                    }
+                    for (int i = k; i < m; i++) U[i][k] = -U[i][k];
+                    U[k][k] = 1.0 + U[k][k];
+                    for (int i = 0; i < k - 1; i++) U[i][k] = 0.0;
+                } else {
+                    for (int i = 0; i < m; i++) U[i][k] = 0.0;
+                    U[k][k] = 1.0;
+                }
+            }
+
+            for (int k = n - 1; k >= 0; k--) {
+                if ((k < nrt) && (e[k] != 0.0)) {
+                    for (int j = k + 1; j < nu; j++) {
+                        double t = 0;
+                        for (int i = k + 1; i < n; i++) t += V[i][k] * V[i][j];
+                        t = -t / V[k + 1][k];
+                        for (int i = k + 1; i < n; i++) V[i][j] += t * V[i][k];
+                    }
+                }
+                for (int i = 0; i < n; i++) V[i][k] = 0.0;
+                V[k][k] = 1.0;
+            }
+
+            int pp = p - 1;
+            int iter = 0;
+            double eps = Math.pow(2.0, -52.0);
+            double tiny = Math.pow(2.0, -966.0);
+            while (p > 0) {
+                int k, kase;
+                if (iter >= 500) break;
+                for (k = p - 2; k >= -1; k--) {
+                    if (k == -1) break;
+                    if (Math.abs(e[k]) <= tiny + eps * (Math.abs(s[k]) + Math.abs(s[k + 1]))) {
+                        e[k] = 0.0;
+                        break;
+                    }
+                }
+                if (k == p - 2) {
+                    kase = 4;
+                } else {
+                    int ks;
+                    for (ks = p - 1; ks >= k; ks--) {
+                        if (ks == k) break;
+                        double t = (ks != p ? Math.abs(e[ks]) : 0.) + (ks != k + 1 ? Math.abs(e[ks - 1]) : 0.);
+                        if (Math.abs(s[ks]) <= tiny + eps * t) {
+                            s[ks] = 0.0;
+                            break;
+                        }
+                    }
+                    if (ks == k) kase = 3;
+                    else if (ks == p - 1) kase = 1;
+                    else { kase = 2; k = ks; }
+                }
+                k++;
+
+                switch (kase) {
+                    case 1: {
+                        double f = e[p - 2];
+                        e[p - 2] = 0.0;
+                        for (int j = p - 2; j >= k; j--) {
+                            double t = Math.hypot(s[j], f);
+                            double cs = s[j] / t;
+                            double sn = f / t;
+                            s[j] = t;
+                            if (j != k) { f = -sn * e[j - 1]; e[j - 1] = cs * e[j - 1]; }
+                            for (int i = 0; i < n; i++) {
+                                t = cs * V[i][j] + sn * V[i][p - 1];
+                                V[i][p - 1] = -sn * V[i][j] + cs * V[i][p - 1];
+                                V[i][j] = t;
+                            }
+                        }
+                    }
+                    break;
+                    case 2: {
+                        double f = e[k - 1];
+                        e[k - 1] = 0.0;
+                        for (int j = k; j < p; j++) {
+                            double t = Math.hypot(s[j], f);
+                            double cs = s[j] / t;
+                            double sn = f / t;
+                            s[j] = t;
+                            f = -sn * e[j];
+                            e[j] = cs * e[j];
+                            for (int i = 0; i < m; i++) {
+                                t = cs * U[i][j] + sn * U[i][k - 1];
+                                U[i][k - 1] = -sn * U[i][j] + cs * U[i][k - 1];
+                                U[i][j] = t;
+                            }
+                        }
+                    }
+                    break;
+                    case 3: {
+                        double scale = Math.max(Math.max(Math.max(Math.max(Math.abs(s[p - 1]), Math.abs(s[p - 2])), Math.abs(e[p - 2])), Math.abs(s[k])), Math.abs(e[k]));
+                        double sp = s[p - 1] / scale;
+                        double spm1 = s[p - 2] / scale;
+                        double epm1 = e[p - 2] / scale;
+                        double sk = s[k] / scale;
+                        double ek = e[k] / scale;
+                        double b = ((spm1 + sp) * (spm1 - sp) + epm1 * epm1) / 2.0;
+                        double c = (sp * epm1) * (sp * epm1);
+                        double shift = 0.0;
+                        if ((b != 0.0) || (c != 0.0)) {
+                            shift = Math.sqrt(b * b + c);
+                            if (b < 0.0) shift = -shift;
+                            shift = c / (b + shift);
+                        }
+                        double f = (sk + sp) * (sk - sp) + shift;
+                        double g = sk * ek;
+                        for (int j = k; j < p - 1; j++) {
+                            double t = Math.hypot(f, g);
+                            double cs = f / t;
+                            double sn = g / t;
+                            if (j != k) e[j - 1] = t;
+                            f = cs * s[j] + sn * e[j];
+                            e[j] = cs * e[j] - sn * s[j];
+                            g = sn * s[j + 1];
+                            s[j + 1] = cs * s[j + 1];
+                            for (int i = 0; i < n; i++) {
+                                t = cs * V[i][j] + sn * V[i][j + 1];
+                                V[i][j + 1] = -sn * V[i][j] + cs * V[i][j + 1];
+                                V[i][j] = t;
+                            }
+                            t = Math.hypot(f, g);
+                            cs = f / t;
+                            sn = g / t;
+                            s[j] = t;
+                            f = cs * e[j] + sn * s[j + 1];
+                            s[j + 1] = -sn * e[j] + cs * s[j + 1];
+                            g = sn * e[j + 1];
+                            e[j + 1] = cs * e[j + 1];
+                            for (int i = 0; i < m; i++) {
+                                t = cs * U[i][j] + sn * U[i][j + 1];
+                                U[i][j + 1] = -sn * U[i][j] + cs * U[i][j + 1];
+                                U[i][j] = t;
+                            }
+                        }
+                        e[p - 2] = f;
+                        iter = iter + 1;
+                    }
+                    break;
+                    case 4: {
+                        if (s[k] <= 0.0) {
+                            s[k] = (s[k] < 0.0 ? -s[k] : 0.0);
+                            for (int i = 0; i <= pp; i++) V[i][k] = -V[i][k];
+                        }
+                        while (k < pp) {
+                            if (s[k] >= s[k + 1]) break;
+                            double t = s[k]; s[k] = s[k + 1]; s[k + 1] = t;
+                            for (int i = 0; i < n; i++) { t = V[i][k + 1]; V[i][k + 1] = V[i][k]; V[i][k] = t; }
+                            for (int i = 0; i < m; i++) { t = U[i][k + 1]; U[i][k + 1] = U[i][k]; U[i][k] = t; }
+                            k++;
+                        }
+                        iter = 0;
+                        p--;
+                    }
+                    break;
+                }
+            }
+
+            Real[] sigmaReal = new Real[nu];
+            for (int i = 0; i < nu; i++) sigmaReal[i] = Real.of(s[i]);
+            Real[][] UReal = new Real[m][nu];
+            for (int i = 0; i < m; i++) for (int j = 0; j < nu; j++) UReal[i][j] = Real.of(U[i][j]);
+            Real[][] VReal = new Real[n][nu]; // Economy V
+            for (int i = 0; i < n; i++) for (int j = 0; j < nu; j++) VReal[i][j] = Real.of(V[i][j]);
+
+            return new SVDResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(UReal, Reals.getInstance()),
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(s),
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(VReal, Reals.getInstance())
+            );
+        }
+    }
+
+    private static class JavaEigen {
+        public static EigenResult<Real> decompose(Matrix<Real> matrix) {
+            int n = matrix.rows();
+            if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+            // Simple QR algorithm for eigenvalues
+            Real[][] A = new Real[n][n];
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
+
+            Real[][] Q_acc = new Real[n][n];
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) Q_acc[i][j] = (i == j) ? Real.ONE : Real.ZERO;
+
+            int maxIter = 100;
+            for (int iter = 0; iter < maxIter; iter++) {
+                QRResult<Real> qr = JavaQR.decompose(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(A, Reals.getInstance()));
+                Matrix<Real> nextA = qr.R().multiply(qr.Q());
+                
+                // Accumulate eigenvectors (approximate)
+                Matrix<Real> nextQ = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q_acc, Reals.getInstance()).multiply(qr.Q());
+                for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) Q_acc[i][j] = nextQ.get(i, j);
+
+                double offDiagNorm = 0.0;
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        A[i][j] = nextA.get(i, j);
+                        if (i != j) offDiagNorm += Math.abs(A[i][j].doubleValue());
+                    }
+                }
+                if (offDiagNorm < 1e-12) break;
+            }
+
+            Real[] values = new Real[n];
+            for (int i = 0; i < n; i++) values[i] = A[i][i];
+
+            List<Real> valList = java.util.Arrays.asList(values);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q_acc, Reals.getInstance()), 
+                new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(valList, Reals.getInstance()));
+        }
     }
 }
 

@@ -12,17 +12,28 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
-import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo;
 import com.google.auto.service.AutoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.ArrayList;
 
 
 import java.nio.DoubleBuffer;
@@ -53,6 +64,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel normalizeRowInvKernel;
     private static cl_kernel gaussJordanInvKernel;
     private static cl_kernel gaussElimPhase1Kernel;
+    private static cl_kernel gaussElimPhase1WithBKernel;
     private static cl_kernel swapRowsKernel;
     private static cl_kernel luDecomposeStepKernel;
     private static cl_kernel choleskyDecomposeStepKernel;
@@ -229,6 +241,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             normalizeRowInvKernel = clCreateKernel(program, "normalizeRowInv", null);
             gaussJordanInvKernel = clCreateKernel(program, "gaussJordanInv", null);
             gaussElimPhase1Kernel = clCreateKernel(program, "gaussElimPhase1", null);
+            gaussElimPhase1WithBKernel = clCreateKernel(program, "gaussElimPhase1WithB", null);
             swapRowsKernel = clCreateKernel(program, "swapRows", null);
             luDecomposeStepKernel = clCreateKernel(program, "lu_decompose_step", null);
             choleskyDecomposeStepKernel = clCreateKernel(program, "cholesky_decompose_step", null);
@@ -288,7 +301,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             if (memA != null) clReleaseMemObject(memA);
             if (memB != null) clReleaseMemObject(memB);
 
-            return fromDoubleArray(dstData, cols, rows);
+            return fromDoubleArray(dstData, cols, rows, a);
         } catch (Exception e) {
             throw new UnsupportedOperationException(getName() + ": OpenCL transpose failed", e);
         }
@@ -333,7 +346,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(h_C), 0, null, null);
                 
                 logger.debug("Creating result matrix from array...");
-                Matrix<Real> result = fromDoubleArray(h_C, m, n);
+                Matrix<Real> result = fromDoubleArray(h_C, m, n, a);
                 org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/OpenCL", System.nanoTime() - start);
                 logger.debug("OpenCL multiply finished successfully.");
                 return result;
@@ -360,10 +373,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return data;
     }
 
-    private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
+    private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols, Matrix<Real> reference) {
         Real[] reals = new Real[data.length];
         for(int i=0; i<data.length; i++) reals[i] = Real.of(data[i]);
-        return new DenseMatrix<Real>(reals, rows, cols, Reals.getInstance());
+        return new DenseMatrix<Real>(reals, rows, cols, (Ring<Real>) reference.getScalarRing());
     }
 
     @Override
@@ -438,17 +451,17 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 for (int j = i + 1; j < n; j++) sum += h_A[i * n + j] * x[j];
                 x[i] = (h_B[i] - sum) / h_A[i * n + i];
             }
-            return toRealVector(x);
+            return toRealVector(x, a);
         } finally {
             if (memA != null) clReleaseMemObject(memA);
             if (memB != null) clReleaseMemObject(memB);
         }
         */
-        // CPU Fallback for debugging
-        Real[] bData = new Real[b.dimension()];
-        for (int i = 0; i < b.dimension(); i++) bData[i] = b.get(i);
-        Real[] xData = org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition.decompose(a).solve(bData);
-        return toRealVector(xData);
+        // CPU Fallback for debugging (using MatrixSolver)
+        Real[] bArr = new Real[b.dimension()];
+        for(int i=0; i<bArr.length; i++) bArr[i] = b.get(i);
+        List<Real> solvedList = java.util.Arrays.asList(MatrixSolver.solve(a, bArr));
+        return new DenseVector<>(solvedList, (Ring<Real>) a.getScalarRing());
     }
 
     @Override
@@ -520,7 +533,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             }
             
             clEnqueueReadBuffer(commandQueue, memInv, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(inv), 0, null, null);
-            return fromDoubleArray(inv, n, n);
+            return fromDoubleArray(inv, n, n, a);
         } finally { 
             if (memA != null) clReleaseMemObject(memA);
             if (memInv != null) clReleaseMemObject(memInv);
@@ -542,64 +555,67 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 for (int i = k + 1; i < n; i++) if (Math.abs(h_A[i * n + k]) > Math.abs(h_A[max * n + k])) max = i;
                 if (k != max) {
                     for (int j = k; j < n; j++) { double t = h_A[k * n + j]; h_A[k * n + j] = h_A[max * n + j]; h_A[max * n + j] = t; }
-                    det = -det;
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)k * n * Sizeof.cl_double), 0, null, null);
-                    clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(h_A).withByteOffset((long)max * n * Sizeof.cl_double), 0, null, null);
-                }
-                det *= h_A[k * n + k];
-                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                if (n - k - 1 > 0) {
-                    clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
-                }
-                clFinish(commandQueue); // Synchronize loop
+                det = -det;
+                double[] rowK = new double[n];
+                double[] rowMax = new double[n];
+                for(int j=0; j<n; j++) { rowK[j] = h_A[k*n+j]; rowMax[j] = h_A[max*n+j]; }
+                clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)k * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(rowMax), 0, null, null);
+                clEnqueueWriteBuffer(commandQueue, memA, CL_TRUE, (long)max * n * Sizeof.cl_double, (long)Sizeof.cl_double * n, Pointer.to(rowK), 0, null, null);
             }
-            return Real.of(det);
-        } finally { if (memA != null) clReleaseMemObject(memA); }
-    }
+            det *= h_A[k * n + k];
+            clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+            if (n - k - 1 > 0) {
+                clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+            }
+            clFinish(commandQueue); // Synchronize loop
+        }
+        return Real.of(det);
+    } finally { if (memA != null) clReleaseMemObject(memA); }
+}
 
-    @Override public String getNativeLibraryName() { return "opencl"; }
-    @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }
-    @Override public void selectDevice(int deviceId) { }
-    @Override public long allocateGPUMemory(long size) { return 0; }
-    @Override public void copyToGPU(long handle, DoubleBuffer buffer, long count) { }
-    @Override public void copyFromGPU(long handle, DoubleBuffer buffer, long count) { }
-    @Override public void freeGPUMemory(long handle) { }
-    @Override public void synchronize() { if (commandQueue != null) clFinish(commandQueue); }
-    @Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
+@Override public String getNativeLibraryName() { return "opencl"; }
+@Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }
+@Override public void selectDevice(int deviceId) { }
+@Override public long allocateGPUMemory(long size) { return 0; }
+@Override public void copyToGPU(long handle, DoubleBuffer buffer, long count) { }
+@Override public void copyFromGPU(long handle, DoubleBuffer buffer, long count) { }
+@Override public void freeGPUMemory(long handle) { }
+@Override public void synchronize() { if (commandQueue != null) clFinish(commandQueue); }
+@Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
 
-    /** Matrix add via element-wise OpenCL. */
-    @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Matrix add()");
-        return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecAddKernel, a.rows(), a.cols());
-    }
-    @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Matrix subtract()");
-        return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecSubKernel, a.rows(), a.cols());
-    }
-    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for scale()");
-        return fromDoubleArray(scaleVec(toDoubleArray(a), scalar.doubleValue()), a.rows(), a.cols());
-    }
+/** Matrix add via element-wise OpenCL. */
+@Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+    if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Matrix add()");
+    return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecAddKernel, a.rows(), a.cols(), a);
+}
+@Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+    if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Matrix subtract()");
+    return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecSubKernel, a.rows(), a.cols(), a);
+}
+@Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+    if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for scale()");
+    return fromDoubleArray(scaleVec(toDoubleArray(a), scalar.doubleValue()), a.rows(), a.cols(), a);
+}
     @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
         // Mv = A * (b as column matrix) — reuse GPU matmul kernel
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for MatVec multiply()");
         double[] av = toDoubleArray(a), bv = toDoubleVec(b);
         double[] result = matVecMul(av, bv, a.rows(), a.cols());
-        return toRealVector(result);
+        return toRealVector(result, a);
     }
     @Override public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Vector add()");
-        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecAddKernel));
+        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecAddKernel), a);
     }
     @Override public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Vector subtract()");
-        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecSubKernel));
+        return toRealVector(vecOp(toDoubleVec(a), toDoubleVec(b), vecSubKernel), a);
     }
     @Override public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Vector multiply()");
-        return toRealVector(scaleVec(toDoubleVec(vector), scalar.doubleValue()));
+        return toRealVector(scaleVec(toDoubleVec(vector), scalar.doubleValue()), vector);
     }
     @Override public Real dot(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for dot()");
@@ -615,7 +631,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return Real.of(Math.sqrt(sum));
     }
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
+    public LUResult<Real> lu(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for LU decomposition");
         int m = a.rows();
         int n = a.cols();
@@ -675,17 +691,17 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 }
             }
 
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
-                fromDoubleArray(lData, n, n),
-                fromDoubleArray(uData, n, n),
-                toRealVector(pData)
+            return new LUResult<Real>(
+                fromDoubleArray(lData, n, n, a),
+                fromDoubleArray(uData, n, n, a),
+                toRealVector(pData, a)
             );
         } finally {
             if (memA != null) clReleaseMemObject(memA);
         }
     }
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
+    public QRResult<Real> qr(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for QR decomposition");
         int m = a.rows();
         int n = a.cols();
@@ -735,9 +751,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clEnqueueReadBuffer(commandQueue, memQ, CL_TRUE, 0, (long)m * m * Sizeof.cl_double, Pointer.to(qData), 0, null, null);
             
             // h_A is now R (upper triangular)
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
-                fromDoubleArray(qData, m, m),
-                fromDoubleArray(h_A, m, n)
+            return new QRResult<Real>(
+                fromDoubleArray(qData, m, m, a),
+                fromDoubleArray(h_A, m, n, a)
             );
         } finally {
             if (memA != null) clReleaseMemObject(memA);
@@ -746,7 +762,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     }
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
+    public SVDResult<Real> svd(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for SVD");
         
         int m = a.rows();
@@ -757,7 +773,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         logger.debug("Entering OpenCL SVD (Economy via A^T A): [{}x{}]", m, n);
         Matrix<Real> at = transpose(a);
         Matrix<Real> ata = at.multiply(a);
-        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen = eigen(ata);
+        EigenResult<Real> eigen = eigen(ata);
         
         Matrix<Real> V = eigen.V();
         Vector<Real> D = eigen.D();
@@ -766,7 +782,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         for (int i = 0; i < n; i++) {
             sData[i] = Math.sqrt(Math.max(0, D.get(i).doubleValue()));
         }
-        Vector<Real> S = toRealVector(sData);
+        Vector<Real> S = toRealVector(sData, a);
         
         // U = A * V * inv(S)
         Matrix<Real> AV = a.multiply(V);
@@ -780,14 +796,14 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 for (int i = 0; i < m; i++) avData[i * n + j] = 0.0;
             }
         }
-        Matrix<Real> U = fromDoubleArray(avData, m, n);
+        Matrix<Real> U = fromDoubleArray(avData, m, n, a);
         
         logger.debug("OpenCL SVD finished successfully.");
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
+        return new SVDResult<Real>(U, S, V);
     }
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
+    public CholeskyResult<Real> cholesky(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Cholesky");
         int n = a.rows();
         double[] h_A = toDoubleArray(a);
@@ -815,7 +831,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
             // Zero out upper part
             for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) h_A[i * n + j] = 0.0;
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromDoubleArray(h_A, n, n));
+            return new CholeskyResult<Real>(fromDoubleArray(h_A, n, n, a));
         } finally {
             if (memA != null) clReleaseMemObject(memA);
         }
@@ -823,7 +839,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
+    public EigenResult<Real> eigen(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Eigen decomposition");
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
@@ -896,9 +912,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             double[] eigenvalues = new double[n];
             for (int i = 0; i < n; i++) eigenvalues[i] = h_A[i * n + i];
 
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-                fromDoubleArray(vData, n, n),
-                toRealVector(eigenvalues)
+            return new EigenResult<Real>(
+                fromDoubleArray(vData, n, n, a),
+                toRealVector(eigenvalues, a)
             );
         } finally {
             if (memA != null) clReleaseMemObject(memA);
@@ -926,8 +942,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     // ---- helpers ----
 
-    private Matrix<Real> elementWiseVec(double[] a, double[] b, cl_kernel k, int rows, int cols) {
-        return fromDoubleArray(vecOp(a, b, k), rows, cols);
+    private Matrix<Real> elementWiseVec(double[] a, double[] b, cl_kernel k, int rows, int cols, Matrix<Real> reference) {
+        return fromDoubleArray(vecOp(a, b, k), rows, cols, reference);
     }
 
     private double[] vecOp(double[] a, double[] b, cl_kernel k) {
@@ -980,8 +996,16 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return d;
     }
 
-    private Vector<Real> toRealVector(double[] d) {
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(d);
+    private Vector<Real> toRealVector(double[] d, Matrix<Real> reference) {
+        List<Real> reals = new ArrayList<>(d.length);
+        for(double v : d) reals.add(Real.of(v));
+        return new DenseVector<>(reals, (Ring<Real>) reference.getScalarRing());
+    }
+
+    private Vector<Real> toRealVector(double[] d, Vector<Real> reference) {
+        List<Real> reals = new ArrayList<>(d.length);
+        for(double v : d) reals.add(Real.of(v));
+        return new DenseVector<>(reals, (Ring<Real>) reference.getScalarRing());
     }
 
     private Vector<Real> toRealVector(Real[] d) {
@@ -1033,6 +1057,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clReleaseKernel(normalizeRowInvKernel);
             clReleaseKernel(gaussJordanInvKernel);
             clReleaseKernel(gaussElimPhase1Kernel);
+            clReleaseKernel(gaussElimPhase1WithBKernel);
             clReleaseProgram(program);
             clReleaseCommandQueue(commandQueue);
             clReleaseContext(context);

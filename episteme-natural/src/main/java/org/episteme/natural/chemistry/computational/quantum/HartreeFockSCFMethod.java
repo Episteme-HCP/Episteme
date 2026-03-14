@@ -137,7 +137,7 @@ public class HartreeFockSCFMethod extends SCFMethod {
             // 6.3 Diagonalize F' = X^T F X
             // Use extrapolate F (which is 'fockMatrix' now)
             Matrix<Real> F_prime = X.transpose().multiply(fockMatrix).multiply(X);
-            EigenDecomposition eig = EigenDecomposition.decompose(F_prime);
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eig = EigenDecomposition.decompose(F_prime);
             
             // 6.4 Transform C' to C = X C'
             // NOTE: Eigendecomposition returns eigenvectors in COLUMNS? 
@@ -303,7 +303,7 @@ public class HartreeFockSCFMethod extends SCFMethod {
         for(int i=0; i<arr.length; i++) arr[i] = val;
     }
     
-    private Matrix<Real> getEigenvectors(EigenDecomposition eig) {
+    private Matrix<Real> getEigenvectors(org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eig) {
         return eig.getEigenvectors(); 
     }
 

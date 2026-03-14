@@ -11,14 +11,14 @@ import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
- * ND4J Native (CPU) Tensor backend, using AVX/AVX2/AVX512 instructions when available.
+ * NativeND4J Tensor backend, using AVX/AVX2/AVX512 instructions when available.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @AutoService({TensorBackend.class, AlgorithmProvider.class})
-public class ND4JNativeTensorBackend extends ND4JBaseTensorBackend {
+public class NativeND4JTensorBackend extends ND4JBaseTensorBackend {
 
     @Override
     protected boolean checkAvailability() {

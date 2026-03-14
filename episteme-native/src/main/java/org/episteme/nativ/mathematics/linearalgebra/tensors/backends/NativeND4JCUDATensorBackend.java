@@ -12,14 +12,14 @@ import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
- * ND4J CUDA (GPU) Tensor backend.
+ * NativeND4J CUDA (GPU) Tensor backend.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @AutoService({TensorBackend.class, AlgorithmProvider.class})
-public class ND4JCUDATensorBackend extends ND4JBaseTensorBackend {
+public class NativeND4JCUDATensorBackend extends ND4JBaseTensorBackend {
 
     @Override
     protected org.episteme.core.technical.backend.ExecutionContext doGetContext() {

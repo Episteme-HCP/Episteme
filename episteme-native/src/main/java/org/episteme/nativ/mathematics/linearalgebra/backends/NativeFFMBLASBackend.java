@@ -62,10 +62,12 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     private static MethodHandle DGESV;
     private static MethodHandle DGETRF;
     private static MethodHandle DGETRI;
+    private static MethodHandle DGETRS;
     private static MethodHandle DGEQRF;
     private static MethodHandle DORGQR;
     private static MethodHandle DGESVD;
     private static MethodHandle DPOTRF;
+    private static MethodHandle DPOTRS;
     private static MethodHandle DSYEV;
     private static MethodHandle DGELS;
     
@@ -149,6 +151,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 DSCAL = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dscal")
                     .map(s -> LINKER.downcallHandle(s, dscalDesc)).orElse(null);
 
+
                 FunctionDescriptor dgemvDesc = FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
@@ -189,6 +192,13 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 DGETRI = findLapackSymbol("LAPACKE_dgetri")
                     .map(s -> LINKER.downcallHandle(s, dgetriDesc)).orElse(null);
 
+                FunctionDescriptor dgetrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DGETRS = findLapackSymbol("LAPACKE_dgetrs")
+                    .map(s -> LINKER.downcallHandle(s, dgetrsDesc)).orElse(null);
+
                 // QR Decomposition
                 FunctionDescriptor dgeqrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -222,6 +232,13 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 );
                 DPOTRF = findLapackSymbol("LAPACKE_dpotrf")
                     .map(s -> LINKER.downcallHandle(s, dpotrfDesc)).orElse(null);
+
+                FunctionDescriptor dpotrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DPOTRS = findLapackSymbol("LAPACKE_dpotrs")
+                    .map(s -> LINKER.downcallHandle(s, dpotrsDesc)).orElse(null);
 
                 // Eigen
                 FunctionDescriptor dsyevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
@@ -509,7 +526,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             }
             Matrix<org.episteme.core.mathematics.numbers.real.Real> Q = createDenseMatrix(qData, m, k, a);
 
-            return new QRResult<>(Q, R);
+            return new QRResult<org.episteme.core.mathematics.numbers.real.Real>(Q, R);
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
@@ -563,7 +580,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             }
             Matrix<org.episteme.core.mathematics.numbers.real.Real> V = new DenseMatrix<>(vObj, (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing());
 
-            return new SVDResult<>(U, S, V);
+            return new SVDResult<org.episteme.core.mathematics.numbers.real.Real>(U, S, V);
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
@@ -617,7 +634,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 }
             }
 
-            return new LUResult<>(
+            return new LUResult<org.episteme.core.mathematics.numbers.real.Real>(
                 createDenseMatrix(lData, m, k, a),
                 createDenseMatrix(uData, k, n, a),
                 new DenseVector<>(java.util.Arrays.stream(pData).mapToObj(org.episteme.core.mathematics.numbers.real.Real::of).toList(), (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing())
@@ -649,7 +666,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
                 }
             }
 
-            return new CholeskyResult<>(createDenseMatrix(lData, n, n, a));
+            return new CholeskyResult<org.episteme.core.mathematics.numbers.real.Real>(createDenseMatrix(lData, n, n, a));
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
@@ -677,7 +694,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
             double[] wData = new double[n];
             MemorySegment.copy(w, ValueLayout.JAVA_DOUBLE, 0L, wData, 0, n);
 
-            return new EigenResult<>(
+            return new EigenResult<org.episteme.core.mathematics.numbers.real.Real>(
                 createDenseMatrix(vData, n, n, a),
                 new DenseVector<>(java.util.Arrays.stream(wData).mapToObj(org.episteme.core.mathematics.numbers.real.Real::of).toList(), (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing())
             );
@@ -912,22 +929,34 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     }
 
     @Override
-    public Vector<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Matrix-Vector multiply() not available");
-        int m = a.rows(), k = a.cols();
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> solve(LUResult<org.episteme.core.mathematics.numbers.real.Real> lu, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
+        if (!IS_AVAILABLE || DGETRS == null) throw new UnsupportedOperationException(getName() + ": solve(LUResult) not available");
+        return lu.solve(b);
+    }
+    
+    @Override
+    public Vector<org.episteme.core.mathematics.numbers.real.Real> solve(CholeskyResult<org.episteme.core.mathematics.numbers.real.Real> cholesky, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
+        if (!IS_AVAILABLE || DPOTRS == null) throw new UnsupportedOperationException(getName() + ": solve(CholeskyResult) not available");
+        int n = b.dimension();
         try (Arena arena = Arena.ofConfined()) {
-            int lenA = m * k;
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) lenA);
-            double[] arrA = toDoubleArray(a);
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, lenA));
+            MemorySegment segL = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+            double[] arrL = toDoubleArray(cholesky.L());
+            MemorySegment.copy(arrL, 0, segL, ValueLayout.JAVA_DOUBLE, 0L, arrL.length);
             
-            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
-            for (int i = 0; i < k; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i, b.get(i).doubleValue());
-            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m);
-            try { DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, k, 1.0, segA, k, segX, 1, 0.0, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            org.episteme.core.mathematics.numbers.real.Real[] result = new org.episteme.core.mathematics.numbers.real.Real[m];
-            for (int i = 0; i < m; i++) result[i] = org.episteme.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i));
-            return DenseVector.of(java.util.Arrays.asList(result), (Ring<org.episteme.core.mathematics.numbers.real.Real>)b.getScalarRing());
+            MemorySegment segB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+            for(int i=0; i<n; i++) segB.setAtIndex(ValueLayout.JAVA_DOUBLE, (long) i, b.get(i).doubleValue());
+            
+            int info = (int) DPOTRS.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+            if (info != 0) throw new ArithmeticException("DPOTRS failed with info: " + info);
+            
+            double[] result = new double[n];
+            MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
+            
+            List<org.episteme.core.mathematics.numbers.real.Real> resList = new ArrayList<>(n);
+            for(double v : result) resList.add(org.episteme.core.mathematics.numbers.real.Real.of(v));
+            return new DenseVector<>(resList, (Ring<org.episteme.core.mathematics.numbers.real.Real>) b.getScalarRing());
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         }
     }
 

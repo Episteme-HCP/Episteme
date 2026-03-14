@@ -32,15 +32,15 @@ public class LinearAlgebraComplianceTest {
     @Test
     public void generateComplianceReport() {
         List<LinearAlgebraProvider<Real>> rawProviders = new ArrayList<>();
-        @SuppressWarnings("rawtypes")
-        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-        Iterator<LinearAlgebraProvider> it = loader.iterator();
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        ServiceLoader<LinearAlgebraProvider<?>> loader = ServiceLoader.load((Class) LinearAlgebraProvider.class);
+        Iterator<LinearAlgebraProvider<?>> it = loader.iterator();
         while(true) {
             try {
                 if (!it.hasNext()) break;
                 LinearAlgebraProvider<?> p = it.next();
                 System.out.println("[ComplianceTest] Discovered via SPI: " + p.getClass().getName());
-                if (((LinearAlgebraProvider)p).isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+                if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                     @SuppressWarnings("unchecked")
                     LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
                     rawProviders.add(typed);
@@ -56,7 +56,7 @@ public class LinearAlgebraComplianceTest {
                 for (org.episteme.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (ap instanceof LinearAlgebraProvider<?> p) {
                         System.out.println("[ComplianceTest]   Found provider: " + ap.getClass().getName());
-                        if (((LinearAlgebraProvider)p).isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+                        if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                             @SuppressWarnings("unchecked")
                             LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
                             rawProviders.add(typed);

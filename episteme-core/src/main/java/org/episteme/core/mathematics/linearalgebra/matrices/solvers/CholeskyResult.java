@@ -16,4 +16,6 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
  * @param <E> the element type
  * @param L   the lower triangular matrix
  */
-public record CholeskyResult<E>(Matrix<E> L) {}
+public record CholeskyResult<E>(Matrix<E> L) {
+    public Matrix<E> getL() { return L; }
+}

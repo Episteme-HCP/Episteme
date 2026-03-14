@@ -18,4 +18,9 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
  * @param V   the eigenvectors (as columns)
  * @param D   the eigenvalues (as a vector)
  */
-public record EigenResult<E>(Matrix<E> V, Vector<E> D) {}
+public record EigenResult<E>(Matrix<E> V, Vector<E> D) {
+    public Matrix<E> getV() { return V; }
+    public Vector<E> getD() { return D; }
+    public Matrix<E> getEigenvectors() { return V; }
+    public Vector<E> getEigenvalues() { return D; }
+}
