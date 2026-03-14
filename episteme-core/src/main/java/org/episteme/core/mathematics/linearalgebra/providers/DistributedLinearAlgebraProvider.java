@@ -3,6 +3,7 @@ package org.episteme.core.mathematics.linearalgebra.providers;
 import org.episteme.core.distributed.DistributedCompute;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.RemoteDistributedContext;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
@@ -27,7 +28,7 @@ import com.google.auto.service.AutoService;
  * @since 2.0
  */
 @AutoService({LinearAlgebraProvider.class, Backend.class})
-public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvider<E>, Backend {
+public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E>, Backend {
 
     public DistributedLinearAlgebraProvider() {
     }
@@ -201,6 +202,35 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         return getLocalProvider(a.getScalarRing()).scale(scalar, a);
+    }
+
+    @Override
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        return getSparseLocalProvider(a.getScalarRing()).bicgstab(a, b, x0, tolerance, maxIterations);
+    }
+
+    @Override
+    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        return getSparseLocalProvider(a.getScalarRing()).conjugateGradient(a, b, x0, tolerance, maxIterations);
+    }
+
+    @Override
+    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
+        return getSparseLocalProvider(a.getScalarRing()).gmres(a, b, x0, tolerance, maxIterations, restarts);
+    }
+
+    @SuppressWarnings("unchecked")
+    private SparseLinearAlgebraProvider<E> getSparseLocalProvider(Ring<E> ring) {
+        SparseLinearAlgebraProvider<E> provider = (SparseLinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+            SparseLinearAlgebraProvider.class, 
+            org.episteme.core.technical.algorithm.OperationContext.DEFAULT, 
+            p -> p != this && (ring == null || p.isCompatible(ring))
+        );
+        if (provider == null) {
+            // Fallback to LinearAlgebraProvider if no sparse one found (interface defaults will throw)
+            return (SparseLinearAlgebraProvider<E>) getLocalProvider(ring);
+        }
+        return provider;
     }
 
     @Override

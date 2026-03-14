@@ -73,36 +73,76 @@ public class EnvironmentController {
         refreshThread = new Thread(() -> {
             java.util.List<AlgorithmProvider> allProviders = new java.util.ArrayList<>();
             java.util.Set<String> seenClasses = new java.util.HashSet<>();
-            ServiceLoader.load(AlgorithmProvider.class).forEach(allProviders::add);
-            ServiceLoader.load(org.episteme.core.technical.backend.Backend.class).forEach(b -> allProviders.addAll(b.getAlgorithmProviders()));
-            ServiceLoader.load(org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend.class).forEach(allProviders::add);
-            ServiceLoader.load(org.episteme.core.media.VisionBackend.class).forEach(allProviders::add);
-            ServiceLoader.load(org.episteme.core.media.AudioBackend.class).forEach(allProviders::add);
-            ServiceLoader.load(org.episteme.natural.physics.classical.mechanics.MechanicsBackend.class).forEach(allProviders::add);
+            
+            // Safe discovery for each category
+            safeDiscover(AlgorithmProvider.class, allProviders);
+            
+            try {
+                ServiceLoader.load(org.episteme.core.technical.backend.Backend.class).forEach(b -> {
+                    try {
+                        allProviders.addAll(b.getAlgorithmProviders());
+                    } catch (Throwable t) {
+                        System.err.println("Error getting providers from backend " + b.getName() + ": " + t.getMessage());
+                    }
+                });
+            } catch (Throwable t) { System.err.println("Error loading Backends: " + t.getMessage()); }
+
+            safeDiscover(org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend.class, allProviders);
+            safeDiscover(org.episteme.core.media.VisionBackend.class, allProviders);
+            safeDiscover(org.episteme.core.media.AudioBackend.class, allProviders);
+            safeDiscover(org.episteme.natural.physics.classical.mechanics.MechanicsBackend.class, allProviders);
+
+            if (allProviders.isEmpty()) {
+                Platform.runLater(() -> providerTable.setPlaceholder(new Label("No providers found.")));
+            }
 
             for (AlgorithmProvider p : allProviders) {
-                if (!seenClasses.add(p.getClass().getName())) {
-                    continue; // Skip duplicates
+                try {
+                    if (!seenClasses.add(p.getClass().getName())) {
+                        continue; // Skip duplicates
+                    }
+                    String type = p.getAlgorithmType();
+                    if (type != null && !type.isEmpty()) {
+                        type = type.substring(0, 1).toUpperCase() + type.substring(1);
+                    }
+                    
+                    final String capitalizedType = type;
+                    String status = p.isAvailable() ? "Available" : "Unavailable";
+                    ProviderItem item = new ProviderItem(
+                        capitalizedType,
+                        p.getName(),
+                        status,
+                        p.getClass().getName()
+                    );
+                    Platform.runLater(() -> providers.add(item));
+                } catch (Throwable t) {
+                    System.err.println("Error processing provider: " + t.getMessage());
                 }
-                String type = p.getAlgorithmType();
-                if (type != null && !type.isEmpty()) {
-                    type = type.substring(0, 1).toUpperCase() + type.substring(1);
-                }
-                
-                final String capitalizedType = type;
-                String status = p.isAvailable() ? "Available" : "Unavailable";
-                ProviderItem item = new ProviderItem(
-                    capitalizedType,
-                    p.getName(),
-                    status,
-                    p.getClass().getName()
-                );
-                Platform.runLater(() -> providers.add(item));
             }
         });
         refreshThread.setDaemon(true);
         refreshThread.setName("ProviderDiscoveryThread");
         refreshThread.start();
+    }
+
+    private <T> void safeDiscover(Class<T> serviceClass, java.util.List<AlgorithmProvider> targetList) {
+        try {
+            ServiceLoader<T> loader = ServiceLoader.load(serviceClass);
+            java.util.Iterator<T> iterator = loader.iterator();
+            while (true) {
+                try {
+                    if (!iterator.hasNext()) break;
+                    T provider = iterator.next();
+                    if (provider instanceof AlgorithmProvider) {
+                        targetList.add((AlgorithmProvider) provider);
+                    }
+                } catch (Throwable t) {
+                    System.err.println("Failed to load a provider for " + serviceClass.getSimpleName() + ": " + t.getMessage());
+                }
+            }
+        } catch (Throwable t) {
+            System.err.println("Critical error initializing ServiceLoader for " + serviceClass.getSimpleName() + ": " + t.getMessage());
+        }
     }
     
     public static class ProviderItem {
