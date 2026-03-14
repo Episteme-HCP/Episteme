@@ -32,7 +32,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.storage.DirectRealDo
 import org.episteme.core.mathematics.numbers.real.Real;
 
 import org.episteme.core.mathematics.structures.rings.Field;
-import org.episteme.core.ComputeContext;
 
 /**
  * A specialized Matrix implementation for Doubles with SIMD and Native

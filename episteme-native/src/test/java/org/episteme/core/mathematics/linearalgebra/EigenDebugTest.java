@@ -1,10 +1,8 @@
 package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
-import java.util.Random;
 
 public class EigenDebugTest {
     public static void main(String[] args) {

@@ -19,14 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
-import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.simd.SIMDBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.Operation;
 
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
-import org.episteme.core.technical.backend.Operation;
 
 /**
  * SIMD-accelerated Linear Algebra Backend for Real numbers using JDK Vector API.
@@ -428,9 +428,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         
         SIMDRealDoubleMatrix simdA = asSIMD(a);
         double[] data = simdA.getInternalData();
-        double[] inv = new double[n * n];
         double det = 1.0;
         var species = getSpecies();
+
         
         for (int k = 0; k < n; k++) {
             int max = k;
@@ -456,7 +456,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
                 for (; j + species.length() <= n; j += species.length()) {
                     var vRowK = DoubleVector.fromArray(species, data, k * n + j);
                     var vRowI = DoubleVector.fromArray(species, data, i * n + j);
-                    vRowI.sub(vRowK.mul(factor)).intoArray(data, i * n + j);
+                    vRowI.lanewise(jdk.incubator.vector.VectorOperators.SUB, 
+                        vRowK.lanewise(jdk.incubator.vector.VectorOperators.MUL, factor))
+                        .intoArray(data, i * n + j);
                 }
                 for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];
             }
@@ -620,7 +622,6 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Cholesky");
         double[] L = new double[n * n];
-        var species = getSpecies();
 
         for (int j = 0; j < n; j++) {
             double sum = 0;

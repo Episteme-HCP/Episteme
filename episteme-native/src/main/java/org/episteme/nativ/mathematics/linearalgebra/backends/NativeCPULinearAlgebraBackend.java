@@ -46,7 +46,6 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
     private static final MethodHandle DGEMV_HANDLE;
     private static final MethodHandle DDOT_HANDLE;
     private static final MethodHandle DNRM2_HANDLE;
-    private static final MethodHandle DAXPY_HANDLE;
     private static final MethodHandle DSCAL_HANDLE;
     
     // LAPACK (via LAPACKE interface)
@@ -76,7 +75,6 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         MethodHandle dgemv = null;
         MethodHandle ddot = null;
         MethodHandle dnrm2 = null;
-        MethodHandle daxpy = null;
         MethodHandle dscal = null;
         
         MethodHandle dgesv = null;
@@ -135,7 +133,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
                 // Level 1 BLAS
                 ddot = lookup.find("cblas_ddot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 dnrm2 = lookup.find("cblas_dnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                daxpy = lookup.find("cblas_daxpy").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
                 dscal = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // LAPACKE (Standard C interface names)
@@ -184,7 +182,6 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         DGEMV_HANDLE = dgemv;
         DDOT_HANDLE = ddot;
         DNRM2_HANDLE = dnrm2;
-        DAXPY_HANDLE = daxpy;
         DSCAL_HANDLE = dscal;
         DGESV_HANDLE = dgesv;
         DGETRF_HANDLE = dgetrf;
@@ -808,13 +805,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
         return null;
     }
 
-    private double[][] to2DArray(Matrix<Real> m) {
-        double[][] d = new double[m.rows()][m.cols()];
-        for (int i = 0; i < m.rows(); i++) {
-            for (int j = 0; j < m.cols(); j++) d[i][j] = m.get(i, j).doubleValue();
-        }
-        return d;
-    }
+
 
     private double[] toDoubleArray(Matrix<Real> m) {
         double[] d = new double[m.rows() * m.cols()];

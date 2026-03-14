@@ -14,7 +14,6 @@ import java.util.ServiceLoader;
 import java.util.ServiceConfigurationError;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.Collection;
 
 public class BackendDiagnostic {
     public static void main(String[] args) {
