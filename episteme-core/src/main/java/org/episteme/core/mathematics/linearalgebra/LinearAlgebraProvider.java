@@ -163,6 +163,29 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
         throw new UnsupportedOperationException(getName() + " does not support solve(CholeskyResult, Vector)");
     }
 
+    // --- Iterative Solvers ---
+
+    /**
+     * Solves Ax = b using BiCGSTAB (BiConjugate Gradient Stabilized) method.
+     */
+    default Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        throw new UnsupportedOperationException(getName() + " does not support bicgstab()");
+    }
+
+    /**
+     * Solves Ax = b using Conjugate Gradient method.
+     */
+    default Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        throw new UnsupportedOperationException(getName() + " does not support conjugateGradient()");
+    }
+
+    /**
+     * Solves Ax = b using GMRES (Generalized Minimal Residual) method.
+     */
+    default Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
+        throw new UnsupportedOperationException(getName() + " does not support gmres()");
+    }
+
     @Override
     default double score(OperationContext context) {
         return AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());

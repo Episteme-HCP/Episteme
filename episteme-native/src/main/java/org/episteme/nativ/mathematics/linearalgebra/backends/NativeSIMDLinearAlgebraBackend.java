@@ -348,12 +348,12 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
                  // A+ = (A^T A)^-1 * A^T
                  Matrix<Real> at = transpose(a);
                  Matrix<Real> ata = at.multiply(a);
-                 return ata.inverse().multiply(at);
+                 return inverse(ata).multiply(at);
              } else {
                  // A+ = A^T * (A A^T)^-1
                  Matrix<Real> at = transpose(a);
                  Matrix<Real> aat = a.multiply(at);
-                 return at.multiply(aat.inverse());
+                 return at.multiply(inverse(aat));
              }
         }
         
