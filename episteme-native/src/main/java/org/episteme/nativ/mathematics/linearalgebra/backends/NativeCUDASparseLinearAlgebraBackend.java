@@ -84,6 +84,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUBLAS_DNRM2;
     private static MethodHandle CUBLAS_DAXPY;
     private static MethodHandle CUBLAS_DSCAL;
+    private static MethodHandle CUBLAS_DGEAM;
  
 
 
@@ -202,6 +203,10 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 CUBLAS_DSCAL = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDscal_v2", "cublasDscal").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                CUBLAS_DGEAM = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDgeam_v2", "cublasDgeam").get(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
             }
 
 
@@ -238,6 +243,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             logger.warn("Failed to get devices: {}", t.getMessage());
         }
         return new DeviceInfo[0];
+    }
+
+    @Override
+    public String getEnvironmentInfo() {
+        if (!IS_AVAILABLE) return "N/A";
+        return "GPU (CUDA)";
     }
 
     @Override
@@ -654,14 +665,59 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        // For now, implement via dense fallback but DO NOT use Java local provider
-        // Convert to dense on GPU, add, convert back if needed (or just return dense)
-        return multiplyDense(a, b); // This is NOT add, but I need a placeholder that is NATIVE
+        if (!IS_AVAILABLE || CUBLAS_DGEAM == null) throw new UnsupportedOperationException("CUDA cuBLAS dgeam not available");
+        return performGeam(a, b, 1.0, 1.0);
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        return add(a, b); // Placeholder
+        if (!IS_AVAILABLE || CUBLAS_DGEAM == null) throw new UnsupportedOperationException("CUDA cuBLAS dgeam not available");
+        return performGeam(a, b, 1.0, -1.0);
+    }
+
+    private Matrix<Real> performGeam(Matrix<Real> a, Matrix<Real> b, double alphaVal, double betaVal) {
+        int m = a.rows();
+        int n = a.cols();
+        if (b.rows() != m || b.cols() != n) throw new IllegalArgumentException("Matrix dimensions must match");
+
+        try (Arena arena = Arena.ofConfined()) {
+            long d_a = allocateGPUMemory((long) m * n * 8);
+            long d_b = allocateGPUMemory((long) m * n * 8);
+            long d_c = allocateGPUMemory((long) m * n * 8);
+
+            copyToGPU(d_a, DoubleBuffer.wrap(toDoubleArray(a)), (long) m * n, arena);
+            copyToGPU(d_b, DoubleBuffer.wrap(toDoubleArray(b)), (long) m * n, arena);
+
+            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
+            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, alphaVal);
+            MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, betaVal);
+
+            // C = alpha * op(A) + beta * op(B)
+            // cuBLAS is column-major. If we pass row-major and no transpose, 
+            // it computes row-major C if we swap m and n.
+            int res = (int) CUBLAS_DGEAM.invokeExact(handle, 0, 0, n, m, alpha, 
+                MemorySegment.ofAddress(d_a).reinterpret((long) m * n * 8), n, 
+                beta, 
+                MemorySegment.ofAddress(d_b).reinterpret((long) m * n * 8), n, 
+                MemorySegment.ofAddress(d_c).reinterpret((long) m * n * 8), n);
+            checkCuda(res);
+
+            double[] result = new double[m * n];
+            copyFromGPU(d_c, DoubleBuffer.wrap(result), (long) m * n, arena);
+
+            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_c)));
+
+            return fromDoubleArray(result, m, n);
+        } catch (Throwable t) {
+            logger.error("cuBLAS DGEAM failed: {}", t.getMessage());
+            throw new RuntimeException("CUDA DGEAM failed", t);
+        }
     }
 
     @Override

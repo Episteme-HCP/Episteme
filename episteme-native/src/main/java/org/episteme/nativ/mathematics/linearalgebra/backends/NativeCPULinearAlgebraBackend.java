@@ -783,17 +783,9 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
             aBuf.position(0);
             aBuf.get(evData);
 
-            // LAPACKE row-major returns eigenvectors as rows. Transpose to get columns.
-            double[] vData = new double[n * n];
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    vData[i * n + j] = evData[j * n + i];
-                }
-            }
-
             // Based on residue check: resNoT=0, T=21.5. Eigenvectors are in COLUMNS (no transpose needed for JScience).
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-                RealDoubleMatrix.of(vData, n, n),
+                RealDoubleMatrix.of(evData, n, n),
                 RealDoubleVector.of(wData)
             );
         }

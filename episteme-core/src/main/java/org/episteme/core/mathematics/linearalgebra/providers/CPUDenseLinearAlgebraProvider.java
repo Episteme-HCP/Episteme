@@ -1624,19 +1624,33 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             int n = matrix.rows();
             if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
 
-            // Simple QR algorithm for eigenvalues
+            // Check for symmetry - Jacobi is very robust for symmetric matrices
+            boolean isSymmetric = true;
+            for (int i = 0; i < n && isSymmetric; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    if (Math.abs(matrix.get(i, j).doubleValue() - matrix.get(j, i).doubleValue()) > 1e-10) {
+                        isSymmetric = false;
+                        break;
+                    }
+                }
+            }
+
+            if (isSymmetric) {
+                return jacobi(matrix);
+            }
+
+            // Fallback to QR for non-symmetric matrices
             Real[][] A = new Real[n][n];
             for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
 
             Real[][] Q_acc = new Real[n][n];
             for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) Q_acc[i][j] = (i == j) ? Real.ONE : Real.ZERO;
 
-            int maxIter = 100;
+            int maxIter = 200;
             for (int iter = 0; iter < maxIter; iter++) {
                 QRResult<Real> qr = JavaQR.decompose(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(A, Reals.getInstance()));
                 Matrix<Real> nextA = qr.R().multiply(qr.Q());
                 
-                // Accumulate eigenvectors (approximate)
                 Matrix<Real> nextQ = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q_acc, Reals.getInstance()).multiply(qr.Q());
                 for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) Q_acc[i][j] = nextQ.get(i, j);
 
@@ -1653,9 +1667,81 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             Real[] values = new Real[n];
             for (int i = 0; i < n; i++) values[i] = A[i][i];
 
-            List<Real> valList = java.util.Arrays.asList(values);
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q_acc, Reals.getInstance()), 
-                new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(valList, Reals.getInstance()));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q_acc, Reals.getInstance()), 
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(java.util.Arrays.stream(values).mapToDouble(Real::doubleValue).toArray()));
+        }
+
+        private static EigenResult<Real> jacobi(Matrix<Real> a) {
+            int n = a.rows();
+            double[] data = new double[n * n];
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i * n + j] = a.get(i, j).doubleValue();
+            
+            double[] vData = new double[n * n];
+            for (int i = 0; i < n; i++) vData[i * n + i] = 1.0;
+            
+            int maxSweeps = 50;
+            double eps = 1e-15;
+            
+            for (int sweep = 0; sweep < maxSweeps; sweep++) {
+                double offDiag = 0;
+                for (int i = 0; i < n; i++) {
+                    for (int j = i + 1; j < n; j++) offDiag += Math.abs(data[i * n + j]);
+                }
+                if (offDiag < eps) break;
+                
+                for (int p = 0; p < n - 1; p++) {
+                    for (int q = p + 1; q < n; q++) {
+                        double apq = data[p * n + q];
+                        if (Math.abs(apq) < eps) continue;
+                        
+                        double app = data[p * n + p];
+                        double aqq = data[q * n + q];
+                        
+                        double tau = (aqq - app) / (2.0 * apq);
+                        double t = (tau >= 0) ? 1.0 / (tau + Math.sqrt(1.0 + tau * tau)) 
+                                             : 1.0 / (tau - Math.sqrt(1.0 + tau * tau));
+                        double c = 1.0 / Math.sqrt(1.0 + t * t);
+                        double s = t * c;
+
+                        // Update A
+                        for (int i = 0; i < n; i++) {
+                            double tp = data[p * n + i];
+                            double tq = data[q * n + i];
+                            data[p * n + i] = c * tp - s * tq;
+                            data[q * n + i] = s * tp + c * tq;
+                        }
+                        for (int j = 0; j < n; j++) {
+                            data[j * n + p] = data[p * n + j];
+                            data[j * n + q] = data[q * n + j];
+                        }
+                        
+                        data[p * n + p] = app - t * apq;
+                        data[q * n + q] = aqq + t * apq;
+                        data[p * n + q] = 0.0;
+                        data[q * n + p] = 0.0;
+                        
+                        // Update V
+                        for (int i = 0; i < n; i++) {
+                            double vp = vData[i * n + p];
+                            double vq = vData[i * n + q];
+                            vData[i * n + p] = c * vp - s * vq;
+                            vData[i * n + q] = s * vp + c * vq;
+                        }
+                    }
+                }
+            }
+            
+            double[] eigenvalues = new double[n];
+            for (int i = 0; i < n; i++) eigenvalues[i] = data[i * n + i];
+            
+            Real[][] V = new Real[n][n];
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) V[i][j] = Real.of(vData[i * n + j]);
+
+            return new EigenResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(V, Reals.getInstance()),
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues)
+            );
         }
     }
 }
