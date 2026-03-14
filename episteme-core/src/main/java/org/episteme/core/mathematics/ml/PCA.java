@@ -26,9 +26,11 @@ package org.episteme.core.mathematics.ml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
-import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 
@@ -99,7 +101,7 @@ public class PCA {
 
         // 2. Compute SVD of centered data
         Matrix<Real> X = createMatrix(centered);
-        SVDDecomposition svd = SVDDecomposition.decompose(X);
+        SVDResult<Real> svd = SVDDecomposition.decompose(X);
 
         // 3. Principal components are right singular vectors (V)
         Matrix<Real> V = svd.getV();
@@ -116,12 +118,12 @@ public class PCA {
         components = DenseMatrix.of(componentRows, Reals.getInstance());
 
         // 4. Explained variance
-        Real[] singularValues = svd.getSingularValues();
+        Vector<Real> singularValues = svd.getSingularValues();
         explainedVariance = new Real[nComponents];
         Real totalVariance = Real.ZERO;
 
-        for (int i = 0; i < Math.min(nComponents, singularValues.length); i++) {
-            Real variance = singularValues[i].multiply(singularValues[i]).divide(Real.of(n - 1));
+        for (int i = 0; i < Math.min(nComponents, singularValues.dimension()); i++) {
+            Real variance = singularValues.get(i).multiply(singularValues.get(i)).divide(Real.of(n - 1));
             explainedVariance[i] = variance;
             totalVariance = totalVariance.add(variance);
         }

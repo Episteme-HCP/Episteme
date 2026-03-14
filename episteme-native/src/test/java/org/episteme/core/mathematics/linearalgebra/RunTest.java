@@ -14,7 +14,10 @@ public class RunTest {
             for (int j=i; j<10; j++) { double v = data[i][j]+data[j][i]; data[i][j]=v; data[j][i]=v; }
         }
         RealDoubleMatrix a = RealDoubleMatrix.of(data);
-        EigenDecomposition res = EigenDecomposition.decompose(a);
-        for(Real r : res.getEigenvalues()) { System.out.println("Eig: " + r); }
+        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> res = EigenDecomposition.decompose(a);
+        for (int i = 0; i < res.getEigenvalues().dimension(); i++) {
+            Real r = res.getEigenvalues().get(i);
+            System.out.println("Eig: " + r);
+        }
     }
 }

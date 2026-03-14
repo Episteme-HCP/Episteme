@@ -16,9 +16,9 @@ import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUSparseTen
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
- * ND4J Sparse Tensor backend.
+ * NativeND4J Sparse Tensor backend.
  * <p>
- * When sparsity is low (&lt;30% non-zero), delegates to {@link ND4JNativeTensorBackend}.
+ * When sparsity is low (&lt;30% non-zero), delegates to {@link NativeND4JTensorBackend}.
  * Otherwise uses the CPU sparse fallback.
  * </p>
  *
@@ -27,7 +27,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * @since 1.0
  */
 @AutoService({TensorBackend.class, AlgorithmProvider.class})
-public class ND4JCUDASparseTensorBackend implements TensorBackend {
+public class NativeND4JCUDASparseTensorBackend implements TensorBackend {
 
     private static boolean available = false;
     private static final CPUSparseTensorBackend fallback = new CPUSparseTensorBackend();
@@ -70,7 +70,7 @@ public class ND4JCUDASparseTensorBackend implements TensorBackend {
 
         double sparsity = (double) nonZeroCount / data.length;
         if (sparsity > 0.3) {
-            return new ND4JNativeTensorBackend().create(data, shape);
+            return new NativeND4JTensorBackend().create(data, shape);
         }
         return fallback.create(data, shape);
     }

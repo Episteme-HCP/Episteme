@@ -11,6 +11,9 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +24,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.inverse.InvertMatrix;
 
 /**
- * ND4J Linear Algebra Backend (Dense).
+ * NativeND4J Linear Algebra Backend (Dense).
  * <p>
  * When the ND4J library ({@code org.nd4j:nd4j-native-platform}) is on the classpath,
  * this backend delegates to ND4J's optimized BLAS/LAPACK backends (Native/AVX/CUDA).
@@ -32,8 +35,8 @@ import org.nd4j.linalg.inverse.InvertMatrix;
  * @since 1.0
  */
 @AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class})
-public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.episteme.nativ.technical.backend.nativ.NativeBackend, org.episteme.core.technical.backend.cpu.CPUBackend {
-    private static final Logger logger = LoggerFactory.getLogger(ND4JLinearAlgebraBackend.class);
+public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.episteme.nativ.technical.backend.nativ.NativeBackend, org.episteme.core.technical.backend.cpu.CPUBackend {
+    private static final Logger logger = LoggerFactory.getLogger(NativeND4JLinearAlgebraBackend.class);
 
     @Override
     public int getPriority() {
@@ -350,7 +353,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         INDArray contiguousVt = Vt.isView() || Vt.ordering() != 'c' ? Vt.dup('c') : Vt;
         
         // SVDResult expects V, but gesvd returns Vt. So we transpose Vt back to V.
-        return new SVDResult<>(fromINDArray(contiguousU), fromINDArrayVector(S), fromINDArray(contiguousVt.transpose()));
+        return new SVDResult<Real>(fromINDArray(contiguousU), fromINDArrayVector(S), fromINDArray(contiguousVt.transpose()));
     }
 
     /**
@@ -419,7 +422,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
         double[] p = new double[n];
         for (int i = 0; i < n; i++) p[i] = perm[i];
         
-        return new LUResult<>(fromINDArray(L), fromINDArray(U), org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p));
+        return new LUResult<Real>(fromINDArray(L), fromINDArray(U), org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p));
     }
 
     @Override
@@ -439,7 +442,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
             }
         }
         
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromINDArray(L));
+        return new CholeskyResult<Real>(fromINDArray(L));
     }
 
     @Override
@@ -467,7 +470,7 @@ public class ND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, or
             eigVecs = eigVecs.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
         }
         
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+        return new EigenResult<Real>(
             fromINDArray(eigVecs),
             org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigVals.data().asDouble())
         );

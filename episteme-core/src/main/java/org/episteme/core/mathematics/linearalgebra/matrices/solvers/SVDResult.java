@@ -19,4 +19,9 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
  * @param S   the singular values (as a vector)
  * @param V   the right singular vectors
  */
-public record SVDResult<E>(Matrix<E> U, Vector<E> S, Matrix<E> V) {}
+public record SVDResult<E>(Matrix<E> U, Vector<E> S, Matrix<E> V) {
+    public Matrix<E> getU() { return U; }
+    public Vector<E> getS() { return S; }
+    public Matrix<E> getV() { return V; }
+    public Vector<E> getSingularValues() { return S; }
+}

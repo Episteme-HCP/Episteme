@@ -267,9 +267,13 @@ public class CircuitSimulatorViewer extends org.episteme.core.ui.AbstractViewer 
         try {
             org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.Real> G = 
                 org.episteme.core.mathematics.linearalgebra.Matrix.of(reducedG, org.episteme.core.mathematics.numbers.real.Real.ZERO);
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition lu = 
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<org.episteme.core.mathematics.numbers.real.Real> luResult = 
                 org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUDecomposition.decompose(G);
-            org.episteme.core.mathematics.numbers.real.Real[] solution = lu.solve(reducedI);
+            org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> solutionVec = luResult.solve(
+                org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(reducedI), org.episteme.core.mathematics.sets.Reals.INSTANCE)
+            );
+            org.episteme.core.mathematics.numbers.real.Real[] solution = new org.episteme.core.mathematics.numbers.real.Real[reducedSize];
+            for (int i = 0; i < reducedSize; i++) solution[i] = solutionVec.get(i);
             nodeVoltages = new java.util.HashMap<>();
             int vIdx = 0;
             for (int i = 0; i < size; i++) {

@@ -30,10 +30,11 @@ public class EigenDebugTest {
             }
         }
         RealDoubleMatrix a = RealDoubleMatrix.of(data);
-        EigenDecomposition res = EigenDecomposition.decompose(a);
+        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> res = EigenDecomposition.decompose(a);
         
         StringBuilder sb = new StringBuilder("EIGENVALUES:\n");
-        for(Real val : res.getEigenvalues()) {
+        for (int i = 0; i < res.getEigenvalues().dimension(); i++) {
+            Real val = res.getEigenvalues().get(i);
             sb.append("Eig: ").append(val).append("\n");
         }
         throw new RuntimeException(sb.toString());

@@ -142,6 +142,27 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
         throw new UnsupportedOperationException(getName() + " does not support cholesky()");
     }
 
+    /**
+     * Solves Ax = b using a previously computed LU decomposition.
+     */
+    default Vector<E> solve(LUResult<E> lu, Vector<E> b) {
+        throw new UnsupportedOperationException(getName() + " does not support solve(LUResult, Vector)");
+    }
+
+    /**
+     * Solves Ax = b using a previously computed QR decomposition.
+     */
+    default Vector<E> solve(QRResult<E> qr, Vector<E> b) {
+        throw new UnsupportedOperationException(getName() + " does not support solve(QRResult, Vector)");
+    }
+
+    /**
+     * Solves Ax = b using a previously computed Cholesky decomposition.
+     */
+    default Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
+        throw new UnsupportedOperationException(getName() + " does not support solve(CholeskyResult, Vector)");
+    }
+
     @Override
     default double score(OperationContext context) {
         return AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());

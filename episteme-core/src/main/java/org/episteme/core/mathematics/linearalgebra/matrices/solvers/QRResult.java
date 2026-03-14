@@ -17,4 +17,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
  * @param Q   the orthogonal matrix
  * @param R   the upper triangular matrix
  */
-public record QRResult<E>(Matrix<E> Q, Matrix<E> R) {}
+public record QRResult<E>(Matrix<E> Q, Matrix<E> R) {
+    public Matrix<E> getQ() { return Q; }
+    public Matrix<E> getR() { return R; }
+}

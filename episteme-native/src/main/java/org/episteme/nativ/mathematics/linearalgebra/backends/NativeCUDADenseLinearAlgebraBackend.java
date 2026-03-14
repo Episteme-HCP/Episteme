@@ -29,6 +29,11 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 import com.google.auto.service.AutoService;
 
 /**
@@ -89,10 +94,16 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
 
     private static synchronized void ensureInitialized() {
         if (IS_AVAILABLE) return;
+        
+        boolean disabled = Boolean.getBoolean("episteme.linearalgebra.disable.cuda");
+        if (disabled) {
+            logger.warn("CUDA BLAS Backend disabled via system property.");
+            return;
+        }
 
         try (Arena tempArena = Arena.ofConfined()) {
-            // Try loading cudart
-            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", tempArena);
+             // Try loading cudart
+             Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", tempArena);
             if (cudaRtOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcudart.so");
                 if (Files.exists(linuxPath)) {
@@ -954,7 +965,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 for (int r = 0; r < m; r++) for (int c = 0; c < k; c++) qData[r * k + c] = h_Q[c * m + r];
                 Matrix<Real> Q = fromDoubleArray(qData, m, k);
 
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
+                return new QRResult<Real>(Q, R);
 
             } finally {
                 if (!segA.equals(MemorySegment.NULL)) { checkCuda((int) CUDA_FREE.invokeExact(segA)); }
@@ -1055,7 +1066,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 double[] vData = new double[n * n];
                 for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) vData[r * n + c] = h_VTT[r * n + c];
 
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+                return new SVDResult<Real>(
                     fromDoubleArray(uData, m, m),
                     fromDoubleVec(h_S),
                     fromDoubleArray(vData, n, n)
@@ -1139,7 +1150,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     }
                 }
 
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromDoubleArray(lData, n, n));
+                return new CholeskyResult<Real>(fromDoubleArray(lData, n, n));
             } finally {
                 if (!segA.equals(MemorySegment.NULL)) { checkCuda((int) CUDA_FREE.invokeExact(segA)); }
                 if (!segInfo.equals(MemorySegment.NULL)) { checkCuda((int) CUDA_FREE.invokeExact(segInfo)); }
@@ -1243,7 +1254,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                 double[] pData = new double[n];
                 for (int i = 0; i < n; i++) pData[i] = perm[i];
 
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                return new LUResult<Real>(
                     fromDoubleArray(lData, n, n),
                     fromDoubleArray(uData, n, n),
                     fromDoubleVec(pData)
@@ -1324,7 +1335,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
                     }
                 }
 
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                return new EigenResult<Real>(
                     fromDoubleArray(vData, n, n),
                     fromDoubleVec(h_W)
                 );

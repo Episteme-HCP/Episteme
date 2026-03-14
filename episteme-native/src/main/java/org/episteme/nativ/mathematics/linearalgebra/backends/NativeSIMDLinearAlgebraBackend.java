@@ -13,6 +13,11 @@ import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -528,7 +533,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         }
         double[] pivD = new double[n];
         for (int i = 0; i < n; i++) pivD[i] = piv[i];
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+        return new LUResult<Real>(
             fromDoubleArray(L, n, n), fromDoubleArray(U, n, n),
             org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pivD)
         );
@@ -571,7 +576,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
                 for (int j2 = k; j2 < m; j2++) Q[i * m + j2] -= beta * dot * v[j2];
             }
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
+        return new QRResult<Real>(
             fromDoubleArray(Q, m, m), fromDoubleArray(R, m, n)
         );
     }
@@ -598,7 +603,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         for (int i = 0; i < vMat.getRowDimension(); i++)
             for (int j = 0; j < vMat.getColumnDimension(); j++)
                 vData[i * vMat.getColumnDimension() + j] = vMat.getEntry(i, j);
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+        return new SVDResult<Real>(
             fromDoubleArray(uData, uMat.getRowDimension(), uMat.getColumnDimension()),
             org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sVals),
             fromDoubleArray(vData, vMat.getRowDimension(), vMat.getColumnDimension())
@@ -625,7 +630,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
                 L[i * n + j] = (a.get(i, j).doubleValue() - s) / L[j * n + j];
             }
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+        return new CholeskyResult<Real>(
             fromDoubleArray(L, n, n)
         );
     }
@@ -647,7 +652,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
                 vData[i * n + j] = vMat.getEntry(i, j);
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+        return new EigenResult<Real>(
             fromDoubleArray(vData, n, n),
             org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvals)
         );
