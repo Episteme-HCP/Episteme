@@ -64,6 +64,50 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
         return "Distributed Linear Algebra Provider (" + contextType + ")";
     }
 
+    @SuppressWarnings("unchecked")
+    private LinearAlgebraProvider<E> getLocalProvider(Ring<E> ring) {
+        return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+            LinearAlgebraProvider.class, 
+            org.episteme.core.technical.algorithm.OperationContext.DEFAULT, 
+            p -> p != this && p.isCompatible(ring)
+        );
+    }
+
+    @Override
+    public Vector<E> add(Vector<E> a, Vector<E> b) {
+        return getLocalProvider(a.getScalarRing()).add(a, b);
+    }
+
+    @Override
+    public Vector<E> subtract(Vector<E> a, Vector<E> b) {
+        return getLocalProvider(a.getScalarRing()).subtract(a, b);
+    }
+
+    @Override
+    public Vector<E> multiply(Vector<E> vector, E scalar) {
+        return getLocalProvider(vector.getScalarRing()).multiply(vector, scalar);
+    }
+
+    @Override
+    public E dot(Vector<E> a, Vector<E> b) {
+        return getLocalProvider(a.getScalarRing()).dot(a, b);
+    }
+
+    @Override
+    public E norm(Vector<E> a) {
+        return getLocalProvider(a.getScalarRing()).norm(a);
+    }
+
+    @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        return getLocalProvider(a.getScalarRing()).add(a, b);
+    }
+
+    @Override
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        return getLocalProvider(a.getScalarRing()).subtract(a, b);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
@@ -82,30 +126,45 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
             }
         }
         
-        return LinearAlgebraProvider.super.multiply(a, b);
+        return getLocalProvider(a.getScalarRing()).multiply(a, b);
+    }
+
+    @Override
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        return getLocalProvider(a.getScalarRing()).multiply(a, b);
     }
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
         if (a instanceof TiledMatrix) {
             // Future implementation: Block-cyclic inversion
-            // For now, fallback to local if context is local
-            return LinearAlgebraProvider.super.inverse(a);
+            // For now, fallback to local
+            return getLocalProvider(a.getScalarRing()).inverse(a);
         }
-        return LinearAlgebraProvider.super.inverse(a);
+        return getLocalProvider(a.getScalarRing()).inverse(a);
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (a instanceof TiledMatrix) {
             // Future implementation: Distributed LU/Backsubstitution
-            return LinearAlgebraProvider.super.solve(a, b);
+            return getLocalProvider(a.getScalarRing()).solve(a, b);
         }
-        return LinearAlgebraProvider.super.solve(a, b);
+        return getLocalProvider(a.getScalarRing()).solve(a, b);
     }
 
     @Override
     public E determinant(Matrix<E> a) {
-        return LinearAlgebraProvider.super.determinant(a);
+        return getLocalProvider(a.getScalarRing()).determinant(a);
+    }
+
+    @Override
+    public Matrix<E> transpose(Matrix<E> a) {
+        return getLocalProvider(a.getScalarRing()).transpose(a);
+    }
+
+    @Override
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        return getLocalProvider(a.getScalarRing()).scale(scalar, a);
     }
 
     @Override

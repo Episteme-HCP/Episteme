@@ -39,7 +39,7 @@ public class NativeFFMComplianceTest {
 
     @Test
     public void runComplianceSuite() {
-        LinearAlgebraComplianceTest suite = new LinearAlgebraComplianceTest();
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraComplianceTest suite = new org.episteme.core.mathematics.linearalgebra.LinearAlgebraComplianceTest();
         
         System.setProperty("org.episteme.include.provider", "Native BLAS Provider FFM");
         suite.generateComplianceReport();

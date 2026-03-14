@@ -121,7 +121,8 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     private INDArray toINDArray(Matrix<Real> m) {
         if (m instanceof RealDoubleMatrix) {
             RealDoubleMatrix rdm = (RealDoubleMatrix) m;
-            return Nd4j.create(rdm.toDoubleArray(), new int[]{m.rows(), m.cols()});
+            // Use explicit 'c' ordering (row-major) to match RealDoubleMatrix.toDoubleArray()
+            return Nd4j.create(rdm.toDoubleArray(), new int[]{m.rows(), m.cols()}, 'c');
         }
         double[][] data = new double[m.rows()][m.cols()];
         for(int r=0; r<m.rows(); r++) {
@@ -364,57 +365,58 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     public LUResult<Real> lu(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
-        INDArray work = toINDArray(a).dup();
         
-        // Manual partial-pivoting LU decomposition
-        // since ND4J's getrf(INDArray) single-arg doesn't expose pivot information.
+        // Pure Java LU decomposition with partial pivoting to avoid ND4J ordering issues
+        double[][] work = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                work[i][j] = a.get(i, j).doubleValue();
+        
         int[] perm = new int[n];
         for (int i = 0; i < n; i++) perm[i] = i;
         
         for (int k = 0; k < n; k++) {
             // Find pivot
             int maxIdx = k;
-            double maxVal = Math.abs(work.getDouble(k, k));
+            double maxVal = Math.abs(work[k][k]);
             for (int i = k + 1; i < n; i++) {
-                double v = Math.abs(work.getDouble(i, k));
+                double v = Math.abs(work[i][k]);
                 if (v > maxVal) { maxVal = v; maxIdx = i; }
             }
             
             if (maxIdx != k) {
-                // Swap rows in work matrix and perm array
-                for (int j = 0; j < n; j++) {
-                    double tmp = work.getDouble(k, j);
-                    work.putScalar(k, j, work.getDouble(maxIdx, j));
-                    work.putScalar(maxIdx, j, tmp);
-                }
+                // Swap rows
+                double[] tmp = work[k];
+                work[k] = work[maxIdx];
+                work[maxIdx] = tmp;
                 int tmpP = perm[k]; perm[k] = perm[maxIdx]; perm[maxIdx] = tmpP;
             }
             
             // Gaussian elimination
-            double pivot = work.getDouble(k, k);
+            double pivot = work[k][k];
             if (Math.abs(pivot) > 1e-15) {
                 for (int i = k + 1; i < n; i++) {
-                    double factor = work.getDouble(i, k) / pivot;
-                    work.putScalar(i, k, factor); // Store L factor in lower part
+                    double factor = work[i][k] / pivot;
+                    work[i][k] = factor; // Store L factor in lower part
                     for (int j = k + 1; j < n; j++) {
-                        work.putScalar(i, j, work.getDouble(i, j) - factor * work.getDouble(k, j));
+                        work[i][j] -= factor * work[k][j];
                     }
                 }
             }
         }
         
-        // Extract L and U from the work matrix
-        INDArray L = Nd4j.zeros(n, n);
-        INDArray U = Nd4j.zeros(n, n);
+        // Extract L and U
+        double[] lFlat = new double[n * n];
+        double[] uFlat = new double[n * n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i > j) {
-                    L.putScalar(i, j, work.getDouble(i, j));
+                    lFlat[i * n + j] = work[i][j];
                 } else if (i == j) {
-                    L.putScalar(i, j, 1.0);
-                    U.putScalar(i, j, work.getDouble(i, j));
+                    lFlat[i * n + j] = 1.0;
+                    uFlat[i * n + j] = work[i][j];
                 } else {
-                    U.putScalar(i, j, work.getDouble(i, j));
+                    uFlat[i * n + j] = work[i][j];
                 }
             }
         }
@@ -422,27 +424,44 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         double[] p = new double[n];
         for (int i = 0; i < n; i++) p[i] = perm[i];
         
-        return new LUResult<Real>(fromINDArray(L), fromINDArray(U), org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p));
+        return new LUResult<Real>(
+            RealDoubleMatrix.of(lFlat, n, n),
+            RealDoubleMatrix.of(uFlat, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p)
+        );
     }
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
-        INDArray mat = toINDArray(a);
-        INDArray L = mat.dup();
         
-        // potrf in ND4J typically takes (matrix, isUpper)
-        Nd4j.getBlasWrapper().lapack().potrf(L, false);
+        // Pure Java Cholesky decomposition to avoid ND4J potrf ordering issues
+        double[][] aData = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                aData[i][j] = a.get(i, j).doubleValue();
         
-        // Zero out the upper part explicitly as LAPACK only touches the specified triangle
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                L.putScalar(i, j, 0.0);
+        double[][] lData = new double[n][n];
+        for (int j = 0; j < n; j++) {
+            double sum = 0;
+            for (int k = 0; k < j; k++) sum += lData[j][k] * lData[j][k];
+            double diag = aData[j][j] - sum;
+            if (diag <= 0) throw new ArithmeticException("Matrix is not positive definite");
+            lData[j][j] = Math.sqrt(diag);
+            for (int i = j + 1; i < n; i++) {
+                sum = 0;
+                for (int k = 0; k < j; k++) sum += lData[i][k] * lData[j][k];
+                lData[i][j] = (aData[i][j] - sum) / lData[j][j];
             }
         }
         
-        return new CholeskyResult<Real>(fromINDArray(L));
+        // Flatten row-major
+        double[] flat = new double[n * n];
+        for (int i = 0; i < n; i++)
+            System.arraycopy(lData[i], 0, flat, i * n, n);
+        
+        return new CholeskyResult<Real>(RealDoubleMatrix.of(flat, n, n));
     }
 
     @Override

@@ -912,6 +912,18 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        if (AVAILABLE && DGEMV_HANDLE != null && a instanceof RealDoubleMatrix && b instanceof RealDoubleVector) {
+            RealDoubleMatrix adm = (RealDoubleMatrix) a;
+            RealDoubleVector bdv = (RealDoubleVector) b;
+            if (adm.cols() != bdv.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+            
+            DoubleBuffer aBuf = ensureDirect(adm);
+            DoubleBuffer bBuf = ensureDirect(bdv);
+            RealDoubleVector res = RealDoubleVector.direct(adm.rows());
+            
+            dgemv(adm.rows(), adm.cols(), 1.0, aBuf, adm.cols(), bBuf, 1, 0.0, res.getBuffer(), 1);
+            return res;
+        }
         if (AVAILABLE) {
             RealDoubleMatrix adm = (a instanceof RealDoubleMatrix) ? (RealDoubleMatrix) a : RealDoubleMatrix.of(toDoubleArray(a), a.rows(), a.cols());
             RealDoubleVector bdv = (b instanceof RealDoubleVector) ? (RealDoubleVector) b : RealDoubleVector.of(toDoubleArray(b));

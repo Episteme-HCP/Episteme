@@ -74,6 +74,14 @@ public class SparseVectorStorage<E> implements VectorStorage<E> {
     public VectorStorage<E> copy() {
         return new SparseVectorStorage<>(dimension, zero, data);
     }
+
+    /**
+     * Returns the non-zero entries in this storage.
+     * @return a map of index to value for non-zero entries
+     */
+    public Map<Integer, E> getNonZeros() {
+        return java.util.Collections.unmodifiableMap(data);
+    }
 }
 
 
