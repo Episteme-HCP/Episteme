@@ -192,6 +192,14 @@ public class NativeLibraryLoader {
                 variants.add("cudart");
                 variants.add("cudart.so.12");
                 variants.add("cudart.so.11");
+            } else if (libName.equals("cusolver")) {
+                variants.add("cusolver");
+                variants.add("cusolver.so.12");
+                variants.add("cusolver.so.11");
+            } else if (libName.equals("cusparse")) {
+                variants.add("cusparse");
+                variants.add("cusparse.so.12");
+                variants.add("cusparse.so.11");
             } else if (libName.contains("bullet")) {
                 variants.add("bullet_capi");
                 variants.add("bullet");
