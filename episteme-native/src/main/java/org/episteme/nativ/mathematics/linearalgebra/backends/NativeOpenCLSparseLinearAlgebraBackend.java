@@ -120,6 +120,11 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     @Override
+    public String getType() {
+        return "math";
+    }
+
+    @Override
     public String getName() {
         return "Native OpenCL Sparse Linear Algebra Backend";
     }
@@ -167,8 +172,15 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public boolean isAvailable() {
-        if (cachedAvailability != null) return cachedAvailability;
-        
+        if (cachedAvailability != null) return cachedAvailability && !isExplicitlyDisabled();
+        ensureInitialized();
+        return isInitialized && !isExplicitlyDisabled();
+    }
+
+    private synchronized void ensureInitialized() {
+        if (initAttempted) return; // Already tried to initialize or checked availability
+        initAttempted = true;
+
         try {
             Class.forName("org.jocl.CL");
             CL.setExceptionsEnabled(true);
@@ -177,7 +189,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             CL.clGetPlatformIDs(0, null, numPlatformsArray);
             if (numPlatformsArray[0] == 0) {
                 cachedAvailability = false;
-                return false;
+                return;
             }
             
             cl_platform_id[] platforms = new cl_platform_id[numPlatformsArray[0]];
@@ -200,18 +212,17 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                         
                         if (extensions.contains("cl_khr_fp64") || extensions.contains("cl_amd_fp64")) {
                             cachedAvailability = true;
-                            return true;
+                            return;
                         }
                     }
                 }
             }
             
-            logger.warn("OpenCL found but no device supports double precision (cl_khr_fp64/cl_amd_fp64).");
             cachedAvailability = false;
-            return false;
+            return;
         } catch (Throwable t) {
             cachedAvailability = false;
-            return false;
+            return;
         }
     }
 
@@ -940,37 +951,33 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native OpenCL inverse implementation pending");
+    public Vector<Real> bicgstab(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+        if (!(a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
+            throw new UnsupportedOperationException("OpenCL BiCGSTAB only supports sparse matrices for now");
+        }
+        try {
+            return solveBiCGSTAB((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b, maxIterations, tolerance.doubleValue());
+        } catch (Exception e) {
+            throw new RuntimeException("OpenCL BiCGSTAB failed", e);
+        }
     }
 
     @Override
-    public Real determinant(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native OpenCL determinant implementation pending");
+    public Vector<Real> conjugateGradient(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+        if (!(a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
+            throw new UnsupportedOperationException("OpenCL CG only supports sparse matrices for now");
+        }
+        try {
+            return solveCG((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b, maxIterations, tolerance.doubleValue());
+        } catch (Exception e) {
+            throw new RuntimeException("OpenCL CG failed", e);
+        }
     }
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native OpenCL LU implementation pending");
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native OpenCL QR implementation pending");
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native OpenCL SVD implementation pending");
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native OpenCL Cholesky implementation pending");
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native OpenCL Eigen implementation pending");
+    public Vector<Real> gmres(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations, int restarts) {
+        // Placeholder or basic implementation using CG/BiCGSTAB for now if appropriate, 
+        // or just throw UOE if not implemented.
+        throw new UnsupportedOperationException("OpenCL GMRES not yet implemented");
     }
 }

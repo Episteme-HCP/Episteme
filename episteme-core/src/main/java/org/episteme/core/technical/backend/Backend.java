@@ -38,8 +38,30 @@ public interface Backend {
 
     /**
      * Checks if this backend is currently available (libraries loaded, etc.).
+     * <p>
+     * Default implementation checks {@link #isExplicitlyDisabled()} and returns
+     * false if it is.
+     * </p>
      */
-    boolean isAvailable();
+    default boolean isAvailable() {
+        return !isExplicitlyDisabled();
+    }
+
+    /**
+     * Checks if this backend is specifically disabled via a system property:
+     * {@code "episteme.backend.disable." + getId()}.
+     * <p>
+     * It also checks specialized properties like {@code "episteme.linearalgebra.disable." + getId()}.
+     * </p>
+     * 
+     * @return true if explicitly disabled
+     */
+    default boolean isExplicitlyDisabled() {
+        String id = getId();
+        if (Boolean.getBoolean("episteme.backend.disable." + id)) return true;
+        if ("math".equals(getType()) && Boolean.getBoolean("episteme.linearalgebra.disable." + id)) return true;
+        return false;
+    }
 
     /**
      * Returns the priority for auto-selection (higher = preferred).

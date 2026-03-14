@@ -40,7 +40,7 @@ public class MPIDistributedBackend implements DistributedBackend {
 
     @Override
     public boolean isAvailable() {
-        return available;
+        return available && !isExplicitlyDisabled();
     }
 
     @Override

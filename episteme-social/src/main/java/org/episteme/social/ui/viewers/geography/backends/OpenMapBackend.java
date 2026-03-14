@@ -60,7 +60,7 @@ public class OpenMapBackend implements MapBackend {
     public boolean isAvailable() {
         try {
             Class.forName("com.bbn.openmap.MapBean");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

@@ -69,7 +69,7 @@ public class HDF5IOBackend implements ComputeBackend {
     public boolean isAvailable() {
         try {
             Class.forName("io.jhdf.HdfFile");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

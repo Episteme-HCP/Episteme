@@ -42,7 +42,17 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE;
+        return IS_AVAILABLE && !isExplicitlyDisabled();
+    }
+
+    @Override
+    public String getId() {
+        return "cuda-sparse";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
     }
 
     @Override
@@ -1090,6 +1100,23 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         }
 
         return base;
+    }
+
+    @Override
+    public Vector<Real> bicgstab(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+        // For now, if appropriate, use a hybrid implementation or throw UOE if complex.
+        // Given the scale, iterative solvers are often preferred for very large sparse systems.
+        throw new UnsupportedOperationException("CUDA BiCGSTAB implementation pending (using direct LU solve for now if called via solve())");
+    }
+
+    @Override
+    public Vector<Real> conjugateGradient(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+        throw new UnsupportedOperationException("CUDA Conjugate Gradient implementation pending");
+    }
+
+    @Override
+    public Vector<Real> gmres(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations, int restarts) {
+        throw new UnsupportedOperationException("CUDA GMRES implementation pending");
     }
 
     @Override

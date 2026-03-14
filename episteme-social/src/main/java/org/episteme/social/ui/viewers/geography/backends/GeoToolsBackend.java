@@ -60,7 +60,7 @@ public class GeoToolsBackend implements MapBackend {
     public boolean isAvailable() {
         try {
             Class.forName("org.geotools.map.MapContent");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

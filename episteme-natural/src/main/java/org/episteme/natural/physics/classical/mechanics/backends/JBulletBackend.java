@@ -75,7 +75,7 @@ public class JBulletBackend implements MechanicsBackend, CPUBackend, CollisionPr
     public boolean isAvailable() {
         try {
             Class.forName("com.bulletphysics.dynamics.DiscreteDynamicsWorld");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (Throwable t) {
             return false;
         }

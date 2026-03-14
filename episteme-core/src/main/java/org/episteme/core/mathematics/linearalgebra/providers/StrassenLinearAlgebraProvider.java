@@ -68,4 +68,14 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     public int getPriority() {
         return -10;
     }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public void shutdown() {
+        // No-op
+    }
 }

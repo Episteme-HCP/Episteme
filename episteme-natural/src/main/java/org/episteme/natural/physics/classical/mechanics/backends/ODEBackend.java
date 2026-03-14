@@ -75,7 +75,7 @@ public class ODEBackend implements MechanicsBackend, CPUBackend, CollisionProvid
     public boolean isAvailable() {
         try {
             Class.forName("org.ode4j.ode.OdeHelper");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

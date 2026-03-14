@@ -13,6 +13,8 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import java.util.Optional;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -37,8 +39,8 @@ import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@com.google.auto.service.AutoService({org.episteme.core.technical.backend.cpu.CPUBackend.class, org.episteme.nativ.technical.backend.nativ.NativeBackend.class, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class})
-public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
+@com.google.auto.service.AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
+public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
 
     private static final System.Logger logger = System.getLogger(NativeCPULinearAlgebraBackend.class.getName());
 
@@ -216,7 +218,17 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
     @Override
     public boolean isAvailable() {
-        return AVAILABLE;
+        return AVAILABLE && !isExplicitlyDisabled();
+    }
+
+    @Override
+    public String getId() {
+        return "native-cpu";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
     }
 
     @Override

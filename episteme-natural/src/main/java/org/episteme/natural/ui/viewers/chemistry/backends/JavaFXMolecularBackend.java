@@ -58,7 +58,7 @@ public class JavaFXMolecularBackend implements MolecularBackend {
     public boolean isAvailable() {
         try {
             Class.forName("javafx.application.Platform");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (Throwable t) {
             return false;
         }

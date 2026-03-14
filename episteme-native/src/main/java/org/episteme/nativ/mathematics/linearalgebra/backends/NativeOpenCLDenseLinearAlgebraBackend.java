@@ -1029,6 +1029,16 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     }
 
     @Override
+    public String getId() {
+        return "opencl";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
+    }
+
+    @Override
     public void shutdown() {
         if (initialized) {
             clReleaseKernel(matMulKernel);

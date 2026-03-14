@@ -43,7 +43,7 @@ public class StrangeBackend implements QuantumBackend, QuantumAlgorithmProvider 
     public boolean isAvailable() {
         try {
             Class.forName("org.redfx.strange.Program");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) { return false; }
     }
 

@@ -38,8 +38,8 @@ public class GenesisBackend implements MechanicsBackend, CPUBackend, CollisionPr
 
     @Override
     public boolean isAvailable() {
-        // Pure Java/SIMD backend — always available
-        return true;
+        // Pure Java/SIMD backend
+        return !isExplicitlyDisabled();
     }
 
     @Override

@@ -61,7 +61,7 @@ public class CPUJzy3dPlot3DBackend implements PlottingBackend {
     public boolean isAvailable() {
         try {
             Class.forName("org.jzy3d.chart.Chart");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

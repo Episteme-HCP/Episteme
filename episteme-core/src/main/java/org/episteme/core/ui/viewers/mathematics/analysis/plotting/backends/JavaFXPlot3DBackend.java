@@ -58,7 +58,7 @@ public class JavaFXPlot3DBackend implements PlottingBackend {
     public boolean isAvailable() {
         try {
             Class.forName("javafx.application.Platform");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (Throwable t) {
             return false;
         }

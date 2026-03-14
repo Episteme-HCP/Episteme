@@ -18,7 +18,7 @@ public class QiskitAerBackend extends QiskitBackend {
     public boolean isAvailable() {
         try {
             Process p = new ProcessBuilder(PythonResolver.resolve(), "-c", "import qiskit_aer").start();
-            return p.waitFor() == 0;
+            return p.waitFor() == 0 && !isExplicitlyDisabled();
         } catch (Exception e) { return false; }
     }
 }

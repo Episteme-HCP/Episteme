@@ -37,6 +37,9 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import com.google.auto.service.AutoService;
 
@@ -51,8 +54,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({SparseLinearAlgebraProvider.class})
-public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E> {
+@AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, Backend.class, CPUBackend.class})
+public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E>, CPUBackend {
 
     protected final Ring<E> ring;
 
@@ -73,6 +76,46 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
     }
 
     private static final int PARALLEL_THRESHOLD = 500; // Lower threshold for sparse logic overhead
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public void shutdown() {
+        // No-op
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return null; // CPU has no specific execution context
+    }
+
+    @Override
+    public String getId() {
+        return "cpu-sparse";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Core CPU Sparse Linear Algebra Provider";
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
+    }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
@@ -425,15 +468,14 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
 
         return new SparseMatrix<E>(storage, r);
     }
+
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
             // Default to BiCGSTAB for general sparse matrices
-            @SuppressWarnings("unchecked")
             Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), (Ring<Real>) ring);
-            @SuppressWarnings("unchecked")
-            Vector<E> resultVec = (Vector<E>) bicgstab(a, (Vector<E>) x0, b, (E) Real.of(1e-12), 1000);
-            return resultVec;
+            return bicgstab(a, b, (Vector<E>) (Vector<?>) x0, (E) (Object) Real.of(1e-12), 1000);
         }
         return SparseLinearAlgebraProvider.super.solve(a, b);
     }
@@ -486,7 +528,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
         return arr;
     }
 
-    // --- Autonomous Java Sparse Solvers ---
+    // --- Internal Java Sparse Solvers ---
 
     private static class JavaSparseUtils {
         public static Real[] matrixVectorMultiply(Matrix<Real> A, Real[] x) {
@@ -641,5 +683,6 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
             return x;
         }
     }
+
 
 }

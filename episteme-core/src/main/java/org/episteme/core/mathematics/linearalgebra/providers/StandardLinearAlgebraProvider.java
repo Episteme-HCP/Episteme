@@ -40,4 +40,14 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     public int getPriority() {
         return -10; // Low priority so it's not picked automatically as default
     }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public void shutdown() {
+        // No-op
+    }
 }

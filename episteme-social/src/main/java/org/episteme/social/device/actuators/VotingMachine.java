@@ -25,7 +25,6 @@ package org.episteme.social.device.actuators;
 
 import org.episteme.core.device.ComplexInstrument;
 import org.episteme.social.device.sensors.VoterScanner;
-import org.episteme.social.device.actuators.BallotCaster;
 
 /**
  * A Voting Machine device for electronic voting.

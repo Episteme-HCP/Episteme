@@ -61,7 +61,7 @@ public class GoogleGeoChartBackend implements MapBackend {
         // Always available if JavaFX WebView is present
         try {
             Class.forName("javafx.scene.web.WebView");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

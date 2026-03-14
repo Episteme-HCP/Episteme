@@ -56,4 +56,14 @@ public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider
     public int getPriority() {
         return -10;
     }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public void shutdown() {
+        // No-op
+    }
 }

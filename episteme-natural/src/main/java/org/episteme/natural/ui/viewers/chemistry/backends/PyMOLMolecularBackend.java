@@ -60,7 +60,7 @@ public class PyMOLMolecularBackend implements MolecularBackend {
             // Check for PyMOL executable in PATH
             ProcessBuilder pb = new ProcessBuilder(System.getProperty("os.name").toLowerCase().contains("win") ? "where" : "which", "pymol");
             Process p = pb.start();
-            return p.waitFor() == 0;
+            return p.waitFor() == 0 && !isExplicitlyDisabled();
         } catch (Exception e) {
             return false;
         }

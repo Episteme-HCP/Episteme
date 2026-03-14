@@ -298,6 +298,64 @@ public class LinearAlgebraComplianceTest {
                 }
             });
 
+            testOperation(res, "BiCGSTAB", () -> {
+                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
+                SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
+                Random rand = new Random(42);
+                int n = 30;
+                double[][] aData = randomData(n, n, rand);
+                for(int i=0; i<n; i++) aData[i][i] = 10.0 + Math.abs(aData[i][i]);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                double[] bData = new double[n];
+                for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
+                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
+                Vector<Real> x = sparseProvider.bicgstab(a, b, x0, Real.of(1e-8), 2000);
+                Vector<Real> ax = provider.multiply(a, x);
+                for (int i = 0; i < n; i++) {
+                    assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
+                }
+            });
+
+            testOperation(res, "ConjugateGradient", () -> {
+                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
+                SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
+                Random rand = new Random(42);
+                int n = 30;
+                double[][] aData = randomData(n, n, rand);
+                SimpleMatrix mat = new SimpleMatrix(aData);
+                SimpleMatrix spd = mat.transpose().mult(mat).plus(SimpleMatrix.identity(n).scale(5.0));
+                RealDoubleMatrix a = RealDoubleMatrix.of(toArray(spd));
+                double[] bData = new double[n];
+                for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
+                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
+                Vector<Real> x = sparseProvider.conjugateGradient(a, b, x0, Real.of(1e-8), 2000);
+                Vector<Real> ax = provider.multiply(a, x);
+                for (int i = 0; i < n; i++) {
+                    assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
+                }
+            });
+
+            testOperation(res, "GMRES", () -> {
+                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
+                SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
+                Random rand = new Random(42);
+                int n = 30;
+                double[][] aData = randomData(n, n, rand);
+                for(int i=0; i<n; i++) aData[i][i] = 10.0 + Math.abs(aData[i][i]);
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                double[] bData = new double[n];
+                for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
+                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
+                Vector<Real> x = sparseProvider.gmres(a, b, x0, Real.of(1e-8), 2000, 30);
+                Vector<Real> ax = provider.multiply(a, x);
+                for (int i = 0; i < n; i++) {
+                    assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
+                }
+            });
+
             testOperation(res, "Transpose (Rect)", () -> {
                 Random rand = new Random(42);
                 double[][] aData = randomData(15, 25, rand);

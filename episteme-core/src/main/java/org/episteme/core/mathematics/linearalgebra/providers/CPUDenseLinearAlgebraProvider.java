@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
@@ -47,8 +49,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({LinearAlgebraProvider.class})
-public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+@AutoService({LinearAlgebraProvider.class, Backend.class, CPUBackend.class})
+public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E>, CPUBackend {
 
     protected final Field<E> field;
     private static final int PARALLEL_THRESHOLD = 1000;
@@ -78,6 +80,37 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @Override
     public boolean isAvailable() {
         return true;
+    }
+
+
+    @Override
+    public void shutdown() {
+        // No-op
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return null;
+    }
+
+    @Override
+    public String getId() {
+        return "cpu-dense";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Core CPU Dense Linear Algebra Provider";
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
     }
 
 

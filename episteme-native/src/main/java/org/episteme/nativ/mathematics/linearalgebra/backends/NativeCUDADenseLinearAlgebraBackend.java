@@ -24,6 +24,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import org.slf4j.Logger;
@@ -45,8 +46,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, GPUBackend.class, NativeBackend.class, LinearAlgebraProvider.class})
-public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, LinearAlgebraProvider<Real>, GPUBackend {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
+public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDADenseLinearAlgebraBackend.class);
     private static boolean IS_AVAILABLE = false;
     private static final Linker LINKER = NativeLibraryLoader.getLinker();
@@ -95,11 +96,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     private static synchronized void ensureInitialized() {
         if (IS_AVAILABLE) return;
         
-        boolean disabled = Boolean.getBoolean("episteme.linearalgebra.disable.cuda");
-        if (disabled) {
-            logger.warn("CUDA BLAS Backend disabled via system property.");
-            return;
-        }
+        // Disabling now handled by Backend.isAvailable() via isExplicitlyDisabled()
 
         try (Arena tempArena = Arena.ofConfined()) {
              // Try loading cudart
@@ -267,7 +264,17 @@ public class NativeCUDADenseLinearAlgebraBackend implements NativeBackend, Linea
     }
 
     @Override
-    public boolean isAvailable() { ensureInitialized(); return IS_AVAILABLE; }
+    public boolean isAvailable() { ensureInitialized(); return IS_AVAILABLE && !isExplicitlyDisabled(); }
+
+    @Override
+    public String getId() {
+        return "cuda-dense";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
+    }
 
     @Override
     public boolean isLoaded() { return IS_AVAILABLE; }

@@ -63,7 +63,7 @@ public class JavaFXGraphBackend implements GraphBackend {
     public boolean isAvailable() {
         try {
             Class.forName("javafx.application.Platform");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (Throwable t) {
             return false;
         }
