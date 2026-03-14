@@ -395,6 +395,8 @@ public class LinearAlgebraComplianceTest {
             test.run();
             res.status.put(opName, "✅ PASS");
         } catch (UnsupportedOperationException e) {
+            System.err.println("N/A: " + opName + " on " + res.providerName);
+            e.printStackTrace();
             res.status.put(opName, "❌ N/A");
         } catch (Throwable e) {
             String msg = e.getMessage();

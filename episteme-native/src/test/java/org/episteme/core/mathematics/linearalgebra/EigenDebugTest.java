@@ -13,24 +13,16 @@ public class EigenDebugTest {
     
     @Test
     public void testNaN() {
-        int SIZE = 50;
-        Random rand = new Random(42);
+        int SIZE = 12; // Test size 12
         double[][] data = new double[SIZE][SIZE];
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                double val = (rand.nextDouble() < 0.2) ? 0.0 : rand.nextDouble() * 2 - 1;
-                data[i][j] = val;
-            }
-        }
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = i; j < SIZE; j++) {
-                double val = data[i][j] + data[j][i];
-                data[i][j] = val;
-                data[j][i] = val;
+                data[i][j] = 1.0;
             }
         }
         RealDoubleMatrix a = RealDoubleMatrix.of(data);
-        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> res = EigenDecomposition.decompose(a);
+        org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraBackend backend = new org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraBackend();
+        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> res = backend.eigen(a);
         
         StringBuilder sb = new StringBuilder("EIGENVALUES:\n");
         for (int i = 0; i < res.getEigenvalues().dimension(); i++) {

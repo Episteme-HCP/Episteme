@@ -17,7 +17,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
@@ -395,7 +394,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             return solve(ata, atb); // ata is square, uses native square solver
         }
         
-        /*
         double[] h_A = toDoubleArray(a);
         double[] h_B = toDoubleVec(b);
         double[] pivotCol = new double[n];
@@ -423,7 +421,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                     clSetKernelArg(swapRowsKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{max}));
                     clEnqueueNDRangeKernel(commandQueue, swapRowsKernel, 1, null, new long[]{n}, null, 0, null, null);
 
-                    // Swap B elements on CPU (or GPU, but CPU is fine here as it's just two doubles)
+                    // Swap B elements on CPU
                     double tb = h_B[k]; h_B[k] = h_B[max]; h_B[max] = tb;
                     clEnqueueWriteBuffer(commandQueue, memB, CL_TRUE, 0, (long)n * Sizeof.cl_double, Pointer.to(h_B), 0, null, null);
                 }
@@ -456,12 +454,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             if (memA != null) clReleaseMemObject(memA);
             if (memB != null) clReleaseMemObject(memB);
         }
-        */
-        // CPU Fallback for debugging (using MatrixSolver)
-        Real[] bArr = new Real[b.dimension()];
-        for(int i=0; i<bArr.length; i++) bArr[i] = b.get(i);
-        List<Real> solvedList = java.util.Arrays.asList(MatrixSolver.solve(a, bArr));
-        return new DenseVector<>(solvedList, (Ring<Real>) a.getScalarRing());
     }
 
     @Override

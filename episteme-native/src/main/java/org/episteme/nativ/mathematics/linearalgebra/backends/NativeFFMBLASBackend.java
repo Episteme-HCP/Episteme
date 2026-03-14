@@ -587,6 +587,35 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     }
 
     @Override
+    public EigenResult<org.episteme.core.mathematics.numbers.real.Real> eigen(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
+        if (!IS_AVAILABLE || DSYEV == null) throw new UnsupportedOperationException(getName() + ": eigen() not available");
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+        try (Arena arena = Arena.ofConfined()) {
+            double[] arrA = toDoubleArray(a);
+            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
+            MemorySegment w = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
+
+            // lapack_int LAPACKE_dsyev( int matrix_layout, char jobz, char uplo, lapack_int n, double* a, lapack_int lda, double* w );
+            // jobz = 'V' (compute eigenvalues and eigenvectors)
+            // uplo = 'U' (upper triangle of A is stored)
+            int info = (int) DSYEV.invokeExact(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
+            if (info != 0) throw new RuntimeException("DSYEV failed with info: " + info);
+
+            double[] eigenvalues = w.toArray(ValueLayout.JAVA_DOUBLE);
+            double[] eigenvectors = segA.toArray(ValueLayout.JAVA_DOUBLE);
+
+            return new EigenResult<org.episteme.core.mathematics.numbers.real.Real>(
+                createDenseMatrix(eigenvectors, n, n, a),
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues)
+            );
+        } catch (Throwable t) {
+            throw new RuntimeException("FFM Eigen failed", t);
+        }
+    }
+
+    @Override
     public LUResult<org.episteme.core.mathematics.numbers.real.Real> lu(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
         if (!IS_AVAILABLE || DGETRF == null) throw new UnsupportedOperationException(getName() + ": lu() not available");
         int m = a.rows();
@@ -672,36 +701,6 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         }
     }
 
-    @Override
-    public EigenResult<org.episteme.core.mathematics.numbers.real.Real> eigen(Matrix<org.episteme.core.mathematics.numbers.real.Real> a) {
-        if (!IS_AVAILABLE || DSYEV == null) throw new UnsupportedOperationException(getName() + ": eigen() not available");
-        int n = a.rows();
-        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
-
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
-            double[] arrA = toDoubleArray(a);
-            MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
-            
-            MemorySegment w = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
-            
-            int info = (int) DSYEV.invokeExact(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
-            if (info != 0) throw new RuntimeException("DSYEV failed with info: " + info);
-
-            double[] vData = new double[n * n];
-            MemorySegment.copy(segA, ValueLayout.JAVA_DOUBLE, 0L, vData, 0, n * n);
-
-            double[] wData = new double[n];
-            MemorySegment.copy(w, ValueLayout.JAVA_DOUBLE, 0L, wData, 0, n);
-
-            return new EigenResult<org.episteme.core.mathematics.numbers.real.Real>(
-                createDenseMatrix(vData, n, n, a),
-                new DenseVector<>(java.util.Arrays.stream(wData).mapToObj(org.episteme.core.mathematics.numbers.real.Real::of).toList(), (Ring<org.episteme.core.mathematics.numbers.real.Real>) a.getScalarRing())
-            );
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
 
     @Override
     public String getDescription() {

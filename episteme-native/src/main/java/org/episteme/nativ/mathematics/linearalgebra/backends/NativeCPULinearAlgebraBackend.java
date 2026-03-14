@@ -793,7 +793,7 @@ public class NativeCPULinearAlgebraBackend implements CPUBackend, NativeBackend,
 
             // Based on residue check: resNoT=0, T=21.5. Eigenvectors are in COLUMNS (no transpose needed for JScience).
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-                RealDoubleMatrix.of(evData, n, n),
+                RealDoubleMatrix.of(vData, n, n),
                 RealDoubleVector.of(wData)
             );
         }

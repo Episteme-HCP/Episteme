@@ -13,11 +13,7 @@ import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -582,32 +578,41 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        // Delegate to Apache Commons Math for SVD (always on classpath)
-        int m = a.rows(), n = a.cols();
-        double[][] data = new double[m][n];
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                data[i][j] = a.get(i, j).doubleValue();
-        org.apache.commons.math3.linear.SingularValueDecomposition svd =
-            new org.apache.commons.math3.linear.SingularValueDecomposition(
-                org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data));
-        double[] sVals = svd.getSingularValues();
-        org.apache.commons.math3.linear.RealMatrix uMat = svd.getU();
-        org.apache.commons.math3.linear.RealMatrix vMat = svd.getV();
-        double[] uData = new double[uMat.getRowDimension() * uMat.getColumnDimension()];
-        for (int i = 0; i < uMat.getRowDimension(); i++)
-            for (int j = 0; j < uMat.getColumnDimension(); j++)
-                uData[i * uMat.getColumnDimension() + j] = uMat.getEntry(i, j);
-        double[] vData = new double[vMat.getRowDimension() * vMat.getColumnDimension()];
-        for (int i = 0; i < vMat.getRowDimension(); i++)
-            for (int j = 0; j < vMat.getColumnDimension(); j++)
-                vData[i * vMat.getColumnDimension() + j] = vMat.getEntry(i, j);
-        return new SVDResult<Real>(
-            fromDoubleArray(uData, uMat.getRowDimension(), uMat.getColumnDimension()),
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sVals),
-            fromDoubleArray(vData, vMat.getRowDimension(), vMat.getColumnDimension())
-        );
+    public SVDResult<Real> svd(Matrix<Real> a) {
+        // Economy SVD via Eigen decomposition of A^T A (for m >= n)
+        // A = U S V^T  => A^T A = V S^2 V^T
+        int m = a.rows();
+        int n = a.cols();
+        
+        logger.debug("Entering SIMD SVD (Economy via A^T A): [{}x{}]", m, n);
+        Matrix<Real> at = transpose(a);
+        Matrix<Real> ata = at.multiply(a);
+        EigenResult<Real> eigen = eigen(ata);
+        
+        Matrix<Real> V = eigen.V();
+        Vector<Real> D = eigen.D();
+        
+        double[] sData = new double[n];
+        for (int i = 0; i < n; i++) {
+            sData[i] = Math.sqrt(Math.max(0, D.get(i).doubleValue()));
+        }
+        Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sData);
+        
+        // U = A * V * inv(S)
+        Matrix<Real> AV = a.multiply(V);
+        double[] avData = toMatrixDoubleArray(AV);
+        for (int j = 0; j < n; j++) {
+            double sVal = sData[j];
+            if (sVal > 1e-12) {
+                double invS = 1.0 / sVal;
+                for (int i = 0; i < m; i++) avData[i * n + j] *= invS;
+            } else {
+                for (int i = 0; i < m; i++) avData[i * n + j] = 0.0;
+            }
+        }
+        Matrix<Real> U = fromDoubleArray(avData, m, n);
+        
+        return new SVDResult<Real>(U, S, V);
     }
 
     @Override
@@ -636,25 +641,108 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
-        // Delegate to Apache Commons Math for Eigen (always on classpath)
+    public EigenResult<Real> eigen(Matrix<Real> a) {
         int n = a.rows();
-        double[][] data = new double[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                data[i][j] = a.get(i, j).doubleValue();
-        org.apache.commons.math3.linear.EigenDecomposition eig =
-            new org.apache.commons.math3.linear.EigenDecomposition(
-                org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data));
-        double[] eigenvals = eig.getRealEigenvalues();
-        org.apache.commons.math3.linear.RealMatrix vMat = eig.getV();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        
+        // Use a more numerically stable Cyclic Jacobi method for symmetric matrices
+        double[] data = toMatrixDoubleArray(a);
         double[] vData = new double[n * n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                vData[i * n + j] = vMat.getEntry(i, j);
-        return new EigenResult<Real>(
-            fromDoubleArray(vData, n, n),
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvals)
+        for (int i = 0; i < n; i++) vData[i * n + i] = 1.0;
+        
+        int maxSweeps = 50;
+        double eps = 1e-15;
+        var species = getSpecies();
+        
+        for (int sweep = 0; sweep < maxSweeps; sweep++) {
+            double offDiag = 0;
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    offDiag += Math.abs(data[i * n + j]);
+                }
+            }
+            if (offDiag < eps) break;
+            
+            for (int p = 0; p < n - 1; p++) {
+                for (int q = p + 1; q < n; q++) {
+                    double apq = data[p * n + q];
+                    if (Math.abs(apq) < eps) continue;
+                    
+                    double app = data[p * n + p];
+                    double aqq = data[q * n + q];
+                    
+                    double tau = (aqq - app) / (2.0 * apq);
+                    double t = (tau >= 0) ? 1.0 / (tau + Math.sqrt(1.0 + tau * tau)) 
+                                         : 1.0 / (tau - Math.sqrt(1.0 + tau * tau));
+                    double c = 1.0 / Math.sqrt(1.0 + t * t);
+                    double s = t * c;
+
+                    // Update matrix A - Vectorized row rotations
+                    int pIdx = p * n;
+                    int qIdx = q * n;
+                    int i = 0;
+                    int loopBound = species.loopBound(n);
+                    for (; i < loopBound; i += species.length()) {
+                        DoubleVector vp = DoubleVector.fromArray(species, data, pIdx + i);
+                        DoubleVector vq = DoubleVector.fromArray(species, data, qIdx + i);
+                        DoubleVector vp_new = vp.mul(c).sub(vq.mul(s));
+                        DoubleVector vq_new = vp.mul(s).add(vq.mul(c));
+                        vp_new.intoArray(data, pIdx + i);
+                        vq_new.intoArray(data, qIdx + i);
+                    }
+                    for (; i < n; i++) {
+                        double tp = data[pIdx + i];
+                        double tq = data[qIdx + i];
+                        data[pIdx + i] = c * tp - s * tq;
+                        data[qIdx + i] = s * tp + c * tq;
+                    }
+                    
+                    // Mirror to columns for symmetry
+                    for (int j = 0; j < n; j++) {
+                        data[j * n + p] = data[p * n + j];
+                        data[j * n + q] = data[q * n + j];
+                    }
+                    
+                    // Reset diagonal and off-diagonal strictly correctly
+                    data[p * n + p] = app - t * apq;
+                    data[q * n + q] = aqq + t * apq;
+                    data[p * n + q] = 0.0;
+                    data[q * n + p] = 0.0;
+                    
+                    // Update eigenvectors V (all columns/rows)
+                    i = 0;
+                    for (; i + species.length() <= n; i += species.length()) {
+                        DoubleVector vp = DoubleVector.fromArray(species, vData, pIdx + i);
+                        DoubleVector vq = DoubleVector.fromArray(species, vData, qIdx + i);
+                        DoubleVector vp_new = vp.mul(c).sub(vq.mul(s));
+                        DoubleVector vq_new = vp.mul(s).add(vq.mul(c));
+                        vp_new.intoArray(vData, pIdx + i);
+                        vq_new.intoArray(vData, qIdx + i);
+                    }
+                    for (; i < n; i++) {
+                        double vp = vData[pIdx + i];
+                        double vq = vData[qIdx + i];
+                        vData[pIdx + i] = c * vp - s * vq;
+                        vData[qIdx + i] = s * vp + c * vq;
+                    }
+                }
+            }
+        }
+        
+        double[] eigenvalues = new double[n];
+        for (int i = 0; i < n; i++) eigenvalues[i] = data[i * n + i];
+        
+        // Transpose vData because we rotated rows but JScience expects eigenvectors as columns
+        double[] vDataCol = new double[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                vDataCol[j * n + i] = vData[i * n + j];
+            }
+        }
+
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+            fromDoubleArray(vDataCol, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues)
         );
     }
 }
