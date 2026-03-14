@@ -69,15 +69,21 @@ public class StandardAlgorithmService implements AlgorithmService {
 
         // Path 1: SPI
         ServiceLoader<P> loader = ServiceLoader.load(providerClass);
-        for (P provider : loader) {
+        Iterator<P> iterator = loader.iterator();
+        while (true) {
             try {
+                if (!iterator.hasNext()) break;
+                P provider = iterator.next();
                 if (isFiltered(provider.getName())) continue;
                 String key = provider.getClass().getName() + ":" + provider.getName();
                 if (provider.isAvailable() && seenKeys.add(key)) {
                     available.add(provider);
                 }
+            } catch (ServiceConfigurationError | Exception e) {
+                logger.warn("Skipping bad provider entry: {}", e.getMessage());
             } catch (Throwable t) {
-                logger.warn("Skipping bad provider: {}", t.getMessage());
+                logger.error("Critical error during provider discovery: {}", t.getMessage());
+                break;
             }
         }
 

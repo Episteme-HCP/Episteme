@@ -7,6 +7,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
@@ -27,11 +28,16 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, SIMDBackend.class, LinearAlgebraProvider.class})
-public class EpistemeLinearAlgebraBackend implements SIMDBackend, LinearAlgebraProvider<Real> {
+@AutoService({LinearAlgebraProvider.class, Backend.class})
+public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, SIMDBackend {
 
-    private final CPUDenseLinearAlgebraProvider<Real> denseProvider = new CPUDenseLinearAlgebraProvider<>();
-    private final CPUSparseLinearAlgebraProvider<Real> sparseProvider = new CPUSparseLinearAlgebraProvider<>();
+    private final CPUDenseLinearAlgebraProvider<Real> denseProvider;
+    private final CPUSparseLinearAlgebraProvider<Real> sparseProvider;
+
+    public EpistemeLinearAlgebraBackend() {
+        this.denseProvider = new CPUDenseLinearAlgebraProvider<>();
+        this.sparseProvider = new CPUSparseLinearAlgebraProvider<>();
+    }
 
     @Override
     public String getType() {
@@ -199,6 +205,21 @@ public class EpistemeLinearAlgebraBackend implements SIMDBackend, LinearAlgebraP
     @Override
     public Vector<Real> solve(CholeskyResult<Real> cholesky, Vector<Real> b) {
         return denseProvider.solve(cholesky, b);
+    }
+
+    @Override
+    public Vector<Real> bicgstab(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+        return sparseProvider.bicgstab(a, b, x0, tolerance, maxIterations);
+    }
+
+    @Override
+    public Vector<Real> conjugateGradient(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+        return sparseProvider.conjugateGradient(a, b, x0, tolerance, maxIterations);
+    }
+
+    @Override
+    public Vector<Real> gmres(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations, int restarts) {
+        return sparseProvider.gmres(a, b, x0, tolerance, maxIterations, restarts);
     }
 
     // ---- SIMDBackend ---

@@ -39,23 +39,28 @@ public class LinearAlgebraComplianceTest {
             try {
                 if (!it.hasNext()) break;
                 LinearAlgebraProvider<?> p = it.next();
-                System.out.println("[ComplianceTest] Discovered via SPI: " + p.getClass().getName());
+                String name = "Unknown";
+                try { name = p.getName(); } catch(Throwable t) {}
+                System.out.println("[ComplianceTest] Discovered via SPI: " + p.getClass().getName() + " (" + name + ")");
                 if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                     @SuppressWarnings("unchecked")
                     LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
                     rawProviders.add(typed);
                 }
             } catch (Throwable e) {
-                System.err.println("Error loading SPI provider: " + e.getMessage());
+                System.err.println("Error loading SPI provider:");
+                e.printStackTrace();
             }
         }
         try {
             System.out.println("[ComplianceTest] Discovering via BackendDiscovery...");
             for (org.episteme.core.technical.backend.Backend backend : org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders()) {
-                System.out.println("[ComplianceTest] Probing backend: " + backend.getName());
+                System.out.println("[ComplianceTest] Probing backend: " + backend.getName() + " [" + backend.getClass().getName() + "]");
                 for (org.episteme.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
                     if (ap instanceof LinearAlgebraProvider<?> p) {
-                        System.out.println("[ComplianceTest]   Found provider: " + ap.getClass().getName());
+                        String name = "Unknown";
+                        try { name = p.getName(); } catch(Throwable t) {}
+                        System.out.println("[ComplianceTest]   Found provider: " + ap.getClass().getName() + " (" + name + ")");
                         if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                             @SuppressWarnings("unchecked")
                             LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
@@ -132,6 +137,14 @@ public class LinearAlgebraComplianceTest {
             System.out.println("Starting compliance tests for provider: " + provider.getName());
             ComplianceResult res = new ComplianceResult();
             res.providerName = provider.getName();
+            
+            if (!provider.isAvailable()) {
+                res.environment = "DISABLED";
+                System.out.println("Provider " + provider.getName() + " is disabled. Skipping tests.");
+                results.add(res);
+                continue;
+            }
+            
             res.environment = provider.getEnvironmentInfo();
             
             testOperation(res, "Transpose", () -> {

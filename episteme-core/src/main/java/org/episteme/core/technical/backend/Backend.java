@@ -58,9 +58,7 @@ public interface Backend {
      */
     default boolean isExplicitlyDisabled() {
         String id = getId();
-        if (Boolean.getBoolean("episteme.backend.disable." + id)) return true;
-        if ("math".equals(getType()) && Boolean.getBoolean("episteme.linearalgebra.disable." + id)) return true;
-        return false;
+        return id != null && Boolean.getBoolean("episteme.backend.disable." + id);
     }
 
     /**

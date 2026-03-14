@@ -28,6 +28,7 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import org.episteme.server.server.proto.*;
 import org.episteme.core.technical.backend.Backend;
+import com.google.auto.service.AutoService;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -61,10 +62,18 @@ import java.util.concurrent.TimeUnit;
 @AutoService({LinearAlgebraProvider.class, Backend.class})
 public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Backend {
 
-    private final ManagedChannel channel;
-    private final MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
+    private ManagedChannel channel;
+    private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
     private final Field<E> field;
     private final String serverAddress;
+
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     * Defaults to localhost:50051.
+     */
+    public GRPCLinearAlgebraBackend() {
+        this("localhost", 50051, (Field<E>) org.episteme.core.mathematics.sets.Reals.getInstance());
+    }
 
     /**
      * Creates a gRPC provider connected to the specified server.
@@ -76,10 +85,31 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Ba
     public GRPCLinearAlgebraBackend(String host, int port, Field<E> field) {
         this.serverAddress = host + ":" + port;
         this.field = field;
-        this.channel = ManagedChannelBuilder.forAddress(host, port)
-                .usePlaintext()
-                .build();
-        this.blockingStub = MatrixServiceGrpc.newBlockingStub(channel);
+        try {
+            this.channel = ManagedChannelBuilder.forAddress(host, port)
+                    .usePlaintext()
+                    .build();
+            this.blockingStub = MatrixServiceGrpc.newBlockingStub(channel);
+        } catch (Exception e) {
+            // Log and allow null for isAvailable() check
+            this.channel = null;
+            this.blockingStub = null;
+        }
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return channel != null && !channel.isShutdown() && !isExplicitlyDisabled();
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Remote linear algebra provider using gRPC for offloading computations.";
     }
 
     @Override
@@ -98,23 +128,8 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Ba
     }
 
     @Override
-    public String getDescription() {
-        return "Remote linear algebra provider using gRPC for offloading computations.";
-    }
-
-    @Override
     public int getPriority() {
         return 0; // Low priority - typically selected manually or via config
-    }
-
-    @Override
-    public boolean isAvailable() {
-        return channel != null && !channel.isShutdown() && !channel.isTerminated() && !isExplicitlyDisabled();
-    }
-
-    @Override
-    public Object createBackend() {
-        return this;
     }
 
 

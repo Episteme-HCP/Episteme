@@ -43,6 +43,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.episteme</groupId>
+            <artifactId>episteme-client</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Native AI Backends -->
         
         <!-- ONNX Runtime for Java -->

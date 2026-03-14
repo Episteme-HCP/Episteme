@@ -59,6 +59,32 @@ public class SparseMatrixStorage<E> implements MatrixStorage<E> {
         this.zeroValue = zeroValue;
     }
 
+    public SparseMatrixStorage(int rows, int cols, E zeroValue, int[] rowPointers, int[] colIndices, Object[] values) {
+        this.data = new HashMap<>(values.length);
+        this.rowsCount = rows;
+        this.colsCount = cols;
+        this.zeroValue = zeroValue;
+        for (int i = 0; i < rows; i++) {
+            for (int j = rowPointers[i]; j < rowPointers[i + 1]; j++) {
+                @SuppressWarnings("unchecked")
+                E value = (E) values[j];
+                this.data.put(key(i, colIndices[j]), value);
+            }
+        }
+    }
+
+    public SparseMatrixStorage(int rows, int cols, E zeroValue, List<java.util.TreeMap<Integer, E>> rowMaps) {
+        this.data = new HashMap<>();
+        this.rowsCount = rows;
+        this.colsCount = cols;
+        this.zeroValue = zeroValue;
+        for (int i = 0; i < rows; i++) {
+            for (Map.Entry<Integer, E> entry : rowMaps.get(i).entrySet()) {
+                this.data.put(key(i, entry.getKey()), entry.getValue());
+            }
+        }
+    }
+
     @Override
     public E get(int row, int col) {
         checkBounds(row, col);
