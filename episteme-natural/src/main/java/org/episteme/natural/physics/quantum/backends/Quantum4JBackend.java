@@ -30,7 +30,7 @@ public class Quantum4JBackend implements QuantumBackend, QuantumAlgorithmProvide
     public boolean isAvailable() {
         try {
             Class.forName("com.quantum4j.core.circuit.QuantumCircuit");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) { return false; }
     }
 

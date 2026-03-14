@@ -64,7 +64,7 @@ public class GraphStreamBackend implements GraphBackend {
     public boolean isAvailable() {
         try {
             Class.forName("org.graphstream.graph.Graph");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

@@ -63,7 +63,7 @@ public class UnfoldingMapBackend implements MapBackend {
     public boolean isAvailable() {
         try {
             Class.forName("de.fhpotsdam.unfolding.UnfoldingMap");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

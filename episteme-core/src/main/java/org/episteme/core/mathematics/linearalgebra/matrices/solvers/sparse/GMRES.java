@@ -8,6 +8,7 @@ package org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
@@ -30,7 +31,7 @@ public class GMRES {
      */
     @SuppressWarnings("unchecked")
     public static Real[] solve(Matrix<Real> A, Real[] b, Real[] x0, Real tolerance, int maxIterations, int restarts) {
-        LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) AlgorithmManager.getProvider(LinearAlgebraProvider.class);
+        SparseLinearAlgebraProvider<Real> provider = (SparseLinearAlgebraProvider<Real>) AlgorithmManager.getProvider(SparseLinearAlgebraProvider.class);
         Vector<Real> bVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(Arrays.asList(b), Reals.getInstance());
         Vector<Real> x0Vec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(Arrays.asList(x0), Reals.getInstance());
         Vector<Real> result = provider.gmres(A, bVec, x0Vec, tolerance, maxIterations, restarts);

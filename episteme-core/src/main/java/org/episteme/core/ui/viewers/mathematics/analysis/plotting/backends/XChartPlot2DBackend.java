@@ -58,7 +58,7 @@ public class XChartPlot2DBackend implements PlottingBackend {
     public boolean isAvailable() {
         try {
             Class.forName("org.knowm.xchart.XYChart");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

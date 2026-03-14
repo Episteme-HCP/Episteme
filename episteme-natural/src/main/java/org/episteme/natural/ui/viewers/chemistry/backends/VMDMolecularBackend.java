@@ -60,7 +60,7 @@ public class VMDMolecularBackend implements MolecularBackend {
             // Check for VMD executable in PATH
             ProcessBuilder pb = new ProcessBuilder(System.getProperty("os.name").toLowerCase().contains("win") ? "where" : "which", "vmd");
             Process p = pb.start();
-            return p.waitFor() == 0;
+            return p.waitFor() == 0 && !isExplicitlyDisabled();
         } catch (Exception e) {
             return false;
         }

@@ -24,6 +24,7 @@ import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.technical.backend.Operation;
+import org.episteme.core.technical.backend.ExecutionContext;
 
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
@@ -35,8 +36,8 @@ import jdk.incubator.vector.VectorSpecies;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, SIMDBackend.class, LinearAlgebraProvider.class, NativeBackend.class, CPUBackend.class})
-public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, NativeBackend, LinearAlgebraProvider<Real> {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class})
+public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend, SIMDBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSIMDLinearAlgebraBackend.class);
     
@@ -45,23 +46,29 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
 
     @Override
+    public String getId() {
+        return "simd";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
+    }
+
+    @Override
+    public String getAlgorithmType() {
+        return "LinearAlgebra";
+    }
+
+    @Override
     public boolean isAvailable() {
-        try {
-            Class.forName("jdk.incubator.vector.VectorSpecies");
-            return true;
-        } catch (Throwable t) {
-            return false;
-        }
+        return jdk.incubator.vector.VectorSpecies.ofLargestShape(double.class).vectorBitSize() > 0 
+            && !isExplicitlyDisabled();
     }
     
     @Override
     public boolean isLoaded() {
         return isAvailable();
-    }
-
-    @Override
-    public String getType() {
-        return SIMDBackend.super.getType();
     }
 
     @Override
@@ -124,46 +131,46 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         logger.debug("Entering SIMD multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
-        SIMDRealDoubleMatrix sa = asSIMD(a);
-        SIMDRealDoubleMatrix sb = asSIMD(b);
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
+        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from(b);
         return sa.multiply(sb);
     }
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        SIMDRealDoubleMatrix sa = asSIMD(a);
-        SIMDRealDoubleMatrix sb = asSIMD(b);
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
+        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from(b);
         return sa.add(sb);
     }
     
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        SIMDRealDoubleMatrix sa = asSIMD(a);
-        SIMDRealDoubleMatrix sb = asSIMD(b);
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
+        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from(b);
         return sa.subtract(sb);
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        SIMDRealDoubleMatrix sa = asSIMD(a);
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
         return sa.scale(scalar.doubleValue());
     }
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        return asSIMD(a).transpose();
+        return SIMDRealDoubleMatrix.from(a).transpose();
     }
     
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        return asSIMD(a).multiply(b);
+        return SIMDRealDoubleMatrix.from(a).multiply(b);
     }
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if(!(a.getScalarRing() instanceof Reals)) throw new UnsupportedOperationException("SIMD solve only supports Real field.");
         
-        SIMDRealDoubleMatrix simdA = asSIMD(a);
+        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from(a);
         int m = simdA.rows();
         int n = simdA.cols();
         if (m == n) {
@@ -172,7 +179,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
             // Rectangular solve (Least Squares) via Normal Equations: A^T A x = A^T b
             logger.debug("Rectangular SIMD solve via Normal Equations: [{}x{}]", m, n);
             Matrix<Real> at = transpose(a);
-            Matrix<Real> ata = at.multiply(a);
+            Matrix<Real> ata = at.multiply(simdA);
             Vector<Real> atb = at.multiply(b);
             return solve(ata, atb); // ata is square
         }
@@ -333,9 +340,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
     
     private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
-        Real[] reals = new Real[data.length];
-        for(int i=0; i<data.length; i++) reals[i] = Real.of(data[i]);
-        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<Real>(reals, rows, cols, Reals.getInstance());
+        return new SIMDRealDoubleMatrix(rows, cols, data);
     }
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
@@ -346,19 +351,21 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
              logger.debug("Rectangular SIMD pseudo-inverse via Normal Equations: [{}x{}]", m, n);
              if (m > n) {
                  // A+ = (A^T A)^-1 * A^T
-                 Matrix<Real> at = transpose(a);
-                 Matrix<Real> ata = at.multiply(a);
+                 SIMDRealDoubleMatrix simdA = asSIMD(a);
+                 Matrix<Real> at = transpose(simdA);
+                 Matrix<Real> ata = at.multiply(simdA);
                  return inverse(ata).multiply(at);
              } else {
                  // A+ = A^T * (A A^T)^-1
-                 Matrix<Real> at = transpose(a);
-                 Matrix<Real> aat = a.multiply(at);
+                 SIMDRealDoubleMatrix simdA = asSIMD(a);
+                 Matrix<Real> at = transpose(simdA);
+                 Matrix<Real> aat = simdA.multiply(at);
                  return at.multiply(inverse(aat));
              }
         }
         
         // Solve AX = I using Gaussian elimination with partial pivoting
-        SIMDRealDoubleMatrix simdA = asSIMD(a);
+        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from(a);
         double[] data = simdA.getInternalData();
         double[] inv = new double[n * n];
         for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
@@ -426,7 +433,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         
-        SIMDRealDoubleMatrix simdA = asSIMD(a);
+        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from(a);
         double[] data = simdA.getInternalData();
         double det = 1.0;
         var species = getSpecies();
@@ -467,20 +474,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
     }
 
     private SIMDRealDoubleMatrix asSIMD(Matrix<Real> m) {
-        if (m instanceof SIMDRealDoubleMatrix) return (SIMDRealDoubleMatrix) m;
-        if (m instanceof RealDoubleMatrix) {
-            RealDoubleMatrix rdm = (RealDoubleMatrix) m;
-            return new SIMDRealDoubleMatrix(rdm.rows(), rdm.cols(), rdm.toDoubleArray());
-        }
-        int rows = m.rows();
-        int cols = m.cols();
-        double[] data = new double[rows * cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = m.get(i, j).doubleValue();
-            }
-        }
-        return new SIMDRealDoubleMatrix(rows, cols, data);
+        return SIMDRealDoubleMatrix.from(m);
     }
 
     private double[] toMatrixDoubleArray(Matrix<Real> m) {
@@ -587,8 +581,9 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         int n = a.cols();
         
         logger.debug("Entering SIMD SVD (Economy via A^T A): [{}x{}]", m, n);
-        Matrix<Real> at = transpose(a);
-        Matrix<Real> ata = at.multiply(a);
+        SIMDRealDoubleMatrix simdA = asSIMD(a);
+        Matrix<Real> at = transpose(simdA);
+        Matrix<Real> ata = at.multiply(simdA);
         EigenResult<Real> eigen = eigen(ata);
         
         Matrix<Real> V = eigen.V();
@@ -601,7 +596,7 @@ public class NativeSIMDLinearAlgebraBackend implements SIMDBackend, CPUBackend, 
         Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sData);
         
         // U = A * V * inv(S)
-        Matrix<Real> AV = a.multiply(V);
+        Matrix<Real> AV = simdA.multiply(V);
         double[] avData = toMatrixDoubleArray(AV);
         for (int j = 0; j < n; j++) {
             double sVal = sData[j];

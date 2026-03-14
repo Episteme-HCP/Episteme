@@ -5,6 +5,7 @@
 
 package org.episteme.core.mathematics.linearalgebra;
 
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.ProviderSelector;
@@ -96,7 +97,7 @@ public final class Decomposition {
     }
 
     /**
-     * Solves the linear system AX = B using the most appropriate decomposition.
+     * Solves Ax = b using the most appropriate decomposition.
      *
      * @param <E> the element type
      * @param a   the coefficient matrix A
@@ -108,6 +109,36 @@ public final class Decomposition {
         OperationContext ctx = createContext(a);
         return ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
                 p -> ((LinearAlgebraProvider<E>) p).solve(a, b));
+    }
+
+    /**
+     * Solves Ax = b using BiCGSTAB.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        OperationContext ctx = createContext(a);
+        return ProviderSelector.execute(SparseLinearAlgebraProvider.class, ctx,
+                p -> ((SparseLinearAlgebraProvider<E>) p).bicgstab(a, b, x0, tolerance, maxIterations));
+    }
+
+    /**
+     * Solves Ax = b using Conjugate Gradient.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        OperationContext ctx = createContext(a);
+        return ProviderSelector.execute(SparseLinearAlgebraProvider.class, ctx,
+                p -> ((SparseLinearAlgebraProvider<E>) p).conjugateGradient(a, b, x0, tolerance, maxIterations));
+    }
+
+    /**
+     * Solves Ax = b using GMRES.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
+        OperationContext ctx = createContext(a);
+        return ProviderSelector.execute(SparseLinearAlgebraProvider.class, ctx,
+                p -> ((SparseLinearAlgebraProvider<E>) p).gmres(a, b, x0, tolerance, maxIterations, restarts));
     }
 
     private static OperationContext createContext(Matrix<?> matrix) {

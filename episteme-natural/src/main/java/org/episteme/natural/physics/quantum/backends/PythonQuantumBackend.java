@@ -47,7 +47,8 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
     @Override
     public boolean isAvailable() {
         try {
-            return new ProcessBuilder(pythonExecutable, "-c", "import qiskit, qiskit_nature").start().waitFor() == 0;
+            return new ProcessBuilder(pythonExecutable, "-c", "import qiskit, qiskit_nature").start().waitFor() == 0
+                && !isExplicitlyDisabled();
         } catch (Exception e) { return false; }
     }
 

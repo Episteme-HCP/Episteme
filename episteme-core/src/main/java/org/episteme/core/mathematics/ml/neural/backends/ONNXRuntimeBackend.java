@@ -69,7 +69,7 @@ public class ONNXRuntimeBackend implements Backend, AlgorithmProvider {
     public boolean isAvailable() {
         try {
             Class.forName("ai.onnxruntime.OrtEnvironment");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

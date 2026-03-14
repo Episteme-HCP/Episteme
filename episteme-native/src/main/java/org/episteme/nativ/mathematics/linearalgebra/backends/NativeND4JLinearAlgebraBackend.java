@@ -14,11 +14,13 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 import com.google.auto.service.AutoService;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.technical.backend.ComputeBackend;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.inverse.InvertMatrix;
@@ -34,8 +36,8 @@ import org.nd4j.linalg.inverse.InvertMatrix;
  * @author Silvere Martin-Michiellot
  * @since 1.0
  */
-@AutoService({LinearAlgebraProvider.class, NativeBackend.class, ComputeBackend.class})
-public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, org.episteme.nativ.technical.backend.nativ.NativeBackend, org.episteme.core.technical.backend.cpu.CPUBackend {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
+public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeND4JLinearAlgebraBackend.class);
 
     @Override
@@ -87,7 +89,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     private static final boolean IS_AVAILABLE;
     static {
         boolean avail = false;
-        if (!Boolean.getBoolean("episteme.nd4j.skip")) {
+        if (true) { // Disabling now handled by Backend.isAvailable()
             try {
                 Class.forName("org.nd4j.linalg.factory.Nd4j");
                 // Test actual ND4J initialization
@@ -103,7 +105,17 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE;
+        return IS_AVAILABLE && !isExplicitlyDisabled();
+    }
+
+    @Override
+    public String getId() {
+        return "nd4j";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
     }
 
     @Override

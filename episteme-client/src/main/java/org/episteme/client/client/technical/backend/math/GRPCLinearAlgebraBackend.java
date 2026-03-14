@@ -27,6 +27,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import org.episteme.server.server.proto.*;
+import org.episteme.core.technical.backend.Backend;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -57,7 +58,8 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E> {
+@AutoService({LinearAlgebraProvider.class, Backend.class})
+public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Backend {
 
     private final ManagedChannel channel;
     private final MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
@@ -86,8 +88,33 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E> {
     }
 
     @Override
+    public String getId() {
+        return "grpc-math";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Remote linear algebra provider using gRPC for offloading computations.";
+    }
+
+    @Override
+    public int getPriority() {
+        return 0; // Low priority - typically selected manually or via config
+    }
+
+    @Override
     public boolean isAvailable() {
-        return channel != null && !channel.isShutdown() && !channel.isTerminated();
+        return channel != null && !channel.isShutdown() && !channel.isTerminated() && !isExplicitlyDisabled();
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
     }
 
 

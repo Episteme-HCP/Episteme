@@ -30,7 +30,7 @@ public class AmazonBraketBackend implements QuantumBackend, QuantumAlgorithmProv
     public boolean isAvailable() {
         try {
             Class.forName("software.amazon.awssdk.services.braket.BraketClient");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) { return false; }
     }
 

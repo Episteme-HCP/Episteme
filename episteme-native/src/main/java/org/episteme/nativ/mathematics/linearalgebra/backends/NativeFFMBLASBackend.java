@@ -14,10 +14,12 @@ import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -34,8 +36,8 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * Binds to OpenBLAS/MKL for Matrix Operations.
  * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
-@AutoService({Backend.class, LinearAlgebraProvider.class, CPUBackend.class, NativeBackend.class, AlgorithmProvider.class})
-public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>, CPUBackend, NativeBackend {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
+public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
     
     private static final Logger logger = LoggerFactory.getLogger(NativeFFMBLASBackend.class);
 
@@ -103,14 +105,9 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
         }
         LAPACK_LOOKUP = lapackLib.orElse(null);
         
-        boolean disabled = Boolean.getBoolean("episteme.linearalgebra.disable.ffm");
-        if (disabled) {
-            logger.warn("FFM BLAS Backend disabled via system property.");
-        }
-
         boolean available = false;
 
-        if (LOOKUP != null && !disabled) {
+        if (LOOKUP != null && !Boolean.getBoolean("episteme.backend.disable.ffm-blas")) {
             try {
                 // BLAS Handles - Use JAVA_INT as standard, but we'll check availability
                 FunctionDescriptor dgemmDesc = FunctionDescriptor.ofVoid(
@@ -471,7 +468,17 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<org.episteme.
     
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE;
+        return IS_AVAILABLE && !isExplicitlyDisabled();
+    }
+
+    @Override
+    public String getId() {
+        return "blas";
+    }
+
+    @Override
+    public String getType() {
+        return "math";
     }
 
     @Override

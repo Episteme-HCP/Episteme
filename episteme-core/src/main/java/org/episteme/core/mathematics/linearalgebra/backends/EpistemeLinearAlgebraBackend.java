@@ -55,7 +55,7 @@ public class EpistemeLinearAlgebraBackend implements SIMDBackend, LinearAlgebraP
 
     @Override
     public boolean isAvailable() {
-        return true;
+        return !isExplicitlyDisabled();
     }
 
     @Override

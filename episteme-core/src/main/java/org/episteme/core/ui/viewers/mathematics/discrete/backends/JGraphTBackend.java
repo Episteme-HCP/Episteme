@@ -64,7 +64,7 @@ public class JGraphTBackend implements GraphBackend {
     public boolean isAvailable() {
         try {
             Class.forName("org.jgrapht.Graph");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

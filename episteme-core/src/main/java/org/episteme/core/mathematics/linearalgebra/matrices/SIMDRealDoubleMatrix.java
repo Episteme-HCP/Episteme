@@ -30,6 +30,23 @@ import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
  * @since 1.2
  */
 public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseable {
+    
+    public static SIMDRealDoubleMatrix from(Matrix<Real> m) {
+        if (m instanceof SIMDRealDoubleMatrix) return (SIMDRealDoubleMatrix) m;
+        if (m instanceof RealDoubleMatrix) {
+            RealDoubleMatrix rdm = (RealDoubleMatrix) m;
+            return new SIMDRealDoubleMatrix(rdm.rows(), rdm.cols(), rdm.toDoubleArray());
+        }
+        int rows = m.rows();
+        int cols = m.cols();
+        double[] data = new double[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i * cols + j] = m.get(i, j).doubleValue();
+            }
+        }
+        return new SIMDRealDoubleMatrix(rows, cols, data);
+    }
 
     private static VectorSpecies<Double> getSpecies() {
         return DoubleVector.SPECIES_PREFERRED;
@@ -162,9 +179,8 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     @Override
     public Matrix<Real> add(Matrix<Real> other) {
-        if (other instanceof SIMDRealDoubleMatrix) {
-            SIMDRealDoubleMatrix that = (SIMDRealDoubleMatrix) other;
-            checkDimensions(that);
+        SIMDRealDoubleMatrix that = from(other);
+        checkDimensions(that);
             
             double[] res = new double[data.length];
             int i = 0;
@@ -177,15 +193,12 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
                 res[i] = this.data[i] + that.data[i];
             }
             return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
-        }
-        throw new UnsupportedOperationException("Mixed type addition not supported yet");
     }
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> other) {
-        if (other instanceof SIMDRealDoubleMatrix) {
-            SIMDRealDoubleMatrix that = (SIMDRealDoubleMatrix) other;
-            if (storage.cols() != that.storage.rows()) throw new IllegalArgumentException("Dimension mismatch");
+        SIMDRealDoubleMatrix that = from(other);
+        if (storage.cols() != that.storage.rows()) throw new IllegalArgumentException("Dimension mismatch");
             
             SIMDRealDoubleMatrix C = new SIMDRealDoubleMatrix(storage.rows(), that.storage.cols());
             
@@ -209,13 +222,11 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
                 }
             }
             return C;
-        }
-        throw new UnsupportedOperationException("Mixed type multiplication not supported yet");
     }
     
     private void checkDimensions(Matrix<?> other) {
         if (storage.rows() != other.rows() || storage.cols() != other.cols()) 
-            throw new IllegalArgumentException("Dimensions match");
+            throw new IllegalArgumentException("Dimensions mismatch");
     }
 
     @Override
@@ -231,9 +242,8 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     
     @Override 
     public Matrix<Real> subtract(Matrix<Real> other) {
-        if (other instanceof SIMDRealDoubleMatrix) {
-            SIMDRealDoubleMatrix that = (SIMDRealDoubleMatrix) other;
-            checkDimensions(that);
+        SIMDRealDoubleMatrix that = from(other);
+        checkDimensions(that);
             double[] res = new double[data.length];
             int i = 0;
             for (; i < getSpecies().loopBound(data.length); i += getSpecies().length()) {
@@ -245,8 +255,6 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
                 res[i] = this.data[i] - that.data[i];
             }
             return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
-        }
-        throw new UnsupportedOperationException("Mixed type subtraction not supported yet");
     }
 
     @Override public Real trace() { 

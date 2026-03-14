@@ -20,7 +20,7 @@ public class IBMQBackend extends QiskitBackend {
             String python = PythonResolver.resolve();
             Process p = new ProcessBuilder(python, "-c", "import qiskit_ibm_runtime").start();
             boolean success = p.waitFor() == 0;
-            return success;
+            return success && !isExplicitlyDisabled();
         } catch (Exception e) { return false; }
     }
 

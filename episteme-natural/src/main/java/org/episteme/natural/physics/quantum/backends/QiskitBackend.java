@@ -35,7 +35,7 @@ public class QiskitBackend implements QuantumBackend, QuantumAlgorithmProvider {
     public boolean isAvailable() {
         try {
             Process p = new ProcessBuilder(PythonResolver.resolve(), "-c", "import qiskit").start();
-            return p.waitFor() == 0;
+            return p.waitFor() == 0 && !isExplicitlyDisabled();
         } catch (Exception e) { return false; }
     }
 

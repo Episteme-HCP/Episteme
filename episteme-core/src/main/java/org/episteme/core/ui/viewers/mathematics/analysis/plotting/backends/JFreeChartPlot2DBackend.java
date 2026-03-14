@@ -58,7 +58,7 @@ public class JFreeChartPlot2DBackend implements PlottingBackend {
     public boolean isAvailable() {
         try {
             Class.forName("org.jfree.chart.JFreeChart");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }

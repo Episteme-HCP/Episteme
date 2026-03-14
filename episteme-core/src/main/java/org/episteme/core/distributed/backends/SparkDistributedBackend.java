@@ -40,7 +40,7 @@ public class SparkDistributedBackend implements DistributedBackend {
 
     @Override
     public boolean isAvailable() {
-        return available;
+        return available && !isExplicitlyDisabled();
     }
 
     @Override

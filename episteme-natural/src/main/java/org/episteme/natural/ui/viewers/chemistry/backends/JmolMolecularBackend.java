@@ -59,7 +59,7 @@ public class JmolMolecularBackend implements MolecularBackend {
     public boolean isAvailable() {
         try {
             Class.forName("org.jmol.viewer.Viewer");
-            return true;
+            return !isExplicitlyDisabled();
         } catch (ClassNotFoundException e) {
             return false;
         }
