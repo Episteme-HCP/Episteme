@@ -280,10 +280,21 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         System.arraycopy(rowData, 0, data, row * storage.cols(), storage.cols());
     }
     
-    @Override public Vector<Real> getRow(int row) { throw new UnsupportedOperationException(); }
-    @Override public Vector<Real> getColumn(int col) { throw new UnsupportedOperationException(); }
-    @Override public Real determinant() { throw new UnsupportedOperationException(); }
-    @Override public Matrix<Real> inverse() { throw new UnsupportedOperationException(); }
+    @Override 
+    public Vector<Real> getRow(int row) { 
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(getRowData(row));
+    }
+    
+    @Override 
+    public Vector<Real> getColumn(int col) { 
+        int rows = storage.rows();
+        int cols = storage.cols();
+        double[] colData = new double[rows];
+        for (int i = 0; i < rows; i++) colData[i] = data[i * cols + col];
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(colData);
+    }
+    @Override public Real determinant() { return provider.determinant(this); }
+    @Override public Matrix<Real> inverse() { return provider.inverse(this); }
     @Override 
     public Vector<Real> multiply(Vector<Real> vector) {
         if (storage.cols() != vector.dimension()) {
@@ -329,9 +340,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         for(int i=0; i<Math.min(storage.rows(),storage.cols()); i++) m.set(i,i, 1.0);
         return m;
     }
-    @Override public MatrixStorage<Real> getStorage() { throw new UnsupportedOperationException(); }
+    @Override public MatrixStorage<Real> getStorage() { return storage; }
     @Override public Ring<Real> getScalarRing() { return Reals.getInstance(); }
-    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> element) { throw new UnsupportedOperationException(); }
+    @Override public Matrix<Real> scale(Real scalar, Matrix<Real> element) { return provider.scale(scalar, element); }
     
     @Override
     public boolean contains(Matrix<Real> element) {

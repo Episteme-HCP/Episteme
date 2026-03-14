@@ -9,6 +9,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
@@ -323,6 +324,23 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     public Matrix<Real> transpose(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         return fromINDArray(toINDArray(a).transpose());
+    }
+
+    /**
+     * QR decomposition via ND4J's 'qr' custom op.
+     */
+    @Override
+    public QRResult<Real> qr(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        INDArray A = toINDArray(a);
+        
+        // Use DynamicCustomOp for QR: returns Q and R
+        org.nd4j.linalg.api.ops.DynamicCustomOp op = org.nd4j.linalg.api.ops.DynamicCustomOp.builder("qr")
+                .addInputs(A)
+                .build();
+        INDArray[] outputs = Nd4j.getExecutioner().exec(op);
+        
+        return new QRResult<Real>(fromINDArray(outputs[0]), fromINDArray(outputs[1]));
     }
 
     @Override

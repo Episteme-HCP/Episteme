@@ -67,11 +67,15 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
     @SuppressWarnings("unchecked")
     private LinearAlgebraProvider<E> getLocalProvider(Ring<E> ring) {
-        return (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+        LinearAlgebraProvider<E> provider = (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
             LinearAlgebraProvider.class, 
             org.episteme.core.technical.algorithm.OperationContext.DEFAULT, 
-            p -> p != this && p.isCompatible(ring)
+            p -> p != this && (ring == null || p.isCompatible(ring))
         );
+        if (provider == null) {
+            throw new UnsupportedOperationException("No suitable local provider found for " + getName());
+        }
+        return provider;
     }
 
     @Override
@@ -171,18 +175,17 @@ public class DistributedLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
     @Override
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        // Fallback to local
-        return getLocalProvider(null).solve(lu, b); 
+        return getLocalProvider(b.getScalarRing()).solve(lu, b); 
     }
 
     @Override
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
-        return getLocalProvider(null).solve(qr, b);
+        return getLocalProvider(b.getScalarRing()).solve(qr, b);
     }
 
     @Override
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
-        return getLocalProvider(null).solve(cholesky, b);
+        return getLocalProvider(b.getScalarRing()).solve(cholesky, b);
     }
 
     @Override

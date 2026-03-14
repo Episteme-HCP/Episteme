@@ -135,24 +135,27 @@ public class MatrixSolver {
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     private static Real[] solveCG(Matrix<Real> A, Real[] b) {
-        Real[] x0 = new Real[b.length];
-        java.util.Arrays.fill(x0, Real.ZERO);
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.ConjugateGradient.solve(
-                A, b, x0, EPSILON, b.length * 2);
+        LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) AlgorithmManager.getProvider(LinearAlgebraProvider.class);
+        Vector<Real> bVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(b), Reals.getInstance());
+        Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.length, Reals.getInstance());
+        return toRealArray(provider.conjugateGradient(A, bVec, x0, EPSILON, b.length * 2));
     }
 
+    @SuppressWarnings("unchecked")
     private static Real[] solveBiCGSTAB(Matrix<Real> A, Real[] b) {
-        Real[] x0 = new Real[b.length];
-        java.util.Arrays.fill(x0, Real.ZERO);
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.BiCGSTAB.solve(
-                A, b, x0, EPSILON, b.length * 2);
+        LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) AlgorithmManager.getProvider(LinearAlgebraProvider.class);
+        Vector<Real> bVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(b), Reals.getInstance());
+        Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.length, Reals.getInstance());
+        return toRealArray(provider.bicgstab(A, bVec, x0, EPSILON, b.length * 2));
     }
 
+    @SuppressWarnings("unchecked")
     private static Real[] solveGMRES(Matrix<Real> A, Real[] b) {
-        Real[] x0 = new Real[b.length];
-        java.util.Arrays.fill(x0, Real.ZERO);
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.GMRES.solve(
-                A, b, x0, EPSILON, Math.min(50, b.length), 5);
+        LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) AlgorithmManager.getProvider(LinearAlgebraProvider.class);
+        Vector<Real> bVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(b), Reals.getInstance());
+        Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.length, Reals.getInstance());
+        return toRealArray(provider.gmres(A, bVec, x0, EPSILON, Math.min(50, b.length), 5));
     }
 }

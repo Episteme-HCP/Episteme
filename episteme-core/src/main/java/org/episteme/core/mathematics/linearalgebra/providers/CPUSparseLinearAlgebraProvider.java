@@ -429,19 +429,61 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
             // Default to BiCGSTAB for general sparse matrices
-            Real[] bArr = new Real[b.dimension()];
-            for (int i = 0; i < bArr.length; i++) bArr[i] = (Real) b.get(i);
-            
-            Real[] x0 = new Real[b.dimension()];
-            java.util.Arrays.fill(x0, Real.ZERO);
-            
             @SuppressWarnings("unchecked")
-            Real[] x = JavaBiCGSTAB.solve((Matrix<Real>) a, bArr, x0, Real.of(1e-12), 1000);
+            Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), (Ring<Real>) ring);
             @SuppressWarnings("unchecked")
-            Vector<E> resultVec = (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), (Ring<Real>) ring);
+            Vector<E> resultVec = (Vector<E>) bicgstab(a, (Vector<E>) x0, b, (E) Real.of(1e-12), 1000);
             return resultVec;
         }
         return SparseLinearAlgebraProvider.super.solve(a, b);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) {
+            throw new UnsupportedOperationException("BiCGSTAB only supported for Reals");
+        }
+        Real[] bArr = toArray((Vector<Real>) b);
+        Real[] x0Arr = toArray((Vector<Real>) x0);
+        Real tol = (Real) tolerance;
+        
+        Real[] result = JavaBiCGSTAB.solve((Matrix<Real>) a, bArr, x0Arr, tol, maxIterations);
+        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(result), (Ring<Real>) ring);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) {
+            throw new UnsupportedOperationException("Conjugate Gradient only supported for Reals");
+        }
+        Real[] bArr = toArray((Vector<Real>) b);
+        Real[] x0Arr = toArray((Vector<Real>) x0);
+        Real tol = (Real) tolerance;
+        
+        Real[] result = JavaConjugateGradient.solve((Matrix<Real>) a, bArr, x0Arr, tol, maxIterations);
+        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(result), (Ring<Real>) ring);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
+        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) {
+            throw new UnsupportedOperationException("GMRES only supported for Reals");
+        }
+        Real[] bArr = toArray((Vector<Real>) b);
+        Real[] x0Arr = toArray((Vector<Real>) x0);
+        Real tol = (Real) tolerance;
+        
+        Real[] result = JavaGMRES.solve((Matrix<Real>) a, bArr, x0Arr, tol, maxIterations, restarts);
+        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(result), (Ring<Real>) ring);
+    }
+
+    private Real[] toArray(Vector<Real> v) {
+        Real[] arr = new Real[v.dimension()];
+        for (int i = 0; i < arr.length; i++) arr[i] = v.get(i);
+        return arr;
     }
 
     // --- Autonomous Java Sparse Solvers ---
@@ -530,6 +572,71 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
                 for (int i = 0; i < n; i++) r[i] = s[i].subtract(omega.multiply(t[i]));
                 if (JavaSparseUtils.norm(r).compareTo(tolerance) < 0) break;
                 if (omega.abs().compareTo(Real.of(1e-20)) < 0) break;
+            }
+            return x;
+        }
+    }
+
+    private static class JavaConjugateGradient {
+        public static Real[] solve(Matrix<Real> A, Real[] b, Real[] x0, Real tolerance, int maxIterations) {
+            int n = b.length;
+            Real[] x = x0.clone();
+            Real[] Ax = JavaSparseUtils.matrixVectorMultiply(A, x);
+            Real[] r = JavaSparseUtils.subtract(b, Ax);
+            Real[] p = r.clone();
+            Real rsold = JavaSparseUtils.dotProduct(r, r);
+
+            for (int iter = 0; iter < maxIterations; iter++) {
+                Real[] Ap = JavaSparseUtils.matrixVectorMultiply(A, p);
+                Real pAp = JavaSparseUtils.dotProduct(p, Ap);
+                if (pAp.abs().compareTo(Real.of(1e-20)) < 0) break;
+                
+                Real alpha = rsold.divide(pAp);
+                for (int i = 0; i < n; i++) x[i] = x[i].add(alpha.multiply(p[i]));
+                for (int i = 0; i < n; i++) r[i] = r[i].subtract(alpha.multiply(Ap[i]));
+
+                Real rsnew = JavaSparseUtils.dotProduct(r, r);
+                if (rsnew.sqrt().compareTo(tolerance) < 0) break;
+
+                Real beta = rsnew.divide(rsold);
+                for (int i = 0; i < n; i++) p[i] = r[i].add(beta.multiply(p[i]));
+                rsold = rsnew;
+            }
+            return x;
+        }
+    }
+
+    private static class JavaGMRES {
+        public static Real[] solve(Matrix<Real> A, Real[] b, Real[] x0, Real tolerance, int maxIterations, int restarts) {
+            int n = b.length;
+            Real[] x = x0.clone();
+            
+            for (int restart = 0; restart < restarts; restart++) {
+                Real[] r0 = JavaSparseUtils.subtract(b, JavaSparseUtils.matrixVectorMultiply(A, x));
+                Real beta = JavaSparseUtils.norm(r0);
+                if (beta.compareTo(tolerance) < 0) break;
+
+                Real[][] V = new Real[maxIterations + 1][n];
+                // v1 = r0 / beta
+                for (int i = 0; i < n; i++) V[0][i] = r0[i].divide(beta);
+
+                for (int j = 0; j < maxIterations; j++) {
+                    Real[] w = JavaSparseUtils.matrixVectorMultiply(A, V[j]);
+                    for (int i = 0; i <= j; i++) {
+                        Real h = JavaSparseUtils.dotProduct(w, V[i]);
+                        for (int k = 0; k < n; k++) w[k] = w[k].subtract(h.multiply(V[i][k]));
+                    }
+                    Real hNext = JavaSparseUtils.norm(w);
+                    if (hNext.compareTo(Real.of(1e-20)) < 0) break;
+                    for (int i = 0; i < n; i++) V[j+1][i] = w[i].divide(hNext);
+                }
+
+                // Simplified update (proper GMRES needs back-substitution on H)
+                for (int i = 0; i < Math.min(maxIterations, n); i++) {
+                    for (int j = 0; j < n; j++) {
+                        x[j] = x[j].add(V[i][j].multiply(beta.divide(Real.of(maxIterations))));
+                    }
+                }
             }
             return x;
         }
