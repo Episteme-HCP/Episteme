@@ -49,6 +49,12 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     }
 
     @Override
+    public String getEnvironmentInfo() {
+        if (!isAvailable()) return "N/A";
+        return "CPU (Native ND4J)";
+    }
+
+    @Override
     public boolean isLoaded() {
         return isAvailable();
     }
@@ -468,30 +474,109 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         
-        INDArray[] result = org.nd4j.linalg.eigen.Eigen.eig(toINDArray(a));
-        INDArray eigVals = result[0];
-        INDArray eigVecs = result[1];
-        
-        // If complex, eigenvalues has 2 columns (Real, Imag) or is complex type
-        if (eigVals.rank() == 2 && eigVals.columns() == 2) {
-             eigVals = eigVals.getColumn(0).dup(); // Take real part
-        } else if (eigVals.dataType() == org.nd4j.linalg.api.buffer.DataType.FLOAT || eigVals.dataType() == org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
-             // Already real
-        } else {
-             eigVals = eigVals.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
+        // For efficiency and robustness with standard ND4J, we use Jacobi for symmetric matrices
+        boolean isSymmetric = true;
+        int n = a.rows();
+        for (int i = 0; i < n && isSymmetric; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (Math.abs(a.get(i, j).doubleValue() - a.get(j, i).doubleValue()) > 1e-10) {
+                    isSymmetric = false;
+                    break;
+                }
+            }
         }
 
-        if (eigVecs.rank() == 3) {
-            // Complex eigenvectors representation in some ND4J versions [n, n, 2]
-            // Slicing to get [n, n, 0] which is the real part
-            eigVecs = eigVecs.get(org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.point(0)).dup(); 
-        } else if (eigVecs.dataType() != org.nd4j.linalg.api.buffer.DataType.DOUBLE) {
-            eigVecs = eigVecs.castTo(org.nd4j.linalg.api.buffer.DataType.DOUBLE);
+        if (isSymmetric) {
+            return jacobi(a);
+        }
+
+        // Fallback to ND4J native eig for non-symmetric
+        try {
+            INDArray[] result = org.nd4j.linalg.eigen.Eigen.eig(toINDArray(a));
+            INDArray eigVals = result[0];
+            INDArray eigVecs = result[1];
+            
+            if (eigVals.rank() == 2 && eigVals.columns() == 2) {
+                 eigVals = eigVals.getColumn(0).dup(); // Take real part
+            }
+            if (eigVecs.rank() == 3) {
+                eigVecs = eigVecs.get(org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.point(0)).dup(); 
+            }
+            
+            return new EigenResult<Real>(
+                fromINDArray(eigVecs),
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigVals.data().asDouble())
+            );
+        } catch (Exception e) {
+            logger.warn("ND4J Native eig failed: {}. Falling back to Jacobi (as approximate).", e.getMessage());
+            return jacobi(a);
+        }
+    }
+
+    private EigenResult<Real> jacobi(Matrix<Real> a) {
+        int n = a.rows();
+        double[] data = new double[n * n];
+        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i * n + j] = a.get(i, j).doubleValue();
+        
+        double[] vData = new double[n * n];
+        for (int i = 0; i < n; i++) vData[i * n + i] = 1.0;
+        
+        int maxSweeps = 50;
+        double eps = 1e-15;
+        
+        for (int sweep = 0; sweep < maxSweeps; sweep++) {
+            double offDiag = 0;
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) offDiag += Math.abs(data[i * n + j]);
+            }
+            if (offDiag < eps) break;
+            
+            for (int p = 0; p < n - 1; p++) {
+                for (int q = p + 1; q < n; q++) {
+                    double apq = data[p * n + q];
+                    if (Math.abs(apq) < eps) continue;
+                    
+                    double app = data[p * n + p];
+                    double aqq = data[q * n + q];
+                    
+                    double tau = (aqq - app) / (2.0 * apq);
+                    double t = (tau >= 0) ? 1.0 / (tau + Math.sqrt(1.0 + tau * tau)) 
+                                         : 1.0 / (tau - Math.sqrt(1.0 + tau * tau));
+                    double c = 1.0 / Math.sqrt(1.0 + t * t);
+                    double s = t * c;
+
+                    for (int i = 0; i < n; i++) {
+                        double tp = data[p * n + i];
+                        double tq = data[q * n + i];
+                        data[p * n + i] = c * tp - s * tq;
+                        data[q * n + i] = s * tp + c * tq;
+                    }
+                    for (int j = 0; j < n; j++) {
+                        data[j * n + p] = data[p * n + j];
+                        data[j * n + q] = data[q * n + j];
+                    }
+                    
+                    data[p * n + p] = app - t * apq;
+                    data[q * n + q] = aqq + t * apq;
+                    data[p * n + q] = 0.0;
+                    data[q * n + p] = 0.0;
+                    
+                    for (int i = 0; i < n; i++) {
+                        double vp = vData[i * n + p];
+                        double vq = vData[i * n + q];
+                        vData[i * n + p] = c * vp - s * vq;
+                        vData[i * n + q] = s * vp + c * vq;
+                    }
+                }
+            }
         }
         
-        return new EigenResult<Real>(
-            fromINDArray(eigVecs),
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigVals.data().asDouble())
+        double[] eigenvalues = new double[n];
+        for (int i = 0; i < n; i++) eigenvalues[i] = data[i * n + i];
+        
+        return new EigenResult<>(
+            RealDoubleMatrix.of(vData, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues)
         );
     }
 }

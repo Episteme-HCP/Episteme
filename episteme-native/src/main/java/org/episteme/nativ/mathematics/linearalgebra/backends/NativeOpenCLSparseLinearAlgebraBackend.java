@@ -119,6 +119,11 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     @Override
+    public String getEnvironmentInfo() {
+        return isAvailable() ? "GPU (OpenCL)" : "N/A";
+    }
+
+    @Override
     public String getDescription() {
         return "GPU-accelerated linear algebra operations via OpenCL.";
     }
