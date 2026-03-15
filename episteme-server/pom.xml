@@ -324,7 +324,7 @@
                 <version>3.4.3</version>
                 <configuration>
                     <mainClass>org.episteme.server.server.EpistemeApplication</mainClass>
-                    <jvmArguments>--add-modules=jdk.incubator.vector</jvmArguments>
+                    <jvmArguments>--add-modules jdk.incubator.vector --enable-preview</jvmArguments>
                 </configuration>
                 <executions>
                     <execution>

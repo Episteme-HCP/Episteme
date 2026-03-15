@@ -41,12 +41,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.episteme</groupId>
-            <artifactId>episteme-client</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- Native AI Backends -->
         
@@ -184,9 +178,9 @@
                     <release>25</release>
                     <fork>true</fork>
                     <compilerArgs>
-                        <!-- FFM is standard in 22+, but let's ensure preview is enabled if needed for other libs -->
+                        <arg>--add-modules</arg>
+                        <arg>jdk.incubator.vector</arg>
                         <arg>--enable-preview</arg>
-                        <arg>--add-modules=jdk.incubator.vector</arg>
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
                     <excludes>
@@ -208,7 +202,7 @@
                 <configuration>
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
-                    <argLine>--enable-preview --enable-native-access ALL-UNNAMED --add-modules jdk.incubator.vector</argLine>
+                    <argLine>--enable-preview --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
                     <systemPropertyVariables>
                         <episteme.benchmark.skip>true</episteme.benchmark.skip>
                         <episteme.nd4j.skip>false</episteme.nd4j.skip>
