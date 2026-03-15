@@ -31,7 +31,7 @@ public class BenchmarkRegistry {
                     } else {
                         all.add(b);
                     }
-                } catch (java.util.ServiceConfigurationError | Exception e) {
+                } catch (Throwable e) {
                     System.err.println("[WARN] Skipping bad explicit benchmark: " + e.getMessage());
                 }
             }
@@ -52,7 +52,7 @@ public class BenchmarkRegistry {
                     }
                     
                     all.add(wrapProvider(p));
-                } catch (java.util.ServiceConfigurationError | Exception e) {
+                } catch (Throwable e) {
                     System.err.println("[WARN] Skipping bad algorithm provider: " + e.getMessage());
                 }
             }
@@ -147,7 +147,7 @@ public class BenchmarkRegistry {
                     };
                     System.out.println("[DEBUG]     + Added benchmark instance: " + rb.getId() + " [Domain: " + rb.getDomain() + "]");
                     list.add(rb);
-                } catch (java.util.ServiceConfigurationError | Exception e) {
+                } catch (Throwable e) {
                     System.err.println("[WARN] Skipping bad systematic provider: " + e.getMessage());
                 }
             }
