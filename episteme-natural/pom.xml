@@ -16,7 +16,7 @@
     <description>Episteme Natural Sciences Layer - Physics, Chemistry, Biology, Earth, Medicine, Computing</description>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
     <!-- Force IDE resync -->
@@ -151,8 +151,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <fork>true</fork>
                     <compilerArgs>
+                        <arg>--add-modules</arg>
+                        <arg>jdk.incubator.vector</arg>
                         <arg>--enable-preview</arg>
+                        <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
                     <excludes>
                         <!-- Medical/Consultation files remain in episteme-social -->
@@ -162,6 +166,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>--enable-preview --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
