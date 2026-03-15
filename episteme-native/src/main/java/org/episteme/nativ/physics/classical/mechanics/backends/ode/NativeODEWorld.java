@@ -9,7 +9,7 @@ import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.quantity.Time;
 import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -43,7 +43,7 @@ public class NativeODEWorld implements PhysicsWorldBridge {
 
     static {
         boolean avail = false;
-        Optional<SymbolLookup> libOpt = NativeLibraryLoader.loadLibrary("ode", Arena.global());
+        Optional<SymbolLookup> libOpt = NativeFFMLoader.loadLibrary("ode", Arena.global());
         if (libOpt.isPresent()) {
             SymbolLookup lib = libOpt.get();
             Linker linker = Linker.nativeLinker();

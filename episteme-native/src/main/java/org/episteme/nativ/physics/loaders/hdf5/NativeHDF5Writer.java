@@ -24,7 +24,7 @@
 package org.episteme.nativ.physics.loaders.hdf5;
 
 import java.util.Optional;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
@@ -64,7 +64,7 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
 
     static {
         Linker linker = Linker.nativeLinker();
-        Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("hdf5", Arena.global());
+        Optional<SymbolLookup> lookupOpt = NativeFFMLoader.loadLibrary("hdf5", Arena.global());
         SymbolLookup lookup = lookupOpt.orElse(null);
         
         if (lookup != null && lookup.find("H5Fcreate").isPresent()) {
@@ -105,7 +105,7 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
                 System.err.println("[WARN] Failed to call H5open(): " + t.getMessage());
             }
 
-            MemorySegment h5tNativeDouble = NativeLibraryLoader.findSymbol(lookup, "H5T_NATIVE_DOUBLE_g").orElseGet(() -> NativeLibraryLoader.findSymbol(lookup, "H5T_IEEE_F64LE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found")));
+            MemorySegment h5tNativeDouble = NativeFFMLoader.findSymbol(lookup, "H5T_NATIVE_DOUBLE_g").orElseGet(() -> NativeFFMLoader.findSymbol(lookup, "H5T_IEEE_F64LE_g").orElseThrow(() -> new IllegalStateException("H5T_NATIVE_DOUBLE_g not found")));
             
             if (h5tNativeDouble.byteSize() >= 8) {
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_LONG, 0);
@@ -113,7 +113,7 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
                 H5T_NATIVE_DOUBLE = h5tNativeDouble.get(ValueLayout.JAVA_INT, 0);
             }
 
-            MemorySegment h5pDatasetCreate = NativeLibraryLoader.findSymbol(lookup, "H5P_CLS_DATASET_CREATE_ID_g").orElseThrow(() -> new IllegalStateException("H5P_CLS_DATASET_CREATE_ID_g not found"));
+            MemorySegment h5pDatasetCreate = NativeFFMLoader.findSymbol(lookup, "H5P_CLS_DATASET_CREATE_ID_g").orElseThrow(() -> new IllegalStateException("H5P_CLS_DATASET_CREATE_ID_g not found"));
             if (h5pDatasetCreate.byteSize() >= 8) {
                 H5P_DATASET_CREATE = h5pDatasetCreate.get(ValueLayout.JAVA_LONG, 0);
             } else {

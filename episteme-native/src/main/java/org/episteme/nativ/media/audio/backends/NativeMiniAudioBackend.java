@@ -12,7 +12,7 @@ import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.Operation;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.media.audio.AudioAlgorithmProvider;
 import org.episteme.core.media.audio.AudioBuffer;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
@@ -48,10 +48,10 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
 
     static {
         // Load standalone miniaudio library from /libs
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("miniaudio", Arena.global());
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("miniaudio", Arena.global());
         if (lib.isEmpty()) {
             // Also try 'portaudio' as alternative if miniaudio is not bundled
-            lib = NativeLibraryLoader.loadLibrary("portaudio", Arena.global());
+            lib = NativeFFMLoader.loadLibrary("portaudio", Arena.global());
         }
 
         boolean avail = false;
@@ -60,19 +60,19 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
             try {
                 Linker linker = Linker.nativeLinker();
                 
-                MA_DEVICE_INIT = NativeLibraryLoader.findSymbol(LOOKUP, "ma_device_init")
+                MA_DEVICE_INIT = NativeFFMLoader.findSymbol(LOOKUP, "ma_device_init")
                         .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
                 
-                MA_DEVICE_START = NativeLibraryLoader.findSymbol(LOOKUP, "ma_device_start")
+                MA_DEVICE_START = NativeFFMLoader.findSymbol(LOOKUP, "ma_device_start")
                         .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                MA_DEVICE_STOP = NativeLibraryLoader.findSymbol(LOOKUP, "ma_device_stop")
+                MA_DEVICE_STOP = NativeFFMLoader.findSymbol(LOOKUP, "ma_device_stop")
                         .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                MA_DECODER_INIT_FILE = NativeLibraryLoader.findSymbol(LOOKUP, "ma_decoder_init_file")
+                MA_DECODER_INIT_FILE = NativeFFMLoader.findSymbol(LOOKUP, "ma_decoder_init_file")
                         .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
                 
-                MA_DECODER_GET_LENGTH = NativeLibraryLoader.findSymbol(LOOKUP, "ma_decoder_get_length_in_pcm_frames")
+                MA_DECODER_GET_LENGTH = NativeFFMLoader.findSymbol(LOOKUP, "ma_decoder_get_length_in_pcm_frames")
                         .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS))).orElse(null);
 
                 avail = (MA_DEVICE_INIT != null && MA_DEVICE_START != null);

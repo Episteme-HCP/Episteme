@@ -58,9 +58,17 @@ public class JSONRPCService {
                 return listTools(id);
             } else if ("tools/call".equals(method)) {
                 return callTool(request.get("params"), id);
+            } else if ("resources/list".equals(method)) {
+                return listResources(id);
+            } else if ("resources/read".equals(method)) {
+                return readResource(request.get("params"), id);
+            } else if ("prompts/list".equals(method)) {
+                return listPrompts(id);
+            } else if ("prompts/get".equals(method)) {
+                return getPrompt(request.get("params"), id);
             }
 
-            return error(id, -32601, "Method not found");
+            return error(id, -32601, "Method not found: " + method);
         } catch (Exception e) {
             LOG.error("Invalid JSON-RPC request", e);
             return error(null, -32700, "Parse error");
@@ -69,7 +77,6 @@ public class JSONRPCService {
 
     private String listTools(JsonNode id) throws IOException {
         var tools = registry.getAllTools().values();
-        // Construct JSON-RPC response manually for simplicity or use DTOs
         var response = mapper.createObjectNode();
         response.put("jsonrpc", "2.0");
         response.set("id", id);
@@ -80,8 +87,92 @@ public class JSONRPCService {
             var t = toolsArray.addObject();
             t.put("name", tool.name());
             t.put("description", tool.description());
-            // Schema...
+            try {
+                t.set("inputSchema", mapper.readTree(tool.inputSchema()));
+            } catch (Exception e) {
+                t.put("inputSchema", tool.inputSchema());
+            }
         }
+        return mapper.writeValueAsString(response);
+    }
+
+    private String listResources(JsonNode id) throws IOException {
+        var response = mapper.createObjectNode();
+        response.put("jsonrpc", "2.0");
+        response.set("id", id);
+        var result = response.putObject("result");
+        var resourcesArray = result.putArray("resources");
+
+        var r1 = resourcesArray.addObject();
+        r1.put("uri", "episteme://models/global-migration");
+        r1.put("name", "Global Migration Spatial Dataset");
+        r1.put("mimeType", "application/json");
+
+        var r2 = resourcesArray.addObject();
+        r2.put("uri", "episteme://models/sir-simulation");
+        r2.put("name", "Epidemiological SIR Model State");
+        r2.put("mimeType", "application/json");
+
+        return mapper.writeValueAsString(response);
+    }
+
+    private String readResource(JsonNode params, JsonNode id) throws IOException {
+        String uri = params.get("uri").asText();
+        var response = mapper.createObjectNode();
+        response.put("jsonrpc", "2.0");
+        response.set("id", id);
+        var result = response.putObject("result");
+        var contentArray = result.putArray("contents");
+        var content = contentArray.addObject();
+        content.put("uri", uri);
+        content.put("mimeType", "application/json");
+
+        if (uri.contains("global-migration")) {
+            content.put("text", "{\"model_type\": \"SPATIAL_GEOMETRY\", \"locations\": 150, \"magnitude\": 1.25e7}");
+        } else if (uri.contains("sir-simulation")) {
+            content.put("text", "{\"model_type\": \"EPIDEMIOLOGICAL_SIR\", \"susceptible\": 9500000, \"infected\": 50000}");
+        } else {
+            return error(id, -32001, "Resource not found: " + uri);
+        }
+
+        return mapper.writeValueAsString(response);
+    }
+
+    private String listPrompts(JsonNode id) throws IOException {
+        var response = mapper.createObjectNode();
+        response.put("jsonrpc", "2.0");
+        response.set("id", id);
+        var result = response.putObject("result");
+        var promptsArray = result.putArray("prompts");
+
+        var p1 = promptsArray.addObject();
+        p1.put("name", "analyze_simulation");
+        p1.put("description", "Guided analysis of a scientific simulation run");
+        var args = p1.putArray("arguments");
+        args.addObject().put("name", "model_uri").put("description", "URI of the model to analyze").put("required", true);
+
+        return mapper.writeValueAsString(response);
+    }
+
+    private String getPrompt(JsonNode params, JsonNode id) throws IOException {
+        String name = params.get("name").asText();
+        var response = mapper.createObjectNode();
+        response.put("jsonrpc", "2.0");
+        response.set("id", id);
+        var result = response.putObject("result");
+        var messages = result.putArray("messages");
+
+        if ("analyze_simulation".equals(name)) {
+            String uri = params.get("arguments").get("model_uri").asText();
+            var m1 = messages.addObject();
+            m1.put("role", "user");
+            var c1 = m1.putObject("content");
+            c1.put("type", "text");
+            c1.put("text", "Please analyze the scientific data at " + uri + ". Focus on the growth rate and stability.");
+        } else {
+            return error(id, -32001, "Prompt not found: " + name);
+        }
+
         return mapper.writeValueAsString(response);
     }
 

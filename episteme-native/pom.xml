@@ -15,9 +15,7 @@
     <description>Native library integration via Project Panama (FFM API)</description>
 
     <properties>
-        <!-- Requires Java 25 (Project Panama / Valhalla) -->
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
         <cuda.exclude.1>**/_NONE_/**</cuda.exclude.1>
         <cuda.exclude.2>**/_NONE_/**</cuda.exclude.2>
         <cuda.exclude.3>**/_NONE_/**</cuda.exclude.3>
@@ -184,11 +182,11 @@
                 <configuration>
                     <!-- IMPORTANT: Ensure your IDE is configured for Java 25 for this module -->
                     <release>25</release>
+                    <fork>true</fork>
                     <compilerArgs>
                         <!-- FFM is standard in 22+, but let's ensure preview is enabled if needed for other libs -->
                         <arg>--enable-preview</arg>
-                        <arg>--add-modules</arg>
-                        <arg>jdk.incubator.vector</arg>
+                        <arg>--add-modules=jdk.incubator.vector</arg>
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
                     <excludes>

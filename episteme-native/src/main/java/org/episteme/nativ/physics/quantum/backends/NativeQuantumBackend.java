@@ -5,7 +5,7 @@
 package org.episteme.nativ.physics.quantum.backends;
 
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import com.google.auto.service.AutoService;
@@ -49,29 +49,29 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
 
     private static synchronized void ensureInitialized() {
         if (IS_INITIALIZED) return; // Check IS_INITIALIZED instead of LOOKUP
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("QuEST", Arena.global());
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("QuEST", Arena.global());
         if (lib.isPresent()) {
             LOOKUP = lib.get();
             try {
-                Linker linker = NativeLibraryLoader.getLinker();
+                Linker linker = NativeFFMLoader.getLinker();
                 
-                QUEST_CREATE_ENV = NativeLibraryLoader.findSymbol(LOOKUP, "createQuESTEnv", "createQuESTEnv@0", "_createQuESTEnv", "initQuESTEnv", "initQuESTEnv@0", "_initQuESTEnv")
+                QUEST_CREATE_ENV = NativeFFMLoader.findSymbol(LOOKUP, "createQuESTEnv", "createQuESTEnv@0", "_createQuESTEnv", "initQuESTEnv", "initQuESTEnv@0", "_initQuESTEnv")
                     .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.of(ValueLayout.ADDRESS)))
                     .orElse(null);
                     
-                QUEST_CREATE_QUREG = NativeLibraryLoader.findSymbol(LOOKUP, "createQureg", "createQureg@8", "_createQureg")
+                QUEST_CREATE_QUREG = NativeFFMLoader.findSymbol(LOOKUP, "createQureg", "createQureg@8", "_createQureg")
                     .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)))
                     .orElse(null);
                     
-                QUEST_HADAMARD = NativeLibraryLoader.findSymbol(LOOKUP, "hadamard", "hadamard@8", "_hadamard")
+                QUEST_HADAMARD = NativeFFMLoader.findSymbol(LOOKUP, "hadamard", "hadamard@8", "_hadamard")
                     .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT)))
                     .orElse(null);
                     
-                QUEST_CONTROLLED_NOT = NativeLibraryLoader.findSymbol(LOOKUP, "controlledNot", "controlledNot@12", "_controlledNot")
+                QUEST_CONTROLLED_NOT = NativeFFMLoader.findSymbol(LOOKUP, "controlledNot", "controlledNot@12", "_controlledNot")
                     .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)))
                     .orElse(null);
                     
-                QUEST_MEASURE = NativeLibraryLoader.findSymbol(LOOKUP, "measure", "measure@8", "_measure")
+                QUEST_MEASURE = NativeFFMLoader.findSymbol(LOOKUP, "measure", "measure@8", "_measure")
                     .map(seg -> linker.downcallHandle(seg, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)))
                     .orElse(null);
                 

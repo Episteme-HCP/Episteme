@@ -19,16 +19,8 @@ public class BenchmarkVisionBackends {
         NativeCPUVisionBackend pureJava = new NativeCPUVisionBackend();
         NativeJavaCVMediaBackend javaCv = new NativeJavaCVMediaBackend();
         
-        // Debug explicit load
-        String dllPath = "c:\\Silvere\\Encours\\Developpement\\Episteme\\episteme-native\\target\\classes\\win32-x86_64\\episteme_vision.dll";
-        System.out.println("DEBUG: Attempting explicit load of " + dllPath);
-        try {
-            System.load(dllPath);
-            System.out.println("DEBUG: Explicit load SUCCESS!");
-        } catch (Throwable t) {
-            System.err.println("DEBUG: Explicit load FAILED: " + t.getMessage());
-            t.printStackTrace();
-        }
+        // Standardized library loading via NativeFFMLoader (Panama)
+        org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.loadLibrary("episteme_vision", java.lang.foreign.Arena.global());
 
         NativeCPUCBindingVisionBackend cBinding = new NativeCPUCBindingVisionBackend();
 

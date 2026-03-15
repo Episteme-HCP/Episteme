@@ -16,7 +16,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
@@ -44,7 +44,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
     private static final SymbolLookup LOOKUP;
     private static final SymbolLookup LAPACK_LOOKUP;
     private static final boolean IS_AVAILABLE;
-    private static final Linker LINKER = NativeLibraryLoader.getLinker();
+    private static final Linker LINKER = NativeFFMLoader.getLinker();
 
     // CBLAS Layout Constants
     private static final int CblasRowMajor = 101;
@@ -76,32 +76,32 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
     private static final int LAPACK_ROW_MAJOR = 101;
 
     private static Optional<MemorySegment> findLapackSymbol(String name) {
-        Optional<MemorySegment> sym = NativeLibraryLoader.findSymbol(LOOKUP, name);
+        Optional<MemorySegment> sym = NativeFFMLoader.findSymbol(LOOKUP, name);
         if (sym.isEmpty() && LAPACK_LOOKUP != null) {
-            sym = NativeLibraryLoader.findSymbol(LAPACK_LOOKUP, name);
+            sym = NativeFFMLoader.findSymbol(LAPACK_LOOKUP, name);
         }
         return sym;
     }
 
     static {
         Arena arena = Arena.global();
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("openblas", arena);
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("openblas", arena);
         if (lib.isEmpty()) {
-             lib = NativeLibraryLoader.loadLibrary("mkl_rt", arena);
+             lib = NativeFFMLoader.loadLibrary("mkl_rt", arena);
         }
         
         if (lib.isPresent()) {
              logger.info("FFM: Successfully matched native library for FFM backend: {}", lib.get());
         } else {
              logger.info("FFM: No local BLAS/LAPACK library found in libs/. Attempting system lookup (CAUTION: possible ABI mismatch).");
-             lib = NativeLibraryLoader.getSystemLookup();
+             lib = NativeFFMLoader.getSystemLookup();
         }
         
         LOOKUP = lib.orElse(null);
         
-        Optional<SymbolLookup> lapackLib = NativeLibraryLoader.loadLibrary("lapacke", arena);
+        Optional<SymbolLookup> lapackLib = NativeFFMLoader.loadLibrary("lapacke", arena);
         if (lapackLib.isEmpty()) {
-            lapackLib = NativeLibraryLoader.loadLibrary("lapack", arena);
+            lapackLib = NativeFFMLoader.loadLibrary("lapack", arena);
         }
         LAPACK_LOOKUP = lapackLib.orElse(null);
         
@@ -117,7 +117,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                Optional<MemorySegment> dgemmSym = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dgemm");
+                Optional<MemorySegment> dgemmSym = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dgemm");
                 if (dgemmSym.isPresent()) {
                     DGEMM = LINKER.downcallHandle(dgemmSym.get(), dgemmDesc);
                 }
@@ -126,26 +126,26 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DDOT = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_ddot")
+                DDOT = NativeFFMLoader.findSymbol(LOOKUP, "cblas_ddot")
                     .map(s -> LINKER.downcallHandle(s, ddotDesc)).orElse(null);
 
                 FunctionDescriptor dnrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DNRM2 = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dnrm2")
+                DNRM2 = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dnrm2")
                     .map(s -> LINKER.downcallHandle(s, dnrm2Desc)).orElse(null);
 
                 FunctionDescriptor daxpyDesc = FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DAXPY = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_daxpy")
+                DAXPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_daxpy")
                     .map(s -> LINKER.downcallHandle(s, daxpyDesc)).orElse(null);
                 
                 FunctionDescriptor dscalDesc = FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DSCAL = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dscal")
+                DSCAL = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dscal")
                     .map(s -> LINKER.downcallHandle(s, dscalDesc)).orElse(null);
 
 
@@ -155,7 +155,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DGEMV = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_dgemv")
+                DGEMV = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dgemv")
                     .map(s -> LINKER.downcallHandle(s, dgemvDesc)).orElse(null);
 
                 FunctionDescriptor domatcopyDesc = FunctionDescriptor.ofVoid(
@@ -163,7 +163,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
                         ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                DOMATCOPY = NativeLibraryLoader.findSymbol(LOOKUP, "cblas_domatcopy", "mkl_domatcopy")
+                DOMATCOPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_domatcopy", "mkl_domatcopy")
                     .map(s -> LINKER.downcallHandle(s, domatcopyDesc)).orElse(null);
 
                 // LAPACK

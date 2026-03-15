@@ -5,7 +5,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader; // Changed from NativeLibraryLoader
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;
@@ -42,7 +42,7 @@ public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, Na
         }
 
         // Look for Arrow C library (e.g. libarrow.so or specific C-Data-Interface wrapper)
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("arrow", Arena.global());
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("arrow", Arena.global());
         
         if (lib.isPresent()) {
             LOOKUP = lib.get();

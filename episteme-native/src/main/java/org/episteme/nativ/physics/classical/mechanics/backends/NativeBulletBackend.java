@@ -16,7 +16,7 @@ import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.episteme.natural.physics.classical.mechanics.RigidBody;
 import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.measure.units.SI;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -63,45 +63,45 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
         SymbolLookup lookup = null;
         java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
 
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("bullet_capi", arena);
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("bullet_capi", arena);
         if (lib.isEmpty()) {
-            lib = NativeLibraryLoader.loadLibrary("bulletc", arena);
+            lib = NativeFFMLoader.loadLibrary("bulletc", arena);
         }
         lookup = lib.orElse(null);
 
         if (lookup != null) {
-            DETECT_SPHERES = NativeLibraryLoader.findSymbol(lookup, "bt_detect_sphere_collisions")
+            DETECT_SPHERES = NativeFFMLoader.findSymbol(lookup, "bt_detect_sphere_collisions")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-            RESOLVE_COLLISIONS = NativeLibraryLoader.findSymbol(lookup, "bt_resolve_sphere_collisions")
+            RESOLVE_COLLISIONS = NativeFFMLoader.findSymbol(lookup, "bt_resolve_sphere_collisions")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
             
             // Look up dynamics handles
-            BT_DEFAULT_COLLISION_CONFIGURATION_NEW = NativeLibraryLoader.findSymbol(lookup, "btDefaultCollisionConfiguration_new")
+            BT_DEFAULT_COLLISION_CONFIGURATION_NEW = NativeFFMLoader.findSymbol(lookup, "btDefaultCollisionConfiguration_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS))).orElse(null);
-            BT_COLLISION_DISPATCHER_NEW = NativeLibraryLoader.findSymbol(lookup, "btCollisionDispatcher_new")
+            BT_COLLISION_DISPATCHER_NEW = NativeFFMLoader.findSymbol(lookup, "btCollisionDispatcher_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
-            BT_DBVT_BROADPHASE_NEW = NativeLibraryLoader.findSymbol(lookup, "btDbvtBroadphase_new")
+            BT_DBVT_BROADPHASE_NEW = NativeFFMLoader.findSymbol(lookup, "btDbvtBroadphase_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
-            BT_SEQUENTIAL_IMPULSE_CONSTRAINT_SOLVER_NEW = NativeLibraryLoader.findSymbol(lookup, "btSequentialImpulseConstraintSolver_new")
+            BT_SEQUENTIAL_IMPULSE_CONSTRAINT_SOLVER_NEW = NativeFFMLoader.findSymbol(lookup, "btSequentialImpulseConstraintSolver_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS))).orElse(null);
-            BT_DISCRETE_DYNAMICS_WORLD_NEW = NativeLibraryLoader.findSymbol(lookup, "btDiscreteDynamicsWorld_new")
+            BT_DISCRETE_DYNAMICS_WORLD_NEW = NativeFFMLoader.findSymbol(lookup, "btDiscreteDynamicsWorld_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
-            BT_DYNAMICS_WORLD_STEP_SIMULATION = NativeLibraryLoader.findSymbol(lookup, "btDynamicsWorld_stepSimulation")
+            BT_DYNAMICS_WORLD_STEP_SIMULATION = NativeFFMLoader.findSymbol(lookup, "btDynamicsWorld_stepSimulation")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT))).orElse(null);
-            BT_DYNAMICS_WORLD_SET_GRAVITY = NativeLibraryLoader.findSymbol(lookup, "btDynamicsWorld_setGravity")
+            BT_DYNAMICS_WORLD_SET_GRAVITY = NativeFFMLoader.findSymbol(lookup, "btDynamicsWorld_setGravity")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
 
-            BT_SPHERE_SHAPE_NEW = NativeLibraryLoader.findSymbol(lookup, "btSphereShape_new")
+            BT_SPHERE_SHAPE_NEW = NativeFFMLoader.findSymbol(lookup, "btSphereShape_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT))).orElse(null);
-            BT_DEFAULT_MOTION_STATE_NEW = NativeLibraryLoader.findSymbol(lookup, "btDefaultMotionState_new")
+            BT_DEFAULT_MOTION_STATE_NEW = NativeFFMLoader.findSymbol(lookup, "btDefaultMotionState_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
-            BT_RIGID_BODY_NEW = NativeLibraryLoader.findSymbol(lookup, "btRigidBody_new")
+            BT_RIGID_BODY_NEW = NativeFFMLoader.findSymbol(lookup, "btRigidBody_new")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
-            BT_DYNAMICS_WORLD_ADD_RIGID_BODY = NativeLibraryLoader.findSymbol(lookup, "btDynamicsWorld_addRigidBody")
+            BT_DYNAMICS_WORLD_ADD_RIGID_BODY = NativeFFMLoader.findSymbol(lookup, "btDynamicsWorld_addRigidBody")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
-            BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY = NativeLibraryLoader.findSymbol(lookup, "btDynamicsWorld_removeRigidBody")
+            BT_DYNAMICS_WORLD_REMOVE_RIGID_BODY = NativeFFMLoader.findSymbol(lookup, "btDynamicsWorld_removeRigidBody")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS))).orElse(null);
-            BT_COLLISION_SHAPE_CALCULATE_INERTIA = NativeLibraryLoader.findSymbol(lookup, "btCollisionShape_calculateLocalInertia")
+            BT_COLLISION_SHAPE_CALCULATE_INERTIA = NativeFFMLoader.findSymbol(lookup, "btCollisionShape_calculateLocalInertia")
                 .map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS))).orElse(null);
 
             IS_AVAILABLE_FLAG = BT_DISCRETE_DYNAMICS_WORLD_NEW != null;
@@ -116,8 +116,8 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
     @Override
     public String getStatusMessage() {
         if (IS_AVAILABLE_FLAG) return "Ready (Bullet Native)";
-        String cause = NativeLibraryLoader.getFailureCause("bullet_capi");
-        if (cause.contains("Not found")) cause = NativeLibraryLoader.getFailureCause("bulletc");
+        String cause = NativeFFMLoader.getFailureCause("bullet_capi");
+        if (cause.contains("Not found")) cause = NativeFFMLoader.getFailureCause("bulletc");
         return "Native library load failed: " + cause;
     }
 
