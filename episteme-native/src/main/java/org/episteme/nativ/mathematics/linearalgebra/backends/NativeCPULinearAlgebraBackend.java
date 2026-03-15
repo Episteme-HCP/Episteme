@@ -26,7 +26,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 
 /**
  * Standalone Native Linear Algebra backend using bundled episteme_native library.
@@ -92,13 +92,13 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         boolean avail = false;
 
         try {
-            Linker linker = NativeLibraryLoader.getLinker();
+            Linker linker = NativeFFMLoader.getLinker();
             java.util.List<SymbolLookup> lookups = new java.util.ArrayList<>();
             
             // Try common libraries
             String[] commonLibs = {"episteme-jni", "openblas", "lapacke", "lapack", "mkl_rt"};
             for (String lib : commonLibs) {
-                NativeLibraryLoader.loadLibrary(lib, java.lang.foreign.Arena.global()).ifPresent(lookups::add);
+                NativeFFMLoader.loadLibrary(lib, java.lang.foreign.Arena.global()).ifPresent(lookups::add);
             }
             
             // Add system lookup as fallback
@@ -148,7 +148,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                 dgetri = lookup.find("LAPACKE_dgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                Optional<MemorySegment> s_dsyev = NativeLibraryLoader.findSymbol(lookup, "LAPACKE_dsyev", "lapacke_dsyev");
+                Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "lapacke_dsyev");
                 if (s_dsyev.isPresent()) {
                     dsyev = linker.downcallHandle(s_dsyev.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 }
@@ -162,7 +162,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                 dorgqr = lookup.find("LAPACKE_dorgqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                Optional<MemorySegment> s_dgesvd = NativeLibraryLoader.findSymbol(lookup, "LAPACKE_dgesvd", "lapacke_dgesvd");
+                Optional<MemorySegment> s_dgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesvd", "lapacke_dgesvd");
                 if (s_dgesvd.isPresent()) {
                     dgesvd = linker.downcallHandle(s_dgesvd.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 }

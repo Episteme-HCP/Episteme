@@ -8,9 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 
 import java.util.ServiceLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 
 public class EnvironmentController {
 
@@ -58,7 +58,7 @@ public class EnvironmentController {
 
     @FXML
     private void handleRefresh() {
-        NativeLibraryLoader.clearCache();
+        NativeFFMLoader.clearCache();
         refreshProviders();
     }
 

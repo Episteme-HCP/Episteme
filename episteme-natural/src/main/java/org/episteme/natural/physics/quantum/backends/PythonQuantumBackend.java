@@ -30,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 @AutoService({AlgorithmProvider.class, QuantumBackend.class, ComputeBackend.class, Backend.class})
 public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmProvider {
 
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(PythonQuantumBackend.class);
+
     @Override
     public int getPriority() { return 100; }
 
@@ -93,39 +95,62 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
     public QuantumBackend.QuantumResult executeSimulator(QuantumBackend.QuantumCircuit circuit, int shots) {
         return runExecution(circuit, shots, "qasm_simulator");
     }
- 
+
     @Override
     public QuantumBackend.QuantumResult executeHardware(QuantumBackend.QuantumCircuit circuit, int shots, String backend) {
         return runExecution(circuit, shots, backend);
     }
 
-    private QuantumBackend.QuantumResult runExecution(QuantumBackend.QuantumCircuit circuit, int shots, String backendName) {
+    private Process workerProcess;
+    private PrintWriter workerIn;
+    private BufferedReader workerOut;
+
+    private void ensureWorkerStarted() {
+        if (workerProcess != null && workerProcess.isAlive()) return;
+        
         try {
-            File script = createExtendedScript(circuit.toQASM(), shots, backendName);
-            Process p = new ProcessBuilder(pythonExecutable, script.getAbsolutePath()).start();
+            String scriptPath = "scripts/NativePythonWorker.py";
+            // Check if file exists relative to execution root or common locations
+            File scriptFile = new File(scriptPath);
+            if (!scriptFile.exists()) {
+                 // Try to locate it based on workspace structure
+                 scriptFile = new File("../scripts/NativePythonWorker.py");
+            }
+
+            ProcessBuilder pb = new ProcessBuilder(pythonExecutable, scriptFile.getAbsolutePath());
+            pb.redirectErrorStream(true);
+            workerProcess = pb.start();
+            workerIn = new PrintWriter(new OutputStreamWriter(workerProcess.getOutputStream(), StandardCharsets.UTF_8), true);
+            workerOut = new BufferedReader(new InputStreamReader(workerProcess.getInputStream(), StandardCharsets.UTF_8));
             
-            String output = new String(p.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            if (p.waitFor() != 0) throw new RuntimeException("Python error: " + output);
-            
-            return parseRobustResult(output);
-        } catch (Exception e) { throw new RuntimeException("Quantum execution failed", e); }
+            // Wait for READY signal
+            String readySignal = workerOut.readLine();
+            LOG.info("Python Worker started: {}", readySignal);
+        } catch (Exception e) {
+            LOG.error("Failed to start Python worker", e);
+            workerProcess = null;
+        }
     }
 
-    private File createExtendedScript(String qasm, int shots, String backendName) throws IOException {
-        File f = File.createTempFile("qiskit_exec_", ".py");
-        try (PrintWriter out = new PrintWriter(f)) {
-            out.println("import json, sys");
-            out.println("from qiskit import QuantumCircuit, execute, Aer, IBMQ");
-            out.println("try:");
-            out.println("    qc = QuantumCircuit.from_qasm_str('''" + qasm + "''')");
-            out.println("    backend = Aer.get_backend('" + backendName + "')");
-            out.println("    job = execute(qc, backend, shots=" + shots + ")");
-            out.println("    res = job.result()");
-            out.println("    print(json.dumps({'counts': res.get_counts(), 'time': res.time_taken}))");
-            out.println("except Exception as e:");
-            out.println("    print(str(e), file=sys.stderr); sys.exit(1)");
+    private QuantumBackend.QuantumResult runExecution(QuantumBackend.QuantumCircuit circuit, int shots, String backendName) {
+        ensureWorkerStarted();
+        if (workerProcess == null) throw new RuntimeException("Python worker not available");
+
+        try {
+            // Simplified JSON construction for demo, ideally use Jackson
+            String request = String.format("{\"command\": \"exec_qasm\", \"params\": {\"qasm\": \"%s\", \"shots\": %d, \"backend\": \"%s\"}}\n",
+                circuit.toQASM().replace("\"", "\\\"").replace("\n", "\\n"), shots, backendName);
+            
+            workerIn.println(request);
+            String responseLine = workerOut.readLine();
+            if (responseLine == null) throw new EOFException("Worker process died");
+
+            return parseRobustResult(responseLine);
+        } catch (Exception e) { 
+            workerProcess.destroyForcibly();
+            workerProcess = null;
+            throw new RuntimeException("Quantum execution failed over persistent bridge", e); 
         }
-        return f;
     }
 
     private QuantumBackend.QuantumResult parseRobustResult(String json) {
@@ -136,6 +161,12 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"(\\d+)\":\\s*(\\d+)").matcher(json);
         while (m.find()) {
             counts.put(m.group(1), Integer.parseInt(m.group(2)));
+        }
+        
+        // Extract time if present
+        java.util.regex.Matcher tm = java.util.regex.Pattern.compile("\"time\":\\s*([\\d.]+)").matcher(json);
+        if (tm.find()) {
+            time = (long)(Double.parseDouble(tm.group(1)) * 1000);
         }
         
         return new AdvancedQuantumResult(counts, time);

@@ -25,7 +25,7 @@ package org.episteme.nativ.physics.loaders.hdf5;
 
 import java.io.IOException;
 import java.util.Optional;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
@@ -61,7 +61,7 @@ public class NativeHDF5Reader extends AbstractResourceReader<NativeDoubleMatrixS
 
     static {
         Linker linker = Linker.nativeLinker();
-        Optional<SymbolLookup> lookupOpt = NativeLibraryLoader.loadLibrary("hdf5", Arena.global());
+        Optional<SymbolLookup> lookupOpt = NativeFFMLoader.loadLibrary("hdf5", Arena.global());
         SymbolLookup lookup = lookupOpt.orElse(null);
         
         if (lookup != null && lookup.find("H5Fopen").isPresent()) {

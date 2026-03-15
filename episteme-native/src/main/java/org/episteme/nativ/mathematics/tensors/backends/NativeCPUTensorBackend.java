@@ -12,7 +12,7 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.mathematics.linearalgebra.tensors.NativeTensor;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.Arena;
@@ -44,9 +44,9 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
     private static synchronized void ensureInitialized() {
         if (IS_INITIALIZED) return;
         // Try to load oneDNN or MKL
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("dnnl", Arena.global());
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("dnnl", Arena.global());
         if (lib.isEmpty()) {
-            lib = NativeLibraryLoader.loadLibrary("mkl_rt", Arena.global());
+            lib = NativeFFMLoader.loadLibrary("mkl_rt", Arena.global());
         }
         
         if (lib.isPresent()) {
@@ -162,7 +162,7 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
     @Override
     public void shutdown() {
         if (IS_AVAILABLE) {
-            NativeLibraryLoader.shutdown();
+            NativeFFMLoader.shutdown();
         }
     }
 

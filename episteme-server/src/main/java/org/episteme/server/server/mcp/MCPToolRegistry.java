@@ -44,21 +44,34 @@ public class MCPToolRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(MCPToolRegistry.class);
     private final Map<String, ToolDefinition> tools = new ConcurrentHashMap<>();
 
+    private final org.springframework.context.ApplicationContext context;
+
+    public MCPToolRegistry(org.springframework.context.ApplicationContext context) {
+        this.context = context;
+    }
+
     @PostConstruct
     public void init() {
-        // In a real implementation, we would scan the BeanContext
-        // For this prototype, we manually register core tools
+        // Core diagnostic tools
         registerTool("convert_units", "Convert scientific units", 
-            "{\"properties\": {\"value\": {\"type\": \"number\"}, \"from\": {\"type\": \"string\"}, \"to\": {\"type\": \"string\"}}, \"required\": [\"value\", \"from\", \"to\"]}");
+            "{\"type\": \"object\", \"properties\": {\"value\": {\"type\": \"number\"}, \"from\": {\"type\": \"string\"}, \"to\": {\"type\": \"string\"}}, \"required\": [\"value\", \"from\", \"to\"]}");
         registerTool("get_constant", "Retrieve scientific constants (e.g., PI, SPEED_OF_LIGHT, EARTH_MASS)",
-            "{\"properties\": {\"category\": {\"type\": \"string\", \"enum\": [\"MATH\", \"PHYSICS\", \"EARTH\", \"GEOGRAPHY\", \"HISTORY\"]}, \"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}");
-        registerTool("balance_reaction", "Balance chemical equation",
-            "{\"properties\": {\"equation\": {\"type\": \"string\"}}, \"required\": [\"equation\"]}");
-        registerTool("get_data_model", "Retrieve a structured scientific data model by name (e.g., 'Global Migration Spatial Dataset')",
-            "{\"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}");
+            "{\"type\": \"object\", \"properties\": {\"category\": {\"type\": \"string\", \"enum\": [\"MATH\", \"PHYSICS\", \"EARTH\", \"GEOGRAPHY\", \"HISTORY\"]}, \"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}");
+        
+        // Dynamic discovery of AlgorithmProviders
+        var providers = context.getBeansOfType(org.episteme.core.technical.algorithm.AlgorithmProvider.class);
+        for (var provider : providers.values()) {
+            if (provider.isAvailable()) {
+                String toolName = provider.getName().toLowerCase().replace(" ", "_").replace("/", "_");
+                String description = String.format("Execute scientific algorithm: %s (%s)", provider.getName(), provider.getAlgorithmType());
+                // For now, we use a generic schema. In a full implementation, 
+                // we'd use reflection or a schema-defining interface.
+                String schema = "{\"type\": \"object\", \"properties\": {\"params\": {\"type\": \"object\"}}}";
+                registerTool(toolName, description, schema);
+            }
+        }
 
-
-        LOG.info("Registered {} MCP tools", tools.size());
+        LOG.info("Registered {} dynamic MCP tools from grid algorithms", tools.size());
     }
 
     public void registerTool(String name, String description, String jsonSchema) {

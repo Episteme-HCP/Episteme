@@ -10,8 +10,8 @@ import org.episteme.core.media.VisionBackend;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 import com.google.auto.service.AutoService;
 
 import java.awt.image.BufferedImage;
@@ -43,7 +43,7 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
     private static final MethodHandle MH_PROCESS_IMAGE;
 
     static {
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary(LIB_NAME, Arena.global());
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary(LIB_NAME, Arena.global());
         if (lib.isPresent()) {
             LOOKUP = lib.get();
             FunctionDescriptor desc = FunctionDescriptor.ofVoid(
@@ -53,7 +53,7 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
                     ValueLayout.JAVA_INT
             );
             
-            Optional<MemorySegment> symbol = NativeLibraryLoader.findSymbol(LOOKUP, "process_image");
+            Optional<MemorySegment> symbol = NativeFFMLoader.findSymbol(LOOKUP, "process_image");
             if (symbol.isPresent()) {
                 MH_PROCESS_IMAGE = LINKER.downcallHandle(symbol.get(), desc);
                 IS_AVAILABLE = true;

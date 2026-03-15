@@ -11,7 +11,7 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
 import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -46,7 +46,7 @@ public class NativeGenesisWorld implements PhysicsWorldBridge {
 
     static {
         boolean avail = false;
-        Optional<SymbolLookup> libOpt = NativeLibraryLoader.loadLibrary("GenesisC", Arena.global());
+        Optional<SymbolLookup> libOpt = NativeFFMLoader.loadLibrary("GenesisC", Arena.global());
         if (libOpt.isPresent()) {
             SymbolLookup lib = libOpt.get();
             Linker linker = Linker.nativeLinker();

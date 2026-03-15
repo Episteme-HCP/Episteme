@@ -12,6 +12,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.util.Optional;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.analysis.fft.FFTProvider;
@@ -59,7 +60,9 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
         if (initialized) return;
         initialized = true;
         try {
-            SymbolLookup lookup = org.episteme.core.technical.backend.nativ.NativeLibraryLoader.loadLibrary("fftw3");
+        Optional<SymbolLookup> lookupOpt = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.loadLibrary("fftw3", Arena.global());
+        if (lookupOpt.isEmpty()) return;
+        SymbolLookup lookup = lookupOpt.get();
             Linker linker = Linker.nativeLinker();
 
             DPLAN_R2C_1D = linker.downcallHandle(lookup.find("fftw_plan_dft_r2c_1d").get(),

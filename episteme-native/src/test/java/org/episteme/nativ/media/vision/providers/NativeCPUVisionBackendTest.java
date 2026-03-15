@@ -6,7 +6,7 @@
 package org.episteme.nativ.media.vision.providers;
 
 import org.episteme.core.media.vision.ImageOp;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -62,7 +62,7 @@ class NativeCPUVisionBackendTest {
     @EnabledOnOs(OS.WINDOWS)
     void testNativeLibraryLoaderFindsKernel32() {
         // Verify that our loader logic actually works by trying to load a system library
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("Kernel32", Arena.global());
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("Kernel32", Arena.global());
         assertTrue(lib.isPresent(), "Should be able to load Kernel32 on Windows");
         
         if (lib.isPresent()) {

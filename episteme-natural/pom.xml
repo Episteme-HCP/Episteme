@@ -15,6 +15,10 @@
     <name>Episteme Natural</name>
     <description>Episteme Natural Sciences Layer - Physics, Chemistry, Biology, Earth, Medicine, Computing</description>
 
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+    </properties>
+
     <!-- Force IDE resync -->
     <dependencies>
         <!-- Core module -->
@@ -22,8 +26,6 @@
             <groupId>org.episteme</groupId>
             <artifactId>episteme-core</artifactId>
         </dependency>
-
-
 
         <!-- JSON Support -->
         <dependency>
@@ -40,8 +42,6 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.sbml.jsbml</groupId>
@@ -133,25 +133,6 @@
                     <exclude>**/*.stl</exclude>
                 </excludes>
             </resource>
-            <!-- Exclude heavy binary resources (anatomy models) as requested -->
-            <!--
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*.jpg</include>
-                    <include>**/*.png</include>
-                    <include>**/*.tif</include>
-                    <include>**/*.tiff</include>
-                    <include>**/*.obj</include>
-                    <include>**/*.gltf</include>
-                    <include>**/*.glb</include>
-                    <include>**/*.bin</include>
-                    <include>**/*.fbx</include>
-                    <include>**/*.stl</include>
-                </includes>
-            </resource>
-            -->
         </resources>
         <plugins>
             <plugin>
@@ -170,6 +151,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
                     <excludes>
                         <!-- Medical/Consultation files remain in episteme-social -->
                      </excludes>
@@ -179,30 +163,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
-            <!-- JAXB Plugin - Enabled to process restored XSDs -->
-            <!--
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sources>
-                        <source>src/main/resources/xsd/animl-core.xsd</source>
-                        <source>src/main/resources/xsd/animl-technique.xsd</source>
-                        <source>src/main/resources/xsd/ThermoML.xsd</source>
-                    </sources>
-                    <packageName>org.astm.animl.schema.core.draft._0</packageName>
-                </configuration>
-            </plugin>
-            -->
         </plugins>
     </build>
     <profiles>

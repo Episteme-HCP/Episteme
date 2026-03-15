@@ -21,7 +21,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import java.lang.foreign.*;
 import java.util.List;
 import java.util.Optional;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 
 /**
  * Native implementation of {@link MechanicsBackend} for ODE (Open Dynamics Engine).
@@ -39,7 +39,7 @@ public class NativeODEBackend implements CollisionProvider, MechanicsBackend, CP
 
     private static synchronized void ensureInitialized() {
         if (IS_INITIALIZED) return;
-        Optional<SymbolLookup> lib = NativeLibraryLoader.loadLibrary("ode", Arena.global());
+        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("ode", Arena.global());
         IS_AVAILABLE = lib.isPresent();
         IS_INITIALIZED = true;
     }

@@ -19,7 +19,7 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -126,8 +126,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         if (IS_AVAILABLE) return;
 
         try {
-            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", Arena.global());
-            Optional<SymbolLookup> cusparseOpt = NativeLibraryLoader.loadLibrary("cusparse", Arena.global());
+            Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", Arena.global());
+            Optional<SymbolLookup> cusparseOpt = NativeFFMLoader.loadLibrary("cusparse", Arena.global());
 
             if (cudaRtOpt.isEmpty() || cusparseOpt.isEmpty()) {
                 logger.warn("Native CUDA Sparse libraries not found (cudart={}, cusparse={})", 
@@ -139,7 +139,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             cusparse_lookup = cusparseOpt.get();
 
             // Verify GPU Presence
-            Optional<MemorySegment> deviceCountSym = NativeLibraryLoader.findSymbol(cudart, "cudaGetDeviceCount");
+            Optional<MemorySegment> deviceCountSym = NativeFFMLoader.findSymbol(cudart, "cudaGetDeviceCount");
             if (deviceCountSym.isPresent()) {
                 MethodHandle getDeviceCount = LINKER.downcallHandle(deviceCountSym.get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
@@ -154,82 +154,82 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             }
 
             // Core Runtime
-            CUDA_MALLOC = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cudart, "cudaMalloc_v2", "cudaMalloc").get(),
+            CUDA_MALLOC = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaMalloc_v2", "cudaMalloc").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
-            CUDA_FREE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cudart, "cudaFree").get(),
+            CUDA_FREE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaFree").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUDA_MEMCPY = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cudart, "cudaMemcpy").get(),
+            CUDA_MEMCPY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaMemcpy").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
-            CUDA_DEVICE_SYNCHRONIZE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cudart, "cudaDeviceSynchronize").get(),
+            CUDA_DEVICE_SYNCHRONIZE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaDeviceSynchronize").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT));
 
             // cuSPARSE handles
-            CUSPARSE_CREATE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseCreate").get(),
+            CUSPARSE_CREATE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreate").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUSPARSE_DESTROY = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseDestroy").get(),
+            CUSPARSE_DESTROY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseDestroy").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             
-            CUSPARSE_CREATE_CSR = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseCreateCsr").get(),
+            CUSPARSE_CREATE_CSR = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateCsr").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
             
-            CUSPARSE_CREATE_DN_MAT = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseCreateDnMat").get(),
+            CUSPARSE_CREATE_DN_MAT = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateDnMat").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
                     ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
 
-            CUSPARSE_SPMM_BUFFER_SIZE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseSpMM_bufferSize").get(),
+            CUSPARSE_SPMM_BUFFER_SIZE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMM_bufferSize").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUSPARSE_SPMM = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseSpMM").get(),
+            CUSPARSE_SPMM = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMM").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUSPARSE_SPMV_BUFFER_SIZE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseSpMV_bufferSize").get(),
+            CUSPARSE_SPMV_BUFFER_SIZE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMV_bufferSize").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUSPARSE_SPMV = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseSpMV").get(),
+            CUSPARSE_SPMV = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMV").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUSPARSE_CREATE_DN_VEC = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseCreateDnVec").get(),
+            CUSPARSE_CREATE_DN_VEC = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateDnVec").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
-            CUSPARSE_CREATE_MAT_DESCR = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseCreateMatDescr").get(),
+            CUSPARSE_CREATE_MAT_DESCR = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateMatDescr").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUSPARSE_DESTROY_MAT_DESCR = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusparse_lookup, "cusparseDestroyMatDescr").get(),
+            CUSPARSE_DESTROY_MAT_DESCR = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseDestroyMatDescr").get(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
             // cuBLAS handles
-            Optional<SymbolLookup> cublasOpt = NativeLibraryLoader.loadLibrary("cublas", Arena.global());
+            Optional<SymbolLookup> cublasOpt = NativeFFMLoader.loadLibrary("cublas", Arena.global());
             if (cublasOpt.isPresent()) {
                 SymbolLookup cublas = cublasOpt.get();
-                CUBLAS_CREATE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasCreate_v2", "cublasCreate").get(),
+                CUBLAS_CREATE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasCreate_v2", "cublasCreate").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUBLAS_DESTROY = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDestroy_v2", "cublasDestroy").get(),
+                CUBLAS_DESTROY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDestroy_v2", "cublasDestroy").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUBLAS_DGEMM = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDgemm_v2", "cublasDgemm").get(),
+                CUBLAS_DGEMM = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDgemm_v2", "cublasDgemm").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
                         ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 
-                CUBLAS_DDOT = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDdot_v2", "cublasDdot").get(),
+                CUBLAS_DDOT = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDdot_v2", "cublasDdot").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 
-                CUBLAS_DNRM2 = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDnrm2_v2", "cublasDnrm2").get(),
+                CUBLAS_DNRM2 = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDnrm2_v2", "cublasDnrm2").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-                CUBLAS_DAXPY = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDaxpy_v2", "cublasDaxpy").get(),
+                CUBLAS_DAXPY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDaxpy_v2", "cublasDaxpy").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
-                CUBLAS_DSCAL = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDscal_v2", "cublasDscal").get(),
+                CUBLAS_DSCAL = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDscal_v2", "cublasDscal").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                CUBLAS_DGEAM = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cublas, "cublasDgeam_v2", "cublasDgeam").get(),
+                CUBLAS_DGEAM = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDgeam_v2", "cublasDgeam").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
@@ -241,14 +241,14 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             }
 
             // cuSolver handles
-            Optional<SymbolLookup> cusolverOpt = NativeLibraryLoader.loadLibrary("cusolver", Arena.global());
+            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", Arena.global());
             if (cusolverOpt.isPresent()) {
                 cusolver_lookup = cusolverOpt.get();
-                CUSOLVER_SP_CREATE = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverSpCreate").get(),
+                CUSOLVER_SP_CREATE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusolver_lookup, "cusolverSpCreate").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUSOLVER_SP_DESTROY = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverSpDestroy").get(),
+                CUSOLVER_SP_DESTROY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusolver_lookup, "cusolverSpDestroy").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUSOLVER_SP_D_CSRLSV_LU = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cusolver_lookup, "cusolverSpDcsrlsvlu").get(),
+                CUSOLVER_SP_D_CSRLSV_LU = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusolver_lookup, "cusolverSpDcsrlsvlu").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                         ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
                         ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
@@ -268,9 +268,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     public DeviceInfo[] getDevices() {
         if (!IS_AVAILABLE) return new DeviceInfo[0];
         try {
-            Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", Arena.global());
+            Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", Arena.global());
             if (cudaRtOpt.isPresent()) {
-                MethodHandle getDeviceCount = LINKER.downcallHandle(NativeLibraryLoader.findSymbol(cudaRtOpt.get(), "cudaGetDeviceCount").get(),
+                MethodHandle getDeviceCount = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudaRtOpt.get(), "cudaGetDeviceCount").get(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment countPtr = arena.allocate(ValueLayout.JAVA_INT);

@@ -24,12 +24,11 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
-import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
@@ -50,7 +49,7 @@ import com.google.auto.service.AutoService;
 public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDADenseLinearAlgebraBackend.class);
     private static boolean IS_AVAILABLE = false;
-    private static final Linker LINKER = NativeLibraryLoader.getLinker();
+    private static final Linker LINKER = Linker.nativeLinker();
 
     // Native Library Lookups
     private static SymbolLookup cublas_lookup;
@@ -100,31 +99,31 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
         try (Arena tempArena = Arena.ofConfined()) {
              // Try loading cudart
-             Optional<SymbolLookup> cudaRtOpt = NativeLibraryLoader.loadLibrary("cudart", tempArena);
+             Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", tempArena);
             if (cudaRtOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcudart.so");
                 if (Files.exists(linuxPath)) {
-                    cudaRtOpt = NativeLibraryLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cudaRtOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
                 }
             }
             SymbolLookup cudart = cudaRtOpt.orElse(null);
 
             // Try loading cublas
-            Optional<SymbolLookup> cublasOptLocal = NativeLibraryLoader.loadLibrary("cublas", tempArena);
+            Optional<SymbolLookup> cublasOptLocal = NativeFFMLoader.loadLibrary("cublas", tempArena);
             if (cublasOptLocal.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcublas.so");
                 if (Files.exists(linuxPath)) {
-                    cublasOptLocal = NativeLibraryLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cublasOptLocal = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
                 }
             }
             cublas_lookup = cublasOptLocal.orElse(null);
 
             // Try loading cusolver
-            Optional<SymbolLookup> cusolverOpt = NativeLibraryLoader.loadLibrary("cusolver", tempArena);
+            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", tempArena);
             if (cusolverOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcusolver.so");
                 if (Files.exists(linuxPath)) {
-                    cusolverOpt = NativeLibraryLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cusolverOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
                 }
             }
             cusolver_lookup = cusolverOpt.orElse(null);
@@ -258,7 +257,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
     private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor desc) {
         if (lookup == null) return null;
-        return NativeLibraryLoader.findSymbol(lookup, name)
+        return NativeFFMLoader.findSymbol(lookup, name)
             .map(s -> LINKER.downcallHandle(s, desc))
             .orElse(null);
     }
@@ -1449,7 +1448,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             synchronize();
             // We only shutdown the loader if this is the primary user 
             // but for now global shutdown is fine as we are exiting.
-            NativeLibraryLoader.shutdown();
+            NativeFFMLoader.shutdown();
         } catch (Exception e) {
             logger.warn("Error during CUDA backend shutdown: {}", e.getMessage());
         }
