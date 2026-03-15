@@ -25,6 +25,7 @@ package org.episteme.core.mathematics.linearalgebra.matrices;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.DirectRealDoubleMatrixStorage;
@@ -189,9 +190,9 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
             // Result type matches this type (Heap vs Direct)
             RealDoubleMatrixStorage resStorage;
             if (this.isDirect()) {
-                resStorage = new DirectRealDoubleMatrixStorage(rows(), cols());
+                resStorage = new org.episteme.core.mathematics.linearalgebra.matrices.storage.DirectRealDoubleMatrixStorage(rows(), cols());
             } else {
-                resStorage = new HeapRealDoubleMatrixStorage(rows(), cols());
+                resStorage = new org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage(rows(), cols());
             }
 
             for (int i = 0; i < rows(); i++) {
@@ -203,14 +204,44 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
         }
         return super.add(other);
     }
+
+    public RealDoubleMatrix subtract(RealDoubleMatrix other) {
+        return (RealDoubleMatrix) super.subtract(other);
+    }
+
+    public RealDoubleMatrix scale(Real scalar) {
+        return (RealDoubleMatrix) super.scale(scalar, this);
+    }
+
+    public RealDoubleVector solve(Vector<Real> b) {
+        return (RealDoubleVector) provider.solve(this, b);
+    }
+
     @Override
-    public Matrix<Real> inverse() {
-        return provider.inverse(this);
+    public RealDoubleMatrix transpose() {
+        return (RealDoubleMatrix) super.transpose();
+    }
+    @Override
+    public RealDoubleMatrix inverse() {
+        Matrix<Real> result = provider.inverse(this);
+        if (result instanceof RealDoubleMatrix) {
+            return (RealDoubleMatrix) result;
+        }
+        // Fallback for generic matrix result
+        RealDoubleMatrixStorage storage = (RealDoubleMatrixStorage) result.getStorage();
+        return RealDoubleMatrix.of(storage.toDoubleArray(), result.rows(), result.cols());
     }
     
     @Override
-    public Vector<Real> multiply(Vector<Real> vector) {
-        return provider.multiply(this, vector);
+    public RealDoubleVector multiply(Vector<Real> vector) {
+        Vector<Real> result = provider.multiply(this, vector);
+        if (result instanceof RealDoubleVector) {
+            return (RealDoubleVector) result;
+        }
+        // Fallback for generic vector result
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage storage = 
+            (org.episteme.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage) result.getStorage();
+        return RealDoubleVector.of(storage.toDoubleArray());
     }
 
     @Override

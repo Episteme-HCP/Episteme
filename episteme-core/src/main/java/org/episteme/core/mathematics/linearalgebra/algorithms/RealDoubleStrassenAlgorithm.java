@@ -140,9 +140,9 @@ public class RealDoubleStrassenAlgorithm {
             int oR = i * n;
             int j = 0;
             for (; j < SPECIES.loopBound(n); j += SPECIES.length()) {
-                var v1 = DoubleVector.fromArray(SPECIES, A, oA + j);
-                var v2 = DoubleVector.fromArray(SPECIES, B, oB + j);
-                v1.add(v2).intoArray(R, oR + j);
+                var v1 = (DoubleVector) DoubleVector.fromArray(SPECIES, A, oA + j);
+                var v2 = (DoubleVector) DoubleVector.fromArray(SPECIES, B, oB + j);
+                ((DoubleVector) v1.add(v2)).intoArray(R, oR + j);
             }
             for (; j < n; j++) R[oR + j] = A[oA + j] + B[oB + j];
         }
@@ -155,9 +155,9 @@ public class RealDoubleStrassenAlgorithm {
             int oR = i * n;
             int j = 0;
             for (; j < SPECIES.loopBound(n); j += SPECIES.length()) {
-                var v1 = DoubleVector.fromArray(SPECIES, A, oA + j);
-                var v2 = DoubleVector.fromArray(SPECIES, B, oB + j);
-                v1.sub(v2).intoArray(R, oR + j);
+                var v1 = (DoubleVector) DoubleVector.fromArray(SPECIES, A, oA + j);
+                var v2 = (DoubleVector) DoubleVector.fromArray(SPECIES, B, oB + j);
+                ((DoubleVector) v1.sub(v2)).intoArray(R, oR + j);
             }
             for (; j < n; j++) R[oR + j] = A[oA + j] - B[oB + j];
         }
@@ -199,9 +199,9 @@ public class RealDoubleStrassenAlgorithm {
                 int rowB = (bRow + l) * bStride + bCol;
                 int j = 0;
                 for (; j < SPECIES.loopBound(n); j += SPECIES.length()) {
-                    var bVec = DoubleVector.fromArray(SPECIES, B, rowB + j);
-                    var cVec = DoubleVector.fromArray(SPECIES, C, rowC + j);
-                    bVec.fma(DoubleVector.broadcast(SPECIES, aik), cVec).intoArray(C, rowC + j);
+                    var bVec = (DoubleVector) DoubleVector.fromArray(SPECIES, B, rowB + j);
+                    var cVec = (DoubleVector) DoubleVector.fromArray(SPECIES, C, rowC + j);
+                    ((DoubleVector) bVec.fma(DoubleVector.broadcast(SPECIES, aik), cVec)).intoArray(C, rowC + j);
                 }
                 for (; j < n; j++) C[rowC + j] += aik * B[rowB + j];
             }

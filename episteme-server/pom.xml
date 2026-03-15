@@ -16,7 +16,6 @@
     <description>RPC Server for Distributed Scientific Computing (Coordinator Node)</description>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <dependencyManagement>
@@ -155,6 +154,10 @@
             <groupId>org.jmdns</groupId>
             <artifactId>jmdns</artifactId>
             <version>3.5.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
         </dependency>
 
         <!-- Testing -->
@@ -315,6 +318,7 @@
                 <version>3.4.3</version>
                 <configuration>
                     <mainClass>org.episteme.server.server.EpistemeApplication</mainClass>
+                    <jvmArguments>--add-modules=jdk.incubator.vector</jvmArguments>
                 </configuration>
                 <executions>
                     <execution>
