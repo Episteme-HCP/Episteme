@@ -81,9 +81,9 @@ public class RealDoubleCARMAAlgorithm {
                 
                 int j = 0;
                 for (; j < SPECIES.loopBound(n); j += SPECIES.length()) {
-                    var bVec = DoubleVector.fromArray(SPECIES, B, rowB + j);
-                    var cVec = DoubleVector.fromArray(SPECIES, C, rowC + j);
-                    bVec.fma(DoubleVector.broadcast(SPECIES, aik), cVec).intoArray(C, rowC + j);
+                    var bVec = (DoubleVector) DoubleVector.fromArray(SPECIES, B, rowB + j);
+                    var cVec = (DoubleVector) DoubleVector.fromArray(SPECIES, C, rowC + j);
+                    ((DoubleVector) bVec.fma(DoubleVector.broadcast(SPECIES, aik), cVec)).intoArray(C, rowC + j);
                 }
                 for (; j < n; j++) {
                     C[rowC + j] += aik * B[rowB + j];

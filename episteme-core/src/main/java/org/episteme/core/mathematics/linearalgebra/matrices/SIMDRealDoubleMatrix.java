@@ -209,11 +209,11 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
                     int j = 0;
                     for (; j < getSpecies().loopBound(that.storage.cols()); j += getSpecies().length()) {
                         int bIdx = k * that.storage.cols() + j;
-                        var bVec = DoubleVector.fromArray(getSpecies(), that.data, bIdx);
+                        var bVec = (DoubleVector) DoubleVector.fromArray(getSpecies(), that.data, bIdx);
                         
                         int cIdx = i * that.storage.cols() + j;
-                        var cVec = DoubleVector.fromArray(getSpecies(), C.data, cIdx);
-                        cVec = bVec.fma(DoubleVector.broadcast(getSpecies(), aik), cVec); 
+                        var cVec = (DoubleVector) DoubleVector.fromArray(getSpecies(), C.data, cIdx);
+                        cVec = (DoubleVector) bVec.fma(DoubleVector.broadcast(getSpecies(), aik), cVec); 
                         cVec.intoArray(C.data, cIdx);
                     }
                     for (; j < that.storage.cols(); j++) {

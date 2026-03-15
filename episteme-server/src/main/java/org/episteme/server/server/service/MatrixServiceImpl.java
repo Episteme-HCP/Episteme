@@ -25,11 +25,10 @@ package org.episteme.server.server.service;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.episteme.server.server.proto.MatrixData;
-import org.episteme.server.server.proto.MatrixRequest;
-import org.episteme.server.server.proto.MatrixResponse;
-import org.episteme.server.server.proto.MatrixServiceGrpc;
+import org.episteme.server.server.proto.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +85,158 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         }
     }
 
+    @Override
+    public void matrixAdd(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
+        try {
+            RealDoubleMatrix result = (RealDoubleMatrix) fromProto(request.getMatrixA()).add(fromProto(request.getMatrixB()));
+            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("matrixAdd", e, responseObserver);
+        }
+    }
+
+    @Override
+    public void matrixSubtract(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
+        try {
+            RealDoubleMatrix result = (RealDoubleMatrix) fromProto(request.getMatrixA()).subtract(fromProto(request.getMatrixB()));
+            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("matrixSubtract", e, responseObserver);
+        }
+    }
+
+    @Override
+    public void matrixTranspose(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
+        try {
+            RealDoubleMatrix result = (RealDoubleMatrix) fromProto(request.getMatrix()).transpose();
+            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("matrixTranspose", e, responseObserver);
+        }
+    }
+
+    @Override
+    public void matrixInverse(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
+        try {
+            RealDoubleMatrix result = (RealDoubleMatrix) fromProto(request.getMatrix()).inverse();
+            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("matrixInverse", e, responseObserver);
+        }
+    }
+
+    @Override
+    public void matrixScale(ScaleRequest request, StreamObserver<MatrixResponse> responseObserver) {
+        try {
+            RealDoubleMatrix result = (RealDoubleMatrix) fromProto(request.getMatrix()).scale(Real.of(request.getScalar()), fromProto(request.getMatrix()));
+            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("matrixScale", e, responseObserver);
+        }
+    }
+
+    @Override
+    public void matrixDeterminant(SingleMatrixRequest request, StreamObserver<ScalarResponse> responseObserver) {
+        try {
+            double det = fromProto(request.getMatrix()).determinant().doubleValue();
+            responseObserver.onNext(ScalarResponse.newBuilder().setValue(det).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    @Override
+    public void vectorAdd(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            RealDoubleVector result = (RealDoubleVector) fromProto(request.getVectorA()).add(fromProto(request.getVectorB()));
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    @Override
+    public void vectorSubtract(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            RealDoubleVector result = (RealDoubleVector) fromProto(request.getVectorA()).subtract(fromProto(request.getVectorB()));
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    @Override
+    public void vectorScale(VectorScaleRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            RealDoubleVector result = (RealDoubleVector) fromProto(request.getVector()).multiply(Real.of(request.getScalar()));
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    @Override
+    public void vectorDot(VectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
+        try {
+            double dot = fromProto(request.getVectorA()).dot(fromProto(request.getVectorB())).doubleValue();
+            responseObserver.onNext(ScalarResponse.newBuilder().setValue(dot).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    @Override
+    public void vectorNorm(SingleVectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
+        try {
+            double norm = fromProto(request.getVector()).norm().doubleValue();
+            responseObserver.onNext(ScalarResponse.newBuilder().setValue(norm).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    @Override
+    public void matrixVectorMultiply(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            RealDoubleVector result = (RealDoubleVector) fromProto(request.getMatrix()).multiply(fromProto(request.getVector()));
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    @Override
+    public void linearSolve(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            RealDoubleVector result = fromProto(request.getMatrix()).solve((org.episteme.core.mathematics.linearalgebra.Vector<Real>) fromProto(request.getVector()));
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
+    private void handleError(String op, Exception e, StreamObserver<?> responseObserver) {
+        LOG.error("Error during " + op, e);
+        responseObserver.onError(
+                io.grpc.Status.INTERNAL
+                        .withDescription(op + " failed: " + e.getMessage())
+                        .withCause(e)
+                        .asRuntimeException());
+    }
+
     private RealDoubleMatrix fromProto(MatrixData proto) {
         int rows = proto.getRows();
         int cols = proto.getCols();
@@ -98,6 +249,20 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         }
 
         return RealDoubleMatrix.of(data, rows, cols);
+    }
+
+    private RealDoubleVector fromProto(VectorData proto) {
+        double[] data = new double[proto.getSize()];
+        List<Double> list = proto.getDataList();
+        for (int i = 0; i < data.length; i++) data[i] = list.get(i);
+        return RealDoubleVector.of(data);
+    }
+
+    private VectorData toProto(RealDoubleVector vector) {
+        VectorData.Builder builder = VectorData.newBuilder().setSize(vector.dimension());
+        double[] data = vector.toDoubleArray();
+        for (double d : data) builder.addData(d);
+        return builder.build();
     }
 
     private MatrixData toProto(RealDoubleMatrix matrix) {
