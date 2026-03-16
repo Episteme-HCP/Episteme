@@ -254,6 +254,31 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
     }
 
     @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu() {
+        return super.lu();
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr() {
+        return super.qr();
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd() {
+        return super.svd();
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky() {
+        return super.cholesky();
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen() {
+        return super.eigen();
+    }
+
+    @Override
     public void close() {
         doubleStorage.close();
     }

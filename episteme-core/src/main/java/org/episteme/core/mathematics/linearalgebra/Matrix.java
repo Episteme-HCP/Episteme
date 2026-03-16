@@ -28,6 +28,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 
 import java.util.List;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
@@ -236,6 +237,31 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
      * Returns the zero matrix of the same dimensions.
      */
     Matrix<E> zero();
+
+    /**
+     * Computes the LU decomposition of this matrix.
+     */
+    LUResult<E> lu();
+
+    /**
+     * Computes the QR decomposition of this matrix.
+     */
+    QRResult<E> qr();
+
+    /**
+     * Computes the Singular Value Decomposition (SVD) of this matrix.
+     */
+    SVDResult<E> svd();
+
+    /**
+     * Computes the Cholesky decomposition of this matrix.
+     */
+    CholeskyResult<E> cholesky();
+
+    /**
+     * Computes the eigenvalue decomposition of this matrix.
+     */
+    EigenResult<E> eigen();
 
 
     // --- Default implementations for Ring/Module/Group interfaces ---
