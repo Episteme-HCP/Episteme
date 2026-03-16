@@ -12,6 +12,10 @@
     <artifactId>episteme-benchmarks</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+    </properties>
+
     <name>Episteme Benchmarking Suite</name>
     <description>Benchmarking and performance analysis suite for Episteme. Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
 

@@ -557,7 +557,15 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     private static boolean isReal(Matrix<?> m) {
-        return m.getScalarRing() instanceof org.episteme.core.mathematics.sets.Reals || m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            return true;
+        }
+        if (m.getScalarRing() instanceof org.episteme.core.mathematics.sets.Reals) {
+            // Only use double fast path if not in EXACT precision mode
+            return org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() != 
+                   org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT;
+        }
+        return false;
     }
 
     private static double[] toDoubleArray(Matrix<?> m) {

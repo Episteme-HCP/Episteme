@@ -21,9 +21,6 @@ public class LoaderVerification {
                 System.out.println("ERROR: " + t.getMessage());
             }
         }
-                System.out.println("ERROR: " + t.getMessage());
-            }
-        }
         System.out.println("==========================================");
 
         System.out.println("=== Algorithm Provider Discovery ===");

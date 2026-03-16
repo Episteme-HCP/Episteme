@@ -29,6 +29,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorag
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.OperationContext;
@@ -257,6 +258,56 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .build();
         return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).multiply(this, vector));
+    }
+
+    @Override
+    public LUResult<E> lu() {
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_LU)
+                .build();
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+            p -> ((LinearAlgebraProvider<E>) p).lu(this));
+    }
+
+    @Override
+    public QRResult<E> qr() {
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_QR)
+                .build();
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+            p -> ((LinearAlgebraProvider<E>) p).qr(this));
+    }
+
+    @Override
+    public SVDResult<E> svd() {
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_SVD)
+                .build();
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+            p -> ((LinearAlgebraProvider<E>) p).svd(this));
+    }
+
+    @Override
+    public CholeskyResult<E> cholesky() {
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_CHOLESKY)
+                .build();
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+            p -> ((LinearAlgebraProvider<E>) p).cholesky(this));
+    }
+
+    @Override
+    public EigenResult<E> eigen() {
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_EIGEN)
+                .build();
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+            p -> ((LinearAlgebraProvider<E>) p).eigen(this));
     }
 
     @Override
