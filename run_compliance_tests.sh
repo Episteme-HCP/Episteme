@@ -23,7 +23,7 @@ echo "Running Linear Algebra Compliance Tests..."
 
 # Run compliance tests with native access enabled and libs in path
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/episteme-native/libs:$(pwd)/episteme-jni/libs
-export MAVEN_OPTS="--add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED"
+export MAVEN_OPTS="--add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED"
 mvn test -Dtest=LinearAlgebraComplianceTest -Dorg.episteme.project.name=Episteme -Dorg.episteme.report.path=../docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md -pl episteme-native
 
 echo ""

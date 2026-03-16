@@ -21,9 +21,9 @@ fi
 # Start the Episteme Distributed Server
 echo "Starting Episteme Server..."
 
-if [ ! -f "episteme-server/target/episteme-server-1.0.0-SNAPSHOT.jar" ]; then
+if [ ! -f "episteme-server/target/episteme-server-1.0.0-beta1-exec.jar" ]; then
     echo "Building Server..."
     mvn clean package -pl episteme-server -am -DskipTests
 fi
 
-java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -cp episteme-server/target/episteme-server-1.0.0-SNAPSHOT.jar:episteme-server/target/lib/* org.episteme.server.JscienceServer
+java --add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -jar episteme-server/target/episteme-server-1.0.0-beta1-exec.jar

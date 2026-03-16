@@ -170,14 +170,15 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
         if (result instanceof RealDoubleMatrix) {
             return (RealDoubleMatrix) result;
         }
-        // Conversion if provider returned a GenericMatrix or other type
-        double[][] data = new double[result.rows()][result.cols()];
+        // Safer conversion if provider returned a GenericMatrix or other type
+        double[] data = new double[result.rows() * result.cols()];
+        int idx = 0;
         for (int i = 0; i < result.rows(); i++) {
             for (int j = 0; j < result.cols(); j++) {
-                data[i][j] = result.get(i, j).doubleValue();
+                data[idx++] = result.get(i, j).doubleValue();
             }
         }
-        return RealDoubleMatrix.of(data);
+        return RealDoubleMatrix.of(data, result.rows(), result.cols());
     }
 
     @Override
@@ -227,9 +228,15 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
         if (result instanceof RealDoubleMatrix) {
             return (RealDoubleMatrix) result;
         }
-        // Fallback for generic matrix result
-        RealDoubleMatrixStorage storage = (RealDoubleMatrixStorage) result.getStorage();
-        return RealDoubleMatrix.of(storage.toDoubleArray(), result.rows(), result.cols());
+        // Safer conversion
+        double[] data = new double[result.rows() * result.cols()];
+        int idx = 0;
+        for (int i = 0; i < result.rows(); i++) {
+            for (int j = 0; j < result.cols(); j++) {
+                data[idx++] = result.get(i, j).doubleValue();
+            }
+        }
+        return RealDoubleMatrix.of(data, result.rows(), result.cols());
     }
     
     @Override
@@ -238,10 +245,12 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
         if (result instanceof RealDoubleVector) {
             return (RealDoubleVector) result;
         }
-        // Fallback for generic vector result
-        org.episteme.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage storage = 
-            (org.episteme.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage) result.getStorage();
-        return RealDoubleVector.of(storage.toDoubleArray());
+        // Safer conversion for generic vector result
+        double[] data = new double[result.dimension()];
+        for (int i = 0; i < result.dimension(); i++) {
+            data[i] = result.get(i).doubleValue();
+        }
+        return RealDoubleVector.of(data);
     }
 
     @Override

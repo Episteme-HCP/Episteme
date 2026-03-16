@@ -1,7 +1,6 @@
 package org.episteme.apps.apps.util;
 
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
-import java.lang.foreign.Arena;
+import org.episteme.jni.jni.NativeJNILoader;
 
 
 public class LoaderVerification {
@@ -11,21 +10,17 @@ public class LoaderVerification {
         System.out.println("NATIVE_ROOT: " + System.getenv("NATIVE_ROOT"));
         System.out.println("java.library.path: " + System.getProperty("java.library.path"));
         
-        String[] libs = {"openblas", "fftw3", "hdf5", "libbulletc", "ode", "libsndfile", "arrow", "QuEST", "libvlc", "cuda"};
+        String[] libs = {"openblas", "fftw3", "hdf5", "libbulletc", "ode", "libsndfile", "arrow", "QuEST", "libvlc", "cuda", "episteme-jni"};
         
         for (String lib : libs) {
             System.out.print("Checking " + lib + "... ");
             try {
-                if (lib.equals("arrow")) {
-                   System.out.print("(pre-loading parquet) ");
-                   try { NativeLibraryLoader.loadLibrary("parquet", Arena.ofAuto()); } catch (Exception e) {}
-                }
-                if (NativeLibraryLoader.loadLibrary(lib, Arena.ofAuto()).isPresent()) {
-                    System.out.println("OK");
-                } else {
-                    System.out.println("MISSING (Check dependencies in NATIVE_LIBS_SETUP.md)");
-                }
+                NativeJNILoader.loadLibrary(lib);
+                System.out.println("OK");
             } catch (Throwable t) {
+                System.out.println("ERROR: " + t.getMessage());
+            }
+        }
                 System.out.println("ERROR: " + t.getMessage());
             }
         }

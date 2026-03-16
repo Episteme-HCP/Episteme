@@ -16,6 +16,7 @@
     <description>RPC Server for Distributed Scientific Computing (Coordinator Node)</description>
 
     <properties>
+        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <dependencyManagement>
@@ -23,7 +24,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.4.3</version>
+                <version>3.5.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -321,10 +322,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.4.3</version>
+                <version>3.5.0</version>
                 <configuration>
                     <mainClass>org.episteme.server.server.EpistemeApplication</mainClass>
                     <jvmArguments>--add-modules jdk.incubator.vector --enable-preview</jvmArguments>
+                    <classifier>exec</classifier>
                 </configuration>
                 <executions>
                     <execution>

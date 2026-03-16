@@ -26,6 +26,39 @@ service MatrixService {
   // Matrix-Vector operations
   rpc MatrixVectorMultiply (MatrixVectorRequest) returns (VectorResponse);
   rpc LinearSolve (MatrixVectorRequest) returns (VectorResponse);
+
+  // Decompositions
+  rpc MatrixLU (SingleMatrixRequest) returns (LUResponse);
+  rpc MatrixQR (SingleMatrixRequest) returns (QRResponse);
+  rpc MatrixSVD (SingleMatrixRequest) returns (SVDResponse);
+  rpc MatrixCholesky (SingleMatrixRequest) returns (CholeskyResponse);
+  rpc MatrixEigen (SingleMatrixRequest) returns (EigenResponse);
+}
+
+message LUResponse {
+  MatrixData l = 1;
+  MatrixData u = 2;
+  VectorData p = 3; // Pivots
+}
+
+message QRResponse {
+  MatrixData q = 1;
+  MatrixData r = 2;
+}
+
+message SVDResponse {
+  MatrixData u = 1;
+  VectorData s = 2;
+  MatrixData v = 3;
+}
+
+message CholeskyResponse {
+  MatrixData l = 1;
+}
+
+message EigenResponse {
+  MatrixData v = 1; // Eigenvectors
+  VectorData d = 2; // Eigenvalues
 }
 
 message MatrixRequest {

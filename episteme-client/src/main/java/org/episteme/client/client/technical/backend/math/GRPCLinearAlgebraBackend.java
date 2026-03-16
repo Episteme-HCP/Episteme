@@ -372,6 +372,72 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Ba
         }
     }
 
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
+        try {
+            LUResponse response = blockingStub.matrixLU(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                fromProtoMatrix(response.getL()),
+                fromProtoMatrix(response.getU()),
+                fromProtoVector(response.getP())
+            );
+        } catch (StatusRuntimeException e) {
+            throw new RuntimeException("gRPC matrixLU failed: " + e.getStatus(), e);
+        }
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
+        try {
+            QRResponse response = blockingStub.matrixQR(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
+                fromProtoMatrix(response.getQ()),
+                fromProtoMatrix(response.getR())
+            );
+        } catch (StatusRuntimeException e) {
+            throw new RuntimeException("gRPC matrixQR failed: " + e.getStatus(), e);
+        }
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
+        try {
+            SVDResponse response = blockingStub.matrixSVD(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+                fromProtoMatrix(response.getU()),
+                fromProtoVector(response.getS()),
+                fromProtoMatrix(response.getV())
+            );
+        } catch (StatusRuntimeException e) {
+            throw new RuntimeException("gRPC matrixSVD failed: " + e.getStatus(), e);
+        }
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+        try {
+            CholeskyResponse response = blockingStub.matrixCholesky(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+                fromProtoMatrix(response.getL())
+            );
+        } catch (StatusRuntimeException e) {
+            throw new RuntimeException("gRPC matrixCholesky failed: " + e.getStatus(), e);
+        }
+    }
+
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
+        try {
+            EigenResponse response = blockingStub.matrixEigen(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                fromProtoMatrix(response.getV()),
+                fromProtoVector(response.getD())
+            );
+        } catch (StatusRuntimeException e) {
+            throw new RuntimeException("gRPC matrixEigen failed: " + e.getStatus(), e);
+        }
+    }
+
     // ==================== Conversion Utilities ====================
 
     private MatrixData toProtoMatrix(Matrix<E> matrix) {
