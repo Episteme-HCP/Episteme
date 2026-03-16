@@ -23,7 +23,7 @@
 
 package org.episteme.jni.jni;
 
-import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
+import org.episteme.jni.jni.NativeJNILoader;
 
 /**
  * JNI Bridge for communicating with real hardware devices via C++/Rust native
@@ -36,7 +36,7 @@ import org.episteme.core.technical.backend.nativ.NativeLibraryLoader;
 public class NativeDeviceBridge {
 
     static {
-        NativeLibraryLoader.loadLibrary("episteme-jni");
+        NativeJNILoader.loadLibrary("episteme-jni");
     }
 
     /**

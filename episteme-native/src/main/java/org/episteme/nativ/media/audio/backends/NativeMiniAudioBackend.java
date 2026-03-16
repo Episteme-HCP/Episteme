@@ -85,7 +85,7 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
                 avail = false;
             }
         } else {
-            logger.warn("NativeMiniAudioBackend: miniaudio library not found by NativeLibraryLoader");
+            logger.warn("NativeMiniAudioBackend: miniaudio library not found by NativeFFMLoader");
             LOOKUP = null;
             avail = false;
         }

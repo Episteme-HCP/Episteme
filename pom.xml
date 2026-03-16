@@ -65,7 +65,7 @@
     <indriya.version>2.2</indriya.version>
     <!-- Logging -->
     <slf4j.version>2.0.9</slf4j.version>
-    <logback.version>1.4.11</logback.version>
+    <logback.version>1.5.16</logback.version>
     <!-- Testing -->
     <junit.version>5.10.1</junit.version>
     <assertj.version>3.25.1</assertj.version>
@@ -728,7 +728,6 @@
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
-              <arg>--enable-preview</arg>
               <arg>-Xpkginfo:always</arg>
             </compilerArgs>
             <annotationProcessorPaths>
@@ -745,7 +744,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.2.5</version>
           <configuration>
-            <argLine>${argLine} --enable-preview --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+            <argLine>${argLine} --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
             <systemPropertyVariables>
               <episteme.benchmark.skip>true</episteme.benchmark.skip>
             </systemPropertyVariables>

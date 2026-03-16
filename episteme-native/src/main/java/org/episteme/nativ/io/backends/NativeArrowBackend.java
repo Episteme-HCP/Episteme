@@ -5,7 +5,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader; // Changed from NativeLibraryLoader
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import com.google.auto.service.AutoService;
 
 import java.lang.foreign.*;

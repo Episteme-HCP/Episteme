@@ -56,3 +56,16 @@ build_vision/
 
 # Local Automation
 episteme-vm-test.ps1
+
+# Local Data & Logs
+data/
+*.txt
+*.log
+episteme-server/server_run_log.txt
+episteme-server/server_run_log_utf8.txt
+natural_build_log.txt
+social_build_log.txt
+social_build_log_utf8.txt
+server_dep_tree.txt
+server_dep_tree_utf8.txt
+install_error_context.txt

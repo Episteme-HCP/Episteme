@@ -12,6 +12,9 @@
     <artifactId>episteme-social</artifactId>
     <name>Episteme Social</name>
     <description>Social sciences module (Economics, Sociology, History, Psychology)</description>
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -63,7 +66,6 @@
                     <compilerArgs>
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
-                        <arg>--enable-preview</arg>
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
                 </configuration>
@@ -72,7 +74,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>--enable-preview --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+                    <argLine>--add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
         </plugins>

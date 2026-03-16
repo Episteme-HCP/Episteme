@@ -19,10 +19,10 @@ REM Start the Episteme Distributed Server
 echo Starting Episteme Server...
 
 REM Check if Maven build is needed
-if not exist "episteme-server\target\episteme-server-1.0.0-beta1.jar" (
+if not exist "episteme-server\target\episteme-server-1.0.0-beta1-exec.jar" (
     echo Building Server...
     call mvn clean package -pl episteme-server -am -DskipTests
 )
 
 REM Run Server
-java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -cp episteme-server\target\episteme-server-1.0.0-beta1.jar;episteme-server\target\lib\* org.episteme.server.server.EpistemeApplication
+java --add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -jar episteme-server\target\episteme-server-1.0.0-beta1-exec.jar

@@ -9,6 +9,7 @@ import java.lang.foreign.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.episteme.core.technical.backend.nativ.NativeDiscovery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,40 +37,16 @@ public class NativeFFMLoader {
             temp = Linker.nativeLinker();
         } catch (Throwable t) {
             System.err.println("[NativeFFMLoader] CRITICAL: Linker.nativeLinker() failed: " + t.getMessage());
+            t.printStackTrace();
         }
         LINKER = temp;
     }
 
-    public static List<java.nio.file.Path> findLibsDirectories() {
-        List<java.nio.file.Path> paths = new ArrayList<>();
-        java.nio.file.Path current = java.nio.file.Paths.get(System.getProperty("user.dir"));
-        
-        java.nio.file.Path temp = current;
-        while (temp != null) {
-            java.nio.file.Path libs = temp.resolve("libs");
-            if (java.nio.file.Files.exists(libs) && java.nio.file.Files.isDirectory(libs)) {
-                paths.add(libs.toAbsolutePath());
-            }
-            temp = temp.getParent();
-        }
-
-        String[] modules = {"episteme-native", "episteme-jni", "episteme-core", "episteme-natural"};
-        temp = current;
-        while (temp != null) {
-            for (String mod : modules) {
-                java.nio.file.Path modLibs = temp.resolve(mod).resolve("libs");
-                if (java.nio.file.Files.exists(modLibs) && java.nio.file.Files.isDirectory(modLibs)) {
-                    paths.add(modLibs.toAbsolutePath());
-                }
-            }
-            temp = temp.getParent();
-        }
-        
-        return paths;
-    }
-
     private static final java.util.Set<String> PRELOADED_RUNTIMES = new java.util.HashSet<>();
 
+    /**
+     * Pre-loads common runtime dependencies found in the libs directory.
+     */
     private static void preloadRuntimes(java.nio.file.Path libsDir, Arena arena) {
         if (libsDir == null || !java.nio.file.Files.exists(libsDir)) return;
         String[] runtimes = {"libwinpthread-1", "libgcc_s_seh-1", "libstdc++-6", "zlib1", "msvcp140", "vcruntime140", "libgfortran-5", "libquadmath-0"};
@@ -86,11 +63,25 @@ public class NativeFFMLoader {
         }
     }
 
+    /**
+     * Loads a native library by name using a global arena.
+     * 
+     * @param libName Name of the library (e.g., "cuda", "opencl", "fftw3")
+     * @return SymbolLookup for the loaded library
+     * @throws RuntimeException if the library cannot be found or loaded
+     */
     public static SymbolLookup loadLibrary(String libName) {
         return loadLibrary(libName, Arena.global()).orElseThrow(() -> 
             new RuntimeException("Could not load native library: " + libName));
     }
 
+    /**
+     * Attempts to load a library by name with variant support and multiple search paths.
+     * 
+     * @param libName the library name
+     * @param arena the arena to associate with the library loading
+     * @return an Optional containing the SymbolLookup if found, or empty.
+     */
     public static Optional<SymbolLookup> loadLibrary(String libName, Arena arena) {
         if (LOADED_LIBS.containsKey(libName)) {
             return Optional.of(LOADED_LIBS.get(libName));
@@ -108,11 +99,18 @@ public class NativeFFMLoader {
             variants.add("lib" + libName);
             variants.add("lib" + libName + "-3");
             variants.add(libName + "-3");
-            if (libName.equals("cuda")) variants.add("nvcuda");
-            else if (libName.startsWith("cu")) {
+            
+            if (libName.equals("cuda")) {
+                variants.add("nvcuda");
+            } else if (libName.startsWith("cu")) {
                 variants.add(libName + "64_13");
                 variants.add(libName + "64_12");
                 variants.add(libName + "64_11");
+                if (libName.equals("cudart")) {
+                    variants.add("cudart64_130");
+                    variants.add("cudart64_120");
+                    variants.add("cudart64_110");
+                }
             } else if (libName.equals("vlc")) {
                 variants.add("libvlc"); 
                 variants.add("libvlccore"); 
@@ -121,7 +119,21 @@ public class NativeFFMLoader {
             }
         }
 
-        List<java.nio.file.Path> discoveredPaths = findLibsDirectories();
+        // Common Linux/Universal variants
+        if (!isWin) {
+            if (libName.equalsIgnoreCase("opencl")) {
+                variants.add("OpenCL");
+                variants.add("OpenCL.so.1");
+            } else if (libName.equals("cuda")) {
+                variants.add("cuda");
+                variants.add("cuda.so.1");
+            } else if (libName.equals("openblas")) {
+                variants.add("openblas");
+                variants.add("libopenblas.so.3");
+            }
+        }
+
+        List<java.nio.file.Path> discoveredPaths = NativeDiscovery.findLibsDirectories();
         for (java.nio.file.Path p : discoveredPaths) {
             preloadRuntimes(p, arena);
         }
@@ -129,7 +141,7 @@ public class NativeFFMLoader {
         for (String variant : variants) {
             String currentMapped;
             if (!isWin && (variant.contains(".so") || variant.contains(".dylib"))) {
-                currentMapped = variant.startsWith("lib") ? variant : "lib" + variant;
+                currentMapped = variant.startsWith("lib") || variant.equals("OpenCL") ? variant : "lib" + variant;
             } else {
                 currentMapped = System.mapLibraryName(variant);
             }
@@ -144,16 +156,7 @@ public class NativeFFMLoader {
                 FAILURE_CAUSES.put(variant, t.toString());
             }
 
-            List<String> searchPaths = new ArrayList<>();
-            for (java.nio.file.Path p : discoveredPaths) searchPaths.add(p.toString());
-            
-            if (!isWin) {
-                searchPaths.add("/usr/lib/x86_64-linux-gnu");
-                searchPaths.add("/usr/local/lib");
-            }
-            searchPaths.add(System.getProperty("user.dir"));
-            
-            for (String path : searchPaths) {
+            for (String path : NativeDiscovery.getSearchPaths()) {
                 if (path == null || path.isEmpty()) continue; 
                 Optional<SymbolLookup> found = tryLoadFromDirectory(java.nio.file.Paths.get(path), currentMapped, arena);
                 if (found.isPresent()) {
@@ -162,38 +165,9 @@ public class NativeFFMLoader {
                 }
             }
         }
-
+        
         FAILED_LIBS.add(libName);
         return Optional.empty();
-    }
-        
-    public static void clearCache() {
-        LOADED_LIBS.clear();
-        FAILED_LIBS.clear();
-        FAILURE_CAUSES.clear();
-        logger.info("Native library cache cleared.");
-    }
-
-    public static String getFailureCause(String libName) {
-        return FAILURE_CAUSES.getOrDefault(libName, "No failure recorded for " + libName);
-    }
-
-    public static List<String> getAllFailureCauses() {
-        List<String> causes = new ArrayList<>();
-        FAILURE_CAUSES.forEach((lib, cause) -> causes.add(lib + ": " + cause));
-        if (FAILED_LIBS.isEmpty() && FAILURE_CAUSES.isEmpty()) {
-            return causes;
-        }
-        for (String lib : FAILED_LIBS) {
-            if (!FAILURE_CAUSES.containsKey(lib)) {
-                causes.add(lib + ": Generic failure (see logs)");
-            }
-        }
-        return causes;
-    }
-
-    public static void shutdown() {
-        clearCache();
     }
 
     private static Optional<SymbolLookup> tryLoadFromDirectory(java.nio.file.Path basePath, String mappedName, Arena arena) {
@@ -205,6 +179,18 @@ public class NativeFFMLoader {
                     return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
                 } catch (Throwable t) {
                     FAILURE_CAUSES.put(fullPath.toString(), t.toString());
+                }
+            }
+            
+            // Try subdirectory "lib" or "bin"
+            for (String sub : new String[]{"lib", "bin"}) {
+                java.nio.file.Path subPath = basePath.resolve(sub).resolve(mappedName).toAbsolutePath();
+                if (java.nio.file.Files.exists(subPath)) {
+                    try {
+                        return Optional.of(SymbolLookup.libraryLookup(subPath, arena));
+                    } catch (Throwable t) {
+                        FAILURE_CAUSES.put(subPath.toString(), t.toString());
+                    }
                 }
             }
         } catch (Throwable ignored) {}
@@ -220,11 +206,33 @@ public class NativeFFMLoader {
         for (String name : names) {
             Optional<MemorySegment> segment = lookup.find(name);
             if (segment.isPresent()) return segment;
+            
+            String[] variants = {"_" + name, name + "_", "__" + name};
+            for (String v : variants) {
+                segment = lookup.find(v);
+                if (segment.isPresent()) return segment;
+            }
         }
         return Optional.empty();
     }
 
     public static Optional<SymbolLookup> getSystemLookup() {
         return Optional.of(SymbolLookup.loaderLookup());
+    }
+
+    public static String getFailureCause(String libName) {
+        return FAILURE_CAUSES.getOrDefault(libName, "No recorded error");
+    }
+
+    public static void clearCache() {
+        FAILED_LIBS.clear();
+        FAILURE_CAUSES.clear();
+        LOADED_LIBS.clear();
+        logger.info("Native library cache cleared.");
+    }
+
+    public static void shutdown() {
+        clearCache();
+        logger.info("NativeFFMLoader shut down.");
     }
 }
