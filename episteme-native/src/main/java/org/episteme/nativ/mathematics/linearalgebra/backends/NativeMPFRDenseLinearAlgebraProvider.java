@@ -12,6 +12,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -27,8 +28,8 @@ import com.google.auto.service.AutoService;
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
+@AutoService({LinearAlgebraBackend.class, Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
+public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBackend<Real>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRDenseLinearAlgebraProvider.class);
     private static final Linker LINKER = Linker.nativeLinker();
@@ -89,10 +90,12 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraProvid
 
     @Override public boolean isAvailable() { return AVAILABLE && !isExplicitlyDisabled(); }
     @Override public String getId() { return "native-mpfr-dense"; }
-    @Override public String getType() { return "math"; }
     @Override public String getName() { return "Native MPFR Arbitrary-Precision Backend"; }
+    @Override public String getDescription() { return "High-performance Arbitrary Precision Linear Algebra backend using libmpfr bound via Project Panama."; }
     @Override public int getPriority() { return 120; }
     @Override public boolean isLoaded() { return AVAILABLE; }
+    @Override public String getNativeLibraryName() { return "mpfr"; }
+    @Override public Object createBackend() { return this; }
     @Override public String getEnvironmentInfo() { return AVAILABLE ? "CPU (Panama/MPFR)" : "N/A"; }
 
     @Override

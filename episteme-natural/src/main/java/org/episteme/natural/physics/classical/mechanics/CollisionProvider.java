@@ -18,12 +18,8 @@ import java.lang.foreign.MemorySegment;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public interface CollisionProvider extends ComputeBackend, AlgorithmProvider {
+public interface CollisionProvider extends AlgorithmProvider {
 
-    @Override
-    default void shutdown() {
-        // Default no-op
-    }
 
     @Override
     default int getPriority() {
@@ -63,8 +59,4 @@ public interface CollisionProvider extends ComputeBackend, AlgorithmProvider {
      */
     void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions);
 
-    @Override
-    default ExecutionContext createContext() {
-        return null;
-    }
 }

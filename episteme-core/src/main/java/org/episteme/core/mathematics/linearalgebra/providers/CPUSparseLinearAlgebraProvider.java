@@ -39,6 +39,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
@@ -56,8 +57,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({LinearAlgebraProvider.class, Backend.class})
-public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E>, CPUBackend {
+@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
+public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E>, SparseLinearAlgebraProvider<E>, CPUBackend {
 
     protected final Ring<E> ring;
 
@@ -889,11 +890,13 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
             double[] pDouble = new double[n];
             for (int i = 0; i < n; i++) pDouble[i] = perm[i];
 
-            return new LUResult<E>(
-                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(lData, field),
-                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(uData, field),
-                (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble)
-            );
+                @SuppressWarnings("unchecked")
+                Vector<E> pVec = (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble);
+                return new LUResult<E>(
+                    new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(lData, field),
+                    new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(uData, field),
+                    pVec
+                );
         }
 
         public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field) {

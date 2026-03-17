@@ -110,13 +110,11 @@ public class CollisionSimulation {
         }
 
         if (backend != null) {
-            updateNative(dt.doubleValue());
-        } else {
-            updateLegacy(dt.doubleValue());
+            runCollisionPass(dt.doubleValue());
         }
     }
 
-    private void updateNative(double dt) {
+    private void runCollisionPass(double dt) {
         int n = bodies.size();
         if (n == 0) return;
 
@@ -128,7 +126,7 @@ public class CollisionSimulation {
         long velSize = n * 3 * Double.BYTES;
         long massSize = n * Double.BYTES;
         long radiiSize = n * Double.BYTES;
-        long collSize = n * n * 2 * Integer.BYTES;
+        long collSize = (long) n * n * 2 * Integer.BYTES;
 
         if (positions == null || positions.byteSize() < posSize) {
             positions = arena.allocate(posSize);
@@ -173,104 +171,6 @@ public class CollisionSimulation {
                 velocities.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 1),
                 velocities.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 2)
             ));
-        }
-    }
-
-    private void updateLegacy(double dtVal) {
-        Real dt = Real.of(dtVal);
-        for (Body vb : bodies) {
-            RigidBody b = vb.physicsBody;
-            Vector<Real> grav = toVector(0, gravity, 0);
-            b.setVelocity(b.getVelocity().add(grav));
-            b.integrate(dt);
-
-            double x = b.getPosition().get(0).doubleValue();
-            double y = b.getPosition().get(1).doubleValue();
-            double vx = b.getVelocity().get(0).doubleValue();
-            double vy = b.getVelocity().get(1).doubleValue();
-
-            if (y + vb.radius > height) {
-                y = height - vb.radius;
-                vy *= -vb.bounciness;
-                b.setPosition(toVector(x, y, 0));
-                b.setVelocity(toVector(vx, vy, 0));
-            }
-            if (x - vb.radius < 0) {
-                x = vb.radius;
-                vx *= -vb.bounciness;
-                b.setPosition(toVector(x, y, 0));
-                b.setVelocity(toVector(vx, vy, 0));
-            }
-            if (x + vb.radius > width) {
-                x = width - vb.radius;
-                vx *= -vb.bounciness;
-                b.setPosition(toVector(x, y, 0));
-                b.setVelocity(toVector(vx, vy, 0));
-            }
-        }
-
-        // Inter-body collisions
-        for (int i = 0; i < bodies.size(); i++) {
-            for (int j = i + 1; j < bodies.size(); j++) {
-                Body vb1 = bodies.get(i);
-                Body vb2 = bodies.get(j);
-                RigidBody b1 = vb1.physicsBody;
-                RigidBody b2 = vb2.physicsBody;
-
-                double x1 = b1.getPosition().get(0).doubleValue();
-                double y1 = b1.getPosition().get(1).doubleValue();
-                double x2 = b2.getPosition().get(0).doubleValue();
-                double y2 = b2.getPosition().get(1).doubleValue();
-
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-                double dist = Math.sqrt(dx * dx + dy * dy);
-                double minDist = vb1.radius + vb2.radius;
-
-                if (dist < minDist && dist > 0) {
-                    double nx = dx / dist;
-                    double ny = dy / dist;
-
-                    double vx1 = b1.getVelocity().get(0).doubleValue();
-                    double vy1 = b1.getVelocity().get(1).doubleValue();
-                    double vx2 = b2.getVelocity().get(0).doubleValue();
-                    double vy2 = b2.getVelocity().get(1).doubleValue();
-
-                    double relVelX = vx2 - vx1;
-                    double relVelY = vy2 - vy1;
-                    double velAlongNormal = relVelX * nx + relVelY * ny;
-
-                    if (velAlongNormal > 0) continue;
-
-                    double e = Math.min(vb1.bounciness, vb2.bounciness);
-                    double m1 = vb1.radius * vb1.radius;
-                    double m2 = vb2.radius * vb2.radius;
-
-                    double jImpulse = -(1 + e) * velAlongNormal / (1 / m1 + 1 / m2);
-
-                    double impulseX = jImpulse * nx;
-                    double impulseY = jImpulse * ny;
-
-                    vx1 -= 1 / m1 * impulseX;
-                    vy1 -= 1 / m1 * impulseY;
-                    vx2 += 1 / m2 * impulseX;
-                    vy2 += 1 / m2 * impulseY;
-
-                    b1.setVelocity(toVector(vx1, vy1, 0));
-                    b2.setVelocity(toVector(vx2, vy2, 0));
-
-                    double percent = 0.2, slop = 0.01;
-                    double correction = Math.max(minDist - dist - slop, 0) / (1 / m1 + 1 / m2) * percent;
-
-                    x1 -= 1 / m1 * nx * correction;
-                    y1 -= 1 / m1 * ny * correction;
-                    x2 += 1 / m2 * nx * correction;
-                    y2 += 1 / m2 * ny * correction;
-
-                    b1.setPosition(toVector(x1, y1, 0));
-                    b2.setPosition(toVector(x2, y2, 0));
-                }
-            }
         }
     }
 
