@@ -9,6 +9,7 @@ SKIP_HDF5=false
 SKIP_FFTW=false
 SKIP_BULLET=false
 SKIP_OPENBLAS=false
+SKIP_EPISTEME_NATIVE=false
 
 # Helper function to check for local archive
 get_local_archive() {
@@ -44,6 +45,10 @@ do
         ;;
         --skip-openblas)
         SKIP_OPENBLAS=true
+        shift
+        ;;
+        --skip-episteme-native)
+        SKIP_EPISTEME_NATIVE=true
         shift
         ;;
         --install-dir=*)
@@ -198,6 +203,13 @@ if [ "$SKIP_OPENBLAS" = false ]; then
     echo "[INFO] OpenBLAS source installed. Compilation required:"
     echo "  cd $INSTALL_DIR/OpenBLAS"
     echo "  make -j4 && sudo make install"
+fi
+
+# 6. Episteme Native (Consolidated)
+if [ "$SKIP_EPISTEME_NATIVE" = false ]; then
+    echo ""
+    echo "--- Episteme Native (Consolidated) ---"
+    echo "[INFO] This library is built locally using build_native.sh"
 fi
 
 echo ""

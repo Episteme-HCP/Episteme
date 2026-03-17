@@ -261,29 +261,43 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
 
     @Override
     public DeviceInfo[] getDevices() {
-        return new DeviceInfo[0];
+        return backend.getDevices();
     }
 
     @Override
-    public void selectDevice(int deviceId) {}
+    public void selectDevice(int deviceId) {
+        backend.selectDevice(deviceId);
+    }
 
     @Override
-    public long allocateGPUMemory(long sizeBytes) { return 0; }
+    public long allocateGPUMemory(long sizeBytes) {
+        return backend.allocateGPUMemory(sizeBytes);
+    }
 
     @Override
-    public void copyToGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {}
+    public void copyToGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
+        backend.copyToGPU(gpuHandle, hostBuffer, sizeBytes);
+    }
 
     @Override
-    public void copyFromGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {}
+    public void copyFromGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
+        backend.copyFromGPU(gpuHandle, hostBuffer, sizeBytes);
+    }
 
     @Override
-    public void freeGPUMemory(long gpuHandle) {}
+    public void freeGPUMemory(long gpuHandle) {
+        backend.freeGPUMemory(gpuHandle);
+    }
 
     @Override
-    public void synchronize() {}
+    public void synchronize() {
+        backend.synchronize();
+    }
 
     @Override
-    public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {}
+    public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {
+        throw new UnsupportedOperationException("Matrix multiplication not implemented in this LBM specialized backend.");
+    }
 
     @Override
     public ExecutionContext createContext() {

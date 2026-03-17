@@ -46,6 +46,7 @@ Episteme is configured to look for native libraries in the project's root `libs/
 | Library | Purpose | Installation Method |
 | :--- | :--- | :--- |
 | **MiniAudio** | Low-latency Audio | **All**: [miniaud.io](https://miniaud.io/) <br> Episteme uses a native wrapper. Ensure `miniaudio.dll` is present in `libs/`. |
+| **Episteme Native** | Vision & Collision | **Internal**: Built from `episteme-native/src/main/cpp`. Ensure `episteme-native.dll` is in `libs/`. |
 | **PortAudio** | Cross-platform Audio | **Win**: [Official Site](http://www.portaudio.com/download.html) <br> **Lin**: `sudo apt install libportaudio2` <br> **Mac**: `brew install portaudio` |
 | **VLC (libvlc)** | Media Playback | **Win**: Install [VLC Media Player](https://www.videolan.org/vlc/) and copy `libvlc.dll`, `libvlccore.dll` and the `plugins/` folder. <br> **Lin**: `sudo apt install libvlc-dev` <br> **Mac**: `brew install --cask vlc` |
 | **mpg123** | MP3 Decoding | **Win**: [mpg123.org](https://mpg123.de/download/win64/) <br> **Lin**: `sudo apt install libmpg123-dev` <br> **Mac**: `brew install mpg123` |

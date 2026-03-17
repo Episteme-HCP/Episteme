@@ -16,6 +16,7 @@ import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
+import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.core.measure.units.SI;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -34,7 +35,7 @@ import org.episteme.natural.physics.classical.mechanics.simulation.SimulationPro
  * @since 1.1
  */
 @AutoService({MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
-public class NativeBulletBackend implements MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
+public class NativeBulletBackend implements NativeCollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
 
     private static final MethodHandle DETECT_SPHERES;
     private static final MethodHandle RESOLVE_COLLISIONS;
@@ -167,7 +168,7 @@ public class NativeBulletBackend implements MechanicsBackend, CPUBackend, Native
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return null;
+        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
     }
 
     @Override
@@ -187,7 +188,37 @@ public class NativeBulletBackend implements MechanicsBackend, CPUBackend, Native
 
     @Override
     public RigidBodyBridge createRigidBody(RigidBody body) {
-        return null; // Created via world.addRigidBody
+        throw new UnsupportedOperationException("RigidBody bridge creation must be handled via PhysicsWorldBridge.addRigidBody for Bullet.");
+    }
+
+    @Override
+    public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
+        if (isLoaded()) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment radSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, radii);
+                MemorySegment colSeg = arena.allocate(ValueLayout.JAVA_INT, (long) n * n * 2);
+                int count = detectSphereCollisions(posSeg, radSeg, n, colSeg);
+                MemorySegment.copy(colSeg, ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
+                return count;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
+        if (isLoaded()) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment velSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, velocities);
+                MemorySegment massSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, masses);
+                MemorySegment colSeg = arena.allocateFrom(ValueLayout.JAVA_INT, collisions);
+                resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions);
+                MemorySegment.copy(posSeg, ValueLayout.JAVA_DOUBLE, 0, positions, 0, n * 3);
+                MemorySegment.copy(velSeg, ValueLayout.JAVA_DOUBLE, 0, velocities, 0, n * 3);
+            }
+        }
     }
 
     @Override

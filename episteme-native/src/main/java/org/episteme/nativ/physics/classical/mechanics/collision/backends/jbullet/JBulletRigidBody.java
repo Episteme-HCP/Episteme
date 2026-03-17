@@ -11,6 +11,8 @@ import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.complex.Quaternion;
 import org.episteme.core.mathematics.numbers.real.Real;
@@ -61,6 +63,7 @@ public class JBulletRigidBody implements RigidBodyBridge {
 
     public void pushState() {
         Transform trans = new Transform();
+        trans.setIdentity();
         Vector<Real> pos = owner.getPosition();
         if (pos != null) {
             trans.origin.set((float) pos.get(0).doubleValue(), (float) pos.get(1).doubleValue(), (float) pos.get(2).doubleValue());
@@ -68,7 +71,13 @@ public class JBulletRigidBody implements RigidBodyBridge {
         
         Quaternion rot = owner.getRotation();
         if (rot != null) {
-            // Convert to JBullet matrix or quat
+            Quat4f bRot = new Quat4f(
+                (float) rot.getI().doubleValue(),
+                (float) rot.getJ().doubleValue(),
+                (float) rot.getK().doubleValue(),
+                (float) rot.getReal().doubleValue()
+            );
+            trans.setRotation(bRot);
         }
         
         bulletBody.setWorldTransform(trans);

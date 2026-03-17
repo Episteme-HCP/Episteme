@@ -8,12 +8,12 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
+    name: Build on ${{ matrix.os }} (JDK ${{ matrix.java-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 1
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         java-version: ['21', '25']
       fail-fast: false # Don't cancel other OS jobs if one fails
 

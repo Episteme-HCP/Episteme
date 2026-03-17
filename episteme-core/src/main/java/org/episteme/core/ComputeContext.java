@@ -68,6 +68,13 @@ public class ComputeContext {
             java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory,
             null, true);
 
+    /**
+     * Executes a computation within the current compute context, potentially in parallel.
+     */
+    public <T> T computeParallel(java.util.function.Supplier<T> task) {
+        return SHARED_POOL.submit(() -> task.get()).join();
+    }
+
     // RESOURCES (Kept in Context)
     private volatile DistributedContext distributedContext = org.episteme.core.distributed.DistributedCompute.getContext();
     private volatile GPUBackend gpuBackend;

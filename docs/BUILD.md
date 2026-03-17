@@ -24,7 +24,7 @@ mvn install:install-file -Dfile=launchers/lib/java-fbx-loader-v1.0.jar -DgroupId
 ## Project Structure & Java Versions
 
 * **episteme-core, episteme-natural, episteme-social**: Compiled with **Java 21** compatibility (`--release 21`).
-* **episteme-native**: Compiled with **Java 25** (`--release 25`) to leverage the Foreign Function & Memory API (Project Panama).
+* **episteme-native**: Compiled with **Java 25** (`--release 25`) to leverage the Foreign Function & Memory API (Project Panama). This module also contains the JNI bridge and coordinates the consolidated C++ library.
 
 ## How to Build
 
@@ -40,6 +40,24 @@ This command will:
 2. Compile `episteme-native` using Java 25 features (Preview/Panama enabled).
 3. Run tests (unless skipped with `-DskipTests`).
 4. Install artifacts to your local Maven repository.
+
+### Native Library Build
+
+If you need to recompile the C++ components:
+
+**Windows:**
+
+```powershell
+.\build_native.ps1
+```
+
+**Linux/Mac:**
+
+```bash
+./build_native.sh
+```
+
+This will produce `episteme-native` and `miniaudio` libraries in the `libs/` directory.
 
 ### Skipping Tests
 

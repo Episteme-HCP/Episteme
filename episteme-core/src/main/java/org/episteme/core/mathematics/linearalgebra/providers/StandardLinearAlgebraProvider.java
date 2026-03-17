@@ -14,6 +14,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
  * Intended for benchmarking and comparison purposes.
  */
 @AutoService({LinearAlgebraProvider.class})
+@SuppressWarnings("rawtypes")
 public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
     public StandardLinearAlgebraProvider() {

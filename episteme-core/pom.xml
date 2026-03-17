@@ -16,6 +16,7 @@
     <description>Episteme Core - Mathematics, Measure, and Computing Infrastructure</description>
 
     <properties>
+        <maven.compiler.release>21</maven.compiler.release>
         <jzy3d.exclude>**/Jzy3d*.java</jzy3d.exclude>
     </properties>
 

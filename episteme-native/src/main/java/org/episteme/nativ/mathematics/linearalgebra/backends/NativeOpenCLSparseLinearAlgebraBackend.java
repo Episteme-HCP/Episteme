@@ -52,8 +52,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     private static volatile boolean isInitialized = false;
     private static volatile boolean initAttempted = false;
     private static Boolean cachedAvailability = null;
-    private static final java.util.Map<Long, cl_mem> handleMap = new java.util.concurrent.ConcurrentHashMap<>();
-    private static java.util.concurrent.atomic.AtomicLong handleCounter = new java.util.concurrent.atomic.AtomicLong(1);
+    // Removed synthetic handle map and counter to use native pointers directly.
 
     // Kernels
     private static final String KERNEL_SPMV = 
@@ -363,22 +362,40 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     public long allocateGPUMemory(long size) {
         if (!isInitialized) start();
         cl_mem mem = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, size, null, null);
-        long handle = handleCounter.getAndIncrement();
-        handleMap.put(handle, mem);
-        return handle;
+        return getNativePointer(mem);
+    }
+
+    private static long getNativePointer(cl_mem mem) {
+        try {
+            java.lang.reflect.Field field = cl_mem.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            return field.getLong(mem);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to access OpenCL native pointer", e);
+        }
+    }
+
+    private static cl_mem createMemObject(long handle) {
+        cl_mem mem = new cl_mem();
+        try {
+            java.lang.reflect.Field field = cl_mem.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            field.setLong(mem, handle);
+            return mem;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to wrap native OpenCL handle", e);
+        }
     }
 
     @Override
     public void freeGPUMemory(long handle) {
         if (handle == 0) return;
-        cl_mem mem = handleMap.remove(handle);
-        if (mem != null) clReleaseMemObject(mem);
+        clReleaseMemObject(createMemObject(handle));
     }
 
     @Override
     public void copyToGPU(long handle, DoubleBuffer buffer, long size) {
-        cl_mem mem = handleMap.get(handle);
-        if (mem == null) throw new IllegalArgumentException("Invalid GPU handle: " + handle);
+        cl_mem mem = createMemObject(handle);
         double[] data = new double[(int)size];
         buffer.get(data); buffer.rewind();
         clEnqueueWriteBuffer(staticCommandQueue, mem, CL_TRUE, 0, Sizeof.cl_double * size, Pointer.to(data), 0, null, null);
@@ -386,8 +403,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public void copyFromGPU(long handle, DoubleBuffer buffer, long size) {
-        cl_mem mem = handleMap.get(handle);
-        if (mem == null) throw new IllegalArgumentException("Invalid GPU handle: " + handle);
+        cl_mem mem = createMemObject(handle);
         double[] data = new double[(int)size];
         clEnqueueReadBuffer(staticCommandQueue, mem, CL_TRUE, 0, Sizeof.cl_double * size, Pointer.to(data), 0, null, null);
         buffer.put(data); buffer.rewind();

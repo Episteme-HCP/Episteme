@@ -24,6 +24,14 @@
 package org.episteme.natural.physics.classical.mechanics.collision.providers;
 
 import com.google.auto.service.AutoService;
+import org.episteme.natural.physics.classical.mechanics.collision.CollisionProvider;
+
+/**
+ * CPU-based implementation of CollisionProvider.
+ */
+@AutoService(CollisionProvider.class)
+public class CPUCollisionProvider implements CollisionProvider {
+
     @Override
     public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
         int count = 0;

@@ -59,7 +59,7 @@
   </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>21</maven.compiler.release>
+    <maven.compiler.release>25</maven.compiler.release>
     <!-- JSR-385 Units of Measurement -->
     <uom.version>2.2</uom.version>
     <indriya.version>2.2</indriya.version>
