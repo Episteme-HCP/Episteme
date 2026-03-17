@@ -274,20 +274,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         E dotProduct = dot(a, a);
-        if (field instanceof org.episteme.core.mathematics.sets.Reals) {
-            org.episteme.core.mathematics.numbers.real.Real r = (org.episteme.core.mathematics.numbers.real.Real) dotProduct;
-            double val = r.doubleValue();
-            return (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of(Math.sqrt(val));
-        }
-        if (dotProduct instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
-            org.episteme.core.mathematics.numbers.real.RealDouble rd = (org.episteme.core.mathematics.numbers.real.RealDouble) dotProduct;
-            return (E) (Object) org.episteme.core.mathematics.numbers.real.RealDouble.of(Math.sqrt(rd.doubleValue()));
-        }
-        if (dotProduct instanceof org.episteme.core.mathematics.numbers.real.Real) {
-            org.episteme.core.mathematics.numbers.real.Real r = (org.episteme.core.mathematics.numbers.real.Real) dotProduct;
-            return (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of(Math.sqrt(r.doubleValue()));
-        }
-        throw new UnsupportedOperationException("Norm not supported for field: " + field.getClass().getSimpleName());
+        return sqrt(dotProduct, field);
     }
 
     @Override
@@ -1097,7 +1084,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (QRResult<E>) JavaQR.decompose((Matrix<Real>) a);
         }
-        return LinearAlgebraProvider.super.qr(a);
+        return GenericQR.decompose(a, field);
     }
 
     @Override
@@ -1106,7 +1093,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (SVDResult<E>) JavaSVD.decompose((Matrix<Real>) a);
         }
-        return LinearAlgebraProvider.super.svd(a);
+        return GenericSVD.decompose(a, field);
     }
 
     @Override
@@ -1115,7 +1102,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (EigenResult<E>) JavaEigen.decompose((Matrix<Real>) a);
         }
-        return LinearAlgebraProvider.super.eigen(a);
+        return GenericEigen.decompose(a, field);
     }
 
     @Override
@@ -1124,7 +1111,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (LUResult<E>) JavaLU.decompose((Matrix<Real>) a);
         }
-        return LinearAlgebraProvider.super.lu(a);
+        return GenericLU.decompose(a, field);
     }
 
     @Override
@@ -1133,7 +1120,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (CholeskyResult<E>) JavaCholesky.decompose((Matrix<Real>) a);
         }
-        return LinearAlgebraProvider.super.cholesky(a);
+        return GenericCholesky.decompose(a, field);
     }
 
     @Override
@@ -1142,7 +1129,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (field instanceof Reals) {
             return (Vector<E>) JavaLU.solve((LUResult<Real>) lu, (Vector<Real>) b);
         }
-        throw new UnsupportedOperationException("Generic LU solve not yet implemented in CPUDenseLinearAlgebraProvider");
+        return GenericLU.solve(lu, b, field);
     }
 
     @Override
@@ -1151,7 +1138,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (field instanceof Reals) {
             return (Vector<E>) JavaQR.solve((QRResult<Real>) qr, (Vector<Real>) b);
         }
-        throw new UnsupportedOperationException("Generic QR solve not yet implemented in CPUDenseLinearAlgebraProvider");
+        return GenericQR.solve(qr, b, field);
     }
 
     @Override
@@ -1160,40 +1147,430 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (field instanceof Reals) {
             return (Vector<E>) JavaCholesky.solve((CholeskyResult<Real>) cholesky, (Vector<Real>) b);
         }
-        throw new UnsupportedOperationException("Generic Cholesky solve not yet implemented in CPUDenseLinearAlgebraProvider");
+        return GenericCholesky.solve(cholesky, b, field);
     }
 
     @SuppressWarnings("unchecked")
     private Matrix<E> pseudoInverse(Matrix<E> a) {
-        if (a.getScalarRing() instanceof Reals) {
-             SVDResult<E> svd = svd(a);
-             // A+ = V * S+ * UT (using economy dimensions)
-             int m = a.rows();
-             int n = a.cols();
-             int k = svd.S().dimension();
-             
-             // Create S+ (pseudo-inverse of diagonal S) as k x k
-             DenseMatrixStorage<E> sPlusStorage = new DenseMatrixStorage<>(k, k, field.zero());
-             for (int i = 0; i < k; i++) {
-                 double sVal = ((Real) svd.S().get(i)).doubleValue();
-                 if (sVal > 1e-12) {
-                     sPlusStorage.set(i, i, (E)(Object) Real.of(1.0 / sVal));
-                 }
-             }
-             Matrix<E> sPlus = new GenericMatrix<>(sPlusStorage, this, field);
-             
-             // V is n x n, we need first k columns to match sPlus (k x k)
-             Matrix<E> vEco = svd.V().getSubMatrix(0, n, 0, k);
-             
-             // U is m x m, we need first k columns (m x k) so UT is (k x m)
-             Matrix<E> uEco = svd.U().getSubMatrix(0, m, 0, k);
-             
-             return multiply(multiply(vEco, sPlus), transpose(uEco));
+        SVDResult<E> svd = svd(a);
+        // A+ = V * S+ * UT (using economy dimensions)
+        int m = a.rows();
+        int n = a.cols();
+        int k = svd.S().dimension();
+        
+        // Create S+ (pseudo-inverse of diagonal S) as k x k
+        DenseMatrixStorage<E> sPlusStorage = new DenseMatrixStorage<>(k, k, field.zero());
+        for (int i = 0; i < k; i++) {
+            E sVal = svd.S().get(i);
+            if (absValue(sVal) > 1e-12) {
+                sPlusStorage.set(i, i, field.divide(field.one(), sVal));
+            }
         }
-        throw new UnsupportedOperationException("Pseudo-inverse not supported for generic field: " + field.getClass().getSimpleName());
+        Matrix<E> sPlus = new GenericMatrix<>(sPlusStorage, this, field);
+        
+        // V is n x n, we need first k columns to match sPlus (k x k)
+        Matrix<E> vEco = svd.V().getSubMatrix(0, n, 0, k);
+        
+        // U is m x m, we need first k columns (m x k) so UT is (k x m)
+        Matrix<E> uEco = svd.U().getSubMatrix(0, m, 0, k);
+        
+        return multiply(multiply(vEco, sPlus), transpose(uEco));
     }
 
-    // --- Autonomous Java Solver Foundations ---
+    // --- Generic Field Decompositions ---
+
+    private static class GenericLU {
+        public static <E> LUResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int n = matrix.rows();
+            if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+            @SuppressWarnings("unchecked")
+            E[][] data = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = matrix.get(i, j);
+
+            int[] perm = new int[n];
+            for (int i = 0; i < n; i++) perm[i] = i;
+
+            for (int k = 0; k < n; k++) {
+                int maxRow = k;
+                double maxVal = absValue(data[k][k]);
+                for (int i = k + 1; i < n; i++) {
+                    double val = absValue(data[i][k]);
+                    if (val > maxVal) {
+                        maxVal = val;
+                        maxRow = i;
+                    }
+                }
+
+                if (maxRow != k) {
+                    E[] temp = data[k];
+                    data[k] = data[maxRow];
+                    data[maxRow] = temp;
+                    int tempPerm = perm[k];
+                    perm[k] = perm[maxRow];
+                    perm[maxRow] = tempPerm;
+                }
+
+                E diagonal = data[k][k];
+                if (diagonal.equals(field.zero())) continue;
+
+                for (int i = k + 1; i < n; i++) {
+                    E factor = field.divide(data[i][k], diagonal);
+                    data[i][k] = factor;
+                    for (int j = k + 1; j < n; j++) {
+                        data[i][j] = field.add(data[i][j], field.negate(field.multiply(factor, data[k][j])));
+                    }
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            E[][] lData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            @SuppressWarnings("unchecked")
+            E[][] uData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i > j) { lData[i][j] = data[i][j]; uData[i][j] = field.zero(); }
+                    else if (i == j) { lData[i][j] = field.one(); uData[i][j] = data[i][j]; }
+                    else { lData[i][j] = field.zero(); uData[i][j] = data[i][j]; }
+                }
+            }
+
+            double[] pDouble = new double[n];
+            for (int i = 0; i < n; i++) pDouble[i] = perm[i];
+
+            return new LUResult<E>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(lData, field),
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(uData, field),
+                (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble)
+            );
+        }
+
+        public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field) {
+            int n = lu.L().rows();
+            @SuppressWarnings("unchecked")
+            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            @SuppressWarnings("unchecked")
+            E[] pb = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+
+            for (int i = 0; i < n; i++) {
+                Object pVal = lu.P().get(i);
+                int pIdx;
+                if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+                else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
+                else pIdx = i;
+                pb[i] = b.get(pIdx);
+            }
+
+            @SuppressWarnings("unchecked")
+            E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = 0; i < n; i++) {
+                E sum = field.zero();
+                for (int j = 0; j < i; j++) {
+                    sum = field.add(sum, field.multiply(lu.L().get(i, j), y[j]));
+                }
+                y[i] = field.add(pb[i], field.negate(sum));
+            }
+
+            for (int i = n - 1; i >= 0; i--) {
+                E sum = field.zero();
+                for (int j = i + 1; j < n; j++) {
+                    sum = field.add(sum, field.multiply(lu.U().get(i, j), x[j]));
+                }
+                y[i] = field.add(y[i], field.negate(sum));
+                x[i] = field.divide(y[i], lu.U().get(i, i));
+            }
+
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        }
+    }
+
+    private static class GenericQR {
+        public static <E> QRResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int m = matrix.rows();
+            int n = matrix.cols();
+
+            @SuppressWarnings("unchecked")
+            E[][] Q = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m, n);
+            @SuppressWarnings("unchecked")
+            E[][] R = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            
+            for (int j = 0; j < n; j++) {
+                @SuppressWarnings("unchecked")
+                E[] v = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m);
+                for (int i = 0; i < m; i++) v[i] = matrix.get(i, j);
+                
+                for (int i = 0; i < j; i++) {
+                    E rij = dot(Q, v, i, m, field);
+                    R[i][j] = rij;
+                    for (int k = 0; k < m; k++) {
+                        v[k] = field.add(v[k], field.negate(field.multiply(rij, Q[k][i])));
+                    }
+                }
+                
+                E rjj = norm(v, field);
+                R[j][j] = rjj;
+                if (!rjj.equals(field.zero())) {
+                    for (int k = 0; k < m; k++) Q[k][j] = field.divide(v[k], rjj);
+                } else {
+                    for (int k = 0; k < m; k++) Q[k][j] = field.zero();
+                }
+            }
+
+            return new QRResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q, field),
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(R, field)
+            );
+        }
+
+        private static <E> E dot(E[][] Q, E[] v, int col, int m, Field<E> field) {
+            E sum = field.zero();
+            for (int i = 0; i < m; i++) {
+                sum = field.add(sum, field.multiply(conjugate(Q[i][col], field), v[i]));
+            }
+            return sum;
+        }
+
+        private static <E> E norm(E[] v, Field<E> field) {
+            E sum = field.zero();
+            for (E val : v) {
+                sum = field.add(sum, field.multiply(conjugate(val, field), val));
+            }
+            return sqrt(sum, field);
+        }
+
+        public static <E> Vector<E> solve(QRResult<E> qr, Vector<E> b, Field<E> field) {
+            int m = qr.Q().rows();
+            int n = qr.R().cols();
+            
+            @SuppressWarnings("unchecked")
+            E[] qtb = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = 0; i < n; i++) {
+                E sum = field.zero();
+                for (int j = 0; j < m; j++) {
+                    sum = field.add(sum, field.multiply(conjugate(qr.Q().get(j, i), field), b.get(j)));
+                }
+                qtb[i] = sum;
+            }
+            
+            @SuppressWarnings("unchecked")
+            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = n - 1; i >= 0; i--) {
+                E sum = qtb[i];
+                for (int j = i + 1; j < n; j++) {
+                    sum = field.add(sum, field.negate(field.multiply(qr.R().get(i, j), x[j])));
+                }
+                x[i] = field.divide(sum, qr.R().get(i, i));
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        }
+    }
+
+    private static class GenericCholesky {
+        public static <E> CholeskyResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int n = matrix.rows();
+            @SuppressWarnings("unchecked")
+            E[][] L = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) L[i][j] = field.zero();
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j <= i; j++) {
+                    E sum = field.zero();
+                    if (j == i) {
+                        for (int k = 0; k < j; k++) {
+                            sum = field.add(sum, field.multiply(L[j][k], conjugate(L[j][k], field)));
+                        }
+                        L[j][j] = sqrt(field.add(matrix.get(j, j), field.negate(sum)), field);
+                    } else {
+                        for (int k = 0; k < j; k++) {
+                            sum = field.add(sum, field.multiply(L[i][k], conjugate(L[j][k], field)));
+                        }
+                        L[i][j] = field.divide(field.add(matrix.get(i, j), field.negate(sum)), L[j][j]);
+                    }
+                }
+            }
+            return new CholeskyResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(L, field));
+        }
+
+        public static <E> Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b, Field<E> field) {
+            int n = cholesky.L().rows();
+            @SuppressWarnings("unchecked")
+            E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            @SuppressWarnings("unchecked")
+            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+
+            for (int i = 0; i < n; i++) {
+                E sum = field.zero();
+                for (int j = 0; j < i; j++) sum = field.add(sum, field.multiply(cholesky.L().get(i, j), y[j]));
+                y[i] = field.divide(field.add(b.get(i), field.negate(sum)), cholesky.L().get(i, i));
+            }
+            for (int i = n - 1; i >= 0; i--) {
+                E sum = field.zero();
+                for (int j = i + 1; j < n; j++) sum = field.add(sum, field.multiply(conjugate(cholesky.L().get(j, i), field), x[j]));
+                x[i] = field.divide(field.add(y[i], field.negate(sum)), conjugate(cholesky.L().get(i, i), field));
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        }
+    }
+
+    // --- Helper math methods for generic fields ---
+
+    private static double absValue(Object element) {
+        if (element instanceof Real) return ((Real) element).doubleValue();
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) 
+            return ((org.episteme.core.mathematics.numbers.complex.Complex) element).abs().doubleValue();
+        if (element instanceof Number) return ((Number) element).doubleValue();
+        return 0.0;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E conjugate(E element, Field<E> field) {
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+            return (E) ((org.episteme.core.mathematics.numbers.complex.Complex) element).conjugate();
+        }
+        return element;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E sqrt(E element, Field<E> field) {
+        if (element instanceof org.episteme.core.mathematics.numbers.real.Real) {
+            return (E) ((org.episteme.core.mathematics.numbers.real.Real) element).sqrt();
+        }
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+            return (E) ((org.episteme.core.mathematics.numbers.complex.Complex) element).sqrt();
+        }
+        try {
+            java.lang.reflect.Method m = element.getClass().getMethod("sqrt");
+            return (E) m.invoke(element);
+        } catch (Exception e) {}
+        throw new UnsupportedOperationException("sqrt not supported for type: " + element.getClass().getName());
+    }
+
+    private static class GenericEigen {
+        public static <E> EigenResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int n = matrix.rows();
+            if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+            @SuppressWarnings("unchecked")
+            E[][] A = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
+
+            @SuppressWarnings("unchecked")
+            E[][] V = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) V[i][j] = (i == j) ? field.one() : field.zero();
+
+            int maxSweeps = 50;
+            double eps = 1e-15;
+
+            for (int sweep = 0; sweep < maxSweeps; sweep++) {
+                double offDiag = 0;
+                int p = 0, q = 0;
+                double maxOff = -1.0;
+
+                for (int i = 0; i < n; i++) {
+                    for (int j = i + 1; j < n; j++) {
+                        double val = absValue(A[i][j]);
+                        offDiag += val;
+                        if (val > maxOff) {
+                            maxOff = val;
+                            p = i;
+                            q = j;
+                        }
+                    }
+                }
+
+                if (offDiag < eps) break;
+
+                // Jacobi rotation for A[p][p], A[p][q], A[q][q]
+                // For generic fields, we'll use a simplified version for now
+                // approximating rotation if possible, or using a basic numeric approach
+                // since exact trig for generic FieldElement isn't always available.
+                // However, Reals and Complex have sqrt/atan2.
+                
+                E app = A[p][p];
+                E aqq = A[q][q];
+                E apq = A[p][q];
+
+                // Simplified Jacobi for generic: tan(2theta) = 2*apq / (aqq - app)
+                // For Reals it's standard. For others, we might need more abstractions.
+                // But we can use the bridging methods.
+                
+                // theta calculation
+                E diff = field.add(aqq, field.negate(app));
+                E twoApq = field.add(apq, apq);
+                
+                // This part is tricky generically. I'll rely on the Number bridge if available
+                // or use a simplified iterative step.
+                
+                double tau = absValue(diff) < 1e-18 ? 0.0 : absValue(twoApq) / absValue(diff);
+                double t = tau / (1.0 + Math.sqrt(1.0 + tau * tau));
+                double c = 1.0 / Math.sqrt(1.0 + t * t);
+                double s = t * c;
+
+                // For Complex/Real, we can use these c, s values directly if we convert back
+                E cE = (E) Real.of(c);
+                E sE = (E) Real.of(s);
+                
+                // Apply rotation to A
+                for (int i = 0; i < n; i++) {
+                    E ap = A[p][i];
+                    E aq = A[q][i];
+                    A[p][i] = field.add(field.multiply(cE, ap), field.negate(field.multiply(sE, aq)));
+                    A[q][i] = field.add(field.multiply(sE, ap), field.multiply(cE, aq));
+                }
+                for (int i = 0; i < n; i++) {
+                    E ap = A[i][p];
+                    E aq = A[i][q];
+                    A[i][p] = field.add(field.multiply(cE, ap), field.negate(field.multiply(sE, aq)));
+                    A[i][q] = field.add(field.multiply(sE, ap), field.multiply(cE, aq));
+                }
+                // Accumulate V
+                for (int i = 0; i < n; i++) {
+                    E vp = V[i][p];
+                    E vq = V[i][q];
+                    V[i][p] = field.add(field.multiply(cE, vp), field.negate(field.multiply(sE, vq)));
+                    V[i][q] = field.add(field.multiply(sE, vp), field.multiply(cE, vq));
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            E[] eigenvalues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = 0; i < n; i++) eigenvalues[i] = A[i][i];
+
+            return new EigenResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(V, field),
+                org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(eigenvalues), field)
+            );
+        }
+    }
+
+    private static class GenericSVD {
+        public static <E> SVDResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            // SVD via AT*A for generic field (simplified)
+            int m = matrix.rows();
+            int n = matrix.cols();
+            
+            Matrix<E> selfAdj = matrix.multiply(matrix.transpose()); // m x m
+            EigenResult<E> eigen = GenericEigen.decompose(selfAdj, field);
+            
+            @SuppressWarnings("unchecked")
+            E[] sValues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), Math.min(m, n));
+            for (int i = 0; i < sValues.length; i++) {
+                sValues[i] = (E) eigen.D().get(i); // Eigen S is already E (or castable)
+            }
+            
+            // U = eigenvectors of A*A*
+            Matrix<E> U = eigen.V();
+            
+            // V = eigenvectors of A**A (if needed) or derive from U, S, A
+            // For simplicity in generic, we'll do A**A for V too
+            Matrix<E> selfAdjV = matrix.transpose().multiply(matrix); // n x n
+            EigenResult<E> eigenV = GenericEigen.decompose(selfAdjV, field);
+            Matrix<E> V = eigenV.V();
+
+            return new SVDResult<E>(U, org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(sValues), field), V);
+        }
+    }
 
     private static class JavaLU {
         public static LUResult<Real> decompose(Matrix<Real> matrix) {
@@ -1263,7 +1640,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             Real[] pb = new Real[n];
 
             for (int i = 0; i < n; i++) {
-                pb[i] = b.get((int) lu.P().get(i).doubleValue());
+                Object pVal = lu.P().get(i);
+                int pIdx;
+                if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+                else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
+                else pIdx = i;
+                pb[i] = b.get(pIdx);
             }
 
             Real[] y = new Real[n];

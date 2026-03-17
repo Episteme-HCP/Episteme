@@ -82,7 +82,8 @@ message MatrixResponse {
 message MatrixData {
   int32 rows = 1;
   int32 cols = 2;
-  repeated double data = 3; // Row-major order
+  bytes data = 3; // Raw double data (Zero-copy payload)
+  bool is_complex = 4;
 }
 
 message VectorRequest {
@@ -105,7 +106,8 @@ message VectorResponse {
 
 message VectorData {
   int32 size = 1;
-  repeated double data = 2;
+  bytes data = 2; // Raw double data
+  bool is_complex = 3;
 }
 
 message MatrixVectorRequest {

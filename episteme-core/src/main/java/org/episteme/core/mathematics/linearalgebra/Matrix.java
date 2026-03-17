@@ -312,6 +312,16 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
 
     @Override
     Matrix<E> scale(E scalar, Matrix<E> element);
+    
+    /**
+     * Convenience scalar multiplication (scalar Ã— this).
+     * 
+     * @param scalar the scalar
+     * @return scalar Ã— this
+     */
+    default Matrix<E> scale(E scalar) {
+        return scale(scalar, this);
+    }
 
     /**
      * Converts this matrix to a rank-2 tensor.

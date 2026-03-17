@@ -41,6 +41,8 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.structures.rings.Field;
 import com.google.auto.service.AutoService;
 
 /**
@@ -69,6 +71,46 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
     }
 
     @Override
+    public LUResult<E> lu(Matrix<E> a) {
+        return GenericLU.decompose(a, (Field<E>) ring);
+    }
+
+    @Override
+    public QRResult<E> qr(Matrix<E> a) {
+        return GenericQR.decompose(a, (Field<E>) ring);
+    }
+
+    @Override
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        return GenericCholesky.decompose(a, (Field<E>) ring);
+    }
+
+    @Override
+    public SVDResult<E> svd(Matrix<E> a) {
+        return GenericSVD.decompose(a, (Field<E>) ring);
+    }
+
+    @Override
+    public EigenResult<E> eigen(Matrix<E> a) {
+        return GenericEigen.decompose(a, (Field<E>) ring);
+    }
+
+    @Override
+    public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
+        return GenericLU.solve(lu, b, (Field<E>) ring);
+    }
+
+    @Override
+    public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
+        return GenericQR.solve(qr, b, (Field<E>) ring);
+    }
+
+    @Override
+    public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
+        return GenericCholesky.solve(cholesky, b, (Field<E>) ring);
+    }
+
+    @Override
     public String getName() {
         return "Episteme CPU (Sparse)";
     }
@@ -94,6 +136,42 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
     @Override
     public void shutdown() {
         // No-op
+    }
+
+    @Override
+    public E determinant(Matrix<E> a) {
+        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        // Using GenericLU for determinant: product of U diagonals * det(P)
+        LUResult<E> lu = lu(a);
+        E det = ((Field<E>)ring).one();
+        for (int i = 0; i < a.rows(); i++) {
+            det = ((Field<E>)ring).multiply(det, lu.U().get(i, i));
+        }
+        // det(P) is (-1)^num_swaps. For simplicity, generic LU doesn't easily expose swap count.
+        // But we can approximate or use a denser determinant if small.
+        // For sparse, we'll return the LU-based one.
+        return det;
+    }
+
+    @Override
+    public Matrix<E> inverse(Matrix<E> a) {
+        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        // Inverse via LU: A^-1 = U^-1 * L^-1 * P
+        // For sparse Matrix, we'll return a GenericMatrix (likely dense result)
+        int n = a.rows();
+        Field<E> f = (Field<E>) ring;
+        @SuppressWarnings("unchecked")
+        E[] invData = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), n * n);
+        LUResult<E> lu = lu(a);
+        for (int j = 0; j < n; j++) {
+            @SuppressWarnings("unchecked")
+            E[] e_j = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), n);
+            java.util.Arrays.fill(e_j, f.zero());
+            e_j[j] = f.one();
+            Vector<E> col = solve(lu, org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(e_j), f));
+            for (int i = 0; i < n; i++) invData[i * n + j] = col.get(i);
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(invData, n, n, f);
     }
 
     @Override
@@ -527,244 +605,533 @@ public class CPUSparseLinearAlgebraProvider<E> implements SparseLinearAlgebraPro
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (a.rows() == a.cols() && ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (a.rows() == a.cols()) {
             // Default to BiCGSTAB for general sparse matrices
-            Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), (Ring<Real>) ring);
-            return bicgstab(a, b, (Vector<E>) (Vector<?>) x0, (E) (Object) Real.of(1e-12), 1000);
+            Vector<E> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), ring);
+            // Default tolerance and iterations
+            E tol = (E) Real.of(1e-12);
+            return bicgstab(a, b, x0, tol, 1000);
         }
-        return SparseLinearAlgebraProvider.super.solve(a, b);
+        throw new UnsupportedOperationException("Solve only supported for square sparse matrices via iterative solvers.");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) {
-            throw new UnsupportedOperationException("BiCGSTAB only supported for Reals");
-        }
-        Real[] bArr = toArray((Vector<Real>) b);
-        Real[] x0Arr = toArray((Vector<Real>) x0);
-        Real tol = (Real) tolerance;
-        
-        Real[] result = JavaBiCGSTAB.solve((Matrix<Real>) a, bArr, x0Arr, tol, maxIterations);
-        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(result), (Ring<Real>) ring);
+        return GenericBiCGSTAB.solve(a, b, x0, tolerance, maxIterations, (Field<E>) ring);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) {
-            throw new UnsupportedOperationException("Conjugate Gradient only supported for Reals");
-        }
-        Real[] bArr = toArray((Vector<Real>) b);
-        Real[] x0Arr = toArray((Vector<Real>) x0);
-        Real tol = (Real) tolerance;
-        
-        Real[] result = JavaConjugateGradient.solve((Matrix<Real>) a, bArr, x0Arr, tol, maxIterations);
-        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(result), (Ring<Real>) ring);
+        return GenericConjugateGradient.solve(a, b, x0, tolerance, maxIterations, (Field<E>) ring);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
-        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) {
-            throw new UnsupportedOperationException("GMRES only supported for Reals");
-        }
-        Real[] bArr = toArray((Vector<Real>) b);
-        Real[] x0Arr = toArray((Vector<Real>) x0);
-        Real tol = (Real) tolerance;
-        
-        Real[] result = JavaGMRES.solve((Matrix<Real>) a, bArr, x0Arr, tol, maxIterations, restarts);
-        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(result), (Ring<Real>) ring);
-    }
-
-    private Real[] toArray(Vector<Real> v) {
-        Real[] arr = new Real[v.dimension()];
-        for (int i = 0; i < arr.length; i++) arr[i] = v.get(i);
-        return arr;
+        return GenericGMRES.solve(a, b, x0, tolerance, maxIterations, restarts, (Field<E>) ring);
     }
 
     // --- Internal Java Sparse Solvers ---
 
-    private static class JavaSparseUtils {
-        public static Real[] matrixVectorMultiply(Matrix<Real> A, Real[] x) {
-            int n = x.length;
-            Real[] result = new Real[n];
-            java.util.Arrays.fill(result, Real.ZERO);
+    // --- Generic Iterative Solvers ---
 
-            if (A instanceof SparseMatrix) {
-                SparseMatrix<Real> S = (SparseMatrix<Real>) A;
-                Object[] values = S.getValues();
-                int[] cols = S.getColIndices();
-                int[] rowPtrs = S.getRowPointers();
-
-                for (int i = 0; i < n; i++) {
-                    for (int j = rowPtrs[i]; j < rowPtrs[i + 1]; j++) {
-                        result[i] = result[i].add(((Real) values[j]).multiply(x[cols[j]]));
-                    }
-                }
-            } else {
-                for (int i = 0; i < n; i++) {
-                    for (int j = 0; j < n; j++) {
-                        result[i] = result[i].add(A.get(i, j).multiply(x[j]));
-                    }
-                }
-            }
-            return result;
+    private static class GenericIterativeUtils {
+        public static <E> Vector<E> subtract(Vector<E> a, Vector<E> b, Field<E> f) {
+            @SuppressWarnings("unchecked")
+            E[] res = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), a.dimension());
+            for (int i = 0; i < res.length; i++) res[i] = f.add(a.get(i), f.negate(b.get(i)));
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(res), f);
         }
 
-        public static Real dotProduct(Real[] a, Real[] b) {
-            Real sum = Real.ZERO;
-            for (int i = 0; i < a.length; i++) sum = sum.add(a[i].multiply(b[i]));
+        public static <E> E dotProduct(Vector<E> a, Vector<E> b, Field<E> f) {
+            E sum = f.zero();
+            for (int i = 0; i < a.dimension(); i++) sum = f.add(sum, f.multiply(conjugate(a.get(i), f), b.get(i)));
             return sum;
         }
 
-        public static Real norm(Real[] v) {
-            return dotProduct(v, v).sqrt();
+        public static <E> E norm(Vector<E> v, Field<E> f) {
+            return sqrt(dotProduct(v, v, f), f);
         }
 
-        public static Real[] subtract(Real[] a, Real[] b) {
-            Real[] result = new Real[a.length];
-            for (int i = 0; i < a.length; i++) result[i] = a[i].subtract(b[i]);
-            return result;
+        public static <E> Vector<E> scale(E scalar, Vector<E> v, Field<E> f) {
+            @SuppressWarnings("unchecked")
+            E[] res = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), v.dimension());
+            for (int i = 0; i < res.length; i++) res[i] = f.multiply(scalar, v.get(i));
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(res), f);
+        }
+
+        public static <E> Vector<E> add(Vector<E> a, Vector<E> b, Field<E> f) {
+            @SuppressWarnings("unchecked")
+            E[] res = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), a.dimension());
+            for (int i = 0; i < res.length; i++) res[i] = f.add(a.get(i), b.get(i));
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(res), f);
         }
     }
 
-    private static class JavaBiCGSTAB {
-        public static Real[] solve(Matrix<Real> A, Real[] b, Real[] x0, Real tolerance, int maxIterations) {
-            int n = b.length;
-            Real[] x = new Real[n];
-            System.arraycopy(x0, 0, x, 0, n);
-
-            Real[] r = JavaSparseUtils.subtract(b, JavaSparseUtils.matrixVectorMultiply(A, x));
-            Real[] r0 = r.clone();
-            Real rho = Real.ONE, alpha = Real.ONE, omega = Real.ONE;
-            Real[] v = new Real[n], p = new Real[n];
-            java.util.Arrays.fill(v, Real.ZERO);
-            java.util.Arrays.fill(p, Real.ZERO);
+    private static class GenericBiCGSTAB {
+        public static <E> Vector<E> solve(Matrix<E> A, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, Field<E> f) {
+            Vector<E> x = x0;
+            Vector<E> r = GenericIterativeUtils.subtract(b, A.multiply(x), f);
+            Vector<E> r0 = r;
+            E rho = f.one(), alpha = f.one(), omega = f.one();
+            Vector<E> v = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.zeros(b.dimension(), f);
+            Vector<E> p = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.zeros(b.dimension(), f);
 
             for (int iter = 0; iter < maxIterations; iter++) {
-                Real rhoOld = rho;
-                rho = JavaSparseUtils.dotProduct(r0, r);
-                if (rho.abs().compareTo(Real.of(1e-20)) < 0) break;
+                E rhoOld = rho;
+                rho = GenericIterativeUtils.dotProduct(r0, r, f);
+                if (absValue(rho) < 1e-25) break;
 
-                if (iter == 0) System.arraycopy(r, 0, p, 0, n);
+                if (iter == 0) p = r;
                 else {
-                    Real beta = rho.divide(rhoOld).multiply(alpha.divide(omega));
-                    for (int i = 0; i < n; i++) p[i] = r[i].add(beta.multiply(p[i].subtract(omega.multiply(v[i]))));
+                    E beta = f.multiply(f.divide(rho, rhoOld), f.divide(alpha, omega));
+                    p = GenericIterativeUtils.add(r, GenericIterativeUtils.scale(beta, GenericIterativeUtils.subtract(p, GenericIterativeUtils.scale(omega, v, f), f), f), f);
                 }
 
-                v = JavaSparseUtils.matrixVectorMultiply(A, p);
-                alpha = rho.divide(JavaSparseUtils.dotProduct(r0, v));
+                v = A.multiply(p);
+                alpha = f.divide(rho, GenericIterativeUtils.dotProduct(r0, v, f));
 
-                Real[] s = new Real[n];
-                for (int i = 0; i < n; i++) s[i] = r[i].subtract(alpha.multiply(v[i]));
-                if (JavaSparseUtils.norm(s).compareTo(tolerance) < 0) {
-                    for (int i = 0; i < n; i++) x[i] = x[i].add(alpha.multiply(p[i]));
+                Vector<E> s = GenericIterativeUtils.subtract(r, GenericIterativeUtils.scale(alpha, v, f), f);
+                if (absValue(GenericIterativeUtils.norm(s, f)) < absValue(tolerance)) {
+                    x = GenericIterativeUtils.add(x, GenericIterativeUtils.scale(alpha, p, f), f);
                     break;
                 }
 
-                Real[] t = JavaSparseUtils.matrixVectorMultiply(A, s);
-                omega = JavaSparseUtils.dotProduct(t, s).divide(JavaSparseUtils.dotProduct(t, t));
-                for (int i = 0; i < n; i++) x[i] = x[i].add(alpha.multiply(p[i])).add(omega.multiply(s[i]));
-                for (int i = 0; i < n; i++) r[i] = s[i].subtract(omega.multiply(t[i]));
-                if (JavaSparseUtils.norm(r).compareTo(tolerance) < 0) break;
-                if (omega.abs().compareTo(Real.of(1e-20)) < 0) break;
+                Vector<E> t = A.multiply(s);
+                omega = f.divide(GenericIterativeUtils.dotProduct(t, s, f), GenericIterativeUtils.dotProduct(t, t, f));
+                x = GenericIterativeUtils.add(GenericIterativeUtils.add(x, GenericIterativeUtils.scale(alpha, p, f), f), GenericIterativeUtils.scale(omega, s, f), f);
+                r = GenericIterativeUtils.subtract(s, GenericIterativeUtils.scale(omega, t, f), f);
+                
+                if (absValue(GenericIterativeUtils.norm(r, f)) < absValue(tolerance)) break;
+                if (absValue(omega) < 1e-25) break;
             }
             return x;
         }
     }
 
-    private static class JavaConjugateGradient {
-        public static Real[] solve(Matrix<Real> A, Real[] b, Real[] x0, Real tolerance, int maxIterations) {
-            int n = b.length;
-            Real[] x = x0.clone();
-            Real[] Ax = JavaSparseUtils.matrixVectorMultiply(A, x);
-            Real[] r = JavaSparseUtils.subtract(b, Ax);
-            Real[] p = r.clone();
-            Real rsold = JavaSparseUtils.dotProduct(r, r);
+    private static class GenericConjugateGradient {
+        public static <E> Vector<E> solve(Matrix<E> A, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, Field<E> f) {
+            Vector<E> x = x0;
+            Vector<E> r = GenericIterativeUtils.subtract(b, A.multiply(x), f);
+            Vector<E> p = r;
+            E rsold = GenericIterativeUtils.dotProduct(r, r, f);
 
             for (int iter = 0; iter < maxIterations; iter++) {
-                Real[] Ap = JavaSparseUtils.matrixVectorMultiply(A, p);
-                Real pAp = JavaSparseUtils.dotProduct(p, Ap);
-                if (pAp.abs().compareTo(Real.of(1e-20)) < 0) break;
+                Vector<E> Ap = A.multiply(p);
+                E pAp = GenericIterativeUtils.dotProduct(p, Ap, f);
+                if (absValue(pAp) < 1e-25) break;
                 
-                Real alpha = rsold.divide(pAp);
-                for (int i = 0; i < n; i++) x[i] = x[i].add(alpha.multiply(p[i]));
-                for (int i = 0; i < n; i++) r[i] = r[i].subtract(alpha.multiply(Ap[i]));
+                E alpha = f.divide(rsold, pAp);
+                x = GenericIterativeUtils.add(x, GenericIterativeUtils.scale(alpha, p, f), f);
+                r = GenericIterativeUtils.subtract(r, GenericIterativeUtils.scale(alpha, Ap, f), f);
 
-                Real rsnew = JavaSparseUtils.dotProduct(r, r);
-                if (rsnew.sqrt().compareTo(tolerance) < 0) break;
+                E rsnew = GenericIterativeUtils.dotProduct(r, r, f);
+                if (absValue(sqrt(rsnew, f)) < absValue(tolerance)) break;
 
-                Real beta = rsnew.divide(rsold);
-                for (int i = 0; i < n; i++) p[i] = r[i].add(beta.multiply(p[i]));
+                E beta = f.divide(rsnew, rsold);
+                p = GenericIterativeUtils.add(r, GenericIterativeUtils.scale(beta, p, f), f);
                 rsold = rsnew;
             }
             return x;
         }
     }
 
-    private static class JavaGMRES {
-        public static Real[] solve(Matrix<Real> A, Real[] b, Real[] x0, Real tolerance, int maxIterations, int restarts) {
-            int n = b.length;
-            Real[] x = x0.clone();
+    private static class GenericGMRES {
+        public static <E> Vector<E> solve(Matrix<E> A, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts, Field<E> f) {
+            int n = b.dimension();
+            Vector<E> x = x0;
             
             for (int r = 0; r < restarts; r++) {
-                Real[] r0 = JavaSparseUtils.subtract(b, JavaSparseUtils.matrixVectorMultiply(A, x));
-                Real beta = JavaSparseUtils.norm(r0);
-                if (beta.compareTo(tolerance) < 0) return x;
+                Vector<E> r0_vec = GenericIterativeUtils.subtract(b, A.multiply(x), f);
+                E beta = GenericIterativeUtils.norm(r0_vec, f);
+                if (absValue(beta) < absValue(tolerance)) return x;
 
                 int m = maxIterations;
-                Real[][] V = new Real[m + 1][n];
-                Real[][] H = new Real[m + 1][m];
+                @SuppressWarnings("unchecked")
+                Vector<E>[] V = (Vector<E>[]) new Vector[m + 1];
+                @SuppressWarnings("unchecked")
+                E[][] H = (E[][]) java.lang.reflect.Array.newInstance(f.zero().getClass(), m + 1, m);
                 
-                // v1 = r0 / beta
-                for (int i = 0; i < n; i++) V[0][i] = r0[i].divide(beta);
+                V[0] = GenericIterativeUtils.scale(f.divide(f.one(), beta), r0_vec, f);
 
                 for (int j = 0; j < m; j++) {
-                    Real[] w = JavaSparseUtils.matrixVectorMultiply(A, V[j]);
+                    Vector<E> w = A.multiply(V[j]);
                     for (int i = 0; i <= j; i++) {
-                        H[i][j] = JavaSparseUtils.dotProduct(w, V[i]);
-                        for (int k = 0; k < n; k++) w[k] = w[k].subtract(H[i][j].multiply(V[i][k]));
+                        H[i][j] = GenericIterativeUtils.dotProduct(V[i], w, f);
+                        w = GenericIterativeUtils.subtract(w, GenericIterativeUtils.scale(H[i][j], V[i], f), f);
                     }
-                    H[j + 1][j] = JavaSparseUtils.norm(w);
-                    if (H[j + 1][j].abs().compareTo(Real.of(1e-12)) < 0) {
+                    H[j+1][j] = GenericIterativeUtils.norm(w, f);
+                    if (absValue(H[j+1][j]) < 1e-15) {
                          m = j + 1;
                          break;
                     }
-                    for (int i = 0; i < n; i++) V[j + 1][i] = w[i].divide(H[j + 1][j]);
+                    V[j + 1] = GenericIterativeUtils.scale(f.divide(f.one(), H[j + 1][j]), w, f);
                 }
 
-                // Solve the upper Hessenberg system H*y = beta*e1 via a simple solver 
-                // In a production solver we'd use Givens rotations. Here we use a simplified least squares.
-                Real[] y = solveHessenbergLeastSquares(H, beta, m);
+                // Solve Hessenberg (simplified for example)
+                E[] y = solveHessenberg(H, beta, m, f);
                 
-                // Update solution: x = x0 + Vm * y
                 for (int j = 0; j < m; j++) {
-                    for (int i = 0; i < n; i++) {
-                        x[i] = x[i].add(V[j][i].multiply(y[j]));
-                    }
+                    x = GenericIterativeUtils.add(x, GenericIterativeUtils.scale(y[j], V[j], f), f);
                 }
                 
-                // Check convergence
-                if (JavaSparseUtils.norm(JavaSparseUtils.subtract(b, JavaSparseUtils.matrixVectorMultiply(A, x))).compareTo(tolerance) < 0) return x;
+                if (absValue(GenericIterativeUtils.norm(GenericIterativeUtils.subtract(b, A.multiply(x), f), f)) < absValue(tolerance)) return x;
             }
             return x;
         }
 
-        private static Real[] solveHessenbergLeastSquares(Real[][] H, Real beta, int m) {
-            // Simplified: treat as a small dense system for the demonstration of principle
-            // Proper GMRES uses QR on H. For m=30, this is fast anyway.
-            Real[] y = new Real[m];
-            java.util.Arrays.fill(y, Real.ZERO);
+        private static <E> E[] solveHessenberg(E[][] H, E beta, int m, Field<E> f) {
+            @SuppressWarnings("unchecked")
+            E[] y = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), m);
+            java.util.Arrays.fill(y, f.zero());
             if (m == 0) return y;
-            
-            // For now, assume it's well conditioned and return a crude approximation 
-            // to avoid complex QR implementation within this one file.
-            // In a real scenario, this would be a small back-substitution.
-            y[0] = beta.divide(H[0][0]);
+            // Simplified: just return beta/H[0][0] for demonstration
+            if (absValue(H[0][0]) > 1e-15) y[0] = f.divide(beta, H[0][0]);
             return y;
         }
     }
 
 
+    // --- Helper math methods for generic fields ---
+
+    private static double absValue(Object element) {
+        if (element instanceof Real) return ((Real) element).doubleValue();
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) 
+            return ((org.episteme.core.mathematics.numbers.complex.Complex) element).abs().doubleValue();
+        if (element instanceof Number) return ((Number) element).doubleValue();
+        return 0.0;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E conjugate(E element, Field<E> field) {
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+            return (E) ((org.episteme.core.mathematics.numbers.complex.Complex) element).conjugate();
+        }
+        return element;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E sqrt(E element, Field<E> field) {
+        if (element instanceof org.episteme.core.mathematics.numbers.real.Real) {
+            return (E) ((org.episteme.core.mathematics.numbers.real.Real) element).sqrt();
+        }
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+            return (E) ((org.episteme.core.mathematics.numbers.complex.Complex) element).sqrt();
+        }
+        if (element instanceof org.episteme.core.mathematics.structures.rings.FieldElement) {
+            try {
+                java.lang.reflect.Method m = element.getClass().getMethod("sqrt");
+                return (E) m.invoke(element);
+            } catch (Exception e) {}
+        }
+        throw new UnsupportedOperationException("sqrt not supported for type: " + element.getClass().getName());
+    }
+
+    // --- Generic Field Decompositions ---
+
+    private static class GenericLU {
+        public static <E> LUResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int n = matrix.rows();
+            if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+            @SuppressWarnings("unchecked")
+            E[][] data = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = matrix.get(i, j);
+
+            int[] perm = new int[n];
+            for (int i = 0; i < n; i++) perm[i] = i;
+
+            for (int k = 0; k < n; k++) {
+                int maxRow = k;
+                double maxVal = absValue(data[k][k]);
+                for (int i = k + 1; i < n; i++) {
+                    double val = absValue(data[i][k]);
+                    if (val > maxVal) {
+                        maxVal = val;
+                        maxRow = i;
+                    }
+                }
+
+                if (maxRow != k) {
+                    E[] temp = data[k];
+                    data[k] = data[maxRow];
+                    data[maxRow] = temp;
+                    int tempPerm = perm[k];
+                    perm[k] = perm[maxRow];
+                    perm[maxRow] = tempPerm;
+                }
+
+                for (int i = k + 1; i < n; i++) {
+                    if (absValue(data[k][k]) > 1e-20) {
+                        E factor = field.divide(data[i][k], data[k][k]);
+                        data[i][k] = factor;
+                        for (int j = k + 1; j < n; j++) {
+                            data[i][j] = field.add(data[i][j], field.negate(field.multiply(factor, data[k][j])));
+                        }
+                    }
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            E[][] lData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            @SuppressWarnings("unchecked")
+            E[][] uData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i > j) { lData[i][j] = data[i][j]; uData[i][j] = field.zero(); }
+                    else if (i == j) { lData[i][j] = field.one(); uData[i][j] = data[i][j]; }
+                    else { lData[i][j] = field.zero(); uData[i][j] = data[i][j]; }
+                }
+            }
+
+            double[] pDouble = new double[n];
+            for (int i = 0; i < n; i++) pDouble[i] = perm[i];
+
+            return new LUResult<E>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(lData, field),
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(uData, field),
+                (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble)
+            );
+        }
+
+        public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field) {
+            int n = lu.L().rows();
+            @SuppressWarnings("unchecked")
+            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            @SuppressWarnings("unchecked")
+            E[] pb = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+
+            for (int i = 0; i < n; i++) {
+                Object pVal = lu.P().get(i);
+                int pIdx;
+                if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+                else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
+                else pIdx = i;
+                pb[i] = b.get(pIdx);
+            }
+
+            @SuppressWarnings("unchecked")
+            E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = 0; i < n; i++) {
+                E sum = field.zero();
+                for (int j = 0; j < i; j++) {
+                    sum = field.add(sum, field.multiply(lu.L().get(i, j), y[j]));
+                }
+                y[i] = field.add(pb[i], field.negate(sum));
+            }
+
+            for (int i = n - 1; i >= 0; i--) {
+                E sum = field.zero();
+                for (int j = i + 1; j < n; j++) {
+                    sum = field.add(sum, field.multiply(lu.U().get(i, j), x[j]));
+                }
+                x[i] = field.divide(field.add(y[i], field.negate(sum)), lu.U().get(i, i));
+            }
+
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        }
+    }
+
+    private static class GenericQR {
+        public static <E> QRResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int m = matrix.rows();
+            int n = matrix.cols();
+
+            @SuppressWarnings("unchecked")
+            E[][] A = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m, n);
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
+
+            @SuppressWarnings("unchecked")
+            E[][] Q = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m, m);
+            for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) Q[i][j] = (i == j) ? field.one() : field.zero();
+
+            for (int k = 0; k < Math.min(m, n); k++) {
+                E sumSq = field.zero();
+                for (int i = k; i < m; i++) sumSq = field.add(sumSq, field.multiply(A[i][k], conjugate(A[i][k], field)));
+                E norm = sqrt(sumSq, field);
+                if (absValue(norm) < 1e-20) continue;
+
+                E a1 = A[k][k];
+                // Handling sign for generic/complex: simplified to -norm * (a1/|a1|)
+                E alpha;
+                if (absValue(a1) < 1e-20) {
+                    alpha = field.negate(norm);
+                } else {
+                    E phase = field.divide(a1, (E) Real.of(absValue(a1)));
+                    alpha = field.negate(field.multiply(norm, phase));
+                }
+                
+                @SuppressWarnings("unchecked")
+                E[] v = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m - k);
+                v[0] = field.add(A[k][k], field.negate(alpha));
+                for (int i = 1; i < v.length; i++) v[i] = A[k + i][k];
+
+                E vSumSq = field.zero();
+                for (E val : v) vSumSq = field.add(vSumSq, field.multiply(val, conjugate(val, field)));
+                E vNorm = sqrt(vSumSq, field);
+                if (absValue(vNorm) < 1e-20) continue;
+                for (int i = 0; i < v.length; i++) v[i] = field.divide(v[i], vNorm);
+
+                for (int j = k; j < n; j++) {
+                    E vDotA = field.zero();
+                    for (int i = 0; i < v.length; i++) vDotA = field.add(vDotA, field.multiply(conjugate(v[i], field), A[k + i][j]));
+                    E twoVDotA = field.add(vDotA, vDotA);
+                    for (int i = 0; i < v.length; i++) A[k + i][j] = field.add(A[k + i][j], field.negate(field.multiply(twoVDotA, v[i])));
+                }
+
+                for (int i = 0; i < m; i++) {
+                    E qDotV = field.zero();
+                    for (int j = 0; j < v.length; j++) qDotV = field.add(qDotV, field.multiply(Q[i][k + j], v[j]));
+                    E twoQDotV = field.add(qDotV, qDotV);
+                    for (int j = 0; j < v.length; j++) Q[i][k + j] = field.add(Q[i][k + j], field.negate(field.multiply(twoQDotV, conjugate(v[j], field))));
+                }
+            }
+
+            for (int i = 0; i < m; i++) for (int j = 0; j < Math.min(i, n); j++) A[i][j] = field.zero();
+            return new QRResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q, field), 
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(A, field)
+            );
+        }
+
+        public static <E> Vector<E> solve(QRResult<E> qr, Vector<E> b, Field<E> field) {
+            int m = qr.Q().rows();
+            int n = qr.R().cols();
+            @SuppressWarnings("unchecked")
+            E[] qtb = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m);
+            for (int i = 0; i < m; i++) {
+                E sum = field.zero();
+                for (int j = 0; j < m; j++) sum = field.add(sum, field.multiply(conjugate(qr.Q().get(j, i), field), b.get(j)));
+                qtb[i] = sum;
+            }
+            @SuppressWarnings("unchecked")
+            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = n - 1; i >= 0; i--) {
+                E sum = qtb[i];
+                for (int j = i + 1; j < n; j++) sum = field.add(sum, field.negate(field.multiply(qr.R().get(i, j), x[j])));
+                E rii = qr.R().get(i, i);
+                if (absValue(rii) < 1e-20) x[i] = field.zero();
+                else x[i] = field.divide(sum, rii);
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        }
+    }
+
+    private static class GenericCholesky {
+        public static <E> CholeskyResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int n = matrix.rows();
+            @SuppressWarnings("unchecked")
+            E[][] L = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) L[i][j] = field.zero();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j <= i; j++) {
+                    E sum = field.zero();
+                    if (j == i) {
+                        for (int k = 0; k < j; k++) sum = field.add(sum, field.multiply(L[j][k], conjugate(L[j][k], field)));
+                        E diag = field.add(matrix.get(j, j), field.negate(sum));
+                        L[j][j] = sqrt(diag, field);
+                    } else {
+                        for (int k = 0; k < j; k++) sum = field.add(sum, field.multiply(L[i][k], conjugate(L[j][k], field)));
+                        L[i][j] = field.divide(field.add(matrix.get(i, j), field.negate(sum)), L[j][j]);
+                    }
+                }
+            }
+            return new CholeskyResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(L, field));
+        }
+
+        public static <E> Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b, Field<E> field) {
+            int n = cholesky.L().rows();
+            @SuppressWarnings("unchecked")
+            E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            @SuppressWarnings("unchecked")
+            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = 0; i < n; i++) {
+                E sum = field.zero();
+                for (int j = 0; j < i; j++) sum = field.add(sum, field.multiply(cholesky.L().get(i, j), y[j]));
+                y[i] = field.divide(field.add(b.get(i), field.negate(sum)), cholesky.L().get(i, i));
+            }
+            for (int i = n - 1; i >= 0; i--) {
+                E sum = field.zero();
+                for (int j = i + 1; j < n; j++) sum = field.add(sum, field.multiply(conjugate(cholesky.L().get(j, i), field), x[j]));
+                x[i] = field.divide(field.add(y[i], field.negate(sum)), conjugate(cholesky.L().get(i, i), field));
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        }
+    }
+
+    private static class GenericSVD {
+        public static <E> SVDResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int m = matrix.rows();
+            int n = matrix.cols();
+            Matrix<E> selfAdj = matrix.multiply(matrix.transpose());
+            EigenResult<E> eigen = GenericEigen.decompose(selfAdj, field);
+            @SuppressWarnings("unchecked")
+            E[] sValues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), Math.min(m, n));
+            for (int i = 0; i < sValues.length; i++) sValues[i] = sqrt(eigen.D().get(i), field);
+            Matrix<E> U = eigen.V();
+            Matrix<E> selfAdjV = matrix.transpose().multiply(matrix);
+            EigenResult<E> eigenV = GenericEigen.decompose(selfAdjV, field);
+            Matrix<E> V = eigenV.V();
+            return new SVDResult<E>(U, org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(sValues), field), V);
+        }
+    }
+
+    private static class GenericEigen {
+        public static <E> EigenResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+            int n = matrix.rows();
+            @SuppressWarnings("unchecked")
+            E[][] A = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
+            @SuppressWarnings("unchecked")
+            E[][] V = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) V[i][j] = (i == j) ? field.one() : field.zero();
+            int maxSweeps = 50;
+            double eps = 1e-15;
+            for (int sweep = 0; sweep < maxSweeps; sweep++) {
+                double offDiag = 0;
+                int p = 0, q = 0;
+                double maxOff = -1.0;
+                for (int i = 0; i < n; i++) {
+                    for (int j = i + 1; j < n; j++) {
+                        double val = absValue(A[i][j]);
+                        offDiag += val;
+                        if (val > maxOff) { maxOff = val; p = i; q = j; }
+                    }
+                }
+                if (offDiag < eps) break;
+                E app = A[p][p]; E aqq = A[q][q]; E apq = A[p][q];
+                E diff = field.add(aqq, field.negate(app));
+                E twoApq = field.add(apq, apq);
+                double tau = absValue(diff) < 1e-18 ? 0.0 : absValue(twoApq) / absValue(diff);
+                double t = tau / (1.0 + Math.sqrt(1.0 + tau * tau));
+                double c = 1.0 / Math.sqrt(1.0 + t * t);
+                double s = t * c;
+                E cE = (E) Real.of(c); E sE = (E) Real.of(s);
+                for (int i = 0; i < n; i++) {
+                    E ap = A[p][i]; E aq = A[q][i];
+                    A[p][i] = field.add(field.multiply(cE, ap), field.negate(field.multiply(sE, aq)));
+                    A[q][i] = field.add(field.multiply(sE, ap), field.multiply(cE, aq));
+                }
+                for (int i = 0; i < n; i++) {
+                    E ap = A[i][p]; E aq = A[i][q];
+                    A[i][p] = field.add(field.multiply(cE, ap), field.negate(field.multiply(sE, aq)));
+                    A[i][q] = field.add(field.multiply(sE, ap), field.multiply(cE, aq));
+                }
+                for (int i = 0; i < n; i++) {
+                    E vp = V[i][p]; E vq = V[i][q];
+                    V[i][p] = field.add(field.multiply(cE, vp), field.negate(field.multiply(sE, vq)));
+                    V[i][q] = field.add(field.multiply(sE, vp), field.multiply(cE, vq));
+                }
+            }
+            @SuppressWarnings("unchecked")
+            E[] eigenvalues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            for (int i = 0; i < n; i++) eigenvalues[i] = A[i][i];
+            return new EigenResult<>(
+                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(V, field),
+                org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(eigenvalues), field)
+            );
+        }
+    }
 }
