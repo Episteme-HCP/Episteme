@@ -12,7 +12,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
@@ -24,12 +23,10 @@ import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.technical.backend.Operation;
-import org.episteme.core.technical.backend.ExecutionContext;
 
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
 import static jdk.incubator.vector.VectorOperators.*;
-import jdk.incubator.vector.VectorOperators;
 
 /**
  * SIMD-accelerated Linear Algebra Backend for Real numbers using JDK Vector API.

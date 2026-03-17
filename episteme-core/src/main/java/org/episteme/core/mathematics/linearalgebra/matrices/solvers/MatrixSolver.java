@@ -71,7 +71,7 @@ public class MatrixSolver {
     @SuppressWarnings("unchecked")
     public static Real[] solve(Matrix<Real> A, Real[] b, Strategy strategy) {
         Strategy effectiveStrategy = (strategy == Strategy.AUTO) ? recommend(A) : strategy;
-        LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) AlgorithmManager.getProvider(LinearAlgebraProvider.class);
+        LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) AlgorithmManager.getProvider(LinearAlgebraProvider.class);
         Vector<Real> bVec = Vector.of(java.util.Arrays.asList(b), Reals.getInstance());
 
         switch (effectiveStrategy) {
@@ -135,21 +135,18 @@ public class MatrixSolver {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     private static Real[] solveCG(Matrix<Real> A, Real[] b) {
         Vector<Real> bVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(b), Reals.getInstance());
         Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.length, Reals.getInstance());
         return toRealArray(org.episteme.core.mathematics.linearalgebra.Decomposition.conjugateGradient(A, bVec, x0, EPSILON, b.length * 2));
     }
 
-    @SuppressWarnings("unchecked")
     private static Real[] solveBiCGSTAB(Matrix<Real> A, Real[] b) {
         Vector<Real> bVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(b), Reals.getInstance());
         Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.length, Reals.getInstance());
         return toRealArray(org.episteme.core.mathematics.linearalgebra.Decomposition.bicgstab(A, bVec, x0, EPSILON, b.length * 2));
     }
 
-    @SuppressWarnings("unchecked")
     private static Real[] solveGMRES(Matrix<Real> A, Real[] b) {
         Vector<Real> bVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(b), Reals.getInstance());
         Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.length, Reals.getInstance());

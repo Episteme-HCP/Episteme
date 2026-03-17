@@ -22,5 +22,7 @@ public enum HardwareAccelerator {
     /** Field Programmable Gate Array */
     FPGA,
     /** Quantum Processing Unit */
-    QUANTUM
+    QUANTUM,
+    /** Distributed computing (Cluster, gRPC, Swarm) */
+    DISTRIBUTED
 }

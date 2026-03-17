@@ -26,10 +26,11 @@ package org.episteme.core.mathematics.linearalgebra.matrices;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.OperationContext;
@@ -118,7 +119,7 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.MAT_ADD)
                 .build();
             return ProviderSelector.execute(LinearAlgebraProvider.class, ctx, 
-                p -> ((LinearAlgebraProvider<E>) p).add(this, (GenericMatrix<E>) other));
+                p -> p.add(this, (GenericMatrix<E>) other));
         }
         
         // Fallback manual addition
@@ -147,7 +148,7 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.MAT_MUL)
                 .build();
             return ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
-                p -> ((LinearAlgebraProvider<E>) p).multiply(this, (GenericMatrix<E>) other));
+                p -> p.multiply(this, (GenericMatrix<E>) other));
         }
         
         // Fallback manual multiplication
@@ -266,8 +267,10 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .dataSize((long) this.rows() * this.cols())
                 .addHint(Hint.MAT_LU)
                 .build();
-        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+        @SuppressWarnings("unchecked")
+        LUResult<E> result = org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).lu(this));
+        return result;
     }
 
     @Override
@@ -276,8 +279,10 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .dataSize((long) this.rows() * this.cols())
                 .addHint(Hint.MAT_QR)
                 .build();
-        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+        @SuppressWarnings("unchecked")
+        QRResult<E> result = org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).qr(this));
+        return result;
     }
 
     @Override
@@ -286,8 +291,10 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .dataSize((long) this.rows() * this.cols())
                 .addHint(Hint.MAT_SVD)
                 .build();
-        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+        @SuppressWarnings("unchecked")
+        SVDResult<E> result = org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).svd(this));
+        return result;
     }
 
     @Override
@@ -296,8 +303,10 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .dataSize((long) this.rows() * this.cols())
                 .addHint(Hint.MAT_CHOLESKY)
                 .build();
-        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+        @SuppressWarnings("unchecked")
+        CholeskyResult<E> result = org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).cholesky(this));
+        return result;
     }
 
     @Override
@@ -306,8 +315,10 @@ public class GenericMatrix<E> implements Matrix<E> {
                 .dataSize((long) this.rows() * this.cols())
                 .addHint(Hint.MAT_EIGEN)
                 .build();
-        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+        @SuppressWarnings("unchecked")
+        EigenResult<E> result = org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
             p -> ((LinearAlgebraProvider<E>) p).eigen(this));
+        return result;
     }
 
     @Override

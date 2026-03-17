@@ -42,7 +42,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.paint.CycleMethod;
 import javafx.stage.Stage;
 
-import org.episteme.natural.physics.classical.mechanics.NBodySimulation;
+import org.episteme.natural.physics.classical.mechanics.nbody.NBodySimulation;
 import org.episteme.natural.physics.classical.mechanics.Particle;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.PhysicalConstants;

@@ -14,6 +14,7 @@ import jcuda.driver.JCudaDriver;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.Backend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import java.nio.DoubleBuffer;
 
 /**
@@ -29,11 +30,21 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({ComputeBackend.class, GPUBackend.class, Backend.class})
-public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend {
+@AutoService({ComputeBackend.class, GPUBackend.class, Backend.class, NativeBackend.class})
+public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, NativeBackend {
 
     private static final int GPU_THRESHOLD = 1000;
     private static volatile Boolean cudaAvailable;
+
+    @Override
+    public boolean isLoaded() {
+        return isAvailable();
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "cuda";
+    }
 
 
     @Override

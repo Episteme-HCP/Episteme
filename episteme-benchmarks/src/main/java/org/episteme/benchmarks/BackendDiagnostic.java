@@ -4,7 +4,7 @@ import org.episteme.core.media.VisionBackendManager;
 import org.episteme.core.media.VideoBackendManager;
 import org.episteme.core.media.AudioBackendManager;
 import org.episteme.core.mathematics.linearalgebra.tensors.TensorBackendManager;
-import org.episteme.natural.physics.classical.mechanics.MechanicsBackendManager;
+import org.episteme.natural.physics.classical.mechanics.collision.MechanicsBackendManager;
 import org.episteme.natural.ui.viewers.chemistry.MolecularBackendManager;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.natural.physics.quantum.QuantumBackendManager;

@@ -258,7 +258,11 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         int nnz = s.getNnz();
         
         Object[] scaledValues = new Object[nnz];
-        for (int i = 0; i < nnz; i++) scaledValues[i] = r.multiply((E) values[i], scalar);
+        for (int i = 0; i < nnz; i++) {
+            @SuppressWarnings("unchecked")
+            E val = (E) values[i];
+            scaledValues[i] = r.multiply(val, scalar);
+        }
         
         return new SparseMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E>(
             rows, cols, r.zero(), rowPtrs, colIdxs, scaledValues), r);
@@ -549,7 +553,11 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         Object[] values = a.getValues();
         int nnz = a.getNnz();
         Object[] negatedValues = new Object[nnz];
-        for (int i = 0; i < nnz; i++) negatedValues[i] = r.negate((E) values[i]);
+        for (int i = 0; i < nnz; i++) {
+            @SuppressWarnings("unchecked")
+            E val = (E) values[i];
+            negatedValues[i] = r.negate(val);
+        }
         return new SparseMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E>(
             a.rows(), a.cols(), r.zero(), rowPtrs.clone(), colIdxs.clone(), negatedValues), r);
     }
@@ -567,7 +575,9 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         for (int i = 0; i < rows; i++) {
             E sum = r.zero();
             for (int j = rowPtrs[i]; j < rowPtrs[i+1]; j++) {
-                sum = r.add(sum, r.multiply((E) values[j], b.get(colIdxs[j])));
+                @SuppressWarnings("unchecked")
+                E val = (E) values[j];
+                sum = r.add(sum, r.multiply(val, b.get(colIdxs[j])));
             }
             if (!sum.equals(r.zero())) storage.set(i, sum);
         }
@@ -617,19 +627,16 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
         return GenericBiCGSTAB.solve(a, b, x0, tolerance, maxIterations, (Field<E>) ring);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
         return GenericConjugateGradient.solve(a, b, x0, tolerance, maxIterations, (Field<E>) ring);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
         return GenericGMRES.solve(a, b, x0, tolerance, maxIterations, restarts, (Field<E>) ring);
     }
@@ -741,7 +748,6 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     private static class GenericGMRES {
         public static <E> Vector<E> solve(Matrix<E> A, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts, Field<E> f) {
-            int n = b.dimension();
             Vector<E> x = x0;
             
             for (int r = 0; r < restarts; r++) {
@@ -962,6 +968,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 if (absValue(a1) < 1e-20) {
                     alpha = field.negate(norm);
                 } else {
+                    @SuppressWarnings("unchecked")
                     E phase = field.divide(a1, (E) Real.of(absValue(a1)));
                     alpha = field.negate(field.multiply(norm, phase));
                 }
@@ -1111,7 +1118,10 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 double t = tau / (1.0 + Math.sqrt(1.0 + tau * tau));
                 double c = 1.0 / Math.sqrt(1.0 + t * t);
                 double s = t * c;
-                E cE = (E) Real.of(c); E sE = (E) Real.of(s);
+                @SuppressWarnings("unchecked")
+                E cE = (E) Real.of(c); 
+                @SuppressWarnings("unchecked")
+                E sE = (E) Real.of(s);
                 for (int i = 0; i < n; i++) {
                     E ap = A[p][i]; E aq = A[q][i];
                     A[p][i] = field.add(field.multiply(cE, ap), field.negate(field.multiply(sE, aq)));

@@ -43,9 +43,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     private static MethodHandle MPFR_ADD;
     private static MethodHandle MPFR_SUB;
     private static MethodHandle MPFR_MUL;
+    @SuppressWarnings("unused")
     private static MethodHandle MPFR_DIV;
-    private static MethodHandle MPFR_SQRT;
-    private static MethodHandle MPFR_CMP;
     private static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
@@ -70,8 +69,6 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                 MPFR_SUB = lookup(mpfr, "mpfr_sub", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_MUL = lookup(mpfr, "mpfr_mul", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_DIV = lookup(mpfr, "mpfr_div", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
                 MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null && MPFR_MUL != null && MPFR_SUB != null;
@@ -92,7 +89,21 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     @Override public String getId() { return "native-mpfr-dense"; }
     @Override public String getName() { return "Native MPFR Arbitrary-Precision Backend"; }
     @Override public String getDescription() { return "High-performance Arbitrary Precision Linear Algebra backend using libmpfr bound via Project Panama."; }
-    @Override public int getPriority() { return 120; }
+    
+    @Override
+    public String getType() {
+        return "linearalgebra";
+    }
+
+    @Override
+    public int getPriority() {
+        return 120;
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
+    }
     @Override public boolean isLoaded() { return AVAILABLE; }
     @Override public String getNativeLibraryName() { return "mpfr"; }
     @Override public Object createBackend() { return this; }

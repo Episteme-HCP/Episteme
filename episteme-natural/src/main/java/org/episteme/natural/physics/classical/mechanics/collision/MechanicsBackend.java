@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.technical.backend.ComputeBackend;
 
@@ -39,8 +39,18 @@ import org.episteme.core.technical.backend.ComputeBackend;
 public interface MechanicsBackend extends ComputeBackend, CollisionProvider {
 
     @Override
+    default String getType() {
+        return "mechanics";
+    }
+
+    @Override
     default void shutdown() {
         // Default no-op to resolve diamond inheritance between ComputeBackend and AlgorithmProvider
+    }
+
+    @Override
+    default Object createBackend() {
+        return this;
     }
 
     /**

@@ -21,56 +21,58 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
-
-import org.episteme.core.measure.Quantity;
-import org.episteme.core.measure.quantity.Time;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 /**
- * Represents a physics simulation environment (Scene/World).
+ * Backend representation of a RigidBody.
+ * <p>
+ * This interface bridges the high-level Episteme {@code RigidBody} state 
+ * to the low-level physics engine representation (e.g. {@code btRigidBody}).
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface PhysicsWorldBridge {
+public interface RigidBodyBridge {
+    
+    /**
+     * Syncs the backend state from the Episteme object.
+     * Called before simulation step.
+     */
+    void pushState();
 
     /**
-     * Adds a rigid body to the simulation.
-     * 
-     * @param body the body to add
+     * Syncs the Episteme object from the backend state.
+     * Called after simulation step.
      */
-    void addRigidBody(RigidBody body);
+    void pullState();
+    
+    /**
+     * Apply a central force to the body.
+     * 
+     * @param x force x
+     * @param y force y
+     * @param z force z
+     */
+    void applyCentralForce(double x, double y, double z);
+    
+    /**
+     * Apply a central impulse to the body.
+     * 
+     * @param x impulse x
+     * @param y impulse y
+     * @param z impulse z
+     */
+    void applyCentralImpulse(double x, double y, double z);
 
     /**
-     * Removes a rigid body from the simulation.
-     * 
-     * @param body the body to remove
+     * Gets the Episteme RigidBody owner of this bridge.
      */
-    void removeRigidBody(RigidBody body);
+    RigidBody getOwner();
 
     /**
-     * Steps the simulation forward in time.
-     * 
-     * @param timeStep the amount of time to simulate
+     * Destroys native resources associated with this body.
      */
-    void stepSimulation(Quantity<Time> timeStep);
-
-    /**
-     * Steps the simulation with fixed time steps and max substeps.
-     * 
-     * @param timeStep the amount of time to simulate
-     * @param maxSubSteps maximum number of internal substeps
-     * @param fixedTimeStep the internal fixed time step
-     */
-    void stepSimulation(Quantity<Time> timeStep, int maxSubSteps, Quantity<Time> fixedTimeStep);
-
-    /**
-     * Sets the gravity vector for the world.
-     * 
-     * @param gravityX gravity in X
-     * @param gravityY gravity in Y
-     * @param gravityZ gravity in Z
-     */
-    void setGravity(double gravityX, double gravityY, double gravityZ);
+    void destroy();
 }

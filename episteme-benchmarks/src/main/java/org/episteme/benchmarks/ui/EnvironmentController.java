@@ -11,6 +11,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 import java.util.ServiceLoader;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
+import org.episteme.natural.physics.classical.mechanics.collision.MechanicsBackend;
 
 public class EnvironmentController {
 
@@ -90,7 +91,7 @@ public class EnvironmentController {
             safeDiscover(org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend.class, allProviders);
             safeDiscover(org.episteme.core.media.VisionBackend.class, allProviders);
             safeDiscover(org.episteme.core.media.AudioBackend.class, allProviders);
-            safeDiscover(org.episteme.natural.physics.classical.mechanics.MechanicsBackend.class, allProviders);
+            safeDiscover(MechanicsBackend.class, allProviders);
 
             if (allProviders.isEmpty()) {
                 Platform.runLater(() -> providerTable.setPlaceholder(new Label("No providers found.")));

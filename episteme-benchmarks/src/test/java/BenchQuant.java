@@ -1,4 +1,5 @@
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ public class BenchQuant {
         RealDoubleMatrix A = RealDoubleMatrix.of(dataA);
         RealDoubleMatrix B = RealDoubleMatrix.of(dataB);
         
+        @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> p : loader) {
             if (!p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) continue;
@@ -36,7 +38,9 @@ public class BenchQuant {
             
             // Warmup
             try {
-                for(int i=0; i<2; i++) ((LinearAlgebraProvider<Real>)p).multiply(A, B);
+                @SuppressWarnings("unchecked")
+                LinearAlgebraProvider<Real> pReal = (LinearAlgebraProvider<Real>) p;
+                for(int i=0; i<2; i++) pReal.multiply((Matrix<Real>)A, (Matrix<Real>)B);
             } catch (Throwable t) {
                 System.out.println("  Failed during warmup: " + t.getMessage());
                 continue;
@@ -44,8 +48,10 @@ public class BenchQuant {
             
             long start = System.currentTimeMillis();
             try {
+                @SuppressWarnings("unchecked")
+                LinearAlgebraProvider<Real> pReal = (LinearAlgebraProvider<Real>) p;
                 for(int i=0; i<ITERS; i++) {
-                   ((LinearAlgebraProvider<Real>)p).multiply(A, B);
+                   pReal.multiply((Matrix<Real>)A, (Matrix<Real>)B);
                 }
                 long end = System.currentTimeMillis();
                 double avg = (end - start) / (double)ITERS;

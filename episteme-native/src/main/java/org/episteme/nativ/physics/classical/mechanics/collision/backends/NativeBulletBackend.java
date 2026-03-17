@@ -10,11 +10,10 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
-import org.episteme.natural.physics.classical.mechanics.CollisionProvider;
-import org.episteme.natural.physics.classical.mechanics.MechanicsBackend;
-import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.MechanicsBackend;
+import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.measure.units.SI;
@@ -34,8 +33,8 @@ import org.episteme.natural.physics.classical.mechanics.simulation.SimulationPro
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@AutoService({CollisionProvider.class, MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
-public class NativeBulletBackend implements CollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
+@AutoService({MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
+public class NativeBulletBackend implements MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
 
     private static final MethodHandle DETECT_SPHERES;
     private static final MethodHandle RESOLVE_COLLISIONS;
@@ -144,6 +143,11 @@ public class NativeBulletBackend implements CollisionProvider, MechanicsBackend,
     @Override
     public String getName() {
         return "Native Bullet Physics (FFM)";
+    }
+
+    @Override
+    public String getType() {
+        return "mechanics";
     }
 
     @Override

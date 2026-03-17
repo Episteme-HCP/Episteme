@@ -1,13 +1,7 @@
-/*
- * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- */
-
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.technical.backend.ComputeBackend;
-import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.Backend;
 import java.lang.foreign.MemorySegment;
 
 /**
@@ -18,7 +12,7 @@ import java.lang.foreign.MemorySegment;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public interface CollisionProvider extends AlgorithmProvider {
+public interface CollisionProvider extends AlgorithmProvider, Backend {
 
 
     @Override
@@ -29,6 +23,21 @@ public interface CollisionProvider extends AlgorithmProvider {
     @Override
     default boolean isAvailable() {
         return true;
+    }
+
+    @Override
+    default String getType() {
+        return "collision";
+    }
+
+    @Override
+    default Object createBackend() {
+        return this;
+    }
+
+    @Override
+    default void shutdown() {
+        AlgorithmProvider.super.shutdown();
     }
 
     @Override

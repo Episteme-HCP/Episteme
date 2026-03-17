@@ -21,17 +21,17 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.nbody;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.natural.physics.classical.mechanics.Particle;
 import org.episteme.natural.physics.PhysicalConstants;
 import org.episteme.core.measure.Units;
 
-import org.episteme.natural.physics.classical.mechanics.nbody.NBodyProvider;
 import org.episteme.natural.physics.classical.mechanics.nbody.providers.MulticoreNBodyProvider;
 
 /**

@@ -39,7 +39,7 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         // SIMD fast path
         if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
-            return (Matrix<E>) RealDoubleStrassenAlgorithm.multiply(
+            return (Matrix<E>) (Matrix<?>) RealDoubleStrassenAlgorithm.multiply(
                     (SIMDRealDoubleMatrix) a, (SIMDRealDoubleMatrix) b);
         }
         
@@ -53,12 +53,12 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
             SIMDRealDoubleMatrix res = RealDoubleStrassenAlgorithm.multiply(simda, simdb);
             // Convert back to RealDoubleMatrix to preserve expected contract or just return as SIMD? 
             // The provider expects Matrix<E> so returning SIMD is fine, they both implement Matrix.
-            return (Matrix<E>) res;
+            return (Matrix<E>) (Matrix<?>) res;
         }
         
         // Generic path (if E is Real)
         if (a.get(0,0) instanceof Real) {
-             return (Matrix<E>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
+             return (Matrix<E>) (Matrix<?>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
         }
 
         return super.multiply(a, b);

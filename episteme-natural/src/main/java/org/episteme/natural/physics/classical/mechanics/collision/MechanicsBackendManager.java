@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.technical.backend.AbstractBackendManager;
 import java.util.Comparator;

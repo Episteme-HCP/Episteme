@@ -9,8 +9,8 @@ import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.quantity.Time;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 
 import java.lang.foreign.*;

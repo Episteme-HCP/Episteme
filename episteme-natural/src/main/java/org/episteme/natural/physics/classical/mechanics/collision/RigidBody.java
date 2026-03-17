@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.mathematics.linearalgebra.Vector;
 
@@ -29,6 +29,7 @@ import org.episteme.core.mathematics.numbers.complex.Quaternion;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver;
 import org.episteme.core.mathematics.geometry.collision.CollisionShape;
+import org.episteme.natural.physics.classical.mechanics.Kinematics;
 import java.util.Arrays;
 import java.util.List;
 

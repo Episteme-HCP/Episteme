@@ -28,6 +28,7 @@ import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import java.nio.DoubleBuffer;
 
 /**
@@ -42,8 +43,18 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({NBodyProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class})
-public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend {
+@AutoService({NBodyProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class, NativeBackend.class})
+public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, NativeBackend {
+
+    @Override
+    public boolean isLoaded() {
+        return isAvailable();
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "opencl";
+    }
 
     // ------------------------------------------------------------------ //
     //  Inner class: CPU Barnes-Hut Octree                                //

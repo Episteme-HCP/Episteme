@@ -31,6 +31,7 @@ import org.episteme.natural.chemistry.*;
 import org.episteme.natural.chemistry.crystallography.*;
 import org.episteme.natural.physics.astronomy.*;
 import org.episteme.natural.physics.classical.mechanics.*;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 import org.episteme.natural.physics.classical.thermodynamics.*;
 
 public class NaturalPojoTests {

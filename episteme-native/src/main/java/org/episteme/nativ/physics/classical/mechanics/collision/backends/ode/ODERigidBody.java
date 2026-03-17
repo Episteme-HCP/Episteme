@@ -9,8 +9,8 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.complex.Quaternion;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DBody;
@@ -88,6 +88,11 @@ public class ODERigidBody implements RigidBodyBridge {
         // ODE body.setLinearVel(odeBody.getLinearVel().add(x/m, y/m, z/m))
         // or just use impulse methods if available in extensions. ODE Core uses addForce.
         odeBody.addForce(x, y, z); // Approximation for fixed step
+    }
+
+    @Override
+    public RigidBody getOwner() {
+        return epistemeBody;
     }
 
     @Override

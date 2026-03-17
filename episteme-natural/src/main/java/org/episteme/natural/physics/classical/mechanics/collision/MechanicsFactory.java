@@ -21,17 +21,12 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 import java.util.Collection;
 
 /**
  * Factory for creating rigid body dynamics backends using SPI-based discovery.
- * Auto-detects best available backend if not specified.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class MechanicsFactory {
 

@@ -129,11 +129,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, field);
         } else {
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
             return IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
-                        if (i % 512 == 0) ctx.checkCancelled();
                         return field.add(a.get(i), b.get(i));
                     })
                     .collect(Collectors.collectingAndThen(
@@ -1150,7 +1148,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return GenericCholesky.solve(cholesky, b, field);
     }
 
-    @SuppressWarnings("unchecked")
     private Matrix<E> pseudoInverse(Matrix<E> a) {
         SVDResult<E> svd = svd(a);
         // A+ = V * S+ * UT (using economy dimensions)
@@ -1239,10 +1236,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             double[] pDouble = new double[n];
             for (int i = 0; i < n; i++) pDouble[i] = perm[i];
 
+            @SuppressWarnings("unchecked")
+            Vector<E> pVec = (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble);
             return new LUResult<E>(
                 new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(lData, field),
                 new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(uData, field),
-                (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble)
+                pVec
             );
         }
 
@@ -1508,7 +1507,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 double s = t * c;
 
                 // For Complex/Real, we can use these c, s values directly if we convert back
+                @SuppressWarnings("unchecked")
                 E cE = (E) Real.of(c);
+                @SuppressWarnings("unchecked")
                 E sE = (E) Real.of(s);
                 
                 // Apply rotation to A
