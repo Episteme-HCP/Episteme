@@ -260,6 +260,25 @@ public class RigidBody {
         return inverseInertiaTensor;
     }
 
+    public Real getMass() {
+        return mass;
+    }
+
+    public Real getInverseMass() {
+        return inverseMass;
+    }
+
+    public Quaternion getRotation() {
+        return orientation;
+    }
+
+    public double getBoundingRadius() {
+        if (collisionShape instanceof org.episteme.core.mathematics.geometry.collision.SphereShape s) {
+            return s.getRadius().doubleValue();
+        }
+        return 0; // Default or fallback
+    }
+
     public void setPosition(Vector<Real> position) {
         this.position = position;
     }

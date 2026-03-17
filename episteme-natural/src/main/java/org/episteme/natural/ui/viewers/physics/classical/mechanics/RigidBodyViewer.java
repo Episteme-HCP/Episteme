@@ -59,8 +59,9 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         VisualBodyData(Color c) { this.color = c; }
     }
 
-    private final CollisionSimulation engine = new CollisionSimulation();
-    private final java.util.Map<CollisionSimulation.Body, VisualBodyData> visualData = new java.util.HashMap<>();
+    private final org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge world = org.episteme.natural.physics.classical.mechanics.MechanicsFactory.createWorld();
+    private final List<RigidBody> bodies = new ArrayList<>();
+    private final java.util.Map<RigidBody, VisualBodyData> visualData = new java.util.HashMap<>();
     
     private double gravityVal = 0.5;
     private double bouncinessVal = 0.8;
@@ -91,7 +92,7 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     }
 
     private void setupParameters() {
-        parameters.add(new NumericParameter("rigid.gravity", I18N.getInstance().get("rigid.gravity", "Gravity"), 0, 2, 0.1, gravityVal, v -> gravityVal = v));
+        parameters.add(new NumericParameter("rigid.gravity", I18N.getInstance().get("rigid.gravity", "Gravity"), 0, 20.0, 0.5, gravityVal, v -> gravityVal = v));
         parameters.add(new NumericParameter("rigid.bounciness", I18N.getInstance().get("rigid.bounciness", "Bounciness"), 0.1, 1.0, 0.05, bouncinessVal, v -> bouncinessVal = v));
         
         parameters.add(new BooleanParameter("rigid.add", I18N.getInstance().get("rigid.add", "Add Body"), false, v -> {
@@ -99,7 +100,11 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         }));
         
         parameters.add(new BooleanParameter("rigid.clear", I18N.getInstance().get("rigid.clear", "Clear World"), false, v -> {
-            if (v) { engine.clear(); visualData.clear(); }
+            if (v) {
+                for (RigidBody b : bodies) world.removeRigidBody(b);
+                bodies.clear();
+                visualData.clear();
+            }
         }));
     }
 
@@ -115,32 +120,38 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     private void addBody() {
         Random r = new Random();
         double radius = 10 + r.nextDouble() * 20;
-        double px = 100 + r.nextDouble() * (600);
+        double px = 100 + r.nextDouble() * (canvas.getWidth() - 200);
         double py = 50.0;
         
         Real one = Real.ONE, zero = Real.ZERO;
         List<List<Real>> data = Arrays.asList(
             Arrays.asList(one, zero, zero), Arrays.asList(zero, one, zero), Arrays.asList(zero, zero, one)
         );
-        org.episteme.core.mathematics.linearalgebra.Matrix<Real> inertia = org.episteme.core.mathematics.linearalgebra.Matrix.of(data, Reals.getInstance());
+        org.episteme.core.mathematics.linearalgebra.Matrix<Real> inertia = org.episteme.core.mathematics.linearalgebra.Matrix.of(data, org.episteme.core.mathematics.sets.Reals.getInstance());
 
-        RigidBody rb = new RigidBody(toVector(px, py, 0), Real.of(radius * radius), inertia, null);
+        // Use a sphere collision shape if available
+        org.episteme.core.mathematics.geometry.collision.CollisionShape shape = null;
+        try {
+            shape = new org.episteme.core.mathematics.geometry.collision.SphereShape(radius);
+        } catch (Exception e) {}
+
+        RigidBody rb = new RigidBody(toVector(px, py, 0), Real.of(radius * radius), inertia, shape);
         rb.setVelocity(toVector((r.nextDouble() - 0.5) * 10, 0, 0));
 
-        CollisionSimulation.Body body = new CollisionSimulation.Body(rb, radius);
-        body.bounciness = bouncinessVal;
-        engine.addBody(body);
-        visualData.put(body, new VisualBodyData(Color.hsb(r.nextDouble() * 360, 0.7, 0.9)));
+        bodies.add(rb);
+        world.addRigidBody(rb);
+        visualData.put(rb, new VisualBodyData(Color.hsb(r.nextDouble() * 360, 0.7, 0.9)));
     }
 
     private Vector<Real> toVector(double x, double y, double z) {
-        return Vector.of(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
+        return Vector.of(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), org.episteme.core.mathematics.sets.Reals.getInstance());
     }
 
     private void update() {
-        engine.setGravity(gravityVal);
-        engine.setBounds(canvas.getWidth(), canvas.getHeight());
-        engine.update(speed);
+        if (world != null) {
+            world.setGravity(0, gravityVal, 0);
+            world.stepSimulation(org.episteme.core.measure.Quantities.create(0.016 * speed, org.episteme.core.measure.units.SI.SECOND));
+        }
     }
 
     private void render() {
@@ -149,19 +160,29 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         gc.setStroke(Color.GRAY);
         gc.strokeLine(0, canvas.getHeight() - 1, canvas.getWidth(), canvas.getHeight() - 1);
 
-        for (CollisionSimulation.Body vb : engine.getBodies()) {
-            RigidBody b = vb.physicsBody;
+        for (RigidBody b : bodies) {
             double x = b.getPosition().get(0).doubleValue();
             double y = b.getPosition().get(1).doubleValue();
-            VisualBodyData data = visualData.get(vb);
+            VisualBodyData data = visualData.get(b);
+            
+            double radius = 15; // Fallback
+            if (b.getCollisionShape() instanceof org.episteme.core.mathematics.geometry.collision.SphereShape s) {
+                radius = s.getRadius().doubleValue();
+            }
+            
             gc.setFill(data != null ? data.color : Color.GRAY);
-            gc.fillOval(x - vb.radius, y - vb.radius, vb.radius * 2, vb.radius * 2);
+            gc.fillOval(x - radius, y - radius, radius * 2, radius * 2);
         }
     }
 
     @Override public void play() { running = true; }
     @Override public void pause() { running = false; }
-    @Override public void stop() { running = false; engine.clear(); visualData.clear(); }
+    @Override public void stop() { 
+        running = false; 
+        for (RigidBody b : bodies) world.removeRigidBody(b);
+        bodies.clear(); 
+        visualData.clear(); 
+    }
     @Override public boolean isPlaying() { return running; }
     @Override public void setSpeed(double s) { speed = s; }
     @Override public void step() { update(); render(); }

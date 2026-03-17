@@ -23,7 +23,6 @@
 
 package org.episteme.natural.physics.classical.mechanics;
 
-import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.backend.ComputeBackend;
 
 /**
@@ -37,7 +36,7 @@ import org.episteme.core.technical.backend.ComputeBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface MechanicsBackend extends ComputeBackend, AlgorithmProvider {
+public interface MechanicsBackend extends ComputeBackend, CollisionProvider {
 
     @Override
     default void shutdown() {

@@ -12,6 +12,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
@@ -31,8 +32,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, CPUBackend.class})
-public class NativeMPFRSparseLinearAlgebraProvider implements SparseLinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
+@AutoService({LinearAlgebraBackend.class, Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, CPUBackend.class})
+public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBackend<Real>, SparseLinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraProvider.class);
     private static final Linker LINKER = Linker.nativeLinker();
@@ -97,13 +98,13 @@ public class NativeMPFRSparseLinearAlgebraProvider implements SparseLinearAlgebr
     }
 
     @Override
-    public String getType() {
-        return "math";
+    public String getName() {
+        return "Native MPFR Sparse Backend";
     }
 
     @Override
-    public String getName() {
-        return "Native MPFR Sparse Backend";
+    public String getDescription() {
+        return "Native high-performance Sparse Arbitrary Precision Linear Algebra backend using libmpfr bound via Project Panama.";
     }
 
     @Override
@@ -114,6 +115,16 @@ public class NativeMPFRSparseLinearAlgebraProvider implements SparseLinearAlgebr
     @Override
     public boolean isLoaded() {
         return AVAILABLE;
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "mpfr";
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
     }
 
     @Override

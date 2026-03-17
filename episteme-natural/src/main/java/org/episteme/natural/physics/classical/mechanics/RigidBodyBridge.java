@@ -67,6 +67,11 @@ public interface RigidBodyBridge {
     void applyCentralImpulse(double x, double y, double z);
 
     /**
+     * Gets the Episteme RigidBody owner of this bridge.
+     */
+    RigidBody getOwner();
+
+    /**
      * Destroys native resources associated with this body.
      */
     void destroy();

@@ -1,6 +1,5 @@
 package org.episteme.core.mathematics.linearalgebra.backends;
 
-import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
@@ -11,10 +10,11 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
-import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.cpu.CPUExecutionContext;
 import org.episteme.core.technical.backend.simd.SIMDBackend;
+import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import com.google.auto.service.AutoService;
 
 /**
@@ -28,8 +28,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({LinearAlgebraProvider.class, Backend.class})
-public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, SIMDBackend {
+@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
+public class EpistemeLinearAlgebraBackend implements LinearAlgebraBackend<Real>, SparseLinearAlgebraProvider<Real>, SIMDBackend {
 
     private final CPUDenseLinearAlgebraProvider<Real> denseProvider;
     private final CPUSparseLinearAlgebraProvider<Real> sparseProvider;
@@ -40,8 +40,8 @@ public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider
     }
 
     @Override
-    public String getType() {
-        return BackendDiscovery.TYPE_LINEAR_ALGEBRA;
+    public String getNativeLibraryName() {
+        return null; // Pure Java foundation
     }
 
     @Override

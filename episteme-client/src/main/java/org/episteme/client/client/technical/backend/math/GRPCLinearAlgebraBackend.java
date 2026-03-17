@@ -28,6 +28,8 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import org.episteme.server.server.proto.*;
 import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import com.google.auto.service.AutoService;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
@@ -63,8 +65,8 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({LinearAlgebraProvider.class, Backend.class})
-public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Backend {
+@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
+public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, Backend {
 
     private ManagedChannel channel;
     private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
@@ -127,8 +129,11 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Ba
     }
 
     @Override
-    public String getType() {
-        return "math";
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.core.technical.backend.ExecutionContext() {
+            @Override public <T> T execute(org.episteme.core.technical.backend.Operation<T> op) { return op.compute(this); }
+            @Override public void close() {}
+        };
     }
 
     @Override
