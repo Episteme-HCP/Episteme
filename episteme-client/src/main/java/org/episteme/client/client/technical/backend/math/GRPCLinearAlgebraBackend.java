@@ -38,6 +38,10 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 
+import com.google.protobuf.ByteString;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -441,26 +445,31 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Ba
     // ==================== Conversion Utilities ====================
 
     private MatrixData toProtoMatrix(Matrix<E> matrix) {
-        MatrixData.Builder builder = MatrixData.newBuilder();
         int rows = matrix.rows();
         int cols = matrix.cols();
-        builder.setRows(rows);
-        builder.setCols(cols);
+        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8).order(ByteOrder.LITTLE_ENDIAN);
+        DoubleBuffer db = bb.asDoubleBuffer();
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                E val = matrix.get(i, j);
-                builder.addData(toDouble(val));
+                db.put(toDouble(matrix.get(i, j)));
             }
         }
-        return builder.build();
+        return MatrixData.newBuilder()
+                .setRows(rows)
+                .setCols(cols)
+                .setData(ByteString.copyFrom(bb))
+                .build();
     }
 
     @SuppressWarnings("unchecked")
     private Matrix<E> fromProtoMatrix(MatrixData data) {
         int rows = data.getRows();
         int cols = data.getCols();
-        List<Double> raw = data.getDataList();
+        ByteString byteData = data.getData();
+        
+        double[] raw = new double[rows * cols];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
 
         List<List<E>> matrixRows = new ArrayList<>();
         int dataIdx = 0;
@@ -468,8 +477,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Ba
         for (int i = 0; i < rows; i++) {
             List<E> row = new ArrayList<>();
             for (int j = 0; j < cols; j++) {
-                double val = raw.get(dataIdx++);
-                row.add((E) Real.of(val));
+                row.add((E) Real.of(raw[dataIdx++]));
             }
             matrixRows.add(row);
         }
@@ -478,23 +486,30 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, Ba
     }
 
     private VectorData toProtoVector(Vector<E> vector) {
-        VectorData.Builder builder = VectorData.newBuilder();
         int size = vector.dimension();
-        builder.setSize(size);
+        ByteBuffer bb = ByteBuffer.allocate(size * 8).order(ByteOrder.LITTLE_ENDIAN);
+        DoubleBuffer db = bb.asDoubleBuffer();
 
         for (int i = 0; i < size; i++) {
-            E val = vector.get(i);
-            builder.addData(toDouble(val));
+            db.put(toDouble(vector.get(i)));
         }
-        return builder.build();
+
+        return VectorData.newBuilder()
+                .setSize(size)
+                .setData(ByteString.copyFrom(bb))
+                .build();
     }
     
     @SuppressWarnings("unchecked")
     private Vector<E> fromProtoVector(VectorData data) {
-        List<Double> raw = data.getDataList();
+        int size = data.getSize();
+        ByteString byteData = data.getData();
+        
+        double[] raw = new double[size];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
+        
         List<E> elements = new ArrayList<>();
-
-        for (Double val : raw) {
+        for (double val : raw) {
             elements.add((E) Real.of(val));
         }
 

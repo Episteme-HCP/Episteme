@@ -33,6 +33,10 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.protobuf.ByteString;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
 import java.util.List;
 
 /**
@@ -54,14 +58,14 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             LOG.info("Received Matrix Multiplication request");
 
             // 1. Convert Proto to Episteme Matrices
-            RealDoubleMatrix matrixA = fromProto(request.getMatrixA());
-            RealDoubleMatrix matrixB = fromProto(request.getMatrixB());
+            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrixA = fromProto(request.getMatrixA());
+            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrixB = fromProto(request.getMatrixB());
 
             LOG.debug("Multiplying matrices: [{}x{}] * [{}x{}]",
                     matrixA.rows(), matrixA.cols(), matrixB.rows(), matrixB.cols());
 
             // 2. Perform Multiplication
-            RealDoubleMatrix resultMatrix = matrixA.multiply(matrixB);
+            org.episteme.core.mathematics.linearalgebra.Matrix<Real> resultMatrix = matrixA.multiply(matrixB);
 
             // 3. Convert Result to Proto
             MatrixData resultData = toProto(resultMatrix);
@@ -88,7 +92,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixAdd(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            RealDoubleMatrix result = (RealDoubleMatrix) fromProto(request.getMatrixA()).add(fromProto(request.getMatrixB()));
+            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrixA()).add(fromProto(request.getMatrixB()));
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -99,7 +103,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixSubtract(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            RealDoubleMatrix result = (RealDoubleMatrix) fromProto(request.getMatrixA()).subtract(fromProto(request.getMatrixB()));
+            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrixA()).subtract(fromProto(request.getMatrixB()));
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -132,8 +136,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixScale(ScaleRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            RealDoubleMatrix matrix = fromProto(request.getMatrix());
-            RealDoubleMatrix result = matrix.scale(Real.of(request.getScalar()));
+            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrix = fromProto(request.getMatrix());
+            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = matrix.scale(Real.of(request.getScalar()), matrix);
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -155,7 +159,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void vectorAdd(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            RealDoubleVector result = (RealDoubleVector) fromProto(request.getVectorA()).add(fromProto(request.getVectorB()));
+            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVectorA()).add(fromProto(request.getVectorB()));
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -166,7 +170,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void vectorSubtract(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            RealDoubleVector result = (RealDoubleVector) fromProto(request.getVectorA()).subtract(fromProto(request.getVectorB()));
+            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVectorA()).subtract(fromProto(request.getVectorB()));
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -177,7 +181,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void vectorScale(VectorScaleRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            RealDoubleVector result = (RealDoubleVector) fromProto(request.getVector()).multiply(Real.of(request.getScalar()));
+            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVector()).multiply(Real.of(request.getScalar()));
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -210,7 +214,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixVectorMultiply(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            RealDoubleVector result = (RealDoubleVector) fromProto(request.getMatrix()).multiply(fromProto(request.getVector()));
+            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getMatrix()).multiply(fromProto(request.getVector()));
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -221,7 +225,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void linearSolve(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            RealDoubleVector result = fromProto(request.getMatrix()).solve((org.episteme.core.mathematics.linearalgebra.Vector<Real>) fromProto(request.getVector()));
+            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getMatrix()).solve(fromProto(request.getVector()));
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -317,30 +321,33 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     private RealDoubleMatrix fromProto(MatrixData proto) {
         int rows = proto.getRows();
         int cols = proto.getCols();
-        List<Double> dataList = proto.getDataList();
-
-        // Convert List<Double> to double[]
-        double[] data = new double[dataList.size()];
-        for (int i = 0; i < dataList.size(); i++) {
-            data[i] = dataList.get(i);
-        }
+        ByteString byteData = proto.getData();
+        
+        double[] data = new double[rows * cols];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(data);
 
         return RealDoubleMatrix.of(data, rows, cols);
     }
 
     private RealDoubleVector fromProto(VectorData proto) {
-        double[] data = new double[proto.getSize()];
-        List<Double> list = proto.getDataList();
-        for (int i = 0; i < data.length; i++) data[i] = list.get(i);
+        int size = proto.getSize();
+        ByteString byteData = proto.getData();
+        double[] data = new double[size];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(data);
         return RealDoubleVector.of(data);
     }
 
     private VectorData toProto(org.episteme.core.mathematics.linearalgebra.Vector<Real> vector) {
-        VectorData.Builder builder = VectorData.newBuilder().setSize(vector.dimension());
-        for (int i = 0; i < vector.dimension(); i++) {
-            builder.addData(vector.get(i).doubleValue());
+        int size = vector.dimension();
+        ByteBuffer bb = ByteBuffer.allocate(size * 8).order(ByteOrder.LITTLE_ENDIAN);
+        DoubleBuffer db = bb.asDoubleBuffer();
+        for (int i = 0; i < size; i++) {
+            db.put(vector.get(i).doubleValue());
         }
-        return builder.build();
+        return VectorData.newBuilder()
+                .setSize(size)
+                .setData(ByteString.copyFrom(bb))
+                .build();
     }
 
     private MatrixData toProto(org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrix) {
@@ -351,29 +358,20 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                 .setRows(rows)
                 .setCols(cols);
 
+        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8).order(ByteOrder.LITTLE_ENDIAN);
+        DoubleBuffer db = bb.asDoubleBuffer();
+
         if (matrix instanceof RealDoubleMatrix rdm) {
-            java.nio.DoubleBuffer buffer = rdm.getBuffer();
-            if (buffer.hasArray()) {
-                double[] arr = buffer.array();
-                for (double d : arr) {
-                    builder.addData(d);
-                }
-            } else {
-                buffer.rewind();
-                while (buffer.hasRemaining()) {
-                    builder.addData(buffer.get());
-                }
-            }
+            db.put(rdm.getBuffer());
         } else {
             // Generic slow path for views (Transposed, etc.)
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    builder.addData(matrix.get(i, j).doubleValue());
+                    db.put(matrix.get(i, j).doubleValue());
                 }
             }
         }
-
+        builder.setData(ByteString.copyFrom(bb));
         return builder.build();
     }
 }
-

@@ -28,6 +28,7 @@ import org.episteme.core.technical.backend.ExecutionContext;
 
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorSpecies;
+import static jdk.incubator.vector.VectorOperators.*;
 import jdk.incubator.vector.VectorOperators;
 
 /**
@@ -232,7 +233,7 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
                  var vX = DoubleVector.fromArray(species, x, j);
                  vSum = vSum.add(vA.mul(vX));
             }
-            sum = vSum.reduceLanes(VectorOperators.ADD);
+            sum = vSum.reduceLanes(ADD);
             for (; j < n; j++) {
                 sum += data[i*n + j] * x[j];
             }
@@ -321,7 +322,7 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
             DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
             sum = sum.add(va.mul(vb));
         }
-        double res = sum.reduceLanes(VectorOperators.ADD);
+        double res = sum.reduceLanes(ADD);
         
         for (; i < n; i++) {
             res += aData[i] * bData[i];
@@ -464,8 +465,8 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
                 for (; j + species.length() <= n; j += species.length()) {
                     var vRowK = DoubleVector.fromArray(species, data, k * n + j);
                     var vRowI = DoubleVector.fromArray(species, data, i * n + j);
-                    vRowI.lanewise(VectorOperators.SUB, 
-                        vRowK.lanewise(VectorOperators.MUL, factor))
+                    vRowI.lanewise(SUB, 
+                        vRowK.lanewise(MUL, factor))
                         .intoArray(data, i * n + j);
                 }
                 for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];

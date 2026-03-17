@@ -68,6 +68,17 @@ public interface Module<M, R> extends AbelianGroup<M> {
      * @return r Ãƒâ€” m
      */
     M scale(R scalar, M moduleElement);
+
+    /**
+     * Convenience scalar multiplication (r Ã— this).
+     * 
+     * @param scalar the scalar r âˆˆ R
+     * @return r Ã— this
+     */
+    @SuppressWarnings("unchecked")
+    default M scale(R scalar) {
+        return scale(scalar, (M) this);
+    }
 }
 
 
