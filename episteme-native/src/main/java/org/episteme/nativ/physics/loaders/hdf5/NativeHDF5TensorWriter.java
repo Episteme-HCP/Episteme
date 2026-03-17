@@ -16,21 +16,30 @@ import org.episteme.core.io.ResourceWriter;
  * Currently supports Rank-2 Tensors (Matrices) by converting to NativeDoubleMatrixStorage.
  * Future versions will support N-Dimensional arrays directly.
  */
-public class NativeHDF5TensorWriter implements ResourceWriter<Tensor<?>> {
+import org.episteme.core.technical.i18n.I18N;
+import org.episteme.core.io.AbstractResourceWriter;
+
+
+/**
+ * Adapter to save Tensors to HDF5 files.
+ * Currently supports Rank-2 Tensors (Matrices) by converting to NativeDoubleMatrixStorage.
+ * Future versions will support N-Dimensional arrays directly.
+ */
+public class NativeHDF5TensorWriter extends AbstractResourceWriter<Tensor<?>> {
 
     @Override
     public String getName() {
-        return "HDF5 Tensor Writer";
+        return I18N.get("io.hdf5.writer.name");
     }
 
     @Override
     public String getDescription() {
-        return "Saves Tensors to HDF5 files.";
+        return I18N.get("io.hdf5.writer.description");
     }
 
     @Override
     public String getCategory() {
-        return "I/O / Native";
+        return I18N.get("io.hdf5.writer.category");
     }
 
     @SuppressWarnings("unchecked")
@@ -46,7 +55,7 @@ public class NativeHDF5TensorWriter implements ResourceWriter<Tensor<?>> {
 
     @Override
     public String getLongDescription() {
-        return "Adapter that allows saving org.episteme.core.mathematics.linearalgebra.Tensor objects directly to HDF5 files by converting them to NativeDoubleMatrixStorage representations.";
+        return I18N.get("io.hdf5.writer.longDescription");
     }
 
     @Override

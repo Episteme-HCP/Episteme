@@ -21,16 +21,33 @@
  * SOFTWARE.
  */
 
-package org.episteme.core.io;
-
-import java.io.BufferedOutputStream;
-import java.io.OutputStream;
+import org.episteme.core.technical.i18n.I18N;
 
 /**
  * Abstract base for resource writers.
- * Provides basic buffering support but no caching/fallback logic (Output only).
+ * Provides basic buffering support and I18N metadata.
  */
 public abstract class AbstractResourceWriter<T> implements ResourceWriter<T> {
+
+    @Override
+    public String getName() {
+        return I18N.get("io.generic.writer.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return I18N.get("io.generic.writer.description");
+    }
+
+    @Override
+    public String getCategory() {
+        return I18N.get("io.generic.writer.category");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 
     /**
      * Prepares an OutputStream with buffering.
