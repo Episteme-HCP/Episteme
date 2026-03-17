@@ -15,6 +15,7 @@ import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBr
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import org.episteme.natural.physics.classical.mechanics.simulation.SimulationProvider;
+import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import java.lang.foreign.*;
@@ -34,7 +35,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
  * @since 1.1
  */
 @AutoService({MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
-public class ODEBackend implements MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
+public class ODEBackend implements NativeCollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
  
     private static boolean IS_INITIALIZED = false;
     private static boolean IS_AVAILABLE = false;
@@ -58,31 +59,19 @@ public class ODEBackend implements MechanicsBackend, CPUBackend, NativeBackend, 
 
     @Override
     public String getDescription() {
-        if (isLoaded()) {
-            return "Native high-performance ODE physics engine (Project Panama).";
-        }
-        return "ode4j physics engine backend (Java Port of ODE).";
+        return "Native high-performance ODE physics engine (Project Panama).";
     }
 
     @Override
     public boolean isAvailable() {
         ensureInitialized();
-        if (IS_AVAILABLE) return !isExplicitlyDisabled();
-        
-        // Fallback check for ode4j
-        try {
-            Class.forName("org.ode4j.ode.OdeHelper");
-            return !isExplicitlyDisabled();
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
+        return IS_AVAILABLE && !isExplicitlyDisabled();
     }
 
     @Override
     public String getStatusMessage() {
         if (isLoaded()) return "Ready (Native ODE)";
-        if (isAvailable()) return "Ready (ode4j fallback)";
-        return "Neither native library 'ode' nor 'ode4j' found";
+        return "Native library 'ode' not found";
     }
 
     @Override
@@ -109,32 +98,61 @@ public class ODEBackend implements MechanicsBackend, CPUBackend, NativeBackend, 
 
     @Override
     public PhysicsWorldBridge createWorld() {
-        if (isLoaded()) {
-            return new org.episteme.nativ.physics.classical.mechanics.collision.backends.ode.NativeODEWorld();
+        if (!isLoaded()) {
+            throw new UnsupportedOperationException("Native ODE library not loaded");
         }
-        return new org.episteme.nativ.physics.classical.mechanics.collision.backends.ode.ODEWorld();
+        return new org.episteme.nativ.physics.classical.mechanics.collision.backends.ode.NativeODEWorld();
     }
 
     @Override
     public RigidBodyBridge createRigidBody(RigidBody body) {
-        return null;
+        throw new UnsupportedOperationException("RigidBody creation must be handled via PhysicsWorldBridge.addRigidBody for ODE backend.");
+    }
+
+    @Override
+    public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
+        if (isLoaded()) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment radSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, radii);
+                MemorySegment colSeg = arena.allocate(ValueLayout.JAVA_INT, (long) n * n * 2);
+                int count = detectSphereCollisions(posSeg, radSeg, n, colSeg);
+                MemorySegment.copy(colSeg, ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
+                return count;
+            }
+        }
+        return 0; // Or fallback to CPU implementation
+    }
+
+    @Override
+    public void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
+        if (isLoaded()) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment velSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, velocities);
+                MemorySegment massSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, masses);
+                MemorySegment colSeg = arena.allocateFrom(ValueLayout.JAVA_INT, collisions);
+                resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions);
+                // Copy back updated positions and velocities
+                MemorySegment.copy(posSeg, ValueLayout.JAVA_DOUBLE, 0, positions, 0, n * 3);
+                MemorySegment.copy(velSeg, ValueLayout.JAVA_DOUBLE, 0, velocities, 0, n * 3);
+            }
+        }
     }
 
     @Override
     public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
-        // If native is available, we could call a native collision handler here.
-        // For now, return 0 as placeholder.
-        return 0;
+        throw new UnsupportedOperationException("Raw MemorySegment collision detection not yet implemented for ODE.");
     }
 
     @Override
     public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
-        // Native or fallback resolution
+        throw new UnsupportedOperationException("Raw MemorySegment collision resolution not yet implemented for ODE.");
     }
 
     @Override
     public void parallelExecute(List<Runnable> tasks, int parallelism) {
-        // Native or fallback parallel execution
+        throw new UnsupportedOperationException("Higher-level parallel execution not supported by this native backend.");
     }
 
     @Override

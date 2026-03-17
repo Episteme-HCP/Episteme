@@ -33,7 +33,10 @@ import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBr
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import java.lang.foreign.MemorySegment;
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
+import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.physics.classical.mechanics.collision.backends.jbullet.JBulletWorld;
+import org.episteme.nativ.physics.classical.mechanics.collision.backends.jbullet.JBulletRigidBody;
 
 /**
  * JBullet physics backend provider.
@@ -44,7 +47,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
  * @since 1.0
  */
 @AutoService({MechanicsBackend.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class, org.episteme.core.technical.backend.Backend.class, NativeBackend.class})
-public class NativeJBulletBackend implements MechanicsBackend, CPUBackend, NativeBackend {
+public class NativeJBulletBackend implements NativeCollisionProvider, MechanicsBackend, CPUBackend, NativeBackend {
 
     @Override
     public String getType() {
@@ -118,11 +121,29 @@ public class NativeJBulletBackend implements MechanicsBackend, CPUBackend, Nativ
     }
 
     @Override
+    public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
+        // Reuse MemorySegment version by wrapping arrays
+        MemorySegment posSeg = MemorySegment.ofArray(positions);
+        MemorySegment radSeg = MemorySegment.ofArray(radii);
+        MemorySegment colSeg = MemorySegment.ofArray(collisions);
+        return detectSphereCollisions(posSeg, radSeg, n, colSeg);
+    }
+
+    @Override
+    public void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
+        MemorySegment posSeg = MemorySegment.ofArray(positions);
+        MemorySegment velSeg = MemorySegment.ofArray(velocities);
+        MemorySegment massSeg = MemorySegment.ofArray(masses);
+        MemorySegment colSeg = MemorySegment.ofArray(collisions);
+        resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions);
+    }
+
+    @Override
     public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
         if (n == 0) return 0;
-        java.nio.DoubleBuffer posBuf  = positions.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        java.nio.DoubleBuffer radiiBuf = radii.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        java.nio.IntBuffer    collBuf  = collisions.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+        java.nio.DoubleBuffer posBuf  = positions.reinterpret(n * 3 * 8).asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        java.nio.DoubleBuffer radiiBuf = radii.reinterpret(n * 8).asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        java.nio.IntBuffer    collBuf  = collisions.reinterpret(n * n * 4).asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
 
         // --- Spatial Hash O(n) collision detection ---
         // Find max radius to determine cell size

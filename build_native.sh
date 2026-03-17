@@ -20,9 +20,7 @@ cmake --build . --config Release
 
 cd ../..
 
-echo "Copying libraries to libs..."
-mkdir -p "$OUTPUT_DIR"
-cp "$BUILD_DIR/vision/libepisteme-native.so" "$OUTPUT_DIR/" 2>/dev/null
-cp "$BUILD_DIR/audio/libminiaudio.so" "$OUTPUT_DIR/" 2>/dev/null
+echo "Copying libraries to libs (via install target)..."
+cmake --install .
 
 echo "[SUCCESS] Episteme Native (Linux) build complete."

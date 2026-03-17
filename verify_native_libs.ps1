@@ -14,7 +14,8 @@ $libraries = @(
     @{ Name = "OpenBLAS";    EnvVar = "OpenBLAS_DIR"; LocalDir = "OpenBLAS"; CheckFile = "bin\libopenblas.dll"; Type = "native" },
     @{ Name = "Bullet3";     EnvVar = "BULLET_HOME"; LocalDir = "Bullet3DLL"; CheckFile = "libbulletc.dll"; Type = "native" },
     @{ Name = "TarsosDSP";   EnvVar = $null; LocalDir = "Tarsos\Tarsos-master"; CheckFile = "lib\TarsosDSP-2.4.jar"; Type = "java" },
-    @{ Name = "oneDNN";      EnvVar = "DNNL_DIR"; LocalDir = "oneDNN\oneDNN-main"; CheckFile = "CMakeLists.txt"; Type = "source" }
+    @{ Name = "oneDNN";      EnvVar = "DNNL_DIR"; LocalDir = "oneDNN\oneDNN-main"; CheckFile = "CMakeLists.txt"; Type = "source" },
+    @{ Name = "EpistemeNative"; EnvVar = $null; LocalDir = ""; CheckFile = "episteme-native.dll"; Type = "native" }
 )
 
 $currentPath = $env:PATH

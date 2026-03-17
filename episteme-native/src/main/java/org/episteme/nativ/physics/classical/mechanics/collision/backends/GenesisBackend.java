@@ -15,12 +15,14 @@ import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBr
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import org.episteme.natural.physics.classical.mechanics.simulation.SimulationProvider;
+import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
+import java.lang.foreign.ValueLayout;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +40,7 @@ import java.util.Optional;
  * @since 1.1
  */
 @AutoService({MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
-public class GenesisBackend implements MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
+public class GenesisBackend implements NativeCollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
 
     private static boolean IS_INITIALIZED = false;
     private static boolean IS_AVAILABLE = false;
@@ -62,24 +64,19 @@ public class GenesisBackend implements MechanicsBackend, CPUBackend, NativeBacke
 
     @Override
     public String getDescription() {
-        if (isLoaded()) {
-            return "Native high-performance Genesis physics engine (Project Panama).";
-        }
-        return "Genesis high-performance physics engine backend (SIMD accelerated).";
+        return "Native high-performance Genesis physics engine (Project Panama).";
     }
 
     @Override
     public boolean isAvailable() {
         ensureInitialized();
-        if (IS_AVAILABLE) return !isExplicitlyDisabled();
-        // Pure Java/SIMD backend fallback is always available if not disabled
-        return !isExplicitlyDisabled();
+        return IS_AVAILABLE && !isExplicitlyDisabled();
     }
 
     @Override
     public String getStatusMessage() {
         if (isLoaded()) return "Ready (Native Genesis)";
-        return "Ready (SIMD fallback)";
+        return "Native library 'GenesisC' not found";
     }
 
     @Override
@@ -105,30 +102,60 @@ public class GenesisBackend implements MechanicsBackend, CPUBackend, NativeBacke
 
     @Override
     public PhysicsWorldBridge createWorld() {
-        if (isLoaded()) {
-            return new org.episteme.nativ.physics.classical.mechanics.collision.backends.genesis.NativeGenesisWorld();
+        if (!isLoaded()) {
+            throw new UnsupportedOperationException("Native Genesis library not loaded");
         }
-        return new org.episteme.nativ.physics.classical.mechanics.collision.backends.genesis.GenesisWorld();
+        return new org.episteme.nativ.physics.classical.mechanics.collision.backends.genesis.NativeGenesisWorld();
     }
 
     @Override
     public RigidBodyBridge createRigidBody(RigidBody body) {
-        return null;
+        throw new UnsupportedOperationException("RigidBody creation must be handled via PhysicsWorldBridge.addRigidBody for Genesis backend.");
+    }
+
+    @Override
+    public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
+        if (isLoaded()) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment radSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, radii);
+                MemorySegment colSeg = arena.allocate(ValueLayout.JAVA_INT, (long) n * n * 2);
+                int count = detectSphereCollisions(posSeg, radSeg, n, colSeg);
+                MemorySegment.copy(colSeg, ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
+                return count;
+            }
+        }
+        return 0; 
+    }
+
+    @Override
+    public void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
+        if (isLoaded()) {
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment velSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, velocities);
+                MemorySegment massSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, masses);
+                MemorySegment colSeg = arena.allocateFrom(ValueLayout.JAVA_INT, collisions);
+                resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions);
+                MemorySegment.copy(posSeg, ValueLayout.JAVA_DOUBLE, 0, positions, 0, n * 3);
+                MemorySegment.copy(velSeg, ValueLayout.JAVA_DOUBLE, 0, velocities, 0, n * 3);
+            }
+        }
     }
 
     @Override
     public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
-        return 0;
+        throw new UnsupportedOperationException("Raw MemorySegment collision detection not yet implemented for Genesis.");
     }
 
     @Override
     public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
-        // Native resolution
+        throw new UnsupportedOperationException("Raw MemorySegment collision resolution not yet implemented for Genesis.");
     }
 
     @Override
     public void parallelExecute(List<Runnable> tasks, int parallelism) {
-        // Native parallel execution
+        throw new UnsupportedOperationException("Higher-level parallel execution not supported by this native backend.");
     }
 
     @Override

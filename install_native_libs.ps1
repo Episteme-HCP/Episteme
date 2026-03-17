@@ -6,7 +6,7 @@
 
 param(
     [Parameter(Position=0)]
-    [ValidateSet("All", "MPJ", "HDF5", "FFTW", "Bullet", "OpenBLAS")]
+    [ValidateSet("All", "MPJ", "HDF5", "FFTW", "Bullet", "OpenBLAS", "EpistemeNative")]
     [string[]]$Libraries = @("All"),
     
     [string]$InstallDir = (Join-Path $PSScriptRoot "libs")
@@ -254,6 +254,12 @@ if ($Libraries -contains "All" -or $Libraries -contains "OpenBLAS") {
     if ($openblasPath) {
         Add-UserPath (Join-Path $openblasPath "bin")
     }
+}
+
+# 6. Episteme Native (Consolidated)
+if ($Libraries -contains "All" -or $Libraries -contains "EpistemeNative") {
+    Write-Host "`n--- Episteme Native (Consolidated) ---" -ForegroundColor Cyan
+    Write-Host "[INFO] This library is built locally using build_native.ps1" -ForegroundColor Yellow
 }
 
 Write-Host "`n[OK] Installation/Configuration complete!" -ForegroundColor Green

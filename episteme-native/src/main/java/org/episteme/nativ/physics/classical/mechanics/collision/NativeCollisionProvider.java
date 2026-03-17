@@ -29,4 +29,8 @@ public interface NativeCollisionProvider extends CollisionProvider {
     default void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
         // Default implementation
     }
+    /**
+     * Returns true if the native library is loaded and operational.
+     */
+    boolean isLoaded();
 }

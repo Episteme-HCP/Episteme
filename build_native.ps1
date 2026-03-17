@@ -1,7 +1,6 @@
 # Script to compile episteme-native.dll via CMake and copy it to the libs directory
 
 $buildDir = "episteme-native\build_native"
-$outputDir = "libs"
 
 if (Test-Path $buildDir) { Remove-Item -Recurse -Force $buildDir -ErrorAction SilentlyContinue }
 if (!(Test-Path $buildDir)) { New-Item -ItemType Directory -Force -Path $buildDir | Out-Null }
@@ -18,19 +17,9 @@ cmd /c "`"$vcvars`" x64 && cmake --build . --config Release"
 
 Set-Location $PSScriptRoot
 
-Write-Host "Copying DLLs to libs..."
-# Vision library is now in vision/Release
-$absBuildRel = Join-Path $PSScriptRoot "$buildDir\vision\Release\episteme-native.dll"
-$absDest = Join-Path $PSScriptRoot "$outputDir\episteme-native.dll"
-if (Test-Path $absBuildRel) {
-    Copy-Item $absBuildRel -Destination $absDest -Force
-}
+Write-Host "Copying DLLs to libs (via install target)..."
+cmd /c "`"$vcvars`" x64 && cmake --install ."
 
-# Audio library is in audio\Release
-$absAudioRel = Join-Path $PSScriptRoot "$buildDir\audio\Release\miniaudio.dll"
-$absAudioDest = Join-Path $PSScriptRoot "$outputDir\miniaudio.dll"
-if (Test-Path $absAudioRel) {
-    Copy-Item $absAudioRel -Destination $absAudioDest -Force
-}
+# The install target handles both episteme-native and miniaudio
 
 Write-Host "Done!"

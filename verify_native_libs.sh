@@ -105,6 +105,7 @@ case "$OS" in
         FFTW_CHECK="libfftw3.so"
         BLAS_CHECK="lib/libopenblas.so"
         BULLET_CHECK="libbulletc.so"
+        EPISTEME_CHECK="libepisteme-native.so"
         ;;
     Darwin*)
         MPJ_CHECK="lib/mpj.jar"
@@ -112,6 +113,7 @@ case "$OS" in
         FFTW_CHECK="libfftw3.dylib"
         BLAS_CHECK="lib/libopenblas.dylib"
         BULLET_CHECK="libbulletc.dylib"
+        EPISTEME_CHECK="libepisteme-native.dylib"
         ;;
     *)
         # Fallback to Windows names (MSYS/Cygwin)
@@ -131,6 +133,7 @@ check_lib "OpenBLAS"    "OpenBLAS_DIR"  "OpenBLAS"                "$BLAS_CHECK" 
 check_lib "Bullet3"     "BULLET_HOME"   "Bullet3DLL"              "$BULLET_CHECK"        "native"
 check_lib "TarsosDSP"   ""              "Tarsos/Tarsos-master"    "lib/TarsosDSP-2.4.jar" "java"
 check_lib "oneDNN"      "DNNL_DIR"      "oneDNN/oneDNN-main"      "CMakeLists.txt"       "source"
+check_lib "Episteme Native" ""           ""                        "$EPISTEME_CHECK"      "native"
 
 # ── Summary ─────────────────────────────────────────────────────
 
