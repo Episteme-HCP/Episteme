@@ -2,19 +2,11 @@ package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
-import java.lang.foreign.MemorySegment;
 
 /**
  * Interface for high-performance collision detection and physics simulation.
- * Optimized for N-body collisions using spatial partitioning and native solvers.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.1
  */
 public interface CollisionProvider extends AlgorithmProvider, Backend {
-
-
     @Override
     default int getPriority() {
         return 0;
@@ -48,24 +40,24 @@ public interface CollisionProvider extends AlgorithmProvider, Backend {
     /**
      * Performs collision detection between spheres.
      *
-     * @param positions Flattened array [x0, y0, z0, x1, y1, z1, ...] as MemorySegment
-     * @param radii     Array of radii [r0, r1, ...] as MemorySegment
+     * @param positions Flattened array [x0, y0, z0, x1, y1, z1, ...]
+     * @param radii     Array of radii [r0, r1, ...]
      * @param n         Number of spheres
-     * @param collisions Output segment for collision pairs [idA, idB, ...]
+     * @param collisions Output array for collision pairs [idA, idB, ...]
      * @return Number of collisions found
      */
-    int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions);
+    int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions);
 
     /**
      * Resolves collisions by updating velocities.
      *
-     * @param positions  Positions segment
-     * @param velocities Velocities segment
-     * @param masses     Masses segment
+     * @param positions  Positions array
+     * @param velocities Velocities array
+     * @param masses     Masses array
      * @param n          Number of spheres
-     * @param collisions Collisions segment
+     * @param collisions Collisions array
      * @param numCollisions Number of collision pairs
      */
-    void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions);
+    void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions);
 
 }
