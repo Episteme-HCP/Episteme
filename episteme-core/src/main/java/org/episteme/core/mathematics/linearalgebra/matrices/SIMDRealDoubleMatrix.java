@@ -12,6 +12,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
@@ -48,9 +49,7 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         return new SIMDRealDoubleMatrix(rows, cols, data);
     }
 
-    private static VectorSpecies<Double> getSpecies() {
-        return DoubleVector.SPECIES_PREFERRED;
-    }
+    private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
 
     private final double[] data;
 
@@ -119,7 +118,7 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     private Matrix<Real> applyOp(jdk.incubator.vector.VectorOperators.Unary op, java.util.function.DoubleUnaryOperator scalarFallback) {
         double[] res = new double[data.length];
         int i = 0;
-        final VectorSpecies<Double> species = getSpecies();
+        final VectorSpecies<Double> species = SPECIES;
         for (; i < species.loopBound(data.length); i += species.length()) {
             var v = DoubleVector.fromArray(species, this.data, i);
             v.lanewise(op).intoArray(res, i);
@@ -133,7 +132,7 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     public Matrix<Real> scale(double scalar) {
         double[] res = new double[data.length];
         int i = 0;
-        final VectorSpecies<Double> species = getSpecies();
+        final VectorSpecies<Double> species = SPECIES;
         for (; i < species.loopBound(data.length); i += species.length()) {
             var v = DoubleVector.fromArray(species, this.data, i);
             v.mul(DoubleVector.broadcast(species, scalar)).intoArray(res, i);
@@ -146,9 +145,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     public double doubleSum() {
         int i = 0;
-        DoubleVector acc = DoubleVector.zero(getSpecies());
-        for (; i < getSpecies().loopBound(data.length); i += getSpecies().length()) {
-            acc = acc.add(DoubleVector.fromArray(getSpecies(), data, i));
+        DoubleVector acc = DoubleVector.zero(SPECIES);
+        for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
+            acc = acc.add(DoubleVector.fromArray(SPECIES, data, i));
         }
         double total = acc.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
         for (; i < data.length; i++) total += data[i];
@@ -157,9 +156,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     public double doubleMin() {
         int i = 0;
-        DoubleVector acc = DoubleVector.broadcast(getSpecies(), java.lang.Double.POSITIVE_INFINITY);
-        for (; i < getSpecies().loopBound(data.length); i += getSpecies().length()) {
-            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MIN, DoubleVector.fromArray(getSpecies(), data, i));
+        DoubleVector acc = DoubleVector.broadcast(SPECIES, java.lang.Double.POSITIVE_INFINITY);
+        for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
+            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MIN, DoubleVector.fromArray(SPECIES, data, i));
         }
         double min = acc.reduceLanes(jdk.incubator.vector.VectorOperators.MIN);
         for (; i < data.length; i++) min = java.lang.Math.min(min, data[i]);
@@ -168,9 +167,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
 
     public double doubleMax() {
         int i = 0;
-        DoubleVector acc = DoubleVector.broadcast(getSpecies(), java.lang.Double.NEGATIVE_INFINITY);
-        for (; i < getSpecies().loopBound(data.length); i += getSpecies().length()) {
-            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MAX, DoubleVector.fromArray(getSpecies(), data, i));
+        DoubleVector acc = DoubleVector.broadcast(SPECIES, java.lang.Double.NEGATIVE_INFINITY);
+        for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
+            acc = acc.lanewise(jdk.incubator.vector.VectorOperators.MAX, DoubleVector.fromArray(SPECIES, data, i));
         }
         double max = acc.reduceLanes(jdk.incubator.vector.VectorOperators.MAX);
         for (; i < data.length; i++) max = java.lang.Math.max(max, data[i]);
@@ -184,9 +183,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
             
             double[] res = new double[data.length];
             int i = 0;
-            for (; i < getSpecies().loopBound(data.length); i += getSpecies().length()) {
-                var v1 = DoubleVector.fromArray(getSpecies(), this.data, i);
-                var v2 = DoubleVector.fromArray(getSpecies(), that.data, i);
+            for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
+                var v1 = DoubleVector.fromArray(SPECIES, this.data, i);
+                var v2 = DoubleVector.fromArray(SPECIES, that.data, i);
                 v1.add(v2).intoArray(res, i);
             }
             for (; i < data.length; i++) {
@@ -207,13 +206,13 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
                     double aik = this.data[i * storage.cols() + k];
                     
                     int j = 0;
-                    for (; j < getSpecies().loopBound(that.storage.cols()); j += getSpecies().length()) {
+                    for (; j < SPECIES.loopBound(that.storage.cols()); j += SPECIES.length()) {
                         int bIdx = k * that.storage.cols() + j;
-                        var bVec = (DoubleVector) DoubleVector.fromArray(getSpecies(), that.data, bIdx);
+                        var bVec = (DoubleVector) DoubleVector.fromArray(SPECIES, that.data, bIdx);
                         
                         int cIdx = i * that.storage.cols() + j;
-                        var cVec = (DoubleVector) DoubleVector.fromArray(getSpecies(), C.data, cIdx);
-                        cVec = (DoubleVector) bVec.fma(DoubleVector.broadcast(getSpecies(), aik), cVec); 
+                        var cVec = (DoubleVector) DoubleVector.fromArray(SPECIES, C.data, cIdx);
+                        cVec = (DoubleVector) bVec.fma(DoubleVector.broadcast(SPECIES, aik), cVec); 
                         cVec.intoArray(C.data, cIdx);
                     }
                     for (; j < that.storage.cols(); j++) {
@@ -246,9 +245,9 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         checkDimensions(that);
             double[] res = new double[data.length];
             int i = 0;
-            for (; i < getSpecies().loopBound(data.length); i += getSpecies().length()) {
-                DoubleVector v1 = DoubleVector.fromArray(getSpecies(), this.data, i);
-                DoubleVector v2 = DoubleVector.fromArray(getSpecies(), that.data, i);
+            for (; i < SPECIES.loopBound(data.length); i += SPECIES.length()) {
+                DoubleVector v1 = DoubleVector.fromArray(SPECIES, this.data, i);
+                DoubleVector v2 = DoubleVector.fromArray(SPECIES, that.data, i);
                 v1.sub(v2).intoArray(res, i);
             }
             for (; i < data.length; i++) {
@@ -317,11 +316,11 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         for (int i = 0; i < storage.rows(); i++) {
             int rowOffset = i * storage.cols();
             
-            DoubleVector acc = DoubleVector.zero(getSpecies());
+            DoubleVector acc = DoubleVector.zero(SPECIES);
             int j = 0;
-            for (; j < getSpecies().loopBound(storage.cols()); j += getSpecies().length()) {
-                var aVec = DoubleVector.fromArray(getSpecies(), data, rowOffset + j);
-                var bVec = DoubleVector.fromArray(getSpecies(), bData, j);
+            for (; j < SPECIES.loopBound(storage.cols()); j += SPECIES.length()) {
+                var aVec = DoubleVector.fromArray(SPECIES, data, rowOffset + j);
+                var bVec = DoubleVector.fromArray(SPECIES, bData, j);
                 acc = acc.add(aVec.mul(bVec)); 
             }
             res[i] = acc.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
@@ -358,6 +357,6 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
     }
     @Override
     public String description() {
-        return "SIMD Matrix (" + storage.rows() + "x" + storage.cols() + ") using " + getSpecies().toString();
+        return "SIMD Matrix (" + storage.rows() + "x" + storage.cols() + ") using " + SPECIES.toString();
     }
 }

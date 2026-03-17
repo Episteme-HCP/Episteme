@@ -24,6 +24,7 @@
 package org.episteme.server.server.service;
 
 import io.grpc.stub.StreamObserver;
+import java.nio.DoubleBuffer;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.episteme.server.server.proto.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
@@ -36,8 +37,7 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.util.List;
+
 
 /**
  * Server-side implementation of the MatrixService via gRPC.

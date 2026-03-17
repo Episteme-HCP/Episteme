@@ -45,8 +45,10 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     private static MethodHandle MPFR_SET_STR;
     private static MethodHandle MPFR_GET_STR;
     private static MethodHandle MPFR_ADD;
+    @SuppressWarnings("unused")
     private static MethodHandle MPFR_SUB;
     private static MethodHandle MPFR_MUL;
+    @SuppressWarnings("unused")
     private static MethodHandle MPFR_DIV;
     private static MethodHandle MPFR_FREE_STR;
 
@@ -93,23 +95,18 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     }
 
     @Override
-    public String getId() {
-        return "native-mpfr-sparse";
-    }
-
-    @Override
-    public String getName() {
-        return "Native MPFR Sparse Backend";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Native high-performance Sparse Arbitrary Precision Linear Algebra backend using libmpfr bound via Project Panama.";
+    public String getType() {
+        return "linearalgebra";
     }
 
     @Override
     public int getPriority() {
         return 120; // High priority for high-precision tasks
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }
 
     @Override
@@ -155,8 +152,6 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> sa = 
             (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a;
         
-        int m = sa.rows();
-        int k = sa.cols();
         int n = b.cols();
 
         long prec = getPrecision();
@@ -174,7 +169,6 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
 
     private Matrix<Real> spmv(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> a, Matrix<Real> x, Arena arena, long prec) throws Throwable {
         int m = a.rows();
-        int k = a.cols();
         int[] rowPtr = a.getRowPointers();
         int[] colIdx = a.getColIndices();
         Object[] vals = a.getValues();
@@ -182,8 +176,6 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         MemorySegment h_x = initVector(x, arena, prec);
         MemorySegment h_y = allocateVector(m, arena, prec);
 
-        MemorySegment temp = arena.allocate(MPFR_LAYOUT);
-        MPFR_INIT2.invoke(temp, prec);
         MemorySegment term = arena.allocate(MPFR_LAYOUT);
         MPFR_INIT2.invoke(term, prec);
 
@@ -201,7 +193,6 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
             }
         }
 
-        MPFR_CLEAR.invoke(temp);
         MPFR_CLEAR.invoke(term);
 
         return backToMatrix(h_y, m, 1, arena);

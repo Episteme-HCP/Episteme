@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.mathematics.geometry.Point3D;
 import org.episteme.core.mathematics.geometry.Vector3D;

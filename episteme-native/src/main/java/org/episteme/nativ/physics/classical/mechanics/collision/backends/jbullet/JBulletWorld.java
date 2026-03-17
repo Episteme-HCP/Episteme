@@ -13,8 +13,8 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.quantity.Time;
 import org.episteme.core.measure.units.SI;
-import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 
 import javax.vecmath.Vector3f;
 import java.util.HashMap;

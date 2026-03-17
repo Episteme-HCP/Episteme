@@ -40,13 +40,13 @@ public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider
         // Generic CARMA implementation
         // SIMD fast path
         if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
-            return (Matrix<E>) RealDoubleCARMAAlgorithm.multiply(
+            return (Matrix<E>) (Matrix<?>) RealDoubleCARMAAlgorithm.multiply(
                     (SIMDRealDoubleMatrix) a, (SIMDRealDoubleMatrix) b);
         }
         
         // Generic path (if E is Real)
         if (a.get(0,0) instanceof Real) {
-             return (Matrix<E>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
+             return (Matrix<E>) (Matrix<?>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
         }
 
         return super.multiply(a, b);

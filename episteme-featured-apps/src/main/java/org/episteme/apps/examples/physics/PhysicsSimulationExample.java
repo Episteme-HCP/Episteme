@@ -6,8 +6,8 @@ package org.episteme.apps.examples.physics;
  
 import org.episteme.core.measure.Quantities;
 import org.episteme.core.measure.units.SI;
-import org.episteme.natural.physics.classical.mechanics.MechanicsFactory;
-import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.MechanicsFactory;
+import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBridge;
  
 /**
  * Demonstrates usage of the standardized Physics Simulation API.

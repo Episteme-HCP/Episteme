@@ -26,7 +26,7 @@ package org.episteme.natural.physics.classical.mechanics.collision.providers;
 import com.google.auto.service.AutoService;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import org.episteme.natural.physics.classical.mechanics.CollisionProvider;
+import org.episteme.natural.physics.classical.mechanics.collision.CollisionProvider;
 
 /**
  * Standard CPU implementation of the CollisionProvider.
@@ -160,5 +160,10 @@ public class CPUCollisionProvider implements CollisionProvider {
     @Override
     public String getDescription() {
         return "Java-based collision detection and resolution for spheres.";
+    }
+
+    @Override
+    public int getPriority() {
+        return 10;
     }
 }

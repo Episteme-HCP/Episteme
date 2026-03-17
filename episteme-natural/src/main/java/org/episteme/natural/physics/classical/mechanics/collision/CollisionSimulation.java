@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -64,8 +64,8 @@ public class CollisionSimulation {
         this(null);
     }
 
-    public CollisionSimulation(CollisionProvider backend) {
-        this.backend = backend;
+    public CollisionSimulation(CollisionProvider provider) {
+        this.backend = provider;
     }
 
     public void addBody(Body body) {

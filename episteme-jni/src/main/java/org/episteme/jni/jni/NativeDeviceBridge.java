@@ -23,8 +23,6 @@
 
 package org.episteme.jni.jni;
 
-import org.episteme.jni.jni.NativeJNILoader;
-
 /**
  * JNI Bridge for communicating with real hardware devices via C++/Rust native
  * libraries.

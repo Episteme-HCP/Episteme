@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.episteme.natural.physics.classical.mechanics;
+package org.episteme.natural.physics.classical.mechanics.nbody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.natural.physics.PhysicalConstants;
 import org.episteme.core.mathematics.structures.SpatialOctree;
+import org.episteme.natural.physics.classical.mechanics.Particle;
 
 /**
  * Barnes-Hut N-body gravitational simulation (O(N log N)).

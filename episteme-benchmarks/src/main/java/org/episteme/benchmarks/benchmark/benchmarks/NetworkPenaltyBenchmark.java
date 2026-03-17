@@ -28,8 +28,9 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.mathematics.sets.Reals;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.OperationContext;
 import java.util.Random;
 import java.util.Map;
 import java.util.HashMap;
@@ -121,17 +122,21 @@ public class NetworkPenaltyBenchmark implements RunnableBenchmark {
         // Discovery
         var providers = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
         
-        for (LinearAlgebraProvider<Real> p : providers) {
+        for (var p : providers) {
             if (p.getName().contains("Native SIMD") || p.getName().contains("Panama")) {
-                panamaProvider = p;
+                @SuppressWarnings("unchecked")
+                var castP = (LinearAlgebraProvider<Real>) p;
+                panamaProvider = castP;
             } else if (p.getName().contains("gRPC Remote")) {
-                grpcProvider = p;
+                @SuppressWarnings("unchecked")
+                var castP = (LinearAlgebraProvider<Real>) p;
+                grpcProvider = castP;
             }
         }
         
         if (panamaProvider == null) {
              org.slf4j.LoggerFactory.getLogger(NetworkPenaltyBenchmark.class).warn("Panama provider not found, fallback to default provider.");
-             panamaProvider = AlgorithmManager.getProvider(LinearAlgebraProvider.class);
+             panamaProvider = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, Reals.getInstance());
         }
     }
 

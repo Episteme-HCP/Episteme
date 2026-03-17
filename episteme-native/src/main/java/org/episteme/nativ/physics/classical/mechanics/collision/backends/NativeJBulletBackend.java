@@ -28,12 +28,12 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.Operation;
-import org.episteme.natural.physics.classical.mechanics.MechanicsBackend;
-import org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge;
-import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
-import org.episteme.natural.physics.classical.mechanics.CollisionProvider;
+import org.episteme.natural.physics.classical.mechanics.collision.MechanicsBackend;
+import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import java.lang.foreign.MemorySegment;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 /**
  * JBullet physics backend provider.
@@ -43,8 +43,8 @@ import org.episteme.natural.physics.classical.mechanics.RigidBody;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({MechanicsBackend.class, CollisionProvider.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class, org.episteme.core.technical.backend.Backend.class})
-public class NativeJBulletBackend implements MechanicsBackend, CPUBackend, CollisionProvider {
+@AutoService({MechanicsBackend.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class, org.episteme.core.technical.backend.Backend.class, NativeBackend.class})
+public class NativeJBulletBackend implements MechanicsBackend, CPUBackend, NativeBackend {
 
     @Override
     public String getType() {
@@ -53,7 +53,7 @@ public class NativeJBulletBackend implements MechanicsBackend, CPUBackend, Colli
 
     @Override
     public String getAlgorithmType() {
-        return "PhysicsEngine";
+        return "mechanics";
     }
 
     @Override
@@ -84,6 +84,16 @@ public class NativeJBulletBackend implements MechanicsBackend, CPUBackend, Colli
     @Override
     public void shutdown() {
         // JBullet is pure Java and handles its own memory.
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return true; 
+    }
+
+    @Override
+    public String getNativeLibraryName() {
+        return "jbullet-java";
     }
 
 

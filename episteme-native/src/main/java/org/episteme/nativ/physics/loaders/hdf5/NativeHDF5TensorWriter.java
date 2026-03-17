@@ -6,10 +6,10 @@
 package org.episteme.nativ.physics.loaders.hdf5;
 
 import org.episteme.core.mathematics.linearalgebra.Tensor;
-import org.episteme.core.io.ResourceWriter;
 import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
-import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
-import java.lang.foreign.Arena;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.io.ResourceWriter;
+
 
 /**
  * Adapter to save Tensors to HDF5 files.

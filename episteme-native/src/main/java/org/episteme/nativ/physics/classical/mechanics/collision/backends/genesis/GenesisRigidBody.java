@@ -8,8 +8,8 @@ package org.episteme.nativ.physics.classical.mechanics.collision.backends.genesi
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 
 import java.util.Arrays;
 
@@ -88,6 +88,11 @@ public class GenesisRigidBody implements RigidBodyBridge {
         vy += y / mass;
         vz += z / mass;
         pushState();
+    }
+
+    @Override
+    public RigidBody getOwner() {
+        return body;
     }
 
     @Override

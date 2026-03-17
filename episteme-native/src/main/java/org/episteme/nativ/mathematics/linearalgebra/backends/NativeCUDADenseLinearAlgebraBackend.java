@@ -66,6 +66,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     private static MethodHandle CUDA_DEVICE_SYNCHRONIZE;
     private static MethodHandle CUBLAS_DDOT;
     private static MethodHandle CUBLAS_DNRM2;
+    private static MethodHandle CUBLAS_ZGEMM;
+    private static MethodHandle CUBLAS_ZGEAM;
+    private static MethodHandle CUBLAS_ZDOTU;
 
     // cuSolver Handles
     private static MethodHandle CUSOLVER_CREATE;
@@ -83,6 +86,17 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     private static MethodHandle CUSOLVER_DPOTRF;
     private static MethodHandle CUSOLVER_DSYEVD_BUFFER_SIZE;
     private static MethodHandle CUSOLVER_DSYEVD;
+    private static MethodHandle CUSOLVER_ZGETRF_BUFFER_SIZE;
+    private static MethodHandle CUSOLVER_ZGETRF;
+    private static MethodHandle CUSOLVER_ZGETRS;
+    private static MethodHandle CUSOLVER_ZGEQRF_BUFFER_SIZE;
+    private static MethodHandle CUSOLVER_ZGEQRF;
+    private static MethodHandle CUSOLVER_ZORGQR_BUFFER_SIZE;
+    private static MethodHandle CUSOLVER_ZORGQR;
+    private static MethodHandle CUSOLVER_ZGESVD_BUFFER_SIZE;
+    private static MethodHandle CUSOLVER_ZGESVD;
+    private static MethodHandle CUSOLVER_ZHEEVD_BUFFER_SIZE;
+    private static MethodHandle CUSOLVER_ZHEEVD;
     private static MethodHandle CUDA_GET_DEVICE_COUNT;
     private static MethodHandle CUDA_GET_ERROR_STRING;
     private static MethodHandle CUBLAS_STATUS_GET_STRING;
@@ -208,10 +222,25 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             if (CUBLAS_DDOT == null) CUBLAS_DDOT = lookup(cublas_lookup, "cublasDdot", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUBLAS_DNRM2 = lookup(cublas_lookup, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             if (CUBLAS_DNRM2 == null) CUBLAS_DNRM2 = lookup(cublas_lookup, "cublasDnrm2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUBLAS_ZGEMM = lookup(cublas_lookup, "cublasZgemm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+            ));
+            CUBLAS_ZGEAM = lookup(cublas_lookup, "cublasZgeam_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT
+            ));
+            CUBLAS_ZDOTU = lookup(cublas_lookup, "cublasZdotu_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
             // cuSolver Core
             CUSOLVER_CREATE = lookup(cusolver_lookup, "cusolverDnCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
@@ -245,6 +274,33 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             CUSOLVER_DSYEVD_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnDsyevd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
             CUSOLVER_DSYEVD = lookup(cusolver_lookup, "cusolverDnDsyevd", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUSOLVER_ZGETRF_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnZgetrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_ZGETRF = lookup(cusolver_lookup, "cusolverDnZgetrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            CUSOLVER_ZGETRS = lookup(cusolver_lookup, "cusolverDnZgetrs", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            CUSOLVER_ZGEQRF_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnZgeqrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_ZGEQRF = lookup(cusolver_lookup, "cusolverDnZgeqrf", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_ZORGQR_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnZungqr_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, // ZUNGQR for complex
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            CUSOLVER_ZORGQR = lookup(cusolver_lookup, "cusolverDnZungqr", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUSOLVER_ZGESVD_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnZgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSOLVER_ZGESVD = lookup(cusolver_lookup, "cusolverDnZgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            
+            CUSOLVER_ZHEEVD_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnZheevd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            CUSOLVER_ZHEEVD = lookup(cusolver_lookup, "cusolverDnZheevd", FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
             IS_AVAILABLE = true;
@@ -351,6 +407,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": CUDA not available for multiply()");
 
+        if (isComplex(a) || isComplex(b)) {
+            return multiplyComplex(a, b);
+        }
+
         logger.debug("Entering CUDA multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         long start = System.nanoTime();
         int m = a.rows();
@@ -377,65 +437,106 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             MemorySegment d_B = p_B.get(ValueLayout.ADDRESS, 0);
             MemorySegment d_C = p_C.get(ValueLayout.ADDRESS, 0);
 
-            // Copy to Device
-            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_A);
-            MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_B);
+            try {
+                // Copy to Device
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_A), (long) m * k * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_B), (long) k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
 
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, segA, (long) m * k * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, segB, (long) k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                // cuBLAS Handle
+                MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+                checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
+                MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
 
-            // cuBLAS Handle
-            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
-            int resH = (int) CUBLAS_CREATE.invokeExact(p_Handle);
-            checkCublas(resH);
-            MemorySegment cublasHandle = p_Handle.get(ValueLayout.ADDRESS, 0);
+                try {
+                    // cuBLAS DGEMM Setup (Alpha, Beta)
+                    MemorySegment segAlpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
+                    MemorySegment segBeta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
 
-            // cuBLAS DGEMM Setup (Alpha, Beta)
-            MemorySegment segAlpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
-            MemorySegment segBeta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
+                    // Call DGEMM
+                    checkCublas((int) CUBLAS_DGEMM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, segAlpha, d_B, n, d_A, k, segBeta, d_C, n));
 
-            // Call DGEMM
-            // To compute C = A * B for Row-Major matrices A(m,k) and B(k,n) in CUBLAS (Column-Major):
-            // We use C^T = B^T * A^T. 
-            // Since Row-Major storage of A is identical to Column-Major storage of A^T (size k x m):
-            // B^T is n x k, A^T is k x m, C^T is n x m.
-            // cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, alpha, B, n, A, k, beta, C, n)
-            int lda = n; // Leading dimension of B^T (n x k)
-            int ldb = k; // Leading dimension of A^T (k x m)
-            int ldc = n; // Leading dimension of C^T (n x m)
-
-            checkCublas((int) CUBLAS_DGEMM.invokeExact(
-                cublasHandle, 
-                CUBLAS_OP_N, CUBLAS_OP_N, // Transpose flags for B^T and A^T
-                n, m, k, // Dimensions for C^T = B^T * A^T
-                segAlpha, d_B, lda, // B^T (stored as B row-major)
-                d_A, ldb, // A^T (stored as A row-major)
-                segBeta, d_C, ldc // C^T (stored as C row-major)
-            ));
-
-            // Copy back
-            double[] h_C = new double[m * n];
-            MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
-            checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C, (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
-            MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
-
-            // Cleanup
-            int rD = (int) CUBLAS_DESTROY.invokeExact(cublasHandle);
-            checkCublas(rD);
-            int rA = (int) CUDA_FREE.invokeExact(d_A);
-            checkCuda(rA);
-            int rB = (int) CUDA_FREE.invokeExact(d_B);
-            checkCuda(rB);
-            int rC = (int) CUDA_FREE.invokeExact(d_C);
-            checkCuda(rC);
-            
-            Matrix<Real> result = fromDoubleArray(h_C, m, n);
-            org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/CUDA", System.nanoTime() - start);
-            return result;
-
+                    // Copy back
+                    double[] h_C = new double[m * n];
+                    MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+                    checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C, (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+                    MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
+                    
+                    Matrix<Real> result = fromDoubleArray(h_C, m, n);
+                    org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/CUDA", System.nanoTime() - start);
+                    return result;
+                } finally {
+                    checkCublas((int) CUBLAS_DESTROY.invokeExact(handle));
+                }
+            } finally {
+                checkCuda((int) CUDA_FREE.invokeExact(d_A));
+                checkCuda((int) CUDA_FREE.invokeExact(d_B));
+                checkCuda((int) CUDA_FREE.invokeExact(d_C));
+            }
         } catch (Throwable t) {
             if (t instanceof UnsupportedOperationException) throw (UnsupportedOperationException) t;
             throw new UnsupportedOperationException("CUDA multiply failed: " + t.getMessage(), t);
+        }
+    }
+
+    private Matrix<Real> multiplyComplex(Matrix<Real> a, Matrix<Real> b) {
+        long start = System.nanoTime();
+        int m = a.rows();
+        int k = a.cols();
+        int n = b.cols();
+
+        try (Arena arena = Arena.ofConfined()) {
+            double[] h_A = toComplexDoubleArray(a);
+            double[] h_B = toComplexDoubleArray(b);
+
+            MemorySegment p_A = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_B = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_C = arena.allocate(ValueLayout.ADDRESS);
+
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_A, (long) m * k * 16));
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_B, (long) k * n * 16));
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_C, (long) m * n * 16));
+
+            MemorySegment d_A = p_A.get(ValueLayout.ADDRESS, 0);
+            MemorySegment d_B = p_B.get(ValueLayout.ADDRESS, 0);
+            MemorySegment d_C = p_C.get(ValueLayout.ADDRESS, 0);
+
+            try {
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_A), (long) m * k * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_B), (long) k * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+                checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
+                MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+                try {
+                    MemorySegment segAlpha = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                    segAlpha.set(ValueLayout.JAVA_DOUBLE, 0, 1.0);
+                    segAlpha.set(ValueLayout.JAVA_DOUBLE, 8, 0.0);
+                    
+                    MemorySegment segBeta = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                    segBeta.set(ValueLayout.JAVA_DOUBLE, 0, 0.0);
+                    segBeta.set(ValueLayout.JAVA_DOUBLE, 8, 0.0);
+
+                    checkCublas((int) CUBLAS_ZGEMM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, segAlpha, d_B, n, d_A, k, segBeta, d_C, n));
+
+                    double[] resData = new double[m * n * 2];
+                    MemorySegment hostC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
+                    checkCuda((int) CUDA_MEMCPY.invokeExact(hostC, d_C, (long) m * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                    MemorySegment.copy(hostC, ValueLayout.JAVA_DOUBLE, 0, resData, 0, m * n * 2);
+
+                    Matrix<Real> result = fromComplexDoubleArray(resData, m, n);
+                    org.episteme.core.util.PerformanceLogger.log("MatrixMultiplyComplex", "Dense/CUDA", System.nanoTime() - start);
+                    return result;
+                } finally {
+                    checkCublas((int) CUBLAS_DESTROY.invokeExact(handle));
+                }
+            } finally {
+                checkCuda((int) CUDA_FREE.invokeExact(d_A));
+                checkCuda((int) CUDA_FREE.invokeExact(d_B));
+                checkCuda((int) CUDA_FREE.invokeExact(d_C));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex multiply failed", t);
         }
     }
 
@@ -443,39 +544,48 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Matrix add()");
+        if (isComplex(a) || (b != null && isComplex(b))) {
+            return geamComplex(a, b, Real.of(1.0), Real.of(1.0));
+        }
         return geam(a, b, 1.0, 1.0);
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Matrix subtract()");
+        if (isComplex(a) || (b != null && isComplex(b))) {
+            return geamComplex(a, b, Real.of(1.0), Real.of(-1.0));
+        }
         return geam(a, b, 1.0, -1.0);
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for Matrix scale()");
+        if (isComplex(a)) {
+            return geamComplex(a, null, scalar, Real.of(0.0));
+        }
         return geam(a, null, scalar.doubleValue(), 0.0);
     }
 
     private Matrix<Real> geam(Matrix<Real> a, Matrix<Real> b, double alphaVal, double betaVal) {
         int m = a.rows(); int n = a.cols();
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
-            MemorySegment d_B = arena.allocate(ValueLayout.ADDRESS);
-            MemorySegment d_C = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) m * n * 8));
-            checkCuda((int) CUDA_MALLOC.invokeExact(d_C, (long) m * n * 8));
+            MemorySegment p_A = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_B = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_C = arena.allocate(ValueLayout.ADDRESS);
+
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_A, (long) m * n * 8));
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_C, (long) m * n * 8));
             
-            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A.get(ValueLayout.ADDRESS, 0), segA, (long) m * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-            
+            MemorySegment d_A = p_A.get(ValueLayout.ADDRESS, 0);
+            MemorySegment d_C = p_C.get(ValueLayout.ADDRESS, 0);
+            MemorySegment d_B = MemorySegment.NULL;
             if (b != null) {
-                checkCuda((int) CUDA_MALLOC.invokeExact(d_B, (long) m * n * 8));
+                checkCuda((int) CUDA_MALLOC.invokeExact(p_B, (long) m * n * 8));
+                d_B = p_B.get(ValueLayout.ADDRESS, 0);
                 MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B.get(ValueLayout.ADDRESS, 0), segB, (long) m * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-            } else {
-                d_B = arena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, segB, (long) m * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
             }
 
             MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
@@ -486,28 +596,100 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, betaVal);
             
             // DGEAM: C = alpha * op(A) + beta * op(B). Use col-major swap for row-major.
-            checkCublas((int) CUBLAS_DGEAM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, alpha, d_A.get(ValueLayout.ADDRESS, 0), n, beta, d_B.get(ValueLayout.ADDRESS, 0), n, d_C.get(ValueLayout.ADDRESS, 0), n));
+            checkCublas((int) CUBLAS_DGEAM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, alpha, d_A, n, beta, d_B, n, d_C, n));
             
             double[] h_C = new double[m * n];
             MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
-            checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C.get(ValueLayout.ADDRESS, 0), (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C, (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
             MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
             
             int rD = (int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
             checkCublas(rD);
-            int rF1 = (int) CUDA_FREE.invokeExact(d_A.get(ValueLayout.ADDRESS, 0));
+            int rF1 = (int) CUDA_FREE.invokeExact(d_A);
             checkCuda(rF1);
             if (b != null) {
-                int rF2 = (int) CUDA_FREE.invokeExact(d_B.get(ValueLayout.ADDRESS, 0));
+                int rF2 = (int) CUDA_FREE.invokeExact(d_B);
                 checkCuda(rF2);
             }
-            int rF3 = (int) CUDA_FREE.invokeExact(d_C.get(ValueLayout.ADDRESS, 0));
+            int rF3 = (int) CUDA_FREE.invokeExact(d_C);
             checkCuda(rF3);
             
             return fromDoubleArray(h_C, m, n);
         } catch (Throwable t) {
             if (t instanceof UnsupportedOperationException) throw (UnsupportedOperationException) t;
             throw new UnsupportedOperationException("CUDA GEAM operation failed: " + t.getMessage(), t);
+        }
+    }
+
+    private Matrix<Real> geamComplex(Matrix<Real> a, Matrix<Real> b, Real alphaReal, Real betaReal) {
+        int m = a.rows(); int n = a.cols();
+        try (Arena arena = Arena.ofConfined()) {
+            double[] h_A = toComplexDoubleArray(a);
+            double[] h_B = (b != null) ? toComplexDoubleArray(b) : null;
+
+            MemorySegment p_A = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_B = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_C = arena.allocate(ValueLayout.ADDRESS);
+
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_A, (long) m * n * 16));
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_C, (long) m * n * 16));
+
+            MemorySegment d_A = p_A.get(ValueLayout.ADDRESS, 0);
+            MemorySegment d_C = p_C.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment d_B_val = MemorySegment.NULL;
+            try {
+                MemorySegment d_A_ptr = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_A);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, d_A_ptr, (long) m * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+                
+                if (h_B != null) {
+                    checkCuda((int) CUDA_MALLOC.invokeExact(p_B, (long) m * n * 16));
+                    d_B_val = p_B.get(ValueLayout.ADDRESS, 0);
+                    MemorySegment d_B_ptr = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_B);
+                    checkCuda((int) CUDA_MEMCPY.invokeExact(d_B_val, d_B_ptr, (long) m * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+                }
+
+                MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+                checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
+                MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+                try {
+                    MemorySegment segAlpha = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                    if (((Object)alphaReal) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
+                        segAlpha.set(ValueLayout.JAVA_DOUBLE, 0, cv.getReal().doubleValue());
+                        segAlpha.set(ValueLayout.JAVA_DOUBLE, 8, cv.getImaginary().doubleValue());
+                    } else {
+                        segAlpha.set(ValueLayout.JAVA_DOUBLE, 0, alphaReal.doubleValue());
+                        segAlpha.set(ValueLayout.JAVA_DOUBLE, 8, 0.0);
+                    }
+
+                    MemorySegment segBeta = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                    if (((Object)betaReal) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
+                        segBeta.set(ValueLayout.JAVA_DOUBLE, 0, cv.getReal().doubleValue());
+                        segBeta.set(ValueLayout.JAVA_DOUBLE, 8, cv.getImaginary().doubleValue());
+                    } else {
+                        segBeta.set(ValueLayout.JAVA_DOUBLE, 0, betaReal.doubleValue());
+                        segBeta.set(ValueLayout.JAVA_DOUBLE, 8, 0.0);
+                    }
+
+                    checkCublas((int) CUBLAS_ZGEAM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, segAlpha, d_A, n, segBeta, d_B_val, n, d_C, n));
+
+                    double[] resData = new double[m * n * 2];
+                    MemorySegment hostC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
+                    checkCuda((int) CUDA_MEMCPY.invokeExact(hostC, d_C, (long) m * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                    MemorySegment.copy(hostC, ValueLayout.JAVA_DOUBLE, 0, resData, 0, m * n * 2);
+
+                    return fromComplexDoubleArray(resData, m, n);
+                } finally {
+                    checkCublas((int) CUBLAS_DESTROY.invokeExact(handle));
+                }
+            } finally {
+                checkCuda((int) CUDA_FREE.invokeExact(d_A));
+                if (d_B_val != MemorySegment.NULL) checkCuda((int) CUDA_FREE.invokeExact(d_B_val));
+                checkCuda((int) CUDA_FREE.invokeExact(d_C));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex GEAM failed", t);
         }
     }
 
@@ -551,7 +733,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (!IS_AVAILABLE || CUBLAS_DDOT == null) throw new UnsupportedOperationException(getName() + ": CUDA dot not available");
+        if (!isAvailable() || CUBLAS_DDOT == null) throw new UnsupportedOperationException(getName() + ": CUDA dot not available");
+        if (isComplex(a)) return dotComplex(a, b);
         int n = a.dimension();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
@@ -608,8 +791,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for solve()");
 
+        if (isComplex(a) || (b != null && isComplex(b))) {
+            return solveComplex(a, b);
+        }
+
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for solve");
+        if (b == null) throw new NullPointerException("Vector b cannot be null");
         if (n != b.dimension()) throw new IllegalArgumentException("Vector dimension mismatch");
 
         try (Arena arena = Arena.ofConfined()) {
@@ -682,10 +870,86 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         }
     }
 
+    private Vector<Real> solveComplex(Matrix<Real> a, Vector<Real> b) {
+        int n = a.rows();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUSOLVER_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment segA = MemorySegment.NULL;
+            MemorySegment segB = MemorySegment.NULL;
+            MemorySegment segIpiv = MemorySegment.NULL;
+            MemorySegment segInfo = MemorySegment.NULL;
+            MemorySegment segWork = MemorySegment.NULL;
+
+            try {
+                MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_B = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Ipiv = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Info = arena.allocate(ValueLayout.ADDRESS);
+
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) n * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_B, (long) n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Ipiv, (long) n * 4));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Info, (long) 4));
+
+                segA = d_A.get(ValueLayout.ADDRESS, 0);
+                segB = d_B.get(ValueLayout.ADDRESS, 0);
+                segIpiv = d_Ipiv.get(ValueLayout.ADDRESS, 0);
+                segInfo = d_Info.get(ValueLayout.ADDRESS, 0);
+
+                double[] h_A = toComplexDoubleArray(a);
+                double[] h_B = toComplexDoubleVec(b);
+                double[] h_At = new double[n * n * 2];
+                for (int r = 0; r < n; r++) {
+                    for (int c = 0; c < n; c++) {
+                        h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2];
+                        h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                    }
+                }
+
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segB, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_B), (long) n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+                checkCuda((int) CUSOLVER_ZGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+                int lwork = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+
+                MemorySegment d_Work = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Work, (long) lwork * 16));
+                segWork = d_Work.get(ValueLayout.ADDRESS, 0);
+
+                checkCuda((int) CUSOLVER_ZGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
+                checkCuda((int) CUSOLVER_ZGETRS.invokeExact(handle, 0, n, 1, segA, n, segIpiv, segB, n, segInfo));
+
+                double[] resData = new double[n * 2];
+                MemorySegment hostB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostB, segB, (long) n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostB, ValueLayout.JAVA_DOUBLE, 0, resData, 0, n * 2);
+
+                return fromComplexDoubleVec(resData);
+            } finally {
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segB.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segB));
+                if (!segIpiv.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segIpiv));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex solve failed", t);
+        }
+    }
+
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for inverse()");
+
+        if (isComplex(a)) {
+            return inverseComplex(a);
+        }
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for inverse");
@@ -773,10 +1037,99 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         }
     }
 
+    private Matrix<Real> inverseComplex(Matrix<Real> a) {
+        int n = a.rows();
+        double[] identity = new double[n * n * 2];
+        for (int i = 0; i < n; i++) {
+            identity[(i * n + i) * 2] = 1.0;
+            identity[(i * n + i) * 2 + 1] = 0.0;
+        }
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUSOLVER_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment segA = MemorySegment.NULL;
+            MemorySegment segB = MemorySegment.NULL;
+            MemorySegment segIpiv = MemorySegment.NULL;
+            MemorySegment segInfo = MemorySegment.NULL;
+            MemorySegment segWork = MemorySegment.NULL;
+
+            try {
+                MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_B = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Ipiv = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Info = arena.allocate(ValueLayout.ADDRESS);
+
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) n * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_B, (long) n * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Ipiv, (long) n * 4));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Info, (long) 4));
+
+                segA = d_A.get(ValueLayout.ADDRESS, 0);
+                segB = d_B.get(ValueLayout.ADDRESS, 0);
+                segIpiv = d_Ipiv.get(ValueLayout.ADDRESS, 0);
+                segInfo = d_Info.get(ValueLayout.ADDRESS, 0);
+
+                double[] h_A = toComplexDoubleArray(a);
+                double[] h_At = new double[n * n * 2];
+                for (int r = 0; r < n; r++) {
+                    for (int c = 0; c < n; c++) {
+                        h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2];
+                        h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                    }
+                }
+
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segB, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, identity), (long) n * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+                checkCuda((int) CUSOLVER_ZGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+                int lwork = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+
+                MemorySegment d_Work = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Work, (long) lwork * 16));
+                segWork = d_Work.get(ValueLayout.ADDRESS, 0);
+
+                checkCuda((int) CUSOLVER_ZGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
+                checkCuda((int) CUSOLVER_ZGETRS.invokeExact(handle, 0, n, n, segA, n, segIpiv, segB, n, segInfo));
+
+                double[] resData = new double[n * n * 2];
+                MemorySegment hostB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostB, segB, (long) n * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostB, ValueLayout.JAVA_DOUBLE, 0, resData, 0, n * n * 2);
+
+                double[] resDataT = new double[n * n * 2];
+                for (int r = 0; r < n; r++) {
+                    for (int c = 0; c < n; c++) {
+                        resDataT[(r * n + c) * 2] = resData[(c * n + r) * 2];
+                        resDataT[(r * n + c) * 2 + 1] = resData[(c * n + r) * 2 + 1];
+                    }
+                }
+
+                return fromComplexDoubleArray(resDataT, n, n);
+            } finally {
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segB.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segB));
+                if (!segIpiv.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segIpiv));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex inverse failed", t);
+        }
+    }
+
 
     @Override
     public Real determinant(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for determinant()");
+
+        if (isComplex(a)) {
+            return determinantComplex(a);
+        }
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for determinant");
@@ -841,10 +1194,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
                 return Real.of(det);
             } finally {
-                if (!segA.equals(MemorySegment.NULL)) { checkCuda((int) CUDA_FREE.invokeExact(segA)); }
-                if (!segIpiv.equals(MemorySegment.NULL)) { checkCuda((int) CUDA_FREE.invokeExact(segIpiv)); }
-                if (!segInfo.equals(MemorySegment.NULL)) { checkCuda((int) CUDA_FREE.invokeExact(segInfo)); }
-                if (!segWork.equals(MemorySegment.NULL)) { checkCuda((int) CUDA_FREE.invokeExact(segWork)); }
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segIpiv.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segIpiv));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
                 checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
             }
         } catch (Throwable t) {
@@ -853,8 +1206,488 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         }
     }
 
+    private Real determinantComplex(Matrix<Real> a) {
+        int n = a.rows();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUSOLVER_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment segA = MemorySegment.NULL;
+            MemorySegment segIpiv = MemorySegment.NULL;
+            MemorySegment segInfo = MemorySegment.NULL;
+            MemorySegment segWork = MemorySegment.NULL;
+
+            try {
+                MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Ipiv = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Info = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) n * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Ipiv, (long) n * 4));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Info, (long) 4));
+
+                segA = d_A.get(ValueLayout.ADDRESS, 0);
+                segIpiv = d_Ipiv.get(ValueLayout.ADDRESS, 0);
+                segInfo = d_Info.get(ValueLayout.ADDRESS, 0);
+
+                double[] h_A = toComplexDoubleArray(a);
+                double[] h_At = new double[n * n * 2];
+                for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) {
+                    h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2];
+                    h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                }
+
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+                checkCuda((int) CUSOLVER_ZGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+                int lwork = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+
+                MemorySegment d_Work = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Work, (long) lwork * 16));
+                segWork = d_Work.get(ValueLayout.ADDRESS, 0);
+
+                checkCuda((int) CUSOLVER_ZGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
+
+                double[] h_QR = new double[n * n * 2];
+                MemorySegment hostQR = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostQR, segA, (long) n * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostQR, ValueLayout.JAVA_DOUBLE, 0, h_QR, 0, n * n * 2);
+
+                int[] h_Ipiv = new int[n];
+                MemorySegment hostIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostIpiv, segIpiv, (long) n * 4, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostIpiv, ValueLayout.JAVA_INT, 0, h_Ipiv, 0, n);
+
+                org.episteme.core.mathematics.numbers.complex.Complex det = org.episteme.core.mathematics.numbers.complex.Complex.ONE;
+                for (int i = 0; i < n; i++) {
+                    org.episteme.core.mathematics.numbers.complex.Complex diag = org.episteme.core.mathematics.numbers.complex.Complex.of(h_QR[(i * n + i) * 2], h_QR[(i * n + i) * 2 + 1]);
+                    det = det.multiply(diag);
+                }
+
+                int swaps = 0;
+                for (int i = 0; i < n; i++) if (h_Ipiv[i] != (i + 1)) swaps++;
+                if (swaps % 2 != 0) det = det.negate();
+
+                return (Real) (Object) det;
+            } finally {
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segIpiv.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segIpiv));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex determinant failed", t);
+        }
+    }
+
+    private LUResult<Real> luComplex(Matrix<Real> a) {
+        int n = a.rows();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUSOLVER_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment segA = MemorySegment.NULL;
+            MemorySegment segIpiv = MemorySegment.NULL;
+            MemorySegment segInfo = MemorySegment.NULL;
+            MemorySegment segWork = MemorySegment.NULL;
+
+            try {
+                MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Ipiv = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Info = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) n * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Ipiv, (long) n * 4));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Info, (long) 4));
+
+                segA = d_A.get(ValueLayout.ADDRESS, 0);
+                segIpiv = d_Ipiv.get(ValueLayout.ADDRESS, 0);
+                segInfo = d_Info.get(ValueLayout.ADDRESS, 0);
+
+                double[] h_A = toComplexDoubleArray(a);
+                double[] h_At = new double[n * n * 2];
+                for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) {
+                    h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2];
+                    h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                }
+
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+                checkCuda((int) CUSOLVER_ZGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+                int lwork = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+
+                MemorySegment d_Work = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Work, (long) lwork * 16));
+                segWork = d_Work.get(ValueLayout.ADDRESS, 0);
+
+                checkCuda((int) CUSOLVER_ZGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
+
+                double[] h_LU = new double[n * n * 2];
+                MemorySegment hostLU = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostLU, segA, (long) n * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostLU, ValueLayout.JAVA_DOUBLE, 0, h_LU, 0, n * n * 2);
+
+                int[] h_Ipiv = new int[n];
+                MemorySegment hostIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostIpiv, segIpiv, (long) n * 4, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostIpiv, ValueLayout.JAVA_INT, 0, h_Ipiv, 0, n);
+
+                Real[][] L = new Real[n][n];
+                Real[][] U = new Real[n][n];
+                for (int r = 0; r < n; r++) {
+                    for (int c = 0; c < n; c++) {
+                        double re = h_LU[(c * n + r) * 2];
+                        double im = h_LU[(c * n + r) * 2 + 1];
+                        org.episteme.core.mathematics.numbers.complex.Complex val = org.episteme.core.mathematics.numbers.complex.Complex.of(re, im);
+                        if (r > c) {
+                            L[r][c] = (Real)(Object)val;
+                            U[r][c] = (Real)(Object)org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
+                        } else if (r < c) {
+                            L[r][c] = (Real)(Object)org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
+                            U[r][c] = (Real)(Object)val;
+                        } else {
+                            L[r][c] = (Real)(Object)org.episteme.core.mathematics.numbers.complex.Complex.ONE;
+                            U[r][c] = (Real)(Object)val;
+                        }
+                    }
+                }
+                Real[] P = new Real[n];
+                for (int i = 0; i < n; i++) P[i] = Real.of(h_Ipiv[i]);
+
+                return new LUResult<>(
+                    Matrix.of(L, Reals.getInstance()),
+                    Matrix.of(U, Reals.getInstance()),
+                    Vector.of(P, Reals.getInstance())
+                );
+            } finally {
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segIpiv.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segIpiv));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex LU failed", t);
+        }
+    }
+
+    private QRResult<Real> qrComplex(Matrix<Real> a) {
+        int m = a.rows();
+        int n = a.cols();
+        int k = Math.min(m, n);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUSOLVER_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment segA = MemorySegment.NULL;
+            MemorySegment segTau = MemorySegment.NULL;
+            MemorySegment segInfo = MemorySegment.NULL;
+            MemorySegment segWork = MemorySegment.NULL;
+
+            try {
+                MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Tau = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Info = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) m * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Tau, (long) k * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Info, (long) 4));
+
+                segA = d_A.get(ValueLayout.ADDRESS, 0);
+                segTau = d_Tau.get(ValueLayout.ADDRESS, 0);
+                segInfo = d_Info.get(ValueLayout.ADDRESS, 0);
+
+                double[] h_A = toComplexDoubleArray(a);
+                double[] h_At = new double[m * n * 2];
+                for (int r = 0; r < m; r++) for (int c = 0; c < n; c++) {
+                    h_At[(c * m + r) * 2] = h_A[(r * n + c) * 2];
+                    h_At[(c * m + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                }
+
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) m * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+                checkCuda((int) CUSOLVER_ZGEQRF_BUFFER_SIZE.invokeExact(handle, m, n, segA, m, p_Lwork));
+                int lwork = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+
+                MemorySegment d_Work = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Work, (long) lwork * 16));
+                segWork = d_Work.get(ValueLayout.ADDRESS, 0);
+
+                checkCuda((int) CUSOLVER_ZGEQRF.invokeExact(handle, m, n, segA, m, segTau, segWork, lwork, segInfo));
+
+                double[] h_QR = new double[m * n * 2];
+                MemorySegment hostQR = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostQR, segA, (long) m * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostQR, ValueLayout.JAVA_DOUBLE, 0, h_QR, 0, m * n * 2);
+
+                Real[][] rMatrixData = new Real[m][n];
+                for (int r = 0; r < m; r++) {
+                    for (int c = 0; c < n; c++) {
+                        if (c >= r) {
+                            rMatrixData[r][c] = (Real)(Object)org.episteme.core.mathematics.numbers.complex.Complex.of(h_QR[(c * m + r) * 2], h_QR[(c * m + r) * 2 + 1]);
+                        } else {
+                            rMatrixData[r][c] = (Real)(Object)org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
+                        }
+                    }
+                }
+                Matrix<Real> R = Matrix.of(rMatrixData, Reals.getInstance());
+
+                checkCuda((int) CUSOLVER_ZORGQR_BUFFER_SIZE.invokeExact(handle, m, k, k, segA, m, segTau, p_Lwork));
+                int lworkQ = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+                if (lworkQ > lwork) {
+                    checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                    MemorySegment d_WorkQ = arena.allocate(ValueLayout.ADDRESS);
+                    checkCuda((int) CUDA_MALLOC.invokeExact(d_WorkQ, (long) lworkQ * 16));
+                    segWork = d_WorkQ.get(ValueLayout.ADDRESS, 0);
+                    lwork = lworkQ;
+                }
+                checkCuda((int) CUSOLVER_ZORGQR.invokeExact(handle, m, k, k, segA, m, segTau, segWork, lwork, segInfo));
+
+                double[] h_Q = new double[m * k * 2];
+                MemorySegment hostQ = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * k * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostQ, segA, (long) m * k * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostQ, ValueLayout.JAVA_DOUBLE, 0, h_Q, 0, m * k * 2);
+
+                double[] h_QT = new double[m * k * 2];
+                for (int r = 0; r < m; r++) for (int c = 0; c < k; c++) {
+                    h_QT[(r * k + c) * 2] = h_Q[(c * m + r) * 2];
+                    h_QT[(r * k + c) * 2 + 1] = h_Q[(c * m + r) * 2 + 1];
+                }
+
+                return new QRResult<>(fromComplexDoubleArray(h_QT, m, k), R);
+            } finally {
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segTau.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segTau));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex QR failed", t);
+        }
+    }
+
+    private SVDResult<Real> svdComplex(Matrix<Real> a) {
+        int m = a.rows();
+        int n = a.cols();
+        int k = Math.min(m, n);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUSOLVER_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment segA = MemorySegment.NULL;
+            MemorySegment segS = MemorySegment.NULL;
+            MemorySegment segU = MemorySegment.NULL;
+            MemorySegment segVT = MemorySegment.NULL;
+            MemorySegment segInfo = MemorySegment.NULL;
+            MemorySegment segWork = MemorySegment.NULL;
+
+            try {
+                MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_S = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_U = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_VT = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Info = arena.allocate(ValueLayout.ADDRESS);
+
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) m * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_S, (long) k * 8));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_U, (long) m * m * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_VT, (long) n * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Info, (long) 4));
+
+                segA = d_A.get(ValueLayout.ADDRESS, 0);
+                segS = d_S.get(ValueLayout.ADDRESS, 0);
+                segU = d_U.get(ValueLayout.ADDRESS, 0);
+                segVT = d_VT.get(ValueLayout.ADDRESS, 0);
+                segInfo = d_Info.get(ValueLayout.ADDRESS, 0);
+
+                double[] h_A = toComplexDoubleArray(a);
+                double[] h_At = new double[m * n * 2];
+                for (int r = 0; r < m; r++) for (int c = 0; c < n; c++) {
+                    h_At[(c * m + r) * 2] = h_A[(r * n + c) * 2];
+                    h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                }
+
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) m * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+                checkCuda((int) CUSOLVER_ZGESVD_BUFFER_SIZE.invokeExact(handle, m, n, p_Lwork));
+                int lwork = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+
+                MemorySegment d_Work = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Work, (long) lwork * 16));
+                segWork = d_Work.get(ValueLayout.ADDRESS, 0);
+
+                checkCuda((int) CUSOLVER_ZGESVD.invokeExact(handle, (byte)'A', (byte)'A', m, n, segA, m, segS, segU, m, segVT, n, segWork, lwork, MemorySegment.NULL, segInfo));
+
+                double[] h_S = new double[k];
+                MemorySegment hostS = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostS, segS, (long) k * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostS, ValueLayout.JAVA_DOUBLE, 0, h_S, 0, k);
+
+                double[] h_U = new double[m * m * 2];
+                MemorySegment hostU = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * m * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostU, segU, (long) m * m * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostU, ValueLayout.JAVA_DOUBLE, 0, h_U, 0, m * m * 2);
+
+                double[] h_VT = new double[n * n * 2];
+                MemorySegment hostVT = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostVT, segVT, (long) n * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostVT, ValueLayout.JAVA_DOUBLE, 0, h_VT, 0, n * n * 2);
+
+                double[] h_UT = new double[m * m * 2];
+                for (int r = 0; r < m; r++) for (int c = 0; c < m; c++) {
+                    h_UT[(r * m + c) * 2] = h_U[(c * m + r) * 2];
+                    h_UT[(r * m + c) * 2 + 1] = h_U[(c * m + r) * 2 + 1];
+                }
+
+                double[] h_VTT = new double[n * n * 2];
+                for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) {
+                    h_VTT[(r * n + c) * 2] = h_VT[(c * n + r) * 2];
+                    h_VTT[(r * n + c) * 2 + 1] = h_VT[(c * n + r) * 2 + 1];
+                }
+
+                return new SVDResult<>(fromComplexDoubleArray(h_UT, m, m), fromDoubleVec(h_S), fromComplexDoubleArray(h_VTT, n, n));
+            } finally {
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segS.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segS));
+                if (!segU.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segU));
+                if (!segVT.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segVT));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex SVD failed", t);
+        }
+    }
+
+    private EigenResult<Real> eigenComplex(Matrix<Real> a) {
+        int n = a.rows();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUSOLVER_CREATE.invokeExact(p_Handle));
+            MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+
+            MemorySegment segA = MemorySegment.NULL;
+            MemorySegment segW = MemorySegment.NULL;
+            MemorySegment segInfo = MemorySegment.NULL;
+            MemorySegment segWork = MemorySegment.NULL;
+
+            try {
+                MemorySegment d_A = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_W = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment d_Info = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_A, (long) n * n * 16));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_W, (long) n * 8));
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Info, (long) 4));
+
+                segA = d_A.get(ValueLayout.ADDRESS, 0);
+                segW = d_W.get(ValueLayout.ADDRESS, 0);
+                segInfo = d_Info.get(ValueLayout.ADDRESS, 0);
+
+                double[] h_A = toComplexDoubleArray(a);
+                double[] h_At = new double[n * n * 2];
+                for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) {
+                    h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2];
+                    h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                }
+
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+
+                MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+                checkCuda((int) CUSOLVER_ZHEEVD_BUFFER_SIZE.invokeExact(handle, 1, 0, n, segA, n, segW, p_Lwork));
+                int lwork = p_Lwork.get(ValueLayout.JAVA_INT, 0);
+
+                MemorySegment d_Work = arena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUDA_MALLOC.invokeExact(d_Work, (long) lwork * 16));
+                segWork = d_Work.get(ValueLayout.ADDRESS, 0);
+
+                checkCuda((int) CUSOLVER_ZHEEVD.invokeExact(handle, 1, 0, n, segA, n, segW, segWork, lwork, segInfo));
+
+                double[] h_W = new double[n];
+                MemorySegment hostW = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * 8);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostW, segW, (long) n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostW, ValueLayout.JAVA_DOUBLE, 0, h_W, 0, n);
+
+                double[] h_V = new double[n * n * 2];
+                MemorySegment hostV = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(hostV, segA, (long) n * n * 16, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(hostV, ValueLayout.JAVA_DOUBLE, 0, h_V, 0, n * n * 2);
+
+                double[] h_VT = new double[n * n * 2];
+                for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) {
+                    h_VT[(r * n + c) * 2] = h_V[(c * n + r) * 2];
+                    h_VT[(r * n + c) * 2 + 1] = h_V[(c * n + r) * 2 + 1];
+                }
+
+                return new EigenResult<>(fromComplexDoubleArray(h_VT, n, n), fromDoubleVec(h_W));
+            } finally {
+                if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
+                if (!segW.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segW));
+                if (!segInfo.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segInfo));
+                if (!segWork.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segWork));
+                checkCublas((int) CUSOLVER_DESTROY.invokeExact(handle));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex Eigen failed", t);
+        }
+    }
 
 
+
+
+    private boolean isComplex(Matrix<Real> m) {
+        if (m.rows() == 0 || m.cols() == 0) return false;
+        return ((Object)m.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
+    private boolean isComplex(Vector<Real> v) {
+        if (v.dimension() == 0) return false;
+        return ((Object)v.get(0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
+    private Real dotComplex(Vector<Real> a, Vector<Real> b) {
+        int n = a.dimension();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment p_A = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_B = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment p_Res = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_A, (long) n * 16));
+            checkCuda((int) CUDA_MALLOC.invokeExact(p_B, (long) n * 16));
+            
+            MemorySegment d_A = p_A.get(ValueLayout.ADDRESS, 0);
+            MemorySegment d_B = p_B.get(ValueLayout.ADDRESS, 0);
+
+            try {
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleVec(a)), (long) n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleVec(b)), (long) n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
+                
+                MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
+                checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
+                MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
+                
+                try {
+                    checkCublas((int) CUBLAS_ZDOTU.invokeExact(handle, n, d_A, 1, d_B, 1, p_Res));
+                    double re = p_Res.get(ValueLayout.JAVA_DOUBLE, 0);
+                    double im = p_Res.get(ValueLayout.JAVA_DOUBLE, 8);
+                    return (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(re, im);
+                } finally {
+                    checkCublas((int) CUBLAS_DESTROY.invokeExact(handle));
+                }
+            } finally {
+                checkCuda((int) CUDA_FREE.invokeExact(d_A));
+                checkCuda((int) CUDA_FREE.invokeExact(d_B));
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA complex dot failed", t);
+        }
+    }
 
     private double[] toDoubleArray(Matrix<Real> m) {
         int rows = m.rows();
@@ -868,14 +1701,51 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         return data;
     }
 
+    private double[] toComplexDoubleArray(Matrix<Real> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        double[] data = new double[rows * cols * 2];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Real val = m.get(i, j);
+                if (((Object)val) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
+                    data[(i * cols + j) * 2] = cv.getReal().doubleValue();
+                    data[(i * cols + j) * 2 + 1] = cv.getImaginary().doubleValue();
+                } else {
+                    data[(i * cols + j) * 2] = val.doubleValue();
+                    data[(i * cols + j) * 2 + 1] = 0.0;
+                }
+            }
+        }
+        return data;
+    }
+
+
     private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
         Real[] reals = new Real[data.length];
         for(int i=0; i<data.length; i++) reals[i] = Real.of(data[i]);
         return new DenseMatrix<Real>(reals, rows, cols, Reals.getInstance());
     }
 
+    private Matrix<Real> fromComplexDoubleArray(double[] data, int rows, int cols) {
+        Real[] reals = new Real[rows * cols];
+        for (int i = 0; i < rows * cols; i++) {
+            reals[i] = (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
+        }
+        return new DenseMatrix<Real>(reals, rows, cols, Reals.getInstance());
+    }
+
     private Vector<Real> fromDoubleVec(double[] data) {
         return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
+    }
+
+    private Vector<Real> fromComplexDoubleVec(double[] data) {
+        int dim = data.length / 2;
+        Real[] reals = new Real[dim];
+        for (int i = 0; i < dim; i++) {
+            reals[i] = (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
+        }
+        return org.episteme.core.mathematics.linearalgebra.Vector.of(reals, org.episteme.core.mathematics.sets.Reals.getInstance());
     }
 
     private double[] toDoubleVec(Vector<Real> v) {
@@ -884,9 +1754,29 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         return d;
     }
 
+    private double[] toComplexDoubleVec(Vector<Real> v) {
+        int dim = v.dimension();
+        double[] data = new double[dim * 2];
+        for (int i = 0; i < dim; i++) {
+            Real val = v.get(i);
+            if (((Object)val) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
+                data[i * 2] = cv.getReal().doubleValue();
+                data[i * 2 + 1] = cv.getImaginary().doubleValue();
+            } else {
+                data[i * 2] = val.doubleValue();
+                data[i * 2 + 1] = 0.0;
+            }
+        }
+        return data;
+    }
+
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGEQRF == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for qr()");
+    public QRResult<Real> qr(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for qr()");
+
+        if (isComplex(a)) {
+            return qrComplex(a);
+        }
 
         int m = a.rows();
         int n = a.cols();
@@ -988,8 +1878,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGESVD == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for svd()");
+    public SVDResult<Real> svd(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for svd()");
+
+        if (isComplex(a)) {
+            return svdComplex(a);
+        }
 
         int m = a.rows();
         int n = a.cols();
@@ -1171,8 +2065,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DGETRF == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for lu()");
+    public LUResult<Real> lu(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for lu()");
+
+        if (isComplex(a)) {
+            return luComplex(a);
+        }
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for LU");
@@ -1279,8 +2177,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     }
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
-        if (!IS_AVAILABLE || CUSOLVER_DSYEVD == null) throw new UnsupportedOperationException(getName() + ": CUDA not available for eigen()");
+    public EigenResult<Real> eigen(Matrix<Real> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": CUDA not available for eigen()");
+
+        if (isComplex(a)) {
+            return eigenComplex(a);
+        }
 
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Eigen");

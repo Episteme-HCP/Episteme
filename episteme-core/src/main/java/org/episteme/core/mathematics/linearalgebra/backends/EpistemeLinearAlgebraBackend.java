@@ -13,7 +13,6 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.cpu.CPUExecutionContext;
 import org.episteme.core.technical.backend.simd.SIMDBackend;
-import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import com.google.auto.service.AutoService;
 
@@ -37,11 +36,6 @@ public class EpistemeLinearAlgebraBackend implements LinearAlgebraBackend<Real>,
     public EpistemeLinearAlgebraBackend() {
         this.denseProvider = new CPUDenseLinearAlgebraProvider<>();
         this.sparseProvider = new CPUSparseLinearAlgebraProvider<>();
-    }
-
-    @Override
-    public String getNativeLibraryName() {
-        return null; // Pure Java foundation
     }
 
     @Override
@@ -82,6 +76,11 @@ public class EpistemeLinearAlgebraBackend implements LinearAlgebraBackend<Real>,
     @Override
     public Object createBackend() {
         return this;
+    }
+
+    @Override
+    public String getType() {
+        return "math";
     }
 
     @Override

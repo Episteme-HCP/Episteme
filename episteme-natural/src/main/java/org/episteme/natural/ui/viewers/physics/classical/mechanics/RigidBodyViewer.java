@@ -29,9 +29,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.natural.physics.classical.mechanics.CollisionSimulation;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
+
+import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.MechanicsFactory;
 import org.episteme.core.ui.NumericParameter;
 import org.episteme.core.ui.BooleanParameter;
 import org.episteme.core.ui.Parameter;
@@ -59,7 +60,7 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         VisualBodyData(Color c) { this.color = c; }
     }
 
-    private final org.episteme.natural.physics.classical.mechanics.PhysicsWorldBridge world = org.episteme.natural.physics.classical.mechanics.MechanicsFactory.createWorld();
+    private final PhysicsWorldBridge world = MechanicsFactory.createWorld();
     private final List<RigidBody> bodies = new ArrayList<>();
     private final java.util.Map<RigidBody, VisualBodyData> visualData = new java.util.HashMap<>();
     

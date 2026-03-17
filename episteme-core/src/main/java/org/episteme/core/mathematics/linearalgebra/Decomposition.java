@@ -4,8 +4,6 @@
  */
 
 package org.episteme.core.mathematics.linearalgebra;
-
-import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.ProviderSelector;

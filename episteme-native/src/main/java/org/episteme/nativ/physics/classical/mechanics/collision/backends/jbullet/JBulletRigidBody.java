@@ -14,8 +14,8 @@ import com.bulletphysics.linearmath.Transform;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.complex.Quaternion;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.natural.physics.classical.mechanics.RigidBody;
-import org.episteme.natural.physics.classical.mechanics.RigidBodyBridge;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
+import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 
 import javax.vecmath.Vector3f;
 

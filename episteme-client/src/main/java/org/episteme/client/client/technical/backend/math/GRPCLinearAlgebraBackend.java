@@ -30,15 +30,14 @@ import org.episteme.server.server.proto.*;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import com.google.auto.service.AutoService;
-
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Field;
-import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import com.google.auto.service.AutoService;
 
 import com.google.protobuf.ByteString;
 import java.nio.ByteBuffer;
@@ -65,8 +64,8 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
-public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, Backend {
+@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, org.episteme.core.technical.backend.ComputeBackend.class, Backend.class})
+public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org.episteme.core.technical.backend.ComputeBackend {
 
     private ManagedChannel channel;
     private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
@@ -77,6 +76,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, Bac
      * Public no-arg constructor required by ServiceLoader.
      * Defaults to localhost:50051.
      */
+    @SuppressWarnings("unchecked")
     public GRPCLinearAlgebraBackend() {
         this("localhost", 50051, (Field<E>) org.episteme.core.mathematics.sets.Reals.getInstance());
     }
@@ -126,6 +126,16 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, Bac
     @Override
     public String getId() {
         return "grpc-math";
+    }
+
+    @Override
+    public String getType() {
+        return "linearalgebra";
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.DISTRIBUTED;
     }
 
     @Override

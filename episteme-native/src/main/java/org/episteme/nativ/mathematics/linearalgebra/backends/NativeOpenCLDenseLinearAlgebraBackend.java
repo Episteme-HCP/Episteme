@@ -67,6 +67,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel luDecomposeStepKernel;
     private static cl_kernel choleskyDecomposeStepKernel;
     private static cl_kernel qrHouseholderApplyKernel;
+    private static cl_kernel complexMatMulKernel;
+    private static cl_kernel complexVecAddKernel;
+    private static cl_kernel complexVecSubKernel;
+    private static cl_kernel complexVecScaleKernel;
+    private static cl_kernel complexVecDotPartialKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -180,8 +185,42 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "    int i = get_global_id(1) + k;\n" +
         "    if (i < rows && j < cols) {\n" +
         "        double dot = 0.0;\n" +
-        "        for (int l = k; l < rows; l++) dot += v[l] * a[l * cols + j];\n" +
         "        a[i * cols + j] -= 2.0 * v[i] * dot;\n" +
+        "    }\n" +
+        "}\n" +
+        "typedef struct { double r; double i; } double2_custom;\n" +
+        "__kernel void complexMatrixMultiply(__global const double2_custom *a, __global const double2_custom *b, __global double2_custom *c, const int m, const int n, const int k) {\n" +
+        "    int row = get_global_id(1); int col = get_global_id(0);\n" +
+        "    if (row < m && col < n) {\n" +
+        "        double2_custom sum = {0.0, 0.0};\n" +
+        "        for (int i = 0; i < k; i++) {\n" +
+        "            double2_custom av = a[row*k+i];\n" +
+        "            double2_custom bv = b[i*n+col];\n" +
+        "            sum.r += av.r * bv.r - av.i * bv.i;\n" +
+        "            sum.i += av.r * bv.i + av.i * bv.r;\n" +
+        "        }\n" +
+        "        c[row*n+col] = sum;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void complex_vec_add(__global const double2_custom *a, __global const double2_custom *b, __global double2_custom *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) { c[i].r = a[i].r + b[i].r; c[i].i = a[i].i + b[i].i; }\n" +
+        "}\n" +
+        "__kernel void complex_vec_sub(__global const double2_custom *a, __global const double2_custom *b, __global double2_custom *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) { c[i].r = a[i].r - b[i].r; c[i].i = a[i].i - b[i].i; }\n" +
+        "}\n" +
+        "__kernel void complex_vec_scale(__global const double2_custom *a, const double2_custom s, __global double2_custom *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) {\n" +
+        "        double2_custom av = a[i];\n" +
+        "        c[i].r = av.r * s.r - av.i * s.i;\n" +
+        "        c[i].i = av.r * s.i + av.i * s.r;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void complexVecDotPartial(__global const double2_custom *a, __global const double2_custom *b, __global double2_custom *out, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) {\n" +
+        "        double2_custom av = a[i];\n" +
+        "        double2_custom bv = b[i];\n" +
+        "        out[i].r = av.r * bv.r + av.i * bv.i;\n" +
+        "        out[i].i = av.i * bv.r - av.r * bv.i;\n" +
         "    }\n" +
         "}\n";
 
@@ -244,6 +283,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             luDecomposeStepKernel = clCreateKernel(program, "lu_decompose_step", null);
             choleskyDecomposeStepKernel = clCreateKernel(program, "cholesky_decompose_step", null);
             qrHouseholderApplyKernel = clCreateKernel(program, "qr_householder_apply", null);
+            complexMatMulKernel = clCreateKernel(program, "complexMatrixMultiply", null);
+            complexVecAddKernel = clCreateKernel(program, "complex_vec_add", null);
+            complexVecSubKernel = clCreateKernel(program, "complex_vec_sub", null);
+            complexVecScaleKernel = clCreateKernel(program, "complex_vec_scale", null);
+            complexVecDotPartialKernel = clCreateKernel(program, "complexVecDotPartial", null);
 
             initialized = true;
             logger.info("Native OpenCL Dense Backend initialized successfully.");
@@ -308,6 +352,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for multiply()");
+
+        if (isComplex(a)) return multiplyComplex(a, b);
 
         logger.debug("Entering OpenCL multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
         long start = System.nanoTime();
@@ -579,14 +625,17 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 /** Matrix add via element-wise OpenCL. */
 @Override public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
     if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Matrix add()");
+    if (isComplex(a)) return elementWiseVecComplex(toComplexDoubleArray(a), toComplexDoubleArray(b), complexVecAddKernel, a.rows(), a.cols(), a);
     return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecAddKernel, a.rows(), a.cols(), a);
 }
 @Override public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
     if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Matrix subtract()");
+    if (isComplex(a)) return elementWiseVecComplex(toComplexDoubleArray(a), toComplexDoubleArray(b), complexVecSubKernel, a.rows(), a.cols(), a);
     return elementWiseVec(toDoubleArray(a), toDoubleArray(b), vecSubKernel, a.rows(), a.cols(), a);
 }
 @Override public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
     if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for scale()");
+    if (isComplex(a)) return fromComplexDoubleArray(scaleVecComplex(toComplexDoubleArray(a), scalar), a.rows(), a.cols(), a);
     return fromDoubleArray(scaleVec(toDoubleArray(a), scalar.doubleValue()), a.rows(), a.cols(), a);
 }
     @Override public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
@@ -610,12 +659,30 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     }
     @Override public Real dot(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for dot()");
+        if (isComplexVec(a)) {
+            double[] products = vecOpComplex(toComplexDoubleVec(a), toComplexDoubleVec(b), complexVecDotPartialKernel);
+            double re = 0, im = 0;
+            for (int i = 0; i < products.length / 2; i++) {
+                re += products[i * 2];
+                im += products[i * 2 + 1];
+            }
+            return (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(re, im);
+        }
         double[] products = vecOp(toDoubleVec(a), toDoubleVec(b), vecDotPartialKernel);
         double sum = 0; for (double v : products) sum += v;
         return Real.of(sum);
     }
     @Override public Real norm(Vector<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for norm()");
+        if (isComplexVec(a)) {
+            double[] av = toComplexDoubleVec(a);
+            double[] products = vecOpComplex(av, av, complexVecDotPartialKernel);
+            double sum = 0;
+            for (int i = 0; i < products.length / 2; i++) {
+                sum += products[i * 2]; // For norm, we only need real part of a*conj(a) which is |a|^2
+            }
+            return Real.of(Math.sqrt(sum));
+        }
         double[] av = toDoubleVec(a);
         double[] sq = scaleVecElementWise(av, av); // a[i]*a[i] via dot kernel
         double sum = 0; for (double v : sq) sum += v;
@@ -981,6 +1048,150 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return vecOp(a, b, vecDotPartialKernel);
     }
 
+    private Matrix<Real> multiplyComplex(Matrix<Real> a, Matrix<Real> b) {
+        int m = a.rows();
+        int k = a.cols();
+        int n = b.cols();
+
+        double[] h_A = toComplexDoubleArray(a);
+        double[] h_B = toComplexDoubleArray(b);
+        double[] h_C = new double[m * n * 2];
+
+        try {
+            cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * m * k, Pointer.to(h_A), null);
+            cl_mem memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * k * n, Pointer.to(h_B), null);
+            cl_mem memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * 2 * m * n, null, null);
+
+            try {
+                clSetKernelArg(complexMatMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(complexMatMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+                clSetKernelArg(complexMatMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+                clSetKernelArg(complexMatMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                clSetKernelArg(complexMatMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(complexMatMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+
+                long[] globalWorkSize = new long[]{n, m};
+                clEnqueueNDRangeKernel(commandQueue, complexMatMulKernel, 2, null, globalWorkSize, null, 0, null, null);
+                clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * 2 * m * n, Pointer.to(h_C), 0, null, null);
+                
+                return fromComplexDoubleArray(h_C, m, n, a);
+            } finally {
+                if (memA != null) clReleaseMemObject(memA);
+                if (memB != null) clReleaseMemObject(memB);
+                if (memC != null) clReleaseMemObject(memC);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("OpenCL Complex Multiply failed", e);
+        }
+    }
+
+    private boolean isComplex(Matrix<Real> m) {
+        if (m.rows() == 0 || m.cols() == 0) return false;
+        return ((Object)m.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
+    private double[] toComplexDoubleArray(Matrix<Real> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        double[] data = new double[rows * cols * 2];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Real val = m.get(i, j);
+                if (((Object)val) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
+                    data[(i * cols + j) * 2] = cv.getReal().doubleValue();
+                    data[(i * cols + j) * 2 + 1] = cv.getImaginary().doubleValue();
+                } else {
+                    data[(i * cols + j) * 2] = val.doubleValue();
+                    data[(i * cols + j) * 2 + 1] = 0.0;
+                }
+            }
+        }
+        return data;
+    }
+
+
+    private Matrix<Real> fromComplexDoubleArray(double[] data, int rows, int cols, Matrix<Real> reference) {
+        Real[] reals = new Real[rows * cols];
+        for (int i = 0; i < rows * cols; i++) {
+            reals[i] = (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
+        }
+        return new DenseMatrix<Real>(reals, rows, cols, (Ring<Real>) reference.getScalarRing());
+    }
+
+    private Matrix<Real> elementWiseVecComplex(double[] a, double[] b, cl_kernel k, int rows, int cols, Matrix<Real> reference) {
+        return fromComplexDoubleArray(vecOpComplex(a, b, k), rows, cols, reference);
+    }
+
+    private double[] vecOpComplex(double[] a, double[] b, cl_kernel k) {
+        int n = a.length / 2;
+        double[] result = new double[n * 2];
+        cl_mem mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * n, Pointer.to(a), null);
+        cl_mem mB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * n, Pointer.to(b), null);
+        cl_mem mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * 2 * n, null, null);
+        try {
+            clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mA));
+            clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(mB));
+            clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mC));
+            clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(commandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * 2 * n, Pointer.to(result), 0, null, null);
+        } finally { 
+            if (mA != null) clReleaseMemObject(mA); 
+            if (mB != null) clReleaseMemObject(mB); 
+            if (mC != null) clReleaseMemObject(mC); 
+        }
+        return result;
+    }
+
+    private boolean isComplexVec(Vector<Real> v) {
+        if (v.dimension() == 0) return false;
+        return ((Object)v.get(0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
+    private double[] toComplexDoubleVec(Vector<Real> v) {
+        int dim = v.dimension();
+        double[] data = new double[dim * 2];
+        for (int i = 0; i < dim; i++) {
+            Real val = v.get(i);
+            if (((Object)val) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
+                data[i * 2] = cv.getReal().doubleValue();
+                data[i * 2 + 1] = cv.getImaginary().doubleValue();
+            } else {
+                data[i * 2] = val.doubleValue();
+                data[i * 2 + 1] = 0.0;
+            }
+        }
+        return data;
+    }
+
+    private double[] scaleVecComplex(double[] a, Real s) {
+        int n = a.length / 2;
+        double[] result = new double[n * 2];
+        double[] scal = new double[2];
+        if (((Object)s) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
+            scal[0] = cv.getReal().doubleValue();
+            scal[1] = cv.getImaginary().doubleValue();
+        } else {
+            scal[0] = s.doubleValue();
+            scal[1] = 0.0;
+        }
+
+        cl_mem mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * n, Pointer.to(a), null);
+        cl_mem mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * 2 * n, null, null);
+        try {
+            clSetKernelArg(complexVecScaleKernel, 0, Sizeof.cl_mem, Pointer.to(mA));
+            clSetKernelArg(complexVecScaleKernel, 1, Sizeof.cl_double * 2, Pointer.to(scal));
+            clSetKernelArg(complexVecScaleKernel, 2, Sizeof.cl_mem, Pointer.to(mC));
+            clSetKernelArg(complexVecScaleKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(commandQueue, complexVecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * 2 * n, Pointer.to(result), 0, null, null);
+        } finally { 
+            if (mA != null) clReleaseMemObject(mA); 
+            if (mC != null) clReleaseMemObject(mC); 
+        }
+        return result;
+    }
+
     private double[] toDoubleVec(Vector<Real> v) {
         double[] d = new double[v.dimension()];
         for (int i = 0; i < d.length; i++) d[i] = v.get(i).doubleValue();
@@ -1053,6 +1264,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             clReleaseKernel(gaussJordanInvKernel);
             clReleaseKernel(gaussElimPhase1Kernel);
             clReleaseKernel(gaussElimPhase1WithBKernel);
+            clReleaseKernel(complexMatMulKernel);
+            clReleaseKernel(complexVecAddKernel);
+            clReleaseKernel(complexVecSubKernel);
+            clReleaseKernel(complexVecScaleKernel);
+            clReleaseKernel(complexVecDotPartialKernel);
             clReleaseProgram(program);
             clReleaseCommandQueue(commandQueue);
             clReleaseContext(context);
@@ -1061,6 +1277,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     }
 
     @Override public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return null;
+        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext(); // Placeholder
     }
 }

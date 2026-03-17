@@ -5,6 +5,7 @@
 
 package org.episteme.natural.physics.classical.mechanics;
 
+import org.episteme.natural.physics.classical.mechanics.nbody.NBodySimulation;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
