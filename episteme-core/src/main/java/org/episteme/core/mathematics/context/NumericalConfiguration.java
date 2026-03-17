@@ -1,18 +1,18 @@
-package org.episteme.core;
+package org.episteme.core.mathematics.context;
 
 import java.math.MathContext;
 import org.episteme.core.ComputeContext.Backend;
 import org.episteme.core.ComputeContext.FloatPrecision;
 import org.episteme.core.ComputeContext.IntPrecision;
-import org.episteme.core.mathematics.context.ComputeMode;
 import org.episteme.core.mathematics.context.MathContext.OverflowMode;
 import org.episteme.core.mathematics.context.MathContext.RealPrecision;
+import org.episteme.core.Episteme;
 
 /**
  * Configuration for numerical computation, including precision, backend preferences, and thresholds.
- * Extracted from {@link ComputeContext}.
+ * Standardized as NumericalConfiguration in the mathematics.context package.
  */
-public class NumericalConfig {
+public class NumericalConfiguration {
 
     private volatile FloatPrecision floatPrecision = FloatPrecision.DOUBLE;
     private volatile IntPrecision intPrecision = IntPrecision.LONG;
@@ -23,18 +23,18 @@ public class NumericalConfig {
     private volatile ComputeMode computeMode = ComputeMode.AUTO;
     private volatile MathContext mathContext = MathContext.DECIMAL128;
 
-    private double gpuThreshold = 10_000_000; // Default threshold
-    private int parallelThreshold = 50_000;   // Default threshold for CPU parallelization
-    private int maxThreads = Runtime.getRuntime().availableProcessors();
+    private double gpuThreshold = Double.parseDouble(Episteme.getProperty("compute.gpu.threshold", "10000000"));
+    private int parallelThreshold = Integer.parseInt(Episteme.getProperty("compute.parallel.threshold", "50000"));
+    private int maxThreads = Integer.parseInt(Episteme.getProperty("compute.parallel.max_threads", String.valueOf(Runtime.getRuntime().availableProcessors())));
 
-    public NumericalConfig() {
+    public NumericalConfiguration() {
     }
 
     public FloatPrecision getFloatPrecision() {
         return floatPrecision;
     }
 
-    public NumericalConfig setFloatPrecision(FloatPrecision floatPrecision) {
+    public NumericalConfiguration setFloatPrecision(FloatPrecision floatPrecision) {
         this.floatPrecision = floatPrecision;
         return this;
     }
@@ -43,7 +43,7 @@ public class NumericalConfig {
         return intPrecision;
     }
 
-    public NumericalConfig setIntPrecision(IntPrecision intPrecision) {
+    public NumericalConfiguration setIntPrecision(IntPrecision intPrecision) {
         this.intPrecision = intPrecision;
         return this;
     }
@@ -52,7 +52,7 @@ public class NumericalConfig {
         return backend;
     }
 
-    public NumericalConfig setBackend(Backend backend) {
+    public NumericalConfiguration setBackend(Backend backend) {
         this.backend = backend;
         return this;
     }
@@ -61,7 +61,7 @@ public class NumericalConfig {
         return realPrecision;
     }
 
-    public NumericalConfig setRealPrecision(RealPrecision realPrecision) {
+    public NumericalConfiguration setRealPrecision(RealPrecision realPrecision) {
         this.realPrecision = realPrecision;
         return this;
     }
@@ -70,7 +70,7 @@ public class NumericalConfig {
         return overflowMode;
     }
 
-    public NumericalConfig setOverflowMode(OverflowMode overflowMode) {
+    public NumericalConfiguration setOverflowMode(OverflowMode overflowMode) {
         this.overflowMode = overflowMode;
         return this;
     }
@@ -79,7 +79,7 @@ public class NumericalConfig {
         return computeMode;
     }
 
-    public NumericalConfig setComputeMode(ComputeMode computeMode) {
+    public NumericalConfiguration setComputeMode(ComputeMode computeMode) {
         this.computeMode = computeMode;
         return this;
     }
@@ -88,7 +88,7 @@ public class NumericalConfig {
         return mathContext;
     }
 
-    public NumericalConfig setMathContext(MathContext mathContext) {
+    public NumericalConfiguration setMathContext(MathContext mathContext) {
         this.mathContext = mathContext;
         return this;
     }
@@ -97,7 +97,7 @@ public class NumericalConfig {
         return gpuThreshold;
     }
 
-    public NumericalConfig setGpuThreshold(double gpuThreshold) {
+    public NumericalConfiguration setGpuThreshold(double gpuThreshold) {
         this.gpuThreshold = gpuThreshold;
         return this;
     }
@@ -106,7 +106,7 @@ public class NumericalConfig {
         return parallelThreshold;
     }
 
-    public NumericalConfig setParallelThreshold(int parallelThreshold) {
+    public NumericalConfiguration setParallelThreshold(int parallelThreshold) {
         this.parallelThreshold = parallelThreshold;
         return this;
     }
@@ -115,7 +115,7 @@ public class NumericalConfig {
         return maxThreads;
     }
 
-    public NumericalConfig setMaxThreads(int maxThreads) {
+    public NumericalConfiguration setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         return this;
     }

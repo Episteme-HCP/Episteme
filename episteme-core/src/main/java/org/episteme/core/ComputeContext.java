@@ -17,6 +17,7 @@ import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.mathematics.linearalgebra.tensors.TensorProvider;
 import org.episteme.core.technical.algorithm.ProviderRegistry;
+import org.episteme.core.mathematics.context.NumericalConfiguration;
 
 /**
  * Compute context for configuring linear algebra and numerical computation
@@ -25,7 +26,7 @@ import org.episteme.core.technical.algorithm.ProviderRegistry;
  * This class provides a facade for:
  * <ul>
  * <li>Service provider registration and lookup (via {@link ProviderRegistry})</li>
- * <li>Numerical configuration (via {@link NumericalConfig})</li>
+ * <li>Numerical configuration (via {@link NumericalConfiguration})</li>
  * <li>Backend selection and execution</li>
  * </ul>
  * </p>
@@ -60,7 +61,7 @@ public class ComputeContext {
     private static final ThreadLocal<ComputeContext> CURRENT = ThreadLocal.withInitial(ComputeContext::new);
 
     // DELEGATES
-    private final NumericalConfig numericalConfig = new NumericalConfig();
+    private final NumericalConfiguration numericalConfig = new NumericalConfiguration();
     private final ProviderRegistry providerRegistry = new ProviderRegistry();
     private static final java.util.concurrent.ForkJoinPool SHARED_POOL = new java.util.concurrent.ForkJoinPool(
             Runtime.getRuntime().availableProcessors(),
@@ -345,7 +346,7 @@ public class ComputeContext {
     @Override
     public String toString() {
         return "ComputeContext{" +
-                "numericalConfig=" + numericalConfig + // Need toString() in Config?
+                "numericalConfig=" + numericalConfig +
                 ", distributedContext=" + distributedContext +
                 '}';
     }
