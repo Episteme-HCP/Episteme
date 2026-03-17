@@ -91,16 +91,43 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
     public GRPCLinearAlgebraBackend(String host, int port, Field<E> field) {
         this.serverAddress = host + ":" + port;
         this.field = field;
+        
+        // Define retry policy
+        java.util.Map<String, Object> retryPolicy = new java.util.HashMap<>();
+        retryPolicy.put("maxAttempts", 5.0);
+        retryPolicy.put("initialBackoff", "0.5s");
+        retryPolicy.put("maxBackoff", "30s");
+        retryPolicy.put("backoffMultiplier", 2.0);
+        retryPolicy.put("retryableStatusCodes", java.util.List.of("UNAVAILABLE", "DEADLINE_EXCEEDED"));
+
+        java.util.Map<String, Object> methodConfig = new java.util.HashMap<>();
+        java.util.Map<String, Object> name = new java.util.HashMap<>();
+        name.put("service", "org.episteme.server.server.proto.MatrixService");
+        methodConfig.put("name", java.util.List.of(name));
+        methodConfig.put("retryPolicy", retryPolicy);
+
+        java.util.Map<String, Object> serviceConfig = new java.util.HashMap<>();
+        serviceConfig.put("methodConfig", java.util.List.of(methodConfig));
+
         try {
             this.channel = ManagedChannelBuilder.forAddress(host, port)
+                    .defaultServiceConfig(serviceConfig)
+                    .enableRetry()
                     .usePlaintext()
                     .build();
             this.blockingStub = MatrixServiceGrpc.newBlockingStub(channel);
         } catch (Exception e) {
-            // Log and allow null for isAvailable() check
             this.channel = null;
             this.blockingStub = null;
         }
+    }
+
+    private RuntimeException mapException(String operation, StatusRuntimeException e) {
+        String msg = String.format("gRPC %s failed: [%s] %s", operation, e.getStatus().getCode(), e.getStatus().getDescription());
+        if (e.getStatus().getCode() == io.grpc.Status.Code.UNAVAILABLE) {
+            return new RuntimeException("Remote server is unavailable at " + serverAddress + ". Check if the Episteme server is running.", e);
+        }
+        return new RuntimeException(msg, e);
     }
 
     @Override
@@ -181,7 +208,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             MatrixResponse response = blockingStub.matrixAdd(request);
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixAdd failed: " + e.getStatus(), e);
+            throw mapException("matrixAdd", e);
         }
     }
 
@@ -199,7 +226,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             MatrixResponse response = blockingStub.matrixSubtract(request);
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixSubtract failed: " + e.getStatus(), e);
+            throw mapException("matrixSubtract", e);
         }
     }
 
@@ -217,7 +244,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             MatrixResponse response = blockingStub.matrixMultiply(request);
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixMultiply failed: " + e.getStatus(), e);
+            throw mapException("matrixMultiply", e);
         }
     }
 
@@ -231,7 +258,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             MatrixResponse response = blockingStub.matrixTranspose(request);
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixTranspose failed: " + e.getStatus(), e);
+            throw mapException("matrixTranspose", e);
         }
     }
 
@@ -245,7 +272,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             MatrixResponse response = blockingStub.matrixInverse(request);
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixInverse failed: " + e.getStatus(), e);
+            throw mapException("matrixInverse", e);
         }
     }
 
@@ -262,7 +289,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             MatrixResponse response = blockingStub.matrixScale(request);
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixScale failed: " + e.getStatus(), e);
+            throw mapException("matrixScale", e);
         }
     }
 
@@ -277,7 +304,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             ScalarResponse response = blockingStub.matrixDeterminant(request);
             return (E) Real.of(response.getValue());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixDeterminant failed: " + e.getStatus(), e);
+            throw mapException("matrixDeterminant", e);
         }
     }
 
@@ -294,7 +321,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             VectorResponse response = blockingStub.vectorAdd(request);
             return fromProtoVector(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC vectorAdd failed: " + e.getStatus(), e);
+            throw mapException("vectorAdd", e);
         }
     }
 
@@ -309,7 +336,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             VectorResponse response = blockingStub.vectorSubtract(request);
             return fromProtoVector(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC vectorSubtract failed: " + e.getStatus(), e);
+            throw mapException("vectorSubtract", e);
         }
     }
 
@@ -324,7 +351,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             VectorResponse response = blockingStub.vectorScale(request);
             return fromProtoVector(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC vectorScale failed: " + e.getStatus(), e);
+            throw mapException("vectorScale", e);
         }
     }
 
@@ -340,7 +367,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             ScalarResponse response = blockingStub.vectorDot(request);
             return (E) Real.of(response.getValue());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC vectorDot failed: " + e.getStatus(), e);
+            throw mapException("vectorDot", e);
         }
     }
 
@@ -355,7 +382,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             ScalarResponse response = blockingStub.vectorNorm(request);
             return (E) Real.of(response.getValue());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC vectorNorm failed: " + e.getStatus(), e);
+            throw mapException("vectorNorm", e);
         }
     }
 
@@ -372,7 +399,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             VectorResponse response = blockingStub.matrixVectorMultiply(request);
             return fromProtoVector(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixVectorMultiply failed: " + e.getStatus(), e);
+            throw mapException("matrixVectorMultiply", e);
         }
     }
 
@@ -387,7 +414,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
             VectorResponse response = blockingStub.linearSolve(request);
             return fromProtoVector(response.getResult());
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC linearSolve failed: " + e.getStatus(), e);
+            throw mapException("linearSolve", e);
         }
     }
 
@@ -401,7 +428,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
                 fromProtoVector(response.getP())
             );
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixLU failed: " + e.getStatus(), e);
+            throw mapException("matrixLU", e);
         }
     }
 
@@ -414,7 +441,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
                 fromProtoMatrix(response.getR())
             );
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixQR failed: " + e.getStatus(), e);
+            throw mapException("matrixQR", e);
         }
     }
 
@@ -428,7 +455,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
                 fromProtoMatrix(response.getV())
             );
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixSVD failed: " + e.getStatus(), e);
+            throw mapException("matrixSVD", e);
         }
     }
 
@@ -440,7 +467,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
                 fromProtoMatrix(response.getL())
             );
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixCholesky failed: " + e.getStatus(), e);
+            throw mapException("matrixCholesky", e);
         }
     }
 
@@ -453,7 +480,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
                 fromProtoVector(response.getD())
             );
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("gRPC matrixEigen failed: " + e.getStatus(), e);
+            throw mapException("matrixEigen", e);
         }
     }
 

@@ -129,13 +129,11 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, field);
         } else {
-            return IntStream.range(0, a.dimension())
+            return org.episteme.core.ComputeContext.current().computeParallel(() -> java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
-                    .mapToObj(i -> {
-                        return field.add(a.get(i), b.get(i));
-                    })
-                    .collect(Collectors.collectingAndThen(
-                            Collectors.toList(),
+                    .mapToObj(i -> field.add(a.get(i), b.get(i)))
+                    .collect(java.util.stream.Collectors.collectingAndThen(
+                            java.util.stream.Collectors.toList(),
                             list -> {
                                 @SuppressWarnings("unchecked")
                                 E[] arr = (E[]) list.toArray();
@@ -143,7 +141,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
                                         this, field);
-                            }));
+                            })));
         }
     }
 

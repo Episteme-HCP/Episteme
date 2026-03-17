@@ -62,6 +62,10 @@ public class ComputeContext {
     // DELEGATES
     private final NumericalConfig numericalConfig = new NumericalConfig();
     private final ProviderRegistry providerRegistry = new ProviderRegistry();
+    private static final java.util.concurrent.ForkJoinPool SHARED_POOL = new java.util.concurrent.ForkJoinPool(
+            Runtime.getRuntime().availableProcessors(),
+            java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+            null, true);
 
     // RESOURCES (Kept in Context)
     private volatile DistributedContext distributedContext = org.episteme.core.distributed.DistributedCompute.getContext();
@@ -170,6 +174,24 @@ public class ComputeContext {
 
     public ComputeContext setMathContext(MathContext mathContext) {
         numericalConfig.setMathContext(mathContext);
+        return this;
+    }
+
+    public int getParallelThreshold() {
+        return numericalConfig.getParallelThreshold();
+    }
+
+    public ComputeContext setParallelThreshold(int parallelThreshold) {
+        numericalConfig.setParallelThreshold(parallelThreshold);
+        return this;
+    }
+
+    public int getMaxThreads() {
+        return numericalConfig.getMaxThreads();
+    }
+
+    public ComputeContext setMaxThreads(int maxThreads) {
+        numericalConfig.setMaxThreads(maxThreads);
         return this;
     }
 

@@ -24,6 +24,8 @@ public class NumericalConfig {
     private volatile MathContext mathContext = MathContext.DECIMAL128;
 
     private double gpuThreshold = 10_000_000; // Default threshold
+    private int parallelThreshold = 50_000;   // Default threshold for CPU parallelization
+    private int maxThreads = Runtime.getRuntime().availableProcessors();
 
     public NumericalConfig() {
     }
@@ -97,6 +99,24 @@ public class NumericalConfig {
 
     public NumericalConfig setGpuThreshold(double gpuThreshold) {
         this.gpuThreshold = gpuThreshold;
+        return this;
+    }
+
+    public int getParallelThreshold() {
+        return parallelThreshold;
+    }
+
+    public NumericalConfig setParallelThreshold(int parallelThreshold) {
+        this.parallelThreshold = parallelThreshold;
+        return this;
+    }
+
+    public int getMaxThreads() {
+        return maxThreads;
+    }
+
+    public NumericalConfig setMaxThreads(int maxThreads) {
+        this.maxThreads = maxThreads;
         return this;
     }
 }
