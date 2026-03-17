@@ -27,7 +27,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.sets.Reals;
-import java.lang.foreign.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,18 +46,17 @@ public class CollisionSimulation {
             this.radius = r;
         }
     }
-
     private final List<Body> bodies = new ArrayList<>();
     private double gravity = 0.5;
     private double width = 800;
     private double height = 600;
     private CollisionProvider backend;
-    private Arena arena;
-    private MemorySegment positions;
-    private MemorySegment velocities;
-    private MemorySegment masses;
-    private MemorySegment radii;
-    private MemorySegment collisions;
+
+    private double[] positionArray;
+    private double[] velocityArray;
+    private double[] massArray;
+    private double[] radiusArray;
+    private int[] collisionArray;
 
     public CollisionSimulation() {
         this(null);
@@ -118,43 +116,33 @@ public class CollisionSimulation {
         int n = bodies.size();
         if (n == 0) return;
 
-        if (arena == null) {
-            arena = Arena.ofShared();
+        if (positionArray == null || positionArray.length < n * 3) {
+            positionArray = new double[n * 3];
+            velocityArray = new double[n * 3];
+            massArray = new double[n];
+            radiusArray = new double[n];
+            collisionArray = new int[n * n * 2];
         }
 
-        long posSize = n * 3 * Double.BYTES;
-        long velSize = n * 3 * Double.BYTES;
-        long massSize = n * Double.BYTES;
-        long radiiSize = n * Double.BYTES;
-        long collSize = (long) n * n * 2 * Integer.BYTES;
-
-        if (positions == null || positions.byteSize() < posSize) {
-            positions = arena.allocate(posSize);
-            velocities = arena.allocate(velSize);
-            masses = arena.allocate(massSize);
-            radii = arena.allocate(radiiSize);
-            collisions = arena.allocate(collSize);
-        }
-
-        // Sync to segments
+        // Sync to arrays
         for (int i = 0; i < n; i++) {
             Body b = bodies.get(i);
             RigidBody rb = b.physicsBody;
-            positions.setAtIndex(ValueLayout.JAVA_DOUBLE, i * 3, rb.getPosition().get(0).doubleValue());
-            positions.setAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 1, rb.getPosition().get(1).doubleValue());
-            positions.setAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 2, rb.getPosition().get(2).doubleValue());
+            positionArray[i * 3] = rb.getPosition().get(0).doubleValue();
+            positionArray[i * 3 + 1] = rb.getPosition().get(1).doubleValue();
+            positionArray[i * 3 + 2] = rb.getPosition().get(2).doubleValue();
             
-            velocities.setAtIndex(ValueLayout.JAVA_DOUBLE, i * 3, rb.getVelocity().get(0).doubleValue());
-            velocities.setAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 1, rb.getVelocity().get(1).doubleValue());
-            velocities.setAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 2, rb.getVelocity().get(2).doubleValue());
+            velocityArray[i * 3] = rb.getVelocity().get(0).doubleValue();
+            velocityArray[i * 3 + 1] = rb.getVelocity().get(1).doubleValue();
+            velocityArray[i * 3 + 2] = rb.getVelocity().get(2).doubleValue();
             
-            masses.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.radius * b.radius);
-            radii.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b.radius);
+            massArray[i] = b.radius * b.radius;
+            radiusArray[i] = b.radius;
         }
 
-        int numCollisions = backend.detectSphereCollisions(positions, radii, n, collisions);
+        int numCollisions = backend.detectSphereCollisions(positionArray, radiusArray, n, collisionArray);
         if (numCollisions > 0) {
-            backend.resolveCollisions(positions, velocities, masses, n, collisions, numCollisions);
+            backend.resolveCollisions(positionArray, velocityArray, massArray, n, collisionArray, numCollisions);
         }
 
         // Sync back
@@ -162,14 +150,14 @@ public class CollisionSimulation {
             Body b = bodies.get(i);
             RigidBody rb = b.physicsBody;
             rb.setPosition(toVector(
-                positions.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3),
-                positions.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 1),
-                positions.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 2)
+                positionArray[i * 3],
+                positionArray[i * 3 + 1],
+                positionArray[i * 3 + 2]
             ));
             rb.setVelocity(toVector(
-                velocities.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3),
-                velocities.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 1),
-                velocities.getAtIndex(ValueLayout.JAVA_DOUBLE, i * 3 + 2)
+                velocityArray[i * 3],
+                velocityArray[i * 3 + 1],
+                velocityArray[i * 3 + 2]
             ));
         }
     }
