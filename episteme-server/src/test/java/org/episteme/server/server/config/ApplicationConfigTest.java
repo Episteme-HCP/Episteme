@@ -182,10 +182,47 @@ class ApplicationConfigTest {
 
     @Test
     void testGetLong_DefaultWhenInvalid() {
-        // This would require setting an invalid property, testing the parse error path
         long value = config.getLong("invalid.long.value", 99999L);
-        // Should return default if parsing fails
-        assertTrue(value >= 0, "Should handle invalid values gracefully");
+        assertEquals(99999L, value, "Should return default if parsing fails");
+    }
+
+    // === Environment Resolution Tests ===
+
+    @Test
+    void testResolvePlaceholders_SystemProperty() {
+        System.setProperty("TEST_SUBST", "resolved-value");
+        try {
+            // Internal method might be private, testing via getter if possible
+            // or testing the logic if exposed. config.getString uses it.
+            String result = config.getString("nonexistent.key", "${TEST_SUBST}");
+            assertEquals("resolved-value", result, "Should resolve system property placeholders");
+        } finally {
+            System.clearProperty("TEST_SUBST");
+        }
+    }
+
+    @Test
+    void testResolvePlaceholders_EnvVar() {
+        // We use a system property as a proxy for environment variables
+        // since we can't easily set environment variables from Java.
+        System.setProperty("PORT_ENV", "9090");
+        try {
+            // Test that the config can resolve a value with a placeholder
+            // Note: ApplicationConfig.getInstance().getInt() doesn't currently 
+            // support passing a placeholder as a default value that gets resolved.
+            // It resolves placeholders in the properties files or system properties.
+            
+            // So we set a property with a placeholder
+            System.setProperty("test.dynamic.port", "${PORT_ENV}");
+            config.reload();
+            
+            int port = config.getInt("test.dynamic.port", 0);
+            assertEquals(9090, port, "Placeholder ${PORT_ENV} should be resolved to 9090");
+        } finally {
+            System.clearProperty("PORT_ENV");
+            System.clearProperty("test.dynamic.port");
+            config.reload();
+        }
     }
 
     @Test
@@ -262,6 +299,18 @@ class ApplicationConfigTest {
     void testGetInt_NegativeDefault() {
         int value = config.getInt("nonexistent.key", -1);
         assertEquals(-1, value, "Should return negative default correctly");
+    }
+
+    @Test
+    void testOidcEnabled_EnvOverride() {
+        System.setProperty("security.oidc.enabled", "false");
+        try {
+            config.reload();
+            assertFalse(config.isOidcEnabled(), "OIDC should be disabled via system property override");
+        } finally {
+            System.clearProperty("security.oidc.enabled");
+            config.reload();
+        }
     }
 }
 

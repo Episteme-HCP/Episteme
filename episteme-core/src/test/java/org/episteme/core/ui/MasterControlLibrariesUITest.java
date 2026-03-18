@@ -59,6 +59,7 @@ public class MasterControlLibrariesUITest {
 
     @Test
     void testStageIsShowing(FxRobot robot) {
+        robot.sleep(500); // Wait for stage to stabilize
         assertTrue(stage.isShowing(), "Master Control should be visible after launch");
     }
 
@@ -86,11 +87,18 @@ public class MasterControlLibrariesUITest {
         assertNotNull(librariesTab, "Libraries tab should exist with id 'tab-libraries'");
     }
 
+    private void ensureLibrariesTabSelected(FxRobot robot) {
+        TabPane tabPane = robot.lookup(".tab-pane").queryAs(TabPane.class);
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == null || !"tab-libraries".equals(selectedTab.getId())) {
+            robot.clickOn("#tab-libraries");
+            robot.sleep(200); // Allow UI to transition
+        }
+    }
+
     @Test
     void testNavigateToLibrariesTab(FxRobot robot) {
-        // Click on Libraries tab
-        robot.clickOn("#tab-libraries");
-
+        ensureLibrariesTabSelected(robot);
         TabPane tabPane = robot.lookup(".tab-pane").queryAs(TabPane.class);
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         assertEquals("tab-libraries", selectedTab.getId(), "Libraries tab should be selected");
@@ -100,33 +108,23 @@ public class MasterControlLibrariesUITest {
 
     @Test
     void testDistributedComputingSectionExists(FxRobot robot) {
-        // Navigate to Libraries tab
-        robot.clickOn("#tab-libraries");
-
-        // Look for "Distributed Computing" header label
+        ensureLibrariesTabSelected(robot);
         Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-
         boolean foundDistributed = labels.stream()
                 .anyMatch(label -> label.getText() != null &&
                         label.getText().toLowerCase().contains("distributed"));
-
-        assertTrue(foundDistributed, "Distributed Computing section should exist in Libraries tab");
+        assertTrue(foundDistributed, "Distributed Computing section should exist");
     }
 
     @Test
     void testSparkLibraryDisplayed(FxRobot robot) {
-        // Navigate to Libraries tab
-        robot.clickOn("#tab-libraries");
-
-        // Look for Spark label
+        ensureLibrariesTabSelected(robot);
         Set<Label> allLabels = robot.lookup(".label").queryAllAs(Label.class);
-
         boolean foundSpark = allLabels.stream()
                 .anyMatch(label -> label.getText() != null &&
                         (label.getText().contains("Spark") ||
                                 label.getText().contains("Apache Spark")));
-
-        assertTrue(foundSpark, "Apache Spark should be listed in Libraries tab");
+        assertTrue(foundSpark, "Apache Spark should be listed");
     }
 
     private boolean isMPJAvailable() {
@@ -141,40 +139,26 @@ public class MasterControlLibrariesUITest {
     @Test
     void testMPJLibraryDisplayed(FxRobot robot) {
         // Only run this test if MPJ is actually present in the classpath
-        org.junit.jupiter.api.Assumptions.assumeTrue(isMPJAvailable(), "MPJ library not found in classpath - skipping UI check");
-
-        // Navigate to Libraries tab
-        robot.clickOn("#tab-libraries");
-
-        // Look for MPJ label
+        org.junit.jupiter.api.Assumptions.assumeTrue(isMPJAvailable(), "MPJ library not found");
+        ensureLibrariesTabSelected(robot);
         Set<Label> allLabels = robot.lookup(".label").queryAllAs(Label.class);
-
         boolean foundMPJ = allLabels.stream()
                 .anyMatch(label -> label.getText() != null &&
                         (label.getText().contains("MPJ") ||
                                 label.getText().contains("MPI")));
-
-        assertTrue(foundMPJ, "MPJ Express should be listed in Libraries tab");
+        assertTrue(foundMPJ, "MPJ Express should be listed");
     }
 
     @Test
     void testSparkAndMPJHaveStatusLabels(FxRobot robot) {
-        // Navigate to Libraries tab
-        robot.clickOn("#tab-libraries");
-
-        // Look for status labels (Available / Not Available)
+        ensureLibrariesTabSelected(robot);
         Set<Label> allLabels = robot.lookup(".label").queryAllAs(Label.class);
-
-        // Count status-like labels in Distributed section
         long statusCount = allLabels.stream()
                 .filter(label -> label.getText() != null)
                 .filter(label -> label.getText().equals("Available") ||
                         label.getText().equals("Not Available"))
                 .count();
-
-        // Should have at least 2 status labels (for Spark and MPJ)
-        assertTrue(statusCount >= 2,
-                "Should have status labels for distributed computing libraries. Found: " + statusCount);
+        assertTrue(statusCount >= 2, "Should have status labels. Found: " + statusCount);
     }
 
     // ==================== Default Values Tests ====================
@@ -196,125 +180,49 @@ public class MasterControlLibrariesUITest {
 
     @Test
     void testLibrariesTabRemainsStable(FxRobot robot) {
-        // Navigate to Libraries tab
-        robot.clickOn("#tab-libraries");
-
-        // Scroll through content
+        ensureLibrariesTabSelected(robot);
         ScrollPane scrollPane = robot.lookup(".scroll-pane").queryAs(ScrollPane.class);
         if (scrollPane != null) {
             scrollPane.setVvalue(0.5);
+            robot.sleep(100);
             scrollPane.setVvalue(1.0);
+            robot.sleep(100);
             scrollPane.setVvalue(0.0);
         }
-
-        assertTrue(stage.isShowing(), "Master Control should remain stable after browsing Libraries");
+        assertTrue(stage.isShowing(), "Master Control should remain stable");
     }
 
     // ==================== Backend Categories Tests ====================
 
     @Test
-    void testFrameworkCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
+    void testCategoryDisplay(FxRobot robot) {
+        ensureLibrariesTabSelected(robot);
         Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                l.getText().toLowerCase().contains("framework"));
-        assertTrue(found, "Framework section should be displayed");
+        
+        assertCategory(labels, "framework");
+        assertCategory(labels, "standards");
+        assertCategory(labels, "hardware", "acceleration");
+        assertCategory(labels, "math", "algorithm");
+        assertCategory(labels, "tensor");
+        assertCategory(labels, "visual", "plotting");
+        assertCategory(labels, "audio");
+        assertCategory(labels, "chemistry", "biology");
+        assertCategory(labels, "quantum");
+        assertCategory(labels, "geography", "gis");
+        assertCategory(labels, "network", "graph");
     }
 
-    @Test
-    void testStandardsCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                l.getText().toLowerCase().contains("standards"));
-        assertTrue(found, "Standards section should be displayed");
-    }
-
-    @Test
-    void testHardwareAccelerationCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                (l.getText().toLowerCase().contains("hardware") ||
-                 l.getText().toLowerCase().contains("acceleration")));
-        assertTrue(found, "Hardware Acceleration section should be displayed");
-    }
-
-    @Test
-    void testMathematicsCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                (l.getText().toLowerCase().contains("math") ||
-                 l.getText().toLowerCase().contains("algorithm")));
-        assertTrue(found, "Mathematics & Algorithms section should be displayed");
-    }
-
-    @Test
-    void testTensorsCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                l.getText().toLowerCase().contains("tensor"));
-        assertTrue(found, "Tensor Engines section should be displayed");
-    }
-
-    @Test
-    void testVisualizationCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                (l.getText().toLowerCase().contains("visual") ||
-                 l.getText().toLowerCase().contains("plotting")));
-        assertTrue(found, "Visualization & Plotting section should be displayed");
-    }
-
-    @Test
-    void testAudioCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                (l.getText().toLowerCase().contains("audio")));
-        assertTrue(found, "Audio Processing section should be displayed");
-    }
-
-    @Test
-    void testChemistryCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                (l.getText().toLowerCase().contains("chemistry") ||
-                 l.getText().toLowerCase().contains("biology")));
-        assertTrue(found, "Chemistry & Biology section should be displayed");
-    }
-
-    @Test
-    void testQuantumCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                l.getText().toLowerCase().contains("quantum"));
-        assertTrue(found, "Quantum Computing section should be displayed");
-    }
-
-    @Test
-    void testGeographyCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                (l.getText().toLowerCase().contains("geography") ||
-                 l.getText().toLowerCase().contains("gis")));
-        assertTrue(found, "Geography & GIS section should be displayed");
-    }
-
-    @Test
-    void testNetworkCategoryDisplayed(FxRobot robot) {
-        robot.clickOn("#tab-libraries");
-        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
-        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
-                (l.getText().toLowerCase().contains("network") ||
-                 l.getText().toLowerCase().contains("graph")));
-        assertTrue(found, "Network & Graph Analysis section should be displayed");
+    private void assertCategory(Set<Label> labels, String... keywords) {
+        boolean found = labels.stream().anyMatch(l -> {
+            String text = l.getText();
+            if (text == null) return false;
+            text = text.toLowerCase();
+            for (String kw : keywords) {
+                if (text.contains(kw)) return true;
+            }
+            return false;
+        });
+        assertTrue(found, "Category containing " + java.util.Arrays.toString(keywords) + " should be displayed");
     }
 
     // ==================== Backend Selector Tests ====================

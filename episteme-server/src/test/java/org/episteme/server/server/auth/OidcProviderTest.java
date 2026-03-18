@@ -23,151 +23,153 @@
 
 package org.episteme.server.server.auth;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.RSASSASigner;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator; // Fixed import
-import com.nimbusds.jose.proc.*;
+import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-import com.nimbusds.jwt.proc.ConfigurableJWTProcessor; // Explicit import
-import com.nimbusds.jwt.proc.DefaultJWTProcessor;
-import org.junit.jupiter.api.BeforeAll;
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for OIDCProvider validation and role mapping.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
 class OIDCProviderTest {
 
-    private static RSAKey rsaKey;
-    private static ConfigurableJWTProcessor<SecurityContext> testProcessor;
+    private ConfigurableJWTProcessor<SecurityContext> mockProcessor;
 
-    @BeforeAll
-    static void setup() throws Exception {
-        // Generate a 2048-bit RSA key pair in JWK format
-        rsaKey = new RSAKeyGenerator(2048).keyID("123").generate();
-
-        // Create a JWTProcessor that trusts this key
-        testProcessor = new DefaultJWTProcessor<>();
-        JWKSet jwkSet = new JWKSet(rsaKey);
-
-        // Configure key selector to use our local keys
-        JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(
-                JWSAlgorithm.RS256,
-                (selector, context) -> selector.select(jwkSet) // Simple selector returning our key
-        );
-        testProcessor.setJWSKeySelector(keySelector);
-
-        // Inject this processor for all providers we test
-        OIDCProvider.setJwtProcessorForTest("google", testProcessor);
-        OIDCProvider.setJwtProcessorForTest("keycloak", testProcessor);
-        OIDCProvider.setJwtProcessorForTest("okta", testProcessor);
+    @BeforeEach
+    @SuppressWarnings("unchecked")
+    void setUp() {
+        mockProcessor = Mockito.mock(ConfigurableJWTProcessor.class);
     }
 
     @Test
     void testValidateToken_GoogleAdmin() throws Exception {
+        // Given
+        String provider = "google";
+        String token = "mock-google-token";
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .subject("123")
-                .claim("email", "user@admin.com")
-                .issuer("https://accounts.google.com")
-                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
+                .subject("google-user-123")
+                .claim("email", "admin@admin.com")
                 .build();
+        
+        when(mockProcessor.process(any(String.class), any())).thenReturn(claims);
+        OIDCProvider.setJwtProcessorForTest(provider, mockProcessor);
 
-        String token = createSignedToken(claims);
+        // When
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken(provider, token);
 
-        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("google", token);
-
+        // Then
         assertNotNull(info);
-        assertEquals("user@admin.com", info.email());
+        assertEquals("google-user-123", info.sub());
+        assertEquals("admin@admin.com", info.email());
         assertEquals(Roles.ADMIN, info.role());
         assertTrue(info.isAdmin());
     }
 
     @Test
     void testValidateToken_GoogleScientist() throws Exception {
+        // Given
+        String provider = "google";
+        String token = "mock-google-token";
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .subject("456")
-                .claim("email", "user@example.com")
-                .issuer("https://accounts.google.com")
-                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
+                .subject("google-user-456")
+                .claim("email", "user@gmail.com")
                 .build();
+        
+        when(mockProcessor.process(any(String.class), any())).thenReturn(claims);
+        OIDCProvider.setJwtProcessorForTest(provider, mockProcessor);
 
-        String token = createSignedToken(claims);
+        // When
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken(provider, token);
 
-        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("google", token);
-
+        // Then
         assertNotNull(info);
-        assertEquals("user@example.com", info.email());
         assertEquals(Roles.SCIENTIST, info.role());
         assertFalse(info.isAdmin());
     }
 
     @Test
-    void testValidateToken_Expired() throws Exception {
+    void testValidateToken_KeycloakScientist() throws Exception {
+        // Given
+        String provider = "keycloak";
+        String token = "mock-keycloak-token";
+        
+        Map<String, Object> realmAccess = new HashMap<>();
+        realmAccess.put("roles", Collections.singletonList("SCIENTIST"));
+        
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .subject("123")
-                .issuer("https://accounts.google.com")
-                .expirationTime(Date.from(Instant.now().minusSeconds(3600))) // Expired
-                .build();
-
-        String token = createSignedToken(claims);
-
-        // Nimbus processor throws BadJOSEException on expiration
-        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("google", token);
-
-        assertNull(info, "Expired token should return null");
-    }
-
-    @Test
-    void testValidateToken_KeycloakRole() throws Exception {
-        // Keycloak uses realm_access.roles
-        Map<String, Object> realmAccess = Map.of("roles", List.of("SCIENTIST"));
-
-        JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .subject("789")
-                .issuer("https://sso.example.com/realms/episteme")
+                .subject("kc-user-1")
                 .claim("realm_access", realmAccess)
-                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
                 .build();
+        
+        when(mockProcessor.process(any(String.class), any())).thenReturn(claims);
+        OIDCProvider.setJwtProcessorForTest(provider, mockProcessor);
 
-        String token = createSignedToken(claims);
+        // When
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken(provider, token);
 
-        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("keycloak", token);
-
+        // Then
         assertNotNull(info);
         assertEquals(Roles.SCIENTIST, info.role());
     }
 
     @Test
-    void testValidateToken_Okta() throws Exception {
-        // Okta uses groups
+    void testValidateToken_OktaScientist() throws Exception {
+        // Given
+        String provider = "okta";
+        String token = "mock-okta-token";
+        
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .subject("111")
-                .issuer("https://dev-123.okta.com")
-                .claim("groups", List.of("scientist-group"))
-                .expirationTime(Date.from(Instant.now().plusSeconds(3600)))
+                .subject("okta-user-1")
+                .claim("groups", Collections.singletonList("scientist-group"))
                 .build();
+        
+        when(mockProcessor.process(any(String.class), any())).thenReturn(claims);
+        OIDCProvider.setJwtProcessorForTest(provider, mockProcessor);
 
-        String token = createSignedToken(claims);
+        // When
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken(provider, token);
 
-        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("okta", token);
-
+        // Then
         assertNotNull(info);
         assertEquals(Roles.SCIENTIST, info.role());
     }
 
-    private String createSignedToken(JWTClaimsSet claims) throws Exception {
-        SignedJWT signedJWT = new SignedJWT(
-                new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(rsaKey.getKeyID()).build(),
-                claims);
-        signedJWT.sign(new RSASSASigner(rsaKey));
-        return signedJWT.serialize();
+    @Test
+    void testValidateToken_InvalidToken() throws Exception {
+        // Given
+        String provider = "google";
+        String token = "invalid-token";
+        
+        when(mockProcessor.process(any(String.class), any())).thenThrow(new com.nimbusds.jose.JOSEException("Invalid signature"));
+        OIDCProvider.setJwtProcessorForTest(provider, mockProcessor);
+
+        // When
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken(provider, token);
+
+        // Then
+        assertNull(info);
+    }
+
+    @Test
+    void testValidateToken_EmptyToken() {
+        // When
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("google", "");
+
+        // Then
+        assertNull(info);
     }
 }
-
