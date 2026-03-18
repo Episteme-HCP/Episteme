@@ -219,6 +219,20 @@ public final class MathContext {
     }
 
     /**
+     * Returns true if the precision is NORMAL or EXACT.
+     */
+    public boolean isDoubleOrHigherPrecision() {
+        return realPrecision == RealPrecision.NORMAL || realPrecision == RealPrecision.EXACT;
+    }
+
+    /**
+     * Returns true if the precision is FAST.
+     */
+    public boolean isFastPrecision() {
+        return realPrecision == RealPrecision.FAST;
+    }
+
+    /**
      * Gets the overflow checking mode.
      */
     public OverflowMode getOverflowMode() {

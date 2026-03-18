@@ -13,7 +13,7 @@
     <name>Episteme Social</name>
     <description>Social sciences module (Economics, Sociology, History, Psychology)</description>
     <properties>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <dependencies>

@@ -106,9 +106,14 @@ public class LocalDistributedContext implements DistributedContext {
                 })
                 .collect(Collectors.toList());
 
-        return pool.invokeAll(wrappedTasks).stream()
-                .map(f -> (Future<T>) f)
-                .collect(Collectors.toList());
+        try {
+            return pool.invokeAll(wrappedTasks).stream()
+                    .map(f -> (Future<T>) f)
+                    .collect(Collectors.toList());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Wait for parallel tasks execution interrupted", e);
+        }
     }
 
     @Override

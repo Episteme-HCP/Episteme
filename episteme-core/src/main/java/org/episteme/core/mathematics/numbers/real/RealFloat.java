@@ -47,32 +47,61 @@ final class RealFloat extends Real {
 
     @Override
     public Real add(Real other) {
-        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        if (ctx.isHighPrecision()) {
             return RealBig.create(BigDecimal.valueOf(value)).add(other);
+        }
+        if (ctx.isDoubleOrHigherPrecision()) {
+            return Real.of(value + other.doubleValue());
+        }
+        // FAST mode: Stay in float if other is also float
+        if (other instanceof RealFloat) {
+            return Real.of(value + ((RealFloat) other).value);
         }
         return Real.of(value + other.doubleValue());
     }
 
     @Override
     public Real subtract(Real other) {
-        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        if (ctx.isHighPrecision()) {
             return RealBig.create(BigDecimal.valueOf(value)).subtract(other);
+        }
+        if (ctx.isDoubleOrHigherPrecision()) {
+            return Real.of(value - other.doubleValue());
+        }
+        if (other instanceof RealFloat) {
+            return Real.of(value - ((RealFloat) other).value);
         }
         return Real.of(value - other.doubleValue());
     }
 
     @Override
     public Real multiply(Real other) {
-        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        if (ctx.isHighPrecision()) {
             return RealBig.create(BigDecimal.valueOf(value)).multiply(other);
+        }
+        if (ctx.isDoubleOrHigherPrecision()) {
+            return Real.of(value * other.doubleValue());
+        }
+        if (other instanceof RealFloat) {
+            return Real.of(value * ((RealFloat) other).value);
         }
         return Real.of(value * other.doubleValue());
     }
 
     @Override
     public Real divide(Real other) {
-        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        if (ctx.isHighPrecision()) {
             return RealBig.create(BigDecimal.valueOf(value)).divide(other);
+        }
+        if (ctx.isDoubleOrHigherPrecision()) {
+            return Real.of(value / other.doubleValue());
+        }
+        if (other instanceof RealFloat) {
+            return Real.of(value / ((RealFloat) other).value);
         }
         return Real.of(value / other.doubleValue());
     }
