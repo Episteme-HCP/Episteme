@@ -59,7 +59,6 @@
   </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>25</maven.compiler.release>
     <!-- JSR-385 Units of Measurement -->
     <uom.version>2.2</uom.version>
     <indriya.version>2.2</indriya.version>
@@ -964,6 +963,24 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+    </profile>
+    <profile>
+      <id>jdk21</id>
+      <activation>
+        <jdk>21</jdk>
+      </activation>
+      <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdk25</id>
+      <activation>
+        <jdk>25</jdk>
+      </activation>
+      <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+      </properties>
     </profile>
   </profiles>
 </project>

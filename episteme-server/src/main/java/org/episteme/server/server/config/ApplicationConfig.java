@@ -134,6 +134,9 @@ public class ApplicationConfig {
 
             String resolved = System.getenv(envVar);
             if (resolved == null) {
+                resolved = System.getProperty(envVar);
+            }
+            if (resolved == null) {
                 resolved = defaultValue;
             }
 
@@ -145,10 +148,11 @@ public class ApplicationConfig {
     // --- Generic Getters ---
 
     public String getString(String key, String defaultValue) {
+        String resolvedDefault = resolveValue(defaultValue);
         if (configurationService != null) {
-            return configurationService.getProperty(key, properties.getProperty(key, defaultValue));
+            return configurationService.getProperty(key, properties.getProperty(key, resolvedDefault));
         }
-        return properties.getProperty(key, defaultValue);
+        return properties.getProperty(key, resolvedDefault);
     }
 
     public int getInt(String key, int defaultValue) {

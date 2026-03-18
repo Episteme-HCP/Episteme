@@ -23,14 +23,13 @@
 
 package org.episteme.server.server.gateway;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.episteme.server.server.proto.Empty;
-import org.episteme.server.server.proto.ServerStatus;
+import org.episteme.server.server.proto.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.episteme.server.server.proto.ComputeServiceGrpc;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,6 +70,94 @@ class RestGatewayTest {
         ObjectNode body = (ObjectNode) response.getBody();
         assertEquals(5, body.get("activeWorkers").asInt());
         assertEquals(10, body.get("queuedTasks").asInt());
+    }
+
+    @Test
+    void testSubmitTask() {
+        // Given
+        RestGateway gateway = new RestGateway();
+        ComputeServiceGrpc.ComputeServiceBlockingStub mockStub = Mockito
+                .mock(ComputeServiceGrpc.ComputeServiceBlockingStub.class);
+        ReflectionTestUtils.setField(gateway, "computeStub", mockStub);
+
+        TaskResponse taskResponse = TaskResponse.newBuilder()
+                .setTaskId("task-123")
+                .setStatus(Status.QUEUED)
+                .build();
+
+        when(mockStub.submitTask(any(TaskRequest.class))).thenReturn(taskResponse);
+
+        ObjectNode requestBody = new ObjectMapper().createObjectNode();
+        requestBody.put("taskData", "print('hello')");
+        requestBody.put("priority", "NORMAL");
+
+        // When
+        ResponseEntity<?> response = gateway.submitTask(requestBody, null);
+
+        // Then
+        assertEquals(200, response.getStatusCode().value());
+        ObjectNode body = (ObjectNode) response.getBody();
+        assertEquals("task-123", body.get("taskId").asText());
+        assertEquals("QUEUED", body.get("status").asText());
+    }
+
+    @Test
+    void testLogin() {
+        // Given
+        RestGateway gateway = new RestGateway();
+        AuthServiceGrpc.AuthServiceBlockingStub mockStub = Mockito
+                .mock(AuthServiceGrpc.AuthServiceBlockingStub.class);
+        ReflectionTestUtils.setField(gateway, "authStub", mockStub);
+
+        AuthResponse authResponse = AuthResponse.newBuilder()
+                .setSuccess(true)
+                .setToken("mock-jwt")
+                .setMessage("Login successful")
+                .build();
+
+        when(mockStub.login(any(LoginRequest.class))).thenReturn(authResponse);
+
+        ObjectNode requestBody = new ObjectMapper().createObjectNode();
+        requestBody.put("username", "user");
+        requestBody.put("password", "pass");
+
+        // When
+        ResponseEntity<?> response = gateway.login(requestBody);
+
+        // Then
+        assertEquals(200, response.getStatusCode().value());
+        ObjectNode body = (ObjectNode) response.getBody();
+        assertEquals("mock-jwt", body.get("token").asText());
+    }
+
+    @Test
+    void testRegister() {
+        // Given
+        RestGateway gateway = new RestGateway();
+        AuthServiceGrpc.AuthServiceBlockingStub mockStub = Mockito
+                .mock(AuthServiceGrpc.AuthServiceBlockingStub.class);
+        ReflectionTestUtils.setField(gateway, "authStub", mockStub);
+
+        AuthResponse authResponse = AuthResponse.newBuilder()
+                .setSuccess(true)
+                .setToken("new-token")
+                .setMessage("Register successful")
+                .build();
+
+        when(mockStub.register(any(RegisterRequest.class))).thenReturn(authResponse);
+
+        ObjectNode requestBody = new ObjectMapper().createObjectNode();
+        requestBody.put("username", "newuser");
+        requestBody.put("password", "newpass");
+        requestBody.put("role", "SCIENTIST");
+
+        // When
+        ResponseEntity<?> response = gateway.register(requestBody);
+
+        // Then
+        assertEquals(201, response.getStatusCode().value());
+        ObjectNode body = (ObjectNode) response.getBody();
+        assertEquals("new-token", body.get("token").asText());
     }
 }
 
