@@ -16,7 +16,7 @@
     <description>Episteme Natural Sciences Layer - Physics, Chemistry, Biology, Earth, Medicine, Computing</description>
 
     <properties>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <!-- Force IDE resync -->

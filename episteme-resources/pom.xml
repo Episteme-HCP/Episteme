@@ -15,8 +15,7 @@
     <description>External resources, datasets, and text files for the Episteme project.</description>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <build>

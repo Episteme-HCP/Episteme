@@ -71,7 +71,7 @@ public class HighPrecisionComplianceTest {
         Ring<Real> ring = Reals.getInstance();
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
         
-        for (LinearAlgebraProvider<?> p : loader) {
+        for (LinearAlgebraProvider p : loader) {
             @SuppressWarnings("unchecked")
             LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>) p;
             if (!provider.isCompatible(ring)) continue;
