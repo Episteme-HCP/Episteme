@@ -19,8 +19,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 
-import javax.vecmath.Vector3f;
-
 /**
  * JBullet implementation of RigidBodyBackend.
  */

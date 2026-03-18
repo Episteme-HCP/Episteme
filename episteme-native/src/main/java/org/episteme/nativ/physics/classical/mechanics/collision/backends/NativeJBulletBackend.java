@@ -35,8 +35,6 @@ import java.lang.foreign.MemorySegment;
 import org.episteme.natural.physics.classical.mechanics.collision.RigidBody;
 import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.nativ.physics.classical.mechanics.collision.backends.jbullet.JBulletWorld;
-import org.episteme.nativ.physics.classical.mechanics.collision.backends.jbullet.JBulletRigidBody;
 
 /**
  * JBullet physics backend provider.

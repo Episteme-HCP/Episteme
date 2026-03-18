@@ -7,7 +7,6 @@ import java.lang.foreign.SymbolLookup;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Proactive tests to verify native library linkage using FFM.

@@ -146,13 +146,16 @@ public class NativeFFMLoader {
                 currentMapped = System.mapLibraryName(variant);
             }
             
+            logger.debug("[NativeFFMLoader] Attempting bare lookup for variant: {}", variant);
             try {
                 if (!variant.contains(".") && !variant.contains("/") && !variant.contains("\\")) {
                     SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
                     LOADED_LIBS.put(libName, lookup);
+                    logger.info("[NativeFFMLoader] Successfully loaded {} from system path", variant);
                     return Optional.of(lookup);
                 }
             } catch (Throwable t) {
+                logger.debug("[NativeFFMLoader] System lookup failed for {}: {}", variant, t.getMessage());
                 FAILURE_CAUSES.put(variant, t.toString());
             }
 
@@ -175,9 +178,13 @@ public class NativeFFMLoader {
             if (!java.nio.file.Files.exists(basePath)) return Optional.empty();
             final java.nio.file.Path fullPath = basePath.resolve(mappedName).toAbsolutePath();
             if (java.nio.file.Files.exists(fullPath)) {
+                logger.debug("[NativeFFMLoader] Found file: {}, attempting to load...", fullPath);
                 try {
-                    return Optional.of(SymbolLookup.libraryLookup(fullPath, arena));
+                    SymbolLookup lookup = SymbolLookup.libraryLookup(fullPath, arena);
+                    logger.info("[NativeFFMLoader] Successfully loaded library from: {}", fullPath);
+                    return Optional.of(lookup);
                 } catch (Throwable t) {
+                    logger.error("[NativeFFMLoader] Failed to load library from {}: {}", fullPath, t.getMessage());
                     FAILURE_CAUSES.put(fullPath.toString(), t.toString());
                 }
             }

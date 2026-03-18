@@ -28,7 +28,6 @@ import com.google.auto.service.AutoService;
  * @since 1.2
  */
 @AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
-@SuppressWarnings("rawtypes")
 public class EpistemeLinearAlgebraBackend implements LinearAlgebraBackend<Real>, SparseLinearAlgebraProvider<Real>, SIMDBackend {
 
     private final CPUDenseLinearAlgebraProvider<Real> denseProvider;

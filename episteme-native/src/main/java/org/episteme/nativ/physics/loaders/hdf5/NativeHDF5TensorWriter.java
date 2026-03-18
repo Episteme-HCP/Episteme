@@ -7,8 +7,6 @@ package org.episteme.nativ.physics.loaders.hdf5;
 
 import org.episteme.core.mathematics.linearalgebra.Tensor;
 import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
-import org.episteme.core.technical.backend.Backend;
-import org.episteme.core.io.ResourceWriter;
 
 
 /**

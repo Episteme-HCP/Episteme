@@ -58,7 +58,6 @@ import com.google.auto.service.AutoService;
  * @since 1.0
  */
 @AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
-@SuppressWarnings("rawtypes")
 public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E>, SparseLinearAlgebraProvider<E>, CPUBackend {
 
     protected final Ring<E> ring;
@@ -434,11 +433,6 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         E sum = r.zero();
         
         if (a.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
-            ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) a.getStorage())
-                .getNonZeros().forEach((idx, val) -> {
-                    // sum = sum + val * b.get(idx)
-                    // We need to use recursion or a container because of lambda final restriction
-                });
             // Let's use old fashioned loop for dot to avoid overhead and lambda issues
              Map<Integer, E> nz = ((org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>) a.getStorage()).getNonZeros();
             for (Map.Entry<Integer, E> entry : nz.entrySet()) {
@@ -462,7 +456,9 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     public E norm(Vector<E> a) {
         Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
         E d = dot(a, a);
-        if (r instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (r instanceof org.episteme.core.mathematics.sets.Reals &&
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() != 
+            org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
              return (E) ((Real) d).sqrt();
         }
         throw new UnsupportedOperationException("Norm requires sqrt support on scalars (Reals supported)");
@@ -691,7 +687,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             for (int iter = 0; iter < maxIterations; iter++) {
                 E rhoOld = rho;
                 rho = GenericIterativeUtils.dotProduct(r0, r, f);
-                if (absValue(rho) < 1e-25) break;
+                if (absValue(rho, f) < 1e-25) break;
 
                 if (iter == 0) p = r;
                 else {
@@ -703,7 +699,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 alpha = f.divide(rho, GenericIterativeUtils.dotProduct(r0, v, f));
 
                 Vector<E> s = GenericIterativeUtils.subtract(r, GenericIterativeUtils.scale(alpha, v, f), f);
-                if (absValue(GenericIterativeUtils.norm(s, f)) < absValue(tolerance)) {
+                if (absValue(GenericIterativeUtils.norm(s, f), f) < absValue(tolerance, f)) {
                     x = GenericIterativeUtils.add(x, GenericIterativeUtils.scale(alpha, p, f), f);
                     break;
                 }
@@ -713,8 +709,8 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 x = GenericIterativeUtils.add(GenericIterativeUtils.add(x, GenericIterativeUtils.scale(alpha, p, f), f), GenericIterativeUtils.scale(omega, s, f), f);
                 r = GenericIterativeUtils.subtract(s, GenericIterativeUtils.scale(omega, t, f), f);
                 
-                if (absValue(GenericIterativeUtils.norm(r, f)) < absValue(tolerance)) break;
-                if (absValue(omega) < 1e-25) break;
+                if (absValue(GenericIterativeUtils.norm(r, f), f) < absValue(tolerance, f)) break;
+                if (absValue(omega, f) < 1e-25) break;
             }
             return x;
         }
@@ -730,14 +726,14 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             for (int iter = 0; iter < maxIterations; iter++) {
                 Vector<E> Ap = A.multiply(p);
                 E pAp = GenericIterativeUtils.dotProduct(p, Ap, f);
-                if (absValue(pAp) < 1e-25) break;
+                if (absValue(pAp, f) < 1e-25) break;
                 
                 E alpha = f.divide(rsold, pAp);
                 x = GenericIterativeUtils.add(x, GenericIterativeUtils.scale(alpha, p, f), f);
                 r = GenericIterativeUtils.subtract(r, GenericIterativeUtils.scale(alpha, Ap, f), f);
 
                 E rsnew = GenericIterativeUtils.dotProduct(r, r, f);
-                if (absValue(sqrt(rsnew, f)) < absValue(tolerance)) break;
+                if (absValue(sqrt(rsnew, f), f) < absValue(tolerance, f)) break;
 
                 E beta = f.divide(rsnew, rsold);
                 p = GenericIterativeUtils.add(r, GenericIterativeUtils.scale(beta, p, f), f);
@@ -754,7 +750,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             for (int r = 0; r < restarts; r++) {
                 Vector<E> r0_vec = GenericIterativeUtils.subtract(b, A.multiply(x), f);
                 E beta = GenericIterativeUtils.norm(r0_vec, f);
-                if (absValue(beta) < absValue(tolerance)) return x;
+                if (absValue(beta, f) < absValue(tolerance, f)) return x;
 
                 int m = maxIterations;
                 @SuppressWarnings("unchecked")
@@ -771,7 +767,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                         w = GenericIterativeUtils.subtract(w, GenericIterativeUtils.scale(H[i][j], V[i], f), f);
                     }
                     H[j+1][j] = GenericIterativeUtils.norm(w, f);
-                    if (absValue(H[j+1][j]) < 1e-15) {
+                    if (absValue(H[j+1][j], f) < 1e-15) {
                          m = j + 1;
                          break;
                     }
@@ -785,7 +781,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                     x = GenericIterativeUtils.add(x, GenericIterativeUtils.scale(y[j], V[j], f), f);
                 }
                 
-                if (absValue(GenericIterativeUtils.norm(GenericIterativeUtils.subtract(b, A.multiply(x), f), f)) < absValue(tolerance)) return x;
+                if (absValue(GenericIterativeUtils.norm(GenericIterativeUtils.subtract(b, A.multiply(x), f), f), f) < absValue(tolerance, f)) return x;
             }
             return x;
         }
@@ -796,7 +792,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             java.util.Arrays.fill(y, f.zero());
             if (m == 0) return y;
             // Simplified: just return beta/H[0][0] for demonstration
-            if (absValue(H[0][0]) > 1e-15) y[0] = f.divide(beta, H[0][0]);
+            if (absValue(H[0][0], f) > 1e-15) y[0] = f.divide(beta, H[0][0]);
             return y;
         }
     }
@@ -804,12 +800,18 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     // --- Helper math methods for generic fields ---
 
-    private static double absValue(Object element) {
-        if (element instanceof Real) return ((Real) element).doubleValue();
+    private static double absValue(Object element, Field<?> field) {
+        if (field instanceof org.episteme.core.mathematics.sets.Reals &&
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() !=
+            org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            if (element instanceof Real) return ((Real) element).doubleValue();
+        }
         if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) 
             return ((org.episteme.core.mathematics.numbers.complex.Complex) element).abs().doubleValue();
         if (element instanceof Number) return ((Number) element).doubleValue();
-        return 0.0;
+        // Fallback for types that don't directly map to double for comparison
+        // This might need a more robust solution depending on the Field implementation
+        return 0.0; // Or throw an exception if comparison is critical
     }
 
     @SuppressWarnings("unchecked")
@@ -853,9 +855,9 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
             for (int k = 0; k < n; k++) {
                 int maxRow = k;
-                double maxVal = absValue(data[k][k]);
+                double maxVal = absValue(data[k][k], field);
                 for (int i = k + 1; i < n; i++) {
-                    double val = absValue(data[i][k]);
+                    double val = absValue(data[i][k], field);
                     if (val > maxVal) {
                         maxVal = val;
                         maxRow = i;
@@ -872,7 +874,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 }
 
                 for (int i = k + 1; i < n; i++) {
-                    if (absValue(data[k][k]) > 1e-20) {
+                    if (absValue(data[k][k], field) > 1e-20) {
                         E factor = field.divide(data[i][k], data[k][k]);
                         data[i][k] = factor;
                         for (int j = k + 1; j < n; j++) {
@@ -916,8 +918,11 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             for (int i = 0; i < n; i++) {
                 Object pVal = lu.P().get(i);
                 int pIdx;
-                if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
-                else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
+                if (field instanceof org.episteme.core.mathematics.sets.Reals &&
+                    org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() != 
+                    org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+                    pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+                } else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
                 else pIdx = i;
                 pb[i] = b.get(pIdx);
             }
@@ -961,16 +966,16 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 E sumSq = field.zero();
                 for (int i = k; i < m; i++) sumSq = field.add(sumSq, field.multiply(A[i][k], conjugate(A[i][k], field)));
                 E norm = sqrt(sumSq, field);
-                if (absValue(norm) < 1e-20) continue;
+                if (absValue(norm, field) < 1e-20) continue;
 
                 E a1 = A[k][k];
                 // Handling sign for generic/complex: simplified to -norm * (a1/|a1|)
                 E alpha;
-                if (absValue(a1) < 1e-20) {
+                if (absValue(a1, field) < 1e-20) {
                     alpha = field.negate(norm);
                 } else {
                     @SuppressWarnings("unchecked")
-                    E phase = field.divide(a1, (E) Real.of(absValue(a1)));
+                    E phase = field.divide(a1, (E) Real.of(absValue(a1, field)));
                     alpha = field.negate(field.multiply(norm, phase));
                 }
                 
@@ -982,7 +987,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 E vSumSq = field.zero();
                 for (E val : v) vSumSq = field.add(vSumSq, field.multiply(val, conjugate(val, field)));
                 E vNorm = sqrt(vSumSq, field);
-                if (absValue(vNorm) < 1e-20) continue;
+                if (absValue(vNorm, field) < 1e-20) continue;
                 for (int i = 0; i < v.length; i++) v[i] = field.divide(v[i], vNorm);
 
                 for (int j = k; j < n; j++) {
@@ -1023,7 +1028,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 E sum = qtb[i];
                 for (int j = i + 1; j < n; j++) sum = field.add(sum, field.negate(field.multiply(qr.R().get(i, j), x[j])));
                 E rii = qr.R().get(i, i);
-                if (absValue(rii) < 1e-20) x[i] = field.zero();
+                if (absValue(rii, field) < 1e-20) x[i] = field.zero();
                 else x[i] = field.divide(sum, rii);
             }
             return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
@@ -1106,7 +1111,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 double maxOff = -1.0;
                 for (int i = 0; i < n; i++) {
                     for (int j = i + 1; j < n; j++) {
-                        double val = absValue(A[i][j]);
+                        double val = absValue(A[i][j], field);
                         offDiag += val;
                         if (val > maxOff) { maxOff = val; p = i; q = j; }
                     }
@@ -1115,7 +1120,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 E app = A[p][p]; E aqq = A[q][q]; E apq = A[p][q];
                 E diff = field.add(aqq, field.negate(app));
                 E twoApq = field.add(apq, apq);
-                double tau = absValue(diff) < 1e-18 ? 0.0 : absValue(twoApq) / absValue(diff);
+                double tau = absValue(diff, field) < 1e-18 ? 0.0 : absValue(twoApq, field) / absValue(diff, field);
                 double t = tau / (1.0 + Math.sqrt(1.0 + tau * tau));
                 double c = 1.0 / Math.sqrt(1.0 + t * t);
                 double s = t * c;

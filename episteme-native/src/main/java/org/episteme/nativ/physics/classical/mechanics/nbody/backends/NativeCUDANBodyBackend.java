@@ -10,8 +10,6 @@ import org.episteme.natural.physics.classical.mechanics.nbody.NBodyProvider;
 import org.episteme.core.technical.algorithm.OperationContext;
 import com.google.auto.service.AutoService;
 import jcuda.driver.JCudaDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.technical.backend.ComputeBackend;

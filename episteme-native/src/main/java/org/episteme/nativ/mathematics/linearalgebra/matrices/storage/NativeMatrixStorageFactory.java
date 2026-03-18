@@ -36,16 +36,11 @@ import com.google.auto.service.AutoService;
 public class NativeMatrixStorageFactory implements MatrixStorageFactory {
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E> MatrixStorage<E> createDense(int rows, int cols, Ring<E> ring) {
-        // NativeMatrix only supports Real (double)
-        E zero = ring.zero();
-        if (zero instanceof org.episteme.core.mathematics.numbers.real.Real) {
-            @SuppressWarnings("unchecked")
-            MatrixStorage<E> storage = (MatrixStorage<E>) new NativeDoubleMatrixStorage(rows, cols);
-            return storage;
+        if (ring.getClass().getName().contains("Reals") && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            return (MatrixStorage<E>) (Object) new NativeDoubleMatrixStorage(rows, cols);
         }
-        
-        // Fallback for non-Real types? 
         // Or return null to indicate "cannot handle"?
         // For now, let's return null if we can't handle it, and let MatrixFactory fallback.
         return null;

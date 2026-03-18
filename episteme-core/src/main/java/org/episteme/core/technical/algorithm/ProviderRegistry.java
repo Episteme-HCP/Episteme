@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.episteme.core.mathematics.context.MathContext;
 
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
@@ -124,7 +125,7 @@ public class ProviderRegistry {
         }
 
         // Specialized path for Real
-        if (ring.getClass().getName().contains("Reals")) {
+        if (ring.getClass().getName().contains("Reals") && !MathContext.getCurrent().isHighPrecision()) {
             @SuppressWarnings({"unchecked", "preview", "restricted"})
             MatrixStorage<E> specialized = (MatrixStorage<E>) (MatrixStorage<?>) new org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage(rows, cols);
             return specialized;
