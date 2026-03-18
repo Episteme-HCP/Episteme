@@ -58,7 +58,24 @@ public class ComputeContext {
         JAVA_CPU, OPENCL_GPU, CUDA_GPU, NATIVE_BLAS, COLT, EJML, QUANTUM
     }
 
-    private static final ThreadLocal<ComputeContext> CURRENT = ThreadLocal.withInitial(ComputeContext::new);
+    private static final ThreadLocal<ComputeContext> CURRENT = new InheritableThreadLocal<ComputeContext>() {
+        @Override
+        protected ComputeContext initialValue() {
+            return new ComputeContext();
+        }
+
+        @Override
+        protected ComputeContext childValue(ComputeContext parentValue) {
+            // Shallow copy of context for child threads
+            ComputeContext child = new ComputeContext();
+            child.setRealPrecision(parentValue.getRealPrecision());
+            child.setOverflowMode(parentValue.getOverflowMode());
+            child.setComputeMode(parentValue.getComputeMode());
+            child.setMathContext(parentValue.getMathContext());
+            child.setGpuThreshold(parentValue.getGpuThreshold());
+            return child;
+        }
+    };
 
     // DELEGATES
     private final NumericalConfiguration numericalConfig = new NumericalConfiguration();
@@ -128,6 +145,15 @@ public class ComputeContext {
 
     public ComputeContext setFloatPrecision(FloatPrecision precision) {
         numericalConfig.setFloatPrecision(precision);
+        return this;
+    }
+
+    public double getGpuThreshold() {
+        return numericalConfig.getGpuThreshold();
+    }
+
+    public ComputeContext setGpuThreshold(double threshold) {
+        numericalConfig.setGpuThreshold(threshold);
         return this;
     }
 

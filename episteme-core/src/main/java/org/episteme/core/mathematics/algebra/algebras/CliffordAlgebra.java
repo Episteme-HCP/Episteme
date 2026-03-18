@@ -225,7 +225,8 @@ public class CliffordAlgebra<E> implements Ring<CliffordAlgebra.Multivector<E>> 
                         int j = Integer.numberOfTrailingZeros(b); // current bit in B
                         // Count bits in A that are > j
                         int maskHigh = ~((1 << (j + 1)) - 1);
-                        swaps += Integer.bitCount(blade1 & maskHigh);
+                        int count = Integer.bitCount(blade1 & maskHigh);
+                        swaps += count;
                         b &= ~(1 << j);
                     }
 

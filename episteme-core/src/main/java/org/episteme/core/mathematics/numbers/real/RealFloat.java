@@ -47,21 +47,33 @@ final class RealFloat extends Real {
 
     @Override
     public Real add(Real other) {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            return RealBig.create(BigDecimal.valueOf(value)).add(other);
+        }
         return Real.of(value + other.doubleValue());
     }
 
     @Override
     public Real subtract(Real other) {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            return RealBig.create(BigDecimal.valueOf(value)).subtract(other);
+        }
         return Real.of(value - other.doubleValue());
     }
 
     @Override
     public Real multiply(Real other) {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            return RealBig.create(BigDecimal.valueOf(value)).multiply(other);
+        }
         return Real.of(value * other.doubleValue());
     }
 
     @Override
     public Real divide(Real other) {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            return RealBig.create(BigDecimal.valueOf(value)).divide(other);
+        }
         return Real.of(value / other.doubleValue());
     }
 

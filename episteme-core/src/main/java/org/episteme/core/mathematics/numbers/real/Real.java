@@ -98,10 +98,12 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * @return the Real instance
      */
     public static Real of(double value) {
-        if (value == 0.0)
-            return zeroE();
-        if (value == 1.0)
-            return oneE();
+        if (MathContext.getCurrent().getRealPrecision() != MathContext.RealPrecision.EXACT) {
+            if (value == 0.0)
+                return zeroE();
+            if (value == 1.0)
+                return oneE();
+        }
         if (Double.isNaN(value))
             return nanE();
 
@@ -124,10 +126,12 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * @return the Real instance
      */
     public static Real of(float value) {
-        if (value == 0.0f)
-            return ZERO;
-        if (value == 1.0f)
-            return ONE;
+        if (MathContext.getCurrent().getRealPrecision() != MathContext.RealPrecision.EXACT) {
+            if (value == 0.0f)
+                return ZERO;
+            if (value == 1.0f)
+                return ONE;
+        }
         if (Float.isNaN(value))
             return NaN;
 
@@ -153,10 +157,12 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null");
         }
-        if (value.compareTo(BigDecimal.ZERO) == 0)
-            return ZERO;
-        if (value.compareTo(BigDecimal.ONE) == 0)
-            return ONE;
+        if (MathContext.getCurrent().getRealPrecision() != MathContext.RealPrecision.EXACT) {
+            if (value.compareTo(BigDecimal.ZERO) == 0)
+                return ZERO;
+            if (value.compareTo(BigDecimal.ONE) == 0)
+                return ONE;
+        }
 
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
@@ -579,6 +585,11 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     @Override
     public boolean isMultiplicationCommutative() {
         return true;
+    }
+
+    @Override
+    public Real negate(Real element) {
+        return element.negate();
     }
 
     @Override

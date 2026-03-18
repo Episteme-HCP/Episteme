@@ -26,6 +26,7 @@ package org.episteme.nativ.mathematics.linearalgebra.vectors.storage;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorageFactory;
 import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.context.MathContext;
 
 /**
  * Native implementation of VectorStorageFactory.
@@ -34,13 +35,10 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 public class NativeVectorStorageFactory implements VectorStorageFactory {
 
     @Override
-    public <E> VectorStorage<E> createDense(int dimension, Ring<E> ring) {
-        // NativeVector only supports Real (double)
-        E zero = ring.zero();
-        if (zero instanceof org.episteme.core.mathematics.numbers.real.Real) {
-            @SuppressWarnings("unchecked")
-            VectorStorage<E> storage = (VectorStorage<E>) new NativeDoubleVectorStorage(dimension);
-            return storage;
+    @SuppressWarnings("unchecked")
+    public <E> VectorStorage<E> createDense(int dim, Ring<E> ring) {
+        if (ring.getClass().getName().contains("Reals") && !MathContext.getCurrent().isHighPrecision()) {
+            return (VectorStorage<E>) new NativeDoubleVectorStorage(dim);
         }
         return null;
     }

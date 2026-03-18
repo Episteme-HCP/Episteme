@@ -56,7 +56,6 @@ import java.lang.reflect.Constructor;
  * @since 1.0
  */
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
-@SuppressWarnings("rawtypes")
 public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static final Logger logger = LoggerFactory.getLogger(ColtBackend.class);
@@ -118,12 +117,18 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     @Override
     public boolean isAvailable() {
-        return coltAvailable;
+        return coltAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
     }
 
     @Override
     public int getPriority() {
         return coltAvailable ? 70 : 0;
+    }
+
+    @Override
+    public double score(org.episteme.core.technical.algorithm.OperationContext context) {
+        if (!coltAvailable || !canUseColt() || org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) return -1.0;
+        return getPriority();
     }
 
     @Override

@@ -57,7 +57,6 @@ import java.lang.reflect.Constructor;
  * @since 1.0
  */
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
-@SuppressWarnings("rawtypes")
 public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static final Logger logger = LoggerFactory.getLogger(JBlasBackend.class);
@@ -124,12 +123,18 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     @Override
     public boolean isAvailable() {
-        return jblasAvailable;
+        return jblasAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
     }
 
     @Override
     public int getPriority() {
         return jblasAvailable ? 90 : 0;
+    }
+
+    @Override
+    public double score(org.episteme.core.technical.algorithm.OperationContext context) {
+        if (!jblasAvailable || !canUseJBlas() || org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) return -1.0;
+        return getPriority();
     }
 
     @Override

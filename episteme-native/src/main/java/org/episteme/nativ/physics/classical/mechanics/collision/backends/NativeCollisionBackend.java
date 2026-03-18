@@ -17,9 +17,6 @@ import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridg
 import org.episteme.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-
-import java.lang.foreign.MemorySegment;
-
 /**
  * Native implementation of {@link MechanicsBackend} for general collision processing.
  * Acts as a bridge to native optimized collision kernels.

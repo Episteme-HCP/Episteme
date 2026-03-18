@@ -2,7 +2,6 @@ package org.episteme.nativ.physics.classical;
 
 import org.episteme.natural.physics.classical.mechanics.collision.MechanicsBackend;
 import org.episteme.natural.physics.classical.mechanics.collision.PhysicsWorldBridge;
-import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridge;
 import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.junit.jupiter.api.Test;
 import java.util.ServiceLoader;

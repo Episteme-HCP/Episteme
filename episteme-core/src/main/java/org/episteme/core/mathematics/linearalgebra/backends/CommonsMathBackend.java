@@ -111,12 +111,18 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
 
     @Override
     public boolean isAvailable() {
-        return commonsAvailable;
+        return commonsAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
     }
 
     @Override
     public int getPriority() {
         return commonsAvailable ? 50 : 0;
+    }
+
+    @Override
+    public double score(org.episteme.core.technical.algorithm.OperationContext context) {
+        if (!commonsAvailable || !canUseCommons() || org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) return -1.0;
+        return getPriority();
     }
 
     @Override

@@ -104,7 +104,6 @@ public class CopticCalendar extends JulianCalendar {
      * Recomputes the Rata Die number from the current month, day, and year.
      */
     protected synchronized void recomputeRD() {
-            @SuppressWarnings("deprecation")
             long q = AlternateCalendar.floorDiv(super.year, 4L);
             super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
             q +

@@ -28,7 +28,6 @@ import com.google.auto.service.AutoService;
  * @since 2.0
  */
 @AutoService({LinearAlgebraProvider.class, Backend.class})
-@SuppressWarnings("rawtypes")
 public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraProvider<E>, Backend {
 
     public DistributedLinearAlgebraProvider() {

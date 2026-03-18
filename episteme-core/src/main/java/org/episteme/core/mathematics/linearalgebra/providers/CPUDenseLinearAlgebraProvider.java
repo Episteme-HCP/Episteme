@@ -228,7 +228,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Vector dimensions must match");
         }
         
-        if (field instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (field instanceof org.episteme.core.mathematics.sets.Reals && 
+            !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
             double sum = 0.0;
             int dim = a.dimension();
             for (int i = 0; i < dim; i++) {
@@ -259,7 +260,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @Override
     @SuppressWarnings({"unchecked", "preview", "restricted"})
     public E norm(Vector<E> a) {
-        if (field instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (field instanceof org.episteme.core.mathematics.sets.Reals && 
+            !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
             double sumSq = 0.0;
             int dim = a.dimension();
             for (int i = 0; i < dim; i++) {
@@ -541,12 +543,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     private static boolean isReal(Matrix<?> m) {
         if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
-            return true;
+            // RealDoubleMatrix is ALWAYS double precision. 
+            // If we are in EXACT mode, we MUST treat it as a generic matrix to avoid downcasting.
+            return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
         }
         if (m.getScalarRing() instanceof org.episteme.core.mathematics.sets.Reals) {
-            // Only use double fast path if not in EXACT precision mode
-            return org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() != 
-                   org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT;
+            return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
         }
         return false;
     }

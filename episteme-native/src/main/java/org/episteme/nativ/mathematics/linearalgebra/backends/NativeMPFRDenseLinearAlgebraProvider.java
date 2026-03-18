@@ -48,10 +48,10 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     private static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_LONG.withName("prec"),
+        ValueLayout.JAVA_INT.withName("prec"),
         ValueLayout.JAVA_INT.withName("sign"),
+        ValueLayout.JAVA_INT.withName("exp"),
         MemoryLayout.paddingLayout(4),
-        ValueLayout.JAVA_LONG.withName("exp"),
         ValueLayout.ADDRESS.withName("d")
     );
 
@@ -247,7 +247,7 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                 }
             }
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<Real>(storage.getData(), rows, cols, ring);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<Real>(storage, this, ring);
     }
 
     private Real readMPFR(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {

@@ -24,7 +24,6 @@
 package org.episteme.core.mathematics.numbers.real;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 
 /**
  * Real number backed by arbitrary-precision {@link BigDecimal}.
@@ -79,8 +78,8 @@ final class RealBig extends Real {
         if (other.isInfinite()) {
             return Real.ZERO; // x / infinity = 0
         }
-        // Use default MathContext for division to avoid infinite expansion
-        return Real.of(value.divide(other.bigDecimalValue(), MathContext.DECIMAL128).toString());
+        return Real.of(value.divide(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
     }
 
     @Override
@@ -95,13 +94,13 @@ final class RealBig extends Real {
 
     @Override
     public Real inverse() {
-        return Real.of(BigDecimal.ONE.divide(value, MathContext.DECIMAL128).toString());
+        return Real.of(BigDecimal.ONE.divide(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
     }
 
     @Override
     public Real sqrt() {
-        // BigDecimal sqrt is available in Java 9+
-        return Real.of(value.sqrt(MathContext.DECIMAL128).toString());
+        return Real.of(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
     }
 
     @Override

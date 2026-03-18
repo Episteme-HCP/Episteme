@@ -115,7 +115,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     @Override
     public boolean isAvailable() {
-        return ejmlAvailable;
+        return ejmlAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
     }
 
     @Override
@@ -125,7 +125,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     @Override
     public double score(OperationContext context) {
-        if (!ejmlAvailable || !canUseEJML()) return -1.0;
+        if (!ejmlAvailable || !canUseEJML() || org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) return -1.0;
         
         double score = getPriority();
         if (context.hasHint(Hint.DENSE)) score += 10.0;

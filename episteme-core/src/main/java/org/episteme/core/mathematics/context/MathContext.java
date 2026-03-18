@@ -212,6 +212,13 @@ public final class MathContext {
     }
 
     /**
+     * Returns true if the precision is EXACT.
+     */
+    public boolean isHighPrecision() {
+        return realPrecision == RealPrecision.EXACT;
+    }
+
+    /**
      * Gets the overflow checking mode.
      */
     public OverflowMode getOverflowMode() {

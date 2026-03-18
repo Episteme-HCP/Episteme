@@ -301,11 +301,9 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
             clGetPlatformIDs(0, null, numPlatformsArray);
             if (numPlatformsArray[0] == 0) return new DeviceInfo[0];
             
+            java.util.List<DeviceInfo> deviceList = new java.util.ArrayList<>();
             cl_platform_id[] platforms = new cl_platform_id[numPlatformsArray[0]];
             clGetPlatformIDs(platforms.length, platforms, null);
-            
-            java.util.List<DeviceInfo> deviceList = new java.util.ArrayList<>();
-            int globalId = 0;
             for (cl_platform_id platform : platforms) {
                 int[] numDevicesArray = new int[1];
                 clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, null, numDevicesArray);
@@ -328,11 +326,8 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         }
     }
 
-    private int selectedDeviceId = 0;
-
     @Override
     public void selectDevice(int deviceId) {
-        this.selectedDeviceId = deviceId;
         // In a full implementation, this would re-initialize the context for the specific device
     }
 
