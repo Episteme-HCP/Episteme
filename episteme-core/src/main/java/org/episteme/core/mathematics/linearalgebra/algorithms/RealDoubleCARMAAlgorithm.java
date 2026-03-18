@@ -17,7 +17,7 @@ public class RealDoubleCARMAAlgorithm {
     private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_PREFERRED;
 
     public static SIMDRealDoubleMatrix multiply(SIMDRealDoubleMatrix A, SIMDRealDoubleMatrix B) {
-        org.episteme.core.ComputeContext.checkCurrentCancelled();
+        org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();

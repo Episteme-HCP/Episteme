@@ -42,7 +42,7 @@ import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedCARMAAl
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.LocalDistributedContext;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.technical.monitoring.DistributedMonitor;
 
 import java.util.concurrent.TimeUnit;
@@ -121,7 +121,7 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
     public void doSetup() {
         // Configure distributed context
         DistributedContext ctx = new LocalDistributedContext(parallelism);
-        ComputeContext.current().setDistributedContext(ctx);
+        MathContext.getNumericalConfiguration().setDistributedContext(ctx);
 
         // Generate random matrices
         double[][] dataA = generateRandomData(size);

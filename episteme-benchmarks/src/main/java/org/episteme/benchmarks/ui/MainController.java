@@ -83,7 +83,7 @@ public class MainController {
     private final Object executionLock = new Object();
     private ResourceBundle resources;
     private Task<Void> mainTask;
-    private volatile org.episteme.core.ComputeContext activeComputeContext;
+    private volatile org.episteme.core.mathematics.context.MathContext activeMathContext;
     private boolean isProcessingQueue = false;
 
     private javafx.stage.Stage primaryStage;
@@ -430,8 +430,7 @@ public class MainController {
         mainTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                activeComputeContext = org.episteme.core.ComputeContext.current();
-                activeComputeContext.setCancelled(false);
+                org.episteme.core.mathematics.context.MathContext.setCancelled(false);
                 
                 while (!benchmarkQueue.isEmpty()) {
                     if (isCancelled()) break;
@@ -501,10 +500,8 @@ public class MainController {
     private void handleStop() {
         if (mainTask != null && mainTask.isRunning()) {
             mainTask.cancel();
-            
-            if (activeComputeContext != null) {
-                activeComputeContext.setCancelled(true);
-            }
+        }
+        org.episteme.core.mathematics.context.MathContext.setCancelled(true);
             
             // Immediately update UI to show cancellation of queued items
             synchronized (benchmarkQueue) {
@@ -520,7 +517,6 @@ public class MainController {
                 markPendingAsCanceled(benchmarkTreeTable.getRoot());
                 updateCategoryStatuses(benchmarkTreeTable.getRoot());
             });
-        }
     }
 
     private void markPendingAsCanceled(TreeItem<BenchmarkItem> root) {

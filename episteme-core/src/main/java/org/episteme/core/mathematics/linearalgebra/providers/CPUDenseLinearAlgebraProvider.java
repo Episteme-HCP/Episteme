@@ -23,6 +23,8 @@
 
 package org.episteme.core.mathematics.linearalgebra.providers;
 
+import org.episteme.core.Episteme;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -129,7 +131,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, field);
         } else {
-            return org.episteme.core.ComputeContext.current().computeParallel(() -> java.util.stream.IntStream.range(0, a.dimension())
+            return Episteme.computeParallel(() -> java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> field.add(a.get(i), b.get(i)))
                     .collect(java.util.stream.Collectors.collectingAndThen(
@@ -160,7 +162,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
                     field);
         } else {
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
             return IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
@@ -201,7 +203,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, field);
         } else {
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
             return IntStream.range(0, vector.dimension())
                     .parallel()
                     .mapToObj(i -> {
@@ -222,7 +224,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public E dot(Vector<E> a, Vector<E> b) {
         if (a.dimension() != b.dimension()) {
             throw new IllegalArgumentException("Vector dimensions must match");
@@ -246,7 +248,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
             return sum;
         } else {
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
             return IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
@@ -258,7 +260,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public E norm(Vector<E> a) {
         if (field instanceof org.episteme.core.mathematics.sets.Reals && 
             !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
@@ -298,7 +300,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     resData[i] = dataA[i] + dataB[i];
                 }
             } else {
-                org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+                org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
                 IntStream.range(0, rows).parallel().forEach(i -> {
                     ctx.checkCancelled();
                     int offset = i * cols;
@@ -319,7 +321,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 }
             }
         } else {
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
                 ctx.checkCancelled();
                 for (int j = 0; j < a.cols(); j++) {
@@ -353,7 +355,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     resData[i] = dataA[i] - dataB[i];
                 }
             } else {
-                org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+                org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
                 IntStream.range(0, rows).parallel().forEach(i -> {
                     ctx.checkCancelled();
                     int offset = i * cols;
@@ -375,7 +377,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 }
             }
         } else {
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
                 ctx.checkCancelled();
                 for (int j = 0; j < a.cols(); j++) {
@@ -408,7 +410,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     private Matrix<E> strassenRecursive(Matrix<E> A, Matrix<E> B) {
-        org.episteme.core.ComputeContext.checkCurrentCancelled();
+        org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
         int n = A.rows();
         if (n <= 512) {
             return standardMultiply(A, B, field, this);
@@ -462,7 +464,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
     }
 
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public static <E> Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b, Field<E> field, LinearAlgebraProvider<E> provider) {
         int rowsA = a.rows();
         int colsA = a.cols();
@@ -482,7 +484,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 } else {
                     // Optimized i-k-j loop for small-to-medium matrices
                     for (int i = 0; i < rowsA; i++) {
-                        if (i % 64 == 0) org.episteme.core.ComputeContext.checkCurrentCancelled();
+                        if (i % 64 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                         int rowOffsetA = i * colsA;
                         int rowOffsetC = i * colsB;
                         for (int k = 0; k < colsA; k++) {
@@ -516,7 +518,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     }
                 }
             } else {
-                org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+                org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
                 IntStream.range(0, a.rows()).parallel().forEach(i -> {
                     if (i % 64 == 0) ctx.checkCancelled();
                     for (int j = 0; j < b.cols(); j++) {
@@ -590,7 +592,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     private static void staticTiledMultiply(double[] A, double[] B, double[] C, int M, int K, int N) {
         final int BLOCK_SIZE = 64; 
-        org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
         IntStream.range(0, (M + BLOCK_SIZE - 1) / BLOCK_SIZE).parallel().forEach(bi -> {
             ctx.checkCancelled();
             int i0 = bi * BLOCK_SIZE;
@@ -617,7 +619,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public Matrix<E> transpose(Matrix<E> a) {
         if (isReal(a)) {
             int rows = a.rows();
@@ -642,7 +644,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), field.zero());
-        org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
             ctx.checkCancelled();
             for (int j = 0; j < a.cols(); j++) {
@@ -653,7 +655,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         if (scalar instanceof Real && isReal(a)) {
             double s = ((Real) scalar).doubleValue();
@@ -676,7 +678,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
-        org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
             ctx.checkCancelled();
             for (int j = 0; j < a.cols(); j++) {
@@ -724,7 +726,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public Matrix<E> inverse(Matrix<E> a) {
         if (a.rows() != a.cols()) {
             return pseudoInverse(a);

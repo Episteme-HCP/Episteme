@@ -326,9 +326,9 @@ public class EpistemeMasterControl extends Application {
         // --- Compute Mode ---
         ComboBox<org.episteme.core.mathematics.context.ComputeMode> modeBox = new ComboBox<>();
         modeBox.getItems().addAll(org.episteme.core.mathematics.context.ComputeMode.values());
-        modeBox.setValue(Episteme.getComputeMode());
+        modeBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getComputeMode());
         modeBox.setOnAction(e -> {
-            Episteme.setComputeMode(modeBox.getValue());
+            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().applyComputeMode(modeBox.getValue());
             Episteme.savePreferences();
             refreshUI(); // Update UI to reflect mode change
         });
@@ -337,41 +337,36 @@ public class EpistemeMasterControl extends Application {
                         "AUTO prefers GPU, otherwise uses CPU if unavailable."));
 
         // --- Float Precision ---
-        ComboBox<org.episteme.core.ComputeContext.FloatPrecision> floatBox = new ComboBox<>();
-        floatBox.getItems().addAll(org.episteme.core.ComputeContext.FloatPrecision.values());
-        floatBox.setValue(Episteme.getFloatPrecisionMode());
+        ComboBox<org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision> floatBox = new ComboBox<>();
+        floatBox.getItems().addAll(org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision.values());
+        floatBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getFloatPrecision());
         floatBox.setOnAction(e -> {
-            if (floatBox.getValue() == org.episteme.core.ComputeContext.FloatPrecision.FLOAT)
-                Episteme.setFloatPrecision();
-            else
-                Episteme.setDoublePrecision();
+            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setFloatPrecision(floatBox.getValue());
             Episteme.savePreferences();
         });
         VBox floatInfo = createInfoBox(i18n.get("mastercontrol.computing.float_precision", "Float Precision"),
                 i18n.get("mastercontrol.computing.desc.precision", "FLOAT (32-bit) / DOUBLE (64-bit)"));
 
         // --- Integer Precision ---
-        ComboBox<org.episteme.core.ComputeContext.IntPrecision> intBox = new ComboBox<>();
-        intBox.getItems().addAll(org.episteme.core.ComputeContext.IntPrecision.values());
-        intBox.setValue(Episteme.getIntPrecisionMode());
+        ComboBox<org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision> intBox = new ComboBox<>();
+        intBox.getItems().addAll(org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision.values());
+        intBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getIntPrecision());
         intBox.setOnAction(e -> {
-            if (intBox.getValue() == org.episteme.core.ComputeContext.IntPrecision.INT)
-                Episteme.setIntPrecision();
-            else
-                Episteme.setLongPrecision();
+            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setIntPrecision(intBox.getValue());
             Episteme.savePreferences();
         });
         VBox intInfo = createInfoBox(i18n.get("mastercontrol.computing.int_precision", "Integer Precision"),
                 "INT (32-bit) vs LONG (64-bit)");
 
         // --- MathContext Precision ---
-        Spinner<Integer> precSpinner = new Spinner<>(0, 10000, Episteme.getMathContext().getPrecision());
+        java.math.MathContext currentMC = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext();
+        Spinner<Integer> precSpinner = new Spinner<>(0, 10000, currentMC.getPrecision());
         precSpinner.setEditable(true);
         precSpinner.setPrefWidth(150);
         precSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                java.math.MathContext old = Episteme.getMathContext();
-                Episteme.setMathContext(new java.math.MathContext(newVal, old.getRoundingMode()));
+                java.math.MathContext old = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext();
+                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMathContext(new java.math.MathContext(newVal, old.getRoundingMode()));
                 Episteme.savePreferences();
             }
         });
@@ -381,19 +376,22 @@ public class EpistemeMasterControl extends Application {
         // --- MathContext Rounding ---
         ComboBox<java.math.RoundingMode> roundBox = new ComboBox<>();
         roundBox.getItems().addAll(java.math.RoundingMode.values());
-        roundBox.setValue(Episteme.getMathContext().getRoundingMode());
+        roundBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext().getRoundingMode());
         roundBox.setPrefWidth(150);
         roundBox.setOnAction(e -> {
-            java.math.MathContext old = Episteme.getMathContext();
-            Episteme.setMathContext(new java.math.MathContext(old.getPrecision(), roundBox.getValue()));
+            java.math.MathContext old = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext();
+            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMathContext(new java.math.MathContext(old.getPrecision(), roundBox.getValue()));
             Episteme.savePreferences();
         });
         VBox roundInfo = createInfoBox(i18n.get("mastercontrol.computing.rounding", "Rounding Mode"),
                 i18n.get("mastercontrol.computing.desc.rounding", "Rounding strategy"));
 
-        Label gpuVal = new Label(Episteme.isGpuAvailable() ? i18n.get("mastercontrol.libraries.available", "Available")
+        boolean gpuAvail = org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
+                .anyMatch(p -> (p.getId().toLowerCase().contains("cuda") || p.getId().toLowerCase().contains("opencl")) && p.isAvailable());
+
+        Label gpuVal = new Label(gpuAvail ? i18n.get("mastercontrol.libraries.available", "Available")
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        gpuVal.getStyleClass().add(Episteme.isGpuAvailable() ? "status-connected" : "status-disconnected");
+        gpuVal.getStyleClass().add(gpuAvail ? "status-connected" : "status-disconnected");
 
         // --- Auto-Tuning Mode ---
         ComboBox<org.episteme.core.technical.algorithm.AutoTuningManager.Mode> tuningBox = new ComboBox<>();

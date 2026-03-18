@@ -8,19 +8,21 @@ package org.episteme.core;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.episteme.core.mathematics.context.MathContext;
+
 /**
- * Automated baseline test for ComputeContext.
+ * Automated baseline test for MathContext.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ComputeContextTest {
+public class MathContextTest {
 
     @Test
     public void testClassPresence() {
         // Ensure class is reachable
-        assertNotNull(ComputeContext.class);
+        assertNotNull(MathContext.class);
     }
 }
 

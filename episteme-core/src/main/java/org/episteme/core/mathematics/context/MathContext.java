@@ -77,25 +77,19 @@ public final class MathContext {
         LAZY
     }
 
-    // Thread-local storage is now handled by ComputeContext
-    // private static final ThreadLocal<MathContext> CURRENT ...
+    private static final ThreadLocal<MathState> STATE = InheritableThreadLocal.withInitial(MathState::new);
 
-    // Default context logic is now implicit or handled by ComputeContext defaults
-    // But we keep a static default for API compatibility if needed
-    private static MathContext DEFAULT = new MathContext(
-            RealPrecision.NORMAL,
-            OverflowMode.SAFE);
+    private static class MathState {
+        final NumericalConfiguration config = new NumericalConfiguration();
+        volatile boolean cancelled = false;
+    }
 
     private final RealPrecision realPrecision;
     private final OverflowMode overflowMode;
     private final ComputeMode computeMode;
     private final java.math.MathContext javaMathContext;
 
-    /**
-     * Creates a new computation context.
-     */
-    public MathContext(RealPrecision realPrecision, OverflowMode overflowMode, ComputeMode computeMode,
-            java.math.MathContext javaMathContext) {
+    private MathContext(RealPrecision realPrecision, OverflowMode overflowMode, ComputeMode computeMode, java.math.MathContext javaMathContext) {
         this.realPrecision = realPrecision;
         this.overflowMode = overflowMode;
         this.computeMode = computeMode;
@@ -103,61 +97,75 @@ public final class MathContext {
     }
 
     /**
-     * Creates a new computation context with default java.math.MathContext
-     * (DECIMAL64).
-     */
-    public MathContext(RealPrecision realPrecision, OverflowMode overflowMode, ComputeMode computeMode) {
-        this(realPrecision, overflowMode, computeMode, java.math.MathContext.DECIMAL64);
-    }
-
-    /**
-     * Creates a new computation context (default AUTO compute mode).
-     */
-    public MathContext(RealPrecision realPrecision, OverflowMode overflowMode) {
-        this(realPrecision, overflowMode, ComputeMode.AUTO);
-    }
-
-    /**
-     * Returns the default context.
-     */
-    public static MathContext getDefault() {
-        return DEFAULT;
-    }
-
-    /**
-     * Sets the global default context.
-     */
-    public static void setDefault(MathContext context) {
-        DEFAULT = context;
-    }
-
-    /**
-     * Returns the current thread-local context (view of ComputeContext).
+     * Returns the current thread-local context.
      */
     public static MathContext getCurrent() {
-        org.episteme.core.ComputeContext cc = org.episteme.core.ComputeContext
-                .current();
-        return new MathContext(cc.getRealPrecision(), cc.getOverflowMode(), cc.getComputeMode(), cc.getMathContext());
+        MathState state = STATE.get();
+        NumericalConfiguration config = state.config;
+        return new MathContext(
+                config.getRealPrecision(),
+                config.getOverflowMode(),
+                config.getComputeMode(),
+                config.getMathContext());
     }
 
     /**
-     * Sets the current thread-local context (updates ComputeContext).
+     * Sets the current thread-local context.
      */
     public static void setCurrent(MathContext context) {
-        org.episteme.core.ComputeContext cc = org.episteme.core.ComputeContext
-                .current();
-        cc.setRealPrecision(context.getRealPrecision());
-        cc.setOverflowMode(context.getOverflowMode());
-        cc.setComputeMode(context.getComputeMode());
-        cc.setMathContext(context.getJavaMathContext());
+        MathState state = STATE.get();
+        NumericalConfiguration config = state.config;
+        config.setRealPrecision(context.getRealPrecision());
+        config.setOverflowMode(context.getOverflowMode());
+        config.setComputeMode(context.getComputeMode());
+        config.setMathContext(context.getJavaMathContext());
     }
 
     /**
-     * Resets thread-local context to default.
+     * Resets the current thread-local context to defaults.
      */
     public static void reset() {
-        org.episteme.core.ComputeContext.reset();
+        STATE.remove();
     }
+
+    /**
+     * Returns true if the current context has been cancelled.
+     */
+    public static boolean isCancelled() {
+        return STATE.get().cancelled;
+    }
+
+    /**
+     * Sets the cancellation state for the current context.
+     */
+    public static void setCancelled(boolean cancelled) {
+        STATE.get().cancelled = cancelled;
+    }
+
+    /**
+     * Checks if the current thread's context is cancelled.
+     * @throws RuntimeException if cancelled
+     */
+    public static void checkCurrentCancelled() {
+        if (isCancelled()) {
+            throw new RuntimeException("Computation cancelled");
+        }
+    }
+
+    /**
+     * Synonym for checkCurrentCancelled to match legacy and provider APIs.
+     */
+    public static void checkCancelled() {
+        checkCurrentCancelled();
+    }
+
+    /**
+     * Returns the numerical configuration for the current thread.
+     */
+    public static NumericalConfiguration getNumericalConfiguration() {
+        return STATE.get().config;
+    }
+
 
     /**
      * Creates a fast computation context (float precision).

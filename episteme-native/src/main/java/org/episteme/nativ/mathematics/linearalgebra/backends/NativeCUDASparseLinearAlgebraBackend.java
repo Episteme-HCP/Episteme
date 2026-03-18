@@ -36,7 +36,6 @@ import org.episteme.core.technical.algorithm.OperationContext.Hint;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@SuppressWarnings("preview")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
     

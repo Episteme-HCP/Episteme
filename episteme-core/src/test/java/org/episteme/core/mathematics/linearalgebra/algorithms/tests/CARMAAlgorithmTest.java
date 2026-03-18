@@ -9,7 +9,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.distributed.LocalDistributedContext;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.mathematics.context.MathContext;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,8 +20,8 @@ public class CARMAAlgorithmTest {
 
     @Test
     public void testMultiplicationCorrectness() {
-        // Setup simple context
-        ComputeContext.current().setDistributedContext(new LocalDistributedContext(1));
+        // Setup simple distributed context
+        org.episteme.core.distributed.DistributedCompute.setContext(new LocalDistributedContext(1));
         
         // 4x4 matrix, tiles 2x2
         TiledMatrix A = createIdentity(4, 2);

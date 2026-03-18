@@ -284,7 +284,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
     @Override
     public Vector<org.episteme.core.mathematics.numbers.real.Real> solve(Matrix<org.episteme.core.mathematics.numbers.real.Real> A, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (!IS_AVAILABLE || DGESV == null) throw new UnsupportedOperationException(getName() + ": solve() not available");
-        org.episteme.core.ComputeContext.checkCurrentCancelled();
+        org.episteme.core.mathematics.context.MathContext.checkCancelled();
         
         int m = A.rows();
         int n = A.cols();

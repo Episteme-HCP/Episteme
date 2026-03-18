@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@SuppressWarnings({"preview", "unused", "restricted"})
+@SuppressWarnings({"unused", "restricted"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, AlgorithmProvider.class})
 public class NativeArrowBackend implements AlgorithmProvider, ComputeBackend, NativeBackend {
 

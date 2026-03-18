@@ -1,12 +1,10 @@
 package org.episteme.core.mathematics.context;
 
 import java.math.MathContext;
-import org.episteme.core.ComputeContext.Backend;
-import org.episteme.core.ComputeContext.FloatPrecision;
-import org.episteme.core.ComputeContext.IntPrecision;
 import org.episteme.core.mathematics.context.MathContext.OverflowMode;
 import org.episteme.core.mathematics.context.MathContext.RealPrecision;
 import org.episteme.core.Episteme;
+
 
 /**
  * Configuration for numerical computation, including precision, backend preferences, and thresholds.
@@ -14,14 +12,30 @@ import org.episteme.core.Episteme;
  */
 public class NumericalConfiguration {
 
+    /**
+     * Floating-point precision mode for GPU and numerical operations.
+     */
+    public enum FloatPrecision {
+        FLOAT, DOUBLE
+    }
+
+    /**
+     * Integer precision mode for GPU and numerical operations.
+     */
+    public enum IntPrecision {
+        INT, LONG
+    }
+
     private volatile FloatPrecision floatPrecision = FloatPrecision.DOUBLE;
     private volatile IntPrecision intPrecision = IntPrecision.LONG;
-    private volatile Backend backend = Backend.JAVA_CPU;
+    private volatile String backendId = "java-cpu";
 
     private volatile RealPrecision realPrecision = RealPrecision.NORMAL;
     private volatile OverflowMode overflowMode = OverflowMode.SAFE;
     private volatile ComputeMode computeMode = ComputeMode.AUTO;
     private volatile MathContext mathContext = MathContext.DECIMAL128;
+    private volatile org.episteme.core.technical.backend.distributed.DistributedContext distributedContext;
+
 
     private double gpuThreshold = Double.parseDouble(Episteme.getProperty("compute.gpu.threshold", "10000000"));
     private int parallelThreshold = Integer.parseInt(Episteme.getProperty("compute.parallel.threshold", "50000"));
@@ -48,12 +62,12 @@ public class NumericalConfiguration {
         return this;
     }
 
-    public Backend getBackend() {
-        return backend;
+    public String getBackendId() {
+        return backendId;
     }
 
-    public NumericalConfiguration setBackend(Backend backend) {
-        this.backend = backend;
+    public NumericalConfiguration setBackendId(String backendId) {
+        this.backendId = backendId;
         return this;
     }
 
@@ -117,6 +131,62 @@ public class NumericalConfiguration {
 
     public NumericalConfiguration setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
+        return this;
+    }
+
+    /**
+     * Applies a computation mode, selecting the appropriate backend and adjusting precision if needed.
+     */
+    public void applyComputeMode(ComputeMode mode) {
+        this.computeMode = mode;
+        String targetBackendId = "java-cpu";
+
+        switch (mode) {
+            case OPENCL:
+                targetBackendId = findBackendIdPart("linear-algebra", "opencl");
+                break;
+            case CUDA:
+                targetBackendId = findBackendIdPart("linear-algebra", "cuda");
+                break;
+            case CPU:
+                targetBackendId = "java-cpu";
+                break;
+            case AUTO:
+                if (isGpuAvailable()) {
+                    targetBackendId = org.episteme.core.technical.backend.BackendDiscovery.getInstance()
+                            .getBestProvider("linear-algebra").map(p -> p.getId()).orElse("java-cpu");
+                    setFloatPrecision(FloatPrecision.FLOAT);
+                    setIntPrecision(IntPrecision.INT);
+                } else {
+                    targetBackendId = "java-cpu";
+                    setRealPrecision(RealPrecision.NORMAL);
+                    setFloatPrecision(FloatPrecision.DOUBLE);
+                    setIntPrecision(IntPrecision.LONG);
+                }
+                break;
+        }
+        this.backendId = targetBackendId;
+    }
+
+    private String findBackendIdPart(String type, String idPart) {
+        return org.episteme.core.technical.backend.BackendDiscovery.getInstance()
+                .getAvailableProvidersByType(type).stream()
+                .filter(p -> p.getId().toLowerCase().contains(idPart.toLowerCase()))
+                .map(p -> p.getId())
+                .findFirst().orElse("java-cpu");
+    }
+
+    public boolean isGpuAvailable() {
+        return org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
+                .anyMatch(p -> (p.getId().toLowerCase().contains("cuda") || p.getId().toLowerCase().contains("opencl")) && p.isAvailable());
+    }
+
+    public org.episteme.core.technical.backend.distributed.DistributedContext getDistributedContext() {
+        return distributedContext;
+    }
+
+    public NumericalConfiguration setDistributedContext(org.episteme.core.technical.backend.distributed.DistributedContext distributedContext) {
+        this.distributedContext = distributedContext;
         return this;
     }
 }

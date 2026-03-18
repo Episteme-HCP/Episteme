@@ -3,7 +3,7 @@ package org.episteme.natural.physics.classical.mechanics.nbody.providers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.episteme.core.ComputeContext;
+import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.distributed.LocalDistributedContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,7 @@ public class DistributedNBodyVerificationTest {
     void setUp() {
         provider = new org.episteme.natural.physics.classical.mechanics.nbody.providers.DistributedNBodyProvider();
         // Ensure we are using LocalDistributedContext for testing logic
-        ComputeContext.setCurrent(new ComputeContext());
-        ComputeContext.current().setDistributedContext(new LocalDistributedContext(1)); // 1 node
+        org.episteme.core.distributed.DistributedCompute.setContext(new LocalDistributedContext(1)); // 1 node
     }
 
     @Test

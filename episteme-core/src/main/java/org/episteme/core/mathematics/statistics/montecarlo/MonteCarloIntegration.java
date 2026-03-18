@@ -68,7 +68,7 @@ public class MonteCarloIntegration {
         double width = b - a;
 
         for (int i = 0; i < samples; i++) {
-            if ((i & 0x3FF) == 0) org.episteme.core.ComputeContext.checkCurrentCancelled();
+            if ((i & 0x3FF) == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             double x = a + random.nextDouble() * width;
             sum += f.apply(x);
         }
@@ -115,7 +115,7 @@ public class MonteCarloIntegration {
 
         double sum = 0;
         for (int i = 0; i < samples; i++) {
-            if ((i & 0x3FF) == 0) org.episteme.core.ComputeContext.checkCurrentCancelled();
+            if ((i & 0x3FF) == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             double x = sampler.get();
             double q = proposal.apply(x);
             if (q > 0) {
@@ -140,7 +140,7 @@ public class MonteCarloIntegration {
         double width = b - a;
 
         for (int i = 0; i < samples; i++) {
-            if ((i & 0x3FF) == 0) org.episteme.core.ComputeContext.checkCurrentCancelled();
+            if ((i & 0x3FF) == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             double x = a + random.nextDouble() * width;
             double fx = f.apply(x);
             sum += fx;

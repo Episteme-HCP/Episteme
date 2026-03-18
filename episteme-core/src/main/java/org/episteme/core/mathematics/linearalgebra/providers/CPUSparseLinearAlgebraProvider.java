@@ -328,9 +328,8 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             }
         } else {
             // Parallel execution per row
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
             IntStream.range(0, rows).parallel().forEach(row -> {
-                ctx.checkCancelled();
+                org.episteme.core.mathematics.context.MathContext.checkCancelled();
                 // Populate from A
                 for (int i = aRowPtrs[row]; i < aRowPtrs[row + 1]; i++) {
                     rowMaps.get(row).put(aCols[i], (E) aVals[i]);
@@ -534,9 +533,8 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             }
         } else {
             // Parallel
-            org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
             IntStream.range(0, resultRows).parallel().forEach(i -> {
-                ctx.checkCancelled();
+                org.episteme.core.mathematics.context.MathContext.checkCancelled();
                 computeRowMultiplication(i, rowMaps.get(i), aRowPtrs, aCols, aVals, bRowPtrs, bCols, bVals, r);
             });
         }

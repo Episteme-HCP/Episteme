@@ -6,7 +6,7 @@ package org.episteme.core.technical.algorithm;
 
 /**
  * Thrown when a mathematical operation is cancelled by the user or system via {@link OperationContext} 
- * or {@link org.episteme.core.ComputeContext}.
+ * or {@link org.episteme.core.mathematics.context.MathContext}.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
