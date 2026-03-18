@@ -13,7 +13,7 @@ public class RealStrassenAlgorithm {
     private static final int THRESHOLD = 64;
 
     public static Matrix<Real> multiply(Matrix<Real> A, Matrix<Real> B) {
-        org.episteme.core.ComputeContext.checkCurrentCancelled();
+        org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();

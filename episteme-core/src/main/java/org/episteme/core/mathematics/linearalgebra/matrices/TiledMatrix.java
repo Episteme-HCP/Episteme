@@ -8,7 +8,8 @@ package org.episteme.core.mathematics.linearalgebra.matrices;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.TiledMatrixStorage;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.Episteme;
 import org.episteme.core.mathematics.sets.Reals;
 
 
@@ -36,7 +37,7 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
     public TiledMatrix(Matrix<Real> original, int tileRows, int tileCols) {
         super(new TiledMatrixStorage(new Matrix[(original.rows() + tileRows - 1) / tileRows][(original.cols() + tileCols - 1) / tileCols],
                 original.rows(), original.cols(), tileRows, tileCols),
-                ComputeContext.current().getDenseLinearAlgebraProvider(Reals.getInstance()),
+                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(Reals.getInstance()),
                 Reals.getInstance());
         
         this.rows = original.rows();
@@ -70,7 +71,7 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
     public TiledMatrix(int rows, int cols, int tileSize) {
         super(new TiledMatrixStorage(new Matrix[(rows + tileSize - 1) / tileSize][(cols + tileSize - 1) / tileSize],
                 rows, cols, tileSize, tileSize),
-                ComputeContext.current().getDenseLinearAlgebraProvider(Reals.getInstance()),
+                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(Reals.getInstance()),
                 Reals.getInstance());
         
         this.rows = rows;
@@ -157,7 +158,7 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
      */
     private TiledMatrix(Matrix<Real>[][] tiles, int rows, int cols, int tileRows, int tileCols) {
         super(new TiledMatrixStorage(tiles, rows, cols, tileRows, tileCols),
-                ComputeContext.current().getDenseLinearAlgebraProvider(Reals.getInstance()),
+                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(Reals.getInstance()),
                 Reals.getInstance());
         this.tiles = tiles;
         this.rows = rows;

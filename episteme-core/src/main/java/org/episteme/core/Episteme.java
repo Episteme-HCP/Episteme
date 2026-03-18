@@ -46,7 +46,7 @@ public final class Episteme {
         loadVersionInfo();
     }
 
-    private static java.math.MathContext INSTANCE_MATH_CONTEXT = java.math.MathContext.DECIMAL128;
+
 
     private static void loadConfiguration() {
         try (java.io.InputStream is = Episteme.class.getResourceAsStream("/episteme.properties")) {
@@ -90,7 +90,7 @@ public final class Episteme {
     };
 
     private static void loadVersionInfo() {
-        String v = "5.0.0-SNAPSHOT";
+        String v = "1.0.0-SNAPSHOT";
         String d = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
         try (java.io.InputStream is = Episteme.class.getResourceAsStream("/episteme.properties")) {
             if (is != null) {
@@ -109,27 +109,22 @@ public final class Episteme {
     /**
      * Saves current settings to user preferences.
      */
-    /**
-     * Saves current settings to user preferences.
-     */
     public static void savePreferences() {
         try {
             org.episteme.core.io.UserPreferences prefs = org.episteme.core.io.UserPreferences.getInstance();
-            prefs.set("compute.mode", getComputeMode().name());
-            prefs.set("float.precision", getFloatPrecisionMode().name());
-            prefs.set("int.precision", getIntPrecisionMode().name());
-            java.math.MathContext mc = getMathContext();
+            org.episteme.core.mathematics.context.NumericalConfiguration config = getNumericalConfiguration();
+            
+            prefs.set("compute.mode", config.getComputeMode().name());
+            prefs.set("float.precision", config.getFloatPrecision().name());
+            prefs.set("int.precision", config.getIntPrecision().name());
+            
+            java.math.MathContext mc = config.getMathContext();
             prefs.set("math.precision", String.valueOf(mc.getPrecision()));
             prefs.set("math.rounding", mc.getRoundingMode().name());
 
-            // Backends are now persisted immediately on setXXX(), so mostly no need to save here
-            // except for legacy plotting/linear algebra fields kept in this class
-            org.episteme.core.technical.backend.Backend b2d = (org.episteme.core.technical.backend.Backend) getPlottingBackend2D();
-            org.episteme.core.technical.backend.Backend b3d = (org.episteme.core.technical.backend.Backend) getPlottingBackend3D();
-            prefs.set("plotting.backend.2d", b2d != null ? b2d.getId() : "auto");
-            prefs.set("plotting.backend.3d", b3d != null ? b3d.getId() : "auto");
-            if (getLinearAlgebraProviderId() != null) prefs.set("linear.algebra.backend", getLinearAlgebraProviderId());
-
+            // Save other preferred backends
+            prefs.set("linear.algebra.backend", config.getBackendId());
+            
             prefs.save();
         } catch (Exception e) {
             System.err.println("Failed to save preferences: " + e.getMessage());
@@ -139,26 +134,24 @@ public final class Episteme {
     /**
      * Loads settings from user preferences.
      */
-    /**
-     * Loads settings from user preferences.
-     */
     public static void loadPreferences() {
         try {
             org.episteme.core.io.UserPreferences prefs = org.episteme.core.io.UserPreferences.getInstance();
+            org.episteme.core.mathematics.context.NumericalConfiguration config = getNumericalConfiguration();
 
             String modeStr = prefs.get("compute.mode");
             if (modeStr != null) {
-                setComputeMode(ComputeMode.valueOf(modeStr));
+                config.applyComputeMode(org.episteme.core.mathematics.context.ComputeMode.valueOf(modeStr));
             }
 
             String floatStr = prefs.get("float.precision");
             if (floatStr != null) {
-                ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.valueOf(floatStr));
+                config.setFloatPrecision(org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision.valueOf(floatStr));
             }
 
             String intStr = prefs.get("int.precision");
             if (intStr != null) {
-                ComputeContext.current().setIntPrecision(ComputeContext.IntPrecision.valueOf(intStr));
+                config.setIntPrecision(org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision.valueOf(intStr));
             }
 
             try {
@@ -166,253 +159,81 @@ public final class Episteme {
                 int prec = (precStr != null) ? Integer.parseInt(precStr) : 34;
                 String rmStr = prefs.get("math.rounding", "HALF_EVEN");
                 java.math.RoundingMode rm = java.math.RoundingMode.valueOf(rmStr);
-                setMathContext(new java.math.MathContext(prec, rm));
+                config.setMathContext(new java.math.MathContext(prec, rm));
             } catch (Exception e) {
                 // Ignore math context errors
-            }
-
-            // Load Backends (Using setters to populate runtime if needed, though mostly direct access is preferred)
-            try {
-                String pb2d = prefs.get("plotting.backend.2d");
-                if (pb2d != null) org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set2D(pb2d);
-                
-                String pb3d = prefs.get("plotting.backend.3d");
-                if (pb3d != null) org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set3D(pb3d);
-                
-                // No need to load other backends into local fields as they are now fetching directly from UserPreferences
-                // The getters (getMolecularBackendId, etc.) read from UserPreferences directly.
-                
-            } catch (Exception e) {
-                // Ignore backend loading errors
             }
         } catch (Exception e) {
             // Ignore - use defaults
         }
     }
 
-    // ================= COMPUTE MODE =================
+    private static final org.episteme.core.technical.algorithm.ProviderRegistry providerRegistry = new org.episteme.core.technical.algorithm.ProviderRegistry();
+    
+    /**
+     * Gets the global provider registry.
+     */
+    public static org.episteme.core.technical.algorithm.ProviderRegistry getProviderRegistry() {
+        return providerRegistry;
+    }
+
+    private static final java.util.concurrent.ForkJoinPool SHARED_POOL = new java.util.concurrent.ForkJoinPool(
+            Runtime.getRuntime().availableProcessors(),
+            java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+            null, true);
 
     /**
-     * Sets the global computation mode for linear algebra operations.
-     * 
-     * @param mode the compute mode (CPU, GPU, AUTO)
+     * Executes a computation potentially in parallel using a shared thread pool.
      */
-    public static void setComputeMode(ComputeMode mode) {
-        MathContext.setCurrent(MathContext.getCurrent().withComputeMode(mode));
-        // Also update ComputeContext backend
-        switch (mode) {
-            case OPENCL:
-                ComputeContext.current().setBackend(ComputeContext.Backend.OPENCL_GPU);
-                break;
-            case CUDA:
-                ComputeContext.current().setBackend(ComputeContext.Backend.CUDA_GPU);
-                break;
-            case CPU:
-                ComputeContext.current().setBackend(ComputeContext.Backend.JAVA_CPU);
-                break;
-            case AUTO:
-                if (isGpuAvailable()) {
-                    ComputeContext.current().setBackend(ComputeContext.Backend.OPENCL_GPU);
-                    // AUTO logic: On GPU, prioritize Fast performance
-                    setFloatPrecision();
-                    setIntPrecision();
-                } else {
-                    ComputeContext.current().setBackend(ComputeContext.Backend.JAVA_CPU);
-                    // AUTO logic: On CPU, prioritize Standard precision
-                    setStandardPrecision();
-                    setLongPrecision();
-                }
-                break;
+    public static <T> T computeParallel(java.util.function.Supplier<T> task) {
+        return SHARED_POOL.submit(() -> task.get()).join();
+    }
+
+    /**
+     * Checks if the current computation context has been cancelled.
+     * @throws RuntimeException if cancelled
+     */
+    public static void checkCancelled() {
+        if (MathContext.isCancelled()) {
+            throw new RuntimeException("Computation cancelled");
         }
     }
-
+    
     /**
-     * Re-applies AUTO selection logic based on current environment.
+     * Synonym for checkCancelled to match legacy API.
      */
-    public static void refreshAutoSettings() {
-        if (getComputeMode() == ComputeMode.AUTO) {
-            setComputeMode(ComputeMode.AUTO);
-        }
+    public static void checkCurrentCancelled() {
+        checkCancelled();
     }
-
-    /**
-     * Returns the current computation mode.
-     * 
-     * @return the current compute mode
-     */
-    public static ComputeMode getComputeMode() {
-        return MathContext.getCurrent().getComputeMode();
-    }
-
-    // ================= FLOATING-POINT PRECISION =================
-
-    /**
-     * Sets the library to use exact arithmetic (BigDecimal) where applicable.
-     */
-    public static void setExactPrecision() {
-        MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.EXACT));
-    }
-
-    /**
-     * Sets the library to use standard floating-point arithmetic (double).
-     */
-    public static void setStandardPrecision() {
-        MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.NORMAL));
-        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.DOUBLE);
-    }
-
-    /**
-     * Sets the library to use fast floating-point arithmetic (float).
-     */
-    public static void setFastPrecision() {
-        MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.FAST));
-        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.FLOAT);
-    }
-
-    /**
-     * Sets 32-bit float precision for GPU/numerical operations.
-     * <p>
-     * Faster on most GPUs but lower precision (~7 decimal digits).
-     * </p>
-     */
-    public static void setFloatPrecision() {
-        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.FLOAT);
-    }
-
-    /**
-     * Sets 64-bit double precision for GPU/numerical operations.
-     * <p>
-     * Higher precision (~15 decimal digits) but slower on many GPUs.
-     * </p>
-     */
-    public static void setDoublePrecision() {
-        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.DOUBLE);
-    }
-
-    /**
-     * Returns the current floating-point precision mode.
-     */
-    public static ComputeContext.FloatPrecision getFloatPrecisionMode() {
-        return ComputeContext.current().getFloatPrecision();
-    }
-
-    // ================= INTEGER PRECISION =================
-
-    /**
-     * Sets 32-bit int precision for GPU/numerical integer operations.
-     * <p>
-     * Faster on most GPUs (especially consumer GPUs), smaller memory footprint,
-     * but limited to range Ã‚Â±2.1 billion.
-     * </p>
-     */
-    public static void setIntPrecision() {
-        ComputeContext.current().setIntPrecision(ComputeContext.IntPrecision.INT);
-    }
-
-    /**
-     * Sets 64-bit long precision for GPU/numerical integer operations.
-     * <p>
-     * Larger range (Ã‚Â±9.2 Ãƒâ€” 10^18) but slower on some GPUs,
-     * as many consumer GPUs have weak int64 support.
-     * </p>
-     */
-    public static void setLongPrecision() {
-        ComputeContext.current().setIntPrecision(ComputeContext.IntPrecision.LONG);
-    }
-
-    /**
-     * Returns the current integer precision mode.
-     */
-    public static ComputeContext.IntPrecision getIntPrecisionMode() {
-        return ComputeContext.current().getIntPrecision();
-    }
-
-    // ================= MATH CONTEXT =================
-
-    /**
-     * Sets the default MathContext.
-     */
-    public static void setMathContext(java.math.MathContext context) {
-        INSTANCE_MATH_CONTEXT = context;
-    }
-
-    /**
-     * Gets the current MathContext.
-     */
-    public static java.math.MathContext getMathContext() {
-        return INSTANCE_MATH_CONTEXT;
-    }
-
-    // ================= CONVENIENCE CONFIGURATIONS =================
 
     /**
      * Configures the library for maximum performance.
-     * <p>
-     * Sets ComputeMode to AUTO (GPU if available), float precision to FLOAT,
-     * and integer precision to INT.
-     * </p>
      */
     public static void configureForPerformance() {
-        setComputeMode(ComputeMode.AUTO);
-        setFloatPrecision();
-        setIntPrecision();
+        getNumericalConfiguration().applyComputeMode(ComputeMode.AUTO);
     }
 
     /**
      * Configures the library for maximum precision.
-     * <p>
-     * Sets ComputeMode to CPU (usually required for arbitrary precision),
-     * precision to EXACT, and integer precision to LONG.
-     * </p>
      */
     public static void configureForPrecision() {
-        setComputeMode(ComputeMode.CPU);
-        setExactPrecision();
-        setDoublePrecision();
-        setLongPrecision();
+        org.episteme.core.mathematics.context.NumericalConfiguration config = getNumericalConfiguration();
+        config.applyComputeMode(ComputeMode.CPU);
+        config.setRealPrecision(org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT);
     }
 
     /**
-     * Configures the library for balanced performance/precision.
-     * <p>
-     * Uses GPU if available with double precision for floats and long for integers.
-     * </p>
-     */
-    public static void configureBalanced() {
-        setComputeMode(ComputeMode.AUTO);
-        setDoublePrecision();
-        setLongPrecision();
-    }
-
-    /**
-     * Checks if GPU acceleration is available on the current system.
-     * 
-     * @return true if GPU is available, false otherwise
+     * Returns true if a GPU is likely available.
      */
     public static boolean isGpuAvailable() {
-        return isCudaAvailable() || isOpenCLAvailable();
+        return org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().isGpuAvailable();
     }
 
     /**
-     * Checks if CUDA is available.
-     */
-    public static boolean isCudaAvailable() {
-        return org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
-                .anyMatch(p -> p.getId().toLowerCase().contains("cuda") && p.isAvailable());
-    }
-
-    /**
-     * Checks if OpenCL is available.
-     */
-    public static boolean isOpenCLAvailable() {
-        return org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
-                .anyMatch(p -> p.getId().toLowerCase().contains("opencl") && p.isAvailable());
-    }
-
-    /**
-     * Checks if ND4J is available in the classpath.
+     * Checks if ND4J is available in the classpath or as a backend.
      */
     public static boolean isND4JAvailable() {
+        if (isBackendAvailable("linear-algebra", "nd4j") || isBackendAvailable("tensor", "nd4j")) return true;
         try {
             Class.forName("org.nd4j.linalg.factory.Nd4j");
             return true;
@@ -422,9 +243,10 @@ public final class Episteme {
     }
 
     /**
-     * Checks if Apache Spark is available in the classpath.
+     * Checks if Apache Spark is available in the classpath or as a backend.
      */
     public static boolean isSparkAvailable() {
+        if (isBackendAvailable("distributed", "spark")) return true;
         try {
             Class.forName("org.apache.spark.api.java.JavaSparkContext");
             return true;
@@ -444,14 +266,13 @@ public final class Episteme {
     }
 
     /**
-     * Returns the global compute context for advanced configuration.
-     * <p>
-     * Use this to register custom providers, check available backends, etc.
-     * </p>
+     * Returns the numerical configuration for the current thread.
      */
-    public static ComputeContext getComputeContext() {
-        return ComputeContext.current();
+    public static org.episteme.core.mathematics.context.NumericalConfiguration getNumericalConfiguration() {
+        // Need to expose STATE and config in MathContext
+        return MathContext.getNumericalConfiguration();
     }
+
 
     /**
      * Returns a report of the current configuration and capabilities.
@@ -504,17 +325,24 @@ public final class Episteme {
         
         // 4. BACKENDS (Detailed)
         sb.append("\n[REGISTERED BACKENDS]\n");
-        appendBackends(sb, "Math", org.episteme.core.technical.backend.BackendDiscovery.TYPE_MATH, getMathBackendId());
-        appendBackends(sb, "Linear Algebra", "linear_algebra", getLinearAlgebraProviderId());
-        appendBackends(sb, "Tensors", org.episteme.core.technical.backend.BackendDiscovery.TYPE_TENSOR, getTensorBackendId());
-        // appendBackends(sb, "Molecular", org.episteme.core.technical.backend.BackendDiscovery.TYPE_MOLECULAR, getMolecularBackendId());
-        appendBackends(sb, "Quantum", org.episteme.core.technical.backend.BackendDiscovery.TYPE_QUANTUM, getQuantumBackendId());
-        appendBackends(sb, "Map (GIS)", org.episteme.core.technical.backend.BackendDiscovery.TYPE_MAP, getMapBackendId());
-        appendBackends(sb, "Graph", org.episteme.core.technical.backend.BackendDiscovery.TYPE_GRAPH, getGraphBackendId());
+        // Use reflection or hardcoded list of types from BackendDiscovery to be dynamic
+        String[] types = {
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_MATH,
+            "linear-algebra",
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_TENSOR,
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_MOLECULAR,
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_PLOTTING,
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_QUANTUM,
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_MAP,
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_GRAPH,
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_AUDIO,
+            org.episteme.core.technical.backend.BackendDiscovery.TYPE_DISTRIBUTED
+        };
         
-        // Plotting is special (Enum)
-        sb.append("  Plotting (Current: 2D=").append(getPlottingBackend2D()).append(" / 3D=").append(getPlottingBackend3D()).append(")\n");
-        appendBackends(sb, "Plotting Providers", org.episteme.core.technical.backend.BackendDiscovery.TYPE_PLOTTING, null);
+        for (String type : types) {
+            String label = type.substring(0, 1).toUpperCase() + type.substring(1).replace("-", " ");
+            appendBackends(sb, label, type, getBackendId(type));
+        }
 
         // 5. LIBRARIES (Found in Classpath)
         sb.append("\n[LIBRARIES DETECTION]\n");
@@ -556,138 +384,135 @@ public final class Episteme {
     }
 
     /**
-     * Main entry point for CLI usage and configuration verification.
-     * 
-     * @param args command line arguments
+     * Returns the current computation mode.
      */
-    // ================= PLOTTING BACKEND =================
+    public static ComputeMode getComputeMode() {
+        return getNumericalConfiguration().getComputeMode();
+    }
 
     /**
-     * Gets the current 2D plotting backend.
+     * Sets the computation mode.
      */
+    public static void setComputeMode(ComputeMode mode) {
+        getNumericalConfiguration().applyComputeMode(mode);
+    }
+
+    /**
+     * Sets 32-bit float precision.
+     */
+    public static void setFloatPrecision() {
+        getNumericalConfiguration().setFloatPrecision(org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision.FLOAT);
+    }
+
+    /**
+     * Sets 64-bit double precision.
+     */
+    public static void setDoublePrecision() {
+        getNumericalConfiguration().setFloatPrecision(org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision.DOUBLE);
+    }
+
+    /**
+     * Returns the float precision mode.
+     */
+    public static org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision getFloatPrecisionMode() {
+        return getNumericalConfiguration().getFloatPrecision();
+    }
+
+    /**
+     * Sets 32-bit integer precision.
+     */
+    public static void setIntPrecision() {
+        getNumericalConfiguration().setIntPrecision(org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision.INT);
+    }
+
+    /**
+     * Sets 64-bit long precision.
+     */
+    public static void setLongPrecision() {
+        getNumericalConfiguration().setIntPrecision(org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision.LONG);
+    }
+
+    /**
+     * Returns the integer precision mode.
+     */
+    public static org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision getIntPrecisionMode() {
+        return getNumericalConfiguration().getIntPrecision();
+    }
+
+    /**
+     * Sets the default MathContext.
+     */
+    public static void setMathContext(java.math.MathContext context) {
+        getNumericalConfiguration().setMathContext(context);
+    }
+
+    /**
+     * Gets the current MathContext.
+     */
+    public static java.math.MathContext getMathContext() {
+        return getNumericalConfiguration().getMathContext();
+    }
+
+    /**
+     * Returns the generic current backend for a type.
+     */
+    public static String getBackendId(String type) {
+        return org.episteme.core.io.UserPreferences.getInstance().getPreferredBackend(type);
+    }
+
+    /**
+     * Sets the backend for the specified type.
+     */
+    public static void setBackendId(String type, String id) {
+        org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend(type, id);
+    }
+
+    public static String getMathBackendId() {
+        return getBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MATH);
+    }
+
+    public static void setMathBackendId(String id) {
+        setBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MATH, id);
+    }
+
+    public static String getTensorBackendId() {
+        return getBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_TENSOR);
+    }
+
+    public static void setTensorBackendId(String id) {
+        setBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_TENSOR, id);
+    }
+
+    public static String getMapBackendId() {
+        return getBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MAP);
+    }
+
+    public static void setMapBackendId(String id) {
+        setBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MAP, id);
+    }
+
     public static org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend2D() {
         return org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().get2D();
     }
 
-    /**
-     * Sets the current 2D plotting backend.
-     */
     public static void setPlottingBackend2D(org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
-        org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set2D(backend.getId());
+        org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set2D(backend != null ? backend.getId() : "auto");
     }
 
-    /**
-     * Gets the current 3D plotting backend.
-     */
     public static org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend3D() {
         return org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().get3D();
     }
 
-    /**
-     * Sets the current 3D plotting backend.
-     */
     public static void setPlottingBackend3D(org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
-        org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set3D(backend.getId());
-    }
-    
-    // ================= QUANTUM BACKEND =================
-    
-    /**
-     * Gets the ID of the current Quantum Backend.
-     */
-    public static String getQuantumBackendId() {
-        return org.episteme.core.io.UserPreferences.getInstance().getPreferredBackend("quantum");
+        org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set3D(backend != null ? backend.getId() : "auto");
     }
 
     /**
-     * Sets the Quantum Backend by ID.
+     * Checks if a backend is available by type or ID part.
      */
-    public static void setQuantumBackendId(String id) {
-        org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend("quantum", id);
-    }
-
-    // ================= LINEAR ALGEBRA BACKEND =================
-
-    /**
-     * Gets the ID of the current Linear Algebra Provider.
-     */
-    public static String getLinearAlgebraProviderId() {
-        String val = org.episteme.core.io.UserPreferences.getInstance().get("linear.algebra.backend");
-        return (val != null) ? val : "cpu-dense";
-    }
-
-    /**
-     * Sets the Linear Algebra Provider by ID.
-     */
-    public static void setLinearAlgebraProviderId(String id) {
-        org.episteme.core.io.UserPreferences.getInstance().set("linear.algebra.backend", id);
-        org.episteme.core.io.UserPreferences.getInstance().save(); // Force save as this might be critical
-    }
-
-    // ================= MATH BACKEND =================
-
-    public static String getMathBackendId() {
-        return org.episteme.core.io.UserPreferences.getInstance().getPreferredBackend("math");
-    }
-
-    public static void setMathBackendId(String id) {
-        org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend("math", id);
-    }
-
-    // ================= TENSOR BACKEND =================
-
-    public static String getTensorBackendId() {
-        return org.episteme.core.io.UserPreferences.getInstance().getPreferredBackend("tensor");
-    }
-
-    public static void setTensorBackendId(String id) {
-        org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend("tensor", id);
-    }
-
-    // ================= MOLECULAR BACKEND =================
-    // Module 'episteme-natural' not available in this context
-    /*
-    public static String getMolecularBackendId() {
-        return org.episteme.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getPreferredId();
-    }
-
-    public static void setMolecularBackendId(String id) {
-        org.episteme.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().setPreferredId(id);
-        org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend("molecular", id);
-    }
-    */
-
-    // ================= MAP BACKEND =================
-
-    /**
-     * Gets the ID of the current Map Backend.
-     */
-    public static String getMapBackendId() {
-        return org.episteme.core.io.UserPreferences.getInstance().getPreferredBackend("map");
-    }
-
-    /**
-     * Sets the Map Backend by ID.
-     */
-    public static void setMapBackendId(String id) {
-        org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend("map", id);
-    }
-
-    // ================= GRAPH BACKEND =================
-
-    /**
-     * Gets the ID of the current Graph Backend.
-     */
-    public static String getGraphBackendId() {
-        return org.episteme.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().getPreferredId();
-    }
-
-    /**
-     * Sets the Graph Backend by ID.
-     */
-    public static void setGraphBackendId(String id) {
-        org.episteme.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().setPreferredId(id);
-        org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend("graph", id);
+    public static boolean isBackendAvailable(String type, String idPart) {
+        return org.episteme.core.technical.backend.BackendDiscovery.getInstance().getAvailableProvidersByType(type).stream()
+                .anyMatch(p -> p.getId().toLowerCase().contains(idPart.toLowerCase()));
     }
 
     /**
@@ -696,6 +521,14 @@ public final class Episteme {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        // Parse CLI arguments
+        for (String arg : args) {
+            if ("-report".equalsIgnoreCase(arg)) {
+                System.out.println(getConfigurationReport());
+                System.exit(0);
+            }
+        }
+
         // Parse system properties
         String modeProp = System.getProperty("org.episteme.core.compute.mode");
         if (modeProp != null) {
@@ -725,12 +558,10 @@ public final class Episteme {
         try {
             System.out.println(org.episteme.core.ui.i18n.I18N.getInstance().get("cli.launching", "Launching Episteme Master Control..."));
             javafx.application.Application.launch(org.episteme.core.ui.EpistemeMasterControl.class, args);
-            return;
         } catch (Throwable e) {
-            System.out.println(org.episteme.core.ui.i18n.I18N.getInstance().get("cli.launch_error", "Episteme Master Control not available or JavaFX missing. Showing CLI report.") + " " + e.getMessage());
+            System.out.println(org.episteme.core.ui.i18n.I18N.getInstance().get("cli.launch_error", "Episteme Master Control not available or JavaFX missing. Showing CLI report.") + " " + (e.getMessage() != null ? e.getMessage() : ""));
+            System.out.println(getConfigurationReport());
         }
-
-        System.out.println(getConfigurationReport());
     }
 
     // --- Report Helper Methods ---

@@ -55,7 +55,7 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
     /**
      * Creates a matrix from a 2D array.
      */
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings("unchecked")
     static <E> Matrix<E> of(E[][] data, Ring<E> ring) {
         int rows = data.length;
         if (rows == 0) return new GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(0, 0, ring.zero()), null, ring);

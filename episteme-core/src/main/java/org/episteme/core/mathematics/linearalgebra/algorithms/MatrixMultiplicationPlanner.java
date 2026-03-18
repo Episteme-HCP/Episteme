@@ -10,7 +10,8 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.distributed.DistributedCompute;
+import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class MatrixMultiplicationPlanner {
      * Selects and executes the best distributed multiplication algorithm.
      */
     public static TiledMatrix multiply(TiledMatrix A, TiledMatrix B) {
-        DistributedContext ctx = ComputeContext.current().getDistributedContext();
+        DistributedContext ctx = DistributedCompute.getContext();
         int p = ctx.getParallelism();
         Algorithm algo = selectAlgorithm(A, B, p);
         

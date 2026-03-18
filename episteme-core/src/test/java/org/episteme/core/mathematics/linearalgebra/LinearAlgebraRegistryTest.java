@@ -6,7 +6,7 @@
 package org.episteme.core.mathematics.linearalgebra;
 
 import org.junit.jupiter.api.Test;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.mathematics.context.MathContext;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -20,8 +20,8 @@ public class LinearAlgebraRegistryTest {
 
     @Test
     public void testClassPresence() {
-        // Ensure class is reachable (using ComputeContext instead of deprecated LinearAlgebraRegistry)
-        assertNotNull(ComputeContext.class);
+        // Ensure class is reachable (using MathContext)
+        assertNotNull(MathContext.class);
     }
 }
 

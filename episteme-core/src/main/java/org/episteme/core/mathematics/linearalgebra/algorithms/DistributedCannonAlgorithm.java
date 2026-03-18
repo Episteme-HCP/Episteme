@@ -39,7 +39,7 @@ public class DistributedCannonAlgorithm {
         int n = B.getNumTileCols();
         int k = A.getNumTileCols();
 
-        DistributedContext ctx = org.episteme.core.ComputeContext.current().getDistributedContext();
+        DistributedContext ctx = org.episteme.core.distributed.DistributedCompute.getContext();
         int p = ctx.getParallelism();
         int sqrtP = (int) Math.sqrt(p);
 

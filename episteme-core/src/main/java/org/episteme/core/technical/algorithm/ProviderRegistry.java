@@ -64,19 +64,19 @@ public class ProviderRegistry {
             }
             
             // If best is not compatible, iterate for a compatible one
-             List<?> candidates = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
-             for (Object obj : candidates) {
-                 LinearAlgebraProvider<?> p = (LinearAlgebraProvider<?>) obj;
-                 LinearAlgebraProvider<E> typedProvider = (LinearAlgebraProvider<E>) p;
-                 if (typedProvider.isCompatible(ring)) {
-                     return typedProvider;
-                 }
-             }
+            List<?> candidates = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
+            for (Object obj : candidates) {
+                LinearAlgebraProvider<?> p = (LinearAlgebraProvider<?>) obj;
+                LinearAlgebraProvider<E> typedProvider = (LinearAlgebraProvider<E>) p;
+                if (typedProvider.isCompatible(ring)) {
+                    return typedProvider;
+                }
+            }
         } catch (Exception e) {
             logger.warn("Failed to select best LinearAlgebraProvider: {}", e.getMessage());
         }
 
-        // Fallback: Pick whatever is available via AlgorithmManager instead of hardcoded new instance
+        // Fallback lookup: Pick whatever is available via AlgorithmManager.
         try {
             return AlgorithmManager.getProvider(LinearAlgebraProvider.class);
         } catch (NoSuchElementException e) {
@@ -84,6 +84,14 @@ public class ProviderRegistry {
             Field<E> field = (Field<E>) ring;
             return new CPUDenseLinearAlgebraProvider<E>(field);
         }
+    }
+
+    public <E> LinearAlgebraProvider<E> getLinearAlgebraProvider(Ring<E> ring) {
+        return selectLinearAlgebraProvider(new OperationContext.Builder().build(), ring);
+    }
+
+    public <E> LinearAlgebraProvider<E> getDenseLinearAlgebraProvider(Ring<E> ring) {
+        return getLinearAlgebraProvider(ring);
     }
 
     /**
@@ -126,7 +134,7 @@ public class ProviderRegistry {
 
         // Specialized path for Real
         if (ring.getClass().getName().contains("Reals") && !MathContext.getCurrent().isHighPrecision()) {
-            @SuppressWarnings({"unchecked", "preview", "restricted"})
+            @SuppressWarnings({"unchecked", "restricted"})
             MatrixStorage<E> specialized = (MatrixStorage<E>) (MatrixStorage<?>) new org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage(rows, cols);
             return specialized;
         }

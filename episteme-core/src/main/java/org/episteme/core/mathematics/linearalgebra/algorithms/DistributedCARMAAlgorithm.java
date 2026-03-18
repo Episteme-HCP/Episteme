@@ -9,7 +9,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.distributed.DistributedCompute;
 
 import java.util.concurrent.Future;
 
@@ -38,7 +38,7 @@ public class DistributedCARMAAlgorithm {
             throw new IllegalArgumentException("Matrix dimensions incompatible");
         }
 
-        DistributedContext ctx = ComputeContext.current().getDistributedContext();
+        DistributedContext ctx = DistributedCompute.getContext();
         int p = ctx.getParallelism();
 
         TiledMatrix C = new TiledMatrix(A.rows(), B.cols(), A.getTileSize());

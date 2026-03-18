@@ -9,7 +9,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.distributed.DistributedCompute;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import java.util.concurrent.Future;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class DistributedSUMMAAlgorithm {
         int n = B.getNumTileCols();
         int k = A.getNumTileCols();
 
-        DistributedContext ctx = ComputeContext.current().getDistributedContext();
+        DistributedContext ctx = DistributedCompute.getContext();
         TiledMatrix C = new TiledMatrix(A, A.getTileSize(), A.getTileSize());
 
         for (int step = 0; step < k; step++) {

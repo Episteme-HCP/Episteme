@@ -101,16 +101,16 @@ public class SystemIntegrationTest {
      */
     @Test
     public void testComputeContextConfiguration() {
-        // Access the current compute context
-        org.episteme.core.ComputeContext ctx = org.episteme.core.ComputeContext.current();
+        // Access the current math context
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
         
-        assertNotNull(ctx, "ComputeContext should not be null");
+        assertNotNull(ctx, "MathContext should not be null");
         
         // Verify distributed context is available
-        assertNotNull(ctx.getDistributedContext(), "DistributedContext should be initialized");
+        assertNotNull(org.episteme.core.distributed.DistributedCompute.getContext(), "DistributedContext should be initialized");
         
         // Verify parallelism is available
-        assertTrue(ctx.getDistributedContext().getParallelism() > 0, 
+        assertTrue(org.episteme.core.distributed.DistributedCompute.getParallelism() > 0, 
                 "Should have at least one parallel execution unit");
     }
 }

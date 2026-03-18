@@ -72,11 +72,11 @@ public class MolecularGraph implements Graph<Atom> {
     public Map<Atom, List<Bond>> getConnections() {
         Map<Atom, List<Bond>> connections = new HashMap<>();
         for (Atom a : atoms) {
-            org.episteme.core.ComputeContext.checkCurrentCancelled();
+            org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             connections.put(a, new ArrayList<>());
         }
         for (Bond b : bonds) {
-            org.episteme.core.ComputeContext.checkCurrentCancelled();
+            org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             connections.get(b.source).add(b);
             connections.get(b.target).add(b);
         }
@@ -96,7 +96,7 @@ public class MolecularGraph implements Graph<Atom> {
     public String getFormula() {
         Map<String, Integer> counts = new HashMap<>();
         for (Atom a : atoms) {
-            org.episteme.core.ComputeContext.checkCurrentCancelled();
+            org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             counts.put(a.getElement().getSymbol(), counts.getOrDefault(a.getElement().getSymbol(), 0) + 1);
         }
         // Improve ordering: C first, H second, then alphabetical

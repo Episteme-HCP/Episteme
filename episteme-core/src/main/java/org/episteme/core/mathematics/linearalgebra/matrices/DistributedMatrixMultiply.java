@@ -7,7 +7,7 @@ package org.episteme.core.mathematics.linearalgebra.matrices;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.ComputeContext;
+import org.episteme.core.distributed.DistributedCompute;
 
 /**
  * Utility for performing distributed matrix multiplication using tiles.
@@ -32,7 +32,7 @@ public class DistributedMatrixMultiply {
         int p = A.getNumTileCols();
 
         // Get distributed context for parallel execution
-        ComputeContext.current().getDistributedContext();
+        DistributedCompute.getContext();
         
         // Result tiles
         @SuppressWarnings("unchecked")
