@@ -16,7 +16,6 @@
     <description>RPC Server for Distributed Scientific Computing (Coordinator Node)</description>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <dependencyManagement>
