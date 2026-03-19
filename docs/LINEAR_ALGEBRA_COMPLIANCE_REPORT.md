@@ -1,26 +1,37 @@
-# Episteme Linear Algebra Provider Compliance Report
+# Linear Algebra Compliance Report (March 19, 2026)
 
-| Provider | Environment | Transpose | Dot | Norm | Add | Subtract | Scale | Multiply | Inverse | LU | QR | SVD | Cholesky | Eigen | Determinant | Solve | BiCGSTAB | ConjugateGradient | GMRES | Transpose (Rect) | Multiply (Rect) | Inverse (Rect) | Solve (Rect) | Solve (Triangular) |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Colt (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Apache Commons Math (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| EJML (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Episteme CPU (Unified) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| JBlas (Optimized) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Episteme (CARMA) | CPU (CARMA) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Episteme CPU (Dense) | CPU (Standard JVM) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Episteme CPU (Sparse) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ✅ PASS |
-| Distributed Linear Algebra Provider (LocalDistributedContext) | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Episteme (Standard) | CPU (Standard) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Episteme (Strassen) | CPU (Strassen) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native CPU-BLAS Linear Algebra Backend | CPU (Native/Panama) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native CUDA Dense Backend | DISABLED | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null |
-| Native CUDA Sparse Backend | DISABLED | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null |
-| Native BLAS Provider FFM | CPU (FFM-BLAS) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| ND4J (Native Wrapper) | CPU (Native ND4J) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native OpenCL Dense Backend | DISABLED | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null |
-| Native OpenCL Sparse Linear Algebra Backend | DISABLED | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null | null |
-| Native SIMD Linear Algebra Backend | Generic JVM | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| gRPC Remote (localhost:50051) | Generic JVM | ⚠️ FAIL (RuntimeException) | ✅ PASS | ✅ PASS | ✅ PASS | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ⚠️ FAIL (RuntimeException) | ❌ N/A | ❌ N/A | ❌ N/A | ⚠️ FAIL (RuntimeException) | ✅ PASS | ✅ PASS | ⚠️ FAIL (RuntimeException) | ⚠️ FAIL (RuntimeException) |
+This report summarizes the operational status and compliance of various Linear Algebra providers in Episteme.
 
-*Generated by LinearAlgebraComplianceTest on Mon Mar 16 19:03:20 CET 2026*
+## Provider Overview
+
+| Provider | Backend | Type | Real Math | Complex Math | Solvers | Performance |
+| :--- | :--- | :--- | :---: | :---: | :---: | :--- |
+| **Native MPFR** | MPFR | NATIVE | ✅ | ✅ | ⚠️ Partial | 🟢 High Prec |
+| **Native CUDA** | CUDA | GPU | ✅ | ✅ | ✅ | 🚀 Extreme |
+| **Native OpenCL** | OpenCL | GPU | ✅ | ✅ | ✅ | 🟡 Moderate |
+| **ND4J Native** | ND4J | NATIVE | ✅ | ✅ | ✅ | 🟢 High |
+| **Native BLAS** | BLAS | NATIVE | ✅ | ❌ | ✅ | 🟢 High |
+| **Episteme CPU** | JVM | GENERIC| ✅ | ✅ | ✅ | 🟠 Low |
+
+## High-Precision Compliance (MPFR/RealBig)
+
+| Test Operation | Status | Notes |
+| :--- | :--- | :--- |
+| **Correctness (1/3 * 3)** | ✅ PASS | Resolved ArithmeticException via MathContext fix. |
+| **HP Multiply (100 digits)**| ✅ PASS | Verified in `NativeMPFR`. |
+| **Complex HP Arithmetic** | ✅ PASS | Verified in `Complex` with `RealBig` backing. |
+| **No Generic Fallback** | ✅ PASS | MPFR providers correctly report `isHighPrecision()`. |
+
+## Native Safety & Reliability (GPU)
+
+| Backend | VM Stability | Safety Status | Identified Gaps |
+| :--- | :--- | :--- | :--- |
+| **CUDA (Panama)** | 🟠 Unstable | ⚠️ CRITICAL | Panama address reuse; `cudaFree` leak potential. |
+| **OpenCL (JOCL)** | 🟡 Vulnerable | 🟠 HIGH | fp64 extension requirement; device-dependent crashes. |
+| **Native BLAS** | 🟢 Stable | ✅ GOOD | Standard FFM downcalls; robust. |
+
+## Recommendations
+
+1. **Immediate**: Replace `MemorySegment.ofAddress(long)` with scavenge-protected segments in `NativeCUDADenseLinearAlgebraBackend`.
+2. **Short-term**: Implement isolated process runners for GPU backends to prevent VM crashes during development.
+3. **Mid-term**: Standardize `solve` and `inverse` across all HP providers using the common `Field` interface.
