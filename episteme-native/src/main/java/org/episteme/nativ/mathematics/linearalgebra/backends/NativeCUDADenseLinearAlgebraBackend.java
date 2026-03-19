@@ -2266,10 +2266,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     public void copyToGPU(long handle, java.nio.DoubleBuffer buffer, long count) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment host = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, buffer.array());
-            MemorySegment device = MemorySegment.ofAddress(handle).reinterpret(count * 8);
+            // Use scavenge-protected segment instead of raw reinterpretation
+            MemorySegment device = NativeSafe.scavenge(MemorySegment.ofAddress(handle), count * 8, arena, "cuda_device_query").segment();
             NativeSafe.invoke(CUDA_MEMCPY, device, host, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
         } catch (Throwable t) {
             logger.error("Failed to copy to GPU: {}", t.getMessage());
+            throw new RuntimeException("CUDA Copy To GPU Failed", t);
         }
     }
 
@@ -2277,11 +2279,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     public void copyFromGPU(long handle, java.nio.DoubleBuffer buffer, long count) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, count);
-            MemorySegment device = MemorySegment.ofAddress(handle).reinterpret(count * 8);
+            MemorySegment device = MemorySegment.ofAddress(handle).reinterpret(count * 8, arena, null);
             NativeSafe.invoke(CUDA_MEMCPY, host, device, count * 8, CUDA_MEMCPY_DEVICE_TO_HOST);
             MemorySegment.copy(host, ValueLayout.JAVA_DOUBLE, 0, buffer.array(), 0, (int) count);
         } catch (Throwable t) {
             logger.error("Failed to copy from GPU: {}", t.getMessage());
+            throw new RuntimeException("CUDA Copy From GPU Failed", t);
         }
     }
 
@@ -2299,10 +2302,12 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
     @Override
     public void freeGPUMemory(long handle) {
+        if (handle == 0) return;
         try {
+            // Reinterpret with size 0 to satisfy type, but the address is what matters for free
             NativeSafe.invoke(CUDA_FREE, MemorySegment.ofAddress(handle));
         } catch (Throwable t) {
-            logger.error("Failed to free GPU memory: {}", t.getMessage());
+            logger.error("Failed to free GPU memory at 0x{}: {}", Long.toHexString(handle), t.getMessage());
         }
     }
 
@@ -2394,7 +2399,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             }
             try {
                 MemorySegment seg = (MemorySegment) CUBLAS_STATUS_GET_STRING.invokeExact(result);
-                String msg = seg.reinterpret(1024).getString(0);
+                // Use scavenge-protected segment for error string
+        String msg = NativeSafe.scavenge(seg, 1024, arena, origin).segment().getString(0);
                 logger.error("CUBLAS Error {}: {}", result, msg);
                 throw new RuntimeException("CUBLAS Error " + result + ": " + msg);
             } catch (Throwable t) {

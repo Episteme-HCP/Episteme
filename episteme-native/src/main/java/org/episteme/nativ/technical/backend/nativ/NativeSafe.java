@@ -29,7 +29,15 @@ public class NativeSafe {
             throw new IllegalStateException("Attempted to invoke a null native handle. Library might not be loaded.");
         }
         
-        // Debug logging for sensitive calls if needed
+        // Pre-call validation: Check for NULL segments that shouldn't be NULL
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] instanceof MemorySegment seg) {
+                if (seg.equals(MemorySegment.NULL)) {
+                    logger.warn("Native Invoke: Arg[{}] is NULL MemorySegment. This might be intentional (e.g. workspace size query) or a bug.", i);
+                }
+            }
+        }
+
         if (logger.isTraceEnabled()) {
             logger.trace("Native Invoke: {} with {} args", handle, args.length);
         }
@@ -37,16 +45,41 @@ public class NativeSafe {
         try {
             return handle.invokeWithArguments(args);
         } catch (Throwable t) {
-            logger.error("CRITICAL: Native call failed! Handle: {}. Trace might indicate memory corruption or invalid address.", handle);
+            logger.error("CRITICAL: Native call failed! Handle: {}", handle);
             for (int i = 0; i < args.length; i++) {
                 if (args[i] instanceof MemorySegment seg) {
-                    logger.error("  Arg[{}]: MemorySegment(address=0x{}, size={})", i, Long.toHexString(seg.address()), seg.byteSize());
+                    try {
+                        logger.error("  Arg[{}]: MemorySegment(address=0x{}, size={})", i, Long.toHexString(seg.address()), seg.byteSize());
+                    } catch (UnsupportedOperationException e) {
+                        logger.error("  Arg[{}]: MemorySegment(address=UNAVAILABLE, size={})", i, seg.byteSize());
+                    }
                 } else {
                     logger.error("  Arg[{}]: {} ({})", i, args[i], args[i] != null ? args[i].getClass().getSimpleName() : "null");
                 }
             }
             if (t instanceof RuntimeException) throw (RuntimeException) t;
             throw new RuntimeException("Native boundary protection: " + t.getMessage(), t);
+        }
+    /**
+     * Safely wraps a raw memory address with origin tracking and lifecycle protection.
+     * Use this when a native function returns a pointer that needs to be accessed from Java.
+     */
+    public static ScavengeProtectedSegment scavenge(MemorySegment raw, long size, Arena arena, String origin) {
+        if (raw == null || raw.equals(MemorySegment.NULL)) {
+            logger.warn("NativeSafe: Attempted to scavenge a NULL segment from {}", origin);
+            return new ScavengeProtectedSegment(MemorySegment.NULL, origin, 0);
+        }
+        try {
+            MemorySegment safe = raw.reinterpret(size, arena, segment -> {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("NativeSafe: Scavenged segment from {} (address=0x{}) has been cleaned up.", 
+                        origin, Long.toHexString(segment.address()));
+                }
+            });
+            return new ScavengeProtectedSegment(safe, origin, size);
+        } catch (Throwable t) {
+            logger.error("NativeSafe: Failed to reinterpret segment from {}: {}", origin, t.getMessage());
+            throw new RuntimeException("Scavenging failed for " + origin, t);
         }
     }
 }

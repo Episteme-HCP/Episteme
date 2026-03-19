@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <name>Episteme Benchmarking Suite</name>
@@ -286,7 +285,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>25</release>
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>--add-modules</arg>

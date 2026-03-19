@@ -623,7 +623,17 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         byte[] buffer = new byte[(int)size[0]];
         clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, buffer.length, Pointer.to(buffer), null);
         String extensions = new String(buffer);
-        return extensions.contains("cl_khr_fp64");
+        
+        boolean hasKhr = extensions.contains("cl_khr_fp64");
+        boolean hasAmd = extensions.contains("cl_amd_fp64");
+        
+        if (hasKhr || hasAmd) {
+            logger.info("OpenCL: Device supports double precision ({})", hasKhr ? "cl_khr_fp64" : "cl_amd_fp64");
+            return true;
+        }
+        
+        logger.warn("OpenCL: Device does NOT support double precision extensions.");
+        return false;
     }
 
 @Override public String getNativeLibraryName() { return "opencl"; }

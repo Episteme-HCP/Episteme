@@ -48,6 +48,11 @@ package org.episteme.core.mathematics.context;
  * * */
 public final class MathContext {
 
+    private static final String PROP_EXACT_PRECISION = "org.episteme.core.math.precision.exact";
+    private static final int DEFAULT_EXACT_PRECISION = Integer.parseInt(
+            System.getProperty(PROP_EXACT_PRECISION, 
+            org.episteme.core.Episteme.getProperty(PROP_EXACT_PRECISION, "100")));
+
     /**
      *
  * @author Silvere Martin-Michiellot
@@ -188,7 +193,7 @@ public final class MathContext {
      */
     public static MathContext exact() {
         return new MathContext(RealPrecision.EXACT, OverflowMode.SAFE, ComputeMode.AUTO,
-                new java.math.MathContext(100, java.math.RoundingMode.HALF_UP));
+                new java.math.MathContext(DEFAULT_EXACT_PRECISION, java.math.RoundingMode.HALF_UP));
     }
 
     /**
@@ -294,6 +299,16 @@ public final class MathContext {
      */
     public MathContext withJavaMathContext(java.math.MathContext javaMathContext) {
         return new MathContext(this.realPrecision, this.overflowMode, this.computeMode, javaMathContext);
+    }
+
+    /**
+     * Returns a new context with the specified precision (EXACT mode).
+     * 
+     * @param precision the number of digits
+     * @return the new context
+     */
+    public static MathContext withPrecision(int precision) {
+        return MathContext.exact().withJavaMathContext(new java.math.MathContext(precision, java.math.RoundingMode.HALF_UP));
     }
 
     @Override

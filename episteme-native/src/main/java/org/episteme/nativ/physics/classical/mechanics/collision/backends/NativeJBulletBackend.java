@@ -139,9 +139,10 @@ public class NativeJBulletBackend implements NativeCollisionProvider, MechanicsB
     @Override
     public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
         if (n == 0) return 0;
-        java.nio.DoubleBuffer posBuf  = positions.reinterpret(n * 3 * 8).asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        java.nio.DoubleBuffer radiiBuf = radii.reinterpret(n * 8).asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        java.nio.IntBuffer    collBuf  = collisions.reinterpret(n * n * 4).asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+        // Use scavenge-protected segments for buffer access
+        java.nio.DoubleBuffer posBuf  = NativeSafe.scavenge(positions, (long) n * 3 * 8, java.lang.foreign.Arena.global(), "jbullet_positions").segment().asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        java.nio.DoubleBuffer radiiBuf = NativeSafe.scavenge(radii, (long) n * 8, java.lang.foreign.Arena.global(), "jbullet_radii").segment().asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        java.nio.IntBuffer    collBuf  = NativeSafe.scavenge(collisions, (long) n * n * 4, java.lang.foreign.Arena.global(), "jbullet_collisions").segment().asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
 
         // --- Spatial Hash O(n) collision detection ---
         // Find max radius to determine cell size

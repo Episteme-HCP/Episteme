@@ -24,6 +24,8 @@
 package org.episteme.core.mathematics.numbers.real;
 
 import java.math.BigDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Real number backed by arbitrary-precision {@link BigDecimal}.
@@ -33,7 +35,9 @@ import java.math.BigDecimal;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class RealBig extends Real {
+public @SuppressWarnings("unused")
+final class RealBig extends Real {
+    private static final Logger logger = LoggerFactory.getLogger(RealBig.class);
 
     private final BigDecimal value;
 
@@ -108,9 +112,40 @@ public final class RealBig extends Real {
         return RealBig.create(value.pow(exp));
     }
 
+    private BigDecimal computeTranscendental(String function, BigDecimal value) {
+        try {
+            TranscendentalProvider provider = org.episteme.core.technical.algorithm.AlgorithmManager.getProvider(TranscendentalProvider.class);
+            if (provider != null && provider.isAvailable()) {
+                return provider.compute(function, value, org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext());
+            } else {
+                logger.info("Transcendental provider missing or unavailable for function {}: {}", function, provider);
+            }
+        } catch (Exception e) {
+            logger.error("Transcendental computation failed: {}", e.getMessage());
+            // Fallback to double math
+        }
+        return null;
+    }
+
+    private BigDecimal computeTranscendental(String function, BigDecimal v1, BigDecimal v2) {
+        try {
+            TranscendentalProvider provider = org.episteme.core.technical.algorithm.AlgorithmManager.getProvider(TranscendentalProvider.class);
+            if (provider != null && provider.isAvailable()) {
+                return provider.compute(function, v1, v2, org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext());
+            } else {
+                logger.info("Transcendental provider missing or unavailable for function {}: {}", function, provider);
+            }
+        } catch (Exception e) {
+            logger.error("Transcendental computation failed: {}", e.getMessage());
+            // Fallback to double math
+        }
+        return null;
+    }
+
     @Override
     public Real pow(double exponent) {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("pow", value, BigDecimal.valueOf(exponent));
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.pow(value.doubleValue(), exponent));
     }
 
@@ -125,7 +160,8 @@ public final class RealBig extends Real {
                 return Real.NaN;
             }
         }
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("pow", value, exp.bigDecimalValue());
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.pow(value.doubleValue(), exp.doubleValue()));
     }
 
@@ -133,109 +169,130 @@ public final class RealBig extends Real {
 
     @Override
     public Real exp() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("exp", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.exp(value.doubleValue()));
     }
 
     @Override
     public Real log() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("log", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.log(value.doubleValue()));
     }
 
     @Override
     public Real log10() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("log10", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.log10(value.doubleValue()));
     }
 
     @Override
     public Real sin() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("sin", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.sin(value.doubleValue()));
     }
 
     @Override
     public Real cos() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("cos", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.cos(value.doubleValue()));
     }
 
     @Override
     public Real tan() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("tan", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.tan(value.doubleValue()));
     }
 
     @Override
     public Real asin() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("asin", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.asin(value.doubleValue()));
     }
 
     @Override
     public Real acos() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("acos", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.acos(value.doubleValue()));
     }
 
     @Override
     public Real atan() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("atan", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.atan(value.doubleValue()));
     }
 
     @Override
     public Real atan2(Real x) {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("atan2", value, x.bigDecimalValue());
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.atan2(value.doubleValue(), x.doubleValue()));
     }
 
     @Override
     public Real sinh() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("sinh", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.sinh(value.doubleValue()));
     }
 
     @Override
     public Real cosh() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("cosh", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.cosh(value.doubleValue()));
     }
 
     @Override
     public Real tanh() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("tanh", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.tanh(value.doubleValue()));
     }
 
     @Override
     public Real asinh() {
+        BigDecimal res = computeTranscendental("asinh", value);
+        if (res != null) return RealBig.create(res);
         double d = value.doubleValue();
         return Real.of(Math.log(d + Math.sqrt(d * d + 1.0)));
     }
 
     @Override
     public Real acosh() {
+        BigDecimal res = computeTranscendental("acosh", value);
+        if (res != null) return RealBig.create(res);
         double d = value.doubleValue();
         return Real.of(Math.log(d + Math.sqrt(d * d - 1.0)));
     }
 
     @Override
     public Real atanh() {
+        BigDecimal res = computeTranscendental("atanh", value);
+        if (res != null) return RealBig.create(res);
         double d = value.doubleValue();
         return Real.of(0.5 * Math.log((1.0 + d) / (1.0 - d)));
     }
 
     @Override
     public Real cbrt() {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("cbrt", value);
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.cbrt(value.doubleValue()));
     }
 
     @Override
     public Real hypot(Real y) {
-        // TODO: High-precision implementation
+        BigDecimal res = computeTranscendental("hypot", value, y.bigDecimalValue());
+        if (res != null) return RealBig.create(res);
         return Real.of(Math.hypot(value.doubleValue(), y.doubleValue()));
     }
 
