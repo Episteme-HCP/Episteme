@@ -366,8 +366,14 @@ public class GenericMatrix<E> implements Matrix<E> {
 
     // Getters for Provider usage
 
+    @Override
     public MatrixStorage<E> getStorage() {
         return storage;
+    }
+
+    @Override
+    public LinearAlgebraProvider<E> getProvider() {
+        return provider;
     }
 
     public Ring<E> getField() {

@@ -29,6 +29,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
@@ -2265,7 +2266,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     public void copyToGPU(long handle, java.nio.DoubleBuffer buffer, long count) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment host = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, buffer.array());
-            checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(handle), host, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+            MemorySegment device = MemorySegment.ofAddress(handle).reinterpret(count * 8);
+            NativeSafe.invoke(CUDA_MEMCPY, device, host, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
         } catch (Throwable t) {
             logger.error("Failed to copy to GPU: {}", t.getMessage());
         }
@@ -2275,7 +2277,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     public void copyFromGPU(long handle, java.nio.DoubleBuffer buffer, long count) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, count);
-            checkCuda((int) CUDA_MEMCPY.invokeExact(host, MemorySegment.ofAddress(handle), count * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+            MemorySegment device = MemorySegment.ofAddress(handle).reinterpret(count * 8);
+            NativeSafe.invoke(CUDA_MEMCPY, host, device, count * 8, CUDA_MEMCPY_DEVICE_TO_HOST);
             MemorySegment.copy(host, ValueLayout.JAVA_DOUBLE, 0, buffer.array(), 0, (int) count);
         } catch (Throwable t) {
             logger.error("Failed to copy from GPU: {}", t.getMessage());
@@ -2297,7 +2300,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     @Override
     public void freeGPUMemory(long handle) {
         try {
-            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(handle)));
+            NativeSafe.invoke(CUDA_FREE, MemorySegment.ofAddress(handle));
         } catch (Throwable t) {
             logger.error("Failed to free GPU memory: {}", t.getMessage());
         }

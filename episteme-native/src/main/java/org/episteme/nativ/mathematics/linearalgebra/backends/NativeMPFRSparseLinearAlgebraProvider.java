@@ -20,6 +20,7 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.auto.service.AutoService;
@@ -53,10 +54,10 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     private static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_LONG.withName("prec"),
+        ValueLayout.JAVA_INT.withName("prec"),
         ValueLayout.JAVA_INT.withName("sign"),
+        ValueLayout.JAVA_INT.withName("exp"),
         MemoryLayout.paddingLayout(4),
-        ValueLayout.JAVA_LONG.withName("exp"),
         ValueLayout.ADDRESS.withName("d")
     );
 
@@ -90,8 +91,12 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     }
 
     @Override
-    public boolean isAvailable() {
-        return AVAILABLE && !isExplicitlyDisabled();
+    public String getName() {
+        return "Native MPFR Sparse Linear Algebra Backend";
+    }
+
+    public java.util.Set<String> getCapabilities() {
+        return java.util.Set.of("Transpose", "Multiply");
     }
 
     @Override
@@ -102,6 +107,13 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     @Override
     public int getPriority() {
         return 120; // High priority for high-precision tasks
+    }
+
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) return true;
+        return ring.zero() instanceof Real;
     }
 
     @Override
@@ -144,9 +156,19 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     public void shutdown() {}
 
     @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        Matrix<Real> res = multiply(a, b.toMatrix());
+        java.util.List<Real> list = new java.util.ArrayList<>(res.rows());
+        for (int i = 0; i < res.rows(); i++) {
+            list.add(res.get(i, 0));
+        }
+        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(list, a.getScalarRing());
+    }
+
+    @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!(a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
-            throw new UnsupportedOperationException("Matrix A must be sparse");
+            a = toSparse(a);
         }
         
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> sa = 
@@ -177,23 +199,23 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         MemorySegment h_y = allocateVector(m, arena, prec);
 
         MemorySegment term = arena.allocate(MPFR_LAYOUT);
-        MPFR_INIT2.invoke(term, prec);
+        NativeSafe.invoke(MPFR_INIT2, term, prec);
 
         for (int i = 0; i < m; i++) {
             MemorySegment sum = getMPFR(h_y, i);
-            MPFR_SET_STR.invoke(sum, arena.allocateFrom("0"), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, 0);
 
             for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
                 int col = colIdx[idx];
                 String valStr = ((Real) vals[idx]).bigDecimalValue().toPlainString();
-                MPFR_SET_STR.invoke(term, arena.allocateFrom(valStr), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, term, arena.allocateFrom(valStr), 10, 0);
                 
-                MPFR_MUL.invoke(term, term, getMPFR(h_x, col), 0);
-                MPFR_ADD.invoke(sum, sum, term, 0);
+                NativeSafe.invoke(MPFR_MUL, term, term, getMPFR(h_x, col), 0);
+                NativeSafe.invoke(MPFR_ADD, sum, sum, term, 0);
             }
         }
 
-        MPFR_CLEAR.invoke(term);
+        NativeSafe.invoke(MPFR_CLEAR, term);
 
         return backToMatrix(h_y, m, 1, arena);
     }
@@ -227,7 +249,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     private MemorySegment allocateVector(int n, Arena arena, long prec) throws Throwable {
         MemorySegment vec = arena.allocate(MPFR_LAYOUT, n);
         for (int i = 0; i < n; i++) {
-            MPFR_INIT2.invoke(vec.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            NativeSafe.invoke(MPFR_INIT2, vec.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
         }
         return vec;
     }
@@ -237,7 +259,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         MemorySegment vec = allocateVector(n, arena, prec);
         for (int i = 0; i < n; i++) {
             String val = v.get(i, 0).bigDecimalValue().toPlainString();
-            MPFR_SET_STR.invoke(getMPFR(vec, i), arena.allocateFrom(val), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, getMPFR(vec, i), arena.allocateFrom(val), 10, 0);
         }
         return vec;
     }
@@ -250,26 +272,64 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Real> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, Real.ZERO);
         
-        MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+        MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_INT);
         for (int i = 0; i < rows * cols; i++) {
-            MemorySegment strPtr = (MemorySegment) MPFR_GET_STR.invoke(MemorySegment.NULL, expPtr, 10, 0L, getMPFR(vec, i), 0);
-            String s = strPtr.reinterpret(1024).getString(0);
-            long exp = expPtr.get(ValueLayout.JAVA_LONG, 0);
-            
-            StringBuilder sb = new StringBuilder();
-            if (s.startsWith("-")) {
-                sb.append("-0.");
-                sb.append(s.substring(1));
-            } else {
-                sb.append("0.");
-                sb.append(s);
-            }
-            sb.append("E").append(exp);
-            
-            storage.set(i / cols, i % cols, Real.of(new java.math.BigDecimal(sb.toString())));
-            MPFR_FREE_STR.invoke(strPtr);
+            storage.set(i / cols, i % cols, readMPFR(getMPFR(vec, i), expPtr, arena));
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage, this, Real.ZERO);
+    }
+
+    private Real readMPFR(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
+        MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, val, 0);
+        if (strPtr.equals(MemorySegment.NULL)) {
+             throw new RuntimeException("mpfr_get_str returned NULL");
+        }
+        String s = strPtr.reinterpret(1024).getString(0);
+        int exp = expPtr.get(ValueLayout.JAVA_INT, 0);
+        
+        if (s.isEmpty() || s.equals("0")) {
+             NativeSafe.invoke(MPFR_FREE_STR, strPtr);
+             return Real.ZERO;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (s.startsWith("-")) {
+            if (s.length() > 1) {
+                sb.append("-0.").append(s.substring(1));
+            } else {
+                sb.append("-0"); 
+            }
+        } else {
+            sb.append("0.").append(s);
+        }
+        sb.append("E").append(exp);
+        NativeSafe.invoke(MPFR_FREE_STR, strPtr);
+        
+        try {
+            return Real.of(new java.math.BigDecimal(sb.toString()));
+        } catch (NumberFormatException e) {
+            logger.error("Failed to parse MPFR string: '{}' (exp={})", s, exp);
+            throw new RuntimeException("Invalid MPFR numeric string: " + sb, e);
+        }
+    }
+
+    private org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> toSparse(Matrix<Real> m) {
+        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) {
+            return (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) m;
+        }
+        int rows = m.rows();
+        int cols = m.cols();
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(rows, cols, Real.ZERO);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Real val = m.get(i, j);
+                if (!val.equals(Real.ZERO)) {
+                    storage.set(i, j, val);
+                }
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>(storage, Real.ZERO);
     }
 
     @Override
@@ -280,6 +340,23 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native MPFR Sparse transpose not yet implemented");
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": MPFR Sparse transpose not available");
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> sa = toSparse(a);
+        int rows = sa.rows();
+        int cols = sa.cols();
+        
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> newStorage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(cols, rows, Real.ZERO);
+        
+        int[] rowPtr = sa.getRowPointers();
+        int[] colIdx = sa.getColIndices();
+        Object[] values = sa.getValues();
+        
+        for (int i = 0; i < rows; i++) {
+            for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
+                newStorage.set(colIdx[k], i, (Real) values[k]);
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(newStorage, Real.ZERO);
     }
 }

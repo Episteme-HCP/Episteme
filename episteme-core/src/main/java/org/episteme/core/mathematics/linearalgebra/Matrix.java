@@ -172,6 +172,15 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
     org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> getStorage();
 
     /**
+     * Returns the provider that created or manages this matrix.
+     * 
+     * @return the linear algebra provider
+     */
+    default LinearAlgebraProvider<E> getProvider() {
+        return AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, getScalarRing());
+    }
+
+    /**
      * Returns the sum of this matrix and another.
      */
     Matrix<E> add(Matrix<E> other);
@@ -285,6 +294,19 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
     default Matrix<E> inverse(Matrix<E> element) {
         return element.negate();
     }
+
+    // The following methods are typically implemented in a concrete class like GenericMatrix,
+    // but are included here as default methods for demonstration based on the provided snippet.
+    // In a real scenario, these would be concrete implementations in GenericMatrix.
+    // @Override
+    // public MatrixStorage<E> getStorage() {
+    //     return storage; // 'storage' field would need to be defined in the interface or class
+    // }
+
+    // @Override
+    // public LinearAlgebraProvider<E> getProvider() {
+    //     return provider; // 'provider' field would need to be defined in the interface or class
+    // }
 
     @Override
     default Matrix<E> identity() {

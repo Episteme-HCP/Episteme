@@ -271,90 +271,70 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * @param exponent the exponent
      * @return this^exponent
      */
-    public Real pow(double exponent) {
-        return Real.of(Math.pow(this.doubleValue(), exponent));
-    }
+    public abstract Real pow(double exponent);
 
     /**
      * Returns e raised to this number.
      * 
      * @return e^this
      */
-    public Real exp() {
-        return Real.of(Math.exp(this.doubleValue()));
-    }
+    public abstract Real exp();
 
     /**
      * Returns the natural logarithm of this number.
      * 
      * @return ln(this)
      */
-    public Real log() {
-        return Real.of(Math.log(this.doubleValue()));
-    }
+    public abstract Real log();
 
     /**
      * Returns the base-10 logarithm of this number.
      * 
      * @return logÃ¢â€šÂÃ¢â€šâ‚¬(this)
      */
-    public Real log10() {
-        return Real.of(Math.log10(this.doubleValue()));
-    }
+    public abstract Real log10();
 
     /**
      * Returns the sine of this number (in radians).
      * 
      * @return sin(this)
      */
-    public Real sin() {
-        return Real.of(Math.sin(this.doubleValue()));
-    }
+    public abstract Real sin();
 
     /**
      * Returns the cosine of this number (in radians).
      * 
      * @return cos(this)
      */
-    public Real cos() {
-        return Real.of(Math.cos(this.doubleValue()));
-    }
+    public abstract Real cos();
 
     /**
      * Returns the tangent of this number (in radians).
      * 
      * @return tan(this)
      */
-    public Real tan() {
-        return Real.of(Math.tan(this.doubleValue()));
-    }
+    public abstract Real tan();
 
     /**
      * Returns the arcsine of this number.
      * 
      * @return arcsin(this) in radians
      */
-    public Real asin() {
-        return Real.of(Math.asin(this.doubleValue()));
-    }
+    public abstract Real asin();
 
     /**
      * Returns the arccosine of this number.
      * 
      * @return arccos(this) in radians
      */
-    public Real acos() {
-        return Real.of(Math.acos(this.doubleValue()));
-    }
+    public abstract Real acos();
 
     /**
      * Returns the arctangent of this number.
      * 
      * @return arctan(this) in radians
      */
-    public Real atan() {
-        return Real.of(Math.atan(this.doubleValue()));
-    }
+    public abstract Real atan();
 
     /**
      * Returns the angle theta from the conversion of rectangular coordinates (x, y)
@@ -363,75 +343,56 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * @param x the abscissa coordinate
      * @return the theta component of the point (r, theta)
      */
-    public Real atan2(Real x) {
-        return Real.of(Math.atan2(this.doubleValue(), x.doubleValue()));
-    }
+    public abstract Real atan2(Real x);
 
     /**
      * Returns the hyperbolic sine of this number.
      * 
      * @return sinh(this)
      */
-    public Real sinh() {
-        return Real.of(Math.sinh(this.doubleValue()));
-    }
+    public abstract Real sinh();
 
     /**
      * Returns the hyperbolic cosine of this number.
      * 
      * @return cosh(this)
      */
-    public Real cosh() {
-        return Real.of(Math.cosh(this.doubleValue()));
-    }
+    public abstract Real cosh();
 
     /**
      * Returns the hyperbolic tangent of this number.
      * 
      * @return tanh(this)
      */
-    public Real tanh() {
-        return Real.of(Math.tanh(this.doubleValue()));
-    }
+    public abstract Real tanh();
 
     /**
      * Returns the inverse hyperbolic sine of this number.
      * 
      * @return asinh(this)
      */
-    public Real asinh() {
-        double x = this.doubleValue();
-        return Real.of(Math.log(x + Math.sqrt(x * x + 1.0)));
-    }
+    public abstract Real asinh();
 
     /**
      * Returns the inverse hyperbolic cosine of this number.
      * 
      * @return acosh(this)
      */
-    public Real acosh() {
-        double x = this.doubleValue();
-        return Real.of(Math.log(x + Math.sqrt(x * x - 1.0)));
-    }
+    public abstract Real acosh();
 
     /**
      * Returns the inverse hyperbolic tangent of this number.
      * 
      * @return atanh(this)
      */
-    public Real atanh() {
-        double x = this.doubleValue();
-        return Real.of(0.5 * Math.log((1.0 + x) / (1.0 - x)));
-    }
+    public abstract Real atanh();
 
     /**
      * Returns the cube root of this number.
      * 
      * @return cbrt(this)
      */
-    public Real cbrt() {
-        return Real.of(Math.cbrt(this.doubleValue()));
-    }
+    public abstract Real cbrt();
 
     /**
      * Returns sqrt(x^2 + y^2) without intermediate overflow or underflow.
@@ -439,9 +400,7 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * @param y the other value
      * @return sqrt(this^2 + y^2)
      */
-    public Real hypot(Real y) {
-        return Real.of(Math.hypot(this.doubleValue(), y.doubleValue()));
-    }
+    public abstract Real hypot(Real y);
 
     /**
      * Returns the smallest (closest to negative infinity) double value that is
@@ -449,9 +408,7 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * 
      * @return ceil(this)
      */
-    public Real ceil() {
-        return Real.of(Math.ceil(this.doubleValue()));
-    }
+    public abstract Real ceil();
 
     /**
      * Returns the largest (closest to positive infinity) double value that is
@@ -459,9 +416,7 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * 
      * @return floor(this)
      */
-    public Real floor() {
-        return Real.of(Math.floor(this.doubleValue()));
-    }
+    public abstract Real floor();
 
     /**
      * Returns the closest long to the argument, with ties rounding to positive
@@ -469,9 +424,7 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * 
      * @return round(this)
      */
-    public Real round() {
-        return Real.of(Math.round(this.doubleValue()));
-    }
+    public abstract Real round();
 
     /**
      * Converts an angle measured in radians to an approximately equivalent angle

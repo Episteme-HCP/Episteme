@@ -256,6 +256,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             cl_device_id[] devices = new cl_device_id[1];
             clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 1, devices, null);
             cl_device_id device = devices[0];
+            
+            if (!verifyExtensions(device)) {
+                logger.warn("OpenCL device does not support cl_khr_fp64 extension. Backend will be disabled.");
+                return;
+            }
 
             cl_context_properties contextProperties = new cl_context_properties();
             contextProperties.addProperty(CL_CONTEXT_PLATFORM, platform);
@@ -611,6 +616,15 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         return Real.of(det);
     } finally { if (memA != null) clReleaseMemObject(memA); }
 }
+
+    private static boolean verifyExtensions(cl_device_id device) {
+        long[] size = new long[1];
+        clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, 0, null, size);
+        byte[] buffer = new byte[(int)size[0]];
+        clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, buffer.length, Pointer.to(buffer), null);
+        String extensions = new String(buffer);
+        return extensions.contains("cl_khr_fp64");
+    }
 
 @Override public String getNativeLibraryName() { return "opencl"; }
 @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }
