@@ -466,15 +466,12 @@ public class LinearAlgebraComplianceTest {
             test.run();
             res.status.put(opName, "✅ PASS");
         } catch (UnsupportedOperationException e) {
-            System.err.println("N/A: " + opName + " on " + res.providerName);
-            e.printStackTrace();
+            // Silenced for expected N/A
             res.status.put(opName, "❌ N/A");
         } catch (Throwable e) {
             String msg = e.getMessage();
-            if (msg == null || msg.isEmpty()) msg = e.getClass().getSimpleName();
-            System.err.println("FAIL " + opName + " on " + res.providerName + ": " + msg);
+            if (msg == null || msg.isBlank()) msg = e.getClass().getSimpleName();
             if (e instanceof AssertionError) {
-                 // Capture specific assertion message (Expected vs Actual)
                  res.status.put(opName, "⚠️ FAIL (Assertion)");
             } else {
                  res.status.put(opName, "⚠️ FAIL (" + e.getClass().getSimpleName() + ")");

@@ -112,6 +112,15 @@ public interface Vector<E> extends Module<Vector<E>, E> {
     org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> getStorage();
 
     /**
+     * Returns the provider that created or manages this vector.
+     * 
+     * @return the linear algebra provider
+     */
+    default LinearAlgebraProvider<E> getProvider() {
+        return AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, getScalarRing());
+    }
+
+    /**
      * Returns the sum of this vector and another.
      * 
      * @param other the vector to add

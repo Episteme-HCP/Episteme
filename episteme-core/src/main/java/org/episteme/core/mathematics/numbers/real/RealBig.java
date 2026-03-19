@@ -105,7 +105,13 @@ public final class RealBig extends Real {
 
     @Override
     public Real pow(int exp) {
-        return Real.of(value.pow(exp).toString());
+        return RealBig.create(value.pow(exp));
+    }
+
+    @Override
+    public Real pow(double exponent) {
+        // TODO: High-precision implementation
+        return Real.of(Math.pow(value.doubleValue(), exponent));
     }
 
     @Override
@@ -119,7 +125,146 @@ public final class RealBig extends Real {
                 return Real.NaN;
             }
         }
+        // TODO: High-precision implementation
         return Real.of(Math.pow(value.doubleValue(), exp.doubleValue()));
+    }
+
+    // --- Transcendental Functions ---
+
+    @Override
+    public Real exp() {
+        // TODO: High-precision implementation
+        return Real.of(Math.exp(value.doubleValue()));
+    }
+
+    @Override
+    public Real log() {
+        // TODO: High-precision implementation
+        return Real.of(Math.log(value.doubleValue()));
+    }
+
+    @Override
+    public Real log10() {
+        // TODO: High-precision implementation
+        return Real.of(Math.log10(value.doubleValue()));
+    }
+
+    @Override
+    public Real sin() {
+        // TODO: High-precision implementation
+        return Real.of(Math.sin(value.doubleValue()));
+    }
+
+    @Override
+    public Real cos() {
+        // TODO: High-precision implementation
+        return Real.of(Math.cos(value.doubleValue()));
+    }
+
+    @Override
+    public Real tan() {
+        // TODO: High-precision implementation
+        return Real.of(Math.tan(value.doubleValue()));
+    }
+
+    @Override
+    public Real asin() {
+        // TODO: High-precision implementation
+        return Real.of(Math.asin(value.doubleValue()));
+    }
+
+    @Override
+    public Real acos() {
+        // TODO: High-precision implementation
+        return Real.of(Math.acos(value.doubleValue()));
+    }
+
+    @Override
+    public Real atan() {
+        // TODO: High-precision implementation
+        return Real.of(Math.atan(value.doubleValue()));
+    }
+
+    @Override
+    public Real atan2(Real x) {
+        // TODO: High-precision implementation
+        return Real.of(Math.atan2(value.doubleValue(), x.doubleValue()));
+    }
+
+    @Override
+    public Real sinh() {
+        // TODO: High-precision implementation
+        return Real.of(Math.sinh(value.doubleValue()));
+    }
+
+    @Override
+    public Real cosh() {
+        // TODO: High-precision implementation
+        return Real.of(Math.cosh(value.doubleValue()));
+    }
+
+    @Override
+    public Real tanh() {
+        // TODO: High-precision implementation
+        return Real.of(Math.tanh(value.doubleValue()));
+    }
+
+    @Override
+    public Real asinh() {
+        double d = value.doubleValue();
+        return Real.of(Math.log(d + Math.sqrt(d * d + 1.0)));
+    }
+
+    @Override
+    public Real acosh() {
+        double d = value.doubleValue();
+        return Real.of(Math.log(d + Math.sqrt(d * d - 1.0)));
+    }
+
+    @Override
+    public Real atanh() {
+        double d = value.doubleValue();
+        return Real.of(0.5 * Math.log((1.0 + d) / (1.0 - d)));
+    }
+
+    @Override
+    public Real cbrt() {
+        // TODO: High-precision implementation
+        return Real.of(Math.cbrt(value.doubleValue()));
+    }
+
+    @Override
+    public Real hypot(Real y) {
+        // TODO: High-precision implementation
+        return Real.of(Math.hypot(value.doubleValue(), y.doubleValue()));
+    }
+
+    @Override
+    public Real ceil() {
+        return RealBig.create(value.stripTrailingZeros().setScale(0, java.math.RoundingMode.CEILING));
+    }
+
+    @Override
+    public Real floor() {
+        return RealBig.create(value.stripTrailingZeros().setScale(0, java.math.RoundingMode.FLOOR));
+    }
+
+    @Override
+    public Real round() {
+        return RealBig.create(value.setScale(0, java.math.RoundingMode.HALF_UP));
+    }
+
+    @Override
+    public Real toDegrees() {
+        // TODO: High-precision implementation
+        return Real.of(Math.toDegrees(value.doubleValue()));
+    }
+
+    @Override
+    public Real toRadians() {
+        // TODO: High-precision implementation
+        // Use pi from constants if available
+        return Real.of(Math.toRadians(value.doubleValue()));
     }
 
     @Override

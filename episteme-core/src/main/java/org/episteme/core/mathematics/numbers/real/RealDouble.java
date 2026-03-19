@@ -164,6 +164,128 @@ public final class RealDouble extends Real {
         return Double.toString(value);
     }
 
+    // --- Transcendental Functions ---
+
+    @Override
+    public Real pow(double exponent) {
+        return Real.of(Math.pow(value, exponent));
+    }
+
+    @Override
+    public Real exp() {
+        return Real.of(Math.exp(value));
+    }
+
+    @Override
+    public Real log() {
+        return Real.of(Math.log(value));
+    }
+
+    @Override
+    public Real log10() {
+        return Real.of(Math.log10(value));
+    }
+
+    @Override
+    public Real sin() {
+        return Real.of(Math.sin(value));
+    }
+
+    @Override
+    public Real cos() {
+        return Real.of(Math.cos(value));
+    }
+
+    @Override
+    public Real tan() {
+        return Real.of(Math.tan(value));
+    }
+
+    @Override
+    public Real asin() {
+        return Real.of(Math.asin(value));
+    }
+
+    @Override
+    public Real acos() {
+        return Real.of(Math.acos(value));
+    }
+
+    @Override
+    public Real atan() {
+        return Real.of(Math.atan(value));
+    }
+
+    @Override
+    public Real atan2(Real x) {
+        return Real.of(Math.atan2(value, x.doubleValue()));
+    }
+
+    @Override
+    public Real sinh() {
+        return Real.of(Math.sinh(value));
+    }
+
+    @Override
+    public Real cosh() {
+        return Real.of(Math.cosh(value));
+    }
+
+    @Override
+    public Real tanh() {
+        return Real.of(Math.tanh(value));
+    }
+
+    @Override
+    public Real asinh() {
+        return Real.of(Math.log(value + Math.sqrt(value * value + 1.0)));
+    }
+
+    @Override
+    public Real acosh() {
+        return Real.of(Math.log(value + Math.sqrt(value * value - 1.0)));
+    }
+
+    @Override
+    public Real atanh() {
+        return Real.of(0.5 * Math.log((1.0 + value) / (1.0 - value)));
+    }
+
+    @Override
+    public Real cbrt() {
+        return Real.of(Math.cbrt(value));
+    }
+
+    @Override
+    public Real hypot(Real y) {
+        return Real.of(Math.hypot(value, y.doubleValue()));
+    }
+
+    @Override
+    public Real ceil() {
+        return Real.of(Math.ceil(value));
+    }
+
+    @Override
+    public Real floor() {
+        return Real.of(Math.floor(value));
+    }
+
+    @Override
+    public Real round() {
+        return Real.of(Math.round(value));
+    }
+
+    @Override
+    public Real toDegrees() {
+        return Real.of(Math.toDegrees(value));
+    }
+
+    @Override
+    public Real toRadians() {
+        return Real.of(Math.toRadians(value));
+    }
+
     @Override
     public int characteristic() {
         return 0; // Real numbers have characteristic 0 (infinite field)

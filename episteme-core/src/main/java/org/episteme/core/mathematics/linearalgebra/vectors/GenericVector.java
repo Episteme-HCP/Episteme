@@ -208,6 +208,11 @@ public class GenericVector<E> implements Vector<E> {
         return storage;
     }
 
+    @Override
+    public LinearAlgebraProvider<E> getProvider() {
+        return provider;
+    }
+
     public Ring<E> getField() {
         return ring;
     }

@@ -427,6 +427,57 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         }
     }
 
+    @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        if (AVAILABLE && a instanceof RealDoubleMatrix && b instanceof RealDoubleVector) {
+            RealDoubleMatrix adm = (RealDoubleMatrix) a;
+            RealDoubleVector bdv = (RealDoubleVector) b;
+            
+            if (adm.cols() != bdv.dimension()) {
+                throw new IllegalArgumentException("Matrix-Vector dimension mismatch: " + adm.cols() + " != " + bdv.dimension());
+            }
+
+            int m = adm.rows();
+            int n = adm.cols();
+            
+            double[] result = new double[m];
+            DoubleBuffer aBuf = ensureDirect(adm);
+            DoubleBuffer bBuf = ensureDirect(bdv);
+            DoubleBuffer rBuf = DoubleBuffer.wrap(result);
+            
+            dgemv(m, n, 1.0, aBuf, n, bBuf, 1, 0.0, rBuf, 1);
+            return RealDoubleVector.of(result);
+        }
+        // Fallback for non-RealDouble types or if not available
+        double[] ad = toDoubleArray(a);
+        double[] bd = toDoubleArray(b);
+        double[] rd = new double[a.rows()];
+        for (int i = 0; i < a.rows(); i++) {
+            double sum = 0;
+            for (int k = 0; k < a.cols(); k++) {
+                sum += ad[i * a.cols() + k] * bd[k];
+            }
+            rd[i] = sum;
+        }
+        return RealDoubleVector.of(rd);
+    }
+
+    private double[] toDoubleArray(Vector<Real> v) {
+        if (v instanceof RealDoubleVector) return ((RealDoubleVector) v).toDoubleArray();
+        double[] d = new double[v.dimension()];
+        for (int i = 0; i < v.dimension(); i++) d[i] = v.get(i).doubleValue();
+        return d;
+    }
+
+    private double[] toDoubleArray(Matrix<Real> m) {
+        if (m instanceof RealDoubleMatrix) return ((RealDoubleMatrix) m).toDoubleArray();
+        double[] d = new double[m.rows() * m.cols()];
+        for (int i = 0; i < m.rows(); i++) {
+            for (int j = 0; j < m.cols(); j++) d[i * m.cols() + j] = m.get(i, j).doubleValue();
+        }
+        return d;
+    }
+
     // --- LinearAlgebraProvider Implementation (Merged logic) ---
 
 
@@ -819,20 +870,6 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
 
 
-    private double[] toDoubleArray(Matrix<Real> m) {
-        double[] d = new double[m.rows() * m.cols()];
-        for (int i = 0; i < m.rows(); i++) {
-            for (int j = 0; j < m.cols(); j++) d[i * m.cols() + j] = m.get(i, j).doubleValue();
-        }
-        return d;
-    }
-
-    private double[] toDoubleArray(Vector<Real> v) {
-        double[] d = new double[v.dimension()];
-        for (int i = 0; i < v.dimension(); i++) d[i] = v.get(i).doubleValue();
-        return d;
-    }
-
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
         if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
@@ -903,41 +940,6 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             return Real.of(Math.sqrt(sumSq));
         }
         throw new UnsupportedOperationException(getName() + ": norm() not available for these types");
-    }
-
-    @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        if (AVAILABLE && DGEMV_HANDLE != null && a instanceof RealDoubleMatrix && b instanceof RealDoubleVector) {
-            RealDoubleMatrix adm = (RealDoubleMatrix) a;
-            RealDoubleVector bdv = (RealDoubleVector) b;
-            if (adm.cols() != bdv.dimension()) throw new IllegalArgumentException("Dimension mismatch");
-            
-            DoubleBuffer aBuf = ensureDirect(adm);
-            DoubleBuffer bBuf = ensureDirect(bdv);
-            RealDoubleVector res = RealDoubleVector.direct(adm.rows());
-            
-            dgemv(adm.rows(), adm.cols(), 1.0, aBuf, adm.cols(), bBuf, 1, 0.0, res.getBuffer(), 1);
-            return res;
-        }
-        if (AVAILABLE) {
-            RealDoubleMatrix adm = (a instanceof RealDoubleMatrix) ? (RealDoubleMatrix) a : RealDoubleMatrix.of(toDoubleArray(a), a.rows(), a.cols());
-            RealDoubleVector bdv = (b instanceof RealDoubleVector) ? (RealDoubleVector) b : RealDoubleVector.of(toDoubleArray(b));
-            
-            if (adm.cols() != bdv.dimension()) throw new IllegalArgumentException("Dimension mismatch");
-            
-            double[] aData = adm.toDoubleArray();
-            double[] bData = bdv.toDoubleArray();
-            double[] result = new double[adm.rows()];
-            for (int i = 0; i < adm.rows(); i++) {
-                double sum = 0;
-                for (int j = 0; j < adm.cols(); j++) {
-                    sum += aData[i * adm.cols() + j] * bData[j];
-                }
-                result[i] = sum;
-            }
-            return RealDoubleVector.of(result);
-        }
-        throw new UnsupportedOperationException(getName() + ": Matrix-Vector multiply() not available");
     }
 
     @Override

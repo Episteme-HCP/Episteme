@@ -59,6 +59,8 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
     private static MethodHandle DNRM2;
     private static MethodHandle DSCAL;
     private static MethodHandle DOMATCOPY;
+
+    private static MethodHandle ZGEMM;
     
     // LAPACK Method Handles
     private static MethodHandle DGESV;
@@ -165,6 +167,18 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
                 );
                 DOMATCOPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_domatcopy", "mkl_domatcopy")
                     .map(s -> LINKER.downcallHandle(s, domatcopyDesc)).orElse(null);
+
+                // Complex BLAS
+                FunctionDescriptor complexGemmDesc = FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                        AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                        AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                
+                ZGEMM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zgemm")
+                        .map(s -> LINKER.downcallHandle(s, complexGemmDesc)).orElse(null);
 
                 // LAPACK
                 FunctionDescriptor dgesvDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
@@ -749,6 +763,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
     @Override
     public Matrix<org.episteme.core.mathematics.numbers.real.Real> multiply(Matrix<org.episteme.core.mathematics.numbers.real.Real> A, Matrix<org.episteme.core.mathematics.numbers.real.Real> B) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": multiply() not available");
+        
+        if (isComplex(A)) {
+            return multiplyComplex(A, B);
+        }
+        
         int m = A.rows();
         int k = A.cols();
         int n = B.cols();
@@ -781,6 +800,55 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
             double[] result = new double[m * n];
             MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0L, result, 0, (int) ( (long) m * n ) );
             return createDenseMatrix(result, m, n, A);
+        }
+    }
+
+    private boolean isComplex(Matrix<Real> m) {
+        if (m.rows() == 0 || m.cols() == 0) return false;
+        return ((Object)m.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
+    private double[] toInterlacedDoubleArray(Matrix<Real> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        double[] data = new double[rows * cols * 2];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) m.get(i, j);
+                data[(i * cols + j) * 2] = c.real();
+                data[(i * cols + j) * 2 + 1] = c.imaginary();
+            }
+        }
+        return data;
+    }
+
+    private Matrix<Real> multiplyComplex(Matrix<Real> A, Matrix<Real> B) {
+        int m = A.rows();
+        int k = A.cols();
+        int n = B.cols();
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
+            MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(B));
+            MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
+            
+            MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+            MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
+            
+            if (ZGEMM != null) {
+                ZGEMM.invokeExact(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, segA, k, segB, n, beta, segC, n);
+            } else {
+                throw new UnsupportedOperationException("ZGEMM not available");
+            }
+            
+            double[] resData = segC.toArray(ValueLayout.JAVA_DOUBLE);
+            Real[] resultElements = new Real[m * n];
+            for (int i = 0; i < m * n; i++) {
+                resultElements[i] = (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(resData[i * 2], resData[i * 2 + 1]);
+            }
+            return new DenseMatrix<>(resultElements, m, n, (Ring<Real>) A.getScalarRing());
+        } catch (Throwable t) {
+            throw new RuntimeException("Complex FFM Multiply failed", t);
         }
     }
 
