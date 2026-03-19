@@ -14,7 +14,6 @@
   <description>Standalone Distributed Worker for Episteme Grid</description>
 
   <properties>
-    <maven.compiler.release>25</maven.compiler.release>
   </properties>
 
   <dependencies>
