@@ -54,9 +54,13 @@ public class GrpcDistributedContext implements DistributedContext {
     private final ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
 
     public GrpcDistributedContext(String host, int port) {
-        this.channel = ManagedChannelBuilder.forAddress(host, port)
-                .usePlaintext() // For demo/dev (no encryption)
-                .build();
+        this(ManagedChannelBuilder.forAddress(host, port)
+                .usePlaintext()
+                .build());
+    }
+
+    public GrpcDistributedContext(ManagedChannel channel) {
+        this.channel = channel;
         this.blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
     }
 

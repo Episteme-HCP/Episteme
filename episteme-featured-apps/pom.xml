@@ -15,7 +15,6 @@
     <description>Showcase Applications for Episteme Framework</description>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
         <jzy3d.exclude>**/Jzy3d*.java,**/SpinField2DViewer.java</jzy3d.exclude>
     </properties>
 

@@ -71,10 +71,19 @@ public class WorkerNode {
      * @param port server port
      */
     public WorkerNode(String host, int port) {
-        this.channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
+        this(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build());
+        logger.info("WorkerNode connecting to {}:{}", host, port);
+    }
+
+    /**
+     * Creates a new WorkerNode with an existing channel (useful for testing).
+     *
+     * @param channel the channel to use
+     */
+    public WorkerNode(ManagedChannel channel) {
+        this.channel = channel;
         this.blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
         this.taskRegistry = TaskRegistry.getInstance();
-        logger.info("WorkerNode connecting to {}:{}", host, port);
     }
 
     /**
@@ -119,7 +128,7 @@ public class WorkerNode {
         logger.info("Worker {} shut down", workerId);
     }
 
-    private void register() {
+    void register() {
         WorkerRegistration reg = WorkerRegistration.newBuilder()
                 .setHostname("worker-" + System.currentTimeMillis())
                 .setCores(Runtime.getRuntime().availableProcessors())
@@ -128,7 +137,7 @@ public class WorkerNode {
         logger.info("Registered as worker: {}", workerId);
     }
 
-    private void pollAndExecute() {
+    void pollAndExecute() {
         TaskRequest task = blockingStub.requestTask(
                 WorkerIdentifier.newBuilder().setWorkerId(workerId).build());
 
@@ -157,7 +166,7 @@ public class WorkerNode {
     }
 
     @SuppressWarnings("unchecked")
-    private byte[] executeTask(TaskRequest request) throws Exception {
+    byte[] executeTask(TaskRequest request) throws Exception {
         byte[] taskData = request.getSerializedTask().toByteArray();
         String taskType = request.getTaskType();
 

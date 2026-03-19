@@ -49,8 +49,10 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     @SuppressWarnings("unused")
     private static MethodHandle MPFR_SUB;
     private static MethodHandle MPFR_MUL;
-    @SuppressWarnings("unused")
     private static MethodHandle MPFR_DIV;
+    private static MethodHandle MPFR_SQRT;
+    private static MethodHandle MPFR_CMP;
+    private static MethodHandle MPFR_SET;
     private static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
@@ -74,6 +76,9 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
                 MPFR_SUB = lookup(mpfr, "mpfr_sub", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_MUL = lookup(mpfr, "mpfr_mul", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_DIV = lookup(mpfr, "mpfr_div", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+                MPFR_SET = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null;
@@ -272,7 +277,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Real> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, Real.ZERO);
         
-        MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_INT);
+        MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
         for (int i = 0; i < rows * cols; i++) {
             storage.set(i / cols, i % cols, readMPFR(getMPFR(vec, i), expPtr, arena));
         }
@@ -281,11 +286,12 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
 
     private Real readMPFR(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
         MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, val, 0);
-        if (strPtr.equals(MemorySegment.NULL)) {
-             throw new RuntimeException("mpfr_get_str returned NULL");
+        if (strPtr == null || strPtr.equals(MemorySegment.NULL)) {
+            return Real.ZERO;
         }
-        String s = strPtr.reinterpret(1024).getString(0);
-        int exp = expPtr.get(ValueLayout.JAVA_INT, 0);
+        
+        String s = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
+        long exp = expPtr.get(ValueLayout.JAVA_LONG, 0);
         
         if (s.isEmpty() || s.equals("0")) {
              NativeSafe.invoke(MPFR_FREE_STR, strPtr);
@@ -334,8 +340,166 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
 
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        // Implement Conjugate Gradient or BiCGSTAB using MPFR
-        throw new UnsupportedOperationException("Native MPFR Sparse solve not yet implemented");
+        return conjugateGradient(a, b, null, Real.of(1e-15), 1000);
+    }
+
+    @Override
+    public Vector<Real> conjugateGradient(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " is not available.");
+        
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> sa = toSparse(a);
+        int n = sa.rows();
+        long prec = getPrecision();
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_b = initVector(b.toMatrix(), arena, prec);
+            MemorySegment h_x = (x0 != null) ? initVector(x0.toMatrix(), arena, prec) : allocateVector(n, arena, prec);
+            
+            MemorySegment h_r = allocateVector(n, arena, prec);
+            MemorySegment h_p = allocateVector(n, arena, prec);
+            MemorySegment h_Ap = allocateVector(n, arena, prec);
+            
+            MemorySegment alpha = arena.allocate(MPFR_LAYOUT);
+            MemorySegment beta = arena.allocate(MPFR_LAYOUT);
+            MemorySegment rDotR = arena.allocate(MPFR_LAYOUT);
+            MemorySegment rNextDotRNext = arena.allocate(MPFR_LAYOUT);
+            MemorySegment pDotAp = arena.allocate(MPFR_LAYOUT);
+            MemorySegment tol = arena.allocate(MPFR_LAYOUT);
+            MemorySegment temp = arena.allocate(MPFR_LAYOUT);
+
+            NativeSafe.invoke(MPFR_INIT2, alpha, prec);
+            NativeSafe.invoke(MPFR_INIT2, beta, prec);
+            NativeSafe.invoke(MPFR_INIT2, rDotR, prec);
+            NativeSafe.invoke(MPFR_INIT2, rNextDotRNext, prec);
+            NativeSafe.invoke(MPFR_INIT2, pDotAp, prec);
+            NativeSafe.invoke(MPFR_INIT2, tol, prec);
+            NativeSafe.invoke(MPFR_INIT2, temp, prec);
+
+            NativeSafe.invoke(MPFR_SET_STR, tol, arena.allocateFrom(tolerance.bigDecimalValue().toPlainString()), 10, 0);
+
+            // r = b - A*x
+            spmv_internal(sa, h_x, h_r, arena, prec); // r = A*x
+            for (int i = 0; i < n; i++) {
+                NativeSafe.invoke(MPFR_SUB, getMPFR(h_r, i), getMPFR(h_b, i), getMPFR(h_r, i), 0);
+            }
+            
+            // p = r
+            copyVector(h_p, h_r, n);
+
+            // rDotR = r . r
+            dotProduct(h_r, h_r, n, rDotR, prec, arena);
+
+            int iter = 0;
+            while (iter < maxIterations) {
+                // Check convergence: sqrt(rDotR) < tolerance
+                NativeSafe.invoke(MPFR_SQRT, temp, rDotR, 0);
+                if ((int) NativeSafe.invoke(MPFR_CMP, temp, tol) < 0) break;
+
+                // Ap = A * p
+                spmv_internal(sa, h_p, h_Ap, arena, prec);
+
+                // alpha = rDotR / (p . Ap)
+                dotProduct(h_p, h_Ap, n, pDotAp, prec, arena);
+                NativeSafe.invoke(MPFR_DIV, alpha, rDotR, pDotAp, 0);
+
+                // x = x + alpha * p
+                // r = r - alpha * Ap
+                for (int i = 0; i < n; i++) {
+                    // x_i = x_i + alpha * p_i
+                    NativeSafe.invoke(MPFR_MUL, temp, alpha, getMPFR(h_p, i), 0);
+                    NativeSafe.invoke(MPFR_ADD, getMPFR(h_x, i), getMPFR(h_x, i), temp, 0);
+                    
+                    // r_i = r_i - alpha * Ap_i
+                    NativeSafe.invoke(MPFR_MUL, temp, alpha, getMPFR(h_Ap, i), 0);
+                    NativeSafe.invoke(MPFR_SUB, getMPFR(h_r, i), getMPFR(h_r, i), temp, 0);
+                }
+
+                // rNextDotRNext = r . r
+                dotProduct(h_r, h_r, n, rNextDotRNext, prec, arena);
+
+                // beta = rNextDotRNext / rDotR
+                NativeSafe.invoke(MPFR_DIV, beta, rNextDotRNext, rDotR, 0);
+
+                // p = r + beta * p
+                for (int i = 0; i < n; i++) {
+                    NativeSafe.invoke(MPFR_MUL, temp, beta, getMPFR(h_p, i), 0);
+                    NativeSafe.invoke(MPFR_ADD, getMPFR(h_p, i), getMPFR(h_r, i), temp, 0);
+                }
+
+                // rDotR = rNextDotRNext
+                NativeSafe.invoke(MPFR_SET_STR, rDotR, arena.allocateFrom("0"), 10, 0);
+                NativeSafe.invoke(MPFR_ADD, rDotR, rDotR, rNextDotRNext, 0);
+
+                iter++;
+            }
+
+            if (iter >= maxIterations) {
+                logger.warn("Conjugate Gradient did not converge after {} iterations.", maxIterations);
+            } else {
+                logger.info("Conjugate Gradient converged in {} iterations.", iter);
+            }
+
+            Matrix<Real> resMatrix = backToMatrix(h_x, n, 1, arena);
+            
+            // Cleanup
+            NativeSafe.invoke(MPFR_CLEAR, alpha);
+            NativeSafe.invoke(MPFR_CLEAR, beta);
+            NativeSafe.invoke(MPFR_CLEAR, rDotR);
+            NativeSafe.invoke(MPFR_CLEAR, rNextDotRNext);
+            NativeSafe.invoke(MPFR_CLEAR, pDotAp);
+            NativeSafe.invoke(MPFR_CLEAR, tol);
+            NativeSafe.invoke(MPFR_CLEAR, temp);
+
+            java.util.List<Real> list = new java.util.ArrayList<>(n);
+            for (int i = 0; i < n; i++) list.add(resMatrix.get(i, 0));
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(list, a.getScalarRing());
+
+        } catch (Throwable t) {
+            throw new RuntimeException("MPFR Conjugate Gradient failed", t);
+        }
+    }
+
+    private void spmv_internal(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> a, MemorySegment h_x, MemorySegment h_y, Arena arena, long prec) throws Throwable {
+        int m = a.rows();
+        int[] rowPtr = a.getRowPointers();
+        int[] colIdx = a.getColIndices();
+        Object[] vals = a.getValues();
+
+        MemorySegment term = arena.allocate(MPFR_LAYOUT);
+        NativeSafe.invoke(MPFR_INIT2, term, prec);
+
+        for (int i = 0; i < m; i++) {
+            MemorySegment sum = getMPFR(h_y, i);
+            NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, 0);
+
+            for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
+                int col = colIdx[idx];
+                String valStr = ((Real) vals[idx]).bigDecimalValue().toPlainString();
+                NativeSafe.invoke(MPFR_SET_STR, term, arena.allocateFrom(valStr), 10, 0);
+                
+                NativeSafe.invoke(MPFR_MUL, term, term, getMPFR(h_x, col), 0);
+                NativeSafe.invoke(MPFR_ADD, sum, sum, term, 0);
+            }
+        }
+        NativeSafe.invoke(MPFR_CLEAR, term);
+    }
+
+    private void dotProduct(MemorySegment v1, MemorySegment v2, int n, MemorySegment result, long prec, Arena arena) throws Throwable {
+        NativeSafe.invoke(MPFR_SET_STR, result, arena.allocateFrom("0"), 10, 0);
+        MemorySegment term = arena.allocate(MPFR_LAYOUT);
+        NativeSafe.invoke(MPFR_INIT2, term, prec);
+        
+        for (int i = 0; i < n; i++) {
+            NativeSafe.invoke(MPFR_MUL, term, getMPFR(v1, i), getMPFR(v2, i), 0);
+            NativeSafe.invoke(MPFR_ADD, result, result, term, 0);
+        }
+        NativeSafe.invoke(MPFR_CLEAR, term);
+    }
+
+    private void copyVector(MemorySegment dest, MemorySegment src, int n) throws Throwable {
+        for (int i = 0; i < n; i++) {
+            NativeSafe.invoke(MPFR_SET, getMPFR(dest, i), getMPFR(src, i), 0);
+        }
     }
 
     @Override

@@ -57,7 +57,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public void freeGPUMemory(long handle) {
         try {
-            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(handle)));
+            checkCuda((int) CUDA_FREE.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(handle), 0, Arena.global(), "gpu_free_manual").segment()));
         } catch (Throwable t) {
             logger.error("Failed to free GPU memory: {}", t.getMessage());
         }
@@ -322,18 +322,19 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             // To get row-major C = A*B using col-major DGEMM:
             // C^T = B^T * A^T
             // So we call DGEMM(handle, N, N, n, m, k, alpha, d_B, n, d_A, k, beta, d_C, n)
+            // Use scavenge-protected segments for cuBLAS
             checkCuda((int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, alpha, 
-                MemorySegment.ofAddress(d_B).reinterpret((long)k * n * 8), n, 
-                MemorySegment.ofAddress(d_A).reinterpret((long)m * k * 8), k, 
+                NativeSafe.scavenge(MemorySegment.ofAddress(d_B), (long)k * n * 8, arena, "cublas_dgemm_b").segment(), n, 
+                NativeSafe.scavenge(MemorySegment.ofAddress(d_A), (long)m * n * 8, arena, "cublas_dgemm_a").segment(), k, 
                 beta, 
-                MemorySegment.ofAddress(d_C).reinterpret((long)m * n * 8), n));
+                NativeSafe.scavenge(MemorySegment.ofAddress(d_C), (long)m * n * 8, arena, "cublas_dgemm_c").segment(), n));
 
             copyFromGPU(d_C, C, (long) m * n, arena);
 
             checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
-            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_A)));
-            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_B)));
-            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_C)));
+            checkCuda((int) CUDA_FREE.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_A), 0, Arena.global(), "gpu_free_a").segment()));
+            checkCuda((int) CUDA_FREE.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_B), 0, Arena.global(), "gpu_free_b").segment()));
+            checkCuda((int) CUDA_FREE.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_C), 0, Arena.global(), "gpu_free_c").segment()));
         } catch (Throwable t) {
             logger.error("cuBLAS DGEMM failed: {}", t.getMessage());
         }
@@ -499,10 +500,10 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 MemorySegment h_vals = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, valsHost);
                 MemorySegment h_denseB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
 
-                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrRowPtr).reinterpret((long)(m+1)*4), h_rowPtr, (long)(m + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
-                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrColIdx).reinterpret((long)nnz*4), h_colIdx, (long)nnz * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
-                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrVal).reinterpret((long)nnz*8), h_vals, (long)nnz * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_denseB).reinterpret((long)k*n*8), h_denseB, (long)k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_csrRowPtr), (long)(m+1)*4, arena, "cusparse_rowptr_h2d").segment(), h_rowPtr, (long)(m + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_csrColIdx), (long)nnz*4, arena, "cusparse_colidx_h2d").segment(), h_colIdx, (long)nnz * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_csrVal), (long)nnz*8, arena, "cusparse_val_h2d").segment(), h_vals, (long)nnz * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_denseB), (long)k*n*8, arena, "cusparse_denseb_h2d").segment(), h_denseB, (long)k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
 
                 // 3. cuSPARSE Handles
                 MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
@@ -539,7 +540,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 // 4. Result (D2H)
                 double[] resHost = new double[m * n];
                 MemorySegment h_res = arena.allocate(ValueLayout.JAVA_DOUBLE, m * n);
-                checkCuda((int) CUDA_MEMCPY.invokeExact(h_res, MemorySegment.ofAddress(d_denseC).reinterpret((long)m * n * 8), (long)m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(h_res, NativeSafe.scavenge(MemorySegment.ofAddress(d_denseC), (long)m * n * 8, arena, "cusparse_densec_d2h").segment(), (long)m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
                 MemorySegment.copy(h_res, ValueLayout.JAVA_DOUBLE, 0, resHost, 0, m * n);
 
                 // Cleanup GPU
@@ -626,7 +627,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 hostBuf.duplicate().get(array);
                 h_seg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, array);
             }
-            int rcm6 = (int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_ptr).reinterpret(count * 8), h_seg, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
+            int rcm6 = (int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_ptr), count * 8, arena, "cuda_memcpy_h2d").segment(), h_seg, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
             if (rcm6 != 0) throw new RuntimeException("cudaMemcpy H2D failed with code " + rcm6);
         } catch (Throwable t) {
             throw new RuntimeException("GPU Copy H2D failed", t);
@@ -649,7 +650,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             } else {
                 h_seg = arena.allocate(ValueLayout.JAVA_DOUBLE, count);
             }
-            int rcm7 = (int) CUDA_MEMCPY.invokeExact(h_seg, MemorySegment.ofAddress(d_ptr).reinterpret(count * 8), count * 8, CUDA_MEMCPY_DEVICE_TO_HOST);
+            int rcm7 = (int) CUDA_MEMCPY.invokeExact(h_seg, NativeSafe.scavenge(MemorySegment.ofAddress(d_ptr), count * 8, arena, "cuda_memcpy_d2h").segment(), count * 8, CUDA_MEMCPY_DEVICE_TO_HOST);
             if (rcm7 != 0) throw new RuntimeException("cudaMemcpy D2H failed with code " + rcm7);
             
             if (!isDirect) {
