@@ -188,7 +188,7 @@ public final class MathContext {
      */
     public static MathContext exact() {
         return new MathContext(RealPrecision.EXACT, OverflowMode.SAFE, ComputeMode.AUTO,
-                java.math.MathContext.UNLIMITED);
+                new java.math.MathContext(100, java.math.RoundingMode.HALF_UP));
     }
 
     /**

@@ -92,7 +92,7 @@ public class HighPrecisionComplianceTest {
                     // Complex multiplication: (0.5+0.5i)^2 = 0.5i
                     Complex z2 = z.multiply(z);
                     assertTrue(z2.getReal().isZero(), "Real part should be zero: " + z2.getReal());
-                    assertEquals("0.5", z2.getImaginary().toString());
+                    assertEquals(0, z2.getImaginary().compareTo(Real.of("0.5")));
                     
                     // Matrix<Complex> multiplication
                     // LinearAlgebraProvider<Real> might not support Complex, but we test the Field logic
