@@ -51,7 +51,8 @@ public final class MathContext {
     private static final String PROP_EXACT_PRECISION = "org.episteme.core.math.precision.exact";
     private static final int DEFAULT_EXACT_PRECISION = Integer.parseInt(
             System.getProperty(PROP_EXACT_PRECISION, 
-            org.episteme.core.Episteme.getProperty(PROP_EXACT_PRECISION, "100")));
+            org.episteme.core.Episteme.getProperty(PROP_EXACT_PRECISION, "1000")));
+
 
     /**
      *
