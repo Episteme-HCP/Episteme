@@ -2399,8 +2399,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             }
             try {
                 MemorySegment seg = (MemorySegment) CUBLAS_STATUS_GET_STRING.invokeExact(result);
-                // Use scavenge-protected segment for error string
-        String msg = NativeSafe.scavenge(seg, 1024, arena, origin).segment().getString(0);
+                String msg = seg.reinterpret(1024).getString(0);
                 logger.error("CUBLAS Error {}: {}", result, msg);
                 throw new RuntimeException("CUBLAS Error " + result + ": " + msg);
             } catch (Throwable t) {

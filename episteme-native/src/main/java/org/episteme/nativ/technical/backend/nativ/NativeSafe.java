@@ -5,6 +5,7 @@
 
 package org.episteme.nativ.technical.backend.nativ;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ public class NativeSafe {
             if (t instanceof RuntimeException) throw (RuntimeException) t;
             throw new RuntimeException("Native boundary protection: " + t.getMessage(), t);
         }
+    }
+
     /**
      * Safely wraps a raw memory address with origin tracking and lifecycle protection.
      * Use this when a native function returns a pointer that needs to be accessed from Java.

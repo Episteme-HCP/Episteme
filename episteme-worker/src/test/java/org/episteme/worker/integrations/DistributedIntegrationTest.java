@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.server.server.integrations;
+package org.episteme.worker.integrations;
 
 import io.grpc.ManagedChannel;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * End-to-end integration test for Episteme Grid.
  */
-@SpringBootTest
+@SpringBootTest(classes = org.episteme.server.server.EpistemeApplication.class)
 @ActiveProfiles("test")
 public class DistributedIntegrationTest {
 
@@ -45,7 +45,6 @@ public class DistributedIntegrationTest {
         serverName = InProcessServerBuilder.generateName();
         
         // Start an in-process server using the same ComputeService bean from Spring
-        // Note: ComputeService must extend ComputeServiceGrpc.ComputeServiceImplBase
         InProcessServerBuilder.forName(serverName)
                 .directExecutor()
                 .addService(computeService)

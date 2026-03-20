@@ -94,9 +94,13 @@
     <!-- Platform targeting to avoid downloading all binaries (e.g. Windows DLLs in Docker) -->
     <javacpp.platform>${os.detected.classifier}</javacpp.platform>
     
+    <maven.compiler.release>25</maven.compiler.release>
+    <maven.compiler.source>25</maven.compiler.source>
+    <maven.compiler.target>25</maven.compiler.target>
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
     <argLine></argLine>
   </properties>
+
   <dependencyManagement>
     <dependencies>
       <!-- Internal modules -->
@@ -963,24 +967,6 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-    </profile>
-    <profile>
-      <id>jdk21</id>
-      <activation>
-        <jdk>21</jdk>
-      </activation>
-      <properties>
-        <maven.compiler.release>21</maven.compiler.release>
-      </properties>
-    </profile>
-    <profile>
-      <id>jdk25</id>
-      <activation>
-        <jdk>25</jdk>
-      </activation>
-      <properties>
-        <maven.compiler.release>25</maven.compiler.release>
-      </properties>
     </profile>
   </profiles>
 </project>

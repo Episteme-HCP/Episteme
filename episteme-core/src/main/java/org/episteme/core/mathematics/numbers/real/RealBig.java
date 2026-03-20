@@ -313,15 +313,12 @@ final class RealBig extends Real {
 
     @Override
     public Real toDegrees() {
-        // TODO: High-precision implementation
-        return Real.of(Math.toDegrees(value.doubleValue()));
+        return this.multiply(Real.of("180")).divide(Real.PI);
     }
 
     @Override
     public Real toRadians() {
-        // TODO: High-precision implementation
-        // Use pi from constants if available
-        return Real.of(Math.toRadians(value.doubleValue()));
+        return this.multiply(Real.PI).divide(Real.of("180"));
     }
 
     @Override
