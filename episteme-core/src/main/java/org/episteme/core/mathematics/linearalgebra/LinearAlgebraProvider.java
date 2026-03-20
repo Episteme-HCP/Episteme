@@ -111,6 +111,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the QR decomposition of the specified matrix.
      */
     default QRResult<E> qr(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default qr() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support qr()");
     }
 
@@ -118,6 +119,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the Singular Value Decomposition (SVD) of the specified matrix.
      */
     default SVDResult<E> svd(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default svd() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support svd()");
     }
 
@@ -125,6 +127,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the eigenvalue decomposition of the specified matrix.
      */
     default EigenResult<E> eigen(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default eigen() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support eigen()");
     }
 
@@ -132,6 +135,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the LU decomposition of the specified matrix.
      */
     default LUResult<E> lu(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default lu() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support lu()");
     }
 
@@ -139,6 +143,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the Cholesky decomposition of the specified matrix.
      */
     default CholeskyResult<E> cholesky(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default cholesky() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support cholesky()");
     }
 

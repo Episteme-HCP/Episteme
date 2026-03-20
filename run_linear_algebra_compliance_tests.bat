@@ -20,7 +20,7 @@ setlocal
 echo Running Linear Algebra Compliance Tests...
 
 set MAVEN_OPTS=--add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED
-mvn clean test -Dtest=LinearAlgebraComplianceTest -Dorg.episteme.project.name=Episteme -Dorg.episteme.report.path=../docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md -pl episteme-native
+mvn.cmd clean test "-Dtest=LinearAlgebraComplianceTest" "-DskipTests=false" "-Dsurefire.failIfNoSpecifiedTests=false" "-Dorg.episteme.project.name=Episteme" "-Dorg.episteme.report.path=../docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md" "-pl" "episteme-benchmarks" "-am" "-Denforcer.skip=true"
 
 echo.
 echo Tests completed. View report at docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md
