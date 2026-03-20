@@ -69,6 +69,7 @@ public class DistributedIntegrationTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testFullComputeLoop() throws Exception {
         // Define a simple task
         Callable<String> task = (Callable<String> & Serializable) () -> "Hello from Episteme Grid!";

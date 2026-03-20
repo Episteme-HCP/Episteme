@@ -128,7 +128,7 @@ public class WorkerNode {
         logger.info("Worker {} shut down", workerId);
     }
 
-    void register() {
+    public void register() {
         WorkerRegistration reg = WorkerRegistration.newBuilder()
                 .setHostname("worker-" + System.currentTimeMillis())
                 .setCores(Runtime.getRuntime().availableProcessors())
@@ -137,7 +137,7 @@ public class WorkerNode {
         logger.info("Registered as worker: {}", workerId);
     }
 
-    void pollAndExecute() {
+    public void pollAndExecute() {
         TaskRequest task = blockingStub.requestTask(
                 WorkerIdentifier.newBuilder().setWorkerId(workerId).build());
 
