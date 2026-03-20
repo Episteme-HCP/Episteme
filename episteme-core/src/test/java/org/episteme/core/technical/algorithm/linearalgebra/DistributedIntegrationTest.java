@@ -26,6 +26,7 @@ public class DistributedIntegrationTest {
         // 1. Setup Distributed Context
         DistributedContext distCtx = new SimulationDistributedContext(4); // Simulate 4 nodes
         DistributedCompute.setContext(distCtx);
+        AlgorithmManager.refresh();
         System.out.println("Context set to: " + distCtx.getClass().getSimpleName() + " (Parallelism: " + distCtx.getParallelism() + ")");
 
         // 2. Query AlgorithmManager
