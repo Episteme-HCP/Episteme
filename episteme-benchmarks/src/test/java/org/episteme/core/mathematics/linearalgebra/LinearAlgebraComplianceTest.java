@@ -55,8 +55,22 @@ public class LinearAlgebraComplianceTest {
         try {
             System.out.println("[ComplianceTest] Discovering via BackendDiscovery...");
             for (org.episteme.core.technical.backend.Backend backend : org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders()) {
-                System.out.println("[ComplianceTest] Probing backend: " + backend.getName() + " [" + backend.getClass().getName() + "]");
-                for (org.episteme.core.technical.algorithm.AlgorithmProvider ap : backend.getAlgorithmProviders()) {
+                if (backend == null) continue;
+                String bName = "Unknown";
+                try { bName = backend.getName(); } catch (Throwable t) {}
+                System.out.println("[ComplianceTest] Probing backend: " + bName + " [" + backend.getClass().getName() + "]");
+                
+                List<org.episteme.core.technical.algorithm.AlgorithmProvider> providersList = null;
+                try {
+                    providersList = backend.getAlgorithmProviders();
+                } catch (Throwable t) {
+                    System.err.println("Warning: Backend " + bName + " failed to provide algorithm providers: " + t.getMessage());
+                }
+                
+                if (providersList == null) continue;
+                
+                for (org.episteme.core.technical.algorithm.AlgorithmProvider ap : providersList) {
+                    if (ap == null) continue;
                     if (ap instanceof LinearAlgebraProvider<?> p) {
                         String name = "Unknown";
                         try { name = p.getName(); } catch(Throwable t) {}
@@ -71,6 +85,7 @@ public class LinearAlgebraComplianceTest {
             }
         } catch (Throwable e) {
              System.err.println("Warning: BackendDiscovery traversal interrupted: " + e.getMessage());
+             e.printStackTrace(); // Added printStackTrace for better debugging
         }
                 
         List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
