@@ -24,7 +24,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.auto.service.AutoService;
-import java.math.BigDecimal;
+
 
 /**
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
@@ -50,17 +50,9 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     private static MethodHandle MPFR_CMP_ABS;
     private static MethodHandle MPFR_FREE_STR;
     private static MethodHandle MPFR_SET_UI;
-    private static MethodHandle MPFR_ABS;
     private static MethodHandle MPFR_CMP;
     private static MethodHandle MPFR_ZERO_P;
     private static MethodHandle MPFR_NEG;
-    private static MethodHandle MPFR_EXP;
-    private static MethodHandle MPFR_LOG;
-    private static MethodHandle MPFR_SIN;
-    private static MethodHandle MPFR_COS;
-    private static MethodHandle MPFR_TAN;
-    private static MethodHandle MPFR_POW;
-    private static MethodHandle MPFR_SQRT;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -88,17 +80,9 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                 MPFR_CMP_ABS = lookup(mpfr, "mpfr_cmpabs", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
                 MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
                 MPFR_SET_UI = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
-                MPFR_ABS = lookup(mpfr, "mpfr_abs", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
                 MPFR_ZERO_P = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 MPFR_NEG = lookup(mpfr, "mpfr_neg", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_EXP = lookup(mpfr, "mpfr_exp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_LOG = lookup(mpfr, "mpfr_log", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SIN = lookup(mpfr, "mpfr_sin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_COS = lookup(mpfr, "mpfr_cos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_TAN = lookup(mpfr, "mpfr_tan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_POW = lookup(mpfr, "mpfr_pow", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null && MPFR_MUL != null && MPFR_CMP_ABS != null && MPFR_SUB != null && MPFR_SET != null && MPFR_DIV != null && MPFR_SET_UI != null;
                 if (AVAILABLE) {
@@ -871,22 +855,7 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         }
     }
 
-    private void swapMPFR(MemorySegment h_Mat, int r1, int c1, int r2, int c2, int cols, Arena arena, long prec, boolean isComplex) {
-        MemorySegment m1 = getMPFR(h_Mat, r1, c1, cols, 0, isComplex);
-        MemorySegment m2 = getMPFR(h_Mat, r2, c2, cols, 0, isComplex);
-        MemorySegment tmp = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, tmp, prec);
-        NativeSafe.invoke(MPFR_SET, tmp, m1, 0);
-        NativeSafe.invoke(MPFR_SET, m1, m2, 0);
-        NativeSafe.invoke(MPFR_SET, m2, tmp, 0);
-        if (isComplex) {
-            m1 = getMPFR(h_Mat, r1, c1, cols, 1, true);
-            m2 = getMPFR(h_Mat, r2, c2, cols, 1, true);
-            NativeSafe.invoke(MPFR_SET, tmp, m1, 0);
-            NativeSafe.invoke(MPFR_SET, m1, m2, 0);
-            NativeSafe.invoke(MPFR_SET, m2, tmp, 0);
-        }
-    }
+
 
     private void subtractMulReal(MemorySegment h_Mat, int r, int c, MemorySegment factor, MemorySegment h_Source, int rs, int cs, int cols, Arena arena, long prec) {
         MemorySegment dst = getMPFR(h_Mat, r, c, cols, 0, false);

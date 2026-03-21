@@ -111,6 +111,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
  
     private static MemorySegment CUBLAS_HANDLE;
     private static MemorySegment CUSPARSE_HANDLE;
+    private static MemorySegment CUSOLVER_HANDLE;
 
     // Constants
     private static final int CUSPARSE_INDEX_32BIT = 0;
@@ -126,9 +127,13 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     }
 
     private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor descriptor) {
-        return NativeFFMLoader.findSymbol(lookup, name)
+        MethodHandle handle = NativeFFMLoader.findSymbol(lookup, name)
             .map(s -> LINKER.downcallHandle(s, descriptor))
             .orElse(null);
+        if (handle != null && logger.isTraceEnabled()) {
+            logger.trace("Bound symbol {}: type={}", name, handle.type());
+        }
+        return handle;
     }
 
     private static synchronized void ensureInitialized() {
@@ -136,44 +141,44 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
         try (Arena tempArena = Arena.ofConfined()) {
             // 1. Load CUDA Runtime
-            Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", tempArena);
+            Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", Arena.global());
             if (cudaRtOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcudart.so");
                 if (Files.exists(linuxPath)) {
-                    cudaRtOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cudaRtOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), Arena.global());
                 }
             }
             if (cudaRtOpt.isEmpty()) return;
             SymbolLookup cudart = cudaRtOpt.get();
 
             // 2. cuSPARSE
-            Optional<SymbolLookup> cusparseOpt = NativeFFMLoader.loadLibrary("cusparse", tempArena);
+            Optional<SymbolLookup> cusparseOpt = NativeFFMLoader.loadLibrary("cusparse", Arena.global());
             if (cusparseOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcusparse.so");
                 if (Files.exists(linuxPath)) {
-                    cusparseOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cusparseOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), Arena.global());
                 }
             }
             if (cusparseOpt.isEmpty()) return;
             cusparse_lookup = cusparseOpt.get();
 
             // 3. cuBLAS
-            Optional<SymbolLookup> cublasOpt = NativeFFMLoader.loadLibrary("cublas", tempArena);
+            Optional<SymbolLookup> cublasOpt = NativeFFMLoader.loadLibrary("cublas", Arena.global());
             if (cublasOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcublas.so");
                 if (Files.exists(linuxPath)) {
-                    cublasOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cublasOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), Arena.global());
                 }
             }
             if (cublasOpt.isEmpty()) return;
             SymbolLookup cublas = cublasOpt.get();
 
             // 4. cuSolver
-            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", tempArena);
+            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", Arena.global());
             if (cusolverOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcusolver.so");
                 if (Files.exists(linuxPath)) {
-                    cusolverOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cusolverOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), Arena.global());
                 }
             }
             if (cusolverOpt.isPresent()) {
@@ -260,11 +265,17 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 // Global Handles
                 MemorySegment chPtr = tempArena.allocate(ValueLayout.ADDRESS);
                 checkCuda((int) CUBLAS_CREATE.invokeExact(chPtr));
-                CUBLAS_HANDLE = chPtr.get(ValueLayout.ADDRESS, 0);
+                CUBLAS_HANDLE = MemorySegment.ofAddress(chPtr.get(ValueLayout.JAVA_LONG, 0));
 
                 MemorySegment shPtr = tempArena.allocate(ValueLayout.ADDRESS);
                 checkCuda((int) CUSPARSE_CREATE.invokeExact(shPtr));
-                CUSPARSE_HANDLE = shPtr.get(ValueLayout.ADDRESS, 0);
+                CUSPARSE_HANDLE = MemorySegment.ofAddress(shPtr.get(ValueLayout.JAVA_LONG, 0));
+
+                if (CUSOLVER_SP_CREATE != null) {
+                    MemorySegment slvPtr = tempArena.allocate(ValueLayout.ADDRESS);
+                    checkCuda((int) CUSOLVER_SP_CREATE.invokeExact(slvPtr));
+                    CUSOLVER_HANDLE = MemorySegment.ofAddress(slvPtr.get(ValueLayout.JAVA_LONG, 0));
+                }
             }
 
             IS_AVAILABLE = true;
