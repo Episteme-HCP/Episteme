@@ -16,13 +16,7 @@ import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUDenseTens
  * Abstract base for ND4J-backed Tensor backends.
  * <p>
  * Sub-classes target specific ND4J device backends (native CPU, CUDA GPU).
- * If ND4J is not available, falls back to the pure-Java
- * {@link CPUDenseTensorBackend}.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public abstract class ND4JBaseTensorBackend implements TensorBackend {
 

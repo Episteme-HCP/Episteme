@@ -221,7 +221,19 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
 
     @Override
     public RealDoubleMatrix transpose() {
-        return (RealDoubleMatrix) super.transpose();
+        Matrix<Real> result = super.transpose();
+        if (result instanceof RealDoubleMatrix) {
+            return (RealDoubleMatrix) result;
+        }
+        // Fallback to manual conversion if provider returned a GenericMatrix or other type
+        double[] data = new double[result.rows() * result.cols()];
+        int idx = 0;
+        for (int i = 0; i < result.rows(); i++) {
+            for (int j = 0; j < result.cols(); j++) {
+                data[idx++] = result.get(i, j).doubleValue();
+            }
+        }
+        return RealDoubleMatrix.of(data, result.rows(), result.cols());
     }
     @Override
     public RealDoubleMatrix inverse() {

@@ -18,13 +18,9 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 /**
  * NativeND4J Sparse Tensor backend.
  * <p>
- * When sparsity is low (&lt;30% non-zero), delegates to {@link NativeND4JTensorBackend}.
- * Otherwise uses the CPU sparse fallback.
+ * This backend implements sparse tensor operations using ND4J on CUDA.
+ * Delegation to fallbacks is strictly prohibited by architectural rules.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 @AutoService({TensorBackend.class, AlgorithmProvider.class})
 public class NativeND4JCUDASparseTensorBackend implements TensorBackend {
