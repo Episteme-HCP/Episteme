@@ -11,7 +11,7 @@ if [ -f /etc/apt/sources.list.d/debian.sources ]; then
 fi
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install -y unzip zip curl git maven build-essential
+sudo apt-get install -y unzip zip curl git maven build-essential dkms
 
 echo "--- [1/4] JDK 25 Setup (SDKMAN) ---"
 if [ ! -d "$HOME/.sdkman" ]; then
