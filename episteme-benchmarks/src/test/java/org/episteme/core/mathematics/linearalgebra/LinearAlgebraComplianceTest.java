@@ -468,6 +468,8 @@ public class LinearAlgebraComplianceTest {
         } catch (UnsupportedOperationException e) {
             res.status.put(opName, "❌ N/A");
         } catch (Throwable e) {
+            System.err.println("Test failed for operation " + opName + ":");
+            e.printStackTrace();
             String className = e.getClass().getSimpleName();
             String msg = e.getMessage();
             String label = className;
@@ -499,7 +501,7 @@ public class LinearAlgebraComplianceTest {
             int pivot = (int) res.P().get(i).doubleValue();
             for (int j = 0; j < n; j++) paData[i][j] = a.get(pivot, j);
         }
-        Matrix<Real> PA = Matrix.of(paData, org.episteme.core.mathematics.sets.Reals.getInstance());
+        Matrix<Real> PA = neutralMatrix(paData);
         verifyMatrix(new SimpleMatrix(toDoubleArray(PA)), lu, 1e-8);
     }
 
@@ -516,7 +518,7 @@ public class LinearAlgebraComplianceTest {
                 sMatrix[i][j] = (i == j && i < k) ? res.S().get(i) : Real.ZERO;
             }
         }
-        Matrix<Real> S = Matrix.of(sMatrix, org.episteme.core.mathematics.sets.Reals.getInstance());
+        Matrix<Real> S = neutralMatrix(sMatrix);
         Matrix<Real> reconstructed = res.U().multiply(S).multiply(res.V().transpose());
         verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, 1e-8);
     }
@@ -547,7 +549,7 @@ public class LinearAlgebraComplianceTest {
                 // Provider doesn't support generic Vector? Fallback to Matrix mul
                 Real[][] vColData = new Real[vData.length][1];
                 for (int r = 0; r < vData.length; r++) vColData[r][0] = vData[r];
-                Matrix<Real> vMat = Matrix.of(vColData, org.episteme.core.mathematics.sets.Reals.getInstance());
+                Matrix<Real> vMat = neutralMatrix(vColData);
                 Matrix<Real> Am = a.multiply(vMat);
                 Av = Am.getColumn(0);
             }
@@ -560,6 +562,17 @@ public class LinearAlgebraComplianceTest {
                     "Mismatch at (eigenvalue " + lambda + "). Av: " + Av.get(j) + ", lv: " + lv.get(j));
             }
         }
+    }
+
+    private Matrix<Real> neutralMatrix(Real[][] data) {
+        int rows = data.length;
+        int cols = data[0].length;
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, Real.ZERO);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) storage.set(i, j, data[i][j]);
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage, null, org.episteme.core.mathematics.sets.Reals.getInstance());
     }
 
     private double[][] randomData(int rows, int cols, Random rand) {

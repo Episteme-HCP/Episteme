@@ -19,6 +19,8 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.algorithm.OperationContext.Hint;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.slf4j.Logger;
@@ -161,13 +163,33 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     public void shutdown() {}
 
     @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1.0;
+        if (context.hasHint(Hint.DENSE)) return -1.0;
+        
+        double base = getPriority();
+        if (context.hasHint(Hint.SPARSE)) {
+            base += 50.0; // MPFR loves sparse
+        }
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            base += 100.0; // MPFR is the king of precision
+        }
+        return base;
+    }
+
+    @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
         Matrix<Real> res = multiply(a, b.toMatrix());
-        java.util.List<Real> list = new java.util.ArrayList<>(res.rows());
-        for (int i = 0; i < res.rows(); i++) {
-            list.add(res.get(i, 0));
+        int m = res.rows();
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(m, Real.ZERO);
+        for (int i = 0; i < m; i++) {
+            Real val = res.get(i, 0);
+            if (!val.equals(Real.ZERO)) {
+                storage.set(i, val);
+            }
         }
-        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(list, a.getScalarRing());
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, a.getScalarRing());
     }
 
     @Override
@@ -222,27 +244,29 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
 
         NativeSafe.invoke(MPFR_CLEAR, term);
 
-        return backToMatrix(h_y, m, 1, arena);
+        return backToSparseMatrix(h_y, m, 1, arena);
     }
 
     private Matrix<Real> spmm(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> a, Matrix<Real> b, Arena arena, long prec) throws Throwable {
-        // Fallback to multiple SpMV for now, or implement blocked SPMM
         int m = a.rows();
         int n = b.cols();
-        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Real> storage = 
-            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(m, n, Real.ZERO);
+        
+        // Collect results in a SparseMatrixStorage
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(m, n, Real.ZERO);
         
         for (int j = 0; j < n; j++) {
-            // Extract column j of B as a vector
-            // This is slow, but functional for now. Optimized implementation should use direct memory access.
             Vector<Real> colB = b.getColumn(j);
             Matrix<Real> resCol = multiply(a, colB.toMatrix());
             
             for (int i = 0; i < m; i++) {
-                storage.set(i, j, resCol.get(i, 0));
+                Real val = resCol.get(i, 0);
+                if (!val.equals(Real.ZERO)) {
+                    storage.set(i, j, val);
+                }
             }
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage, this, Real.ZERO);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, Real.ZERO);
     }
 
     private long getPrecision() {
@@ -273,15 +297,18 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         return vec.asSlice((long) idx * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
     }
 
-    private Matrix<Real> backToMatrix(MemorySegment vec, int rows, int cols, Arena arena) throws Throwable {
-        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Real> storage = 
-            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, Real.ZERO);
+    private Matrix<Real> backToSparseMatrix(MemorySegment vec, int rows, int cols, Arena arena) throws Throwable {
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(rows, cols, Real.ZERO);
         
         MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
         for (int i = 0; i < rows * cols; i++) {
-            storage.set(i / cols, i % cols, readMPFR(getMPFR(vec, i), expPtr, arena));
+            Real val = readMPFR(getMPFR(vec, i), expPtr, arena);
+            if (!val.equals(Real.ZERO)) {
+                storage.set(i / cols, i % cols, val);
+            }
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage, this, Real.ZERO);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, Real.ZERO);
     }
 
     private Real readMPFR(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
@@ -439,7 +466,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
                 logger.info("Conjugate Gradient converged in {} iterations.", iter);
             }
 
-            Matrix<Real> resMatrix = backToMatrix(h_x, n, 1, arena);
+            Matrix<Real> resMatrix = backToSparseMatrix(h_x, n, 1, arena);
             
             // Cleanup
             NativeSafe.invoke(MPFR_CLEAR, alpha);
@@ -450,9 +477,16 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
             NativeSafe.invoke(MPFR_CLEAR, tol);
             NativeSafe.invoke(MPFR_CLEAR, temp);
 
-            java.util.List<Real> list = new java.util.ArrayList<>(n);
-            for (int i = 0; i < n; i++) list.add(resMatrix.get(i, 0));
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(list, a.getScalarRing());
+            int m = resMatrix.rows();
+            org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<Real> storage = 
+                new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(m, Real.ZERO);
+            for (int i = 0; i < m; i++) {
+                Real val = resMatrix.get(i, 0);
+                if (!val.equals(Real.ZERO)) {
+                    storage.set(i, val);
+                }
+            }
+            return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, a.getScalarRing());
 
         } catch (Throwable t) {
             throw new RuntimeException("MPFR Conjugate Gradient failed", t);

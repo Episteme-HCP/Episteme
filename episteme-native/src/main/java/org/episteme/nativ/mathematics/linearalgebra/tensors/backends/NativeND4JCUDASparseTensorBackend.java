@@ -30,13 +30,12 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 public class NativeND4JCUDASparseTensorBackend implements TensorBackend {
 
     private static boolean available = false;
-    private static final CPUSparseTensorBackend fallback = new CPUSparseTensorBackend();
 
     static {
         try {
             Class.forName("org.nd4j.linalg.factory.Nd4j");
             org.nd4j.linalg.factory.Nd4jBackend backend = org.nd4j.linalg.factory.Nd4j.getBackend();
-            available = backend != null;
+            available = backend != null && backend.getClass().getName().contains("CudaBackend");
         } catch (Throwable t) {
             available = false;
         }
@@ -44,35 +43,17 @@ public class NativeND4JCUDASparseTensorBackend implements TensorBackend {
 
     @Override
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
-        if (!available) return fallback.zeros(elementType, shape);
-        if (!Real.class.isAssignableFrom(elementType)) return fallback.zeros(elementType, shape);
-        return fallback.zeros(elementType, shape);
+        throw new UnsupportedOperationException("Native ND4J Sparse operations are not yet implemented. Delegation removed per architectural rules.");
     }
 
     @Override
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
-        if (!available) return fallback.ones(elementType, shape);
-        return fallback.ones(elementType, shape);
+        throw new UnsupportedOperationException("Native ND4J Sparse operations are not yet implemented. Delegation removed per architectural rules.");
     }
 
     @Override
     public <T> Tensor<T> create(T[] data, int... shape) {
-        if (!available) return fallback.create(data, shape);
-
-        int nonZeroCount = 0;
-        for (T element : data) {
-            if (element instanceof Real) {
-                if (((Real) element).doubleValue() != 0.0) nonZeroCount++;
-            } else {
-                nonZeroCount++;
-            }
-        }
-
-        double sparsity = (double) nonZeroCount / data.length;
-        if (sparsity > 0.3) {
-            return new NativeND4JTensorBackend().create(data, shape);
-        }
-        return fallback.create(data, shape);
+        throw new UnsupportedOperationException("Native ND4J Sparse operations are not yet implemented. Delegation removed per architectural rules.");
     }
 
     @Override

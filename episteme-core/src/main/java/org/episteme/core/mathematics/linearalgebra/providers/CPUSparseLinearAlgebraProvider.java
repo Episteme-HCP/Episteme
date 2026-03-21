@@ -42,6 +42,7 @@ import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.structures.rings.Field;
 import com.google.auto.service.AutoService;
@@ -137,6 +138,18 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     public void shutdown() {
         // No-op
+    }
+
+    @Override
+    public double score(OperationContext context) {
+        if (!isAvailable()) return -1.0;
+        if (context.hasHint(OperationContext.Hint.DENSE)) return -1.0;
+        
+        double base = getPriority();
+        if (context.hasHint(OperationContext.Hint.SPARSE)) {
+            base += 20.0;
+        }
+        return base;
     }
 
     @Override
@@ -642,10 +655,14 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     private static class GenericIterativeUtils {
         public static <E> Vector<E> subtract(Vector<E> a, Vector<E> b, Field<E> f) {
-            @SuppressWarnings("unchecked")
-            E[] res = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), a.dimension());
-            for (int i = 0; i < res.length; i++) res[i] = f.add(a.get(i), f.negate(b.get(i)));
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(res), f);
+            int dim = a.dimension();
+            org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
+                new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, f.zero());
+            for (int i = 0; i < dim; i++) {
+                E val = f.subtract(a.get(i), b.get(i));
+                if (!val.equals(f.zero())) storage.set(i, val);
+            }
+            return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, null, f);
         }
 
         public static <E> E dotProduct(Vector<E> a, Vector<E> b, Field<E> f) {
@@ -659,17 +676,26 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         }
 
         public static <E> Vector<E> scale(E scalar, Vector<E> v, Field<E> f) {
-            @SuppressWarnings("unchecked")
-            E[] res = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), v.dimension());
-            for (int i = 0; i < res.length; i++) res[i] = f.multiply(scalar, v.get(i));
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(res), f);
+            int dim = v.dimension();
+            org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
+                new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, f.zero());
+            if (scalar.equals(f.zero())) return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, null, f);
+            for (int i = 0; i < dim; i++) {
+                E val = f.multiply(scalar, v.get(i));
+                if (!val.equals(f.zero())) storage.set(i, val);
+            }
+            return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, null, f);
         }
 
         public static <E> Vector<E> add(Vector<E> a, Vector<E> b, Field<E> f) {
-            @SuppressWarnings("unchecked")
-            E[] res = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), a.dimension());
-            for (int i = 0; i < res.length; i++) res[i] = f.add(a.get(i), b.get(i));
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(res), f);
+            int dim = a.dimension();
+            org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
+                new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, f.zero());
+            for (int i = 0; i < dim; i++) {
+                E val = f.add(a.get(i), b.get(i));
+                if (!val.equals(f.zero())) storage.set(i, val);
+            }
+            return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, null, f);
         }
     }
 
@@ -679,8 +705,8 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             Vector<E> r = GenericIterativeUtils.subtract(b, A.multiply(x), f);
             Vector<E> r0 = r;
             E rho = f.one(), alpha = f.one(), omega = f.one();
-            Vector<E> v = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.zeros(b.dimension(), f);
-            Vector<E> p = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.zeros(b.dimension(), f);
+            Vector<E> v = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(b.dimension(), f.zero()), null, f);
+            Vector<E> p = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(b.dimension(), f.zero()), null, f);
 
             for (int iter = 0; iter < maxIterations; iter++) {
                 E rhoOld = rho;

@@ -91,7 +91,7 @@ public class ProviderRegistry {
     }
 
     public <E> LinearAlgebraProvider<E> getDenseLinearAlgebraProvider(Ring<E> ring) {
-        return getLinearAlgebraProvider(ring);
+        return selectLinearAlgebraProvider(new OperationContext.Builder().addHint(OperationContext.Hint.DENSE).build(), ring);
     }
 
     /**

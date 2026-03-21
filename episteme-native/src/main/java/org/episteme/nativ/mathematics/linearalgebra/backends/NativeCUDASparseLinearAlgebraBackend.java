@@ -361,7 +361,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         
         if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) {
             if (b.cols() == 1) {
-                return multiplySparseVector((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b);
+                return multiplySparseVector((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b.getColumn(0)).toMatrix();
             }
             return multiplySparseDense((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b);
         }
@@ -369,7 +369,17 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         return multiplyDense(a, b);
     }
 
-    private Matrix<Real> multiplySparseVector(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> a, Matrix<Real> b) {
+    @Override
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA Sparse Backend not available");
+        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) {
+            return multiplySparseVector((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b);
+        }
+        // Fallback or UOE
+        return org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, b);
+    }
+
+    private Vector<Real> multiplySparseVector(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> a, Vector<Real> b) {
         int m = a.rows();
         int k = a.cols();
         int nnz = a.getNnz();
@@ -446,7 +456,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 if (d_buffer != 0) { checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer))); }
                 checkCuda((int) CUSPARSE_DESTROY.invokeExact(handle));
 
-                return fromDoubleArray(resHost, m, 1);
+                return toSparseVector(resHost);
             } finally {
                 checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrRowPtr)));
                 checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrColIdx)));
@@ -456,7 +466,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             }
         } catch (Throwable t) {
             logger.error("cuSPARSE SpMV failed: {}", t.getMessage());
-            return multiplyDense(a, b);
+            return multiplyDense(a, b.toMatrix()).getColumn(0);
         }
     }
 
@@ -548,7 +558,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 if (d_buffer != 0) { checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer))); }
                 checkCuda((int) CUSPARSE_DESTROY.invokeExact(handle));
 
-                return fromDoubleArray(resHost, m, n);
+                return toSparseMatrix(resHost, m, n);
             } finally {
                 checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrRowPtr)));
                 checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrColIdx)));
@@ -558,7 +568,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             }
         } catch (Throwable t) {
             logger.error("cuSPARSE SpMM failed: {}", t.getMessage());
-            return multiplyDense(a, b); // Desperate fallback
+            throw new RuntimeException("CUDA SpMM failed", t);
         }
     }
 
@@ -684,6 +694,29 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         return data;
     }
 
+    private Matrix<Real> toSparseMatrix(double[] data, int rows, int cols) {
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(rows, cols, Real.ZERO);
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] != 0.0) {
+                storage.set(i / cols, i % cols, Real.of(data[i]));
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, Real.ZERO);
+    }
+
+    private Vector<Real> toSparseVector(double[] data) {
+        int n = data.length;
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(n, Real.ZERO);
+        for (int i = 0; i < n; i++) {
+            if (data[i] != 0.0) {
+                storage.set(i, Real.of(data[i]));
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, Reals.getInstance());
+    }
+
     private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
         Real[] reals = new Real[data.length];
         for (int i = 0; i < data.length; i++) reals[i] = Real.of(data[i]);
@@ -758,7 +791,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_c)));
 
-            return fromDoubleArray(result, m, n);
+            return toSparseMatrix(result, m, n);
         } catch (Throwable t) {
             logger.error("cuBLAS DGEAM failed: {}", t.getMessage());
             throw new RuntimeException("CUDA DGEAM failed", t);
@@ -789,7 +822,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             CUBLAS_DESTROY.invokeExact(handle);
             CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a));
             
-            return fromDoubleArray(result, m, n);
+            return toSparseMatrix(result, m, n);
         } catch (Throwable t) {
             throw new RuntimeException("cuBLAS scale failed", t);
         }
@@ -1086,6 +1119,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public double score(OperationContext context) {
         if (!isAvailable()) return -1.0;
+        if (context.hasHint(Hint.DENSE)) return -1.0;
+        
         double base = getPriority();
 
         if (context.hasHint(Hint.SPARSE)) {

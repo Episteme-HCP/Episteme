@@ -150,21 +150,10 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         if (MathContext.getCurrent().getRealPrecision() == MathContext.RealPrecision.EXACT) {
             return -1.0; // Hardware Float/Double cannot handle Arbitrary Precision MathContext
         }
-
-        // Check for unsupported operations
-        if (context.hasHint(Hint.MAT_INV) || context.hasHint(Hint.MAT_DET) || 
-            context.hasHint(Hint.MAT_SOLVE) || context.hasHint(Hint.MAT_DIV)) {
-            return 0.1; // Very low score, let it fall back naturally
-        }
+        if (!isAvailable()) return -1.0;
+        if (context.hasHint(Hint.DENSE)) return -1.0;
         
         double base = getPriority();
-        if (context.hasHint(Hint.GPU_RESIDENT)) base += 50;
-        if (context.hasHint(Hint.SPARSE)) base += 20;
-        
-        // Granular scoring for OpenCL
-        if (context.hasHint(Hint.MAT_MUL)) base += 10;
-        
-        if (context.getDataSize() > 1000) base += 20;
         
         return base;
     }
@@ -434,9 +423,9 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         
         matrixMultiply(da, db, dc, m, n, k);
         
-        Real[] res = new Real[m * n];
-        for(int i=0; i<m*n; i++) res[i] = Real.of(dc.get(i));
-        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(res, m, n, Reals.getInstance());
+        double[] result = new double[m * n];
+        dc.get(result); dc.rewind();
+        return toSparseMatrix(result, m, n);
     }
 
     @Override
@@ -506,31 +495,44 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         int rows = a.rows();
         int cols = a.cols();
         
-        // This is a placeholder for actual CSR extraction logic
-        // In a real implementation, we would access the storage directly if it's SparseMatrixStorage
-        int[] rowPtr = new int[rows + 1];
-        java.util.List<Integer> colIdxList = new java.util.ArrayList<>();
-        java.util.List<Double> valList = new java.util.ArrayList<>();
-        
-        rowPtr[0] = 0;
-        for (int i = 0; i < rows; i++) {
-            int count = 0;
-            for (int j = 0; j < cols; j++) {
-                Real val = a.get(i, j);
-                if (val.doubleValue() != 0.0) {
-                    colIdxList.add(j);
-                    valList.add(val.doubleValue());
-                    count++;
+        int[] rowPtr;
+        int[] colIndices;
+        double[] values;
+        int nnz;
+
+        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) {
+            org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> sa = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a;
+            rowPtr = sa.getRowPointers();
+            colIndices = sa.getColIndices();
+            nnz = sa.getNnz();
+            values = new double[nnz];
+            Object[] valsObj = sa.getValues();
+            for (int i = 0; i < nnz; i++) values[i] = ((Real) valsObj[i]).doubleValue();
+        } else {
+            // Expensive fallback conversion to CSR
+            java.util.List<Integer> rowPtrList = new java.util.ArrayList<>();
+            java.util.List<Integer> colIdxList = new java.util.ArrayList<>();
+            java.util.List<Double> valList = new java.util.ArrayList<>();
+            rowPtrList.add(0);
+            for (int i = 0; i < rows; i++) {
+                int count = 0;
+                for (int j = 0; j < cols; j++) {
+                    Real val = a.get(i, j);
+                    if (val.doubleValue() != 0.0) {
+                        colIdxList.add(j);
+                        valList.add(val.doubleValue());
+                        count++;
+                    }
                 }
+                rowPtrList.add(rowPtrList.get(i) + count);
             }
-            rowPtr[i+1] = rowPtr[i] + count;
+            rowPtr = rowPtrList.stream().mapToInt(i -> i).toArray();
+            colIndices = colIdxList.stream().mapToInt(i -> i).toArray();
+            values = valList.stream().mapToDouble(d -> d).toArray();
+            nnz = values.length;
         }
-        
-        int nnz = colIdxList.size();
-        int[] colIndices = colIdxList.stream().mapToInt(i -> i).toArray();
-        double[] values = valList.stream().mapToDouble(d -> d).toArray();
-        double[] xData = new double[cols];
-        for (int i = 0; i < cols; i++) xData[i] = x.get(i).doubleValue();
+
+        double[] xData = toDoubleVec(x);
         double[] yData = new double[rows];
 
         cl_mem memPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null);
@@ -560,9 +562,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             clReleaseMemObject(memY);
         }
 
-        Real[] res = new Real[rows];
-        for (int i = 0; i < rows; i++) res[i] = Real.of(yData[i]);
-        return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(res), Reals.getInstance());
+        return toSparseVector(yData);
     }
 
     @Override
@@ -612,7 +612,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     // Helper methods (internal)
     private Matrix<Real> elementWiseVec(double[] a, double[] b, String kernelName, int rows, int cols) {
-        return fromDoubleArray(vecOp(a, b, kernelName), rows, cols);
+        return toSparseMatrix(vecOp(a, b, kernelName), rows, cols);
     }
 
     private double[] vecOp(double[] a, double[] b, String kernelName) {
@@ -669,12 +669,36 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     private double[] toDoubleVec(Vector<Real> v) {
         double[] data = new double[v.dimension()];
-        for(int i=0; i<v.dimension(); i++) data[i] = v.get(i).doubleValue();
+        for (int i = 0; i < v.dimension(); i++) {
+            data[i] = v.get(i).doubleValue();
+        }
         return data;
     }
 
     private Vector<Real> toRealVector(double[] data) {
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
+        return toSparseVector(data);
+    }
+
+    private Vector<Real> toSparseVector(double[] data) {
+        int dim = data.length;
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, Real.ZERO);
+        for (int i = 0; i < dim; i++) {
+            if (data[i] != 0.0) storage.set(i, Real.of(data[i]));
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, Reals.getInstance());
+    }
+
+    private Matrix<Real> toSparseMatrix(double[] data, int rows, int cols) {
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(rows, cols, Real.ZERO);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                double val = data[i * cols + j];
+                if (val != 0.0) storage.set(i, j, Real.of(val));
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, Reals.getInstance());
     }
 
     // Decompositions and advanced operations (Fallbacks removed as per requirements)

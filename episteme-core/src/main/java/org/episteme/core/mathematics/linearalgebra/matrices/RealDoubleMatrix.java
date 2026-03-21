@@ -65,7 +65,7 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
 
     private static org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> lookupInternalProvider() {
         org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider = 
-            Episteme.getProviderRegistry().getLinearAlgebraProvider(org.episteme.core.mathematics.sets.Reals.getInstance());
+            Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(org.episteme.core.mathematics.sets.Reals.getInstance());
         logger.info("RealDoubleMatrix internal operations will use provider: {} (Score: {})", 
             provider.getName(), provider.getPriority());
         return provider;

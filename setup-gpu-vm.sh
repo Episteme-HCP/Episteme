@@ -4,6 +4,10 @@
 
 set -e
 
+echo "--- [0/4] Basic Dependencies ---"
+sudo apt-get update
+sudo apt-get install -y unzip zip curl git maven build-essential
+
 echo "--- [1/4] JDK 25 Setup (SDKMAN) ---"
 if [ ! -d "$HOME/.sdkman" ]; then
     echo "Installing SDKMAN..."
@@ -27,16 +31,16 @@ echo "--- [2/4] NVIDIA & CUDA Drivers ---"
 if ! command -v nvidia-smi &> /dev/null; then
     echo "Installing NVIDIA drivers..."
     sudo apt-get update
-    sudo apt-get install -y linux-headers-$(uname -r) build-essential
+    sudo apt-get install -y linux-headers-amd64 build-essential
     sudo apt-get install -y nvidia-driver nvidia-cuda-toolkit
 else
     echo "[INFO] NVIDIA drivers found."
     nvidia-smi
 fi
 
-echo "--- [3/4] OpenCL Setup ---"
-echo "Installing OpenCL runtimes..."
-sudo apt-get install -y mesa-opencl-icd ocl-icd-opencl-dev clinfo
+# --- [3/4] OpenCL & Media Setup ---
+echo "Installing OpenCL runtimes and media dependencies..."
+sudo apt-get install -y mesa-opencl-icd ocl-icd-opencl-dev clinfo vlc
 clinfo | grep -i "platform" || echo "[WARN] OpenCL clinfo check failed. You may need a reboot."
 
 echo "--- [4/4] Project Sync ---"
