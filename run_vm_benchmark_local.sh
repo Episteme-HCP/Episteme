@@ -27,7 +27,14 @@ git fetch origin main | tee -a "$LOG_DIR/console.txt"
 git reset --hard origin/main | tee -a "$LOG_DIR/console.txt"
 
 # Compilation rapide (sans tests, sans copier les dépendances GUI inutiles)
-export JAVA_HOME="/usr/lib/jvm/java-25-openjdk-amd64"
+# Detect JAVA_HOME
+if [ -d "$HOME/.sdkman/candidates/java/current" ]; then
+    export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
+elif [ -d "/usr/lib/jvm/java-25-openjdk-amd64" ]; then
+    export JAVA_HOME="/usr/lib/jvm/java-25-openjdk-amd64"
+elif [ -d "$HOME/.sdkman/candidates/java/25-open" ]; then
+    export JAVA_HOME="$HOME/.sdkman/candidates/java/25-open"
+fi
 export PATH="$JAVA_HOME/bin:$PATH"
 export CUDA_PATH="/usr/local/cuda"
 
