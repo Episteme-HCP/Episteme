@@ -10,6 +10,7 @@ if [ -f /etc/apt/sources.list.d/debian.sources ]; then
     sudo sed -i 's/Components: main/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
 fi
 sudo apt-get update
+sudo apt-get upgrade -y
 sudo apt-get install -y unzip zip curl git maven build-essential
 
 echo "--- [1/4] JDK 25 Setup (SDKMAN) ---"
