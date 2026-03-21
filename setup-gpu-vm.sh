@@ -4,7 +4,11 @@
 
 set -e
 
-echo "--- [0/4] Basic Dependencies ---"
+echo "--- [0/4] Basic Dependencies & Repositories ---"
+# Enable contrib, non-free and non-free-firmware for Debian 12 (Bookworm)
+if [ -f /etc/apt/sources.list.d/debian.sources ]; then
+    sudo sed -i 's/Components: main/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
+fi
 sudo apt-get update
 sudo apt-get install -y unzip zip curl git maven build-essential
 
