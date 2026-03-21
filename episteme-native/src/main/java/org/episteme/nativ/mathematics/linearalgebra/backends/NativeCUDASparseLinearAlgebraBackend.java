@@ -236,7 +236,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 try (Arena tempArena = Arena.ofConfined()) {
                     MemorySegment handlePtr = tempArena.allocate(ValueLayout.ADDRESS);
                     checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-                    CUBLAS_DESTROY.invokeExact(handlePtr.get(ValueLayout.ADDRESS, 0)); 
+                    int destroyStatus = (int) CUBLAS_DESTROY.invokeExact(handlePtr.get(ValueLayout.ADDRESS, 0)); 
+                    checkCuda(destroyStatus);
                 }
             }
 
@@ -809,7 +810,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_a, DoubleBuffer.wrap(data), (long) m * n, arena);
 
             MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            CUBLAS_CREATE.invokeExact(handlePtr);
+            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
             MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, scalar.doubleValue());
@@ -819,8 +820,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] result = new double[m * n];
             copyFromGPU(d_a, DoubleBuffer.wrap(result), (long) m * n, arena);
             
-            CUBLAS_DESTROY.invokeExact(handle);
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a));
+            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
             
             return toSparseMatrix(result, m, n);
         } catch (Throwable t) {
@@ -855,7 +856,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_b, DoubleBuffer.wrap(toDoubleArray(b)), n, arena);
 
             MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            CUBLAS_CREATE.invokeExact(handlePtr);
+            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
             MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
@@ -867,9 +868,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] result = new double[n];
             copyFromGPU(d_a, DoubleBuffer.wrap(result), n, arena);
             
-            CUBLAS_DESTROY.invokeExact(handle);
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a));
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b));
+            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
             
             return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
         } catch (Throwable t) {
@@ -889,7 +890,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_b, DoubleBuffer.wrap(toDoubleArray(b)), n, arena);
 
             MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            CUBLAS_CREATE.invokeExact(handlePtr);
+            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
             MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0);
@@ -901,9 +902,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] result = new double[n];
             copyFromGPU(d_a, DoubleBuffer.wrap(result), n, arena);
             
-            CUBLAS_DESTROY.invokeExact(handle);
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a));
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b));
+            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
             
             return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
         } catch (Throwable t) {
@@ -920,7 +921,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_v, DoubleBuffer.wrap(toDoubleArray(v)), n, arena);
 
             MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            CUBLAS_CREATE.invokeExact(handlePtr);
+            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
             MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, s.doubleValue());
@@ -930,8 +931,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] result = new double[n];
             copyFromGPU(d_v, DoubleBuffer.wrap(result), n, arena);
             
-            CUBLAS_DESTROY.invokeExact(handle);
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v));
+            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v)));
             
             return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
         } catch (Throwable t) {
@@ -950,7 +951,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_v2, DoubleBuffer.wrap(toDoubleArray(v2)), n, arena);
 
             MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            CUBLAS_CREATE.invokeExact(handlePtr);
+            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
             MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
             MemorySegment resultPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
@@ -962,9 +963,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
             double dot = resultPtr.get(ValueLayout.JAVA_DOUBLE, 0);
             
-            CUBLAS_DESTROY.invokeExact(handle);
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v1));
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v2));
+            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v1)));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v2)));
             
             return Real.of(dot);
         } catch (Throwable t) {
@@ -981,7 +982,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_v, DoubleBuffer.wrap(toDoubleArray(v)), n, arena);
 
             MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            CUBLAS_CREATE.invokeExact(handlePtr);
+            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
             MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
 
             MemorySegment resultPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
@@ -992,8 +993,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
             double norm = resultPtr.get(ValueLayout.JAVA_DOUBLE, 0);
             
-            CUBLAS_DESTROY.invokeExact(handle);
-            CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v));
+            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
+            checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v)));
             
             return Real.of(norm);
         } catch (Throwable t) {
@@ -1067,8 +1068,10 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                     MemorySegment.copy(h_x, ValueLayout.JAVA_DOUBLE, 0, xHost, 0, n);
 
                     // 7. Cleanup
-                    CUSPARSE_DESTROY_MAT_DESCR.invokeExact(descr);
-                    CUSOLVER_SP_DESTROY.invokeExact(handle);
+                    int destroyDescrStatus = (int) CUSPARSE_DESTROY_MAT_DESCR.invokeExact(descr);
+                    checkCuda(destroyDescrStatus);
+                    int destroySolverStatus = (int) CUSOLVER_SP_DESTROY.invokeExact(handle);
+                    checkCuda(destroySolverStatus);
 
                     return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(xHost);
                 } finally {
