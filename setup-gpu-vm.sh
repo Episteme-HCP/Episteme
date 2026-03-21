@@ -36,7 +36,7 @@ echo "--- [2/4] NVIDIA & CUDA Drivers ---"
 if ! command -v nvidia-smi &> /dev/null; then
     echo "Installing NVIDIA drivers..."
     sudo apt-get update
-    sudo apt-get install -y linux-headers-amd64 build-essential
+    sudo apt-get install -y linux-headers-cloud-amd64 build-essential
     sudo apt-get install -y nvidia-driver nvidia-cuda-toolkit
 else
     echo "[INFO] NVIDIA drivers found."
