@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Build Tools and Java dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget curl git build-essential cmake pkg-config libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev portaudio19-dev \
+    wget curl git build-essential cmake pkg-config libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev portaudio19-dev libmpfr-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install OpenJDK 25 (Early Access)
@@ -92,8 +92,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget curl python3 python3-pip python3-venv \
     libvlc-dev vlc-plugin-base libhdf5-dev libfftw3-dev libopenblas-dev libportaudio2 \
-    libsnappy-dev libzstd-dev zlib1g-dev \
+    libsnappy-dev libzstd-dev zlib1g-dev libmpfr-dev \
     ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers liblapack-dev \
+    nvidia-opencl-icd \
     libxxf86vm1 libglu1-mesa libxrender1 libxtst6 libxi6 libgl1 libgl1-mesa-dri \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 

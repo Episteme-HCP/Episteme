@@ -8,6 +8,8 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +109,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUBLAS_DSCAL;
     private static MethodHandle CUBLAS_DGEAM;
  
-
+    private static MemorySegment CUBLAS_HANDLE;
+    private static MemorySegment CUSPARSE_HANDLE;
 
     // Constants
     private static final int CUSPARSE_INDEX_32BIT = 0;
@@ -122,142 +125,152 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         ensureInitialized();
     }
 
+    private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor descriptor) {
+        return NativeFFMLoader.findSymbol(lookup, name)
+            .map(s -> LINKER.downcallHandle(s, descriptor))
+            .orElse(null);
+    }
+
     private static synchronized void ensureInitialized() {
         if (IS_AVAILABLE) return;
 
-        try {
-            Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", Arena.global());
-            Optional<SymbolLookup> cusparseOpt = NativeFFMLoader.loadLibrary("cusparse", Arena.global());
-
-            if (cudaRtOpt.isEmpty() || cusparseOpt.isEmpty()) {
-                logger.warn("Native CUDA Sparse libraries not found (cudart={}, cusparse={})", 
-                    cudaRtOpt.isPresent(), cusparseOpt.isPresent());
-                return;
+        try (Arena tempArena = Arena.ofConfined()) {
+            // 1. Load CUDA Runtime
+            Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", tempArena);
+            if (cudaRtOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
+                Path linuxPath = Path.of("/usr/local/cuda/lib64/libcudart.so");
+                if (Files.exists(linuxPath)) {
+                    cudaRtOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                }
             }
-
+            if (cudaRtOpt.isEmpty()) return;
             SymbolLookup cudart = cudaRtOpt.get();
+
+            // 2. cuSPARSE
+            Optional<SymbolLookup> cusparseOpt = NativeFFMLoader.loadLibrary("cusparse", tempArena);
+            if (cusparseOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
+                Path linuxPath = Path.of("/usr/local/cuda/lib64/libcusparse.so");
+                if (Files.exists(linuxPath)) {
+                    cusparseOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                }
+            }
+            if (cusparseOpt.isEmpty()) return;
             cusparse_lookup = cusparseOpt.get();
 
-            // Verify GPU Presence
-            Optional<MemorySegment> deviceCountSym = NativeFFMLoader.findSymbol(cudart, "cudaGetDeviceCount");
-            if (deviceCountSym.isPresent()) {
-                MethodHandle getDeviceCount = LINKER.downcallHandle(deviceCountSym.get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                try (Arena tempArena = Arena.ofConfined()) {
-                    MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
-                    int resCount = (int) getDeviceCount.invokeExact(countPtr);
-                    if (resCount != 0 || countPtr.get(ValueLayout.JAVA_INT, 0) <= 0) {
-                        logger.warn("No CUDA-capable GPU found or error result ({}). Backend disabled.", resCount);
-                        return;
-                    }
+            // 3. cuBLAS
+            Optional<SymbolLookup> cublasOpt = NativeFFMLoader.loadLibrary("cublas", tempArena);
+            if (cublasOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
+                Path linuxPath = Path.of("/usr/local/cuda/lib64/libcublas.so");
+                if (Files.exists(linuxPath)) {
+                    cublasOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
                 }
             }
+            if (cublasOpt.isEmpty()) return;
+            SymbolLookup cublas = cublasOpt.get();
 
-            // Core Runtime
-            CUDA_MALLOC = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaMalloc_v2", "cudaMalloc").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
-            CUDA_FREE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaFree").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUDA_MEMCPY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaMemcpy").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
-            CUDA_DEVICE_SYNCHRONIZE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cudart, "cudaDeviceSynchronize").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT));
-
-            // cuSPARSE handles
-            CUSPARSE_CREATE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreate").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUSPARSE_DESTROY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseDestroy").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            
-            CUSPARSE_CREATE_CSR = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateCsr").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
-            
-            CUSPARSE_CREATE_DN_MAT = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateDnMat").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
-
-            CUSPARSE_SPMM_BUFFER_SIZE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMM_bufferSize").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-            CUSPARSE_SPMM = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMM").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-            CUSPARSE_SPMV_BUFFER_SIZE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMV_bufferSize").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-            CUSPARSE_SPMV = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseSpMV").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-            CUSPARSE_CREATE_DN_VEC = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateDnVec").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-
-            CUSPARSE_CREATE_MAT_DESCR = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseCreateMatDescr").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            CUSPARSE_DESTROY_MAT_DESCR = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusparse_lookup, "cusparseDestroyMatDescr").get(),
-                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-            // cuBLAS handles
-            Optional<SymbolLookup> cublasOpt = NativeFFMLoader.loadLibrary("cublas", Arena.global());
-            if (cublasOpt.isPresent()) {
-                SymbolLookup cublas = cublasOpt.get();
-                CUBLAS_CREATE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasCreate_v2", "cublasCreate").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUBLAS_DESTROY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDestroy_v2", "cublasDestroy").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUBLAS_DGEMM = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDgemm_v2", "cublasDgemm").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
-                        ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                
-                CUBLAS_DDOT = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDdot_v2", "cublasDdot").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                
-                CUBLAS_DNRM2 = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDnrm2_v2", "cublasDnrm2").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-                CUBLAS_DAXPY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDaxpy_v2", "cublasDaxpy").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-
-                CUBLAS_DSCAL = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDscal_v2", "cublasDscal").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                CUBLAS_DGEAM = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cublas, "cublasDgeam_v2", "cublasDgeam").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                try (Arena tempArena = Arena.ofConfined()) {
-                    MemorySegment handlePtr = tempArena.allocate(ValueLayout.ADDRESS);
-                    checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-                    int destroyStatus = (int) CUBLAS_DESTROY.invokeExact(handlePtr.get(ValueLayout.ADDRESS, 0)); 
-                    checkCuda(destroyStatus);
+            // 4. cuSolver
+            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", tempArena);
+            if (cusolverOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
+                Path linuxPath = Path.of("/usr/local/cuda/lib64/libcusolver.so");
+                if (Files.exists(linuxPath)) {
+                    cusolverOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
                 }
             }
-
-            // cuSolver handles
-            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", Arena.global());
             if (cusolverOpt.isPresent()) {
                 cusolver_lookup = cusolverOpt.get();
-                CUSOLVER_SP_CREATE = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusolver_lookup, "cusolverSpCreate").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUSOLVER_SP_DESTROY = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusolver_lookup, "cusolverSpDestroy").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                CUSOLVER_SP_D_CSRLSV_LU = LINKER.downcallHandle(NativeFFMLoader.findSymbol(cusolver_lookup, "cusolverSpDcsrlsvlu").get(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
-                        ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
-                        ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            }
+
+            // 5. Bind Handles
+            CUDA_MALLOC = lookup(cudart, "cudaMalloc", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+            CUDA_FREE = lookup(cudart, "cudaFree", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUDA_MEMCPY = lookup(cudart, "cudaMemcpy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
+            CUDA_DEVICE_SYNCHRONIZE = lookup(cudart, "cudaDeviceSynchronize", FunctionDescriptor.of(ValueLayout.JAVA_INT));
+
+            CUSPARSE_CREATE = lookup(cusparse_lookup, "cusparseCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSPARSE_DESTROY = lookup(cusparse_lookup, "cusparseDestroy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSPARSE_CREATE_MAT_DESCR = lookup(cusparse_lookup, "cusparseCreateMatDescr", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUSPARSE_DESTROY_MAT_DESCR = lookup(cusparse_lookup, "cusparseDestroyMatDescr", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            CUSPARSE_CREATE_CSR = lookup(cusparse_lookup, "cusparseCreateCsr", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            
+            CUSPARSE_CREATE_DN_MAT = lookup(cusparse_lookup, "cusparseCreateDnMat", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+
+            CUSPARSE_SPMM_BUFFER_SIZE = lookup(cusparse_lookup, "cusparseSpMM_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUSPARSE_SPMM = lookup(cusparse_lookup, "cusparseSpMM", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUSPARSE_SPMV_BUFFER_SIZE = lookup(cusparse_lookup, "cusparseSpMV_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUSPARSE_SPMV = lookup(cusparse_lookup, "cusparseSpMV", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUSPARSE_CREATE_DN_VEC = lookup(cusparse_lookup, "cusparseCreateDnVec", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+            CUBLAS_CREATE = lookup(cublas, "cublasCreate_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            if (CUBLAS_CREATE == null) CUBLAS_CREATE = lookup(cublas, "cublasCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUBLAS_DESTROY = lookup(cublas, "cublasDestroy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            if (CUBLAS_DESTROY == null) CUBLAS_DESTROY = lookup(cublas, "cublasDestroy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            CUBLAS_DGEMM = lookup(cublas, "cublasDgemm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+            CUBLAS_DDOT = lookup(cublas, "cublasDdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            
+            CUBLAS_DNRM2 = lookup(cublas, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUBLAS_DAXPY = lookup(cublas, "cublasDaxpy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+            CUBLAS_DSCAL = lookup(cublas, "cublasDscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+            
+            CUBLAS_DGEAM = lookup(cublas, "cublasDgeam_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+            if (cusolver_lookup != null) {
+                CUSOLVER_SP_CREATE = lookup(cusolver_lookup, "cusolverSpCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                CUSOLVER_SP_DESTROY = lookup(cusolver_lookup, "cusolverSpDestroy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                CUSOLVER_SP_D_CSRLSV_LU = lookup(cusolver_lookup, "cusolverSpDcsrlsvlu", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                    ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            }
+
+            // 6. Verify GPU and Start
+            MethodHandle getDeviceCount = lookup(cudart, "cudaGetDeviceCount", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            if (getDeviceCount != null) {
+                MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
+                int res = (int) getDeviceCount.invokeExact(countPtr);
+                int count = countPtr.get(ValueLayout.JAVA_INT, 0);
+                if (res != 0 || count <= 0) return;
+                
+                // Kickstart
+                if (CUDA_FREE != null) {
+                    checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.NULL));
+                }
+
+                // Global Handles
+                MemorySegment chPtr = tempArena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUBLAS_CREATE.invokeExact(chPtr));
+                CUBLAS_HANDLE = chPtr.get(ValueLayout.ADDRESS, 0);
+
+                MemorySegment shPtr = tempArena.allocate(ValueLayout.ADDRESS);
+                checkCuda((int) CUSPARSE_CREATE.invokeExact(shPtr));
+                CUSPARSE_HANDLE = shPtr.get(ValueLayout.ADDRESS, 0);
             }
 
             IS_AVAILABLE = true;
             logger.info("Native CUDA Sparse Backend initialized successfully.");
         } catch (Throwable t) {
+            t.printStackTrace();
             logger.warn("CUDA Sparse initialization failed: {}. Backend disabled.", t.getMessage());
         }
     }
@@ -300,7 +313,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {
         if (!IS_AVAILABLE || CUBLAS_DGEMM == null) {
             logger.warn("cuBLAS not available for dense matrix multiply. Falling back to CPU.");
-            // Fallback to CPU multiplication? (Omitted for brevity, or use another backend)
             return;
         }
 
@@ -312,28 +324,17 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_A, A, (long) m * k, arena);
             copyToGPU(d_B, B, (long) k * n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
             MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
 
-            // cuBLAS is column-major by default. Episteme is row-major.
-            // C = op(A) * op(B)
-            // To get row-major C = A*B using col-major DGEMM:
-            // C^T = B^T * A^T
-            // So we call DGEMM(handle, N, N, n, m, k, alpha, d_B, n, d_A, k, beta, d_C, n)
-            // Use scavenge-protected segments for cuBLAS
-            checkCuda((int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, alpha, 
+            checkCuda((int) CUBLAS_DGEMM.invokeExact(CUBLAS_HANDLE, 0, 0, n, m, k, alpha, 
                 NativeSafe.scavenge(MemorySegment.ofAddress(d_B), (long)k * n * 8, arena, "cublas_dgemm_b").segment(), n, 
-                NativeSafe.scavenge(MemorySegment.ofAddress(d_A), (long)m * n * 8, arena, "cublas_dgemm_a").segment(), k, 
+                NativeSafe.scavenge(MemorySegment.ofAddress(d_A), (long)m * k * 8, arena, "cublas_dgemm_a").segment(), k, 
                 beta, 
                 NativeSafe.scavenge(MemorySegment.ofAddress(d_C), (long)m * n * 8, arena, "cublas_dgemm_c").segment(), n));
 
             copyFromGPU(d_C, C, (long) m * n, arena);
 
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_A), 0, Arena.global(), "gpu_free_a").segment()));
             checkCuda((int) CUDA_FREE.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_B), 0, Arena.global(), "gpu_free_b").segment()));
             checkCuda((int) CUDA_FREE.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_C), 0, Arena.global(), "gpu_free_c").segment()));
@@ -344,7 +345,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public void selectDevice(int deviceId) {
-        // No-op for now
     }
 
     @Override
@@ -376,7 +376,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) {
             return multiplySparseVector((org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a, b);
         }
-        // Fallback or UOE
         return org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.super.multiply(a, b);
     }
 
@@ -386,14 +385,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         int nnz = a.getNnz();
 
         try (Arena arena = Arena.ofConfined()) {
-            // 1. Prepare CSR data
             int[] rowPtrHost = a.getRowPointers();
             int[] colIdxHost = a.getColIndices();
             double[] valsHost = new double[nnz];
             Object[] valsObj = a.getValues();
             for (int i = 0; i < nnz; i++) valsHost[i] = ((Real) valsObj[i]).doubleValue();
 
-            // 2. Allocate and copy to GPU
             long d_csrRowPtr = allocateGPUMemory((long)(m + 1) * 4);
             long d_csrColIdx = allocateGPUMemory((long)nnz * 4);
             long d_csrVal = allocateGPUMemory((long)nnz * 8);
@@ -411,12 +408,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrVal), h_vals, (long)nnz * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
                 checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_vecX), h_vecX, (long)k * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
 
-                // 3. cuSPARSE Handles
-                MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-                checkCuda((int) CUSPARSE_CREATE.invokeExact(handlePtr));
-                MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
-                // Descriptors
                 MemorySegment matAPtr = arena.allocate(ValueLayout.ADDRESS);
                 checkCuda((int) CUSPARSE_CREATE_CSR.invokeExact(matAPtr, (long)m, (long)k, (long)nnz, 
                     MemorySegment.ofAddress(d_csrRowPtr), MemorySegment.ofAddress(d_csrColIdx), MemorySegment.ofAddress(d_csrVal),
@@ -431,31 +422,22 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 checkCuda((int) CUSPARSE_CREATE_DN_VEC.invokeExact(vecYPtr, (long)m, MemorySegment.ofAddress(d_vecY), CUDA_R_64F));
                 MemorySegment vecY = vecYPtr.get(ValueLayout.ADDRESS, 0);
 
-                // Buffer allocation for SpMV
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
                 MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
                 MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
                 
-                int rS4 = (int) CUSPARSE_SPMV_BUFFER_SIZE.invokeExact(handle, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr);
-                checkCuda(rS4);
+                checkCuda((int) CUSPARSE_SPMV_BUFFER_SIZE.invokeExact(CUSPARSE_HANDLE, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr));
                 long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
-                System.out.println("[CUDA Sparse] SpMV m=" + m + ", k=" + k + ", nnz=" + nnz + ", bufferSize=" + bufferSize);
                 long d_buffer = bufferSize > 0 ? allocateGPUMemory(bufferSize) : 0;
 
-                // Execution
-                int rS5 = (int) CUSPARSE_SPMV.invokeExact(handle, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer));
-                System.out.println("[CUDA Sparse] SpMV Result Code: " + rS5);
-                checkCuda(rS5);
+                checkCuda((int) CUSPARSE_SPMV.invokeExact(CUSPARSE_HANDLE, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer)));
 
-                // 4. Result (D2H)
                 double[] resHost = new double[m];
                 MemorySegment h_res = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
                 checkCuda((int) CUDA_MEMCPY.invokeExact(h_res, MemorySegment.ofAddress(d_vecY), (long)m * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
                 MemorySegment.copy(h_res, ValueLayout.JAVA_DOUBLE, 0, resHost, 0, m);
 
-                // Cleanup GPU
                 if (d_buffer != 0) { checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer))); }
-                checkCuda((int) CUSPARSE_DESTROY.invokeExact(handle));
 
                 return toSparseVector(resHost);
             } finally {
@@ -491,38 +473,29 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         int nnz = a.getNnz();
 
         try (Arena arena = Arena.ofConfined()) {
-            // 1. Prepare CSR data from SparseMatrix
             int[] rowPtrHost = a.getRowPointers();
             int[] colIdxHost = a.getColIndices();
             Object[] valsObj = a.getValues();
             double[] valsHost = new double[nnz];
             for (int i = 0; i < nnz; i++) valsHost[i] = ((Real) valsObj[i]).doubleValue();
 
-            // 2. Allocate and copy to GPU
             long d_csrRowPtr = allocateGPUMemory((long)(m + 1) * 4);
             long d_csrColIdx = allocateGPUMemory((long)nnz * 4);
             long d_csrVal = allocateGPUMemory((long)nnz * 8);
             long d_denseB = allocateGPUMemory((long)k * n * 8);
             long d_denseC = allocateGPUMemory((long)m * n * 8);
 
-            // Copies (H2D)
             try {
                 MemorySegment h_rowPtr = arena.allocateFrom(ValueLayout.JAVA_INT, rowPtrHost);
                 MemorySegment h_colIdx = arena.allocateFrom(ValueLayout.JAVA_INT, colIdxHost);
                 MemorySegment h_vals = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, valsHost);
                 MemorySegment h_denseB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
 
-                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_csrRowPtr), (long)(m+1)*4, arena, "cusparse_rowptr_h2d").segment(), h_rowPtr, (long)(m + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
-                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_csrColIdx), (long)nnz*4, arena, "cusparse_colidx_h2d").segment(), h_colIdx, (long)nnz * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
-                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_csrVal), (long)nnz*8, arena, "cusparse_val_h2d").segment(), h_vals, (long)nnz * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-                checkCuda((int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_denseB), (long)k*n*8, arena, "cusparse_denseb_h2d").segment(), h_denseB, (long)k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrRowPtr), h_rowPtr, (long)(m + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrColIdx), h_colIdx, (long)nnz * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrVal), h_vals, (long)nnz * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_denseB), h_denseB, (long)k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
 
-                // 3. cuSPARSE Handles
-                MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-                checkCuda((int) CUSPARSE_CREATE.invokeExact(handlePtr));
-                MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
-                // Descriptors
                 MemorySegment matAPtr = arena.allocate(ValueLayout.ADDRESS);
                 checkCuda((int) CUSPARSE_CREATE_CSR.invokeExact(matAPtr, (long)m, (long)k, (long)nnz, 
                     MemorySegment.ofAddress(d_csrRowPtr), MemorySegment.ofAddress(d_csrColIdx), MemorySegment.ofAddress(d_csrVal),
@@ -537,27 +510,22 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 checkCuda((int) CUSPARSE_CREATE_DN_MAT.invokeExact(matCPtr, (long)m, (long)n, (long)n, MemorySegment.ofAddress(d_denseC), CUDA_R_64F, CUSPARSE_ORDER_ROW));
                 MemorySegment matC = matCPtr.get(ValueLayout.ADDRESS, 0);
 
-                // Buffer allocation for SpMM
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
                 MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
                 MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
                 
-                checkCuda((int) CUSPARSE_SPMM_BUFFER_SIZE.invokeExact(handle, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr));
+                checkCuda((int) CUSPARSE_SPMM_BUFFER_SIZE.invokeExact(CUSPARSE_HANDLE, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr));
                 long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
                 long d_buffer = bufferSize > 0 ? allocateGPUMemory(bufferSize) : 0;
 
-                // Execution
-                checkCuda((int) CUSPARSE_SPMM.invokeExact(handle, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer)));
+                checkCuda((int) CUSPARSE_SPMM.invokeExact(CUSPARSE_HANDLE, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer)));
 
-                // 4. Result (D2H)
                 double[] resHost = new double[m * n];
                 MemorySegment h_res = arena.allocate(ValueLayout.JAVA_DOUBLE, m * n);
-                checkCuda((int) CUDA_MEMCPY.invokeExact(h_res, NativeSafe.scavenge(MemorySegment.ofAddress(d_denseC), (long)m * n * 8, arena, "cusparse_densec_d2h").segment(), (long)m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(h_res, MemorySegment.ofAddress(d_denseC), (long)m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
                 MemorySegment.copy(h_res, ValueLayout.JAVA_DOUBLE, 0, resHost, 0, m * n);
 
-                // Cleanup GPU
                 if (d_buffer != 0) { checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_buffer))); }
-                checkCuda((int) CUSPARSE_DESTROY.invokeExact(handle));
 
                 return toSparseMatrix(resHost, m, n);
             } finally {
@@ -634,13 +602,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             if (hostBuf.isDirect()) {
                 h_seg = MemorySegment.ofBuffer(hostBuf);
             } else {
-                // If heap buffer, copy to off-heap first
                 double[] array = new double[(int) count];
                 hostBuf.duplicate().get(array);
                 h_seg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, array);
             }
-            int rcm6 = (int) CUDA_MEMCPY.invokeExact(NativeSafe.scavenge(MemorySegment.ofAddress(d_ptr), count * 8, arena, "cuda_memcpy_h2d").segment(), h_seg, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
-            if (rcm6 != 0) throw new RuntimeException("cudaMemcpy H2D failed with code " + rcm6);
+            checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_ptr), h_seg, count * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
         } catch (Throwable t) {
             throw new RuntimeException("GPU Copy H2D failed", t);
         }
@@ -662,9 +628,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             } else {
                 h_seg = arena.allocate(ValueLayout.JAVA_DOUBLE, count);
             }
-            int rcm7 = (int) CUDA_MEMCPY.invokeExact(h_seg, NativeSafe.scavenge(MemorySegment.ofAddress(d_ptr), count * 8, arena, "cuda_memcpy_d2h").segment(), count * 8, CUDA_MEMCPY_DEVICE_TO_HOST);
-            if (rcm7 != 0) throw new RuntimeException("cudaMemcpy D2H failed with code " + rcm7);
-            
+            checkCuda((int) CUDA_MEMCPY.invokeExact(h_seg, MemorySegment.ofAddress(d_ptr), count * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
             if (!isDirect) {
                 double[] array = h_seg.toArray(ValueLayout.JAVA_DOUBLE);
                 hostBuf.duplicate().put(array);
@@ -767,27 +731,18 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_a, DoubleBuffer.wrap(toDoubleArray(a)), (long) m * n, arena);
             copyToGPU(d_b, DoubleBuffer.wrap(toDoubleArray(b)), (long) m * n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, alphaVal);
             MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, betaVal);
 
-            // C = alpha * op(A) + beta * op(B)
-            // cuBLAS is column-major. If we pass row-major and no transpose, 
-            // it computes row-major C if we swap m and n.
-            int res = (int) CUBLAS_DGEAM.invokeExact(handle, 0, 0, n, m, alpha, 
+            checkCuda((int) CUBLAS_DGEAM.invokeExact(CUBLAS_HANDLE, 0, 0, n, m, alpha, 
                 MemorySegment.ofAddress(d_a).reinterpret((long) m * n * 8), n, 
                 beta, 
                 MemorySegment.ofAddress(d_b).reinterpret((long) m * n * 8), n, 
-                MemorySegment.ofAddress(d_c).reinterpret((long) m * n * 8), n);
-            checkCuda(res);
+                MemorySegment.ofAddress(d_c).reinterpret((long) m * n * 8), n));
 
             double[] result = new double[m * n];
             copyFromGPU(d_c, DoubleBuffer.wrap(result), (long) m * n, arena);
 
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_c)));
@@ -809,18 +764,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             long d_a = allocateGPUMemory((long) m * n * 8);
             copyToGPU(d_a, DoubleBuffer.wrap(data), (long) m * n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, scalar.doubleValue());
-            int res = (int) CUBLAS_DSCAL.invokeExact(handle, m * n, alpha, MemorySegment.ofAddress(d_a).reinterpret((long) m * n * 8), 1);
-            checkCuda(res);
+            checkCuda((int) CUBLAS_DSCAL.invokeExact(CUBLAS_HANDLE, m * n, alpha, MemorySegment.ofAddress(d_a).reinterpret((long) m * n * 8), 1));
 
             double[] result = new double[m * n];
             copyFromGPU(d_a, DoubleBuffer.wrap(result), (long) m * n, arena);
             
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
             
             return toSparseMatrix(result, m, n);
@@ -831,7 +780,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        // Simplest native transpose: copy to GPU and back with index swap
         int m = a.rows();
         int n = a.cols();
         double[] data = toDoubleArray(a);
@@ -855,20 +803,14 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_a, DoubleBuffer.wrap(toDoubleArray(a)), n, arena);
             copyToGPU(d_b, DoubleBuffer.wrap(toDoubleArray(b)), n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
-            int res = (int) CUBLAS_DAXPY.invokeExact(handle, n, alpha, 
+            checkCuda((int) CUBLAS_DAXPY.invokeExact(CUBLAS_HANDLE, n, alpha, 
                 MemorySegment.ofAddress(d_b).reinterpret((long) n * 8), 1, 
-                MemorySegment.ofAddress(d_a).reinterpret((long) n * 8), 1);
-            checkCuda(res);
+                MemorySegment.ofAddress(d_a).reinterpret((long) n * 8), 1));
 
             double[] result = new double[n];
             copyFromGPU(d_a, DoubleBuffer.wrap(result), n, arena);
             
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
             
@@ -889,20 +831,14 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_a, DoubleBuffer.wrap(toDoubleArray(a)), n, arena);
             copyToGPU(d_b, DoubleBuffer.wrap(toDoubleArray(b)), n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0);
-            int res = (int) CUBLAS_DAXPY.invokeExact(handle, n, alpha, 
+            checkCuda((int) CUBLAS_DAXPY.invokeExact(CUBLAS_HANDLE, n, alpha, 
                 MemorySegment.ofAddress(d_b).reinterpret((long) n * 8), 1, 
-                MemorySegment.ofAddress(d_a).reinterpret((long) n * 8), 1);
-            checkCuda(res);
+                MemorySegment.ofAddress(d_a).reinterpret((long) n * 8), 1));
 
             double[] result = new double[n];
             copyFromGPU(d_a, DoubleBuffer.wrap(result), n, arena);
             
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_a)));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
             
@@ -920,18 +856,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             long d_v = allocateGPUMemory((long) n * 8);
             copyToGPU(d_v, DoubleBuffer.wrap(toDoubleArray(v)), n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, s.doubleValue());
-            int res = (int) CUBLAS_DSCAL.invokeExact(handle, n, alpha, MemorySegment.ofAddress(d_v).reinterpret((long) n * 8), 1);
-            checkCuda(res);
+            checkCuda((int) CUBLAS_DSCAL.invokeExact(CUBLAS_HANDLE, n, alpha, MemorySegment.ofAddress(d_v).reinterpret((long) n * 8), 1));
 
             double[] result = new double[n];
             copyFromGPU(d_v, DoubleBuffer.wrap(result), n, arena);
             
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v)));
             
             return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
@@ -950,20 +880,14 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             copyToGPU(d_v1, DoubleBuffer.wrap(toDoubleArray(v1)), n, arena);
             copyToGPU(d_v2, DoubleBuffer.wrap(toDoubleArray(v2)), n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment resultPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
-            int res = (int) CUBLAS_DDOT.invokeExact(handle, n, 
+            checkCuda((int) CUBLAS_DDOT.invokeExact(CUBLAS_HANDLE, n, 
                 MemorySegment.ofAddress(d_v1).reinterpret((long) n * 8), 1, 
                 MemorySegment.ofAddress(d_v2).reinterpret((long) n * 8), 1, 
-                resultPtr);
-            checkCuda(res);
+                resultPtr));
 
             double dot = resultPtr.get(ValueLayout.JAVA_DOUBLE, 0);
             
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v1)));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v2)));
             
@@ -981,122 +905,19 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             long d_v = allocateGPUMemory((long) n * 8);
             copyToGPU(d_v, DoubleBuffer.wrap(toDoubleArray(v)), n, arena);
 
-            MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUBLAS_CREATE.invokeExact(handlePtr));
-            MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
             MemorySegment resultPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
-            int res = (int) CUBLAS_DNRM2.invokeExact(handle, n, 
+            checkCuda((int) CUBLAS_DNRM2.invokeExact(CUBLAS_HANDLE, n, 
                 MemorySegment.ofAddress(d_v).reinterpret((long) n * 8), 1, 
-                resultPtr);
-            checkCuda(res);
+                resultPtr));
 
             double norm = resultPtr.get(ValueLayout.JAVA_DOUBLE, 0);
             
-            checkCuda((int) CUBLAS_DESTROY.invokeExact(handle));
             checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_v)));
             
             return Real.of(norm);
         } catch (Throwable t) {
             throw new RuntimeException("cuBLAS Dnrm2 failed", t);
         }
-    }
-
-    @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (!IS_AVAILABLE || CUSOLVER_SP_D_CSRLSV_LU == null) throw new UnsupportedOperationException("cuSolverSparse LU solver not available");
-        
-        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) {
-            org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> sparseA = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a;
-            int n = a.rows();
-            int nnz = sparseA.getNnz();
-
-            try (Arena arena = Arena.ofConfined()) {
-                // 1. Prepare CSR data
-                int[] rowPtrHost = sparseA.getRowPointers();
-                int[] colIdxHost = sparseA.getColIndices();
-                double[] valsHost = new double[nnz];
-                Object[] valsObj = sparseA.getValues();
-                for (int i = 0; i < nnz; i++) valsHost[i] = ((Real) valsObj[i]).doubleValue();
-                double[] bHost = toDoubleArray(b);
-
-                // 2. Allocate and copy to GPU
-                long d_csrRowPtr = allocateGPUMemory((long)(n + 1) * 4);
-                long d_csrColIdx = allocateGPUMemory((long)nnz * 4);
-                long d_csrVal = allocateGPUMemory((long)nnz * 8);
-                long d_b = allocateGPUMemory((long)n * 8);
-                long d_x = allocateGPUMemory((long)n * 8);
-
-                try {
-                    MemorySegment h_rowPtr = arena.allocateFrom(ValueLayout.JAVA_INT, rowPtrHost);
-                    MemorySegment h_colIdx = arena.allocateFrom(ValueLayout.JAVA_INT, colIdxHost);
-                    MemorySegment h_vals = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, valsHost);
-                    MemorySegment h_b = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bHost);
-
-                    checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrRowPtr), h_rowPtr, (long)(n + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
-                    checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrColIdx), h_colIdx, (long)nnz * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
-                    checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_csrVal), h_vals, (long)nnz * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-                    checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_b), h_b, (long)n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-
-                    // 3. cuSolver Handle
-                    MemorySegment handlePtr = arena.allocate(ValueLayout.ADDRESS);
-                    checkCuda((int) CUSOLVER_SP_CREATE.invokeExact(handlePtr));
-                    MemorySegment handle = handlePtr.get(ValueLayout.ADDRESS, 0);
-
-                    // 4. cuSPARSE Descriptor
-                    MemorySegment descrPtr = arena.allocate(ValueLayout.ADDRESS);
-                    checkCuda((int) CUSPARSE_CREATE_MAT_DESCR.invokeExact(descrPtr));
-                    MemorySegment descr = descrPtr.get(ValueLayout.ADDRESS, 0);
-                    
-                    MemorySegment singularity = arena.allocate(ValueLayout.JAVA_INT);
-                    
-                    // 5. Execution: CUSOLVER_SP_D_CSRLSV_LU
-                    // int n, int nnz, descrA, valA, rowPtrA, colIndA, b, tol, reorder, x, singularity
-                    int status = (int) CUSOLVER_SP_D_CSRLSV_LU.invokeExact(handle, n, nnz, descr, 
-                        MemorySegment.ofAddress(d_csrVal), MemorySegment.ofAddress(d_csrRowPtr), MemorySegment.ofAddress(d_csrColIdx),
-                        MemorySegment.ofAddress(d_b), 1e-12, 0, MemorySegment.ofAddress(d_x), singularity);
-                    
-                    checkCuda(status);
-                    if (singularity.get(ValueLayout.JAVA_INT, 0) != -1) {
-                        throw new RuntimeException("Matrix is singular at " + singularity.get(ValueLayout.JAVA_INT, 0));
-                    }
-
-                    // 6. Result (D2H)
-                    double[] xHost = new double[n];
-                    MemorySegment h_x = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                    checkCuda((int) CUDA_MEMCPY.invokeExact(h_x, MemorySegment.ofAddress(d_x), (long)n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
-                    MemorySegment.copy(h_x, ValueLayout.JAVA_DOUBLE, 0, xHost, 0, n);
-
-                    // 7. Cleanup
-                    int destroyDescrStatus = (int) CUSPARSE_DESTROY_MAT_DESCR.invokeExact(descr);
-                    checkCuda(destroyDescrStatus);
-                    int destroySolverStatus = (int) CUSOLVER_SP_DESTROY.invokeExact(handle);
-                    checkCuda(destroySolverStatus);
-
-                    return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(xHost);
-                } finally {
-                    checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrRowPtr)));
-                    checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrColIdx)));
-                    checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_csrVal)));
-                    checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_b)));
-                    checkCuda((int) CUDA_FREE.invokeExact(MemorySegment.ofAddress(d_x)));
-                }
-            } catch (Throwable t) {
-                logger.error("CUDA Sparse Solve failed: {}", t.getMessage());
-                throw new RuntimeException("CUDA Sparse Solve failed", t);
-            }
-        }
-        throw new UnsupportedOperationException("Dense CUDA solver not implemented yet");
-    }
-
-    @Override
-    public Matrix<Real> inverse(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native CUDA inverse implementation pending");
-    }
-
-    @Override
-    public Real determinant(Matrix<Real> a) {
-        throw new UnsupportedOperationException("Native CUDA determinant implementation pending");
     }
 
     @Override
@@ -1123,29 +944,16 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     public double score(OperationContext context) {
         if (!isAvailable()) return -1.0;
         if (context.hasHint(Hint.DENSE)) return -1.0;
-        
         double base = getPriority();
-
-        if (context.hasHint(Hint.SPARSE)) {
-            base += 40.0;
-        }
-        if (context.hasHint(Hint.GPU_RESIDENT)) {
-            base += 50.0;
-        }
-        
-        // Penalize very small data which is better handled on CPU due to overhead
-        if (context.getDataSize() < 500) {
-            base -= 200.0;
-        }
-
+        if (context.hasHint(Hint.SPARSE)) base += 40.0;
+        if (context.hasHint(Hint.GPU_RESIDENT)) base += 50.0;
+        if (context.getDataSize() < 500) base -= 200.0;
         return base;
     }
 
     @Override
     public Vector<Real> bicgstab(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
-        // For now, if appropriate, use a hybrid implementation or throw UOE if complex.
-        // Given the scale, iterative solvers are often preferred for very large sparse systems.
-        throw new UnsupportedOperationException("CUDA BiCGSTAB implementation pending (using direct LU solve for now if called via solve())");
+        throw new UnsupportedOperationException("CUDA BiCGSTAB implementation pending");
     }
 
     @Override
@@ -1161,5 +969,15 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
         throw new UnsupportedOperationException("Native CUDA Eigen implementation pending");
+    }
+
+    @Override
+    public Matrix<Real> inverse(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native CUDA Inverse implementation pending");
+    }
+
+    @Override
+    public Real determinant(Matrix<Real> a) {
+        throw new UnsupportedOperationException("Native CUDA Determinant implementation pending");
     }
 }

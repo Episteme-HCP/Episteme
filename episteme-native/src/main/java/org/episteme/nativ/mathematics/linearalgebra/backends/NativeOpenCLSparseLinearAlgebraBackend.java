@@ -160,9 +160,8 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public boolean isAvailable() {
-        if (cachedAvailability != null) return cachedAvailability && !isExplicitlyDisabled();
         ensureInitialized();
-        return isInitialized && !isExplicitlyDisabled();
+        return cachedAvailability != null && cachedAvailability && !isExplicitlyDisabled();
     }
 
     private synchronized void ensureInitialized() {
