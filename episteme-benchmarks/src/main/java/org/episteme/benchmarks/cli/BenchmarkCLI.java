@@ -89,6 +89,10 @@ public class BenchmarkCLI {
 
         // Discover Benchmarks
         List<RunnableBenchmark> allBenchmarks = BenchmarkRegistry.discover();
+        System.out.println("Discovered " + allBenchmarks.size() + " benchmarks. IDs:");
+        for (RunnableBenchmark b : allBenchmarks) {
+            System.out.println("  - " + b.getId() + " [Domain: " + b.getDomain() + "]");
+        }
         List<RunnableBenchmark> benchmarks = new ArrayList<>();
         
         for (RunnableBenchmark b : allBenchmarks) {
@@ -101,10 +105,10 @@ public class BenchmarkCLI {
             }
             
             if (domainFilter != null) {
-                String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "").trim();
-                String fClean = domainFilter.toLowerCase().replaceAll("[^a-z0-9]", "").trim();
-                if (!dClean.contains(fClean) && !fClean.contains(dClean)) {
-                    if (runId == null) { // Only log if we didn't specify an ID
+                String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "");
+                String fClean = domainFilter.toLowerCase().replaceAll("[^a-z0-9]", "");
+                if (!dClean.contains(fClean)) {
+                    if (runId == null) {
                         System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because domain [" + domain + "] does not match filter [" + domainFilter + "]");
                     }
                     continue;
