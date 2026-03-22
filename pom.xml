@@ -298,12 +298,6 @@
         <version>${jcuda.version}</version>
         <optional>true</optional>
       </dependency>
-      <dependency>
-        <groupId>org.jcuda</groupId>
-        <artifactId>jcuda-nvrtc</artifactId>
-        <version>${jcuda.version}</version>
-        <optional>true</optional>
-      </dependency>
       <!-- JOCL (OpenCL support) -->
       <dependency>
         <groupId>org.jocl</groupId>
@@ -865,7 +859,7 @@
     <repository>
       <id>jcuda-repo</id>
       <name>JCuda Repository</name>
-      <url>http://www.jcuda.org/maven</url>
+      <url>https://www.jcuda.org/maven</url>
     </repository>
   </repositories>
   <profiles>

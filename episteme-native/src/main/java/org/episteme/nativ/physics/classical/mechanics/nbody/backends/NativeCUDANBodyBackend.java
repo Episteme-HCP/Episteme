@@ -15,12 +15,13 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import jcuda.Pointer;
 import jcuda.driver.*;
-import jcuda.nvrtc.*;
+import jcuda.nvrtc.JNvrtc;
+import jcuda.nvrtc.nvrtcProgram;
 import java.nio.DoubleBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static jcuda.driver.JCudaDriver.*;
-import static jcuda.nvrtc.JCudaNvrtc.*;
+import static jcuda.nvrtc.JNvrtc.*;
 
 /**
  * CUDA-accelerated N-Body simulation backend using JCuda.

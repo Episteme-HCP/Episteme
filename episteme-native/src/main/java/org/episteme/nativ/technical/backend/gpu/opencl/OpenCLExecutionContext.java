@@ -22,6 +22,8 @@ public class OpenCLExecutionContext implements ExecutionContext {
     private final cl_command_queue commandQueue;
 
     public OpenCLExecutionContext(cl_context context, cl_command_queue commandQueue) {
+        if (context == null) throw new IllegalArgumentException("OpenCL context cannot be null");
+        if (commandQueue == null) throw new IllegalArgumentException("OpenCL command queue cannot be null");
         this.context = context;
         this.commandQueue = commandQueue;
     }

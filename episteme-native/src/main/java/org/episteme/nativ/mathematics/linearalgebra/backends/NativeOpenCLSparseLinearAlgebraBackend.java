@@ -262,6 +262,12 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             
             cl_platform_id[] platforms = new cl_platform_id[numPlatforms];
             CL.clGetPlatformIDs(numPlatforms, platforms, null);
+            logger.info("Found {} OpenCL platforms", numPlatforms);
+            for (int i = 0; i < numPlatforms; i++) {
+                byte[] name = new byte[256];
+                CL.clGetPlatformInfo(platforms[i], CL.CL_PLATFORM_NAME, 256, Pointer.to(name), null);
+                logger.info("Platform #{}: {}", i, new String(name).trim());
+            }
             cl_platform_id platform = platforms[0]; // TODO: Logic to select preferred platform
             
             int[] numDevicesArray = new int[1];
@@ -275,6 +281,12 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             
             cl_device_id[] devices = new cl_device_id[numDevices];
             CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, numDevices, devices, null);
+            logger.info("Found {} OpenCL devices on platform 0", numDevices);
+            for (int i = 0; i < numDevices; i++) {
+                byte[] name = new byte[256];
+                CL.clGetDeviceInfo(devices[i], CL.CL_DEVICE_NAME, 256, Pointer.to(name), null);
+                logger.info("Device #{}: {}", i, new String(name).trim());
+            }
             staticDevice = devices[0];
             
             cl_context_properties contextProperties = new cl_context_properties();
@@ -314,9 +326,13 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     @Override
-    public ExecutionContext createContext() {
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
         if (!isInitialized) start();
-        return isInitialized ? new OpenCLExecutionContext(staticContext, staticCommandQueue) : null;
+        if (!isInitialized || staticContext == null) {
+            logger.warn("OpenCL context requested but initialization failed or context is null");
+            return null;
+        }
+        return new OpenCLExecutionContext(staticContext, staticCommandQueue);
     }
 
     @Override
