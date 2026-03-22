@@ -1,0 +1,12 @@
+{
+  "context": {
+    "java_version": "25.0.1",
+    "os_name": "Linux",
+    "os_arch": "amd64",
+    "processors": 1,
+    "timestamp": "2026-03-22T19:03:43.762391891Z"
+  },
+  "runs": [
+    {"date":"2026-03-22 19:03:43","name":"Systematic N-Body","backend":"OpenCL","provider":"N^2) GPU","library":"Episteme Native","domain":"Physics","result":"2037.63 ops/s"}
+  ]
+}

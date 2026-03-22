@@ -15,7 +15,6 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import jcuda.Pointer;
 import jcuda.driver.*;
-import jcuda.nvrtc.JNvrtc;
 import jcuda.nvrtc.nvrtcProgram;
 import java.nio.DoubleBuffer;
 import org.slf4j.Logger;

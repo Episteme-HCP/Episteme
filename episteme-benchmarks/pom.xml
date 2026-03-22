@@ -372,17 +372,6 @@
             <dependencies>
                 <dependency>
                     <groupId>org.jcuda</groupId>
-                    <artifactId>jcuda-nvrtc</artifactId>
-                    <version>${jcuda.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcuda-nvrtc-natives</artifactId>
-                    <version>${jcuda.version}</version>
-                    <classifier>linux-x86_64</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
                     <artifactId>jcuda</artifactId>
                     <version>${jcuda.version}</version>
                 </dependency>
@@ -397,17 +386,6 @@
         <profile>
             <id>jcuda-windows-x86_64</id>
             <dependencies>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcuda-nvrtc</artifactId>
-                    <version>${jcuda.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.jcuda</groupId>
-                    <artifactId>jcuda-nvrtc-natives</artifactId>
-                    <version>${jcuda.version}</version>
-                    <classifier>windows-x86_64</classifier>
-                </dependency>
                 <dependency>
                     <groupId>org.jcuda</groupId>
                     <artifactId>jcuda</artifactId>
