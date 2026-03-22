@@ -83,7 +83,6 @@ public class MainController {
     private final Object executionLock = new Object();
     private ResourceBundle resources;
     private Task<Void> mainTask;
-    private volatile org.episteme.core.mathematics.context.MathContext activeMathContext;
     private boolean isProcessingQueue = false;
 
     private javafx.stage.Stage primaryStage;

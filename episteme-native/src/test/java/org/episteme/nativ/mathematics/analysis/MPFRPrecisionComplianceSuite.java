@@ -7,9 +7,7 @@ package org.episteme.nativ.mathematics.analysis;
 
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;

@@ -8,11 +8,9 @@ package org.episteme.nativ.mathematics.linearalgebra.tensors.backends;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.Tensor;
 import org.episteme.core.mathematics.linearalgebra.tensors.TensorBackend;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
-import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUSparseTensorBackend;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**

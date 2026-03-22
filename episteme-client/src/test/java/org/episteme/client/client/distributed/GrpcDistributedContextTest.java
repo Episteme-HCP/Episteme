@@ -10,16 +10,13 @@ import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
 import io.grpc.testing.GrpcCleanupRule;
-import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.server.server.proto.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -56,6 +53,7 @@ public class GrpcDistributedContextTest {
                 }
             }));
 
+    @SuppressWarnings("null")
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);

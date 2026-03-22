@@ -8,8 +8,6 @@ package org.episteme.benchmarks.benchmark.benchmarks;
 import com.google.auto.service.AutoService;
 import org.episteme.benchmarks.benchmark.ComparisonBenchmark;
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
-import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
-import org.episteme.core.technical.backend.BackendDiscovery;
 
 /**
  * Comparative benchmark: Native HP (MPFR) vs Standard Double (CPU).

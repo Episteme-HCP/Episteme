@@ -8,7 +8,6 @@ package org.episteme.core.mathematics.linearalgebra.matrices;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.TiledMatrixStorage;
-import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.Episteme;
 import org.episteme.core.mathematics.sets.Reals;
 

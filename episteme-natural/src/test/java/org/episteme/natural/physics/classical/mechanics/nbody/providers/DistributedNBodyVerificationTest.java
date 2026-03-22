@@ -3,7 +3,6 @@ package org.episteme.natural.physics.classical.mechanics.nbody.providers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.distributed.LocalDistributedContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

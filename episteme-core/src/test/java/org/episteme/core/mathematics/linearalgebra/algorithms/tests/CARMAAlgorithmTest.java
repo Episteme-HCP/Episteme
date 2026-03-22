@@ -9,7 +9,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedCARMAAlgorithm;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.distributed.LocalDistributedContext;
-import org.episteme.core.mathematics.context.MathContext;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

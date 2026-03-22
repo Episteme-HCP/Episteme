@@ -12,7 +12,6 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
-import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.sets.Reals;
 
 import java.math.BigDecimal;
