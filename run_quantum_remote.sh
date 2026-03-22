@@ -1,5 +1,5 @@
 #!/bin/bash
-export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+export JAVA_HOME=/home/silve/jdk-25.0.1
 export PATH=$JAVA_HOME/bin:$PATH
 export LD_LIBRARY_PATH=/home/silve/Episteme/libs:/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 cd ~/Episteme
