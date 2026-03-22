@@ -98,19 +98,25 @@ public class BenchmarkCLI {
         for (RunnableBenchmark b : allBenchmarks) {
             BenchmarkItem item = new BenchmarkItem(b);
             String provider = item.providerProperty().get();
+            
             String domain = b.getDomain();
-            
-            if (runId != null && !b.getId().equals(runId)) {
-                continue;
-            }
-            
             if (domainFilter != null) {
                 String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "");
                 String fClean = domainFilter.toLowerCase().replaceAll("[^a-z0-9]", "");
-                if (!dClean.contains(fClean)) {
-                    if (runId == null) {
-                        System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because domain [" + domain + "] does not match filter [" + domainFilter + "]");
-                    }
+                boolean match = dClean.contains(fClean) || fClean.contains(dClean);
+                
+                System.out.println("[FILTER] Domain Check: '" + domain + "' vs '" + domainFilter + "' -> Clean: '" + dClean + "' vs '" + fClean + "' -> Match: " + match);
+                
+                if (!match) {
+                    continue;
+                }
+            }
+            
+            if (runId != null) {
+                String id = b.getId();
+                boolean match = id.equalsIgnoreCase(runId) || id.contains(runId);
+                System.out.println("[FILTER] ID Check: '" + id + "' vs '" + runId + "' -> Match: " + match);
+                if (!match) {
                     continue;
                 }
             }
@@ -118,7 +124,7 @@ public class BenchmarkCLI {
             boolean excluded = false;
             for (String ex : excludedProviders) {
                 if (provider.toLowerCase().contains(ex.toLowerCase())) {
-                    System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because provider '" + provider + "' matches exclusion '" + ex + "'.");
+                    System.out.println("[FILTER] Provider Exclusion: Skipping benchmark " + item.getName() + " because provider '" + provider + "' matches exclusion '" + ex + "'.");
                     excluded = true;
                     break;
                 }
