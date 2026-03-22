@@ -114,31 +114,31 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
         try (Arena tempArena = Arena.ofConfined()) {
              // Try loading cudart
-             Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", tempArena);
+             Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", Arena.global());
             if (cudaRtOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcudart.so");
                 if (Files.exists(linuxPath)) {
-                    cudaRtOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cudaRtOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), Arena.global());
                 }
             }
             SymbolLookup cudart = cudaRtOpt.orElse(null);
 
             // Try loading cublas
-            Optional<SymbolLookup> cublasOptLocal = NativeFFMLoader.loadLibrary("cublas", tempArena);
+            Optional<SymbolLookup> cublasOptLocal = NativeFFMLoader.loadLibrary("cublas", Arena.global());
             if (cublasOptLocal.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcublas.so");
                 if (Files.exists(linuxPath)) {
-                    cublasOptLocal = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cublasOptLocal = NativeFFMLoader.loadLibrary(linuxPath.toString(), Arena.global());
                 }
             }
             cublas_lookup = cublasOptLocal.orElse(null);
 
             // Try loading cusolver
-            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", tempArena);
+            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", Arena.global());
             if (cusolverOpt.isEmpty() && System.getProperty("os.name").toLowerCase().contains("linux")) {
                 Path linuxPath = Path.of("/usr/local/cuda/lib64/libcusolver.so");
                 if (Files.exists(linuxPath)) {
-                    cusolverOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), tempArena);
+                    cusolverOpt = NativeFFMLoader.loadLibrary(linuxPath.toString(), Arena.global());
                 }
             }
             cusolver_lookup = cusolverOpt.orElse(null);
@@ -581,7 +581,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             
             MemorySegment d_A = p_A.get(ValueLayout.ADDRESS, 0);
             MemorySegment d_C = p_C.get(ValueLayout.ADDRESS, 0);
-            MemorySegment d_B = MemorySegment.NULL;
+            MemorySegment d_B = d_A; // Fallback to safe valid pointer 
             if (b != null) {
                 checkCuda((int) CUDA_MALLOC.invokeExact(p_B, (long) m * n * 8));
                 d_B = p_B.get(ValueLayout.ADDRESS, 0);
@@ -598,6 +598,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             
             // DGEAM: C = alpha * op(A) + beta * op(B). Use col-major swap for row-major.
             checkCublas((int) CUBLAS_DGEAM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, alpha, d_A, n, beta, d_B, n, d_C, n));
+            checkCuda((int) CUDA_DEVICE_SYNCHRONIZE.invokeExact());
             
             double[] h_C = new double[m * n];
             MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
@@ -638,7 +639,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             MemorySegment d_A = p_A.get(ValueLayout.ADDRESS, 0);
             MemorySegment d_C = p_C.get(ValueLayout.ADDRESS, 0);
 
-            MemorySegment d_B_val = MemorySegment.NULL;
+            MemorySegment d_B_val = d_A; // Fallback
             try {
                 MemorySegment d_A_ptr = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_A);
                 checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, d_A_ptr, (long) m * n * 16, CUDA_MEMCPY_HOST_TO_DEVICE));
@@ -653,7 +654,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
                 MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
                 checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
                 MemorySegment handle = p_Handle.get(ValueLayout.ADDRESS, 0);
-
+                
                 try {
                     MemorySegment segAlpha = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
                     if (((Object)alphaReal) instanceof org.episteme.core.mathematics.numbers.complex.Complex cv) {
@@ -674,6 +675,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
                     }
 
                     checkCublas((int) CUBLAS_ZGEAM.invokeExact(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, segAlpha, d_A, n, segBeta, d_B_val, n, d_C, n));
+                    checkCuda((int) CUDA_DEVICE_SYNCHRONIZE.invokeExact());
 
                     double[] resData = new double[m * n * 2];
                     MemorySegment hostC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
@@ -749,6 +751,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
             checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
             checkCublas((int) CUBLAS_DDOT.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0), n, d_A.get(ValueLayout.ADDRESS, 0), 1, d_B.get(ValueLayout.ADDRESS, 0), 1, d_Res));
+            checkCuda((int) CUDA_DEVICE_SYNCHRONIZE.invokeExact());
             double res = d_Res.get(ValueLayout.JAVA_DOUBLE, 0);
             int rD2 = (int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
             checkCublas(rD2);
@@ -776,6 +779,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             MemorySegment p_Handle = arena.allocate(ValueLayout.ADDRESS);
             checkCublas((int) CUBLAS_CREATE.invokeExact(p_Handle));
             checkCublas((int) CUBLAS_DNRM2.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0), n, d_V.get(ValueLayout.ADDRESS, 0), 1, d_Res));
+            checkCuda((int) CUDA_DEVICE_SYNCHRONIZE.invokeExact());
             double res = d_Res.get(ValueLayout.JAVA_DOUBLE, 0);
             int rD3 = (int) CUBLAS_DESTROY.invokeExact(p_Handle.get(ValueLayout.ADDRESS, 0));
             checkCublas(rD3);

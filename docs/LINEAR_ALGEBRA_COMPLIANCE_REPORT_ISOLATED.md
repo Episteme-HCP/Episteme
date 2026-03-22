@@ -6,3 +6,4 @@
 | ND4J (Native Wrapper) | CPU (Native ND4J) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Native MPFR Arbitrary-Precision Backend | CPU (Panama/MPFR) | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ✅ PASS |
 | Native MPFR Sparse Linear Algebra Backend | CPU (Panama/MPFR/Sparse) | ✅ PASS | ✅ PASS | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
+| Native OpenCL Sparse Linear Algebra Backend | GPU (OpenCL) | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
