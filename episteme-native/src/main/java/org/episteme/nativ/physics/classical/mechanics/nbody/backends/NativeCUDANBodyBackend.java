@@ -25,7 +25,7 @@ import static jcuda.nvrtc.JCudaNvrtc.*;
 /**
  * CUDA-accelerated N-Body simulation backend using JCuda.
  */
-@AutoService({ComputeBackend.class, GPUBackend.class, Backend.class, NativeBackend.class})
+@AutoService({ComputeBackend.class, GPUBackend.class, Backend.class, NativeBackend.class, NBodyProvider.class})
 public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, NativeBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDANBodyBackend.class);

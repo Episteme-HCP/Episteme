@@ -36,7 +36,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({NBodyProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class, NativeBackend.class})
+@AutoService({ComputeBackend.class, GPUBackend.class, Backend.class, NativeBackend.class, NBodyProvider.class})
 public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, NativeBackend {
 
     @Override
