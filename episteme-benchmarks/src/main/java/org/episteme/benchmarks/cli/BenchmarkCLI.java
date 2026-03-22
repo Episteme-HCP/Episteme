@@ -91,11 +91,13 @@ public class BenchmarkCLI {
             String provider = item.providerProperty().get();
             String domain = b.getDomain();
             
-            String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "");
-            String fClean = domainFilter.toLowerCase().replaceAll("[^a-z0-9]", "");
-            if (domainFilter != null && !dClean.contains(fClean)) {
-                System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because domain [" + domain + "] (clean: " + dClean + ") does not match filter [" + domainFilter + "] (clean: " + fClean + ")");
-                continue;
+            if (domainFilter != null) {
+                String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "");
+                String fClean = domainFilter.toLowerCase().replaceAll("[^a-z0-9]", "");
+                if (!dClean.contains(fClean)) {
+                    System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because domain [" + domain + "] (clean: " + dClean + ") does not match filter [" + domainFilter + "] (clean: " + fClean + ")");
+                    continue;
+                }
             }
             
             boolean excluded = false;
