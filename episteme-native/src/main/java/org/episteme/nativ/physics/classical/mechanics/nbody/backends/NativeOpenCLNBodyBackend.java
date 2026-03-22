@@ -340,12 +340,14 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     public long allocateGPUMemory(long sizeBytes) {
         if (!initialized) initialize();
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         return clCreateBuffer(ctx.getContext(), CL_MEM_READ_WRITE, sizeBytes, null, null).getNativePointer();
     }
 
     @Override
     public void copyToGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_mem mem = new cl_mem();
         java.lang.reflect.Field field;
         try {
@@ -361,6 +363,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     @Override
     public void copyFromGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_mem mem = new cl_mem();
         try {
             java.lang.reflect.Field field = cl_mem.class.getDeclaredField("nativePointer");
@@ -388,7 +391,9 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     @Override
     public void synchronize() {
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-        clFinish(ctx.getCommandQueue());
+        if (ctx != null) {
+            clFinish(ctx.getCommandQueue());
+        }
     }
 
     @Override
@@ -459,6 +464,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         }
 
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
         cl_mem memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * p.length, Pointer.to(p), null);
@@ -509,6 +515,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         }
 
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
         cl_mem memNodes   = clCreateBuffer(context, CL_MEM_READ_ONLY  | CL_MEM_COPY_HOST_PTR, (long) Sizeof.cl_float  * flatNodes.length, Pointer.to(flatNodes), null);
@@ -556,6 +563,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         }
 
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
 

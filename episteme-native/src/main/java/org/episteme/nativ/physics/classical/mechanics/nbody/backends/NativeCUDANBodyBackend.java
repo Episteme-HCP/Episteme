@@ -103,7 +103,14 @@ public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, Native
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
+        if (!isAvailable()) return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
+        
+        jcuda.driver.CUdevice device = new jcuda.driver.CUdevice();
+        jcuda.driver.JCudaDriver.cuDeviceGet(device, 0);
+        jcuda.driver.CUcontext context = new jcuda.driver.CUcontext();
+        jcuda.driver.JCudaDriver.cuCtxCreate(context, 0, device);
+        
+        return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext(context, device);
     }
 
     @Override
