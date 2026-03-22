@@ -26,6 +26,7 @@ public class BenchmarkCLI {
         boolean generatePdf = false;
         String exportFile = null;
         String domainFilter = null;
+        String runId = null;
         List<String> excludedProviders = new ArrayList<>();
 
         // Parse arguments
@@ -45,6 +46,10 @@ public class BenchmarkCLI {
                 domainFilter = args[++i].replaceAll("^[\"']|[\"']$", "");
             } else if (arg.startsWith("--domain=")) {
                 domainFilter = arg.substring("--domain=".length()).replaceAll("^[\"']|[\"']$", "");
+            } else if ("--run".equals(arg) && i + 1 < args.length) {
+                runId = args[++i];
+            } else if (arg.startsWith("--run=")) {
+                runId = arg.substring("--run=".length());
             } else if ("--exclude-provider".equals(arg) && i + 1 < args.length) {
                 excludedProviders.add(args[++i].replaceAll("^[\"']|[\"']$", ""));
             } else if (arg.startsWith("--exclude-provider=")) {
@@ -71,8 +76,8 @@ public class BenchmarkCLI {
             }
         }
 
-        if (!runAll) {
-            System.out.println("Nothing to run. Use --run-all to execute all benchmarks.");
+        if (!runAll && runId == null) {
+            System.out.println("Nothing to run. Use --run-all or --run <id> to execute benchmarks.");
             printHelp();
             return;
         }
@@ -91,11 +96,17 @@ public class BenchmarkCLI {
             String provider = item.providerProperty().get();
             String domain = b.getDomain();
             
+            if (runId != null && !b.getId().equals(runId)) {
+                continue;
+            }
+            
             if (domainFilter != null) {
-                String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "");
-                String fClean = domainFilter.toLowerCase().replaceAll("[^a-z0-9]", "");
-                if (!dClean.contains(fClean)) {
-                    System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because domain [" + domain + "] (clean: " + dClean + ") does not match filter [" + domainFilter + "] (clean: " + fClean + ")");
+                String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "").trim();
+                String fClean = domainFilter.toLowerCase().replaceAll("[^a-z0-9]", "").trim();
+                if (!dClean.contains(fClean) && !fClean.contains(dClean)) {
+                    if (runId == null) { // Only log if we didn't specify an ID
+                        System.out.println("[DEBUG] Filter: Skipping benchmark " + item.getName() + " because domain [" + domain + "] does not match filter [" + domainFilter + "]");
+                    }
                     continue;
                 }
             }
@@ -228,6 +239,7 @@ public class BenchmarkCLI {
         System.out.println("  --export-file <f> Save results to JSON file.");
         System.out.println("  --pdf             Generate PDF Report (requires --export-file).");
         System.out.println("  --domain <d>      Only run benchmarks in this domain (e.g. 'Linear Algebra').");
+        System.out.println("  --run <id>        Only run the benchmark with this ID.");
         System.out.println("  --exclude-provider <p> Skip benchmarks from this provider (e.g. 'ND4J').");
         System.out.println("  --help            Show this message.");
     }
