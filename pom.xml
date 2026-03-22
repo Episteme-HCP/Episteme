@@ -862,6 +862,11 @@
       <name>Jzy3d Snapshots</name>
       <url>https://maven.jzy3d.org/snapshots/</url>
     </repository>
+    <repository>
+      <id>jcuda-repo</id>
+      <name>JCuda Repository</name>
+      <url>http://www.jcuda.org/maven</url>
+    </repository>
   </repositories>
   <profiles>
     <profile>
