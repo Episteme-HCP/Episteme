@@ -78,6 +78,10 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
 
         try {
             OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+            if (ctx == null) {
+                logger.error("OpenCL context could not be created during FFT initialization.");
+                return;
+            }
             cl_context context = ctx.getContext();
 
             // Create Program
@@ -184,8 +188,14 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         if (imag == null) imag = new double[n]; // Handle pure real input
         
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) {
+            logger.warn("OpenCL context not available for FFT execution.");
+            return null; // Or throw, but returning null follows the trend of failing gracefully if hardware is missing
+        }
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
+        
+        if (context == null || queue == null) return null;
 
         // Allocate Input/Output
         cl_mem memReal = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(real), null);

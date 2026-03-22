@@ -125,6 +125,10 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
 
         try {
             OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+            if (ctx == null) {
+                LOGGER.severe("OpenCL context could not be created during LBM initialization.");
+                return;
+            }
             cl_context context = ctx.getContext();
 
             // Create Program
@@ -189,6 +193,10 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
         }
         
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) {
+            LOGGER.warning("OpenCL context not available for LBM evolution.");
+            return;
+        }
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
         
