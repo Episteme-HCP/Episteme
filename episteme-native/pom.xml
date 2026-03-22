@@ -281,6 +281,11 @@
                     <artifactId>jcusparse</artifactId>
                     <version>${jcuda.version}</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda-nvrtc</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -309,6 +314,11 @@
                 <dependency>
                     <groupId>org.jcuda</groupId>
                     <artifactId>jcusparse</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda-nvrtc</artifactId>
                     <version>${jcuda.version}</version>
                 </dependency>
             </dependencies>
