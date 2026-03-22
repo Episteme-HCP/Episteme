@@ -859,7 +859,7 @@
     <repository>
       <id>jcuda-repo</id>
       <name>JCuda Repository</name>
-      <url>https://www.jcuda.org/maven</url>
+      <url>http://www.jcuda.org/maven</url>
     </repository>
   </repositories>
   <profiles>
