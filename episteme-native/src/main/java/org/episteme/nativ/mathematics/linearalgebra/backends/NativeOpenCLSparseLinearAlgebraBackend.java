@@ -247,17 +247,34 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     private static synchronized void start() {
-        if (initAttempted) return;
+        if (initAttempted && isInitialized) return;
         initAttempted = true;
         try {
             CL.setExceptionsEnabled(true);
             int[] numPlatformsArray = new int[1];
             CL.clGetPlatformIDs(0, null, numPlatformsArray);
-            cl_platform_id platform = new cl_platform_id();
-            CL.clGetPlatformIDs(1, new cl_platform_id[]{platform}, null);
+            int numPlatforms = numPlatformsArray[0];
+            if (numPlatforms == 0) {
+                logger.warn("No OpenCL platforms found.");
+                isInitialized = false;
+                return;
+            }
             
-            cl_device_id[] devices = new cl_device_id[1];
-            CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 1, devices, null);
+            cl_platform_id[] platforms = new cl_platform_id[numPlatforms];
+            CL.clGetPlatformIDs(numPlatforms, platforms, null);
+            cl_platform_id platform = platforms[0]; // TODO: Logic to select preferred platform
+            
+            int[] numDevicesArray = new int[1];
+            CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 0, null, numDevicesArray);
+            int numDevices = numDevicesArray[0];
+            if (numDevices == 0) {
+                logger.warn("No OpenCL devices found on platform 0.");
+                isInitialized = false;
+                return;
+            }
+            
+            cl_device_id[] devices = new cl_device_id[numDevices];
+            CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, numDevices, devices, null);
             staticDevice = devices[0];
             
             cl_context_properties contextProperties = new cl_context_properties();
@@ -271,7 +288,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             isInitialized = true;
         } catch (Exception e) {
             isInitialized = false;
-            initAttempted = true;
             logger.warn("Failed to initialize OpenCL Sparse Backend: {}", e.getMessage());
         }
     }

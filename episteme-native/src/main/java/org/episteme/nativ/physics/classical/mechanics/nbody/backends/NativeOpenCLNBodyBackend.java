@@ -268,6 +268,11 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
 
         try {
             OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+            if (ctx == null) {
+                logger.warn("OpenCL NBody init failed: createContext() returned null");
+                initialized = false;
+                return;
+            }
             cl_context context = ctx.getContext();
 
             // Brute-force kernel
