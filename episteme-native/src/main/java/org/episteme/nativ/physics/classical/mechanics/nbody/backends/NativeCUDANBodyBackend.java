@@ -29,7 +29,7 @@ import static jcuda.nvrtc.JNvrtc.*;
 public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, NativeBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDANBodyBackend.class);
-    private static final int GPU_THRESHOLD = 512;
+    private static final int GPU_THRESHOLD = 64;
     private static volatile Boolean cudaAvailable;
     private boolean initialized = false;
     private CUmodule module;
