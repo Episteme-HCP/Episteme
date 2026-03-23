@@ -15,6 +15,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 import org.jocl.*;
 import static org.jocl.CL.*;
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

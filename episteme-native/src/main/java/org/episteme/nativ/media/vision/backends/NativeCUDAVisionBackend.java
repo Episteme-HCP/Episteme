@@ -15,6 +15,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 import jcuda.driver.*;
 import static jcuda.driver.JCudaDriver.*;
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
