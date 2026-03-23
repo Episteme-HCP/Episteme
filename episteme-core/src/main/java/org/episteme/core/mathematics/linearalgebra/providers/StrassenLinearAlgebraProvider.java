@@ -58,7 +58,13 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
         
         // Generic path (if E is Real)
         if (a.get(0,0) instanceof Real) {
-             return (Matrix<E>) (Matrix<?>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b);
+             LinearAlgebraProvider<Real> leaf = (LinearAlgebraProvider<Real>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+                 LinearAlgebraProvider.class,
+                 org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+                 p -> p != this && !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider) 
+                      && p.isCompatible(a.getScalarRing())
+             );
+             return (Matrix<E>) (Matrix<?>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf);
         }
 
         return super.multiply(a, b);

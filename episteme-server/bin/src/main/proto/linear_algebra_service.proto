@@ -73,6 +73,7 @@ message SingleMatrixRequest {
 message ScaleRequest {
   double scalar = 1;
   MatrixData matrix = 2;
+  string hp_scalar = 3; // For high-precision scalars (RealBig)
 }
 
 message MatrixResponse {
@@ -84,6 +85,7 @@ message MatrixData {
   int32 cols = 2;
   bytes data = 3; // Raw double data (Zero-copy payload)
   bool is_complex = 4;
+  repeated string hp_data = 5; // For high-precision elements (RealBig)
 }
 
 message VectorRequest {
@@ -98,6 +100,7 @@ message SingleVectorRequest {
 message VectorScaleRequest {
   VectorData vector = 1;
   double scalar = 2;
+  string hp_scalar = 3; // For high-precision scalars
 }
 
 message VectorResponse {
@@ -108,6 +111,7 @@ message VectorData {
   int32 size = 1;
   bytes data = 2; // Raw double data
   bool is_complex = 3;
+  repeated string hp_data = 4; // For high-precision elements
 }
 
 message MatrixVectorRequest {
@@ -117,4 +121,5 @@ message MatrixVectorRequest {
 
 message ScalarResponse {
   double value = 1;
+  string hp_value = 2; // For high-precision result
 }

@@ -5,10 +5,7 @@ import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.RemoteDistributedContext;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.linearalgebra.algorithms.DistributedSUMMAAlgorithm;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -38,8 +35,8 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        // Currently only supports Real numbers due to DistributedSUMMAAlgorithm limitation
-        return ring instanceof Reals || (ring != null && ring.zero() instanceof Real);
+        // Now supports any ring as long as the distributed context is available
+        return ring != null;
     }
 
     @Override
@@ -115,17 +112,15 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         // Check heuristics for distribution
         boolean isLarge = (long)a.rows() * a.cols() * b.cols() > 100_000_000;
         
         if (isLarge && a instanceof TiledMatrix && b instanceof TiledMatrix) {
             try {
-                // Delegate to DistributedSUMMA
-                // Note: result is TiledMatrix (which extends GenericMatrix<Real>)
-                TiledMatrix result = DistributedSUMMAAlgorithm.multiply((TiledMatrix) a, (TiledMatrix) b);
-                return (Matrix<E>) (Matrix<?>) result;
+                // Use the MatrixMultiplicationPlanner for best algorithm selection
+                TiledMatrix<E> result = org.episteme.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply((TiledMatrix<E>) a, (TiledMatrix<E>) b);
+                return (Matrix<E>) result;
             } catch (Exception e) {
                // Fallback on error
                 System.err.println("Distributed multiplication failed, falling back to local: " + e.getMessage());

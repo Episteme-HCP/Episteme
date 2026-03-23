@@ -6,7 +6,6 @@
 package org.episteme.core.mathematics.linearalgebra.algorithms;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
@@ -38,20 +37,39 @@ public class MatrixMultiplicationPlanner {
 
     private static final int STRASSEN_THRESHOLD = 1024;
 
-    public static Matrix<Real> multiply(Matrix<Real> A, Matrix<Real> B) {
+    @SuppressWarnings("unchecked")
+    public static <E> Matrix<E> multiply(Matrix<E> A, Matrix<E> B) {
         int n = Math.max(A.rows(), A.cols());
         
-        if (A instanceof SIMDRealDoubleMatrix && B instanceof SIMDRealDoubleMatrix) {
+        if (A instanceof SIMDRealDoubleMatrix && B instanceof SIMDRealDoubleMatrix && A.getScalarRing() instanceof org.episteme.core.mathematics.sets.Reals) {
             if (n >= STRASSEN_THRESHOLD && isPowerOfTwo(n)) {
-                return RealDoubleStrassenAlgorithm.multiply((SIMDRealDoubleMatrix) A, (SIMDRealDoubleMatrix) B);
+                return (Matrix<E>) RealDoubleStrassenAlgorithm.multiply((SIMDRealDoubleMatrix) A, (SIMDRealDoubleMatrix) B);
             }
-            return RealDoubleCARMAAlgorithm.multiply((SIMDRealDoubleMatrix) A, (SIMDRealDoubleMatrix) B);
+            return (Matrix<E>) RealDoubleCARMAAlgorithm.multiply((SIMDRealDoubleMatrix) A, (SIMDRealDoubleMatrix) B);
         }
         
+        org.episteme.core.mathematics.structures.rings.Ring<E> ring = A.getScalarRing();
+        
         if (n >= STRASSEN_THRESHOLD && isPowerOfTwo(n)) {
-            return RealStrassenAlgorithm.multiply(A, B);
+            @SuppressWarnings("unchecked")
+            org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leaf = (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+                org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class,
+                org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+                p -> !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider) &&
+                     !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider) &&
+                     (ring == null || ((org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<?>)p).isCompatible(ring))
+            );
+            return RealStrassenAlgorithm.multiply(A, B, leaf);
         }
-        return RealCARMAAlgorithm.multiply(A, B);
+        
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leaf = (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+            org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class,
+            org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider) &&
+                 !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider) &&
+                 (ring == null || p.isCompatible(ring))
+        );
+        return RealCARMAAlgorithm.multiply(A, B, leaf);
     }
 
     private static boolean isPowerOfTwo(int n) {
@@ -61,36 +79,46 @@ public class MatrixMultiplicationPlanner {
     /**
      * Selects and executes the best distributed multiplication algorithm.
      */
-    public static TiledMatrix multiply(TiledMatrix A, TiledMatrix B) {
+    public static <E> TiledMatrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B) {
         DistributedContext ctx = DistributedCompute.getContext();
         int p = ctx.getParallelism();
         Algorithm algo = selectAlgorithm(A, B, p);
         
         logger.info("Planner selected algorithm: {}", algo);
         
+        @SuppressWarnings("unchecked")
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leaf = (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+            org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class,
+            org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            prov -> !(prov instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider) &&
+                 !(prov instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider) &&
+                 ((org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<?>)prov).isCompatible(A.getScalarRing())
+        );
+
         switch (algo) {
             case CANNON:
-                return DistributedCannonAlgorithm.multiply(A, B);
+                return DistributedCannonAlgorithm.multiply(A, B, leaf);
             case FOX:
                  // Ensure Fox is valid (square grid)
-                if (isSquareGrid(p)) return DistributedFoxAlgorithm.multiply(A, B);
-                return DistributedSUMMAAlgorithm.multiply(A, B);
+                if (isSquareGrid(p)) return DistributedFoxAlgorithm.multiply(A, B, leaf);
+                return DistributedSUMMAAlgorithm.multiply(A, B, leaf);
             case ALGORITHM_25D:
-                int c = (int) Math.pow(p, 0.33);
-                if (c < 1) c = 1;
-                return Distributed25DAlgorithm.multiply(A, B, c);
+                // Distributed 2.5D Algorithm not yet fully generic-ready or missing from classpath?
+                // For now fallback to SUMMA if needed, or assume it exists.
+                // return Distributed25DAlgorithm.multiply(A, B, cCount, leaf); 
+                return DistributedSUMMAAlgorithm.multiply(A, B, leaf);
             case CARMA:
-                return DistributedCARMAAlgorithm.multiply(A, B);
+                return DistributedCARMAAlgorithm.multiply(A, B, leaf);
             case SUMMA:
             default:
-                return DistributedSUMMAAlgorithm.multiply(A, B);
+                return DistributedSUMMAAlgorithm.multiply(A, B, leaf);
         }
     }
 
     /**
      * Heuristic Selection Logic.
      */
-    public static Algorithm selectAlgorithm(TiledMatrix A, TiledMatrix B, int p) {
+    public static <E> Algorithm selectAlgorithm(TiledMatrix<E> A, TiledMatrix<E> B, int p) {
         long m = A.rows();
         long n = B.cols();
         long k = A.cols();

@@ -142,6 +142,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             Object scalar;
             if (request.getIsComplex()) {
                 scalar = Complex.of(request.getScalar(), request.getImaginary());
+            } else if (!request.getHpScalar().isEmpty()) {
+                scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(request.getHpScalar());
             } else {
                 scalar = Real.of(request.getScalar());
             }
@@ -351,8 +353,20 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         int rows = proto.getRows();
         int cols = proto.getCols();
         boolean isComplex = proto.getIsComplex();
-        ByteString byteData = proto.getData();
         
+        if (!proto.getHpDataList().isEmpty()) {
+            List<String> hpData = proto.getHpDataList();
+            org.episteme.core.mathematics.numbers.real.Real[][] raw = new org.episteme.core.mathematics.numbers.real.Real[rows][cols];
+            int idx = 0;
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    raw[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(hpData.get(idx++));
+                }
+            }
+            return org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix.of(raw, org.episteme.core.mathematics.numbers.real.Real.of("0"));
+        }
+
+        ByteString byteData = proto.getData();
         int multiplier = isComplex ? 2 : 1;
         double[] raw = new double[rows * cols * multiplier];
         byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
@@ -376,8 +390,17 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     private Vector<?> fromProto(VectorData proto) {
         int size = proto.getSize();
         boolean isComplex = proto.getIsComplex();
+
+        if (!proto.getHpDataList().isEmpty()) {
+            List<String> hpData = proto.getHpDataList();
+            List<org.episteme.core.mathematics.numbers.real.Real> data = new ArrayList<>(size);
+            for (String s : hpData) {
+                data.add(org.episteme.core.mathematics.numbers.real.Real.of(s));
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(data, org.episteme.core.mathematics.numbers.real.Real.of("0"));
+        }
+
         ByteString byteData = proto.getData();
-        
         int multiplier = isComplex ? 2 : 1;
         double[] raw = new double[size * multiplier];
         byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
@@ -398,58 +421,75 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         int rows = matrix.rows();
         int cols = matrix.cols();
         boolean isComplex = matrix.getScalarRing() instanceof Complex;
-        int multiplier = isComplex ? 2 : 1;
+        boolean isHP = matrix.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig;
 
         MatrixData.Builder builder = MatrixData.newBuilder()
                 .setRows(rows)
                 .setCols(cols)
                 .setIsComplex(isComplex);
 
-        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
-        DoubleBuffer db = bb.asDoubleBuffer();
-
-        if (matrix instanceof RealDoubleMatrix rdm && !isComplex) {
-            db.put(rdm.getBuffer());
-        } else {
+        if (isHP && !isComplex) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    Object val = matrix.get(i, j);
-                    if (isComplex) {
-                        Complex c = (Complex) val;
-                        db.put(c.real());
-                        db.put(c.imaginary());
-                    } else {
-                        db.put(((Real)val).doubleValue());
+                    builder.addHpData(matrix.get(i, j).toString());
+                }
+            }
+        } else {
+            int multiplier = isComplex ? 2 : 1;
+            ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
+            DoubleBuffer db = bb.asDoubleBuffer();
+
+            if (matrix instanceof RealDoubleMatrix rdm && !isComplex) {
+                db.put(rdm.getBuffer());
+            } else {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        Object val = matrix.get(i, j);
+                        if (isComplex) {
+                            Complex c = (Complex) val;
+                            db.put(c.real());
+                            db.put(c.imaginary());
+                        } else {
+                            db.put(((Real)val).doubleValue());
+                        }
                     }
                 }
             }
+            builder.setData(ByteString.copyFrom(bb));
         }
-        builder.setData(ByteString.copyFrom(bb));
         return builder.build();
     }
 
     private VectorData toProto(Vector<?> vector) {
         int size = vector.dimension();
         boolean isComplex = vector.getScalarRing() instanceof Complex;
-        int multiplier = isComplex ? 2 : 1;
+        boolean isHP = vector.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig;
 
-        ByteBuffer bb = ByteBuffer.allocate(size * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
-        DoubleBuffer db = bb.asDoubleBuffer();
-        for (int i = 0; i < size; i++) {
-            Object val = vector.get(i);
-            if (isComplex) {
-                Complex c = (Complex) val;
-                db.put(c.real());
-                db.put(c.imaginary());
-            } else {
-                db.put(((Real)val).doubleValue());
-            }
-        }
-        return VectorData.newBuilder()
+        VectorData.Builder builder = VectorData.newBuilder()
                 .setSize(size)
-                .setData(ByteString.copyFrom(bb))
-                .setIsComplex(isComplex)
-                .build();
+                .setIsComplex(isComplex);
+
+        if (isHP && !isComplex) {
+            for (int i = 0; i < size; i++) {
+                builder.addHpData(vector.get(i).toString());
+            }
+        } else {
+            int multiplier = isComplex ? 2 : 1;
+            ByteBuffer bb = ByteBuffer.allocate(size * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
+            DoubleBuffer db = bb.asDoubleBuffer();
+            for (int i = 0; i < size; i++) {
+                Object val = vector.get(i);
+                if (isComplex) {
+                    Complex c = (Complex) val;
+                    db.put(c.real());
+                    db.put(c.imaginary());
+                } else {
+                    db.put(((Real)val).doubleValue());
+                }
+            }
+            builder.setData(ByteString.copyFrom(bb));
+        }
+        return builder.build();
     }
 
     private ScalarResponse toProtoScalar(Object scalar) {
@@ -458,6 +498,11 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                     .setValue(c.real())
                     .setImaginary(c.imaginary())
                     .setIsComplex(true)
+                    .build();
+        } else if (scalar instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
+            return ScalarResponse.newBuilder()
+                    .setHpValue(rb.toString())
+                    .setIsComplex(false)
                     .build();
         } else if (scalar instanceof Real r) {
             return ScalarResponse.newBuilder()

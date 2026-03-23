@@ -55,6 +55,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     private static MethodHandle MPFR_SQRT;
     private static MethodHandle MPFR_CMP;
     private static MethodHandle MPFR_SET;
+    private static MethodHandle MPFR_SET_D;
     private static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
@@ -81,6 +82,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
                 MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
                 MPFR_SET = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT));
                 MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null;
@@ -232,8 +234,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
 
             for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
                 int col = colIdx[idx];
-                String valStr = ((Real) vals[idx]).bigDecimalValue().toPlainString();
-                NativeSafe.invoke(MPFR_SET_STR, term, arena.allocateFrom(valStr), 10, 0);
+                setMPFR(term, (Real) vals[idx], arena, 0);
                 
                 NativeSafe.invoke(MPFR_MUL, term, term, getMPFR(h_x, col), 0);
                 NativeSafe.invoke(MPFR_ADD, sum, sum, term, 0);
@@ -285,10 +286,17 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
         int n = v.rows(); // Vector as col-matrix
         MemorySegment vec = allocateVector(n, arena, prec);
         for (int i = 0; i < n; i++) {
-            String val = v.get(i, 0).bigDecimalValue().toPlainString();
-            NativeSafe.invoke(MPFR_SET_STR, getMPFR(vec, i), arena.allocateFrom(val), 10, 0);
+            setMPFR(getMPFR(vec, i), v.get(i, 0), arena, 0);
         }
         return vec;
+    }
+
+    private void setMPFR(MemorySegment mpfr, Real val, Arena arena, int rnd) throws Throwable {
+        if (val instanceof org.episteme.core.mathematics.numbers.real.RealDouble rd) {
+            MPFR_SET_D.invokeExact(mpfr, rd.doubleValue(), rnd);
+        } else {
+            MPFR_SET_STR.invokeExact(mpfr, arena.allocateFrom(val.bigDecimalValue().toPlainString()), 10, rnd);
+        }
     }
 
     private MemorySegment getMPFR(MemorySegment vec, int idx) {
@@ -452,8 +460,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
                 }
 
                 // rDotR = rNextDotRNext
-                NativeSafe.invoke(MPFR_SET_STR, rDotR, arena.allocateFrom("0"), 10, 0);
-                NativeSafe.invoke(MPFR_ADD, rDotR, rDotR, rNextDotRNext, 0);
+                NativeSafe.invoke(MPFR_SET, rDotR, rNextDotRNext, 0);
 
                 iter++;
             }
@@ -506,8 +513,7 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
 
             for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
                 int col = colIdx[idx];
-                String valStr = ((Real) vals[idx]).bigDecimalValue().toPlainString();
-                NativeSafe.invoke(MPFR_SET_STR, term, arena.allocateFrom(valStr), 10, 0);
+                setMPFR(term, (Real) vals[idx], arena, 0);
                 
                 NativeSafe.invoke(MPFR_MUL, term, term, getMPFR(h_x, col), 0);
                 NativeSafe.invoke(MPFR_ADD, sum, sum, term, 0);

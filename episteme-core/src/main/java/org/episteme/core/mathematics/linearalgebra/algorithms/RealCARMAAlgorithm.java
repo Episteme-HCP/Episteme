@@ -1,12 +1,10 @@
 package org.episteme.core.mathematics.linearalgebra.algorithms;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.sets.Reals;
 
 /**
  * Implementation of the CARMA (Communication-Avoidant Recursive Matrix Multiplication) Algorithm
- * for the generic Real type.
+ * for generic ring elements.
  * <p>
  * This version uses index-based recursion to avoid unnecessary data copying (getSubMatrix/combine)
  * which reduces memory pressure and resolves performance stalls.
@@ -16,7 +14,7 @@ public class RealCARMAAlgorithm {
 
     private static final int RECURSION_THRESHOLD = 64;
 
-    public static Matrix<Real> multiply(Matrix<Real> A, Matrix<Real> B) {
+    public static <E> Matrix<E> multiply(Matrix<E> A, Matrix<E> B, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leafProvider) {
         org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
         int m = A.rows();
         int k = A.cols();
@@ -26,55 +24,70 @@ public class RealCARMAAlgorithm {
             throw new IllegalArgumentException("Matrix dimensions incompatible for multiplication");
         }
 
-        Reals reals = Reals.getInstance();
-        Real[][] res = new Real[m][n];
+        org.episteme.core.mathematics.structures.rings.Ring<E> ring = A.getScalarRing();
+        @SuppressWarnings("unchecked")
+        E[][] res = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m, n);
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                res[i][j] = reals.zero();
+                res[i][j] = ring.zero();
             }
         }
 
-        carmaRecursive(A, 0, 0, B, 0, 0, res, 0, 0, m, k, n, reals);
+        carmaRecursive(A, 0, 0, B, 0, 0, res, 0, 0, m, k, n, ring, leafProvider);
 
-        return Matrix.of(res, reals);
+        return Matrix.of(res, ring);
     }
 
-    private static void carmaRecursive(Matrix<Real> A, int aRowOffset, int aColOffset,
-                                     Matrix<Real> B, int bRowOffset, int bColOffset,
-                                     Real[][] C, int cRowOffset, int cColOffset,
-                                     int m, int k, int n, Reals reals) {
+    private static <E> void carmaRecursive(Matrix<E> A, int aRowOffset, int aColOffset,
+                                     Matrix<E> B, int bRowOffset, int bColOffset,
+                                     E[][] C, int cRowOffset, int cColOffset,
+                                     int m, int k, int n, org.episteme.core.mathematics.structures.rings.Ring<E> ring, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leafProvider) {
         if (m <= RECURSION_THRESHOLD && n <= RECURSION_THRESHOLD && k <= RECURSION_THRESHOLD) {
-            standardMultiply(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, m, k, n, reals);
+            if (leafProvider != null) {
+                // Use leaf provider for base case. 
+                // We need to extract the sub-matrices and then add the result to C.
+                Matrix<E> aSub = A.getSubMatrix(aRowOffset, aRowOffset + m, aColOffset, aColOffset + k);
+                Matrix<E> bSub = B.getSubMatrix(bRowOffset, bRowOffset + k, bColOffset, bColOffset + n);
+                Matrix<E> cSub = leafProvider.multiply(aSub, bSub);
+                
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j < n; j++) {
+                        C[cRowOffset + i][cColOffset + j] = ring.add(C[cRowOffset + i][cColOffset + j], cSub.get(i, j));
+                    }
+                }
+            } else {
+                standardMultiply(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, m, k, n, ring);
+            }
             return;
         }
 
         if (m >= n && m >= k) {
             // Split M
             int mHalf = m / 2;
-            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, mHalf, k, n, reals);
-            carmaRecursive(A, aRowOffset + mHalf, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset + mHalf, cColOffset, m - mHalf, k, n, reals);
+            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, mHalf, k, n, ring, leafProvider);
+            carmaRecursive(A, aRowOffset + mHalf, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset + mHalf, cColOffset, m - mHalf, k, n, ring, leafProvider);
         } else if (n >= m && n >= k) {
             // Split N
             int nHalf = n / 2;
-            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, m, k, nHalf, reals);
-            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset + nHalf, C, cRowOffset, cColOffset + nHalf, m, k, n - nHalf, reals);
+            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, m, k, nHalf, ring, leafProvider);
+            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset + nHalf, C, cRowOffset, cColOffset + nHalf, m, k, n - nHalf, ring, leafProvider);
         } else {
             // Split K
             int kHalf = k / 2;
-            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, m, kHalf, n, reals);
-            carmaRecursive(A, aRowOffset, aColOffset + kHalf, B, bRowOffset + kHalf, bColOffset, C, cRowOffset, cColOffset, m, k - kHalf, n, reals);
+            carmaRecursive(A, aRowOffset, aColOffset, B, bRowOffset, bColOffset, C, cRowOffset, cColOffset, m, kHalf, n, ring, leafProvider);
+            carmaRecursive(A, aRowOffset, aColOffset + kHalf, B, bRowOffset + kHalf, bColOffset, C, cRowOffset, cColOffset, m, k - kHalf, n, ring, leafProvider);
         }
     }
 
-    private static void standardMultiply(Matrix<Real> A, int aRow, int aCol,
-                                       Matrix<Real> B, int bRow, int bCol,
-                                       Real[][] C, int cRow, int cCol,
-                                       int m, int k, int n, Reals reals) {
+    private static <E> void standardMultiply(Matrix<E> A, int aRow, int aCol,
+                                       Matrix<E> B, int bRow, int bCol,
+                                       E[][] C, int cRow, int cCol,
+                                       int m, int k, int n, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
         for (int i = 0; i < m; i++) {
             for (int l = 0; l < k; l++) {
-                Real aik = A.get(aRow + i, aCol + l);
+                E aik = A.get(aRow + i, aCol + l);
                 for (int j = 0; j < n; j++) {
-                    C[cRow + i][cCol + j] = reals.add(C[cRow + i][cCol + j], reals.multiply(aik, B.get(bRow + l, bCol + j)));
+                    C[cRow + i][cCol + j] = ring.add(C[cRow + i][cCol + j], ring.multiply(aik, B.get(bRow + l, bCol + j)));
                 }
             }
         }

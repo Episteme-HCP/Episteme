@@ -48,344 +48,44 @@ public class HighPrecisionComplianceTest {
         String environment;
         Map<String, String> status = new LinkedHashMap<>();
     }
-
     @Test
     public void generateHighPrecisionReport() {
         try {
             java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(REPORT_PATH));
         } catch (IOException ignored) {}
 
-        List<LinearAlgebraProvider<Real>> providers = discoverHPProviders();
+        List<LinearAlgebraProvider<?>> providers = discoverHPProviders();
         List<ComplianceResult> results = new ArrayList<>();
 
-        for (LinearAlgebraProvider<Real> provider : providers) {
-            System.out.println("Starting HP compliance tests for: " + provider.getName());
+        for (LinearAlgebraProvider<?> rawProvider : providers) {
+            System.out.println("Starting HP compliance tests for: " + rawProvider.getName());
             ComplianceResult res = new ComplianceResult();
-            res.providerName = provider.getName();
+            res.providerName = rawProvider.getName();
             
-            if (!provider.isAvailable()) {
+            if (!rawProvider.isAvailable()) {
                 res.environment = "DISABLED";
                 results.add(res);
                 continue;
             }
-            res.environment = provider.getEnvironmentInfo();
+            res.environment = rawProvider.getEnvironmentInfo();
 
-            // === REALBIG DOMAIN ===
             MathContext.exact().compute(() -> {
-                RealBig val = RealBig.create(new BigDecimal("0.12345678901234567890123456789012345678901234567890"));
-                RealBig val2 = RealBig.create(new BigDecimal("2.71828182845904523536028747135266249775724709369995"));
-
-                testOp(res, "RB:Add", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    Matrix<Real> b = createRealBigMatrix(val2, 3);
-                    Matrix<Real> c = provider.add(a, b);
-                    assertNoFallback(provider, c);
-                });
-
-                testOp(res, "RB:Sub", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    Matrix<Real> b = createRealBigMatrix(val2, 3);
-                    Matrix<Real> c = provider.subtract(a, b);
-                    assertNoFallback(provider, c);
-                });
-
-                testOp(res, "RB:Scale", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    Matrix<Real> c = provider.scale((Real) val2, a);
-                    assertNoFallback(provider, c);
-                });
-
-                testOp(res, "RB:Mul", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    Matrix<Real> b = createRealBigMatrix(val2, 3);
-                    Matrix<Real> c = provider.multiply(a, b);
-                    assertNoFallback(provider, c);
-                });
-
-                testOp(res, "RB:MatVec", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    Vector<Real> v = createRealBigVector(val2, 3);
-                    Vector<Real> r = provider.multiply(a, v);
-                    assertNoFallback(provider, r);
-                });
-
-                testOp(res, "RB:Trans", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    Matrix<Real> t = provider.transpose(a);
-                    assertNoFallback(provider, t);
-                });
-
-                testOp(res, "RB:Inv", provider, () -> {
-                    Matrix<Real> a = createInvertibleRealBigMatrix(3);
-                    Matrix<Real> inv = provider.inverse(a);
-                    assertNoFallback(provider, inv);
-                });
-
-                testOp(res, "RB:Det", provider, () -> {
-                    Matrix<Real> a = createInvertibleRealBigMatrix(3);
-                    Real det = provider.determinant(a);
-                    assertNotNull(det);
-                });
-
-                testOp(res, "RB:Solve", provider, () -> {
-                    Matrix<Real> a = createInvertibleRealBigMatrix(3);
-                    Vector<Real> b = createRealBigVector(val, 3);
-                    Vector<Real> x = provider.solve(a, b);
-                    assertNoFallback(provider, x);
-                });
-
-                testOp(res, "RB:Dot", provider, () -> {
-                    Vector<Real> a = createRealBigVector(val, 4);
-                    Vector<Real> b = createRealBigVector(val2, 4);
-                    Real d = provider.dot(a, b);
-                    assertNotNull(d);
-                });
-
-                testOp(res, "RB:Norm", provider, () -> {
-                    Vector<Real> a = createRealBigVector(val, 4);
-                    Real n = provider.norm(a);
-                    assertNotNull(n);
-                });
-
-                testOp(res, "RB:LU", provider, () -> {
-                    Matrix<Real> a = createInvertibleRealBigMatrix(3);
-                    LUResult<Real> lu = provider.lu(a);
-                    assertNotNull(lu);
-                });
-
-                testOp(res, "RB:QR", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    QRResult<Real> qr = provider.qr(a);
-                    assertNotNull(qr);
-                });
-
-                testOp(res, "RB:SVD", provider, () -> {
-                    Matrix<Real> a = createRealBigMatrix(val, 3);
-                    SVDResult<Real> svd = provider.svd(a);
-                    assertNotNull(svd);
-                });
-
-                testOp(res, "RB:Chol", provider, () -> {
-                    Matrix<Real> a = createSPDRealBigMatrix(3);
-                    CholeskyResult<Real> chol = provider.cholesky(a);
-                    assertNotNull(chol);
-                });
-
-                testOp(res, "RB:Eigen", provider, () -> {
-                    Matrix<Real> a = createInvertibleRealBigMatrix(3);
-                    EigenResult<Real> eig = provider.eigen(a);
-                    assertNotNull(eig);
-                });
-
-                testOp(res, "RB:BiCGSTAB", provider, () -> {
-                    if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
-                    SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
-                    Matrix<Real> a = createInvertibleRealBigMatrix(4);
-                    Vector<Real> b = createRealBigVector(val, 4);
-                    Vector<Real> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
-                    Vector<Real> x = sp.bicgstab(a, b, x0, Real.of("1e-8"), 1000);
-                    assertNotNull(x);
-                });
-
-                testOp(res, "RB:ConjGrad", provider, () -> {
-                    if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
-                    SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
-                    Matrix<Real> a = createSPDRealBigMatrix(4);
-                    Vector<Real> b = createRealBigVector(val, 4);
-                    Vector<Real> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
-                    Vector<Real> x = sp.conjugateGradient(a, b, x0, Real.of("1e-8"), 1000);
-                    assertNotNull(x);
-                });
-
-                testOp(res, "RB:GMRES", provider, () -> {
-                    if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
-                    SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
-                    Matrix<Real> a = createInvertibleRealBigMatrix(4);
-                    Vector<Real> b = createRealBigVector(val, 4);
-                    Vector<Real> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
-                    Vector<Real> x = sp.gmres(a, b, x0, Real.of("1e-8"), 1000, 10);
-                    assertNotNull(x);
-                });
-
-                // Transcendentals (element-level, not provider ops)
-                testOp(res, "RB:Exp", provider, () -> {
-                    Real v1 = Real.of("1.0");
-                    if (v1 instanceof RealBig rb) {
-                        Real exp = rb.exp();
-                        assertNotNull(exp);
-                    } else {
-                        throw new UnsupportedOperationException("Not a high-precision type");
-                    }
-                });
-
-                testOp(res, "RB:Sin", provider, () -> {
-                    Real v1 = Real.of("0.5");
-                    if (v1 instanceof RealBig rb) {
-                        Real sin = rb.sin();
-                        assertNotNull(sin);
-                    } else {
-                        throw new UnsupportedOperationException("Not a high-precision type");
-                    }
-                });
-
+                Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+                if (rawProvider.isCompatible(ring)) {
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<RealBig> provider = (LinearAlgebraProvider<RealBig>) rawProvider;
+                    runRealBigTests(res, provider);
+                }
                 return null;
             });
 
             // === COMPLEX DOMAIN ===
-            @SuppressWarnings("unchecked")
-            Ring<Real> complexRing = (Ring<Real>) (Object) Complex.of(1.0, 0.0).getScalarRing();
-            boolean complexCompatible = provider.isCompatible(complexRing);
-
-            testOp(res, "C:Add", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
-                Matrix<Real> b = createComplexMatrix(Complex.of(0.7, -1.1), 3);
-                Matrix<Real> c = provider.add(a, b);
-                assertNoFallback(provider, c);
-            });
-
-            testOp(res, "C:Sub", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
-                Matrix<Real> b = createComplexMatrix(Complex.of(0.7, -1.1), 3);
-                Matrix<Real> c = provider.subtract(a, b);
-                assertNoFallback(provider, c);
-            });
-
-            testOp(res, "C:Scale", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
-                Matrix<Real> c = provider.scale((Real)(Object)Complex.of(2.0, -1.0), a);
-                assertNoFallback(provider, c);
-            });
-
-            testOp(res, "C:Mul", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
-                Matrix<Real> b = createComplexMatrix(Complex.of(0.5, -0.5), 3);
-                Matrix<Real> c = provider.multiply(a, b);
-                assertNoFallback(provider, c);
-            });
-
-            testOp(res, "C:MatVec", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
-                Vector<Real> v = createComplexVector(Complex.of(2.0, -1.0), 3);
-                Vector<Real> r = provider.multiply(a, v);
-                assertNoFallback(provider, r);
-            });
-
-            testOp(res, "C:Trans", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
-                Matrix<Real> t = provider.transpose(a);
-                assertNoFallback(provider, t);
-            });
-
-            testOp(res, "C:Inv", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createInvertibleComplexMatrix(3);
-                Matrix<Real> inv = provider.inverse(a);
-                assertNoFallback(provider, inv);
-            });
-
-            testOp(res, "C:Det", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createInvertibleComplexMatrix(3);
-                Real det = provider.determinant(a);
-                assertNotNull(det);
-            });
-
-            testOp(res, "C:Solve", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createInvertibleComplexMatrix(3);
-                Vector<Real> b = createComplexVector(Complex.of(1.0, 2.0), 3);
-                Vector<Real> x = provider.solve(a, b);
-                assertNoFallback(provider, x);
-            });
-
-            testOp(res, "C:Dot", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Vector<Real> a = createComplexVector(Complex.of(1.0, 1.0), 4);
-                Vector<Real> b = createComplexVector(Complex.of(2.0, -1.0), 4);
-                Real d = provider.dot(a, b);
-                assertNotNull(d);
-            });
-
-            testOp(res, "C:Norm", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Vector<Real> a = createComplexVector(Complex.of(1.0, 1.0), 4);
-                Real n = provider.norm(a);
-                assertNotNull(n);
-            });
-
-            testOp(res, "C:LU", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createInvertibleComplexMatrix(3);
-                LUResult<Real> lu = provider.lu(a);
-                assertNotNull(lu);
-            });
-
-            testOp(res, "C:QR", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
-                QRResult<Real> qr = provider.qr(a);
-                assertNotNull(qr);
-            });
-
-            testOp(res, "C:SVD", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
-                SVDResult<Real> svd = provider.svd(a);
-                assertNotNull(svd);
-            });
-
-            testOp(res, "C:Chol", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createSPDComplexMatrix(3);
-                CholeskyResult<Real> chol = provider.cholesky(a);
-                assertNotNull(chol);
-            });
-
-            testOp(res, "C:Eigen", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                Matrix<Real> a = createInvertibleComplexMatrix(3);
-                EigenResult<Real> eig = provider.eigen(a);
-                assertNotNull(eig);
-            });
-
-            testOp(res, "C:BiCGSTAB", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
-                SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
-                Matrix<Real> a = createInvertibleComplexMatrix(4);
-                Vector<Real> b = createComplexVector(Complex.of(1.0, 2.0), 4);
-                Vector<Real> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
-                Vector<Real> x = sp.bicgstab(a, b, x0, (Real)(Object)Complex.of(1e-8, 0), 1000);
-                assertNotNull(x);
-            });
-
-            testOp(res, "C:ConjGrad", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
-                SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
-                Matrix<Real> a = createSPDComplexMatrix(4);
-                Vector<Real> b = createComplexVector(Complex.of(1.0, 2.0), 4);
-                Vector<Real> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
-                Vector<Real> x = sp.conjugateGradient(a, b, x0, (Real)(Object)Complex.of(1e-8, 0), 1000);
-                assertNotNull(x);
-            });
-
-            testOp(res, "C:GMRES", provider, () -> {
-                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
-                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
-                SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
-                Matrix<Real> a = createInvertibleComplexMatrix(4);
-                Vector<Real> b = createComplexVector(Complex.of(1.0, 2.0), 4);
-                Vector<Real> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
-                Vector<Real> x = sp.gmres(a, b, x0, (Real)(Object)Complex.of(1e-8, 0), 1000, 10);
-                assertNotNull(x);
-            });
+            Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
+            if (rawProvider.isCompatible(complexRing)) {
+                @SuppressWarnings("unchecked")
+                LinearAlgebraProvider<Complex> provider = (LinearAlgebraProvider<Complex>) rawProvider;
+                runComplexTests(res, provider);
+            }
 
             results.add(res);
         }
@@ -393,17 +93,295 @@ public class HighPrecisionComplianceTest {
         printMarkdownReport(results);
     }
 
+    private void runRealBigTests(ComplianceResult res, LinearAlgebraProvider<RealBig> provider) {
+        RealBig val = RealBig.create(new BigDecimal("0.12345678901234567890123456789012345678901234567890"));
+        RealBig val2 = RealBig.create(new BigDecimal("2.71828182845904523536028747135266249775724709369995"));
+
+        testOp(res, "RB:Add", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            Matrix<RealBig> b = createRealBigMatrix(val2, 3);
+            Matrix<RealBig> c = provider.add(a, b);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Sub", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            Matrix<RealBig> b = createRealBigMatrix(val2, 3);
+            Matrix<RealBig> c = provider.subtract(a, b);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Scale", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            Matrix<RealBig> c = provider.scale(val2, a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Mul", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            Matrix<RealBig> b = createRealBigMatrix(val2, 3);
+            Matrix<RealBig> c = provider.multiply(a, b);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:MatVec", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            Vector<RealBig> v = createRealBigVector(val2, 3);
+            Vector<RealBig> r = provider.multiply(a, v);
+            assertNoFallback(provider, r);
+        });
+
+        testOp(res, "RB:Trans", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            Matrix<RealBig> t = provider.transpose(a);
+            assertNoFallback(provider, t);
+        });
+
+        testOp(res, "RB:Inv", provider, () -> {
+            Matrix<RealBig> a = createInvertibleRealBigMatrix(3);
+            Matrix<RealBig> inv = provider.inverse(a);
+            assertNoFallback(provider, inv);
+        });
+
+        testOp(res, "RB:Det", provider, () -> {
+            Matrix<RealBig> a = createInvertibleRealBigMatrix(3);
+            RealBig det = provider.determinant(a);
+            assertNotNull(det);
+        });
+
+        testOp(res, "RB:Solve", provider, () -> {
+            Matrix<RealBig> a = createInvertibleRealBigMatrix(3);
+            Vector<RealBig> b = createRealBigVector(val, 3);
+            Vector<RealBig> x = provider.solve(a, b);
+            assertNoFallback(provider, x);
+        });
+
+        testOp(res, "RB:Dot", provider, () -> {
+            Vector<RealBig> a = createRealBigVector(val, 4);
+            Vector<RealBig> b = createRealBigVector(val2, 4);
+            RealBig d = provider.dot(a, b);
+            assertNotNull(d);
+        });
+
+        testOp(res, "RB:Norm", provider, () -> {
+            Vector<RealBig> a = createRealBigVector(val, 4);
+            RealBig n = provider.norm(a);
+            assertNotNull(n);
+        });
+
+        testOp(res, "RB:LU", provider, () -> {
+            Matrix<RealBig> a = createInvertibleRealBigMatrix(3);
+            LUResult<RealBig> lu = provider.lu(a);
+            assertNotNull(lu);
+        });
+
+        testOp(res, "RB:QR", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            QRResult<RealBig> qr = provider.qr(a);
+            assertNotNull(qr);
+        });
+
+        testOp(res, "RB:SVD", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 3);
+            SVDResult<RealBig> svd = provider.svd(a);
+            assertNotNull(svd);
+        });
+
+        testOp(res, "RB:Chol", provider, () -> {
+            Matrix<RealBig> a = createSPDRealBigMatrix(3);
+            CholeskyResult<RealBig> chol = provider.cholesky(a);
+            assertNotNull(chol);
+        });
+
+        testOp(res, "RB:Eigen", provider, () -> {
+            Matrix<RealBig> a = createInvertibleRealBigMatrix(3);
+            EigenResult<RealBig> eig = provider.eigen(a);
+            assertNotNull(eig);
+        });
+
+        testOp(res, "RB:BiCGSTAB", provider, () -> {
+            if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+            SparseLinearAlgebraProvider<RealBig> sp = (SparseLinearAlgebraProvider<RealBig>) provider;
+            Matrix<RealBig> a = createInvertibleRealBigMatrix(4);
+            Vector<RealBig> b = createRealBigVector(val, 4);
+            Vector<RealBig> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
+            Vector<RealBig> x = sp.bicgstab(a, b, x0, RealBig.create(new BigDecimal("1e-8")), 1000);
+            assertNotNull(x);
+        });
+
+        testOp(res, "RB:ConjGrad", provider, () -> {
+            if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+            SparseLinearAlgebraProvider<RealBig> sp = (SparseLinearAlgebraProvider<RealBig>) provider;
+            Matrix<RealBig> a = createSPDRealBigMatrix(4);
+            Vector<RealBig> b = createRealBigVector(val, 4);
+            Vector<RealBig> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
+            Vector<RealBig> x = sp.conjugateGradient(a, b, x0, RealBig.create(new BigDecimal("1e-8")), 1000);
+            assertNotNull(x);
+        });
+
+        testOp(res, "RB:GMRES", provider, () -> {
+            if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+            SparseLinearAlgebraProvider<RealBig> sp = (SparseLinearAlgebraProvider<RealBig>) provider;
+            Matrix<RealBig> a = createInvertibleRealBigMatrix(4);
+            Vector<RealBig> b = createRealBigVector(val, 4);
+            Vector<RealBig> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
+            Vector<RealBig> x = sp.gmres(a, b, x0, RealBig.create(new BigDecimal("1e-8")), 1000, 10);
+            assertNotNull(x);
+        });
+
+        testOp(res, "RB:Exp", provider, () -> {
+            Real exp = val.exp();
+            assertNotNull(exp);
+        });
+
+        testOp(res, "RB:Sin", provider, () -> {
+            Real sin = val.sin();
+            assertNotNull(sin);
+        });
+    }
+
+    private void runComplexTests(ComplianceResult res, LinearAlgebraProvider<Complex> provider) {
+        testOp(res, "C:Add", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
+            Matrix<Complex> b = createComplexMatrix(Complex.of(0.7, -1.1), 3);
+            Matrix<Complex> c = provider.add(a, b);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Sub", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
+            Matrix<Complex> b = createComplexMatrix(Complex.of(0.7, -1.1), 3);
+            Matrix<Complex> c = provider.subtract(a, b);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Scale", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
+            Matrix<Complex> c = provider.scale(Complex.of(2.0, -1.0), a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Mul", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
+            Matrix<Complex> b = createComplexMatrix(Complex.of(0.5, -0.5), 3);
+            Matrix<Complex> c = provider.multiply(a, b);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:MatVec", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
+            Vector<Complex> v = createComplexVector(Complex.of(2.0, -1.0), 3);
+            Vector<Complex> r = provider.multiply(a, v);
+            assertNoFallback(provider, r);
+        });
+
+        testOp(res, "C:Trans", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.5, 2.3), 3);
+            Matrix<Complex> t = provider.transpose(a);
+            assertNoFallback(provider, t);
+        });
+
+        testOp(res, "C:Inv", provider, () -> {
+            Matrix<Complex> a = createInvertibleComplexMatrix(3);
+            Matrix<Complex> inv = provider.inverse(a);
+            assertNoFallback(provider, inv);
+        });
+
+        testOp(res, "C:Det", provider, () -> {
+            Matrix<Complex> a = createInvertibleComplexMatrix(3);
+            Complex det = provider.determinant(a);
+            assertNotNull(det);
+        });
+
+        testOp(res, "C:Solve", provider, () -> {
+            Matrix<Complex> a = createInvertibleComplexMatrix(3);
+            Vector<Complex> b = createComplexVector(Complex.of(1.0, 2.0), 3);
+            Vector<Complex> x = provider.solve(a, b);
+            assertNoFallback(provider, x);
+        });
+
+        testOp(res, "C:Dot", provider, () -> {
+            Vector<Complex> a = createComplexVector(Complex.of(1.0, 1.0), 4);
+            Vector<Complex> b = createComplexVector(Complex.of(2.0, -1.0), 4);
+            Complex d = provider.dot(a, b);
+            assertNotNull(d);
+        });
+
+        testOp(res, "C:Norm", provider, () -> {
+            Vector<Complex> a = createComplexVector(Complex.of(1.0, 1.0), 4);
+            Complex n = provider.norm(a);
+            assertNotNull(n);
+        });
+
+        testOp(res, "C:LU", provider, () -> {
+            Matrix<Complex> a = createInvertibleComplexMatrix(3);
+            LUResult<Complex> lu = provider.lu(a);
+            assertNotNull(lu);
+        });
+
+        testOp(res, "C:QR", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
+            QRResult<Complex> qr = provider.qr(a);
+            assertNotNull(qr);
+        });
+
+        testOp(res, "C:SVD", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 3);
+            SVDResult<Complex> svd = provider.svd(a);
+            assertNotNull(svd);
+        });
+
+        testOp(res, "C:Chol", provider, () -> {
+            Matrix<Complex> a = createSPDComplexMatrix(3);
+            CholeskyResult<Complex> chol = provider.cholesky(a);
+            assertNotNull(chol);
+        });
+
+        testOp(res, "C:Eigen", provider, () -> {
+            Matrix<Complex> a = createInvertibleComplexMatrix(3);
+            EigenResult<Complex> eig = provider.eigen(a);
+            assertNotNull(eig);
+        });
+
+        testOp(res, "C:BiCGSTAB", provider, () -> {
+            if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+            SparseLinearAlgebraProvider<Complex> sp = (SparseLinearAlgebraProvider<Complex>) provider;
+            Matrix<Complex> a = createInvertibleComplexMatrix(4);
+            Vector<Complex> b = createComplexVector(Complex.of(1.0, 2.0), 4);
+            Vector<Complex> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
+            Vector<Complex> x = sp.bicgstab(a, b, x0, Complex.of(1e-8, 0), 1000);
+            assertNotNull(x);
+        });
+
+        testOp(res, "C:ConjGrad", provider, () -> {
+            if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+            SparseLinearAlgebraProvider<Complex> sp = (SparseLinearAlgebraProvider<Complex>) provider;
+            Matrix<Complex> a = createSPDComplexMatrix(4);
+            Vector<Complex> b = createComplexVector(Complex.of(1.0, 2.0), 4);
+            Vector<Complex> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
+            Vector<Complex> x = sp.conjugateGradient(a, b, x0, Complex.of(1e-8, 0), 1000);
+            assertNotNull(x);
+        });
+
+        testOp(res, "C:GMRES", provider, () -> {
+            if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+            SparseLinearAlgebraProvider<Complex> sp = (SparseLinearAlgebraProvider<Complex>) provider;
+            Matrix<Complex> a = createInvertibleComplexMatrix(4);
+            Vector<Complex> b = createComplexVector(Complex.of(1.0, 2.0), 4);
+            Vector<Complex> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
+            Vector<Complex> x = sp.gmres(a, b, x0, Complex.of(1e-8, 0), 1000, 10);
+            assertNotNull(x);
+        });
+    }
+
     // --- Provider Discovery ---
-    private List<LinearAlgebraProvider<Real>> discoverHPProviders() {
-        Map<String, LinearAlgebraProvider<Real>> providers = new LinkedHashMap<>();
+    private List<LinearAlgebraProvider<?>> discoverHPProviders() {
+        Map<String, LinearAlgebraProvider<?>> providers = new LinkedHashMap<>();
         
-        @SuppressWarnings({"unchecked"})
-        ServiceLoader<LinearAlgebraProvider<Real>> loader = ServiceLoader.load((Class<LinearAlgebraProvider<Real>>)(Class<?>)LinearAlgebraProvider.class);
-        for (LinearAlgebraProvider<Real> p : loader) {
-            if (isDoubleOnlyProvider(p.getName())) continue;
-            if (p.isCompatible(Reals.getInstance())) {
-                providers.put(p.getName(), p);
-            }
+        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
+        for (LinearAlgebraProvider<?> prov : loader) {
+            if (isDoubleOnlyProvider(prov.getName())) continue;
+            providers.put(prov.getName(), prov);
         }
 
         try {
@@ -412,11 +390,7 @@ public class HighPrecisionComplianceTest {
                     for (var ap : b.getAlgorithmProviders()) {
                         if (ap instanceof LinearAlgebraProvider<?> p) {
                             if (isDoubleOnlyProvider(p.getName())) continue;
-                            if (p.isCompatible(Reals.getInstance())) {
-                                @SuppressWarnings("unchecked")
-                                LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
-                                providers.putIfAbsent(typed.getName(), typed);
-                            }
+                            providers.putIfAbsent(p.getName(), p);
                         }
                     }
                 } catch (Throwable t) {
@@ -437,7 +411,7 @@ public class HighPrecisionComplianceTest {
     }
 
     // --- Test Infrastructure ---
-    private void assertNoFallback(LinearAlgebraProvider<Real> expectedProvider, Object result) {
+    private <E> void assertNoFallback(LinearAlgebraProvider<E> expectedProvider, Object result) {
         if (result instanceof Matrix<?> m && m.getProvider() != null) {
             String expected = expectedProvider.getClass().getSimpleName();
             String actual = m.getProvider().getClass().getSimpleName();
@@ -453,15 +427,19 @@ public class HighPrecisionComplianceTest {
         }
     }
 
-    private void testOp(ComplianceResult res, String opName, LinearAlgebraProvider<Real> provider, Runnable test) {
+    private <E> void testOp(ComplianceResult res, String opName, LinearAlgebraProvider<E> provider, Runnable test) {
         try {
             test.run();
             res.status.put(opName, "✅ PASS");
         } catch (UnsupportedOperationException e) {
             res.status.put(opName, "❌ N/A");
         } catch (Throwable e) {
-            String className = e.getClass().getSimpleName();
-            String msg = e.getMessage();
+            // Find root cause
+            Throwable root = e;
+            while (root.getCause() != null && root.getCause() != root) root = root.getCause();
+            
+            String className = root.getClass().getSimpleName();
+            String msg = root.getMessage();
             String label = className;
             if (msg != null && !msg.isBlank()) {
                 String cleanMsg = msg.replace("\n", " ").replace("|", "/");
@@ -473,34 +451,34 @@ public class HighPrecisionComplianceTest {
     }
 
     // --- Matrix/Vector Creation ---
-    private Matrix<Real> createRealBigMatrix(Real val, int n) {
-        Real[][] data = new Real[n][n];
+    private Matrix<RealBig> createRealBigMatrix(RealBig val, int n) {
+        RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                data[i][j] = Real.of(new BigDecimal(String.valueOf((i + 1) * 0.1 + (j + 1) * 0.01)).add(val.bigDecimalValue()));
+                data[i][j] = RealBig.create(new BigDecimal(String.valueOf((i + 1) * 0.1 + (j + 1) * 0.01)).add(val.bigDecimalValue()));
             }
         }
-        return Matrix.of(data, Reals.getInstance());
+        return Matrix.of(data, (Ring<RealBig>)(Object)Real.ZERO);
     }
 
-    private Matrix<Real> createInvertibleRealBigMatrix(int n) {
+    private Matrix<RealBig> createInvertibleRealBigMatrix(int n) {
         // Diagonally dominant for invertibility
-        Real[][] data = new Real[n][n];
+        RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i == j) {
-                    data[i][j] = Real.of(new BigDecimal(String.valueOf(n * 2.0 + i)));
+                    data[i][j] = RealBig.create(new BigDecimal(String.valueOf(n * 2.0 + i)));
                 } else {
-                    data[i][j] = Real.of(new BigDecimal(String.valueOf(0.1 * (i + j + 1))));
+                    data[i][j] = RealBig.create(new BigDecimal(String.valueOf(0.1 * (i + j + 1))));
                 }
             }
         }
-        return Matrix.of(data, Reals.getInstance());
+        return Matrix.of(data, (Ring<RealBig>)(Object)Real.ZERO);
     }
 
-    private Matrix<Real> createSPDRealBigMatrix(int n) {
+    private Matrix<RealBig> createSPDRealBigMatrix(int n) {
         // A^T * A + nI for symmetric positive definite
-        Real[][] data = new Real[n][n];
+        RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 double sum = 0;
@@ -508,73 +486,65 @@ public class HighPrecisionComplianceTest {
                     sum += (0.1 * (k + i + 1)) * (0.1 * (k + j + 1));
                 }
                 if (i == j) sum += n;
-                data[i][j] = Real.of(new BigDecimal(String.valueOf(sum)));
+                data[i][j] = RealBig.create(new BigDecimal(String.valueOf(sum)));
             }
         }
-        return Matrix.of(data, Reals.getInstance());
+        return Matrix.of(data, (Ring<RealBig>)(Object)Real.ZERO);
     }
 
-    private Vector<Real> createRealBigVector(Real val, int n) {
-        Real[] data = new Real[n];
+    private Vector<RealBig> createRealBigVector(RealBig val, int n) {
+        RealBig[] data = new RealBig[n];
         for (int i = 0; i < n; i++) {
-            data[i] = Real.of(new BigDecimal(String.valueOf((i + 1) * 0.5)).add(val.bigDecimalValue()));
+            data[i] = RealBig.create(new BigDecimal(String.valueOf((i + 1) * 0.5)).add(val.bigDecimalValue()));
         }
-        return Vector.of(data, Reals.getInstance());
+        return Vector.of(data, (Ring<RealBig>)(Object)Real.ZERO);
     }
 
-    @SuppressWarnings("unchecked")
-    private Matrix<Real> createComplexMatrix(Complex z, int n) {
-        Real[][] data = new Real[n][n];
+    private Matrix<Complex> createComplexMatrix(Complex z, int n) {
+        Complex[][] data = new Complex[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                data[i][j] = (Real)(Object) Complex.of(z.getReal().doubleValue() + i * 0.1, z.getImaginary().doubleValue() + j * 0.1);
+                data[i][j] = Complex.of(z.getReal().doubleValue() + i * 0.1, z.getImaginary().doubleValue() + j * 0.1);
             }
         }
-        Ring<Real> ring = (Ring<Real>)(Object) z.getScalarRing();
-        return Matrix.of(data, ring);
+        return Matrix.of(data, z.getScalarRing());
     }
 
-    @SuppressWarnings("unchecked")
-    private Matrix<Real> createInvertibleComplexMatrix(int n) {
-        Real[][] data = new Real[n][n];
+    private Matrix<Complex> createInvertibleComplexMatrix(int n) {
+        Complex[][] data = new Complex[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i == j) {
-                    data[i][j] = (Real)(Object) Complex.of(n * 2.0 + i, 0.1);
+                    data[i][j] = Complex.of(n * 2.0 + i, 0.1);
                 } else {
-                    data[i][j] = (Real)(Object) Complex.of(0.1 * (i + j + 1), 0.05);
+                    data[i][j] = Complex.of(0.1 * (i + j + 1), 0.05);
                 }
             }
         }
-        Ring<Real> ring = (Ring<Real>)(Object) Complex.of(0, 0).getScalarRing();
-        return Matrix.of(data, ring);
+        return Matrix.of(data, Complex.of(0, 0).getScalarRing());
     }
 
-    @SuppressWarnings("unchecked")
-    private Matrix<Real> createSPDComplexMatrix(int n) {
+    private Matrix<Complex> createSPDComplexMatrix(int n) {
         // Hermitian positive definite
-        Real[][] data = new Real[n][n];
+        Complex[][] data = new Complex[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i == j) {
-                    data[i][j] = (Real)(Object) Complex.of(n * 3.0 + i, 0.0);
+                    data[i][j] = Complex.of(n * 3.0 + i, 0.0);
                 } else {
-                    data[i][j] = (Real)(Object) Complex.of(0.1 * (i + j + 1), i > j ? 0.05 : -0.05);
+                    data[i][j] = Complex.of(0.1 * (i + j + 1), i > j ? 0.05 : -0.05);
                 }
             }
         }
-        Ring<Real> ring = (Ring<Real>)(Object) Complex.of(0, 0).getScalarRing();
-        return Matrix.of(data, ring);
+        return Matrix.of(data, Complex.of(0, 0).getScalarRing());
     }
 
-    @SuppressWarnings("unchecked")
-    private Vector<Real> createComplexVector(Complex z, int n) {
-        Real[] data = new Real[n];
+    private Vector<Complex> createComplexVector(Complex z, int n) {
+        Complex[] data = new Complex[n];
         for (int i = 0; i < n; i++) {
-            data[i] = (Real)(Object) Complex.of(z.getReal().doubleValue() + i * 0.5, z.getImaginary().doubleValue() - i * 0.3);
+            data[i] = Complex.of(z.getReal().doubleValue() + i * 0.5, z.getImaginary().doubleValue() - i * 0.3);
         }
-        Ring<Real> ring = (Ring<Real>)(Object) z.getScalarRing();
-        return Vector.of(data, ring);
+        return Vector.of(data, z.getScalarRing());
     }
 
     // --- Report Generation ---

@@ -96,8 +96,8 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
 
     private Matrix<Real> A;
     private Matrix<Real> B;
-    private TiledMatrix tiledA;
-    private TiledMatrix tiledB;
+    private TiledMatrix<Real> tiledA;
+    private TiledMatrix<Real> tiledB;
 
     @Override
     public void setup() {
@@ -131,8 +131,8 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
         B = Matrix.of(toReal(dataB), org.episteme.core.mathematics.sets.Reals.getInstance());
 
         // Create tiled versions
-        tiledA = new TiledMatrix(A, tileSize, tileSize);
-        tiledB = new TiledMatrix(B, tileSize, tileSize);
+        tiledA = new TiledMatrix<Real>(A, tileSize, tileSize);
+        tiledB = new TiledMatrix<Real>(B, tileSize, tileSize);
     }
 
     @Benchmark
@@ -144,19 +144,19 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
     }
 
     @Benchmark
-    public TiledMatrix summaMultiply() {
+    public TiledMatrix<Real> summaMultiply() {
         long start = System.nanoTime();
-        TiledMatrix res = DistributedSUMMAAlgorithm.multiply(tiledA, tiledB);
+        TiledMatrix<Real> res = DistributedSUMMAAlgorithm.multiply(tiledA, tiledB);
         record("summa", System.nanoTime() - start);
         return res;
     }
 
     @Benchmark
-    public TiledMatrix cannonMultiply() {
+    public TiledMatrix<Real> cannonMultiply() {
         int gridSize = (int) Math.sqrt(parallelism);
         if (gridSize * gridSize == parallelism) {
             long start = System.nanoTime();
-            TiledMatrix res = DistributedCannonAlgorithm.multiply(tiledA, tiledB);
+            TiledMatrix<Real> res = DistributedCannonAlgorithm.multiply(tiledA, tiledB);
             record("cannon", System.nanoTime() - start);
             return res;
         }
@@ -164,11 +164,11 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
     }
 
     @Benchmark
-    public TiledMatrix foxMultiply() {
+    public TiledMatrix<Real> foxMultiply() {
         int gridSize = (int) Math.sqrt(parallelism);
         if (gridSize * gridSize == parallelism) {
             long start = System.nanoTime();
-            TiledMatrix res = DistributedFoxAlgorithm.multiply(tiledA, tiledB);
+            TiledMatrix<Real> res = DistributedFoxAlgorithm.multiply(tiledA, tiledB);
             record("fox", System.nanoTime() - start);
             return res;
         }
@@ -176,14 +176,14 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
     }
 
     @Benchmark
-    public TiledMatrix twoAndHalfDMultiply() {
+    public TiledMatrix<Real> twoAndHalfDMultiply() {
         int c = (parallelism >= 8) ? 2 : 1;
         if (parallelism % c == 0) {
             int pLayer = parallelism / c;
             int pSqrt = (int) Math.sqrt(pLayer);
             if (pSqrt * pSqrt == pLayer) {
                 long start = System.nanoTime();
-                TiledMatrix res = Distributed25DAlgorithm.multiply(tiledA, tiledB, c);
+                TiledMatrix<Real> res = Distributed25DAlgorithm.multiply(tiledA, tiledB, c);
                 record("2.5d", System.nanoTime() - start);
                 return res;
             }
@@ -192,9 +192,9 @@ public class DistributedMatrixBenchmark implements RunnableBenchmark {
     }
 
     @Benchmark
-    public TiledMatrix carmaMultiply() {
+    public TiledMatrix<Real> carmaMultiply() {
         long start = System.nanoTime();
-        TiledMatrix res = DistributedCARMAAlgorithm.multiply(tiledA, tiledB);
+        TiledMatrix<Real> res = DistributedCARMAAlgorithm.multiply(tiledA, tiledB);
         record("carma", System.nanoTime() - start);
         return res;
     }

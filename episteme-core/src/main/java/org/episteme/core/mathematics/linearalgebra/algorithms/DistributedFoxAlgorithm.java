@@ -7,7 +7,6 @@ package org.episteme.core.mathematics.linearalgebra.algorithms;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.DistributedCompute;
 import java.util.concurrent.Future;
@@ -54,7 +53,19 @@ public class DistributedFoxAlgorithm {
      * @return Result matrix C
      * @throws IllegalArgumentException if matrices are incompatible or processor grid is not square
      */
-    public static TiledMatrix multiply(TiledMatrix A, TiledMatrix B) {
+    public static <E> TiledMatrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B) {
+        return multiply(A, B, null);
+    }
+
+    /**
+     * Performs distributed matrix multiplication C = A × B using Fox's algorithm with a leaf provider.
+     *
+     * @param A Left matrix (must be square-tiled)
+     * @param B Right matrix (must be square-tiled)
+     * @param leafProvider Provider for tile-level multiplication
+     * @return Result matrix C
+     */
+    public static <E> TiledMatrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leafProvider) {
         if (A.cols() != B.rows()) {
             throw new IllegalArgumentException("Matrix dimensions incompatible");
         }
@@ -76,10 +87,10 @@ public class DistributedFoxAlgorithm {
         }
 
         // Create result matrix
-        TiledMatrix C = new TiledMatrix(A.rows(), B.cols(), A.getTileSize());
+        TiledMatrix<E> C = new TiledMatrix<E>(A.rows(), B.cols(), A.getTileSize(), A.getScalarRing());
 
         // Working copy of B for shifting
-        TiledMatrix B_current = copyTiledMatrix(B);
+        TiledMatrix<E> B_current = copyTiledMatrix(B);
 
         // Main loop
         for (int step = 0; step < gridSize; step++) {
@@ -89,24 +100,24 @@ public class DistributedFoxAlgorithm {
             @SuppressWarnings("rawtypes")
             List<Future> tasks = new ArrayList<>();
 
-            final TiledMatrix B_step = B_current;
+            final TiledMatrix<E> B_step = B_current;
 
             for (int i = 0; i < m; i++) {
                 final int row = i;
                 // Determine which A tile to broadcast in this row
                 int broadcastCol = (row + currentStep) % gridSize;
-                final Matrix<Real> aTileToBroadcast = A.getTile(row, broadcastCol);
+                final Matrix<E> aTileToBroadcast = A.getTile(row, broadcastCol);
 
                 for (int j = 0; j < n; j++) {
                     final int col = j;
 
                     tasks.add(ctx.submit(() -> {
                         // Each processor in row i receives A[i][(i+step) mod gridSize]
-                        Matrix<Real> aTile = aTileToBroadcast;
-                        Matrix<Real> bTile = B_step.getTile(row, col);
-                        Matrix<Real> product = aTile.multiply(bTile);
+                        Matrix<E> aTile = aTileToBroadcast;
+                        Matrix<E> bTile = B_step.getTile(row, col);
+                        Matrix<E> product = (leafProvider != null) ? leafProvider.multiply(aTile, bTile) : aTile.multiply(bTile);
 
-                        Matrix<Real> current = C.getTile(row, col);
+                        Matrix<E> current = C.getTile(row, col);
                         if (current != null) {
                             C.setTile(row, col, current.add(product));
                         } else {
@@ -134,10 +145,10 @@ public class DistributedFoxAlgorithm {
     /**
      * Shifts all tiles up by one position (circular).
      */
-    private static TiledMatrix shiftUp(TiledMatrix M) {
+    private static <E> TiledMatrix<E> shiftUp(TiledMatrix<E> M) {
         int m = M.getNumTileRows();
         int n = M.getNumTileCols();
-        TiledMatrix shifted = new TiledMatrix(M.rows(), M.cols(), M.getTileSize());
+        TiledMatrix<E> shifted = new TiledMatrix<E>(M.rows(), M.cols(), M.getTileSize(), M.getScalarRing());
 
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
@@ -151,10 +162,10 @@ public class DistributedFoxAlgorithm {
     /**
      * Creates a copy of a tiled matrix.
      */
-    private static TiledMatrix copyTiledMatrix(TiledMatrix M) {
+    private static <E> TiledMatrix<E> copyTiledMatrix(TiledMatrix<E> M) {
         int m = M.getNumTileRows();
         int n = M.getNumTileCols();
-        TiledMatrix copy = new TiledMatrix(M.rows(), M.cols(), M.getTileSize());
+        TiledMatrix<E> copy = new TiledMatrix<E>(M.rows(), M.cols(), M.getTileSize(), M.getScalarRing());
 
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
@@ -171,7 +182,7 @@ public class DistributedFoxAlgorithm {
      * @param B Right matrix
      * @return Performance comparison report
      */
-    public static String compareWithSUMMA(TiledMatrix A, TiledMatrix B) {
+    public static <E> String compareWithSUMMA(TiledMatrix<E> A, TiledMatrix<E> B) {
         long startFox = System.nanoTime();
         multiply(A, B);  // Don't store result, just measure time
         long timeFox = System.nanoTime() - startFox;

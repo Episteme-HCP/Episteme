@@ -7,7 +7,6 @@ package org.episteme.core.mathematics.linearalgebra.algorithms;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.DistributedCompute;
 import java.util.concurrent.Future;
@@ -36,7 +35,20 @@ public class Distributed25DAlgorithm {
      * @param replicationFactor Number of layers (c) to replicate data across
      * @return Result matrix C
      */
-    public static TiledMatrix multiply(TiledMatrix A, TiledMatrix B, int replicationFactor) {
+    public static <E> TiledMatrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B, int replicationFactor) {
+        return multiply(A, B, replicationFactor, null);
+    }
+
+    /**
+     * Performs distributed matrix multiplication C = A x B using 2.5D algorithm with a leaf provider.
+     *
+     * @param A Left matrix
+     * @param B Right matrix
+     * @param replicationFactor Number of layers (c) to replicate data across
+     * @param leafProvider Provider for tile-level multiplication
+     * @return Result matrix C
+     */
+    public static <E> TiledMatrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B, int replicationFactor, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leafProvider) {
         if (A.cols() != B.rows()) {
             throw new IllegalArgumentException("Matrix dimensions incompatible");
         }
@@ -50,7 +62,7 @@ public class Distributed25DAlgorithm {
         int c = replicationFactor;
         if (c < 1) c = 1;
         
-        TiledMatrix C = new TiledMatrix(A, A.getTileSize(), A.getTileSize());
+        TiledMatrix<E> C = new TiledMatrix<E>(A.rows(), B.cols(), A.getTileSize(), A.getScalarRing());
         
         int kTotal = A.getNumTileCols();
         int kChunk = (kTotal + c - 1) / c; 
@@ -65,11 +77,11 @@ public class Distributed25DAlgorithm {
             
             if (kStart >= kTotal) continue;
             
-            final TiledMatrix A_sub = A.getSubTiledMatrix(0, A.getNumTileRows(), kStart, kEnd);
-            final TiledMatrix B_sub = B.getSubTiledMatrix(kStart, kEnd, 0, B.getNumTileCols());
+            final TiledMatrix<E> A_sub = A.getSubTiledMatrix(0, A.getNumTileRows(), kStart, kEnd);
+            final TiledMatrix<E> B_sub = B.getSubTiledMatrix(kStart, kEnd, 0, B.getNumTileCols());
             
             tasks.add(ctx.submit(() -> {
-                multiplyAndAccumulate(A_sub, B_sub, C);
+                multiplyAndAccumulate(A_sub, B_sub, C, leafProvider);
                 return null;
             }));
         }
@@ -81,26 +93,26 @@ public class Distributed25DAlgorithm {
         return C;
     }
     
-    private static void multiplyAndAccumulate(TiledMatrix A, TiledMatrix B, TiledMatrix C) {
+    private static <E> void multiplyAndAccumulate(TiledMatrix<E> A, TiledMatrix<E> B, TiledMatrix<E> C, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leafProvider) {
         int m = A.getNumTileRows();
         int n = B.getNumTileCols();
         int k = A.getNumTileCols(); 
         
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-               Matrix<Real> sum = null;
+               Matrix<E> sum = null;
                for (int l = 0; l < k; l++) {
-                   Matrix<Real> a = A.getTile(i, l);
-                   Matrix<Real> b = B.getTile(l, j);
+                   Matrix<E> a = A.getTile(i, l);
+                   Matrix<E> b = B.getTile(l, j);
                    if (a != null && b != null) {
-                       Matrix<Real> prod = a.multiply(b);
+                       Matrix<E> prod = (leafProvider != null) ? leafProvider.multiply(a, b) : a.multiply(b);
                        sum = (sum == null) ? prod : sum.add(prod);
                    }
                }
                
                if (sum != null) {
                    synchronized(C) {
-                       Matrix<Real> current = C.getTile(i, j);
+                       Matrix<E> current = C.getTile(i, j);
                        C.setTile(i, j, (current == null) ? sum : current.add(sum));
                    }
                }

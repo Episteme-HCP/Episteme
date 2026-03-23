@@ -23,11 +23,11 @@ public class CARMAAlgorithmTest {
         org.episteme.core.distributed.DistributedCompute.setContext(new LocalDistributedContext(1));
         
         // 4x4 matrix, tiles 2x2
-        TiledMatrix A = createIdentity(4, 2);
-        TiledMatrix B = createIdentity(4, 2);
+        TiledMatrix<Real> A = createIdentity(4, 2);
+        TiledMatrix<Real> B = createIdentity(4, 2);
         
         // C = I * I = I
-        TiledMatrix C = DistributedCARMAAlgorithm.multiply(A, B);
+        TiledMatrix<Real> C = DistributedCARMAAlgorithm.multiply(A, B);
         
         // Verify C is Identity
         for(int i=0; i<4; i++) {
@@ -39,8 +39,8 @@ public class CARMAAlgorithmTest {
     }
     
     // Helper to create Identity TiledMatrix
-    private TiledMatrix createIdentity(int n, int tileSize) {
-        TiledMatrix M = new TiledMatrix(n, n, tileSize);
+    private TiledMatrix<Real> createIdentity(int n, int tileSize) {
+        TiledMatrix<Real> M = new TiledMatrix<Real>(n, n, tileSize, org.episteme.core.mathematics.sets.Reals.getInstance());
         for(int i=0; i<n; i++) {
             M.set(i, i, Real.ONE);
         }
