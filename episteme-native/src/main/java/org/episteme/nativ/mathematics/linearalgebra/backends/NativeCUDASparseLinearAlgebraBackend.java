@@ -41,8 +41,8 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
-public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend.class, GPUBackend.class})
+public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend<Real>, NativeBackend, GPUBackend {
     
     @Override
     public boolean isAvailable() {
@@ -67,6 +67,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public int getPriority() {
         return 100;
+    }
+
+    @Override
+    public String getType() {
+        return "linearalgebra";
     }
 
     @Override
@@ -96,6 +101,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUDA_FREE;
     private static MethodHandle CUDA_MEMCPY;
     private static MethodHandle CUDA_DEVICE_SYNCHRONIZE;
+    private static MethodHandle CUDA_GET_DEVICE_COUNT;
+    private static MethodHandle CUDA_GET_ERROR_STRING;
     private static MethodHandle CU_CTX_GET_CURRENT;
     private static MethodHandle CU_CTX_GET_DEVICE;
 
@@ -188,6 +195,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             CUDA_FREE = lookup(cudart, "cudaFree", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             CUDA_MEMCPY = lookup(cudart, "cudaMemcpy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
             CUDA_DEVICE_SYNCHRONIZE = lookup(cudart, "cudaDeviceSynchronize", FunctionDescriptor.of(ValueLayout.JAVA_INT));
+            CUDA_GET_DEVICE_COUNT = lookup(cudart, "cudaGetDeviceCount", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            CUDA_GET_ERROR_STRING = lookup(cudart, "cudaGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
             // Try loading CUDA driver
             Optional<SymbolLookup> cudaDrvOpt = NativeFFMLoader.loadLibrary("cuda", Arena.global());
@@ -244,15 +253,45 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
 
-            // Global Handles
+            // 6. Check for Hardware
+            if (CUDA_GET_DEVICE_COUNT != null) {
+                MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
+                int cudaResult = (int) CUDA_GET_DEVICE_COUNT.invokeExact(countPtr);
+                int deviceCount = countPtr.get(ValueLayout.JAVA_INT, 0);
+                if (cudaResult != 0 || deviceCount <= 0) {
+                    String err = "Unknown error (code " + cudaResult + ")";
+                    if (CUDA_GET_ERROR_STRING != null) {
+                        try {
+                            MemorySegment errStr = (MemorySegment) CUDA_GET_ERROR_STRING.invokeExact(cudaResult);
+                            if (errStr != null && !errStr.equals(MemorySegment.NULL)) {
+                                err = errStr.reinterpret(1024).getString(0);
+                            }
+                        } catch (Throwable ignored) {}
+                    }
+                    logger.warn("No CUDA-capable GPU devices found (result={}, error={}, count={}). Backend disabled.", cudaResult, err, deviceCount);
+                    return;
+                }
+            } else {
+                logger.warn("cudaGetDeviceCount symbol not found. Backend disabled.");
+                return;
+            }
+
+            // 7. Global Handles
             MemorySegment chPtr = tempArena.allocate(ValueLayout.ADDRESS);
-            NativeSafe.invoke(CUBLAS_CREATE, chPtr);
-            CUBLAS_HANDLE = chPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
+            int blasRes = (int) CUBLAS_CREATE.invokeExact(chPtr);
+            if (blasRes == 0) {
+                CUBLAS_HANDLE = chPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
+            } else {
+                logger.warn("cublasCreate failed with error code {}. Backend partially disabled.", blasRes);
+            }
 
             MemorySegment shPtr = tempArena.allocate(ValueLayout.ADDRESS);
-            NativeSafe.invoke(CUSPARSE_CREATE, shPtr);
-            CUSPARSE_HANDLE = shPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
-
+            int sparseRes = (int) CUSPARSE_CREATE.invokeExact(shPtr);
+            if (sparseRes == 0) {
+                CUSPARSE_HANDLE = shPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
+            } else {
+                logger.warn("cusparseCreate failed with error code {}. Backend partially disabled.", sparseRes);
+            }
 
             IS_AVAILABLE = true;
             logger.info("Native CUDA Sparse Backend initialized successfully (Panama).");

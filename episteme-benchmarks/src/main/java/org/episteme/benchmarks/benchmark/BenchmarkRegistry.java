@@ -52,7 +52,12 @@ public class BenchmarkRegistry {
                     org.episteme.core.technical.algorithm.AlgorithmProvider p = providerIterator.next();
                     
                     // Avoid duplicates if already covered by systematic expansion
-                    if (all.stream().anyMatch(b -> b.getId().contains(p.getName().toLowerCase().replace(" ", "-")))) {
+                    String pName = p.getName().toLowerCase();
+                    if (all.stream().anyMatch(b -> {
+                        String bId = b.getId().toLowerCase();
+                        String matchPart = pName.replace(" ", "-").replace("(", "").replace(")", "").replace("/", "-");
+                        return bId.contains(matchPart);
+                    })) {
                         continue;
                     }
                     

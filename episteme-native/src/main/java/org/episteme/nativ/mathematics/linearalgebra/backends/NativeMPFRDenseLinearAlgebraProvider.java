@@ -109,7 +109,7 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
 
     @Override public boolean isAvailable() { return AVAILABLE && !isExplicitlyDisabled(); }
     @Override public String getId() { return "native-mpfr-dense"; }
-    @Override public String getName() { return "Native MPFR Arbitrary-Precision Backend"; }
+    @Override public String getName() { return "Native MPFR Dense Linear Algebra Backend"; }
     @Override public String getDescription() { return "High-performance Arbitrary Precision Linear Algebra backend using libmpfr bound via Project Panama."; }
     
     @Override

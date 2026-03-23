@@ -26,8 +26,16 @@ def run_circuit(qasm_file):
         # Run and get counts
         transpiled_qc = transpile(qc, sim)
         result = sim.run(transpiled_qc, shots=1024).result()
-        counts = result.get_counts(transpiled_qc)
+        try:
+            # get_counts() without arguments is safer for single-circuit results
+            counts = result.get_counts()
+        except Exception:
+            # Fallback
+            counts = result.get_counts(transpiled_qc)
         
+        if not counts:
+             raise ValueError("Simulator returned empty counts. Ensure circuit has measurements.")
+
         print(json.dumps(counts))
 
     except Exception as e:

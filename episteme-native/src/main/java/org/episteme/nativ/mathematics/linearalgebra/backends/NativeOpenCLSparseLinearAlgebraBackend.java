@@ -8,6 +8,7 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
@@ -38,8 +39,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
-public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, SparseLinearAlgebraProvider<Real>, GPUBackend {
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, LinearAlgebraBackend.class, GPUBackend.class})
+public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, SparseLinearAlgebraProvider<Real>, LinearAlgebraBackend<Real>, GPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLSparseLinearAlgebraBackend.class);
 
@@ -120,7 +121,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
     @Override
     public String getType() {
-        return "math";
+        return "linearalgebra";
     }
 
     @Override

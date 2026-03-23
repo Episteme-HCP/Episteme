@@ -43,7 +43,7 @@ public class VLCJMediaBackend implements VideoBackend, AudioBackend, VisionBacke
 
     @Override
     public String getAlgorithmType() {
-        return "Video";
+        return "Video Engine";
     }
 
     @Override

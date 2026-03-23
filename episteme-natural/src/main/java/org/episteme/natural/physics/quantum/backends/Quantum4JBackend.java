@@ -22,8 +22,8 @@ import java.util.HashMap;
 public class Quantum4JBackend implements QuantumBackend, QuantumAlgorithmProvider {
 
     @Override public String getId() { return "quantum4j"; }
-    @Override public String getName() { return "Quantum4J (Enterprise)"; }
-    @Override public String getDescription() { return "Enterprise-grade quantum simulation powered by Quantum4J."; }
+    @Override public String getName() { return "Quantum4J (Enterprise/Mock)"; }
+    @Override public String getDescription() { return "Mock implementation of enterprise-grade quantum simulation powered by Quantum4J."; }
     @Override public int getPriority() { return 90; }
 
     @Override

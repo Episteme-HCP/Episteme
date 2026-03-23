@@ -8,16 +8,25 @@ import traceback
 
 def handle_exec_qasm(params):
     try:
-        from qiskit import QuantumCircuit, execute, Aer
+        try:
+            from qiskit_aer import AerSimulator
+            backend = AerSimulator()
+        except ImportError:
+            from qiskit import Aer
+            backend_name = params.get("backend", "qasm_simulator")
+            backend = Aer.get_backend(backend_name)
     except ImportError:
-        return {"status": "ERROR", "message": "Qiskit not installed in the worker environment."}
+        return {"status": "ERROR", "message": "Qiskit or Qiskit Aer not installed in the worker environment."}
+    
     qasm = params.get("qasm")
     shots = params.get("shots", 1024)
-    backend_name = params.get("backend", "qasm_simulator")
     
+    from qiskit import QuantumCircuit, transpile
     qc = QuantumCircuit.from_qasm_str(qasm)
-    backend = Aer.get_backend(backend_name)
-    job = execute(qc, backend, shots=shots)
+    
+    # Transpile the circuit for the backend
+    transpiled_qc = transpile(qc, backend)
+    job = backend.run(transpiled_qc, shots=shots)
     res = job.result()
     
     return {
