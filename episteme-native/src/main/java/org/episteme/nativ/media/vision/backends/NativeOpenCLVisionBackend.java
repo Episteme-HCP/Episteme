@@ -16,6 +16,8 @@ import com.google.auto.service.AutoService;
 import org.jocl.*;
 import static org.jocl.CL.*;
 import org.episteme.core.media.vision.VisionAlgorithmProvider;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,37 +40,7 @@ import java.nio.DoubleBuffer;
 public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLVisionBackend.class);
-    private static cl_context context;
-    private static cl_command_queue commandQueue;
-    private static volatile boolean initialized = false;
-
-    private static synchronized void init() {
-        if (initialized) return;
-        try {
-            setExceptionsEnabled(true);
-            int[] numPlatformsArray = new int[1];
-            clGetPlatformIDs(0, null, numPlatformsArray);
-            if (numPlatformsArray[0] == 0) return;
-
-            cl_platform_id[] platforms = new cl_platform_id[numPlatformsArray[0]];
-            clGetPlatformIDs(platforms.length, platforms, null);
-            cl_platform_id platform = platforms[0];
-
-            cl_device_id[] devices = new cl_device_id[1];
-            clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 1, devices, null);
-            cl_device_id device = devices[0];
-
-            cl_context_properties contextProperties = new cl_context_properties();
-            contextProperties.addProperty(CL_CONTEXT_PLATFORM, platform);
-            context = clCreateContext(contextProperties, 1, devices, null, null, null);
-            
-            cl_queue_properties queueProperties = new cl_queue_properties();
-            commandQueue = clCreateCommandQueueWithProperties(context, device, queueProperties, null);
-            initialized = true;
-        } catch (Throwable t) {
-            logger.warn("Failed to initialize OpenCL Vision backend: {}", t.getMessage());
-        }
-    }
+    private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
 
     @Override
     public boolean isLoaded() {
@@ -85,17 +57,12 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
     @Override public String getDescription() { return "GPU-accelerated image processing using OpenCL."; }
     @Override
     public boolean isAvailable() {
-        if (!initialized) init();
-        return initialized;
+        return backend.isAvailable();
     }
 
     @Override
     public void shutdown() {
-        if (initialized) {
-            if (commandQueue != null) clReleaseCommandQueue(commandQueue);
-            if (context != null) clReleaseContext(context);
-            initialized = false;
-        }
+        // Shared backend handles its own lifecycle.
     }
 
     @Override
@@ -130,8 +97,7 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        if (!isAvailable()) return null;
-        return new OpenCLExecutionContext(context, commandQueue);
+        return backend.createContext();
     }
 
     public SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {
