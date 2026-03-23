@@ -29,9 +29,17 @@ def handle_exec_qasm(params):
     job = backend.run(transpiled_qc, shots=shots)
     res = job.result()
     
+    if not res.success:
+        return {"status": "ERROR", "message": f"Simulator failed: {res.status}"}
+
+    try:
+        counts = res.get_counts(0)
+    except Exception:
+        counts = res.get_counts()
+    
     return {
         "status": "SUCCESS",
-        "counts": res.get_counts(),
+        "counts": counts,
         "time": res.time_taken
     }
 
