@@ -151,7 +151,7 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
 
     @Override
     public String getAlgorithmType() {
-        return "Audio Processing";
+        return "Audio";
     }
 
     @Override

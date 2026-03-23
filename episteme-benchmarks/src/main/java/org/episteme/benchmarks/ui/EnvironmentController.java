@@ -128,8 +128,10 @@ public class EnvironmentController {
 
     private <T> void safeDiscover(Class<T> serviceClass, java.util.List<AlgorithmProvider> targetList) {
         try {
-            ServiceLoader<T> loader = ServiceLoader.load(serviceClass);
-            java.util.Iterator<T> iterator = loader.iterator();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            if (loader == null) loader = EnvironmentController.class.getClassLoader();
+            ServiceLoader<T> sLoader = ServiceLoader.load(serviceClass, loader);
+            java.util.Iterator<T> iterator = sLoader.iterator();
             while (true) {
                 try {
                     if (!iterator.hasNext()) break;

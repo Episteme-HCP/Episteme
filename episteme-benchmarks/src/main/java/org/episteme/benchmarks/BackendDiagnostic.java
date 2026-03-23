@@ -47,7 +47,10 @@ public class BackendDiagnostic {
 
         AtomicInteger linearAlgebraCount = new AtomicInteger(0);
         System.out.println("\n--- Linear Algebra Backends ---");
-        safeIterate(ServiceLoader.load(LinearAlgebraProvider.class), b -> {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader == null) loader = BackendDiagnostic.class.getClassLoader();
+        
+        safeIterate(ServiceLoader.load(LinearAlgebraProvider.class, loader), b -> {
             if (b instanceof Backend) {
                 checkAvailability(b.getName(), (Backend) b);
                 linearAlgebraCount.incrementAndGet();
@@ -107,7 +110,7 @@ public class BackendDiagnostic {
 
         AtomicInteger computeCount = new AtomicInteger(0);
         System.out.println("\n--- Compute Backends (SPI) ---");
-        safeIterate(ServiceLoader.load(ComputeBackend.class), b -> {
+        safeIterate(ServiceLoader.load(ComputeBackend.class, loader), b -> {
             checkAvailability(b.getName(), b);
             computeCount.incrementAndGet();
         });
