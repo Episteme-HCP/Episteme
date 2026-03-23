@@ -177,6 +177,36 @@ public class HighPrecisionComplianceTest {
                     assertNotNull(eig);
                 });
 
+                testOp(res, "RB:BiCGSTAB", provider, () -> {
+                    if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+                    SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
+                    Matrix<Real> a = createInvertibleRealBigMatrix(4);
+                    Vector<Real> b = createRealBigVector(val, 4);
+                    Vector<Real> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
+                    Vector<Real> x = sp.bicgstab(a, b, x0, Real.of("1e-8"), 1000);
+                    assertNotNull(x);
+                });
+
+                testOp(res, "RB:ConjGrad", provider, () -> {
+                    if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+                    SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
+                    Matrix<Real> a = createSPDRealBigMatrix(4);
+                    Vector<Real> b = createRealBigVector(val, 4);
+                    Vector<Real> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
+                    Vector<Real> x = sp.conjugateGradient(a, b, x0, Real.of("1e-8"), 1000);
+                    assertNotNull(x);
+                });
+
+                testOp(res, "RB:GMRES", provider, () -> {
+                    if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+                    SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
+                    Matrix<Real> a = createInvertibleRealBigMatrix(4);
+                    Vector<Real> b = createRealBigVector(val, 4);
+                    Vector<Real> x0 = createRealBigVector(RealBig.create(BigDecimal.ZERO), 4);
+                    Vector<Real> x = sp.gmres(a, b, x0, Real.of("1e-8"), 1000, 10);
+                    assertNotNull(x);
+                });
+
                 // Transcendentals (element-level, not provider ops)
                 testOp(res, "RB:Exp", provider, () -> {
                     Real v1 = Real.of("1.0");
@@ -322,6 +352,39 @@ public class HighPrecisionComplianceTest {
                 Matrix<Real> a = createInvertibleComplexMatrix(3);
                 EigenResult<Real> eig = provider.eigen(a);
                 assertNotNull(eig);
+            });
+
+            testOp(res, "C:BiCGSTAB", provider, () -> {
+                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
+                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+                SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
+                Matrix<Real> a = createInvertibleComplexMatrix(4);
+                Vector<Real> b = createComplexVector(Complex.of(1.0, 2.0), 4);
+                Vector<Real> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
+                Vector<Real> x = sp.bicgstab(a, b, x0, (Real)(Object)Complex.of(1e-8, 0), 1000);
+                assertNotNull(x);
+            });
+
+            testOp(res, "C:ConjGrad", provider, () -> {
+                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
+                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+                SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
+                Matrix<Real> a = createSPDComplexMatrix(4);
+                Vector<Real> b = createComplexVector(Complex.of(1.0, 2.0), 4);
+                Vector<Real> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
+                Vector<Real> x = sp.conjugateGradient(a, b, x0, (Real)(Object)Complex.of(1e-8, 0), 1000);
+                assertNotNull(x);
+            });
+
+            testOp(res, "C:GMRES", provider, () -> {
+                if (!complexCompatible) throw new UnsupportedOperationException("No Complex support");
+                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not sparse");
+                SparseLinearAlgebraProvider<Real> sp = (SparseLinearAlgebraProvider<Real>) provider;
+                Matrix<Real> a = createInvertibleComplexMatrix(4);
+                Vector<Real> b = createComplexVector(Complex.of(1.0, 2.0), 4);
+                Vector<Real> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
+                Vector<Real> x = sp.gmres(a, b, x0, (Real)(Object)Complex.of(1e-8, 0), 1000, 10);
+                assertNotNull(x);
             });
 
             results.add(res);
