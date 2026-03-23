@@ -268,7 +268,20 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 CL.clGetPlatformInfo(platforms[i], CL.CL_PLATFORM_NAME, 256, Pointer.to(name), null);
                 logger.info("Platform #{}: {}", i, new String(name).trim());
             }
-            cl_platform_id platform = platforms[0]; // TODO: Logic to select preferred platform
+            cl_platform_id platform = platforms[0];
+            for (cl_platform_id p : platforms) {
+                byte[] platformName = new byte[256];
+                CL.clGetPlatformInfo(p, CL.CL_PLATFORM_NAME, 256, Pointer.to(platformName), null);
+                String nameStr = new String(platformName).toUpperCase();
+                if (nameStr.contains("NVIDIA")) {
+                    platform = p;
+                    break;
+                } else if (nameStr.contains("AMD") || nameStr.contains("APPLE")) {
+                    platform = p;
+                }
+            }
+            logger.info("Selected platform: {}", platform);
+
             
             int[] numDevicesArray = new int[1];
             CL.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 0, null, numDevicesArray);
