@@ -27,9 +27,16 @@ import io.grpc.stub.StreamObserver;
 import java.nio.DoubleBuffer;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.episteme.server.server.proto.*;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +44,8 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Server-side implementation of the MatrixService via gRPC.
@@ -57,42 +65,32 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         try {
             LOG.info("Received Matrix Multiplication request");
 
-            // 1. Convert Proto to Episteme Matrices
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrixA = fromProto(request.getMatrixA());
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrixB = fromProto(request.getMatrixB());
+            Matrix<?> matrixA = fromProto(request.getMatrixA());
+            Matrix<?> matrixB = fromProto(request.getMatrixB());
 
             LOG.debug("Multiplying matrices: [{}x{}] * [{}x{}]",
                     matrixA.rows(), matrixA.cols(), matrixB.rows(), matrixB.cols());
 
-            // 2. Perform Multiplication
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> resultMatrix = matrixA.multiply(matrixB);
+            @SuppressWarnings("unchecked")
+            Matrix<?> resultMatrix = ((Matrix<Object>)matrixA).multiply((Matrix<Object>)matrixB);
 
-            // 3. Convert Result to Proto
-            MatrixData resultData = toProto(resultMatrix);
-
-            MatrixResponse response = MatrixResponse.newBuilder()
-                    .setResult(resultData)
-                    .build();
-
-            responseObserver.onNext(response);
+            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(resultMatrix)).build());
             responseObserver.onCompleted();
 
             LOG.info("Matrix Multiplication completed successfully");
 
         } catch (Exception e) {
-            LOG.error("Error during matrix multiplication", e);
-            responseObserver.onError(
-                    io.grpc.Status.INTERNAL
-                            .withDescription("Matrix multiplication failed: " + e.getMessage())
-                            .withCause(e)
-                            .asRuntimeException());
+            handleError("matrixMultiply", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixAdd(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrixA()).add(fromProto(request.getMatrixB()));
+            Matrix<Object> m1 = (Matrix<Object>) fromProto(request.getMatrixA());
+            Matrix<Object> m2 = (Matrix<Object>) fromProto(request.getMatrixB());
+            Matrix<?> result = m1.add(m2);
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -101,9 +99,12 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixSubtract(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrixA()).subtract(fromProto(request.getMatrixB()));
+            Matrix<Object> m1 = (Matrix<Object>) fromProto(request.getMatrixA());
+            Matrix<Object> m2 = (Matrix<Object>) fromProto(request.getMatrixB());
+            Matrix<?> result = m1.subtract(m2);
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -114,7 +115,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixTranspose(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrix()).transpose();
+            Matrix<?> result = fromProto(request.getMatrix()).transpose();
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -125,7 +126,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixInverse(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrix()).inverse();
+            Matrix<?> result = fromProto(request.getMatrix()).inverse();
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -134,10 +135,17 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixScale(ScaleRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrix = fromProto(request.getMatrix());
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = matrix.scale(Real.of(request.getScalar()), matrix);
+            Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+            Object scalar;
+            if (request.getIsComplex()) {
+                scalar = Complex.of(request.getScalar(), request.getImaginary());
+            } else {
+                scalar = Real.of(request.getScalar());
+            }
+            Matrix<?> result = matrix.scale(scalar);
             responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -148,95 +156,116 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixDeterminant(SingleMatrixRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            double det = fromProto(request.getMatrix()).determinant().doubleValue();
-            responseObserver.onNext(ScalarResponse.newBuilder().setValue(det).build());
+            Object det = fromProto(request.getMatrix()).determinant();
+            responseObserver.onNext(toProtoScalar(det));
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixDeterminant", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorAdd(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVectorA()).add(fromProto(request.getVectorB()));
+            Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
+            Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
+            Vector<?> result = v1.add(v2);
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorAdd", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorSubtract(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVectorA()).subtract(fromProto(request.getVectorB()));
+            Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
+            Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
+            Vector<?> result = v1.subtract(v2);
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorSubtract", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorScale(VectorScaleRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVector()).multiply(Real.of(request.getScalar()));
+            Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
+            Object scalar;
+            if (request.getIsComplex()) {
+               scalar = Complex.of(request.getScalar(), request.getImaginary());
+            } else {
+               scalar = Real.of(request.getScalar());
+            }
+            Vector<?> result = vector.multiply(scalar);
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorScale", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorDot(VectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            double dot = fromProto(request.getVectorA()).dot(fromProto(request.getVectorB())).doubleValue();
-            responseObserver.onNext(ScalarResponse.newBuilder().setValue(dot).build());
+            Object dot = ((Vector<Object>)fromProto(request.getVectorA())).dot((Vector<Object>)fromProto(request.getVectorB()));
+            responseObserver.onNext(toProtoScalar(dot));
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorDot", e, responseObserver);
         }
     }
 
     @Override
     public void vectorNorm(SingleVectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            double norm = fromProto(request.getVector()).norm().doubleValue();
-            responseObserver.onNext(ScalarResponse.newBuilder().setValue(norm).build());
+            Object norm = fromProto(request.getVector()).norm();
+            responseObserver.onNext(toProtoScalar(norm));
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorNorm", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixVectorMultiply(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getMatrix()).multiply(fromProto(request.getVector()));
+            Matrix<Object> matrix = (Matrix<Object>)fromProto(request.getMatrix());
+            Vector<Object> vector = (Vector<Object>)fromProto(request.getVector());
+            Vector<?> result = matrix.multiply(vector);
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixVectorMultiply", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void linearSolve(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getMatrix()).solve(fromProto(request.getVector()));
+            Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+            Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
+            Vector<Object> result = matrix.getProvider().solve(matrix, vector);
             responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("linearSolve", e, responseObserver);
         }
     }
 
     @Override
     public void matrixLU(SingleMatrixRequest request, StreamObserver<LUResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> result = 
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<?> result = 
                 fromProto(request.getMatrix()).lu();
             responseObserver.onNext(LUResponse.newBuilder()
                 .setL(toProto(result.L()))
@@ -245,14 +274,14 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                 .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixLU", e, responseObserver);
         }
     }
 
     @Override
     public void matrixQR(SingleMatrixRequest request, StreamObserver<QRResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> result = 
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<?> result = 
                 fromProto(request.getMatrix()).qr();
             responseObserver.onNext(QRResponse.newBuilder()
                 .setQ(toProto(result.Q()))
@@ -260,14 +289,14 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                 .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixQR", e, responseObserver);
         }
     }
 
     @Override
     public void matrixSVD(SingleMatrixRequest request, StreamObserver<SVDResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> result = 
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<?> result = 
                 fromProto(request.getMatrix()).svd();
             responseObserver.onNext(SVDResponse.newBuilder()
                 .setU(toProto(result.U()))
@@ -276,28 +305,28 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                 .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixSVD", e, responseObserver);
         }
     }
 
     @Override
     public void matrixCholesky(SingleMatrixRequest request, StreamObserver<CholeskyResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> result = 
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<?> result = 
                 fromProto(request.getMatrix()).cholesky();
             responseObserver.onNext(CholeskyResponse.newBuilder()
                 .setL(toProto(result.L()))
                 .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixCholesky", e, responseObserver);
         }
     }
 
     @Override
     public void matrixEigen(SingleMatrixRequest request, StreamObserver<EigenResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> result = 
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<?> result = 
                 fromProto(request.getMatrix()).eigen();
             responseObserver.onNext(EigenResponse.newBuilder()
                 .setV(toProto(result.V()))
@@ -305,7 +334,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                 .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixEigen", e, responseObserver);
         }
     }
 
@@ -318,60 +347,129 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                         .asRuntimeException());
     }
 
-    private RealDoubleMatrix fromProto(MatrixData proto) {
+    private Matrix<?> fromProto(MatrixData proto) {
         int rows = proto.getRows();
         int cols = proto.getCols();
+        boolean isComplex = proto.getIsComplex();
         ByteString byteData = proto.getData();
         
-        double[] data = new double[rows * cols];
-        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(data);
+        int multiplier = isComplex ? 2 : 1;
+        double[] raw = new double[rows * cols * multiplier];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
 
-        return RealDoubleMatrix.of(data, rows, cols);
-    }
-
-    private RealDoubleVector fromProto(VectorData proto) {
-        int size = proto.getSize();
-        ByteString byteData = proto.getData();
-        double[] data = new double[size];
-        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(data);
-        return RealDoubleVector.of(data);
-    }
-
-    private VectorData toProto(org.episteme.core.mathematics.linearalgebra.Vector<Real> vector) {
-        int size = vector.dimension();
-        ByteBuffer bb = ByteBuffer.allocate(size * 8).order(ByteOrder.LITTLE_ENDIAN);
-        DoubleBuffer db = bb.asDoubleBuffer();
-        for (int i = 0; i < size; i++) {
-            db.put(vector.get(i).doubleValue());
+        if (isComplex) {
+            List<List<Complex>> data = new ArrayList<>(rows);
+            int idx = 0;
+            for (int i = 0; i < rows; i++) {
+                List<Complex> row = new ArrayList<>(cols);
+                for (int j = 0; j < cols; j++) {
+                    row.add(Complex.of(raw[idx++], raw[idx++]));
+                }
+                data.add(row);
+            }
+            return DenseMatrix.of(data, Complex.ZERO);
+        } else {
+            return RealDoubleMatrix.of(raw, rows, cols);
         }
-        return VectorData.newBuilder()
-                .setSize(size)
-                .setData(ByteString.copyFrom(bb))
-                .build();
     }
 
-    private MatrixData toProto(org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrix) {
+    private Vector<?> fromProto(VectorData proto) {
+        int size = proto.getSize();
+        boolean isComplex = proto.getIsComplex();
+        ByteString byteData = proto.getData();
+        
+        int multiplier = isComplex ? 2 : 1;
+        double[] raw = new double[size * multiplier];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
+
+        if (isComplex) {
+            List<Complex> data = new ArrayList<>(size);
+            int idx = 0;
+            for (int i = 0; i < size; i++) {
+                data.add(Complex.of(raw[idx++], raw[idx++]));
+            }
+            return DenseVector.of(data, Complex.ZERO);
+        } else {
+            return RealDoubleVector.of(raw);
+        }
+    }
+
+    private MatrixData toProto(Matrix<?> matrix) {
         int rows = matrix.rows();
         int cols = matrix.cols();
+        boolean isComplex = matrix.getScalarRing() instanceof Complex;
+        int multiplier = isComplex ? 2 : 1;
 
         MatrixData.Builder builder = MatrixData.newBuilder()
                 .setRows(rows)
-                .setCols(cols);
+                .setCols(cols)
+                .setIsComplex(isComplex);
 
-        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
         DoubleBuffer db = bb.asDoubleBuffer();
 
-        if (matrix instanceof RealDoubleMatrix rdm) {
+        if (matrix instanceof RealDoubleMatrix rdm && !isComplex) {
             db.put(rdm.getBuffer());
         } else {
-            // Generic slow path for views (Transposed, etc.)
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    db.put(matrix.get(i, j).doubleValue());
+                    Object val = matrix.get(i, j);
+                    if (isComplex) {
+                        Complex c = (Complex) val;
+                        db.put(c.real());
+                        db.put(c.imaginary());
+                    } else {
+                        db.put(((Real)val).doubleValue());
+                    }
                 }
             }
         }
         builder.setData(ByteString.copyFrom(bb));
         return builder.build();
+    }
+
+    private VectorData toProto(Vector<?> vector) {
+        int size = vector.dimension();
+        boolean isComplex = vector.getScalarRing() instanceof Complex;
+        int multiplier = isComplex ? 2 : 1;
+
+        ByteBuffer bb = ByteBuffer.allocate(size * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
+        DoubleBuffer db = bb.asDoubleBuffer();
+        for (int i = 0; i < size; i++) {
+            Object val = vector.get(i);
+            if (isComplex) {
+                Complex c = (Complex) val;
+                db.put(c.real());
+                db.put(c.imaginary());
+            } else {
+                db.put(((Real)val).doubleValue());
+            }
+        }
+        return VectorData.newBuilder()
+                .setSize(size)
+                .setData(ByteString.copyFrom(bb))
+                .setIsComplex(isComplex)
+                .build();
+    }
+
+    private ScalarResponse toProtoScalar(Object scalar) {
+        if (scalar instanceof Complex c) {
+            return ScalarResponse.newBuilder()
+                    .setValue(c.real())
+                    .setImaginary(c.imaginary())
+                    .setIsComplex(true)
+                    .build();
+        } else if (scalar instanceof Real r) {
+            return ScalarResponse.newBuilder()
+                    .setValue(r.doubleValue())
+                    .setIsComplex(false)
+                    .build();
+        } else if (scalar instanceof Number n) {
+            return ScalarResponse.newBuilder()
+                    .setValue(n.doubleValue())
+                    .setIsComplex(false)
+                    .build();
+        }
+        throw new IllegalArgumentException("Unknown scalar type: " + scalar.getClass());
     }
 }

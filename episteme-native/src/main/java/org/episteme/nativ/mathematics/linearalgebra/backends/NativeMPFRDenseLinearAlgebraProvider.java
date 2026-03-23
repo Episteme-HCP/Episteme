@@ -16,6 +16,7 @@ import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.core.mathematics.context.MathContext;
@@ -160,13 +161,16 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
 
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        checkDimensionsMultiply(a, b);
         int m = a.rows();
         int k = a.cols();
         int n = b.cols();
 
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (k != b.rows()) throw new IllegalArgumentException("Matrix dimensions do not match.");
+
+        // Detect complex using the scalar ring instead of probing elements to avoid ClassCastException
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
+        int rnd = 0; // MPFR_RNDN
         
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
@@ -176,15 +180,14 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             MemorySegment temp1 = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, temp1, prec);
             MemorySegment temp2 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, temp2, prec);
-
+            NativeSafe.invoke(MPFR_INIT2, temp2, prec); // MPFR_RNDN
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     if (isComplex) {
                         MemorySegment sumR = getMPFR(h_C, i, j, n, 0, true);
                         MemorySegment sumI = getMPFR(h_C, i, j, n, 1, true);
-                        NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, 0);
-                        NativeSafe.invoke(MPFR_SET_STR, sumI, arena.allocateFrom("0"), 10, 0);
+                        MPFR_SET_STR.invokeExact(sumR, arena.allocateFrom("0"), 10, rnd);
+                        MPFR_SET_STR.invokeExact(sumI, arena.allocateFrom("0"), 10, rnd);
 
                         for (int l = 0; l < k; l++) {
                             MemorySegment ar = getMPFR(h_A, i, l, k, 0, true);
@@ -193,23 +196,26 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                             MemorySegment bi = getMPFR(h_B, l, j, n, 1, true);
 
                             // ar*br - ai*bi
-                            NativeSafe.invoke(MPFR_MUL, temp1, ar, br, 0);
-                            NativeSafe.invoke(MPFR_MUL, temp2, ai, bi, 0);
-                            NativeSafe.invoke(MPFR_SUB, temp1, temp1, temp2, 0);
-                            NativeSafe.invoke(MPFR_ADD, sumR, sumR, temp1, 0);
+                            MPFR_MUL.invokeExact(temp1, ar, br, rnd);
+                            MPFR_MUL.invokeExact(temp2, ai, bi, rnd);
+                            MPFR_SUB.invokeExact(temp1, temp1, temp2, rnd);
+                            MPFR_ADD.invokeExact(sumR, sumR, temp1, rnd);
 
                             // ar*bi + ai*br
-                            NativeSafe.invoke(MPFR_MUL, temp1, ar, bi, 0);
-                            NativeSafe.invoke(MPFR_MUL, temp2, ai, br, 0);
-                            NativeSafe.invoke(MPFR_ADD, temp1, temp1, temp2, 0);
-                            NativeSafe.invoke(MPFR_ADD, sumI, sumI, temp1, 0);
+                            MPFR_MUL.invokeExact(temp1, ar, bi, rnd);
+                            MPFR_MUL.invokeExact(temp2, ai, br, rnd);
+                            MPFR_ADD.invokeExact(temp1, temp1, temp2, rnd);
+                            MPFR_ADD.invokeExact(sumI, sumI, temp1, rnd);
                         }
                     } else {
                         MemorySegment sum = getMPFR(h_C, i, j, n, 0, false);
-                        NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, 0);
+                        MPFR_SET_STR.invokeExact(sum, arena.allocateFrom("0"), 10, rnd);
+
                         for (int l = 0; l < k; l++) {
-                            NativeSafe.invoke(MPFR_MUL, temp1, getMPFR(h_A, i, l, k, 0, false), getMPFR(h_B, l, j, n, 0, false), 0);
-                            NativeSafe.invoke(MPFR_ADD, sum, sum, temp1, 0);
+                            MemorySegment a1 = getMPFR(h_A, i, l, k, 0, false);
+                            MemorySegment b1 = getMPFR(h_B, l, j, n, 0, false);
+                            MPFR_MUL.invokeExact(temp1, a1, b1, rnd);
+                            MPFR_ADD.invokeExact(sum, sum, temp1, rnd);
                         }
                     }
                 }
@@ -235,7 +241,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         int m = a.rows();
         int k = a.cols();
         
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        int rnd = 0; // MPFR_RNDN
         long prec = getPrecision();
         
         try (Arena arena = Arena.ofConfined()) {
@@ -247,13 +254,12 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             NativeSafe.invoke(MPFR_INIT2, temp1, prec);
             MemorySegment temp2 = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, temp2, prec);
-            
             for (int i = 0; i < m; i++) {
                 if (isComplex) {
                     MemorySegment sumR = getMPFRVector(h_Y, i, 0, true);
                     MemorySegment sumI = getMPFRVector(h_Y, i, 1, true);
-                    NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, sumI, arena.allocateFrom("0"), 10, 0);
+                    MPFR_SET_STR.invokeExact(sumR, arena.allocateFrom("0"), 10, rnd);
+                    MPFR_SET_STR.invokeExact(sumI, arena.allocateFrom("0"), 10, rnd);
                     
                     for (int l = 0; l < k; l++) {
                         MemorySegment ar = getMPFR(h_A, i, l, k, 0, true);
@@ -262,23 +268,23 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                         MemorySegment xi = getMPFRVector(h_X, l, 1, true);
                         
                         // ar*xr - ai*xi
-                        NativeSafe.invoke(MPFR_MUL, temp1, ar, xr, 0);
-                        NativeSafe.invoke(MPFR_MUL, temp2, ai, xi, 0);
-                        NativeSafe.invoke(MPFR_SUB, temp1, temp1, temp2, 0);
-                        NativeSafe.invoke(MPFR_ADD, sumR, sumR, temp1, 0);
+                        MPFR_MUL.invokeExact(temp1, ar, xr, rnd);
+                        MPFR_MUL.invokeExact(temp2, ai, xi, rnd);
+                        MPFR_SUB.invokeExact(temp1, temp1, temp2, rnd);
+                        MPFR_ADD.invokeExact(sumR, sumR, temp1, rnd);
                         
                         // ar*xi + ai*xr
-                        NativeSafe.invoke(MPFR_MUL, temp1, ar, xi, 0);
-                        NativeSafe.invoke(MPFR_MUL, temp2, ai, xr, 0);
-                        NativeSafe.invoke(MPFR_ADD, temp1, temp1, temp2, 0);
-                        NativeSafe.invoke(MPFR_ADD, sumI, sumI, temp1, 0);
+                        MPFR_MUL.invokeExact(temp1, ar, xi, rnd);
+                        MPFR_MUL.invokeExact(temp2, ai, xr, rnd);
+                        MPFR_ADD.invokeExact(temp1, temp1, temp2, rnd);
+                        MPFR_ADD.invokeExact(sumI, sumI, temp1, rnd);
                     }
                 } else {
                     MemorySegment sum = getMPFRVector(h_Y, i, 0, false);
-                    NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, 0);
+                    MPFR_SET_STR.invokeExact(sum, arena.allocateFrom("0"), 10, rnd);
                     for (int l = 0; l < k; l++) {
-                        NativeSafe.invoke(MPFR_MUL, temp1, getMPFR(h_A, i, l, k, 0, false), getMPFRVector(h_X, l, 0, false), 0);
-                        NativeSafe.invoke(MPFR_ADD, sum, sum, temp1, 0);
+                        MPFR_MUL.invokeExact(temp1, getMPFR(h_A, i, l, k, 0, false), getMPFRVector(h_X, l, 0, false), rnd);
+                        MPFR_ADD.invokeExact(sum, sum, temp1, rnd);
                     }
                 }
             }
@@ -309,13 +315,14 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         int dim = v.dimension();
         MemorySegment vec = allocateVector(dim, arena, prec, isComplex);
         for (int i = 0; i < dim; i++) {
-            Real val = v.get(i);
+            Object val = v.get(i);
             if (isComplex) {
-                org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) val;
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) val;
+                MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
             } else {
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, false), arena.allocateFrom(val.bigDecimalValue().toPlainString()), 10, 0);
+                Real rv = (Real) val;
+                MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
             }
         }
         return vec;
@@ -333,8 +340,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         for (int i = 0; i < dim; i++) {
             if (isComplex) {
                 Real r = readMPFR(getMPFRVector(vec, i, 0, true), expPtr, arena);
-                Real im = readMPFR(getMPFRVector(vec, i, 1, true), expPtr, arena);
-                list.add((Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
+                Real img = readMPFR(getMPFRVector(vec, i, 1, true), expPtr, arena);
+                list.add((Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, img));
             } else {
                 list.add(readMPFR(getMPFRVector(vec, i, 0, false), expPtr, arena));
             }
@@ -347,7 +354,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         checkDimensionsAdd(a, b);
         int m = a.rows();
         int n = a.cols();
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        int rnd = 0; // MPFR_RNDN
         long prec = getPrecision();
 
         try (Arena arena = Arena.ofConfined()) {
@@ -377,8 +385,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         checkDimensionsAdd(a, b);
         int m = a.rows();
         int n = a.cols();
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        long prec = getPrecision();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        long prec = getPrecision(); // MPFR_RNDN
 
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
@@ -406,8 +414,9 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
         int m = a.rows();
         int n = a.cols();
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
+        int rnd = 0; // MPFR_RNDN
 
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
@@ -420,7 +429,7 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             for (int i = 0; i < m * n * multiplier; i++) {
                 MemorySegment ra = h_A.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                 MemorySegment rc = h_C.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                NativeSafe.invoke(MPFR_MUL, rc, ra, s, 0);
+                MPFR_MUL.invokeExact(rc, ra, s, rnd);
             }
             Matrix<Real> res = backToMatrix(h_C, m, n, arena, a.getScalarRing(), isComplex);
             NativeSafe.invoke(MPFR_CLEAR, s);
@@ -451,16 +460,18 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         int rows = m.rows();
         int cols = m.cols();
         MemorySegment mat = allocateMatrix(rows, cols, arena, prec, isComplex);
+        MatrixStorage<?> storage = m.getStorage(); // Bypasses implicit GenericMatrix casts
+        
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                Real val = m.get(i, j);
+                Object val = storage.get(i, j);
                 if (isComplex) {
-                    org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) val;
-                    NativeSafe.invoke(MPFR_SET_STR, getMPFR(mat, i, j, cols, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, getMPFR(mat, i, j, cols, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) val;
+                    MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                 } else {
                     Real rv = (Real) val;
-                    NativeSafe.invoke(MPFR_SET_STR, getMPFR(mat, i, j, cols, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
+                    MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
                 }
             }
         }
@@ -477,20 +488,20 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     public Matrix<Real> transpose(Matrix<Real> a) {
         int m = a.rows();
         int n = a.cols();
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
+        int rnd = 0; // MPFR_RNDN
         
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
             MemorySegment h_C = allocateMatrix(n, m, arena, prec, isComplex);
-            
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     if (isComplex) {
-                        NativeSafe.invoke(MPFR_SET, getMPFR(h_C, j, i, m, 0, true), getMPFR(h_A, i, j, n, 0, true), 0);
-                        NativeSafe.invoke(MPFR_SET, getMPFR(h_C, j, i, m, 1, true), getMPFR(h_A, i, j, n, 1, true), 0);
+                        MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 0, true), getMPFR(h_A, i, j, n, 0, true), rnd);
+                        MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 1, true), getMPFR(h_A, i, j, n, 1, true), rnd);
                     } else {
-                        NativeSafe.invoke(MPFR_SET, getMPFR(h_C, j, i, m, 0, false), getMPFR(h_A, i, j, n, 0, false), 0);
+                        MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 0, false), getMPFR(h_A, i, j, n, 0, false), rnd);
                     }
                 }
             }
@@ -512,8 +523,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             for (int j = 0; j < cols; j++) {
                 if (isComplex) {
                     Real r = readMPFR(getMPFR(mat, i, j, cols, 0, true), expPtr, arena);
-                    Real im = readMPFR(getMPFR(mat, i, j, cols, 1, true), expPtr, arena);
-                    storage.set(i, j, (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
+                    Real img = readMPFR(getMPFR(mat, i, j, cols, 1, true), expPtr, arena);
+                    storage.set(i, j, (Real) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, img));
                 } else {
                     storage.set(i, j, readMPFR(getMPFR(mat, i, j, cols, 0, false), expPtr, arena));
                 }
@@ -569,8 +580,9 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         if (a.rows() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         int n = a.rows();
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
+        int rnd = 0; // MPFR_RNDN
 
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
@@ -624,7 +636,7 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                         }
                         complexSubtractMulVector(h_B, i, tempFactorR, tempFactorI, h_B, k, arena, prec);
                     } else {
-                        NativeSafe.invoke(MPFR_DIV, tempFactor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), 0);
+                        MPFR_DIV.invokeExact(tempFactor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
                         
                         for (int j = k; j < n; j++) {
                             subtractMulReal(h_A, i, j, tempFactor, h_A, k, j, n, arena, prec);
@@ -665,8 +677,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                     }
                     
                     MemorySegment xi = getMPFRVector(h_X, i, 0, false);
-                    NativeSafe.invoke(MPFR_SUB, xi, getMPFRVector(h_B, i, 0, false), sum, 0);
-                    NativeSafe.invoke(MPFR_DIV, xi, xi, getMPFR(h_A, i, i, n, 0, false), 0);
+                    MPFR_SUB.invokeExact(xi, getMPFRVector(h_B, i, 0, false), sum, rnd);
+                    MPFR_DIV.invokeExact(xi, xi, getMPFR(h_A, i, i, n, 0, false), rnd);
                 }
             }
             
@@ -694,19 +706,20 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     public Matrix<Real> inverse(Matrix<Real> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = a.rows();
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        long prec = getPrecision();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        long prec = getPrecision(); // MPFR_RNDN
 
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
             MemorySegment h_Inv = allocateMatrix(n, n, arena, prec, isComplex);
+            int rnd = 0;
             // Initialize Identity
             for (int i = 0; i < n; i++) {
                 if (isComplex) {
-                    NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_Inv, i, i, n, 0, true), 1, 0);
-                    NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_Inv, i, i, n, 1, true), 0, 0);
+                    MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 0, true), 1L, rnd);
+                    MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 1, true), 0L, rnd);
                 } else {
-                    NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_Inv, i, i, n, 0, false), 1, 0);
+                    MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 0, false), 1L, rnd);
                 }
             }
 
@@ -745,10 +758,10 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                 if (isComplex) {
                     MemorySegment pR = arena.allocate(MPFR_LAYOUT);
                     MemorySegment pI = arena.allocate(MPFR_LAYOUT);
-                    NativeSafe.invoke(MPFR_INIT2, pR, prec);
-                    NativeSafe.invoke(MPFR_INIT2, pI, prec);
-                    NativeSafe.invoke(MPFR_SET, pR, getMPFR(h_A, k, k, n, 0, true), 0);
-                    NativeSafe.invoke(MPFR_SET, pI, getMPFR(h_A, k, k, n, 1, true), 0);
+                    MPFR_INIT2.invokeExact(pR, prec);
+                    MPFR_INIT2.invokeExact(pI, prec);
+                    MPFR_SET.invokeExact(pR, getMPFR(h_A, k, k, n, 0, true), rnd);
+                    MPFR_SET.invokeExact(pI, getMPFR(h_A, k, k, n, 1, true), rnd);
                     
                     for (int j = 0; j < n; j++) {
                         complexDivide(getMPFR(h_A, k, j, n, 0, true), getMPFR(h_A, k, j, n, 1, true),
@@ -759,18 +772,18 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                             pR, pI, prec, arena);
                     }
                     // Set A[k][k] to 1+0i explicitly for stability
-                    NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_A, k, k, n, 0, true), 1, 0);
-                    NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_A, k, k, n, 1, true), 0, 0);
+                    MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 0, true), 1L, rnd);
+                    MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 1, true), 0L, rnd);
                 } else {
                     MemorySegment pivotVal = arena.allocate(MPFR_LAYOUT);
-                    NativeSafe.invoke(MPFR_INIT2, pivotVal, prec);
-                    NativeSafe.invoke(MPFR_SET, pivotVal, getMPFR(h_A, k, k, n, 0, false), 0);
+                    MPFR_INIT2.invokeExact(pivotVal, prec);
+                    MPFR_SET.invokeExact(pivotVal, getMPFR(h_A, k, k, n, 0, false), rnd);
                     
                     for (int j = 0; j < n; j++) {
-                        NativeSafe.invoke(MPFR_DIV, getMPFR(h_A, k, j, n, 0, false), getMPFR(h_A, k, j, n, 0, false), pivotVal, 0);
-                        NativeSafe.invoke(MPFR_DIV, getMPFR(h_Inv, k, j, n, 0, false), getMPFR(h_Inv, k, j, n, 0, false), pivotVal, 0);
+                        MPFR_DIV.invokeExact(getMPFR(h_A, k, j, n, 0, false), getMPFR(h_A, k, j, n, 0, false), pivotVal, rnd);
+                        MPFR_DIV.invokeExact(getMPFR(h_Inv, k, j, n, 0, false), getMPFR(h_Inv, k, j, n, 0, false), pivotVal, rnd);
                     }
-                    NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_A, k, k, n, 0, false), 1, 0);
+                    MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 0, false), 1L, rnd);
                 }
                 
                 // Eliminate other rows
@@ -814,8 +827,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
     public Real determinant(Matrix<Real> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = a.rows();
-        boolean isComplex = ((Object)a.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        long prec = getPrecision();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        long prec = getPrecision(); // MPFR_RNDN
 
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
