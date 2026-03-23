@@ -54,7 +54,7 @@ public class DistributedSUMMAAlgorithm {
         int k = A.getNumTileCols();
 
         DistributedContext ctx = DistributedCompute.getContext();
-        TiledMatrix<E> C = new TiledMatrix<E>(A, A.getTileSize(), A.getTileSize());
+        TiledMatrix<E> C = new TiledMatrix<E>(A.rows(), B.cols(), A.getTileSize(), A.getScalarRing());
 
         for (int step = 0; step < k; step++) {
             final int currentStep = step;
@@ -92,14 +92,8 @@ public class DistributedSUMMAAlgorithm {
                         Matrix<E> bTile = B.getTile(currentStep, col);
                         Matrix<E> product = (leafProvider != null) ? leafProvider.multiply(aTile, bTile) : aTile.multiply(bTile);
                         
-                        synchronized (C) {
-                            Matrix<E> current = C.getTile(row, col);
-                            if (current != null) {
-                                C.setTile(row, col, current.add(product));
-                            } else {
-                                C.setTile(row, col, product);
-                            }
-                        }
+                        // Thread-safe update of the tile in C
+                        C.updateTile(row, col, product);
                         return null;
                     }));
                 }

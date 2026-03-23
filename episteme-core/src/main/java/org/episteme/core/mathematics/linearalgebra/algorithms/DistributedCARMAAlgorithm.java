@@ -141,11 +141,8 @@ public class DistributedCARMAAlgorithm {
                     else sum = sum.add(prod);
                 }
                 
-                synchronized (C) {
-                    Matrix<E> current = C.getTile(cRow + i, cCol + j);
-                    if (current == null) C.setTile(cRow + i, cCol + j, sum);
-                    else C.setTile(cRow + i, cCol + j, current.add(sum));
-                }
+                // Thread-safe update of the tile in C
+                C.updateTile(cRow + i, cCol + j, sum);
             }
         }
     }

@@ -111,10 +111,8 @@ public class Distributed25DAlgorithm {
                }
                
                if (sum != null) {
-                   synchronized(C) {
-                       Matrix<E> current = C.getTile(i, j);
-                       C.setTile(i, j, (current == null) ? sum : current.add(sum));
-                   }
+                   // Thread-safe update of the tile in C
+                   C.updateTile(i, j, sum);
                }
             }
         }

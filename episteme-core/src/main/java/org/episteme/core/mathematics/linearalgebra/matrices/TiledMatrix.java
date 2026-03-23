@@ -149,6 +149,18 @@ public class TiledMatrix<E> extends GenericMatrix<E> implements AutoCloseable {
     }
 
     /**
+     * Thread-safe update of a tile (adds delta to current tile).
+     */
+    public synchronized void updateTile(int i, int j, Matrix<E> delta) {
+        Matrix<E> current = tiles[i][j];
+        if (current == null) {
+            tiles[i][j] = delta;
+        } else {
+            tiles[i][j] = current.add(delta);
+        }
+    }
+
+    /**
      * Internal constructor for sub-matrices.
      */
     private TiledMatrix(Matrix<E>[][] tiles, int rows, int cols, int tileRows, int tileCols, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {

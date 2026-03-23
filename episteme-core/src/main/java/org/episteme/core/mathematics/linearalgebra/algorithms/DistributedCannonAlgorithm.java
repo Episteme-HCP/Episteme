@@ -87,14 +87,8 @@ public class DistributedCannonAlgorithm {
                         Matrix<E> bTile = B.getTile(kIndex, col);
                         Matrix<E> product = (leafProvider != null) ? leafProvider.multiply(aTile, bTile) : aTile.multiply(bTile);
 
-                        synchronized(C) {
-                            Matrix<E> current = C.getTile(row, col);
-                            if (current != null) {
-                                C.setTile(row, col, current.add(product));
-                            } else {
-                                C.setTile(row, col, product);
-                            }
-                        }
+                        // Thread-safe update of the tile in C
+                        C.updateTile(row, col, product);
                         return null;
                     }));
                 }
