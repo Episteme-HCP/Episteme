@@ -2,6 +2,7 @@ package org.episteme.benchmarks.benchmark;
 
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.benchmarks.benchmark.benchmarks.SystematicBenchmark;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -152,9 +153,25 @@ public class BenchmarkRegistry {
     private static <P extends org.episteme.core.technical.algorithm.AlgorithmProvider> void addSystematicInstance(SystematicBenchmark<P> base, P p, List<RunnableBenchmark> list) {
         System.out.println("[DEBUG]   - Found systematic provider implementation: " + p.getName() + " (Type: " + p.getAlgorithmType() + ")");
         
+        // Skip slow backends as requested by user
+        String pName = p.getName().toLowerCase();
+        if (pName.contains("mpfr") || pName.contains("nd4j")) {
+             System.out.println("[DEBUG]     - Skipping slow provider: " + p.getName());
+             return;
+        }
+
         // Check compatibility if it's a LinearAlgebraProvider
         if (p instanceof LinearAlgebraProvider) {
-            if (!((LinearAlgebraProvider<?>) p).isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+            LinearAlgebraProvider<?> la = (LinearAlgebraProvider<?>) p;
+            String domain = base.getDomain().toLowerCase();
+            
+            // Heuristic for domain compatibility
+            if (domain.contains("complex") && !la.isCompatible(org.episteme.core.mathematics.numbers.complex.Complex.ZERO)) {
+                System.out.println("[DEBUG]     - Provider " + p.getName() + " is NOT compatible with Complex. Skipping.");
+                return;
+            }
+            
+            if (domain.contains("real") && !la.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                 System.out.println("[DEBUG]     - Provider " + p.getName() + " is NOT compatible with Reals. Skipping.");
                 return;
             }

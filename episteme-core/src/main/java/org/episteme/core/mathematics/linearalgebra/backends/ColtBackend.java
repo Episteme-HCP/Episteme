@@ -117,7 +117,7 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     @Override
     public boolean isAvailable() {
-        return coltAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        return coltAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() && canUseColt();
     }
 
     @Override
@@ -147,9 +147,27 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     }
 
     private boolean canUseColt() {
-        return field != null && 
-               (field instanceof org.episteme.core.mathematics.sets.Reals ||
-                Real.class.isAssignableFrom(field.zero().getClass()));
+        if (field == null) return false;
+        Object zero = field.zero();
+        return (field instanceof org.episteme.core.mathematics.sets.Reals ||
+                zero instanceof Real ||
+                zero instanceof Double ||
+                zero instanceof Float ||
+                zero instanceof Integer);
+    }
+
+    @Override
+    public boolean isCompatible(Object domain) {
+        if (domain instanceof Field) {
+            Field<?> f = (Field<?>) domain;
+            Object zero = f.zero();
+            return (f instanceof org.episteme.core.mathematics.sets.Reals ||
+                    zero instanceof Real ||
+                    zero instanceof Double ||
+                    zero instanceof Float ||
+                    zero instanceof Integer);
+        }
+        return false;
     }
 
     @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkColt(); return coltImpl.add(a, b); }
@@ -199,7 +217,18 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             cern.colt.matrix.impl.DenseDoubleMatrix2D colt = new cern.colt.matrix.impl.DenseDoubleMatrix2D(m.rows(), m.cols());
             for (int i = 0; i < m.rows(); i++) {
                 for (int j = 0; j < m.cols(); j++) {
-                    colt.set(i, j, ((Real) m.get(i, j)).doubleValue());
+                    E val = m.get(i, j);
+                    if (val instanceof Real) {
+                        colt.set(i, j, ((Real) val).doubleValue());
+                    } else if (val instanceof Number) {
+                        colt.set(i, j, ((Number) val).doubleValue());
+                    } else if (val != null) {
+                        try {
+                            colt.set(i, j, Double.parseDouble(val.toString()));
+                        } catch (Exception e) {
+                            throw new ClassCastException("ColtBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                        }
+                    }
                 }
             }
             return colt;
@@ -221,7 +250,18 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         private cern.colt.matrix.DoubleMatrix1D toColtVector(Vector<E> v) {
             cern.colt.matrix.impl.DenseDoubleMatrix1D colt = new cern.colt.matrix.impl.DenseDoubleMatrix1D(v.dimension());
             for (int i = 0; i < v.dimension(); i++) {
-                colt.set(i, ((Real) v.get(i)).doubleValue());
+                E val = v.get(i);
+                if (val instanceof Real) {
+                    colt.set(i, ((Real) val).doubleValue());
+                } else if (val instanceof Number) {
+                    colt.set(i, ((Number) val).doubleValue());
+                } else if (val != null) {
+                    try {
+                        colt.set(i, Double.parseDouble(val.toString()));
+                    } catch (Exception e) {
+                        throw new ClassCastException("ColtBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                    }
+                }
             }
             return colt;
         }
