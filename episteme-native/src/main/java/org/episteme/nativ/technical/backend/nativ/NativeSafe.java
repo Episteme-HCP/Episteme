@@ -34,7 +34,9 @@ public class NativeSafe {
         for (int i = 0; i < args.length; i++) {
             if (args[i] instanceof MemorySegment seg) {
                 if (seg.equals(MemorySegment.NULL)) {
-                    logger.warn("Native Invoke: Arg[{}] is NULL MemorySegment. This might be intentional (e.g. workspace size query) or a bug.", i);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Native Invoke: Arg[{}] is NULL MemorySegment. This might be intentional (e.g. workspace size query) or a hint for internal behavior.", i);
+                    }
                 }
             }
         }

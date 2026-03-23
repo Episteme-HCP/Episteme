@@ -186,8 +186,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                     if (isComplex) {
                         MemorySegment sumR = getMPFR(h_C, i, j, n, 0, true);
                         MemorySegment sumI = getMPFR(h_C, i, j, n, 1, true);
-                        MPFR_SET_STR.invokeExact(sumR, arena.allocateFrom("0"), 10, rnd);
-                        MPFR_SET_STR.invokeExact(sumI, arena.allocateFrom("0"), 10, rnd);
+                        int _r = (int) MPFR_SET_STR.invokeExact(sumR, arena.allocateFrom("0"), 10, rnd);
+                        int _r = (int) MPFR_SET_STR.invokeExact(sumI, arena.allocateFrom("0"), 10, rnd);
 
                         for (int l = 0; l < k; l++) {
                             MemorySegment ar = getMPFR(h_A, i, l, k, 0, true);
@@ -196,26 +196,26 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                             MemorySegment bi = getMPFR(h_B, l, j, n, 1, true);
 
                             // ar*br - ai*bi
-                            MPFR_MUL.invokeExact(temp1, ar, br, rnd);
-                            MPFR_MUL.invokeExact(temp2, ai, bi, rnd);
-                            MPFR_SUB.invokeExact(temp1, temp1, temp2, rnd);
-                            MPFR_ADD.invokeExact(sumR, sumR, temp1, rnd);
+                            int _r = (int) MPFR_MUL.invokeExact(temp1, ar, br, rnd);
+                            int _r = (int) MPFR_MUL.invokeExact(temp2, ai, bi, rnd);
+                            int _r = (int) MPFR_SUB.invokeExact(temp1, temp1, temp2, rnd);
+                            int _r = (int) MPFR_ADD.invokeExact(sumR, sumR, temp1, rnd);
 
                             // ar*bi + ai*br
-                            MPFR_MUL.invokeExact(temp1, ar, bi, rnd);
-                            MPFR_MUL.invokeExact(temp2, ai, br, rnd);
-                            MPFR_ADD.invokeExact(temp1, temp1, temp2, rnd);
-                            MPFR_ADD.invokeExact(sumI, sumI, temp1, rnd);
+                            int _r = (int) MPFR_MUL.invokeExact(temp1, ar, bi, rnd);
+                            int _r = (int) MPFR_MUL.invokeExact(temp2, ai, br, rnd);
+                            int _r = (int) MPFR_ADD.invokeExact(temp1, temp1, temp2, rnd);
+                            int _r = (int) MPFR_ADD.invokeExact(sumI, sumI, temp1, rnd);
                         }
                     } else {
                         MemorySegment sum = getMPFR(h_C, i, j, n, 0, false);
-                        MPFR_SET_STR.invokeExact(sum, arena.allocateFrom("0"), 10, rnd);
+                        int _r = (int) MPFR_SET_STR.invokeExact(sum, arena.allocateFrom("0"), 10, rnd);
 
                         for (int l = 0; l < k; l++) {
                             MemorySegment a1 = getMPFR(h_A, i, l, k, 0, false);
                             MemorySegment b1 = getMPFR(h_B, l, j, n, 0, false);
-                            MPFR_MUL.invokeExact(temp1, a1, b1, rnd);
-                            MPFR_ADD.invokeExact(sum, sum, temp1, rnd);
+                            int _r = (int) MPFR_MUL.invokeExact(temp1, a1, b1, rnd);
+                            int _r = (int) MPFR_ADD.invokeExact(sum, sum, temp1, rnd);
                         }
                     }
                 }
@@ -258,8 +258,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                 if (isComplex) {
                     MemorySegment sumR = getMPFRVector(h_Y, i, 0, true);
                     MemorySegment sumI = getMPFRVector(h_Y, i, 1, true);
-                    MPFR_SET_STR.invokeExact(sumR, arena.allocateFrom("0"), 10, rnd);
-                    MPFR_SET_STR.invokeExact(sumI, arena.allocateFrom("0"), 10, rnd);
+                    int _r = (int) MPFR_SET_STR.invokeExact(sumR, arena.allocateFrom("0"), 10, rnd);
+                    int _r = (int) MPFR_SET_STR.invokeExact(sumI, arena.allocateFrom("0"), 10, rnd);
                     
                     for (int l = 0; l < k; l++) {
                         MemorySegment ar = getMPFR(h_A, i, l, k, 0, true);
@@ -268,23 +268,23 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                         MemorySegment xi = getMPFRVector(h_X, l, 1, true);
                         
                         // ar*xr - ai*xi
-                        MPFR_MUL.invokeExact(temp1, ar, xr, rnd);
-                        MPFR_MUL.invokeExact(temp2, ai, xi, rnd);
-                        MPFR_SUB.invokeExact(temp1, temp1, temp2, rnd);
-                        MPFR_ADD.invokeExact(sumR, sumR, temp1, rnd);
+                        int _r = (int) MPFR_MUL.invokeExact(temp1, ar, xr, rnd);
+                        int _r = (int) MPFR_MUL.invokeExact(temp2, ai, xi, rnd);
+                        int _r = (int) MPFR_SUB.invokeExact(temp1, temp1, temp2, rnd);
+                        int _r = (int) MPFR_ADD.invokeExact(sumR, sumR, temp1, rnd);
                         
                         // ar*xi + ai*xr
-                        MPFR_MUL.invokeExact(temp1, ar, xi, rnd);
-                        MPFR_MUL.invokeExact(temp2, ai, xr, rnd);
-                        MPFR_ADD.invokeExact(temp1, temp1, temp2, rnd);
-                        MPFR_ADD.invokeExact(sumI, sumI, temp1, rnd);
+                        int _r = (int) MPFR_MUL.invokeExact(temp1, ar, xi, rnd);
+                        int _r = (int) MPFR_MUL.invokeExact(temp2, ai, xr, rnd);
+                        int _r = (int) MPFR_ADD.invokeExact(temp1, temp1, temp2, rnd);
+                        int _r = (int) MPFR_ADD.invokeExact(sumI, sumI, temp1, rnd);
                     }
                 } else {
                     MemorySegment sum = getMPFRVector(h_Y, i, 0, false);
-                    MPFR_SET_STR.invokeExact(sum, arena.allocateFrom("0"), 10, rnd);
+                    int _r = (int) MPFR_SET_STR.invokeExact(sum, arena.allocateFrom("0"), 10, rnd);
                     for (int l = 0; l < k; l++) {
-                        MPFR_MUL.invokeExact(temp1, getMPFR(h_A, i, l, k, 0, false), getMPFRVector(h_X, l, 0, false), rnd);
-                        MPFR_ADD.invokeExact(sum, sum, temp1, rnd);
+                        int _r = (int) MPFR_MUL.invokeExact(temp1, getMPFR(h_A, i, l, k, 0, false), getMPFRVector(h_X, l, 0, false), rnd);
+                        int _r = (int) MPFR_ADD.invokeExact(sum, sum, temp1, rnd);
                     }
                 }
             }
@@ -318,11 +318,11 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             Object val = v.get(i);
             if (isComplex) {
                 org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) val;
-                MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                int _r = (int) MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                int _r = (int) MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
             } else {
                 Real rv = (Real) val;
-                MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
+                int _r = (int) MPFR_SET_STR.invokeExact(getMPFRVector(vec, i, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
             }
         }
         return vec;
@@ -429,7 +429,7 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             for (int i = 0; i < m * n * multiplier; i++) {
                 MemorySegment ra = h_A.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                 MemorySegment rc = h_C.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                MPFR_MUL.invokeExact(rc, ra, s, rnd);
+                int _r = (int) MPFR_MUL.invokeExact(rc, ra, s, rnd);
             }
             Matrix<Real> res = backToMatrix(h_C, m, n, arena, a.getScalarRing(), isComplex);
             NativeSafe.invoke(MPFR_CLEAR, s);
@@ -467,11 +467,11 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                 Object val = storage.get(i, j);
                 if (isComplex) {
                     org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) val;
-                    MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    int _r = (int) MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    int _r = (int) MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                 } else {
                     Real rv = (Real) val;
-                    MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
+                    int _r = (int) MPFR_SET_STR.invokeExact(getMPFR(mat, i, j, cols, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
                 }
             }
         }
@@ -498,10 +498,10 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     if (isComplex) {
-                        MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 0, true), getMPFR(h_A, i, j, n, 0, true), rnd);
-                        MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 1, true), getMPFR(h_A, i, j, n, 1, true), rnd);
+                        int _r = (int) MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 0, true), getMPFR(h_A, i, j, n, 0, true), rnd);
+                        int _r = (int) MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 1, true), getMPFR(h_A, i, j, n, 1, true), rnd);
                     } else {
-                        MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 0, false), getMPFR(h_A, i, j, n, 0, false), rnd);
+                        int _r = (int) MPFR_SET.invokeExact(getMPFR(h_C, j, i, m, 0, false), getMPFR(h_A, i, j, n, 0, false), rnd);
                     }
                 }
             }
@@ -636,7 +636,7 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                         }
                         complexSubtractMulVector(h_B, i, tempFactorR, tempFactorI, h_B, k, arena, prec);
                     } else {
-                        MPFR_DIV.invokeExact(tempFactor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
+                        int _r = (int) MPFR_DIV.invokeExact(tempFactor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
                         
                         for (int j = k; j < n; j++) {
                             subtractMulReal(h_A, i, j, tempFactor, h_A, k, j, n, arena, prec);
@@ -677,8 +677,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                     }
                     
                     MemorySegment xi = getMPFRVector(h_X, i, 0, false);
-                    MPFR_SUB.invokeExact(xi, getMPFRVector(h_B, i, 0, false), sum, rnd);
-                    MPFR_DIV.invokeExact(xi, xi, getMPFR(h_A, i, i, n, 0, false), rnd);
+                    int _r = (int) MPFR_SUB.invokeExact(xi, getMPFRVector(h_B, i, 0, false), sum, rnd);
+                    int _r = (int) MPFR_DIV.invokeExact(xi, xi, getMPFR(h_A, i, i, n, 0, false), rnd);
                 }
             }
             
@@ -716,10 +716,10 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
             // Initialize Identity
             for (int i = 0; i < n; i++) {
                 if (isComplex) {
-                    MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 0, true), 1L, rnd);
-                    MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 1, true), 0L, rnd);
+                    int _r = (int) MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 0, true), 1L, rnd);
+                    int _r = (int) MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 1, true), 0L, rnd);
                 } else {
-                    MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 0, false), 1L, rnd);
+                    int _r = (int) MPFR_SET_UI.invokeExact(getMPFR(h_Inv, i, i, n, 0, false), 1L, rnd);
                 }
             }
 
@@ -760,8 +760,8 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                     MemorySegment pI = arena.allocate(MPFR_LAYOUT);
                     MPFR_INIT2.invokeExact(pR, prec);
                     MPFR_INIT2.invokeExact(pI, prec);
-                    MPFR_SET.invokeExact(pR, getMPFR(h_A, k, k, n, 0, true), rnd);
-                    MPFR_SET.invokeExact(pI, getMPFR(h_A, k, k, n, 1, true), rnd);
+                    int _r = (int) MPFR_SET.invokeExact(pR, getMPFR(h_A, k, k, n, 0, true), rnd);
+                    int _r = (int) MPFR_SET.invokeExact(pI, getMPFR(h_A, k, k, n, 1, true), rnd);
                     
                     for (int j = 0; j < n; j++) {
                         complexDivide(getMPFR(h_A, k, j, n, 0, true), getMPFR(h_A, k, j, n, 1, true),
@@ -772,18 +772,18 @@ public class NativeMPFRDenseLinearAlgebraProvider implements LinearAlgebraBacken
                             pR, pI, prec, arena);
                     }
                     // Set A[k][k] to 1+0i explicitly for stability
-                    MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 0, true), 1L, rnd);
-                    MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 1, true), 0L, rnd);
+                    int _r = (int) MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 0, true), 1L, rnd);
+                    int _r = (int) MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 1, true), 0L, rnd);
                 } else {
                     MemorySegment pivotVal = arena.allocate(MPFR_LAYOUT);
                     MPFR_INIT2.invokeExact(pivotVal, prec);
-                    MPFR_SET.invokeExact(pivotVal, getMPFR(h_A, k, k, n, 0, false), rnd);
+                    int _r = (int) MPFR_SET.invokeExact(pivotVal, getMPFR(h_A, k, k, n, 0, false), rnd);
                     
                     for (int j = 0; j < n; j++) {
-                        MPFR_DIV.invokeExact(getMPFR(h_A, k, j, n, 0, false), getMPFR(h_A, k, j, n, 0, false), pivotVal, rnd);
-                        MPFR_DIV.invokeExact(getMPFR(h_Inv, k, j, n, 0, false), getMPFR(h_Inv, k, j, n, 0, false), pivotVal, rnd);
+                        int _r = (int) MPFR_DIV.invokeExact(getMPFR(h_A, k, j, n, 0, false), getMPFR(h_A, k, j, n, 0, false), pivotVal, rnd);
+                        int _r = (int) MPFR_DIV.invokeExact(getMPFR(h_Inv, k, j, n, 0, false), getMPFR(h_Inv, k, j, n, 0, false), pivotVal, rnd);
                     }
-                    MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 0, false), 1L, rnd);
+                    int _r = (int) MPFR_SET_UI.invokeExact(getMPFR(h_A, k, k, n, 0, false), 1L, rnd);
                 }
                 
                 // Eliminate other rows

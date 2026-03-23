@@ -73,6 +73,8 @@ message SingleMatrixRequest {
 message ScaleRequest {
   double scalar = 1;
   MatrixData matrix = 2;
+  double imaginary = 3;
+  bool is_complex = 4;
 }
 
 message MatrixResponse {
@@ -98,6 +100,8 @@ message SingleVectorRequest {
 message VectorScaleRequest {
   VectorData vector = 1;
   double scalar = 2;
+  double imaginary = 3;
+  bool is_complex = 4;
 }
 
 message VectorResponse {
@@ -117,4 +121,6 @@ message MatrixVectorRequest {
 
 message ScalarResponse {
   double value = 1;
+  double imaginary = 2;
+  bool is_complex = 3;
 }

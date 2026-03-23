@@ -178,6 +178,13 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
         return 0; // Low priority - typically selected manually or via config
     }
 
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) return true;
+        return ring.zero() instanceof Real;
+    }
+
 
 
     /**
@@ -278,15 +285,20 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        double scalarValue = toDouble(scalar);
+        ScaleRequest.Builder builder = ScaleRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a));
         
-        ScaleRequest request = ScaleRequest.newBuilder()
-                .setScalar(scalarValue)
-                .setMatrix(toProtoMatrix(a))
-                .build();
+        if (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) {
+            builder.setScalar(c.real())
+                   .setImaginary(c.imaginary())
+                   .setIsComplex(true);
+        } else {
+            builder.setScalar(toDouble(scalar))
+                   .setIsComplex(false);
+        }
 
         try {
-            MatrixResponse response = blockingStub.matrixScale(request);
+            MatrixResponse response = blockingStub.matrixScale(builder.build());
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
             throw mapException("matrixScale", e);
@@ -302,7 +314,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
 
         try {
             ScalarResponse response = blockingStub.matrixDeterminant(request);
-            return (E) Real.of(response.getValue());
+            return fromProtoScalar(response);
         } catch (StatusRuntimeException e) {
             throw mapException("matrixDeterminant", e);
         }
@@ -342,13 +354,20 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
 
     @Override
     public Vector<E> multiply(Vector<E> v, E scalar) {
-        VectorScaleRequest request = VectorScaleRequest.newBuilder()
-                .setVector(toProtoVector(v))
-                .setScalar(toDouble(scalar))
-                .build();
+        VectorScaleRequest.Builder builder = VectorScaleRequest.newBuilder()
+                .setVector(toProtoVector(v));
+        
+        if (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) {
+            builder.setScalar(c.real())
+                   .setImaginary(c.imaginary())
+                   .setIsComplex(true);
+        } else {
+            builder.setScalar(toDouble(scalar))
+                   .setIsComplex(false);
+        }
 
         try {
-            VectorResponse response = blockingStub.vectorScale(request);
+            VectorResponse response = blockingStub.vectorScale(builder.build());
             return fromProtoVector(response.getResult());
         } catch (StatusRuntimeException e) {
             throw mapException("vectorScale", e);
@@ -365,7 +384,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
 
         try {
             ScalarResponse response = blockingStub.vectorDot(request);
-            return (E) Real.of(response.getValue());
+            return fromProtoScalar(response);
         } catch (StatusRuntimeException e) {
             throw mapException("vectorDot", e);
         }
@@ -380,7 +399,7 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
 
         try {
             ScalarResponse response = blockingStub.vectorNorm(request);
-            return (E) Real.of(response.getValue());
+            return fromProtoScalar(response);
         } catch (StatusRuntimeException e) {
             throw mapException("vectorNorm", e);
         }
@@ -489,18 +508,29 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
     private MatrixData toProtoMatrix(Matrix<E> matrix) {
         int rows = matrix.rows();
         int cols = matrix.cols();
-        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8).order(ByteOrder.LITTLE_ENDIAN);
+        
+        boolean isComplex = rows > 0 && cols > 0 && ((Object)matrix.get(0, 0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        int multiplier = isComplex ? 2 : 1;
+        
+        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
         DoubleBuffer db = bb.asDoubleBuffer();
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                db.put(toDouble(matrix.get(i, j)));
+                if (isComplex) {
+                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) matrix.get(i, j);
+                    db.put(c.getReal().doubleValue());
+                    db.put(c.getImaginary().doubleValue());
+                } else {
+                    db.put(toDouble(matrix.get(i, j)));
+                }
             }
         }
         return MatrixData.newBuilder()
                 .setRows(rows)
                 .setCols(cols)
                 .setData(ByteString.copyFrom(bb))
+                .setIsComplex(isComplex)
                 .build();
     }
 
@@ -508,9 +538,11 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
     private Matrix<E> fromProtoMatrix(MatrixData data) {
         int rows = data.getRows();
         int cols = data.getCols();
+        boolean isComplex = data.getIsComplex();
         ByteString byteData = data.getData();
         
-        double[] raw = new double[rows * cols];
+        int multiplier = isComplex ? 2 : 1;
+        double[] raw = new double[rows * cols * multiplier];
         byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
 
         List<List<E>> matrixRows = new ArrayList<>();
@@ -519,7 +551,13 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
         for (int i = 0; i < rows; i++) {
             List<E> row = new ArrayList<>();
             for (int j = 0; j < cols; j++) {
-                row.add((E) Real.of(raw[dataIdx++]));
+                if (isComplex) {
+                    double re = raw[dataIdx++];
+                    double im = raw[dataIdx++];
+                    row.add((E) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(re), Real.of(im)));
+                } else {
+                    row.add((E) Real.of(raw[dataIdx++]));
+                }
             }
             matrixRows.add(row);
         }
@@ -529,33 +567,61 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
 
     private VectorData toProtoVector(Vector<E> vector) {
         int size = vector.dimension();
-        ByteBuffer bb = ByteBuffer.allocate(size * 8).order(ByteOrder.LITTLE_ENDIAN);
+        boolean isComplex = size > 0 && ((Object)vector.get(0)) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        int multiplier = isComplex ? 2 : 1;
+        
+        ByteBuffer bb = ByteBuffer.allocate(size * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
         DoubleBuffer db = bb.asDoubleBuffer();
 
         for (int i = 0; i < size; i++) {
-            db.put(toDouble(vector.get(i)));
+            if (isComplex) {
+               org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) vector.get(i);
+               db.put(c.getReal().doubleValue());
+               db.put(c.getImaginary().doubleValue());
+            } else {
+               db.put(toDouble(vector.get(i)));
+            }
         }
 
         return VectorData.newBuilder()
                 .setSize(size)
                 .setData(ByteString.copyFrom(bb))
+                .setIsComplex(isComplex)
                 .build();
     }
     
     @SuppressWarnings("unchecked")
     private Vector<E> fromProtoVector(VectorData data) {
         int size = data.getSize();
+        boolean isComplex = data.getIsComplex();
         ByteString byteData = data.getData();
         
-        double[] raw = new double[size];
+        int multiplier = isComplex ? 2 : 1;
+        double[] raw = new double[size * multiplier];
         byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
         
         List<E> elements = new ArrayList<>();
-        for (double val : raw) {
-            elements.add((E) Real.of(val));
+        int dataIdx = 0;
+        for (int i = 0; i < size; i++) {
+            if (isComplex) {
+                double re = raw[dataIdx++];
+                double im = raw[dataIdx++];
+                elements.add((E) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(re), Real.of(im)));
+            } else {
+                elements.add((E) Real.of(raw[dataIdx++]));
+            }
         }
 
         return DenseVector.of(elements, field);
+    }
+
+    @SuppressWarnings("unchecked")
+    private E fromProtoScalar(ScalarResponse response) {
+        if (response.getIsComplex()) {
+            return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(response.getValue(), response.getImaginary());
+        } else {
+            return (E) Real.of(response.getValue());
+        }
     }
 
     private double toDouble(E value) {
