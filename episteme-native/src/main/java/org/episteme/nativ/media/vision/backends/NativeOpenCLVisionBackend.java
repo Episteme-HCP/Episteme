@@ -33,7 +33,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, GPUBackend.class, NativeBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, VisionAlgorithmProvider.class, GPUBackend.class, NativeBackend.class})
 public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLVisionBackend.class);
