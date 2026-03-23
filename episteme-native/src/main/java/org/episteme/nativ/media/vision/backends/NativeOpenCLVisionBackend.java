@@ -86,6 +86,11 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
     }
 
     @Override
+    public String getName() {
+        return "OpenCL Vision";
+    }
+
+    @Override
     public int getPriority() {
         return 15; 
     }
