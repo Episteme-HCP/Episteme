@@ -139,7 +139,12 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
     public void freeGPUMemory(long gpuHandle) {}
 
     @Override
-    public void synchronize() {}
+    public void synchronize() {
+        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx != null && ctx.getCommandQueue() != null) {
+            CL.clFinish(ctx.getCommandQueue());
+        }
+    }
 
     @Override
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {}

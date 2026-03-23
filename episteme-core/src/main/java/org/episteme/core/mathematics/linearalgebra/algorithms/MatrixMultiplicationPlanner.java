@@ -11,7 +11,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.DistributedCompute;
-import org.episteme.core.technical.backend.distributed.DistributedContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

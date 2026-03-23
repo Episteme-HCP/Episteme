@@ -101,6 +101,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     private static MethodHandle CUDA_GET_DEVICE_COUNT;
     private static MethodHandle CUDA_GET_ERROR_STRING;
     private static MethodHandle CUBLAS_STATUS_GET_STRING;
+    private static MethodHandle CU_CTX_GET_CURRENT;
+    private static MethodHandle CU_CTX_GET_DEVICE;
 
     // Constants
     private static final int CUBLAS_OP_N = 0;
@@ -153,6 +155,16 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             CUDA_GET_DEVICE_COUNT = lookup(cudart, "cudaGetDeviceCount", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             CUDA_GET_ERROR_STRING = lookup(cudart, "cudaGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
             CUBLAS_STATUS_GET_STRING = lookup(cublas_lookup, "cublasGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+            // Try loading CUDA driver
+            Optional<SymbolLookup> cudaDrvOpt = NativeFFMLoader.loadLibrary("cuda", Arena.global());
+            if (cudaDrvOpt.isEmpty()) cudaDrvOpt = NativeFFMLoader.loadLibrary("nvcuda", Arena.global());
+            SymbolLookup cudaDrv = cudaDrvOpt.orElse(null);
+            
+            if (cudaDrv != null) {
+                CU_CTX_GET_CURRENT = lookup(cudaDrv, "cuCtxGetCurrent", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                CU_CTX_GET_DEVICE = lookup(cudaDrv, "cuCtxGetDevice", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            }
 
             if (CUDA_GET_DEVICE_COUNT != null) {
                 MemorySegment countPtr = tempArena.allocate(ValueLayout.JAVA_INT);
@@ -339,6 +351,33 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     @Override
     public String getEnvironmentInfo() {
         return IS_AVAILABLE ? "GPU (CUDA)" : "N/A";
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        if (!isAvailable()) return null;
+        try (Arena arena = Arena.ofConfined()) {
+            int devId = 0;
+            // Best effort to get active device and context
+            MemorySegment pCtx = arena.allocate(ValueLayout.ADDRESS);
+            long ctxHandle = 0;
+            if (CU_CTX_GET_CURRENT != null) {
+                if ((int)CU_CTX_GET_CURRENT.invokeExact(pCtx) == 0) {
+                    ctxHandle = pCtx.get(ValueLayout.ADDRESS, 0).address();
+                }
+            }
+            
+            MemorySegment pDev = arena.allocate(ValueLayout.JAVA_INT);
+            if (CU_CTX_GET_DEVICE != null) {
+                if ((int)CU_CTX_GET_DEVICE.invokeExact(pDev) == 0) {
+                    devId = pDev.get(ValueLayout.JAVA_INT, 0);
+                }
+            }
+            
+            return org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext.fromNative(ctxHandle, devId);
+        } catch (Throwable t) {
+            return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext(null, null);
+        }
     }
 
     @Override
@@ -2350,10 +2389,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         return org.episteme.core.technical.backend.HardwareAccelerator.GPU;
     }
 
-    @Override
-    public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return null;
-    }
+
 
     @Override
     public void shutdown() {

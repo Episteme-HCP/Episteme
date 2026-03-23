@@ -8,8 +8,7 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,7 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
-import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.core.technical.algorithm.OperationContext.Hint;
+
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver;
@@ -98,6 +96,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUDA_FREE;
     private static MethodHandle CUDA_MEMCPY;
     private static MethodHandle CUDA_DEVICE_SYNCHRONIZE;
+    private static MethodHandle CU_CTX_GET_CURRENT;
+    private static MethodHandle CU_CTX_GET_DEVICE;
 
     private static MethodHandle CUSPARSE_CREATE;
     private static MethodHandle CUSPARSE_CREATE_CSR;
@@ -175,6 +175,16 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             CUDA_FREE = lookup(cudart, "cudaFree", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             CUDA_MEMCPY = lookup(cudart, "cudaMemcpy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
             CUDA_DEVICE_SYNCHRONIZE = lookup(cudart, "cudaDeviceSynchronize", FunctionDescriptor.of(ValueLayout.JAVA_INT));
+
+            // Try loading CUDA driver
+            Optional<SymbolLookup> cudaDrvOpt = NativeFFMLoader.loadLibrary("cuda", Arena.global());
+            if (cudaDrvOpt.isEmpty()) cudaDrvOpt = NativeFFMLoader.loadLibrary("nvcuda", Arena.global());
+            SymbolLookup cudaDrv = cudaDrvOpt.orElse(null);
+            
+            if (cudaDrv != null) {
+                CU_CTX_GET_CURRENT = lookup(cudaDrv, "cuCtxGetCurrent", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                CU_CTX_GET_DEVICE = lookup(cudaDrv, "cuCtxGetDevice", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            }
 
             CUSPARSE_CREATE = lookup(cusparse_lookup, "cusparseCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             
@@ -258,6 +268,33 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public String getEnvironmentInfo() {
         return IS_AVAILABLE ? "GPU (CUDA)" : "N/A";
+    }
+
+    @Override
+    public ExecutionContext createContext() {
+        if (!isAvailable()) return null;
+        try (Arena arena = Arena.ofConfined()) {
+            int devId = 0;
+            // Best effort to get active device and context
+            MemorySegment pCtx = arena.allocate(ValueLayout.ADDRESS);
+            long ctxHandle = 0;
+            if (CU_CTX_GET_CURRENT != null) {
+                if ((int)CU_CTX_GET_CURRENT.invokeExact(pCtx) == 0) {
+                    ctxHandle = pCtx.get(ValueLayout.ADDRESS, 0).address();
+                }
+            }
+            
+            MemorySegment pDev = arena.allocate(ValueLayout.JAVA_INT);
+            if (CU_CTX_GET_DEVICE != null) {
+                if ((int)CU_CTX_GET_DEVICE.invokeExact(pDev) == 0) {
+                    devId = pDev.get(ValueLayout.JAVA_INT, 0);
+                }
+            }
+            
+            return org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext.fromNative(ctxHandle, devId);
+        } catch (Throwable t) {
+            return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext(null, null);
+        }
     }
 
     @Override
@@ -828,16 +865,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         return HardwareAccelerator.GPU;
     }
 
-    @Override
-    public ExecutionContext createContext() {
-        return new ExecutionContext() {
-            @Override
-            public <T> T execute(org.episteme.core.technical.backend.Operation<T> operation) {
-                return operation.compute(this);
-            }
-            @Override public void close() {}
-        };
-    }
+
 
     // --- Utilities ---
 

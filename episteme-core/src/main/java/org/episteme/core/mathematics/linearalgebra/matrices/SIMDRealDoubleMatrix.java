@@ -15,8 +15,7 @@ import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
-import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
+
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 

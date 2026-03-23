@@ -637,7 +637,12 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
 @Override public String getNativeLibraryName() { return "opencl"; }
 @Override public DeviceInfo[] getDevices() { return new DeviceInfo[0]; }
-@Override public void selectDevice(int deviceId) { }
+    @Override public void selectDevice(int deviceId) { }
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        if (!isAvailable()) return null;
+        return new org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext(context, commandQueue);
+    }
 @Override public long allocateGPUMemory(long size) { return 0; }
 @Override public void copyToGPU(long handle, DoubleBuffer buffer, long count) { }
 @Override public void copyFromGPU(long handle, DoubleBuffer buffer, long count) { }
@@ -1299,7 +1304,5 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         }
     }
 
-    @Override public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext(); // Placeholder
-    }
+
 }

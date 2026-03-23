@@ -73,9 +73,7 @@ public class NativeND4JCUDASparseTensorBackend implements TensorBackend {
     @Override
     public ExecutionContext createContext() {
         if (!available) return null;
-        @SuppressWarnings("deprecation")
-        ExecutionContext context = new CUDAExecutionContext();
-        return context;
+        return new CUDAExecutionContext(null, null);
     }
 
     @Override

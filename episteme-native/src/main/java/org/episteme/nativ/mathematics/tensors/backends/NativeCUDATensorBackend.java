@@ -118,6 +118,7 @@ public class NativeCUDATensorBackend implements TensorProvider, GPUBackend, Nati
 
     @Override
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
+        initCUDA();
         ensureAvailable();
         validateType(elementType);
         long totalElements = Arrays.stream(shape).asLongStream().reduce(1, (a, b) -> a * b);
@@ -134,6 +135,7 @@ public class NativeCUDATensorBackend implements TensorProvider, GPUBackend, Nati
 
     @Override
     public <T> Tensor<T> create(T[] data, int... shape) {
+        initCUDA();
         ensureAvailable();
         if (data.length == 0) throw new IllegalArgumentException("Empty data");
         @SuppressWarnings("unchecked")
@@ -232,25 +234,66 @@ public class NativeCUDATensorBackend implements TensorProvider, GPUBackend, Nati
     }
 
     @Override public void selectDevice(int deviceId) { }
+    
+    private static long getNativePointer(jcuda.NativePointerObject obj) {
+        try {
+            java.lang.reflect.Field field = jcuda.NativePointerObject.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            return field.getLong(obj);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to access JCuda native pointer", e);
+        }
+    }
+
+    private static jcuda.Pointer createPointer(long handle) {
+        try {
+            // jcuda.Pointer doesn't have a public no-arg constructor that is safe here,
+            // but we can use reflection on NativePointerObject or create a new Pointer(handle) if exists.
+            // Actually, Pointer(long) is not public.
+            java.lang.reflect.Constructor<jcuda.Pointer> ctor = 
+                jcuda.Pointer.class.getDeclaredConstructor();
+            ctor.setAccessible(true);
+            jcuda.Pointer ptr = ctor.newInstance();
+            
+            java.lang.reflect.Field field = jcuda.NativePointerObject.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            field.setLong(ptr, handle);
+            return ptr;
+        } catch (Exception e) {
+            // Alternative: use Pointer.to(new long[]{handle}) and some trick? No.
+            throw new RuntimeException("Failed to wrap native CUDA handle", e);
+        }
+    }
 
     @Override
     public long allocateGPUMemory(long sizeBytes) {
+        initCUDA();
+        if (!initialized) return 0;
         Pointer ptr = new Pointer();
         JCuda.cudaMalloc(ptr, sizeBytes);
-        return 0; // Not ideal handling but matches the interface's opacity
+        return getNativePointer(ptr);
     }
 
     @Override
     public void copyToGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
-        JCuda.cudaMemcpy(new Pointer(), Pointer.to(hostBuffer), sizeBytes, cudaMemcpyKind.cudaMemcpyHostToDevice);
+        initCUDA();
+        Pointer devicePtr = createPointer(gpuHandle);
+        JCuda.cudaMemcpy(devicePtr, Pointer.to(hostBuffer), sizeBytes, cudaMemcpyKind.cudaMemcpyHostToDevice);
     }
 
     @Override
     public void copyFromGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
-        JCuda.cudaMemcpy(Pointer.to(hostBuffer), new Pointer(), sizeBytes, cudaMemcpyKind.cudaMemcpyDeviceToHost);
+        initCUDA();
+        Pointer devicePtr = createPointer(gpuHandle);
+        JCuda.cudaMemcpy(Pointer.to(hostBuffer), devicePtr, sizeBytes, cudaMemcpyKind.cudaMemcpyDeviceToHost);
     }
 
-    @Override public void freeGPUMemory(long gpuHandle) { }
+    @Override
+    public void freeGPUMemory(long gpuHandle) {
+        if (gpuHandle != 0) {
+            JCuda.cudaFree(createPointer(gpuHandle));
+        }
+    }
     @Override public void synchronize() { JCuda.cudaDeviceSynchronize(); }
     @Override public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) { }
 }
