@@ -224,6 +224,8 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "    }\n" +
         "}\n";
 
+
+
     private static synchronized void init() {
         if (initAttempted) return;
         initAttempted = true;
@@ -317,7 +319,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     @Override public boolean isLoaded() { return initialized; }
     @Override public String getName() { return "Native OpenCL Dense Backend"; }
     @Override public int getPriority() { return 105; }
-    @Override public boolean isCompatible(Ring<?> ring) { return ring instanceof Reals; }
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        return ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {

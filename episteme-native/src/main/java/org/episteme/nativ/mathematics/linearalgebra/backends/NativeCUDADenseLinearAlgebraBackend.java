@@ -109,6 +109,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     private static final int CUDA_MEMCPY_HOST_TO_DEVICE = 1;
     private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
 
+
+
     private static synchronized void ensureInitialized() {
         if (IS_AVAILABLE) return;
         
@@ -332,7 +334,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     }
 
     @Override
-    public boolean isAvailable() { ensureInitialized(); return IS_AVAILABLE && !isExplicitlyDisabled(); }
+    public boolean isAvailable() { 
+        ensureInitialized(); 
+        return IS_AVAILABLE && !isExplicitlyDisabled(); 
+    }
 
     @Override
     public String getId() {
@@ -387,7 +392,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     public int getPriority() { return 110; } // Higher than Native SIMD (90) and Native BLAS (100)
 
     @Override
-    public boolean isCompatible(Ring<?> ring) { return ring instanceof Reals; }
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) { 
+        return ring instanceof org.episteme.core.mathematics.sets.Reals; 
+    }
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {

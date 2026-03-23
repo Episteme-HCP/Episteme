@@ -55,7 +55,7 @@ public class NativeJBulletBackend implements NativeCollisionProvider, MechanicsB
 
     @Override
     public String getAlgorithmType() {
-        return "mechanics";
+        return "Physics/Collision";
     }
 
     @Override

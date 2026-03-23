@@ -14,7 +14,7 @@ import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 import jcuda.driver.*;
-import static jcuda.driver.JCudaDriver.*;
+// Removed static import to prevent premature class loading failure
 import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
 import org.slf4j.Logger;
@@ -45,17 +45,21 @@ public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, Nativ
     private static synchronized void initCUDA() {
         if (initialized) return;
         try {
-            setExceptionsEnabled(true);
-            checkCuda(cuInit(0));
+            // Check if JCuda is even on the classpath first
+            Class.forName("jcuda.driver.JCudaDriver");
+            
+            JCudaDriver.setExceptionsEnabled(true);
+            checkCuda(JCudaDriver.cuInit(0));
             CUdevice device = new CUdevice();
-            checkCuda(cuDeviceGet(device, 0));
+            checkCuda(JCudaDriver.cuDeviceGet(device, 0));
             CUcontext context = new CUcontext();
-            checkCuda(cuCtxCreate(context, 0, device));
+            checkCuda(JCudaDriver.cuCtxCreate(context, 0, device));
             globalContext = context;
             globalDevice = device;
             initialized = true;
         } catch (Throwable t) {
-            logger.warn("Failed to initialize CUDA Vision backend: {}", t.getMessage());
+            logger.warn("Failed to initialize CUDA Vision backend (JCuda): {}", t.getMessage());
+            initialized = false;
         }
     }
 

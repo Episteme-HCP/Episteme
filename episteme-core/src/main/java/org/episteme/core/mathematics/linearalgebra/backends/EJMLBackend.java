@@ -115,7 +115,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     @Override
     public boolean isAvailable() {
-        return ejmlAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        return ejmlAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() && canUseEJML();
     }
 
     @Override
@@ -154,9 +154,27 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     }
 
     private boolean canUseEJML() {
-        return field != null && 
-               (field instanceof org.episteme.core.mathematics.sets.Reals ||
-                Real.class.isAssignableFrom(field.zero().getClass()));
+        if (field == null) return false;
+        Object zero = field.zero();
+        return (field instanceof org.episteme.core.mathematics.sets.Reals ||
+                zero instanceof Real ||
+                zero instanceof Double ||
+                zero instanceof Float ||
+                zero instanceof Integer);
+    }
+
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        if (ring instanceof Field) {
+            Field<?> f = (Field<?>) ring;
+            Object zero = f.zero();
+            return (f instanceof org.episteme.core.mathematics.sets.Reals ||
+                    zero instanceof Real ||
+                    zero instanceof Double ||
+                    zero instanceof Float ||
+                    zero instanceof Integer);
+        }
+        return false;
     }
 
     @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.add(a, b); }
@@ -206,8 +224,20 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         private org.ejml.simple.SimpleMatrix toEjmlMatrix(Matrix<E> m) {
             org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(m.rows(), m.cols());
             for (int i = 0; i < m.rows(); i++)
-                for (int j = 0; j < m.cols(); j++)
-                    ejml.set(i, j, ((Real) m.get(i, j)).doubleValue());
+                for (int j = 0; j < m.cols(); j++) {
+                    E val = m.get(i, j);
+                    if (val instanceof Real) {
+                        ejml.set(i, j, ((Real) val).doubleValue());
+                    } else if (val instanceof Number) {
+                        ejml.set(i, j, ((Number) val).doubleValue());
+                    } else if (val != null) {
+                        try {
+                            ejml.set(i, j, Double.parseDouble(val.toString()));
+                        } catch (Exception e) {
+                            throw new ClassCastException("EJMLBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                        }
+                    }
+                }
             return ejml;
         }
 
@@ -224,8 +254,20 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
         private org.ejml.simple.SimpleMatrix toEjmlVector(Vector<E> v) {
             org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(v.dimension(), 1);
-            for (int i = 0; i < v.dimension(); i++)
-                ejml.set(i, 0, ((Real) v.get(i)).doubleValue());
+            for (int i = 0; i < v.dimension(); i++) {
+                E val = v.get(i);
+                if (val instanceof Real) {
+                    ejml.set(i, 0, ((Real) val).doubleValue());
+                } else if (val instanceof Number) {
+                    ejml.set(i, 0, ((Number) val).doubleValue());
+                } else if (val != null) {
+                    try {
+                        ejml.set(i, 0, Double.parseDouble(val.toString()));
+                    } catch (Exception e) {
+                        throw new ClassCastException("EJMLBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                    }
+                }
+            }
             return ejml;
         }
 

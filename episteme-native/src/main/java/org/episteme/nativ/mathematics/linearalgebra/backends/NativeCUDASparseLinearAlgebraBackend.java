@@ -110,7 +110,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     
     // cuSolver Handles
     private static SymbolLookup cusolver_lookup;
-    private static MethodHandle CUSOLVER_SP_CREATE;
 
     // cuBLAS Handles
     private static MethodHandle CUBLAS_CREATE;
@@ -122,7 +121,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUBLAS_DGEAM;
  
     private static MemorySegment CUBLAS_HANDLE = MemorySegment.NULL;
-    private static MemorySegment CUSOLVER_HANDLE = MemorySegment.NULL;
     private static MemorySegment CUSPARSE_HANDLE = MemorySegment.NULL;
 
     // Constants
@@ -139,6 +137,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         ensureInitialized();
     }
 
+
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        return ring instanceof org.episteme.core.mathematics.sets.Reals;
+    }
+
     private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor descriptor) {
         return NativeFFMLoader.findSymbol(lookup, name)
             .map(s -> LINKER.downcallHandle(s, descriptor))
@@ -151,17 +155,26 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         try (Arena tempArena = Arena.ofConfined()) {
             // 1. Load CUDA Runtime
             Optional<SymbolLookup> cudaRtOpt = NativeFFMLoader.loadLibrary("cudart", Arena.global());
-            if (cudaRtOpt.isEmpty()) return;
+            if (cudaRtOpt.isEmpty()) {
+                logger.warn("CUDA Runtime (cudart) not found. CUDA Sparse Backend disabled.");
+                return;
+            }
             SymbolLookup cudart = cudaRtOpt.get();
 
             // 2. cuSPARSE
             Optional<SymbolLookup> cusparseOpt = NativeFFMLoader.loadLibrary("cusparse", Arena.global());
-            if (cusparseOpt.isEmpty()) return;
+            if (cusparseOpt.isEmpty()) {
+                logger.warn("cuSPARSE library not found. CUDA Sparse Backend disabled.");
+                return;
+            }
             cusparse_lookup = cusparseOpt.get();
 
             // 3. cuBLAS
             Optional<SymbolLookup> cublasOpt = NativeFFMLoader.loadLibrary("cublas", Arena.global());
-            if (cublasOpt.isEmpty()) return;
+            if (cublasOpt.isEmpty()) {
+                logger.warn("cuBLAS library not found. CUDA Sparse Backend disabled.");
+                return;
+            }
             SymbolLookup cublas = cublasOpt.get();
 
             // 4. cuSolver
@@ -230,9 +243,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
-            if (cusolver_lookup != null) {
-                CUSOLVER_SP_CREATE = lookup(cusolver_lookup, "cusolverSpCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-            }
 
             // Global Handles
             MemorySegment chPtr = tempArena.allocate(ValueLayout.ADDRESS);
@@ -243,16 +253,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             NativeSafe.invoke(CUSPARSE_CREATE, shPtr);
             CUSPARSE_HANDLE = shPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
 
-            if (CUSOLVER_SP_CREATE != null) {
-                MemorySegment slvPtr = tempArena.allocate(ValueLayout.ADDRESS);
-                NativeSafe.invoke(CUSOLVER_SP_CREATE, slvPtr);
-                CUSOLVER_HANDLE = slvPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
-            }
 
             IS_AVAILABLE = true;
-            logger.info("Native CUDA Sparse Backend initialized successfully.");
+            logger.info("Native CUDA Sparse Backend initialized successfully (Panama).");
         } catch (Throwable t) {
-            logger.warn("CUDA Sparse initialization failed: {}. Backend disabled.", t.getMessage());
+            IS_AVAILABLE = false; // Ensure it stays false
+            logger.error("CUDA Sparse initialization failed: {}. Backend disabled.", t.getMessage(), t);
         }
     }
 

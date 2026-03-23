@@ -91,12 +91,17 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
 
     @Override
     public String getBackendName() {
-        return "Native CPU Vision Backend (Custom C++ FFM)";
+        return "Native C++ Binding Vision Backend";
+    }
+
+    @Override
+    public String getName() {
+        return getBackendName();
     }
 
     @Override
     public String getDescription() {
-        return "High-performance vision backend using Project Panama to call custom C++ SIMD-optimized routines.";
+        return "Accelerated Computer Vision backend using direct C++ JNI/Panama bindings for SIMD-optimized image processing.";
     }
 
     @Override

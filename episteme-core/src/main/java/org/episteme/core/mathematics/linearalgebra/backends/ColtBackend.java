@@ -35,6 +35,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Field;
+import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.backend.ExecutionContext;
@@ -157,9 +158,9 @@ public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     }
 
     @Override
-    public boolean isCompatible(Object domain) {
-        if (domain instanceof Field) {
-            Field<?> f = (Field<?>) domain;
+    public boolean isCompatible(Ring<?> ring) {
+        if (ring instanceof Field) {
+            Field<?> f = (Field<?>) ring;
             Object zero = f.zero();
             return (f instanceof org.episteme.core.mathematics.sets.Reals ||
                     zero instanceof Real ||

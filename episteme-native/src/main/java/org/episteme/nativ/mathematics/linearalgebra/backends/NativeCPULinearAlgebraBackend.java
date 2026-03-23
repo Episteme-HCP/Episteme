@@ -248,6 +248,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
 
     @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        return ring instanceof org.episteme.core.mathematics.sets.Reals || 
+               (ring != null && ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real);
+    }
+
+    @Override
     public double score(OperationContext context) {
         if (!AVAILABLE) return -1.0;
         return AutoTuningManager.getDynamicScore(getName(), context.getDimensionality(), getPriority());

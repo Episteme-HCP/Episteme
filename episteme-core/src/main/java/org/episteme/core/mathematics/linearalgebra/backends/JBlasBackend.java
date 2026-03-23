@@ -123,7 +123,7 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     @Override
     public boolean isAvailable() {
-        return jblasAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        return jblasAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() && canUseJBlas();
     }
 
     @Override
@@ -148,9 +148,27 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     }
 
     private boolean canUseJBlas() {
-        return field != null && 
-               (field instanceof org.episteme.core.mathematics.sets.Reals ||
-                Real.class.isAssignableFrom(field.zero().getClass()));
+        if (field == null) return false;
+        Object zero = field.zero();
+        return (field instanceof org.episteme.core.mathematics.sets.Reals ||
+                zero instanceof Real ||
+                zero instanceof Double ||
+                zero instanceof Float ||
+                zero instanceof Integer);
+    }
+
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        if (ring instanceof Field) {
+            Field<?> f = (Field<?>) ring;
+            Object zero = f.zero();
+            return (f instanceof org.episteme.core.mathematics.sets.Reals ||
+                    zero instanceof Real ||
+                    zero instanceof Double ||
+                    zero instanceof Float ||
+                    zero instanceof Integer);
+        }
+        return false;
     }
 
     @Override
@@ -208,7 +226,18 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             org.jblas.DoubleMatrix jm = new org.jblas.DoubleMatrix(rows, cols);
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    jm.put(i, j, ((Real) m.get(i, j)).doubleValue());
+                    E val = m.get(i, j);
+                    if (val instanceof Real) {
+                        jm.put(i, j, ((Real) val).doubleValue());
+                    } else if (val instanceof Number) {
+                        jm.put(i, j, ((Number) val).doubleValue());
+                    } else if (val != null) {
+                        try {
+                            jm.put(i, j, Double.parseDouble(val.toString()));
+                        } catch (Exception e) {
+                            throw new ClassCastException("JBlasBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                        }
+                    }
                 }
             }
             return jm;
@@ -229,8 +258,20 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
         private org.jblas.DoubleMatrix toJBlasVector(Vector<E> v) {
             double[] data = new double[v.dimension()];
-            for (int i = 0; i < v.dimension(); i++)
-                data[i] = ((Real) v.get(i)).doubleValue();
+            for (int i = 0; i < v.dimension(); i++) {
+                E val = v.get(i);
+                if (val instanceof Real) {
+                    data[i] = ((Real) val).doubleValue();
+                } else if (val instanceof Number) {
+                    data[i] = ((Number) val).doubleValue();
+                } else if (val != null) {
+                    try {
+                        data[i] = Double.parseDouble(val.toString());
+                    } catch (Exception e) {
+                        throw new ClassCastException("JBlasBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                    }
+                }
+            }
             return new org.jblas.DoubleMatrix(data);
         }
 

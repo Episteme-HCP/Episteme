@@ -46,7 +46,7 @@ public class SystematicMLBenchmark implements SystematicBenchmark<MLProvider> {
 
     @Override
     public String getDomain() {
-        return "Machine Learning";
+        return "Machine Learning (Unsupervised)";
     }
 
     @Override

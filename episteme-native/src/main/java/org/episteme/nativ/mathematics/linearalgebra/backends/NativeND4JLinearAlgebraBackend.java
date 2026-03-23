@@ -40,6 +40,12 @@ import org.nd4j.linalg.inverse.InvertMatrix;
 public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeND4JLinearAlgebraBackend.class);
 
+
+
+    public NativeND4JLinearAlgebraBackend() {
+        // available field is deprecated in favor of static IS_AVAILABLE
+    }
+
     @Override
     public int getPriority() {
         return 50; // Lower than NativeCPULinearAlgebraBackend (100)

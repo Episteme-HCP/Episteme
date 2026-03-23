@@ -66,7 +66,22 @@ public class SparkDistributedContext implements DistributedContext {
         if (!(sparkConf instanceof SparkConf)) {
             throw new IllegalArgumentException("Configuration must be instance of org.apache.spark.SparkConf");
         }
-        this.sparkContext = new JavaSparkContext((SparkConf) sparkConf);
+        
+        // Windows Hadoop Workaround (HADOOP_HOME/winutils.exe check)
+        // If running in local mode and Hadoop is not set, Spark will crash on Windows.
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            if (System.getenv("HADOOP_HOME") == null && System.getProperty("hadoop.home.dir") == null) {
+                // Set to a dummy path. WinUtils not actually needed for local[*] compute, 
+                // but initialization logic checks for its existence.
+                System.setProperty("hadoop.home.dir", "C:\\");
+            }
+        }
+
+        try {
+            this.sparkContext = new JavaSparkContext((SparkConf) sparkConf);
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to initialize Spark Context: " + t.getMessage(), t);
+        }
     }
 
     @Override

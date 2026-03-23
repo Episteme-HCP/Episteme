@@ -17,11 +17,14 @@ def run_circuit(qasm_file):
 
         qc = QuantumCircuit.from_qasm_file(qasm_file)
         
+        # Ensure measurements are present, otherwise AerSimulator won't return counts
+        if not qc.cregs:
+            qc.measure_all()
+        
         sim = AerSimulator()
-        # Compile the circuit for the simulator
-        transpiled_qc = transpile(qc, sim)
         
         # Run and get counts
+        transpiled_qc = transpile(qc, sim)
         result = sim.run(transpiled_qc, shots=1024).result()
         counts = result.get_counts(transpiled_qc)
         

@@ -153,12 +153,7 @@ public class BenchmarkRegistry {
     private static <P extends org.episteme.core.technical.algorithm.AlgorithmProvider> void addSystematicInstance(SystematicBenchmark<P> base, P p, List<RunnableBenchmark> list) {
         System.out.println("[DEBUG]   - Found systematic provider implementation: " + p.getName() + " (Type: " + p.getAlgorithmType() + ")");
         
-        // Skip slow backends as requested by user
-        String pName = p.getName().toLowerCase();
-        if (pName.contains("mpfr") || pName.contains("nd4j")) {
-             System.out.println("[DEBUG]     - Skipping slow provider: " + p.getName());
-             return;
-        }
+        // MPFR and ND4J are now included for auditing as requested by user.
 
         // Check compatibility if it's a LinearAlgebraProvider
         if (p instanceof LinearAlgebraProvider) {

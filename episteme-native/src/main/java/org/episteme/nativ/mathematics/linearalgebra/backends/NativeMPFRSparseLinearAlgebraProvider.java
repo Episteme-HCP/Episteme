@@ -117,25 +117,23 @@ public class NativeMPFRSparseLinearAlgebraProvider implements LinearAlgebraBacke
     }
 
     @Override
+    public boolean isAvailable() {
+        return AVAILABLE && !isExplicitlyDisabled();
+    }
+
+    @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
-        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) return true;
-        return ring.zero() instanceof Real;
-    }
-
-    @Override
-    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
-        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
-    }
-
-    @Override
-    public boolean isLoaded() {
-        return AVAILABLE;
+        return ring instanceof org.episteme.core.mathematics.sets.Reals;
     }
 
     @Override
     public String getNativeLibraryName() {
         return "mpfr";
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return AVAILABLE;
     }
 
     @Override

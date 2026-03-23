@@ -111,6 +111,11 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        return (this.field != null) ? this.field.equals(ring) : (ring instanceof org.episteme.core.mathematics.sets.Reals);
+    }
+
+    @Override
     public Object createBackend() {
         return this;
     }

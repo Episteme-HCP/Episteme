@@ -202,7 +202,13 @@ public class MPIDistributedContext implements DistributedContext {
         public MpiStrategy() {
             try {
                 this.mpiClass = Class.forName("mpi.MPI");
-                this.winClass = Class.forName("mpi.Win");
+                Class<?> wc = null;
+                try {
+                    wc = Class.forName("mpi.Win");
+                } catch (ClassNotFoundException e) {
+                    System.err.println("[MPI-Strategy] mpi.Win not found. RMA/One-Sided operations will be disabled.");
+                }
+                this.winClass = wc;
                 this.commWorld = mpiClass.getField("COMM_WORLD").get(null);
                 
                 this.rank = (int) commWorld.getClass().getMethod("Rank").invoke(commWorld);
@@ -260,7 +266,7 @@ public class MPIDistributedContext implements DistributedContext {
         @Override
         public void shutdown() {
             try {
-                if (win != null) {
+                if (win != null && winClass != null) {
                     winClass.getMethod("Free").invoke(win);
                 }
                 // Only finalize if we are sure we are the ones who initialized it?
@@ -276,6 +282,9 @@ public class MPIDistributedContext implements DistributedContext {
 
         private void ensureWindow(int capacity) throws Exception {
             if (win == null) {
+                if (winClass == null) {
+                    throw new UnsupportedOperationException("MPI RMA (One-Sided) not supported by this MPI implementation (missing mpi.Win)");
+                }
                 // Ensure buffer is large enough for potential reuse or dynamically create
                 // Here we allocate a fixed large buffer for demo purposes (100MB doubles)
                 int safeCap = Math.max(capacity, 1000); 
@@ -336,7 +345,7 @@ public class MPIDistributedContext implements DistributedContext {
         @Override
         public void fence() {
             try {
-                if (win != null) {
+                if (win != null && winClass != null) {
                     winClass.getMethod("Fence", int.class).invoke(win, 0);
                 }
             } catch (Exception e) {

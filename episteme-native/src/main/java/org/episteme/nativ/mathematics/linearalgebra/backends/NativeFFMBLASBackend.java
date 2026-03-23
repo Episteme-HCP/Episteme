@@ -735,7 +735,7 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real;
+        return ring instanceof org.episteme.core.mathematics.sets.Reals;
     }
 
     @Override

@@ -80,7 +80,9 @@ public final class ProviderSelector {
                 .max(Comparator.comparingDouble(p -> p.score(context)))
                 .orElseThrow();
 
-        logger.info("Selected Provider: {} (Score: {}) for {}", best.getName(), best.score(context), providerClass.getSimpleName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Selected Provider: {} (Score: {}) for {}", best.getName(), best.score(context), providerClass.getSimpleName());
+        }
         return best;
     }
 

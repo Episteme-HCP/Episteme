@@ -111,7 +111,7 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
 
     @Override
     public boolean isAvailable() {
-        return commonsAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        return commonsAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() && canUseCommons();
     }
 
     @Override
@@ -141,9 +141,27 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
     }
 
     private boolean canUseCommons() {
-        return field != null && 
-               (field instanceof org.episteme.core.mathematics.sets.Reals ||
-                Real.class.isAssignableFrom(field.zero().getClass()));
+        if (field == null) return false;
+        Object zero = field.zero();
+        return (field instanceof org.episteme.core.mathematics.sets.Reals ||
+                zero instanceof Real ||
+                zero instanceof Double ||
+                zero instanceof Float ||
+                zero instanceof Integer);
+    }
+
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        if (ring instanceof Field) {
+            Field<?> f = (Field<?>) ring;
+            Object zero = f.zero();
+            return (f instanceof org.episteme.core.mathematics.sets.Reals ||
+                    zero instanceof Real ||
+                    zero instanceof Double ||
+                    zero instanceof Float ||
+                    zero instanceof Integer);
+        }
+        return false;
     }
 
     @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkCommons(); return commonsImpl.add(a, b); }
@@ -192,8 +210,20 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
         private org.apache.commons.math3.linear.RealMatrix toCommonsMatrix(Matrix<E> m) {
             double[][] data = new double[m.rows()][m.cols()];
             for (int i = 0; i < m.rows(); i++)
-                for (int j = 0; j < m.cols(); j++)
-                    data[i][j] = ((Real) m.get(i, j)).doubleValue();
+                for (int j = 0; j < m.cols(); j++) {
+                    E val = m.get(i, j);
+                    if (val instanceof Real) {
+                        data[i][j] = ((Real) val).doubleValue();
+                    } else if (val instanceof Number) {
+                        data[i][j] = ((Number) val).doubleValue();
+                    } else if (val != null) {
+                        try {
+                            data[i][j] = Double.parseDouble(val.toString());
+                        } catch (Exception e) {
+                            throw new ClassCastException("CommonsMathBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                        }
+                    }
+                }
             return org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
         }
 
@@ -210,8 +240,20 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
 
         private org.apache.commons.math3.linear.RealVector toCommonsVector(Vector<E> v) {
             double[] data = new double[v.dimension()];
-            for (int i = 0; i < v.dimension(); i++)
-                data[i] = ((Real) v.get(i)).doubleValue();
+            for (int i = 0; i < v.dimension(); i++) {
+                E val = v.get(i);
+                if (val instanceof Real) {
+                    data[i] = ((Real) val).doubleValue();
+                } else if (val instanceof Number) {
+                    data[i] = ((Number) val).doubleValue();
+                } else if (val != null) {
+                    try {
+                        data[i] = Double.parseDouble(val.toString());
+                    } catch (Exception e) {
+                        throw new ClassCastException("CommonsMathBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                    }
+                }
+            }
             return org.apache.commons.math3.linear.MatrixUtils.createRealVector(data);
         }
 
