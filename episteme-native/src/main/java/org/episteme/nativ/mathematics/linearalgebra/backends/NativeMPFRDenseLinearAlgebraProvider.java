@@ -26,6 +26,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.auto.service.AutoService;
+import static org.episteme.nativ.mathematics.analysis.NativeMPFRNumbers.*;
 
 
 /**
@@ -166,40 +167,86 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
         return java.util.Map.of(
             "environment", getEnvironmentInfo(),
             "precision", "full (MPFR)",
-            "capabilities", "Transpose,Add,Subtract,Scale,Multiply,Inverse,Determinant,Solve,Dot,Norm,LU,QR,Cholesky,SVD,Eigen,Exp,Sin"
+            "capabilities", "Transpose,Add,Subtract,Scale,Multiply,Inverse,Determinant,Solve,Dot,Norm,LU,QR,Cholesky,SVD,Eigen,Exp,Log,Log10,Sin,Cos,Tan,Asin,Acos,Atan,Sinh,Cosh,Tanh,Sqrt,Cbrt,Pow"
         );
     }
 
-    @Override
-    public Matrix<E> exp(Matrix<E> a) {
-        return transcendentalOp(a, MPFR_EXP);
-    }
+    @Override public Matrix<E> exp(Matrix<E> a) { return transcendentalOp(a, MPFR_EXP); }
+    @Override public Matrix<E> log(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG); }
+    @Override public Matrix<E> log10(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG10); }
+    @Override public Matrix<E> sin(Matrix<E> a) { return transcendentalOp(a, MPFR_SIN); }
+    @Override public Matrix<E> cos(Matrix<E> a) { return transcendentalOp(a, MPFR_COS); }
+    @Override public Matrix<E> tan(Matrix<E> a) { return transcendentalOp(a, MPFR_TAN); }
+    @Override public Matrix<E> asin(Matrix<E> a) { return transcendentalOp(a, MPFR_ASIN); }
+    @Override public Matrix<E> acos(Matrix<E> a) { return transcendentalOp(a, MPFR_ACOS); }
+    @Override public Matrix<E> atan(Matrix<E> a) { return transcendentalOp(a, MPFR_ATAN); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { return transcendentalOp(a, MPFR_SINH); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { return transcendentalOp(a, MPFR_COSH); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { return transcendentalOp(a, MPFR_TANH); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { return transcendentalOp(a, MPFR_SQRT); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { return transcendentalOp(a, MPFR_CBRT); }
 
     @Override
-    public Matrix<E> sin(Matrix<E> a) {
-        return transcendentalOp(a, MPFR_SIN);
+    public Matrix<E> pow(Matrix<E> a, E exponent) {
+        if (exponent instanceof org.episteme.core.mathematics.numbers.real.Real) {
+            return transcendentalOp2(a, (org.episteme.core.mathematics.numbers.real.Real)exponent, MPFR_POW);
+        }
+        return LinearAlgebraBackend.super.pow(a, exponent);
     }
 
     private Matrix<E> transcendentalOp(Matrix<E> a, MethodHandle handle) {
+        if (handle == null) return LinearAlgebraBackend.super.exp(a); // Fallback to element-wise if handle missing
         int m = a.rows();
         int n = a.cols();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        if (isComplex) throw new UnsupportedOperationException("Transcendental ops on Complex matrices not yet implemented in MPFR backend");
+        if (isComplex) return LinearAlgebraBackend.super.exp(a); // Fallback for complex
         long prec = getPrecision();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, false);
             MemorySegment h_C = allocateMatrix(m, n, arena, prec, false);
+            int rnd = 0; // MPFR_RNDN
             for (int i = 0; i < m * n; i++) {
                 MemorySegment ra = h_A.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                 MemorySegment rc = h_C.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                NativeSafe.invoke(handle, rc, ra, 0);
+                NativeSafe.invoke(handle, rc, ra, rnd);
             }
-            Matrix<E> res = backToMatrix_internal(h_C, m, n, arena, a.getScalarRing(), false);
+            Matrix<E> res = (Matrix<E>) backToMatrix_internal(h_C, m, n, arena, a.getScalarRing(), false);
+            // clear handled by arena? No, MPFR needs explicit clear for its internal allocs
             clearMPFRArray(h_A, m * n);
             clearMPFRArray(h_C, m * n);
             return res;
         } catch (Throwable t) {
             throw new RuntimeException("MPFR transcendental op failed", t);
+        }
+    }
+
+    private Matrix<E> transcendentalOp2(Matrix<E> a, org.episteme.core.mathematics.numbers.real.Real exponent, MethodHandle handle) {
+        if (handle == null) return LinearAlgebraBackend.super.pow(a, (E)exponent);
+        int m = a.rows();
+        int n = a.cols();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (isComplex) return LinearAlgebraBackend.super.pow(a, (E)exponent);
+        long prec = getPrecision();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_A = initMatrix(a, arena, prec, false);
+            MemorySegment h_C = allocateMatrix(m, n, arena, prec, false);
+            MemorySegment h_Exp = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, h_Exp, prec);
+            NativeSafe.invoke(MPFR_SET_STR, h_Exp, arena.allocateFrom(exponent.bigDecimalValue().toPlainString()), 10, 0);
+            
+            int rnd = 0;
+            for (int i = 0; i < m * n; i++) {
+                MemorySegment ra = h_A.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment rc = h_C.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                NativeSafe.invoke(handle, rc, ra, h_Exp, rnd);
+            }
+            Matrix<E> res = (Matrix<E>) backToMatrix_internal(h_C, m, n, arena, a.getScalarRing(), false);
+            NativeSafe.invoke(MPFR_CLEAR, h_Exp);
+            clearMPFRArray(h_A, m * n);
+            clearMPFRArray(h_C, m * n);
+            return res;
+        } catch (Throwable t) {
+            throw new RuntimeException("MPFR transcendental op2 failed", t);
         }
     }
 

@@ -10,7 +10,6 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.mathematics.context.MathContext;
 
 /**
  * Generic LU Decomposition.

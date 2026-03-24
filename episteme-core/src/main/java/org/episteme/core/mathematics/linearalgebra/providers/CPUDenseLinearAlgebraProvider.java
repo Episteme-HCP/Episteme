@@ -101,16 +101,46 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     public String getId() {
         return "cpu-dense";
     }
-    @Override
-    public Matrix<E> exp(Matrix<E> a) {
-        return elementWiseTranscendental(a, "exp");
-    }
+    @Override public Matrix<E> exp(Matrix<E> a) { return elementWiseTranscendental(a, "exp"); }
+    @Override public Matrix<E> log(Matrix<E> a) { return elementWiseTranscendental(a, "log"); }
+    @Override public Matrix<E> log10(Matrix<E> a) { return elementWiseTranscendental(a, "log10"); }
+    @Override public Matrix<E> sin(Matrix<E> a) { return elementWiseTranscendental(a, "sin"); }
+    @Override public Matrix<E> cos(Matrix<E> a) { return elementWiseTranscendental(a, "cos"); }
+    @Override public Matrix<E> tan(Matrix<E> a) { return elementWiseTranscendental(a, "tan"); }
+    @Override public Matrix<E> asin(Matrix<E> a) { return elementWiseTranscendental(a, "asin"); }
+    @Override public Matrix<E> acos(Matrix<E> a) { return elementWiseTranscendental(a, "acos"); }
+    @Override public Matrix<E> atan(Matrix<E> a) { return elementWiseTranscendental(a, "atan"); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { return elementWiseTranscendental(a, "sinh"); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { return elementWiseTranscendental(a, "cosh"); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { return elementWiseTranscendental(a, "tanh"); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { return elementWiseTranscendental(a, "sqrt"); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { return elementWiseTranscendental(a, "cbrt"); }
 
     @Override
-    public Matrix<E> sin(Matrix<E> a) {
-        return elementWiseTranscendental(a, "sin");
+    @SuppressWarnings("unchecked")
+    public Matrix<E> pow(Matrix<E> a, E exponent) {
+        int m = a.rows();
+        int n = a.cols();
+        Ring<E> r = a.getScalarRing();
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(m, n, r.zero());
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                E val = a.get(i, j);
+                E res;
+                if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig && exponent instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                    res = (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).pow((org.episteme.core.mathematics.numbers.real.Real)exponent);
+                } else if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex && exponent instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+                    res = (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).pow((org.episteme.core.mathematics.numbers.complex.Complex)exponent);
+                } else {
+                    throw new UnsupportedOperationException("pow not supported for " + val.getClass().getSimpleName());
+                }
+                storage.set(i, j, res);
+            }
+        }
+        return new GenericMatrix<E>(storage, this, (r instanceof Field) ? (Field<E>)r : null);
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<E> elementWiseTranscendental(Matrix<E> a, String op) {
         int m = a.rows();
         int n = a.cols();
@@ -121,11 +151,43 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 E val = a.get(i, j);
                 E res;
                 if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
-                    res = (op.equals("exp")) ? (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).exp() 
-                                           : (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).sin();
+                    org.episteme.core.mathematics.numbers.real.RealBig rb = (org.episteme.core.mathematics.numbers.real.RealBig)val;
+                    res = switch(op) {
+                        case "exp" -> (E)rb.exp();
+                        case "log" -> (E)rb.log();
+                        case "log10" -> (E)rb.log10();
+                        case "sin" -> (E)rb.sin();
+                        case "cos" -> (E)rb.cos();
+                        case "tan" -> (E)rb.tan();
+                        case "asin" -> (E)rb.asin();
+                        case "acos" -> (E)rb.acos();
+                        case "atan" -> (E)rb.atan();
+                        case "sinh" -> (E)rb.sinh();
+                        case "cosh" -> (E)rb.cosh();
+                        case "tanh" -> (E)rb.tanh();
+                        case "sqrt" -> (E)rb.sqrt();
+                        case "cbrt" -> (E)rb.cbrt();
+                        default -> throw new UnsupportedOperationException(op);
+                    };
                 } else if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
-                    res = (op.equals("exp")) ? (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).exp() 
-                                           : (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).sin();
+                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex)val;
+                    res = switch(op) {
+                        case "exp" -> (E)c.exp();
+                        case "log" -> (E)c.log();
+                        case "log10" -> (E)c.log10();
+                        case "sin" -> (E)c.sin();
+                        case "cos" -> (E)c.cos();
+                        case "tan" -> (E)c.tan();
+                        case "asin" -> (E)c.asin();
+                        case "acos" -> (E)c.acos();
+                        case "atan" -> (E)c.atan();
+                        case "sinh" -> (E)c.sinh();
+                        case "cosh" -> (E)c.cosh();
+                        case "tanh" -> (E)c.tanh();
+                        case "sqrt" -> (E)c.sqrt();
+                        case "cbrt" -> (E)c.cbrt();
+                        default -> throw new UnsupportedOperationException(op);
+                    };
                 } else {
                     throw new UnsupportedOperationException(op + " not supported for " + val.getClass().getSimpleName());
                 }

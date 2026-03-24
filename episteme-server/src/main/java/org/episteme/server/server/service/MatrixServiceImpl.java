@@ -338,6 +338,81 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         }
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public void biCGSTAB(IterativeSolverRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+            Vector<Object> b = (Vector<Object>) fromProto(request.getB());
+            Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
+            Object tol = fromProtoScalar(request.getTolerance());
+            int maxIter = request.getMaxIterations();
+
+            org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<Object> provider = 
+                (org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<Object>) matrix.getProvider();
+            Vector<Object> result = provider.bicgstab(matrix, b, x0, tol, maxIter);
+
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("biCGSTAB", e, responseObserver);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void conjugateGradient(IterativeSolverRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+            Vector<Object> b = (Vector<Object>) fromProto(request.getB());
+            Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
+            Object tol = fromProtoScalar(request.getTolerance());
+            int maxIter = request.getMaxIterations();
+
+            org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<Object> provider = 
+                (org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<Object>) matrix.getProvider();
+            Vector<Object> result = provider.conjugateGradient(matrix, b, x0, tol, maxIter);
+
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("conjugateGradient", e, responseObserver);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void gMRES(GMRESRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+            Vector<Object> b = (Vector<Object>) fromProto(request.getB());
+            Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
+            Object tol = fromProtoScalar(request.getTolerance());
+            int maxIter = request.getMaxIterations();
+            int restart = request.getRestart();
+
+            org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<Object> provider = 
+                (org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<Object>) matrix.getProvider();
+            Vector<Object> result = provider.gmres(matrix, b, x0, tol, maxIter, restart);
+
+            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            handleError("gMRES", e, responseObserver);
+        }
+    }
+
+    private Object fromProtoScalar(ScalarResponse response) {
+        if (!response.getHpValue().isEmpty()) {
+            return org.episteme.core.mathematics.numbers.real.RealBig.of(response.getHpValue());
+        }
+        if (response.getIsComplex()) {
+            return Complex.of(response.getValue(), response.getImaginary());
+        } else {
+            return Real.of(response.getValue());
+        }
+    }
+
     private void handleError(String op, Exception e, StreamObserver<?> responseObserver) {
         LOG.error("Error during " + op, e);
         responseObserver.onError(

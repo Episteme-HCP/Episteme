@@ -40,7 +40,8 @@ public class HighPrecisionComplianceTest {
     // Providers to exclude from HP tests (double-only, broken, or unused)
     private static final Set<String> EXCLUDED_PROVIDERS = Set.of(
         "EJML", "Colt", "Commons Math", "JBlas", "ND4J",
-        "CUDA", "OpenCL", "SIMD", "Unified", "FFMBLAS", "Native BLAS Provider FFM"
+        "CUDA", "OpenCL", "SIMD", "Unified", "FFMBLAS", "Native BLAS Provider FFM",
+        "Native CPU-BLAS"
     );
 
     private static class ComplianceResult {
@@ -242,6 +243,84 @@ public class HighPrecisionComplianceTest {
             Matrix<RealBig> c = provider.sin(a);
             assertNoFallback(provider, c);
         });
+
+        testOp(res, "RB:Cos", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.cos(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Tan", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.tan(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Log", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val2, 1);
+            Matrix<RealBig> c = provider.log(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Log10", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val2, 1);
+            Matrix<RealBig> c = provider.log10(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Asin", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.asin(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Acos", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.acos(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Atan", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.atan(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Sinh", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.sinh(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Cosh", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.cosh(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Tanh", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.tanh(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Sqrt", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val2, 1);
+            Matrix<RealBig> c = provider.sqrt(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Cbrt", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val2, 1);
+            Matrix<RealBig> c = provider.cbrt(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "RB:Pow", provider, () -> {
+            Matrix<RealBig> a = createRealBigMatrix(val2, 1);
+            Matrix<RealBig> c = provider.pow(a, RealBig.create(new java.math.BigDecimal("3")));
+            assertNoFallback(provider, c);
+        });
     }
 
     private void runComplexTests(ComplianceResult res, LinearAlgebraProvider<Complex> provider) {
@@ -375,6 +454,96 @@ public class HighPrecisionComplianceTest {
             Vector<Complex> x0 = createComplexVector(Complex.of(0.0, 0.0), 4);
             Vector<Complex> x = sp.gmres(a, b, x0, Complex.of(1e-8, 0), 1000, 10);
             assertNotNull(x);
+        });
+
+        testOp(res, "C:Exp", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 1);
+            Matrix<Complex> c = provider.exp(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Log", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(2.0, 0.5), 1);
+            Matrix<Complex> c = provider.log(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Log10", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(2.0, 0.5), 1);
+            Matrix<Complex> c = provider.log10(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Sin", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 1);
+            Matrix<Complex> c = provider.sin(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Cos", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 1);
+            Matrix<Complex> c = provider.cos(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Tan", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 1);
+            Matrix<Complex> c = provider.tan(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Asin", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(0.5, 0.2), 1);
+            Matrix<Complex> c = provider.asin(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Acos", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(0.5, 0.2), 1);
+            Matrix<Complex> c = provider.acos(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Atan", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(0.5, 0.2), 1);
+            Matrix<Complex> c = provider.atan(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Sinh", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 1);
+            Matrix<Complex> c = provider.sinh(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Cosh", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 1);
+            Matrix<Complex> c = provider.cosh(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Tanh", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(1.0, 1.0), 1);
+            Matrix<Complex> c = provider.tanh(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Sqrt", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(2.0, 1.0), 1);
+            Matrix<Complex> c = provider.sqrt(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Cbrt", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(2.0, 1.0), 1);
+            Matrix<Complex> c = provider.cbrt(a);
+            assertNoFallback(provider, c);
+        });
+
+        testOp(res, "C:Pow", provider, () -> {
+            Matrix<Complex> a = createComplexMatrix(Complex.of(2.0, 1.0), 1);
+            Matrix<Complex> c = provider.pow(a, Complex.of(2, 0));
+            assertNoFallback(provider, c);
         });
     }
 

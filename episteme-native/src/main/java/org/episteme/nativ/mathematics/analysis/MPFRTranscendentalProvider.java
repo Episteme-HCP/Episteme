@@ -114,10 +114,24 @@ public final class MPFRTranscendentalProvider implements TranscendentalProvider 
     private BigDecimal readMPFR(MemorySegment ptr, Arena arena, MathContext mc) {
         // Reuse logic from linear algebra provider
         MemorySegment expPtr = arena.allocate(java.lang.foreign.ValueLayout.JAVA_LONG);
+        // mpfr_get_str (char *str, mpfr_exp_t *expptr, int base, size_t n, mpfr_srcptr op, mpfr_rnd_t rnd)
         MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, ptr, 0);
         
+        if (strPtr == null || strPtr.address() == 0) {
+             throw new RuntimeException("mpfr_get_str returned NULL pointer");
+        }
+
         try {
-            String digits = strPtr.getString(0);
+            // Reinterpret the raw pointer with enough size to find the null terminator
+            // We use a safe size reflecting the precision requested (+ metadata room)
+            long safeSize = (long)(mc.getPrecision() * 1.5) + 64; 
+            MemorySegment safeSeg = strPtr.reinterpret(safeSize);
+            
+            String digits = safeSeg.getString(0);
+            if (digits == null || digits.isEmpty()) {
+                throw new RuntimeException("mpfr_get_str returned an empty string at 0x" + Long.toHexString(strPtr.address()));
+            }
+
             long exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_LONG, 0);
             
             // Format: 0.[digits] * 10^exp

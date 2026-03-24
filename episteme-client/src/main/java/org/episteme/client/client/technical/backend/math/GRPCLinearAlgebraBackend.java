@@ -64,8 +64,8 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, org.episteme.core.technical.backend.ComputeBackend.class, Backend.class})
-public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org.episteme.core.technical.backend.ComputeBackend {
+@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.class, org.episteme.core.technical.backend.ComputeBackend.class, Backend.class})
+public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E>, LinearAlgebraBackend<E>, org.episteme.core.technical.backend.ComputeBackend {
 
     private ManagedChannel channel;
     private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
@@ -670,6 +670,22 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
         }
     }
 
+    private ScalarResponse toProtoScalar(E scalar) {
+        ScalarResponse.Builder builder = ScalarResponse.newBuilder();
+        if (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) {
+            builder.setValue(c.getReal().doubleValue())
+                   .setImaginary(c.getImaginary().doubleValue())
+                   .setIsComplex(true);
+        } else if (scalar instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
+            builder.setHpValue(rb.toString())
+                   .setIsComplex(false);
+        } else {
+            builder.setValue(toDouble(scalar))
+                   .setIsComplex(false);
+        }
+        return builder.build();
+    }
+
     private double toDouble(E value) {
         if (value instanceof Real) {
             return ((Real) value).doubleValue();
@@ -679,7 +695,58 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
         throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to double for network transfer");
     }
 
-    // ==================== Execution Context ====================
+    // ==================== Sparse Iterative Solvers ====================
+    
+    @Override
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int getMaxIterations) {
+        IterativeSolverRequest request = IterativeSolverRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setB(toProtoVector(b))
+                .setX0(toProtoVector(x0))
+                .setTolerance(toProtoScalar(tolerance))
+                .setMaxIterations(getMaxIterations)
+                .build();
+        try {
+            VectorResponse response = blockingStub.biCGSTAB(request);
+            return fromProtoVector(response.getResult());
+        } catch (StatusRuntimeException e) {
+            throw mapException("biCGSTAB", e);
+        }
+    }
 
+    @Override
+    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int getMaxIterations) {
+        IterativeSolverRequest request = IterativeSolverRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setB(toProtoVector(b))
+                .setX0(toProtoVector(x0))
+                .setTolerance(toProtoScalar(tolerance))
+                .setMaxIterations(getMaxIterations)
+                .build();
+        try {
+            VectorResponse response = blockingStub.conjugateGradient(request);
+            return fromProtoVector(response.getResult());
+        } catch (StatusRuntimeException e) {
+            throw mapException("conjugateGradient", e);
+        }
+    }
+
+    @Override
+    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int getMaxIterations, int restart) {
+        GMRESRequest request = GMRESRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setB(toProtoVector(b))
+                .setX0(toProtoVector(x0))
+                .setTolerance(toProtoScalar(tolerance))
+                .setMaxIterations(getMaxIterations)
+                .setRestart(restart)
+                .build();
+        try {
+            VectorResponse response = blockingStub.gMRES(request);
+            return fromProtoVector(response.getResult());
+        } catch (StatusRuntimeException e) {
+            throw mapException("gmres", e);
+        }
+    }
 }
 

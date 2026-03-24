@@ -33,6 +33,10 @@ service MatrixService {
   rpc MatrixSVD (SingleMatrixRequest) returns (SVDResponse);
   rpc MatrixCholesky (SingleMatrixRequest) returns (CholeskyResponse);
   rpc MatrixEigen (SingleMatrixRequest) returns (EigenResponse);
+  // Iterative Solvers
+  rpc BiCGSTAB (IterativeSolverRequest) returns (VectorResponse);
+  rpc ConjugateGradient (IterativeSolverRequest) returns (VectorResponse);
+  rpc GMRES (GMRESRequest) returns (VectorResponse);
 }
 
 message LUResponse {
@@ -128,4 +132,20 @@ message ScalarResponse {
   double imaginary = 2;
   bool is_complex = 3;
   string hp_value = 4; // For high-precision result
+}
+message IterativeSolverRequest {
+  MatrixData matrix = 1;
+  VectorData b = 2;
+  VectorData x0 = 3;
+  ScalarResponse tolerance = 4;
+  int32 max_iterations = 5;
+}
+
+message GMRESRequest {
+  MatrixData matrix = 1;
+  VectorData b = 2;
+  VectorData x0 = 3;
+  ScalarResponse tolerance = 4;
+  int32 max_iterations = 5;
+  int32 restart = 6;
 }

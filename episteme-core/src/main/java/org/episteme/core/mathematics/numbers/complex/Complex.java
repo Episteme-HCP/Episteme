@@ -398,6 +398,26 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
         return onePlusZ.divide(oneMinusZ).log().multiply(Complex.of(0.5));
     }
 
+    /**
+     * Returns the base-10 logarithm of this complex number.
+     * log10(z) = log(z) / log(10)
+     * 
+     * @return log10(this)
+     */
+    public Complex log10() {
+        return log().divide(Complex.of(Real.of(Math.log(10.0))));
+    }
+
+    /**
+     * Returns the cube root of this complex number.
+     * cbrt(z) = z^(1/3)
+     * 
+     * @return cube root of this
+     */
+    public Complex cbrt() {
+        return pow(1.0 / 3.0);
+    }
+
     @Override
     public String toString() {
         if (imaginary.sign() < 0) {

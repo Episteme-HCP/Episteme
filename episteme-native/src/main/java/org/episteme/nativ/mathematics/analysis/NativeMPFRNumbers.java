@@ -44,6 +44,7 @@ public final class NativeMPFRNumbers {
     public static final MethodHandle MPFR_ACOSH;
     public static final MethodHandle MPFR_ATANH;
     public static final MethodHandle MPFR_CBRT;
+    public static final MethodHandle MPFR_SQRT;
     public static final MethodHandle MPFR_HYPOT;
     public static final MethodHandle MPFR_POW;
     
@@ -61,7 +62,7 @@ public final class NativeMPFRNumbers {
         MethodHandle exp = null, log = null, log10 = null, sin = null, cos = null, tan = null;
         MethodHandle asin = null, acos = null, atan = null, atan2 = null;
         MethodHandle sinh = null, cosh = null, tanh = null, asinh = null, acosh = null, atanh = null;
-        MethodHandle cbrt = null, hypot = null, pow = null;
+        MethodHandle cbrt = null, sqrt = null, hypot = null, pow = null;
         MethodHandle init2 = null, clear = null, setStr = null, getStr = null, freeStr = null;
 
         try {
@@ -87,6 +88,7 @@ public final class NativeMPFRNumbers {
                 acosh = lookup(mpfr, "mpfr_acosh", oneArg);
                 atanh = lookup(mpfr, "mpfr_atanh", oneArg);
                 cbrt = lookup(mpfr, "mpfr_cbrt", oneArg);
+                sqrt = lookup(mpfr, "mpfr_sqrt", oneArg);
                 
                 // Two-arg functions: (rop, op1, op2, rnd)
                 FunctionDescriptor twoArg = FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, ADDRESS, JAVA_INT);
@@ -115,7 +117,7 @@ public final class NativeMPFRNumbers {
         MPFR_EXP = exp; MPFR_LOG = log; MPFR_LOG10 = log10; MPFR_SIN = sin; MPFR_COS = cos; MPFR_TAN = tan;
         MPFR_ASIN = asin; MPFR_ACOS = acos; MPFR_ATAN = atan; MPFR_ATAN2 = atan2;
         MPFR_SINH = sinh; MPFR_COSH = cosh; MPFR_TANH = tanh; MPFR_ASINH = asinh; MPFR_ACOSH = acosh; MPFR_ATANH = atanh;
-        MPFR_CBRT = cbrt; MPFR_HYPOT = hypot; MPFR_POW = pow;
+        MPFR_CBRT = cbrt; MPFR_SQRT = sqrt; MPFR_HYPOT = hypot; MPFR_POW = pow;
         MPFR_INIT2 = init2; MPFR_CLEAR = clear; MPFR_SET_STR = setStr; MPFR_GET_STR = getStr; MPFR_FREE_STR = freeStr;
         AVAILABLE = available;
         if (AVAILABLE) {

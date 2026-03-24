@@ -121,6 +121,23 @@ public interface Vector<E> extends Module<Vector<E>, E> {
     }
 
     /**
+     * Applies a mapping function to each element of this vector.
+     * 
+     * @param mapper the function to apply
+     * @return a new vector with mapped elements
+     */
+    default Vector<E> map(java.util.function.Function<E, E> mapper) {
+        int dim = dimension();
+        org.episteme.core.mathematics.structures.rings.Ring<E> ring = getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(dim);
+        for (int i = 0; i < dim; i++) {
+            storage.set(i, mapper.apply(get(i)));
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, getProvider(), ring);
+    }
+
+    /**
      * Returns the sum of this vector and another.
      * 
      * @param other the vector to add
