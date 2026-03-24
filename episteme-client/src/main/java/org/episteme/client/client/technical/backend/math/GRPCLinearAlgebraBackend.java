@@ -309,7 +309,6 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
         SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
@@ -381,7 +380,6 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
         VectorRequest request = VectorRequest.newBuilder()
                 .setVectorA(toProtoVector(a))
@@ -397,7 +395,6 @@ public class GRPCLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, org
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
         SingleVectorRequest request = SingleVectorRequest.newBuilder()
                 .setVector(toProtoVector(a))

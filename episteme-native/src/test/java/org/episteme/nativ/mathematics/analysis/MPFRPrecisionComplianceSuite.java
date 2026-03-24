@@ -80,7 +80,7 @@ public class MPFRPrecisionComplianceSuite {
             SparseMatrix<Real> A = new SparseMatrix<>(storage, Real.ZERO);
             Vector<Real> b = DenseVector.of(Arrays.asList(Real.of(5.0), Real.of(5.0), Real.of(3.0)), Reals.getInstance());
             
-            NativeMPFRSparseLinearAlgebraProvider provider = new NativeMPFRSparseLinearAlgebraProvider();
+            NativeMPFRSparseLinearAlgebraProvider<Real> provider = new NativeMPFRSparseLinearAlgebraProvider<>();
             Vector<Real> x = provider.solve(A, b);
             
             // logger.info("Solve solution sample: x[0] = {}", x.get(0));

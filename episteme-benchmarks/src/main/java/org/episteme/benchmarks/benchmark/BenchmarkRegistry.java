@@ -2,7 +2,6 @@ package org.episteme.benchmarks.benchmark;
 
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.benchmarks.benchmark.benchmarks.SystematicBenchmark;
-import org.episteme.core.mathematics.numbers.complex.Complex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;

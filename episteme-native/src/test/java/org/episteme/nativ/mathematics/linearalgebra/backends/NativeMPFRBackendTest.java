@@ -37,7 +37,7 @@ public class NativeMPFRBackendTest {
             System.err.println("'libs' directory NOT found at expected root!");
         }
 
-        NativeMPFRDenseLinearAlgebraProvider provider = new NativeMPFRDenseLinearAlgebraProvider();
+        NativeMPFRDenseLinearAlgebraProvider<Real> provider = new NativeMPFRDenseLinearAlgebraProvider<>();
         System.out.println("MPFR Backend Availability: " + provider.isAvailable());
         if (!provider.isAvailable()) {
             System.err.println("Failure cause for 'mpfr': " + org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.getFailureCause("mpfr"));
@@ -47,7 +47,7 @@ public class NativeMPFRBackendTest {
 
     @Test
     public void testSimpleMultiplication() {
-        NativeMPFRDenseLinearAlgebraProvider provider = new NativeMPFRDenseLinearAlgebraProvider();
+        NativeMPFRDenseLinearAlgebraProvider<Real> provider = new NativeMPFRDenseLinearAlgebraProvider<>();
         if (!provider.isAvailable()) {
             System.err.println("Skipping test: MPFR not available");
             return;

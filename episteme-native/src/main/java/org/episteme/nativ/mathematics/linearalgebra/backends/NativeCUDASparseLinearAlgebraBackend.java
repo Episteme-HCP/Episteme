@@ -116,7 +116,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUSPARSE_SPMM_BUFFER_SIZE;
     
     // cuSolver Handles
-    private static SymbolLookup cusolver_lookup;
 
     // cuBLAS Handles
     private static MethodHandle CUBLAS_CREATE;
@@ -183,12 +182,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 return;
             }
             SymbolLookup cublas = cublasOpt.get();
-
-            // 4. cuSolver
-            Optional<SymbolLookup> cusolverOpt = NativeFFMLoader.loadLibrary("cusolver", Arena.global());
-            if (cusolverOpt.isPresent()) {
-                cusolver_lookup = cusolverOpt.get();
-            }
 
             // 5. Bind Handles
             CUDA_MALLOC = lookup(cudart, "cudaMalloc", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));

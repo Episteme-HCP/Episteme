@@ -20,7 +20,6 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
-import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;

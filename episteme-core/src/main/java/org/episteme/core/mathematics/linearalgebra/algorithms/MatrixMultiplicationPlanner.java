@@ -5,12 +5,17 @@
 
 package org.episteme.core.mathematics.linearalgebra.algorithms;
 
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.DistributedCompute;
 
+import org.episteme.core.technical.algorithm.ProviderSelector;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,13 +56,12 @@ public class MatrixMultiplicationPlanner {
         org.episteme.core.mathematics.structures.rings.Ring<E> ring = A.getScalarRing();
         
         if (n >= STRASSEN_THRESHOLD && isPowerOfTwo(n)) {
-            @SuppressWarnings("unchecked")
-            org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leaf = (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
-                org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class,
+            LinearAlgebraProvider<E> leaf = (LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+                LinearAlgebraProvider.class,
                 org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
                 p -> !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider) &&
                      !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider) &&
-                     (ring == null || ((org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<?>)p).isCompatible(ring))
+                     (ring == null || ((LinearAlgebraProvider<?>)p).isCompatible(ring))
             );
             return RealStrassenAlgorithm.multiply(A, B, leaf);
         }
@@ -87,12 +91,12 @@ public class MatrixMultiplicationPlanner {
         logger.info("Planner selected algorithm: {}", algo);
         
         @SuppressWarnings("unchecked")
-        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leaf = (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E>) org.episteme.core.technical.algorithm.ProviderSelector.select(
-            org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class,
-            org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
-            prov -> !(prov instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider) &&
-                 !(prov instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider) &&
-                 ((org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<?>)prov).isCompatible(A.getScalarRing())
+        LinearAlgebraProvider<E> leaf = (LinearAlgebraProvider<E>) ProviderSelector.select(
+            LinearAlgebraProvider.class,
+            OperationContext.DEFAULT,
+            prov -> !(prov instanceof StrassenLinearAlgebraProvider) &&
+                 !(prov instanceof CARMALinearAlgebraProvider) &&
+                 ((LinearAlgebraProvider<?>)prov).isCompatible(A.getScalarRing())
         );
 
         switch (algo) {

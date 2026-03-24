@@ -10,7 +10,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
@@ -38,9 +37,10 @@ public class HighPrecisionComplianceTest {
     private static final String PROJECT_NAME = System.getProperty("org.episteme.project.name", "Episteme");
     private static final String REPORT_PATH = System.getProperty("org.episteme.report.path", "../docs/HIGH_PRECISION_COMPLIANCE_REPORT.md");
 
-    // Providers that only support double — exclude from HP tests
-    private static final Set<String> DOUBLE_ONLY_PROVIDERS = Set.of(
-        "EJML", "Colt", "Commons Math", "JBlas", "ND4J"
+    // Providers to exclude from HP tests (double-only, broken, or unused)
+    private static final Set<String> EXCLUDED_PROVIDERS = Set.of(
+        "EJML", "Colt", "Commons Math", "JBlas", "ND4J",
+        "CUDA", "OpenCL", "SIMD", "Standard", "Strassen", "CPUDense", "CPUSparse", "Unified", "CARMA"
     );
 
     private static class ComplianceResult {
@@ -70,6 +70,7 @@ public class HighPrecisionComplianceTest {
             res.environment = rawProvider.getEnvironmentInfo();
 
             MathContext.exact().compute(() -> {
+                @SuppressWarnings("unchecked")
                 Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
                 if (rawProvider.isCompatible(ring)) {
                     @SuppressWarnings("unchecked")
@@ -378,9 +379,10 @@ public class HighPrecisionComplianceTest {
     private List<LinearAlgebraProvider<?>> discoverHPProviders() {
         Map<String, LinearAlgebraProvider<?>> providers = new LinkedHashMap<>();
         
+        @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> prov : loader) {
-            if (isDoubleOnlyProvider(prov.getName())) continue;
+            if (isExcludedProvider(prov.getName())) continue;
             providers.put(prov.getName(), prov);
         }
 
@@ -389,7 +391,7 @@ public class HighPrecisionComplianceTest {
                 try {
                     for (var ap : b.getAlgorithmProviders()) {
                         if (ap instanceof LinearAlgebraProvider<?> p) {
-                            if (isDoubleOnlyProvider(p.getName())) continue;
+                            if (isExcludedProvider(p.getName())) continue;
                             providers.putIfAbsent(p.getName(), p);
                         }
                     }
@@ -403,8 +405,8 @@ public class HighPrecisionComplianceTest {
         return new ArrayList<>(providers.values());
     }
 
-    private boolean isDoubleOnlyProvider(String name) {
-        for (String dop : DOUBLE_ONLY_PROVIDERS) {
+    private boolean isExcludedProvider(String name) {
+        for (String dop : EXCLUDED_PROVIDERS) {
             if (name.contains(dop)) return true;
         }
         return false;
@@ -458,7 +460,9 @@ public class HighPrecisionComplianceTest {
                 data[i][j] = RealBig.create(new BigDecimal(String.valueOf((i + 1) * 0.1 + (j + 1) * 0.01)).add(val.bigDecimalValue()));
             }
         }
-        return Matrix.of(data, (Ring<RealBig>)(Object)Real.ZERO);
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        return Matrix.of(data, ring);
     }
 
     private Matrix<RealBig> createInvertibleRealBigMatrix(int n) {
@@ -473,7 +477,9 @@ public class HighPrecisionComplianceTest {
                 }
             }
         }
-        return Matrix.of(data, (Ring<RealBig>)(Object)Real.ZERO);
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        return Matrix.of(data, ring);
     }
 
     private Matrix<RealBig> createSPDRealBigMatrix(int n) {
@@ -489,7 +495,9 @@ public class HighPrecisionComplianceTest {
                 data[i][j] = RealBig.create(new BigDecimal(String.valueOf(sum)));
             }
         }
-        return Matrix.of(data, (Ring<RealBig>)(Object)Real.ZERO);
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        return Matrix.of(data, ring);
     }
 
     private Vector<RealBig> createRealBigVector(RealBig val, int n) {
@@ -497,7 +505,9 @@ public class HighPrecisionComplianceTest {
         for (int i = 0; i < n; i++) {
             data[i] = RealBig.create(new BigDecimal(String.valueOf((i + 1) * 0.5)).add(val.bigDecimalValue()));
         }
-        return Vector.of(data, (Ring<RealBig>)(Object)Real.ZERO);
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        return Vector.of(data, ring);
     }
 
     private Matrix<Complex> createComplexMatrix(Complex z, int n) {

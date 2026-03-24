@@ -13,15 +13,8 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
-import org.jocl.*;
-import static org.jocl.CL.*;
 import org.episteme.core.media.vision.VisionAlgorithmProvider;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
-import org.episteme.core.technical.backend.ExecutionContext;
-import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.image.BufferedImage;
 import java.nio.DoubleBuffer;
 
@@ -39,7 +32,6 @@ import java.nio.DoubleBuffer;
 @AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, VisionAlgorithmProvider.class, GPUBackend.class, NativeBackend.class})
 public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
 
-    private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLVisionBackend.class);
     private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
 
     @Override

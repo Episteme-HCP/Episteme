@@ -6,10 +6,8 @@
 package org.episteme.core.mathematics.linearalgebra.matrices;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.TiledMatrixStorage;
 import org.episteme.core.Episteme;
-import org.episteme.core.mathematics.sets.Reals;
 
 
 /**
@@ -83,7 +81,6 @@ public class TiledMatrix<E> extends GenericMatrix<E> implements AutoCloseable {
         this.tiles = (Matrix<E>[][]) new Matrix[numTileRows][numTileCols];
 
         // Initialize with zero matrices
-        E zero = ring.zero();
         for (int i = 0; i < numTileRows; i++) {
             for (int j = 0; j < numTileCols; j++) {
                 int rSize = Math.min(tileSize, rows - i * tileSize);
