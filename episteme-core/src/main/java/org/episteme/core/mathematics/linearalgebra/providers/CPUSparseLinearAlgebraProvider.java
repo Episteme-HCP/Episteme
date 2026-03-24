@@ -25,7 +25,6 @@ package org.episteme.core.mathematics.linearalgebra.providers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
 
@@ -33,7 +32,9 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
@@ -42,7 +43,6 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.episteme.core.mathematics.structures.rings.Field;
 import com.google.auto.service.AutoService;
 
 /**
@@ -61,50 +61,49 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         this.ring = ring;
     }
 
-    @SuppressWarnings("unchecked")
     public CPUSparseLinearAlgebraProvider() {
-        this((Ring<E>) org.episteme.core.mathematics.sets.Reals.getInstance());
+        this(null);
     }
 
 
     @Override
     public LUResult<E> lu(Matrix<E> a) {
-        return GenericLU.decompose(a, (Field<E>) ring);
+        return GenericLU.decompose(a, (Field<E>) a.getScalarRing());
     }
 
     @Override
     public QRResult<E> qr(Matrix<E> a) {
-        return GenericQR.decompose(a, (Field<E>) ring);
+        return GenericQR.decompose(a, (Field<E>) a.getScalarRing());
     }
 
     @Override
     public CholeskyResult<E> cholesky(Matrix<E> a) {
-        return GenericCholesky.decompose(a, (Field<E>) ring);
+        return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing());
     }
 
     @Override
     public SVDResult<E> svd(Matrix<E> a) {
-        return GenericSVD.decompose(a, (Field<E>) ring);
+        return GenericSVD.decompose(a, (Field<E>) a.getScalarRing());
     }
 
     @Override
     public EigenResult<E> eigen(Matrix<E> a) {
-        return GenericEigen.decompose(a, (Field<E>) ring);
+        return GenericEigen.decompose(a, (Field<E>) a.getScalarRing());
     }
 
     @Override
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        return GenericLU.solve(lu, b, (Field<E>) ring);
+        return GenericLU.solve(lu, b, (Field<E>) b.getScalarRing());
     }
 
     @Override
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
-        return GenericQR.solve(qr, b, (Field<E>) ring);
+        return GenericQR.solve(qr, b, (Field<E>) b.getScalarRing());
     }
 
     @Override
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
-        return GenericCholesky.solve(cholesky, b, (Field<E>) ring);
+        return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing());
     }
 
     @Override
@@ -145,8 +144,9 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     public E determinant(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         LUResult<E> lu = lu(a);
-        E det = ((Field<E>)ring).one();
-        for (int i = 0; i < a.rows(); i++) det = ((Field<E>)ring).multiply(det, lu.U().get(i, i));
+        Ring<E> r = a.getScalarRing();
+        E det = ((Field<E>)r).one();
+        for (int i = 0; i < a.rows(); i++) det = ((Field<E>)r).multiply(det, lu.U().get(i, i));
         return det;
     }
 
@@ -154,7 +154,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     public Matrix<E> inverse(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = a.rows();
-        Field<E> f = (Field<E>) ring;
+        Field<E> f = (Field<E>) a.getScalarRing();
         @SuppressWarnings("unchecked")
         E[] invData = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), n * n);
         LUResult<E> lu = lu(a);
@@ -190,26 +190,39 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     public Object createBackend() { return this; }
 
     @Override
+    public Vector<E> add(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        Ring<E> r = a.getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(a.dimension(), r.zero());
+        // Simple dense iteration over possibly sparse inputs - SparseVectorStorage handles efficiency
+        for (int i = 0; i < a.dimension(); i++) {
+            E val = r.add(a.get(i), b.get(i));
+            if (!val.equals(r.zero())) storage.set(i, val);
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
+    }
+
+    @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         return addSparse(ensureSparse(a, r), ensureSparse(b, r));
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         return addSparse(ensureSparse(a, r), negateSparse(ensureSparse(b, r)));
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         return multiplySparse(ensureSparse(a, r), ensureSparse(b, r));
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         SparseMatrix<E> s = ensureSparse(a, r);
         int rows = s.rows(); int cols = s.cols();
         List<TreeMap<Integer, E>> rowMaps = new ArrayList<>();
@@ -228,7 +241,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         if (scalar.equals(r.zero())) return new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(a.rows(), a.cols(), r.zero()), r);
         SparseMatrix<E> s = ensureSparse(a, r);
         int[] rowPtrs = s.getRowPointers();
@@ -242,7 +255,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @SuppressWarnings("unchecked")
     private SparseMatrix<E> addSparse(SparseMatrix<E> a, SparseMatrix<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         int rows = a.rows(); int cols = a.cols();
         List<TreeMap<Integer, E>> rowMaps = new ArrayList<>();
         for (int i = 0; i < rows; i++) rowMaps.add(new TreeMap<>());
@@ -262,7 +275,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         int dim = a.dimension();
         org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, r.zero());
         for (int i = 0; i < dim; i++) {
@@ -274,7 +287,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        Ring<E> r = (this.ring != null) ? this.ring : vector.getScalarRing();
+        Ring<E> r = vector.getScalarRing();
         int dim = vector.dimension();
         org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(dim, r.zero());
         for (int i = 0; i < dim; i++) {
@@ -286,24 +299,46 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     public E dot(Vector<E> a, Vector<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         E sum = r.zero();
-        for (int i = 0; i < a.dimension(); i++) sum = r.add(sum, r.multiply(a.get(i), b.get(i)));
+        for (int i = 0; i < a.dimension(); i++) {
+            sum = r.add(sum, r.multiply(conjugate(a.get(i)), b.get(i)));
+        }
         return sum;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
         E d = dot(a, a);
-        if (r instanceof org.episteme.core.mathematics.sets.Reals) return (E) ((Real) d).sqrt();
-        throw new UnsupportedOperationException("Norm requires sqrt support");
+        return sqrt(d, (Field<E>) a.getScalarRing());
+    }
+
+    @SuppressWarnings("unchecked")
+    private E conjugate(E element) {
+        if (element instanceof Complex) {
+            return (E) ((Complex) element).conjugate();
+        }
+        return element;
+    }
+
+    @SuppressWarnings("unchecked")
+    private E sqrt(E element, Field<E> f) {
+        if (element instanceof Real) {
+            return (E) ((Real) element).sqrt();
+        }
+        if (element instanceof Complex) {
+            return (E) ((Complex) element).sqrt();
+        }
+        try {
+            java.lang.reflect.Method m = element.getClass().getMethod("sqrt");
+            return (E) m.invoke(element);
+        } catch (Exception e) {}
+        return element;
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         int rows = a.rows();
         org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage = new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(rows, r.zero());
         for (int i = 0; i<rows; i++) {
@@ -315,7 +350,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     }
 
     private SparseMatrix<E> multiplySparse(SparseMatrix<E> a, SparseMatrix<E> b) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         int rows = a.rows(); int cols = b.cols();
         List<TreeMap<Integer, E>> rowMaps = new ArrayList<>();
         for (int i = 0; i < rows; i++) rowMaps.add(new TreeMap<>());
@@ -339,7 +374,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     }
 
     private SparseMatrix<E> negateSparse(SparseMatrix<E> a) {
-        Ring<E> r = (this.ring != null) ? this.ring : a.getScalarRing();
+        Ring<E> r = a.getScalarRing();
         return (SparseMatrix<E>) scale(r.negate(r.one()), a);
     }
 
@@ -363,22 +398,29 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return bicgstab(a, b, org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), ring), (E) Real.of(1e-12), 1000);
+        Field<E> f = (Field<E>) a.getScalarRing();
+        E tol;
+        if (f.one() instanceof Real) tol = (E) Real.of(1e-12);
+        else if (f.one() instanceof Complex) tol = (E) Complex.of(1e-12, 0);
+        else if (f.one() instanceof org.episteme.core.mathematics.numbers.real.RealBig) tol = (E) org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal("1e-12"));
+        else tol = f.zero(); // Fallback
+
+        return bicgstab(a, b, org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), f), tol, 1000);
     }
 
     @Override
     public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        return GenericSparseSolvers.bicgstab(this, a, b, x0, tolerance, maxIterations, (Field<E>) ring);
+        return GenericSparseSolvers.bicgstab(this, a, b, x0, tolerance, maxIterations, (Field<E>) a.getScalarRing());
     }
 
     @Override
     public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        return GenericSparseSolvers.conjugateGradient(this, a, b, x0, tolerance, maxIterations, (Field<E>) ring);
+        return GenericSparseSolvers.conjugateGradient(this, a, b, x0, tolerance, maxIterations, (Field<E>) b.getScalarRing());
     }
 
     @Override
     public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
-        return GenericSparseSolvers.gmres(this, a, b, x0, tolerance, maxIterations, restarts, (Field<E>) ring);
+        return GenericSparseSolvers.gmres(this, a, b, x0, tolerance, maxIterations, restarts, (Field<E>) b.getScalarRing());
     }
 
 

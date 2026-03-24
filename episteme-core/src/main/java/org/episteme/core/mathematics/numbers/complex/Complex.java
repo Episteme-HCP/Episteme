@@ -121,6 +121,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
     }
 
     public Complex zero() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return new Complex(org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO), 
+                               org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO));
+        }
         return ZERO;
     }
 
@@ -154,6 +158,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
     }
 
     public Complex one() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return new Complex(org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ONE), 
+                               org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO));
+        }
         return ONE;
     }
 

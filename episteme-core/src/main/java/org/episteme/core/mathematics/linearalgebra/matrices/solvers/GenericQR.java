@@ -17,6 +17,10 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 public class GenericQR {
 
     public static <E> QRResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+        return decompose(matrix, field, null);
+    }
+
+    public static <E> QRResult<E> decompose(Matrix<E> matrix, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int m = matrix.rows();
         int n = matrix.cols();
         
@@ -39,20 +43,31 @@ public class GenericQR {
             
             E norm = norm(v, field);
             rData[j][j] = norm;
-            if (absValue(norm, field) > 1e-20) {
+            if (absValue(norm, field) > 1e-25) {
                 for (int i = 0; i < m; i++) qData[i][j] = field.divide(v[i], norm);
             } else {
                 for (int i = 0; i < m; i++) qData[i][j] = field.zero();
             }
         }
         
-        return new QRResult<>(
-            new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(qData, field),
-            new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(rData, field)
-        );
+        @SuppressWarnings("unchecked")
+        E[] qFlat = (E[]) new Object[m * n];
+        @SuppressWarnings("unchecked")
+        E[] rFlat = (E[]) new Object[n * n];
+        for (int i = 0; i < m; i++) for (int k = 0; k < n; k++) qFlat[i * n + k] = qData[i][k];
+        for (int i = 0; i < n; i++) for (int k = 0; k < n; k++) rFlat[i * n + k] = rData[i][k];
+        
+        Matrix<E> qMat = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(m, n, qFlat), provider, field);
+        Matrix<E> rMat = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(n, n, rFlat), provider, field);
+
+        return new QRResult<>(qMat, rMat);
     }
 
     public static <E> Vector<E> solve(QRResult<E> qr, Vector<E> b, Field<E> field) {
+        return solve(qr, b, field, null);
+    }
+
+    public static <E> Vector<E> solve(QRResult<E> qr, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         Matrix<E> q = qr.Q();
         Matrix<E> r = qr.R();
         int n = r.cols();
@@ -74,7 +89,7 @@ public class GenericQR {
             x[i] = field.divide(field.subtract(qtB[i], sum), r.get(i, i));
         }
         
-        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(x)), provider, field);
     }
 
     private static double absValue(Object element, Field<?> field) {
@@ -96,6 +111,9 @@ public class GenericQR {
         for (E e : v) dot = field.add(dot, field.multiply(conjugate(e, field), e));
         if (dot instanceof Real) return (E) ((Real) dot).sqrt();
         if (dot instanceof Complex) return (E) ((Complex) dot).sqrt();
+        try {
+            return (E) dot.getClass().getMethod("sqrt").invoke(dot);
+        } catch (Exception e) {}
         return dot; // Fallback
     }
 }

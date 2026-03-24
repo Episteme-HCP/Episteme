@@ -31,9 +31,10 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         // Force standard multiply (O(n^3)) via static utility
-        return CPUDenseLinearAlgebraProvider.standardMultiply(a, b, field, this);
+        return CPUDenseLinearAlgebraProvider.standardMultiply(a, b, (org.episteme.core.mathematics.structures.rings.Field<E>) a.getScalarRing(), this);
     }
     
     @Override

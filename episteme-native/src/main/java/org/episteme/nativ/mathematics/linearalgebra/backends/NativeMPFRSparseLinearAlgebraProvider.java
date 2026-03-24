@@ -19,6 +19,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.GenericSparseSolvers;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.OperationContext.Hint;
@@ -715,7 +716,40 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
     }
 
     private void dotProduct(MemorySegment v1, MemorySegment v2, int n, MemorySegment result, long prec, Arena arena, boolean isComplex) throws Throwable {
-        if (isComplex) throw new UnsupportedOperationException("Complex dot product not yet implemented in Sparse MPFR");
+        if (isComplex) {
+            MemorySegment sumR = result.asSlice(0, MPFR_LAYOUT.byteSize());
+            MemorySegment sumI = result.asSlice(MPFR_LAYOUT.byteSize(), MPFR_LAYOUT.byteSize());
+            NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, sumI, arena.allocateFrom("0"), 10, 0);
+
+            MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, t1, prec);
+            MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, t2, prec);
+
+            for (int i = 0; i < n; i++) {
+                MemorySegment aR = getMPFR(v1, i, 0, true);
+                MemorySegment aI = getMPFR(v1, i, 1, true);
+                MemorySegment bR = getMPFR(v2, i, 0, true);
+                MemorySegment bI = getMPFR(v2, i, 1, true);
+
+                // Real part: aR*bR + aI*bI (since conjugate(a) = aR - i*aI, (aR - i*aI)*(bR + i*bI) = (aR*bR + aI*bI) + i(aR*bI - aI*bR))
+                NativeSafe.invoke(MPFR_MUL, t1, aR, bR, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, aI, bI, 0);
+                NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
+
+                // Imag part: aR*bI - aI*bR
+                NativeSafe.invoke(MPFR_MUL, t1, aR, bI, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, aI, bR, 0);
+                NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                NativeSafe.invoke(MPFR_ADD, sumI, sumI, t1, 0);
+            }
+            NativeSafe.invoke(MPFR_CLEAR, t1);
+            NativeSafe.invoke(MPFR_CLEAR, t2);
+            return;
+        }
+        
         NativeSafe.invoke(MPFR_SET_STR, result, arena.allocateFrom("0"), 10, 0);
         MemorySegment term = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, term, prec);
@@ -784,10 +818,21 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment v1 = initVector(a.toMatrix(), arena, prec, isComplex);
             MemorySegment v2 = initVector(b.toMatrix(), arena, prec, isComplex);
-            MemorySegment res = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, res, prec);
+            
+            int resSize = isComplex ? 2 : 1;
+            MemorySegment res = arena.allocate(MPFR_LAYOUT, resSize);
+            for (int i=0; i<resSize; i++) NativeSafe.invoke(MPFR_INIT2, res.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            
             dotProduct(v1, v2, a.dimension(), res, prec, arena, isComplex);
-            return (E) (Object) readMPFR(res, arena.allocate(ValueLayout.JAVA_LONG), arena);
+            
+            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            if (isComplex) {
+                Real r = readMPFR(res.asSlice(0, MPFR_LAYOUT.byteSize()), expPtr, arena);
+                Real im = readMPFR(res.asSlice(MPFR_LAYOUT.byteSize(), MPFR_LAYOUT.byteSize()), expPtr, arena);
+                return (E) (Object) Complex.of(r, im);
+            } else {
+                return (E) (Object) readMPFR(res, expPtr, arena);
+            }
         } catch (Throwable t) {
             throw new RuntimeException("Sparse MPFR dot failed", t);
         }

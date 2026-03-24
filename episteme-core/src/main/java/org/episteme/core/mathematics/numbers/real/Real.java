@@ -522,11 +522,17 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     @Override
     public Real zero() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return RealBig.create(java.math.BigDecimal.ZERO);
+        }
         return zeroE();
     }
 
     @Override
     public Real one() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return RealBig.create(java.math.BigDecimal.ONE);
+        }
         return oneE();
     }
 

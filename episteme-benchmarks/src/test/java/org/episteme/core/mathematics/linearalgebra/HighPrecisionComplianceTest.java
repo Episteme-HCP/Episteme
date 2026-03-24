@@ -232,13 +232,15 @@ public class HighPrecisionComplianceTest {
         });
 
         testOp(res, "RB:Exp", provider, () -> {
-            Real exp = val.exp();
-            assertNotNull(exp);
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.exp(a);
+            assertNoFallback(provider, c);
         });
 
         testOp(res, "RB:Sin", provider, () -> {
-            Real sin = val.sin();
-            assertNotNull(sin);
+            Matrix<RealBig> a = createRealBigMatrix(val, 1);
+            Matrix<RealBig> c = provider.sin(a);
+            assertNoFallback(provider, c);
         });
     }
 
@@ -461,8 +463,7 @@ public class HighPrecisionComplianceTest {
                 data[i][j] = RealBig.create(new BigDecimal(String.valueOf((i + 1) * 0.1 + (j + 1) * 0.01)).add(val.bigDecimalValue()));
             }
         }
-        @SuppressWarnings("unchecked")
-        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        Ring<RealBig> ring = (Ring<RealBig>) (Object) val.getScalarRing();
         return Matrix.of(data, ring);
     }
 
@@ -478,8 +479,7 @@ public class HighPrecisionComplianceTest {
                 }
             }
         }
-        @SuppressWarnings("unchecked")
-        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        Ring<RealBig> ring = (Ring<RealBig>) (Object) data[0][0].getScalarRing();
         return Matrix.of(data, ring);
     }
 
@@ -496,8 +496,7 @@ public class HighPrecisionComplianceTest {
                 data[i][j] = RealBig.create(new BigDecimal(String.valueOf(sum)));
             }
         }
-        @SuppressWarnings("unchecked")
-        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        Ring<RealBig> ring = (Ring<RealBig>) (Object) data[0][0].getScalarRing();
         return Matrix.of(data, ring);
     }
 
@@ -506,8 +505,7 @@ public class HighPrecisionComplianceTest {
         for (int i = 0; i < n; i++) {
             data[i] = RealBig.create(new BigDecimal(String.valueOf((i + 1) * 0.5)).add(val.bigDecimalValue()));
         }
-        @SuppressWarnings("unchecked")
-        Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+        Ring<RealBig> ring = (Ring<RealBig>) (Object) val.getScalarRing();
         return Vector.of(data, ring);
     }
 

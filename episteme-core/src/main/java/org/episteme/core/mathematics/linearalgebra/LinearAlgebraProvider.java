@@ -106,6 +106,12 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
     default Matrix<E> scale(E scalar, Matrix<E> a) {
         throw new UnsupportedOperationException(getName() + " does not support scale()");
     }
+    default Matrix<E> exp(Matrix<E> a) {
+        throw new UnsupportedOperationException(getName() + " does not support exp()");
+    }
+    default Matrix<E> sin(Matrix<E> a) {
+        throw new UnsupportedOperationException(getName() + " does not support sin()");
+    }
 
     /**
      * Computes the QR decomposition of the specified matrix.

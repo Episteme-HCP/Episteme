@@ -57,6 +57,8 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
     private static MethodHandle MPFR_ZERO_P;
     private static MethodHandle MPFR_NEG;
     private static MethodHandle MPFR_SET_D;
+    private static MethodHandle MPFR_EXP;
+    private static MethodHandle MPFR_SIN;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -88,6 +90,8 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
                 MPFR_ZERO_P = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 MPFR_NEG = lookup(mpfr, "mpfr_neg", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT));
+                MPFR_EXP = lookup(mpfr, "mpfr_exp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_SIN = lookup(mpfr, "mpfr_sin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null && MPFR_MUL != null && MPFR_CMP_ABS != null && MPFR_SUB != null && MPFR_SET != null && MPFR_DIV != null && MPFR_SET_UI != null && MPFR_SET_D != null;
                 if (AVAILABLE) {
@@ -157,8 +161,46 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
 
     @Override public void shutdown() {}
 
-    public java.util.Set<String> getCapabilities() {
-        return java.util.Set.of("Transpose", "Add", "Subtract", "Scale", "Multiply", "Solve", "Dot", "Norm", "LU");
+    @Override
+    public java.util.Map<String, String> getMetadata() {
+        return java.util.Map.of(
+            "environment", getEnvironmentInfo(),
+            "precision", "full (MPFR)",
+            "capabilities", "Transpose,Add,Subtract,Scale,Multiply,Inverse,Determinant,Solve,Dot,Norm,LU,QR,Cholesky,SVD,Eigen,Exp,Sin"
+        );
+    }
+
+    @Override
+    public Matrix<E> exp(Matrix<E> a) {
+        return transcendentalOp(a, MPFR_EXP);
+    }
+
+    @Override
+    public Matrix<E> sin(Matrix<E> a) {
+        return transcendentalOp(a, MPFR_SIN);
+    }
+
+    private Matrix<E> transcendentalOp(Matrix<E> a, MethodHandle handle) {
+        int m = a.rows();
+        int n = a.cols();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (isComplex) throw new UnsupportedOperationException("Transcendental ops on Complex matrices not yet implemented in MPFR backend");
+        long prec = getPrecision();
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_A = initMatrix(a, arena, prec, false);
+            MemorySegment h_C = allocateMatrix(m, n, arena, prec, false);
+            for (int i = 0; i < m * n; i++) {
+                MemorySegment ra = h_A.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment rc = h_C.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                NativeSafe.invoke(handle, rc, ra, 0);
+            }
+            Matrix<E> res = backToMatrix_internal(h_C, m, n, arena, a.getScalarRing(), false);
+            clearMPFRArray(h_A, m * n);
+            clearMPFRArray(h_C, m * n);
+            return res;
+        } catch (Throwable t) {
+            throw new RuntimeException("MPFR transcendental op failed", t);
+        }
     }
 
     @Override
@@ -452,7 +494,7 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
                 list.add((E) (Object) readMPFR(getMPFRVector(vec, i, 0, false), expPtr, arena));
             }
         }
-        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(list, ring);
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(list), (LinearAlgebraProvider<E>) this, ring);
     }
 
     @Override
