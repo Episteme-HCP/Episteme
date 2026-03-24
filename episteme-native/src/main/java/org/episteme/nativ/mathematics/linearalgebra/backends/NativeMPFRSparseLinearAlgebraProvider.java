@@ -48,7 +48,6 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
     private static MethodHandle MPFR_SET_STR;
     private static MethodHandle MPFR_GET_STR;
     private static MethodHandle MPFR_ADD;
-    @SuppressWarnings("unused")
     private static MethodHandle MPFR_SUB;
     private static MethodHandle MPFR_MUL;
     private static MethodHandle MPFR_DIV;

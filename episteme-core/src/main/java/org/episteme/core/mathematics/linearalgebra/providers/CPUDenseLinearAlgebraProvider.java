@@ -395,7 +395,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"preview", "restricted"})
+    @SuppressWarnings("restricted")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (a.cols() != b.rows()) {
             throw new IllegalArgumentException("Matrix inner dimensions must match");
@@ -851,7 +851,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public E determinant(Matrix<E> a) {
         if (a.rows() != a.cols())
             throw new ArithmeticException("Must be square");

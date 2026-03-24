@@ -32,6 +32,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.nio.DoubleBuffer;
+import java.nio.ByteBuffer;
 
 /**
  * Local implementation of DistributedContext using ForkJoinPool.
@@ -128,7 +129,7 @@ public class LocalDistributedContext implements DistributedContext {
         }
     }
 
-    private final java.util.concurrent.ConcurrentHashMap<Long, DoubleBuffer> localMemory = new java.util.concurrent.ConcurrentHashMap<>();
+    private final java.util.concurrent.ConcurrentHashMap<Long, Object> localMemory = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Override
     public void put(DoubleBuffer source, int targetRank, long offset) {
@@ -147,8 +148,9 @@ public class LocalDistributedContext implements DistributedContext {
 
     @Override
     public void get(DoubleBuffer target, int sourceRank, long offset) {
-        DoubleBuffer source = localMemory.get(offset);
-        if (source != null) {
+        Object sourceObj = localMemory.get(offset);
+        if (sourceObj instanceof DoubleBuffer) {
+            DoubleBuffer source = (DoubleBuffer) sourceObj;
             int pos = source.position();
             target.put(source);
             source.position(pos); // Restore original position
@@ -158,6 +160,31 @@ public class LocalDistributedContext implements DistributedContext {
             for (int i = 0; i < remaining; i++) {
                 target.put(0.0);
             }
+        }
+    }
+
+    @Override
+    public void put(ByteBuffer source, int targetRank, long offset) {
+        if (source == null) return;
+        ByteBuffer copy = ByteBuffer.allocate(source.remaining());
+        int pos = source.position();
+        try {
+            copy.put(source);
+            copy.flip();
+            localMemory.put(offset, copy);
+        } finally {
+            source.position(pos);
+        }
+    }
+
+    @Override
+    public void get(ByteBuffer target, int sourceRank, long offset) {
+        Object sourceObj = localMemory.get(offset);
+        if (sourceObj instanceof ByteBuffer) {
+            ByteBuffer source = (ByteBuffer) sourceObj;
+            int pos = source.position();
+            target.put(source);
+            source.position(pos);
         }
     }
 
@@ -173,6 +200,11 @@ public class LocalDistributedContext implements DistributedContext {
     @Override
     public void broadcast(DoubleBuffer buffer, int root) {
         // In a local context (single node), broadcast is a no-op as the data is already present.
+    }
+
+    @Override
+    public void broadcast(ByteBuffer buffer, int root) {
+        // Local no-op
     }
 
     @Override
@@ -192,6 +224,16 @@ public class LocalDistributedContext implements DistributedContext {
         // Restore positions (optional, but good practice for "simulating" independent buffers)
         // However, for typical AllGather usage, recvBuffer is expected to be filled.
         // We leave recvBuffer at its new position.
+        sendBuffer.position(sendPos);
+    }
+
+    @Override
+    public void allGather(ByteBuffer sendBuffer, ByteBuffer recvBuffer) {
+        if (recvBuffer.remaining() < sendBuffer.remaining()) {
+            throw new IllegalArgumentException("Receive buffer too small for local AllGather");
+        }
+        int sendPos = sendBuffer.position();
+        recvBuffer.put(sendBuffer);
         sendBuffer.position(sendPos);
     }
 

@@ -71,10 +71,35 @@ public class DistributedMatrixMultiply {
     }
 
     private static <E> Matrix<E> assemble(Matrix<E>[][] tiles, int rows, int cols, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
-        // Implementation to merge tiles back into a single matrix if needed
-        // For now, return a new GenericMatrix or similar
-        // Ideally, we'd have a TiledMatrix that can be used directly for further operations
-        // TODO: Implement actual assembly logic
-        return null; 
+        if (tiles == null || tiles.length == 0 || tiles[0].length == 0) {
+            return Matrix.zeros(rows, cols, ring);
+        }
+
+        int tileRows = tiles[0][0].rows();
+        int tileCols = tiles[0][0].cols();
+        
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, ring.zero());
+        
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[i].length; j++) {
+                Matrix<E> tile = tiles[i][j];
+                if (tile == null) continue;
+                
+                int rOffset = i * tileRows;
+                int cOffset = j * tileCols;
+                
+                for (int r = 0; r < tile.rows(); r++) {
+                    for (int c = 0; c < tile.cols(); c++) {
+                        storage.set(rOffset + r, cOffset + c, tile.get(r, c));
+                    }
+                }
+            }
+        }
+        
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider = 
+            org.episteme.core.Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(ring);
+            
+        return new GenericMatrix<>(storage, provider, ring);
     }
 }

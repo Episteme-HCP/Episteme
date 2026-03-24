@@ -14,6 +14,9 @@ import java.util.concurrent.Future;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.DoubleBuffer;
+import java.nio.ByteBuffer;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * Distributed implementation of the SUMMA (Scalable Universal Matrix Multiplication Algorithm).
@@ -136,16 +139,9 @@ public class DistributedSUMMAAlgorithm {
         boolean isHP = rows > 0 && cols > 0 && tile.get(0, 0) instanceof org.episteme.core.mathematics.numbers.real.RealBig;
         
         if (isHP) {
-            // For High Precision, we serialize to strings or a custom format.
-            // Since DistributedContext.put only supports DoubleBuffer, we have a problem.
-            // We'll fallback to standard element-wise distribution if no ByteBuffer support.
-            // But let's assume the user wants accuracy first.
-            // We'll use the 'submit' mechanism to send the tile safely.
-            // Actually, SUMMA relies on RDMA (put/get) for speed.
-            // If we can't use RDMA for hp, we'll just log a warning and use the best possible double.
-            // TODO: Add ByteBuffer support to DistributedContext for full HP distribution.
-            org.slf4j.LoggerFactory.getLogger(DistributedSUMMAAlgorithm.class)
-                .warn("Precision loss: Broadcasting RealBig tile via DoubleBuffer in SUMMA");
+            // For High Precision, we serialize to ByteBuffer to preserve full accuracy.
+            serializeAndBroadcastHP(tile, row, col, ctx);
+            return;
         }
 
         DoubleBuffer buffer = DoubleBuffer.allocate(size);
@@ -168,5 +164,35 @@ public class DistributedSUMMAAlgorithm {
             ctx.put(buffer, rank, offset);
         }
         ctx.fence();
+    }
+
+    private static <E> void serializeAndBroadcastHP(Matrix<E> tile, int row, int col, DistributedContext ctx) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            
+            int rows = tile.rows();
+            int cols = tile.cols();
+            oos.writeInt(rows);
+            oos.writeInt(cols);
+            
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    oos.writeObject(tile.get(i, j));
+                }
+            }
+            oos.flush();
+            
+            ByteBuffer buffer = ByteBuffer.wrap(baos.toByteArray());
+            int parallelism = ctx.getParallelism();
+            for (int rank = 0; rank < parallelism; rank++) {
+                long offset = (row * 1000L + col) * buffer.capacity();
+                ctx.put(buffer, rank, offset);
+            }
+            ctx.fence();
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(DistributedSUMMAAlgorithm.class)
+                .error("Failed to broadcast HP tile", e);
+            throw new RuntimeException("HP Broadcast failed", e);
+        }
     }
 }

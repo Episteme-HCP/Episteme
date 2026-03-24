@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.nio.DoubleBuffer;
+import java.nio.ByteBuffer;
 
 /**
  * Defines the contract for distributed computing contexts.
@@ -112,6 +113,20 @@ public interface DistributedContext {
     }
 
     /**
+     * Initiates a one-sided data transfer to a remote node (RDMA Put) using ByteBuffer.
+     */
+    default void put(ByteBuffer source, int targetRank, long offset) {
+        throw new UnsupportedOperationException("RDMA Put (ByteBuffer) not supported by this context");
+    }
+
+    /**
+     * Initiates a one-sided data transfer from a remote node (RDMA Get) using ByteBuffer.
+     */
+    default void get(ByteBuffer target, int sourceRank, long offset) {
+        throw new UnsupportedOperationException("RDMA Get (ByteBuffer) not supported by this context");
+    }
+
+    /**
      * Synchronizes RDMA operations.
      */
     default void fence() {
@@ -137,6 +152,20 @@ public interface DistributedContext {
      */
     default void allGather(DoubleBuffer sendBuffer, DoubleBuffer recvBuffer) {
         throw new UnsupportedOperationException("AllGather not supported by this context");
+    }
+
+    /**
+     * Broadcasts data from a root node using ByteBuffer.
+     */
+    default void broadcast(ByteBuffer buffer, int root) {
+        throw new UnsupportedOperationException("Broadcast (ByteBuffer) not supported by this context");
+    }
+
+    /**
+     * Gathers data from all tasks using ByteBuffer.
+     */
+    default void allGather(ByteBuffer sendBuffer, ByteBuffer recvBuffer) {
+        throw new UnsupportedOperationException("AllGather (ByteBuffer) not supported by this context");
     }
 
     /**

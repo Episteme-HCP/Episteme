@@ -35,8 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public @SuppressWarnings("unused")
-final class RealBig extends Real {
+public final class RealBig extends Real {
     private static final Logger logger = LoggerFactory.getLogger(RealBig.class);
 
     private final BigDecimal value;
