@@ -71,11 +71,16 @@ public class GenericLU {
             }
         }
 
-        double[] pDouble = new double[n];
-        for (int i = 0; i < n; i++) pDouble[i] = perm[i];
-        
         @SuppressWarnings("unchecked")
-        Vector<E> pVec = (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble);
+        E[] pData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        for (int i = 0; i < n; i++) {
+            // Safe cast assuming the field can handle Real or is a field of Reals/Complex
+            pData[i] = (E) (Object) Real.of(perm[i]);
+            if (field.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+                pData[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(perm[i]));
+            }
+        }
+        Vector<E> pVec = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(pData), field);
         
         return new LUResult<>(
             new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(lData, field),
