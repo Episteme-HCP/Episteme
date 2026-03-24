@@ -17,7 +17,9 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.GenericSparseSolvers;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.OperationContext.Hint;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
@@ -104,7 +106,7 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
     }
 
     public java.util.Set<String> getCapabilities() {
-        return java.util.Set.of("Transpose", "Multiply");
+        return java.util.Set.of("Transpose", "Multiply", "Add", "Subtract", "Dot", "Norm", "ConjugateGradient", "BiCGSTAB", "GMRES");
     }
 
     @Override
@@ -733,6 +735,91 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
     }
 
     @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        if (a.rows() != b.rows() || a.cols() != b.cols()) throw new IllegalArgumentException("Dimension mismatch");
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sb = toSparse(b);
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(sa.rows(), sa.cols(), (E) sa.getScalarRing().zero());
+        
+        // Simple merge addition for now
+        java.util.Set<Integer> rows = new java.util.HashSet<>();
+        for (int i=0; i<sa.rows(); i++) rows.add(i);
+        for (int i=0; i<sb.rows(); i++) rows.add(i);
+
+        for (int i : rows) {
+            java.util.Map<Integer, E> rowMap = new java.util.HashMap<>();
+            int[] rpa = sa.getRowPointers();
+            int[] cia = sa.getColIndices();
+            Object[] va = sa.getValues();
+            for (int k=rpa[i]; k < rpa[i+1]; k++) rowMap.put(cia[k], (E) va[k]);
+
+            int[] rpb = sb.getRowPointers();
+            int[] cib = sb.getColIndices();
+            Object[] vb = sb.getValues();
+            org.episteme.core.mathematics.structures.rings.Ring<E> ring = (org.episteme.core.mathematics.structures.rings.Ring<E>) sa.getScalarRing();
+            for (int k=rpb[i]; k < rpb[i+1]; k++) {
+                rowMap.merge(cib[k], (E) vb[k], (v1, v2) -> ring.add(v1, v2));
+            }
+            for (java.util.Map.Entry<Integer, E> entry : rowMap.entrySet()) {
+                if (!entry.getValue().equals(ring.zero())) {
+                    storage.set(i, entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, sa.getScalarRing());
+    }
+
+    @Override
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        org.episteme.core.mathematics.structures.rings.Ring<E> ring = (org.episteme.core.mathematics.structures.rings.Ring<E>) a.getScalarRing();
+        return add(a, scale(ring.negate(ring.one()), b));
+    }
+
+    @Override
+    public E dot(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        long prec = getPrecision();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment v1 = initVector(a.toMatrix(), arena, prec, isComplex);
+            MemorySegment v2 = initVector(b.toMatrix(), arena, prec, isComplex);
+            MemorySegment res = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, res, prec);
+            dotProduct(v1, v2, a.dimension(), res, prec, arena, isComplex);
+            return (E) (Object) readMPFR(res, arena.allocate(ValueLayout.JAVA_LONG), arena);
+        } catch (Throwable t) {
+            throw new RuntimeException("Sparse MPFR dot failed", t);
+        }
+    }
+
+    @Override
+    public E norm(Vector<E> a) {
+        long prec = getPrecision();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment v1 = initVector(a.toMatrix(), arena, prec, isComplex);
+            MemorySegment res = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, res, prec);
+            dotProduct(v1, v1, a.dimension(), res, prec, arena, isComplex); // sum squares
+            NativeSafe.invoke(MPFR_SQRT, res, res, 0);
+            return (E) (Object) readMPFR(res, arena.allocate(ValueLayout.JAVA_LONG), arena);
+        } catch (Throwable t) {
+            throw new RuntimeException("Sparse MPFR norm failed", t);
+        }
+    }
+
+    @Override
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        return GenericSparseSolvers.bicgstab(this, a, b, x0, tolerance, maxIterations, (Field<E>) a.getScalarRing());
+    }
+
+    @Override
+    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
+        return GenericSparseSolvers.gmres(this, a, b, x0, tolerance, maxIterations, restarts, (Field<E>) a.getScalarRing());
+    }
+
+    @Override
     public Matrix<E> transpose(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": MPFR Sparse transpose not available");
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
@@ -751,6 +838,6 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
                 newStorage.set(colIdx[k], i, (E) values[k]);
             }
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(newStorage, sa.getScalarRing());
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(newStorage, (org.episteme.core.mathematics.structures.rings.Ring<E>) sa.getScalarRing());
     }
 }

@@ -565,6 +565,14 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         return false;
     }
 
+    /**
+     * Returns the ring structure for real numbers.
+     * @return this instance (as it implements Field<Real>)
+     */
+    public org.episteme.core.mathematics.structures.rings.Ring<Real> getScalarRing() {
+        return this;
+    }
+
 }
 
 

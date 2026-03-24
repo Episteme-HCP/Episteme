@@ -1,0 +1,78 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+package org.episteme.core.mathematics.linearalgebra.matrices.solvers;
+
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.structures.rings.Field;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
+
+/**
+ * Generic Cholesky Decomposition.
+ */
+public class GenericCholesky {
+
+    public static <E> CholeskyResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+        int n = matrix.rows();
+        if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
+
+        @SuppressWarnings("unchecked")
+        E[][] lData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+        for (int i = 0; i < n; i++) java.util.Arrays.fill(lData[i], field.zero());
+
+        for (int j = 0; j < n; j++) {
+            E sum = field.zero();
+            for (int k = 0; k < j; k++) sum = field.add(sum, field.multiply(lData[j][k], conjugate(lData[j][k], field)));
+            E val = field.subtract(matrix.get(j, j), sum);
+            lData[j][j] = sqrt(val, field);
+
+            for (int i = j + 1; i < n; i++) {
+                sum = field.zero();
+                for (int k = 0; k < j; k++) sum = field.add(sum, field.multiply(lData[i][k], conjugate(lData[j][k], field)));
+                lData[i][j] = field.divide(field.subtract(matrix.get(i, j), sum), lData[j][j]);
+            }
+        }
+
+        return new CholeskyResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(lData, field));
+    }
+
+    public static <E> Vector<E> solve(CholeskyResult<E> c, Vector<E> b, Field<E> field) {
+        Matrix<E> l = c.L();
+        int n = l.rows();
+        
+        @SuppressWarnings("unchecked")
+        E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        for (int i = 0; i < n; i++) {
+            E sum = field.zero();
+            for (int j = 0; j < i; j++) sum = field.add(sum, field.multiply(l.get(i, j), y[j]));
+            y[i] = field.divide(field.subtract(b.get(i), sum), l.get(i, i));
+        }
+
+        @SuppressWarnings("unchecked")
+        E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        for (int i = n - 1; i >= 0; i--) {
+            E sum = field.zero();
+            for (int j = i + 1; j < n; j++) sum = field.add(sum, field.multiply(conjugate(l.get(j, i), field), x[j]));
+            x[i] = field.divide(field.subtract(y[i], sum), conjugate(l.get(i, i), field));
+        }
+
+        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E conjugate(E element, Field<E> field) {
+        if (element instanceof Complex) return (E) ((Complex) element).conjugate();
+        return element;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E sqrt(E element, Field<E> field) {
+        if (element instanceof Real) return (E) ((Real) element).sqrt();
+        if (element instanceof Complex) return (E) ((Complex) element).sqrt();
+        return element;
+    }
+}

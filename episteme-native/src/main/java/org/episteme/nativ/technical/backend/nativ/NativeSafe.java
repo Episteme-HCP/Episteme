@@ -47,6 +47,14 @@ public class NativeSafe {
 
         try {
             return handle.invokeWithArguments(args);
+        } catch (java.lang.invoke.WrongMethodTypeException wmte) {
+            // Try to be more explicit if it's a type mismatch
+            logger.warn("Native Invoke: Type mismatch for {}, attempting spreader fallback. Error: {}", handle, wmte.getMessage());
+            try {
+                return handle.asSpreader(Object[].class, args.length).invoke(args);
+            } catch (Throwable t2) {
+                throw new RuntimeException("Native boundary protection (spreader fallback failed): " + t2.getMessage(), t2);
+            }
         } catch (Throwable t) {
             logger.error("CRITICAL: Native call failed! Handle: {}", handle);
             for (int i = 0; i < args.length; i++) {

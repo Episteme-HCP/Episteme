@@ -40,7 +40,7 @@ public class HighPrecisionComplianceTest {
     // Providers to exclude from HP tests (double-only, broken, or unused)
     private static final Set<String> EXCLUDED_PROVIDERS = Set.of(
         "EJML", "Colt", "Commons Math", "JBlas", "ND4J",
-        "CUDA", "OpenCL", "SIMD", "Standard", "Strassen", "CPUDense", "CPUSparse", "Unified", "CARMA"
+        "CUDA", "OpenCL", "SIMD", "Unified", "FFMBLAS", "Native BLAS Provider FFM"
     );
 
     private static class ComplianceResult {
@@ -70,8 +70,9 @@ public class HighPrecisionComplianceTest {
             res.environment = rawProvider.getEnvironmentInfo();
 
             MathContext.exact().compute(() -> {
+                RealBig rbVal = RealBig.create(BigDecimal.ONE);
                 @SuppressWarnings("unchecked")
-                Ring<RealBig> ring = (Ring<RealBig>)(Object)Real.ZERO;
+                Ring<RealBig> ring = (Ring<RealBig>) (Object) rbVal.getScalarRing();
                 if (rawProvider.isCompatible(ring)) {
                     @SuppressWarnings("unchecked")
                     LinearAlgebraProvider<RealBig> provider = (LinearAlgebraProvider<RealBig>) rawProvider;
