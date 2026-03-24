@@ -6,6 +6,7 @@
 package org.episteme.core.mathematics.linearalgebra.providers;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.algorithms.RealDoubleCARMAAlgorithm;
 import org.episteme.core.mathematics.linearalgebra.algorithms.RealCARMAAlgorithm;
@@ -52,10 +53,17 @@ public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider
                  p -> p != this && !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider)
                       && p.isCompatible(a.getScalarRing())
              );
-             return (Matrix<E>) (Matrix<?>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf);
+             return wrap((Matrix<E>) (Matrix<?>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf));
         }
 
-        return super.multiply(a, b);
+        return wrap(super.multiply(a, b));
+    }
+
+    private Matrix<E> wrap(Matrix<E> m) {
+        if (m instanceof GenericMatrix) {
+            return ((GenericMatrix<E>) m).withProvider(this);
+        }
+        return m;
     }
     
     @Override

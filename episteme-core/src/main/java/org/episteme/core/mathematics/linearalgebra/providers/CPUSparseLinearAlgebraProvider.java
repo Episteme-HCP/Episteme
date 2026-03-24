@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.complex.Complex;
@@ -68,12 +69,12 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     public LUResult<E> lu(Matrix<E> a) {
-        return GenericLU.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericLU.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
     public QRResult<E> qr(Matrix<E> a) {
-        return GenericQR.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericQR.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
@@ -141,6 +142,11 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     }
 
     @Override
+    public java.util.Map<String, String> getMetadata() {
+        return java.util.Map.of("capabilities", "Transpose,Add,Subtract,Scale,Multiply,Inverse,Determinant,Solve,Dot,Norm,LU,QR,Cholesky,SVD,Eigen,Exp,Sin,Cos,Tan,Log,Log10");
+    }
+
+    @Override
     public E determinant(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         LUResult<E> lu = lu(a);
@@ -199,25 +205,25 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             E val = r.add(a.get(i), b.get(i));
             if (!val.equals(r.zero())) storage.set(i, val);
         }
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
+        return wrap(new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r));
     }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
         Ring<E> r = a.getScalarRing();
-        return addSparse(ensureSparse(a, r), ensureSparse(b, r));
+        return wrap(addSparse(ensureSparse(a, r), ensureSparse(b, r)));
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
         Ring<E> r = a.getScalarRing();
-        return addSparse(ensureSparse(a, r), negateSparse(ensureSparse(b, r)));
+        return wrap(addSparse(ensureSparse(a, r), negateSparse(ensureSparse(b, r))));
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         Ring<E> r = a.getScalarRing();
-        return multiplySparse(ensureSparse(a, r), ensureSparse(b, r));
+        return wrap(multiplySparse(ensureSparse(a, r), ensureSparse(b, r)));
     }
 
     @Override
@@ -236,13 +242,13 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 rowMaps.get(colIdxs[m]).put(i, value);
             }
         }
-        return buildCSRFromMaps(rowMaps, cols, rows, r);
+        return wrap(buildCSRFromMaps(rowMaps, cols, rows, r));
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         Ring<E> r = a.getScalarRing();
-        if (scalar.equals(r.zero())) return new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(a.rows(), a.cols(), r.zero()), r);
+        if (scalar.equals(r.zero())) return wrap(new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(a.rows(), a.cols(), r.zero()), r));
         SparseMatrix<E> s = ensureSparse(a, r);
         int[] rowPtrs = s.getRowPointers();
         int[] colIdxs = s.getColIndices();
@@ -250,7 +256,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         int nnz = s.getNnz();
         Object[] scaledValues = new Object[nnz];
         for (int i = 0; i < nnz; i++) scaledValues[i] = r.multiply((E) values[i], scalar);
-        return new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(s.rows(), s.cols(), r.zero(), rowPtrs, colIdxs, scaledValues), r);
+        return wrap(new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(s.rows(), s.cols(), r.zero(), rowPtrs, colIdxs, scaledValues), r));
     }
 
     @SuppressWarnings("unchecked")
@@ -282,7 +288,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             E val = r.subtract(a.get(i), b.get(i));
             if (!val.equals(r.zero())) storage.set(i, val);
         }
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
+        return wrap(new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r));
     }
 
     @Override
@@ -294,7 +300,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             E val = r.multiply(vector.get(i), scalar);
             if (!val.equals(r.zero())) storage.set(i, val);
         }
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
+        return wrap(new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r));
     }
 
     @Override
@@ -346,7 +352,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
             for (int j=0; j<a.cols(); j++) sum = r.add(sum, r.multiply(a.get(i, j), b.get(j)));
             if (!sum.equals(r.zero())) storage.set(i, sum);
         }
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r);
+        return wrap(new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r));
     }
 
     private SparseMatrix<E> multiplySparse(SparseMatrix<E> a, SparseMatrix<E> b) {
@@ -420,8 +426,34 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
-        return GenericSparseSolvers.gmres(this, a, b, x0, tolerance, maxIterations, restarts, (Field<E>) b.getScalarRing());
+        return wrap(GenericSparseSolvers.gmres(this, a, b, x0, tolerance, maxIterations, restarts, (Field<E>) b.getScalarRing()));
     }
+
+    private Matrix<E> wrap(Matrix<E> m) {
+        if (m instanceof GenericMatrix) return ((GenericMatrix<E>) m).withProvider(this);
+        return m;
+    }
+
+    private Vector<E> wrap(Vector<E> v) {
+        if (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.GenericVector) return ((org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>) v).withProvider(this);
+        return v;
+    }
+
+    @Override public Matrix<E> exp(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.exp(a)); }
+    @Override public Matrix<E> log(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.log(a)); }
+    @Override public Matrix<E> log10(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.log10(a)); }
+    @Override public Matrix<E> sin(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.sin(a)); }
+    @Override public Matrix<E> cos(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.cos(a)); }
+    @Override public Matrix<E> tan(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.tan(a)); }
+    @Override public Matrix<E> asin(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.asin(a)); }
+    @Override public Matrix<E> acos(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.acos(a)); }
+    @Override public Matrix<E> atan(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.atan(a)); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.sinh(a)); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.cosh(a)); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.tanh(a)); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.sqrt(a)); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { return wrap(SparseLinearAlgebraProvider.super.cbrt(a)); }
+    @Override public Matrix<E> pow(Matrix<E> a, E exponent) { return wrap(SparseLinearAlgebraProvider.super.pow(a, exponent)); }
 
 
 }

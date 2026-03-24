@@ -53,6 +53,14 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     /**
+     * Returns this vector with a different provider.
+     */
+    public GenericVector<E> withProvider(LinearAlgebraProvider<E> provider) {
+        this.provider = provider;
+        return this;
+    }
+
+    /**
      * Creates a GenericVector with automatic storage selection.
      */
     public GenericVector(java.util.List<E> data, Ring<E> ring) {

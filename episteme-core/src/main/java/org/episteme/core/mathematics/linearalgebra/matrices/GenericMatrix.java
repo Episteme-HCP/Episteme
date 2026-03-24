@@ -87,6 +87,14 @@ public class GenericMatrix<E> implements Matrix<E> {
         this.ring = ring;
     }
 
+    /**
+     * Returns a new view of this matrix with a different provider.
+     */
+    public GenericMatrix<E> withProvider(LinearAlgebraProvider<E> provider) {
+        this.provider = provider;
+        return this;
+    }
+
     public void set(int row, int col, E value) {
         storage.set(row, col, value);
     }

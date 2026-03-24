@@ -78,17 +78,17 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
 
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        return getLocalProvider(a.getScalarRing()).add(a, b);
+        return wrap(getLocalProvider(a.getScalarRing()).add(a, b));
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        return getLocalProvider(a.getScalarRing()).subtract(a, b);
+        return wrap(getLocalProvider(a.getScalarRing()).subtract(a, b));
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        return getLocalProvider(vector.getScalarRing()).multiply(vector, scalar);
+        return wrap(getLocalProvider(vector.getScalarRing()).multiply(vector, scalar));
     }
 
     @Override
@@ -103,12 +103,12 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        return getLocalProvider(a.getScalarRing()).add(a, b);
+        return wrap(getLocalProvider(a.getScalarRing()).add(a, b));
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        return getLocalProvider(a.getScalarRing()).subtract(a, b);
+        return wrap(getLocalProvider(a.getScalarRing()).subtract(a, b));
     }
 
     @Override
@@ -127,61 +127,66 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             }
         }
         
-        return getLocalProvider(a.getScalarRing()).multiply(a, b);
+        return wrap(getLocalProvider(a.getScalarRing()).multiply(a, b));
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        return getLocalProvider(a.getScalarRing()).multiply(a, b);
+        return wrap(getLocalProvider(a.getScalarRing()).multiply(a, b));
     }
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).inverse(a);
+        return wrap(getLocalProvider(a.getScalarRing()).inverse(a));
     }
 
     @Override
     public LUResult<E> lu(Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).lu(a);
+        LUResult<E> res = getLocalProvider(a.getScalarRing()).lu(a);
+        return new LUResult<>(wrap(res.L()), wrap(res.U()), wrap(res.P()));
     }
 
     @Override
     public QRResult<E> qr(Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).qr(a);
+        QRResult<E> res = getLocalProvider(a.getScalarRing()).qr(a);
+        return new QRResult<>(wrap(res.Q()), wrap(res.R()));
     }
 
     @Override
     public SVDResult<E> svd(Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).svd(a);
+        SVDResult<E> res = getLocalProvider(a.getScalarRing()).svd(a);
+        return new SVDResult<>(wrap(res.U()), res.S(), wrap(res.V()));
     }
 
     @Override
     public CholeskyResult<E> cholesky(Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).cholesky(a);
+        CholeskyResult<E> res = getLocalProvider(a.getScalarRing()).cholesky(a);
+        return new CholeskyResult<>(wrap(res.L()));
     }
 
     @Override
     public EigenResult<E> eigen(Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).eigen(a);
+        EigenResult<E> res = getLocalProvider(a.getScalarRing()).eigen(a);
+        return new EigenResult<>(wrap(res.V()), res.D());
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return getLocalProvider(a.getScalarRing()).solve(a, b);
+        return wrap(getLocalProvider(a.getScalarRing()).solve(a, b));
     }
 
     @Override
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        return getLocalProvider(b.getScalarRing()).solve(lu, b); 
+        return wrap(getLocalProvider(b.getScalarRing()).solve(lu, b)); 
     }
 
     @Override
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
-        return getLocalProvider(b.getScalarRing()).solve(qr, b);
+        return wrap(getLocalProvider(b.getScalarRing()).solve(qr, b));
     }
 
     @Override
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
-        return getLocalProvider(b.getScalarRing()).solve(cholesky, b);
+        return wrap(getLocalProvider(b.getScalarRing()).solve(cholesky, b));
     }
 
     @Override
@@ -191,27 +196,37 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).transpose(a);
+        return wrap(getLocalProvider(a.getScalarRing()).transpose(a));
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        return getLocalProvider(a.getScalarRing()).scale(scalar, a);
+        return wrap(getLocalProvider(a.getScalarRing()).scale(scalar, a));
     }
 
     @Override
     public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        return getSparseLocalProvider(a.getScalarRing()).bicgstab(a, b, x0, tolerance, maxIterations);
+        return wrap(getSparseLocalProvider(a.getScalarRing()).bicgstab(a, b, x0, tolerance, maxIterations));
     }
 
     @Override
     public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        return getSparseLocalProvider(a.getScalarRing()).conjugateGradient(a, b, x0, tolerance, maxIterations);
+        return wrap(getSparseLocalProvider(a.getScalarRing()).conjugateGradient(a, b, x0, tolerance, maxIterations));
     }
 
     @Override
     public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
-        return getSparseLocalProvider(a.getScalarRing()).gmres(a, b, x0, tolerance, maxIterations, restarts);
+        return wrap(getSparseLocalProvider(a.getScalarRing()).gmres(a, b, x0, tolerance, maxIterations, restarts));
+    }
+
+    private Matrix<E> wrap(Matrix<E> m) {
+        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix) return ((org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>) m).withProvider(this);
+        return m;
+    }
+
+    private Vector<E> wrap(Vector<E> v) {
+        if (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.GenericVector) return ((org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>) v).withProvider(this);
+        return v;
     }
 
     @SuppressWarnings("unchecked")

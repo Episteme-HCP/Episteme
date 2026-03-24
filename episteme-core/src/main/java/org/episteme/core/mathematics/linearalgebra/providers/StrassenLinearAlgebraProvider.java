@@ -6,6 +6,7 @@
 package org.episteme.core.mathematics.linearalgebra.providers;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.algorithms.RealDoubleStrassenAlgorithm;
 import org.episteme.core.mathematics.linearalgebra.algorithms.RealStrassenAlgorithm;
@@ -64,10 +65,17 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
                  p -> p != this && !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider) 
                       && p.isCompatible(a.getScalarRing())
              );
-             return (Matrix<E>) (Matrix<?>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf);
+             return wrap((Matrix<E>) (Matrix<?>) RealStrassenAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf));
         }
 
-        return super.multiply(a, b);
+        return wrap(super.multiply(a, b));
+    }
+
+    private Matrix<E> wrap(Matrix<E> m) {
+        if (m instanceof GenericMatrix) {
+            return ((GenericMatrix<E>) m).withProvider(this);
+        }
+        return m;
     }
     
     @Override
