@@ -33,11 +33,13 @@ public class GenericLU {
 
         for (int k = 0; k < n; k++) {
             int maxRow = k;
-            double maxVal = absValue(data[k][k], field);
+            E maxVal = data[k][k];
+            double maxValDouble = absValue(maxVal, field);
+            
             for (int i = k + 1; i < n; i++) {
-                double val = absValue(data[i][k], field);
-                if (val > maxVal) {
-                    maxVal = val;
+                double valDouble = absValue(data[i][k], field);
+                if (valDouble > maxValDouble) {
+                    maxValDouble = valDouble;
                     maxRow = i;
                 }
             }
@@ -49,9 +51,10 @@ public class GenericLU {
                 perm[maxRow] = tempPerm;
             }
 
-            for (int i = k + 1; i < n; i++) {
-                if (absValue(data[k][k], field) > 1e-25) {
-                    E factor = field.divide(data[i][k], data[k][k]);
+            if (maxValDouble > 0) { // Check for non-singularity
+                E pivot = data[k][k];
+                for (int i = k + 1; i < n; i++) {
+                    E factor = field.divide(data[i][k], pivot);
                     data[i][k] = factor;
                     for (int j = k + 1; j < n; j++) {
                         data[i][j] = field.subtract(data[i][j], field.multiply(factor, data[k][j]));
@@ -61,6 +64,7 @@ public class GenericLU {
         }
 
         // Extract L and U
+
         @SuppressWarnings("unchecked")
         E[] lFlat = (E[]) new Object[n * n];
         @SuppressWarnings("unchecked")

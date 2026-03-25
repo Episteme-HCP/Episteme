@@ -43,7 +43,7 @@ public class GenericQR {
             
             E norm = norm(v, field);
             rData[j][j] = norm;
-            if (absValue(norm, field) > 1e-25) {
+            if (isNonZero(norm, field)) {
                 for (int i = 0; i < m; i++) qData[i][j] = field.divide(v[i], norm);
             } else {
                 for (int i = 0; i < m; i++) qData[i][j] = field.zero();
@@ -92,11 +92,11 @@ public class GenericQR {
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(x)), provider, field);
     }
 
-    private static double absValue(Object element, Field<?> field) {
-        if (element instanceof Real) return ((Real) element).doubleValue();
-        if (element instanceof Complex) return ((Complex) element).abs().doubleValue();
-        if (element instanceof Number) return ((Number) element).doubleValue();
-        return 0.0;
+    private static <E> boolean isNonZero(E element, Field<E> field) {
+        if (element instanceof Real) return !((Real) element).isZero();
+        if (element instanceof Complex) return !((Complex) element).isZero();
+        if (element instanceof Number) return ((Number) element).doubleValue() != 0.0;
+        return !field.zero().equals(element);
     }
 
     @SuppressWarnings("unchecked")

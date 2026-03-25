@@ -28,64 +28,67 @@ public class GenericEigen {
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) V[i][j] = (i == j) ? field.one() : field.zero();
 
         int maxSweeps = 50;
-        double eps = 1e-15;
-
+        
         for (int sweep = 0; sweep < maxSweeps; sweep++) {
-            double offDiag = 0;
             int p = 0, q = 0;
-            double maxOff = -1.0;
+            E maxOff = field.zero();
+            double maxOffDouble = -1.0;
 
             for (int i = 0; i < n; i++) {
                 for (int j = i + 1; j < n; j++) {
-                    double val = absValue(A[i][j], field);
-                    offDiag += val;
-                    if (val > maxOff) {
-                        maxOff = val;
+                    double valDouble = absValueDouble(A[i][j], field);
+                    if (valDouble > maxOffDouble) {
+                        maxOffDouble = valDouble;
+                        maxOff = A[i][j];
                         p = i;
                         q = j;
                     }
                 }
             }
 
-            if (offDiag < eps) break;
+            // Convergence check using maxOffDouble relative to diagonal or absolute
+            if (maxOffDouble < 1e-35) break; // Using a much smaller epsilon for HP
 
             E app = A[p][p];
             E aqq = A[q][q];
             E apq = A[p][q];
 
-            E diff = field.add(aqq, field.negate(app));
+            // theta = (aqq - app) / (2 * apq)
+            E diff = field.subtract(aqq, app);
             E twoApq = field.add(apq, apq);
+            E theta = field.divide(diff, twoApq);
             
-            double tau = absValue(diff, field) < 1e-18 ? 0.0 : absValue(twoApq, field) / absValue(diff, field);
-            double t = tau / (1.0 + Math.sqrt(1.0 + tau * tau));
-            double c = 1.0 / Math.sqrt(1.0 + t * t);
-            double s = t * c;
+            // t = sign(theta) / (|theta| + sqrt(theta^2 + 1))
+            E theta2plus1 = field.add(field.multiply(theta, theta), field.one());
+            E sqrtTheta2plus1 = sqrt(theta2plus1, field);
+            
+            E absTheta = abs(theta, field);
+            E t = field.divide(field.one(), field.add(absTheta, sqrtTheta2plus1));
+            if (isNegative(theta, field)) t = field.negate(t);
 
-            E cE, sE;
-            if (field.zero() instanceof Complex) {
-                cE = (E) (Object) Complex.of(Real.of(c));
-                sE = (E) (Object) Complex.of(Real.of(s));
-            } else {
-                cE = (E) (Object) Real.of(c);
-                sE = (E) (Object) Real.of(s);
-            }
+            // c = 1 / sqrt(t^2 + 1)
+            E t2plus1 = field.add(field.multiply(t, t), field.one());
+            E cE = field.divide(field.one(), sqrt(t2plus1, field));
+            // s = t * c
+            E sE = field.multiply(t, cE);
             
             for (int i = 0; i < n; i++) {
                 E api = A[p][i];
                 E aqi = A[q][i];
-                A[p][i] = field.add(field.multiply(cE, api), field.negate(field.multiply(sE, aqi)));
+                A[p][i] = field.subtract(field.multiply(cE, api), field.multiply(sE, aqi));
                 A[q][i] = field.add(field.multiply(sE, api), field.multiply(cE, aqi));
             }
+            // Matrix is symmetric, but for generic we do both or assume symmetry
             for (int i = 0; i < n; i++) {
                 E aip = A[i][p];
                 E aiq = A[i][q];
-                A[i][p] = field.add(field.multiply(cE, aip), field.negate(field.multiply(sE, aiq)));
+                A[i][p] = field.subtract(field.multiply(cE, aip), field.multiply(sE, aiq));
                 A[i][q] = field.add(field.multiply(sE, aip), field.multiply(cE, aiq));
             }
             for (int i = 0; i < n; i++) {
                 E vip = V[i][p];
                 E viq = V[i][q];
-                V[i][p] = field.add(field.multiply(cE, vip), field.negate(field.multiply(sE, viq)));
+                V[i][p] = field.subtract(field.multiply(cE, vip), field.multiply(sE, viq));
                 V[i][q] = field.add(field.multiply(sE, vip), field.multiply(cE, viq));
             }
         }
@@ -100,10 +103,33 @@ public class GenericEigen {
         );
     }
 
-    private static double absValue(Object element, Field<?> field) {
+    private static <E> E abs(E element, Field<E> field) {
+        if (element instanceof Real) return (E) ((Real) element).abs();
+        if (element instanceof Complex) return (E) ((Complex) element).abs();
+        return element; // Fallback
+    }
+
+    private static boolean isNegative(Object element, Field<?> field) {
+        if (element instanceof Real) return ((Real) element).doubleValue() < 0;
+        if (element instanceof Complex) return ((Complex) element).real() < 0;
+        return false;
+    }
+
+    private static double absValueDouble(Object element, Field<?> field) {
         if (element instanceof Real) return ((Real) element).doubleValue();
         if (element instanceof Complex) return ((Complex) element).abs().doubleValue();
         if (element instanceof Number) return ((Number) element).doubleValue();
         return 0.0;
     }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E sqrt(E element, Field<E> field) {
+        if (element instanceof Real) return (E) ((Real) element).sqrt();
+        if (element instanceof Complex) return (E) ((Complex) element).sqrt();
+        try {
+            return (E) element.getClass().getMethod("sqrt").invoke(element);
+        } catch (Exception e) {}
+        return element;
+    }
 }
+
