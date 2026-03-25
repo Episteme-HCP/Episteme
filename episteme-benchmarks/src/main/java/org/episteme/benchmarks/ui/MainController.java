@@ -27,6 +27,9 @@ import java.util.*;
 import java.io.IOException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.collections.FXCollections;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class MainController {
 
@@ -80,6 +83,46 @@ public class MainController {
     private final java.util.concurrent.ConcurrentLinkedQueue<BenchmarkItem> benchmarkQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
     private int selectedCount = 0;
     private int completedCount = 0;
+
+    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> createRealBigMatrix(int n) {
+        org.episteme.core.mathematics.numbers.real.RealBig[][] data = new org.episteme.core.mathematics.numbers.real.RealBig[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                data[i][j] = org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal(String.valueOf(i + j + 1)));
+            }
+        }
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig>) (org.episteme.core.mathematics.linearalgebra.Matrix<?>) org.episteme.core.mathematics.linearalgebra.Matrix.of(data, org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO).getScalarRing());
+    }
+
+    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> createComplexMatrix(int n) {
+        org.episteme.core.mathematics.numbers.complex.Complex[][] data = new org.episteme.core.mathematics.numbers.complex.Complex[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                data[i][j] = org.episteme.core.mathematics.numbers.complex.Complex.of(i + j + 1, 0.1);
+            }
+        }
+        return org.episteme.core.mathematics.linearalgebra.Matrix.of(data, org.episteme.core.mathematics.numbers.complex.Complex.of(0, 0).getScalarRing());
+    }
+
+    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> createSPDRealBigMatrix(int n) {
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> m = createRealBigMatrix(n);
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> mt = m.transpose();
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> mmt = m.multiply(mt);
+        @SuppressWarnings("unchecked")
+        org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.real.RealBig> ring = (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.real.RealBig>) (Object) org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO).getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> id = org.episteme.core.mathematics.linearalgebra.Matrix.identity(n, ring);
+        return mmt.add(id.scale(org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal(String.valueOf(n)))));
+    }
+
+    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> createSPDComplexMatrix(int n) {
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mc = createComplexMatrix(n);
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mct = mc.transpose().map(org.episteme.core.mathematics.numbers.complex.Complex::conjugate);
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mmct = mc.multiply(mct);
+        @SuppressWarnings("unchecked")
+        org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex> ringC = (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(0, 0).getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> idC = org.episteme.core.mathematics.linearalgebra.Matrix.identity(n, ringC);
+        return mmct.add(idC.scale(org.episteme.core.mathematics.numbers.complex.Complex.of(n, 0)));
+    }
     private final Object executionLock = new Object();
     private ResourceBundle resources;
     private Task<Void> mainTask;
@@ -636,125 +679,84 @@ public class MainController {
             RunnableBenchmark b = item.getBenchmark();
             if (b == null) return;
             
-            // Disable provider fallbacks for the duration of the benchmark run
-            ProviderExecutionMode.set(Mode.BENCHMARK);
+            // Enforce Isolation
+            org.episteme.core.technical.algorithm.AlgorithmService oldService = 
+                org.episteme.core.technical.algorithm.AlgorithmManager.getService();
+            org.episteme.core.technical.algorithm.AlgorithmProvider providerInstance = b.getAlgorithmProviderInstance();
             
+            if (providerInstance != null) {
+                org.episteme.core.technical.algorithm.AlgorithmManager.setService(
+                    new org.episteme.core.technical.algorithm.TestingAlgorithmService(providerInstance));
+            } else if (oldService instanceof org.episteme.core.technical.algorithm.StandardAlgorithmService) {
+                 org.episteme.core.technical.algorithm.AlgorithmManager.setService(
+                    new org.episteme.core.technical.algorithm.TestingAlgorithmService());
+            }
+
             try {
-                // Check availability logic as requested
-                if (!b.isAvailable()) {
-
-                Platform.runLater(() -> {
-                    item.statusProperty().set("Skipped (Unavailable)");
-                    item.resultProperty().set("N/A");
-                    updateCategoryStatuses(benchmarkTreeTable.getRoot()); // UI update
-                });
-                return;
-            }
-    
-                Platform.runLater(() -> item.statusProperty().set("Running..."));
-                b.setup();
+                // Disable provider fallbacks for the duration of the benchmark run
+                ProviderExecutionMode.set(Mode.BENCHMARK);
             
-            // 1. Warmup (Adaptive: ~500ms, max 1M iterations)
-            Platform.runLater(() -> {
-                item.statusProperty().set("Warming up...");
-                updateCategoryStatuses(benchmarkTreeTable.getRoot());
-            });
-            long warmupStart = System.nanoTime();
-            long warmupIters = 0;
-            final long MAX_WARMUP_TIME_NS = 500_000_000L; // 500ms
-            final long MAX_WARMUP_ITERS = 1_000_000;
-            while (System.nanoTime() - warmupStart < MAX_WARMUP_TIME_NS && warmupIters < MAX_WARMUP_ITERS) { 
-                if (mainTask != null && mainTask.isCancelled()) throw new RuntimeException("Canceled");
-                b.run();
-                warmupIters++;
-            }
+                try {
+                    // Check availability logic as requested
+                    if (!b.isAvailable()) {
+                        String errorMsg = "Provider not available";
+                        System.out.println("[INFO] Benchmark skipped: " + item.getName() + " (" + errorMsg + ")");
+                        Platform.runLater(() -> {
+                            item.statusProperty().set("Skipped");
+                            item.resultProperty().set("Skipped (Lib Missing)");
+                        });
+                        return;
+                    }
 
-            // 2. Measure (Adaptive: ~2000ms, max 5M iterations)
-            Platform.runLater(() -> {
-                item.statusProperty().set("Measuring...");
-                updateCategoryStatuses(benchmarkTreeTable.getRoot());
-            });
-            
-            System.gc();
-            try { Thread.sleep(100); } catch (InterruptedException e) {}
+                    Platform.runLater(() -> item.statusProperty().set("Running"));
+                    
+                    // Execution loop
+                    final int iterations = b.getSuggestedIterations();
+                    long startTime = System.nanoTime();
+                    
+                    for (int i = 0; i < iterations; i++) {
+                        b.run();
+                    }
+                    
+                    long endTime = System.nanoTime();
+                    double avgLatencyMs = ((double)(endTime - startTime) / iterations) / 1_000_000.0;
+                    double throughput = 1.0 / (avgLatencyMs / 1000.0);
 
-            java.util.List<Long> iterNanos = new java.util.ArrayList<>();
-            long totalStart = System.nanoTime();
-            long measureIters = 0;
-            final long MAX_MEASURE_TIME_NS = 2_000_000_000L; // 2 seconds
-            final long MAX_MEASURE_ITERS = 5_000_000;
-            final long MAX_SINGLE_ITER_TIME_NS = 60_000_000_000L; // 60 seconds
-            while (System.nanoTime() - totalStart < MAX_MEASURE_TIME_NS && measureIters < MAX_MEASURE_ITERS) {
-                if (mainTask != null && mainTask.isCancelled()) throw new RuntimeException("Canceled");
-                long iterStart = System.nanoTime();
-                b.run();
-                iterNanos.add(System.nanoTime() - iterStart);
-                measureIters++;
-                
-                // Safety: if a single iteration takes more than 60 seconds, abort to avoid stalling
-                if (System.nanoTime() - iterStart > MAX_SINGLE_ITER_TIME_NS) {
-                    System.err.println("Benchmark skipped/stalled: " + item.getName() + " (single iteration > 60s)");
-                    break;
+                    Platform.runLater(() -> {
+                        item.statusProperty().set("Idle");
+                        item.resultProperty().set(String.format("%.3f ms", avgLatencyMs));
+                        updateChart(item, avgLatencyMs);
+                        addToHistory(item, String.format("%.2f ops/s", throughput));
+                    });
+
+                } catch (Throwable e) {
+                    String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+                    if (e instanceof UnsupportedOperationException || (errorMsg != null && errorMsg.contains("not found"))) {
+                         System.out.println("[INFO] Benchmark skipped: " + item.getName() + " (" + errorMsg + ")");
+                         Platform.runLater(() -> {
+                            item.statusProperty().set("Skipped");
+                            item.resultProperty().set("Skipped (Lib Missing)");
+                         });
+                    } else if (e instanceof org.episteme.core.technical.algorithm.OperationCancelledException || "Canceled".equals(errorMsg)) {
+                         Platform.runLater(() -> {
+                            item.statusProperty().set("Canceled");
+                            item.resultProperty().set("Stopped");
+                         });
+                    } else {
+                        e.printStackTrace();
+                        Platform.runLater(() -> {
+                            item.statusProperty().set("Error");
+                            item.resultProperty().set(errorMsg);
+                            updateCategoryStatuses(benchmarkTreeTable.getRoot());
+                        });
+                    }
+                } finally {
+                    ProviderExecutionMode.reset();
                 }
+            } finally {
+                org.episteme.core.technical.algorithm.AlgorithmManager.setService(oldService);
             }
-            long totalEnd = System.nanoTime();
-            
-            long iterations = iterNanos.size();
-            double durationSec = (totalEnd - totalStart) / 1_000_000_000.0;
-            double opsSec = iterations / durationSec;
-            
-            java.util.Collections.sort(iterNanos);
-            int p99Index = Math.max(0, (int) Math.ceil(iterNanos.size() * 0.99) - 1);
-            double p99Ms = iterNanos.get(p99Index) / 1_000_000.0;
-            
-            String resultText;
-            if (opsSec < 1.0) {
-                 resultText = String.format("%.5f ops/s", opsSec);
-            } else if (opsSec < 100.0) {
-                 resultText = String.format("%.3f ops/s", opsSec);
-            } else {
-                 resultText = String.format("%.2f ops/s", opsSec);
-            }
-
-            Platform.runLater(() -> {
-                item.statusProperty().set("Success");
-                item.resultProperty().set(resultText);
-                item.setScore(opsSec);
-                item.setP99LatencyMs(p99Ms);
-                
-                updateChart(item, calculateMetric(item));
-                addToHistory(item, resultText);
-                updateCategoryStatuses(benchmarkTreeTable.getRoot());
-            });
-            
-            b.teardown();
-        } catch (Throwable e) {
-            String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-            
-            // Handle expected "Missing Library" errors gracefully
-            if (e instanceof UnsupportedOperationException || (errorMsg != null && errorMsg.contains("not found"))) {
-                 System.out.println("[INFO] Benchmark skipped: " + item.getName() + " (" + errorMsg + ")");
-                 Platform.runLater(() -> {
-                    item.statusProperty().set("Skipped");
-                    item.resultProperty().set("Skipped (Lib Missing)");
-                 });
-            } else if (e instanceof org.episteme.core.technical.algorithm.OperationCancelledException || "Canceled".equals(errorMsg)) {
-                 Platform.runLater(() -> {
-                    item.statusProperty().set("Canceled");
-                    item.resultProperty().set("Stopped");
-                 });
-            } else {
-                e.printStackTrace();
-                Platform.runLater(() -> {
-                    item.statusProperty().set("Error");
-                    item.resultProperty().set(errorMsg);
-                    updateCategoryStatuses(benchmarkTreeTable.getRoot());
-                });
-            }
-        } finally {
-            ProviderExecutionMode.reset();
-        }
-      } // End synchronized
+        } // End synchronized
     }
 
 

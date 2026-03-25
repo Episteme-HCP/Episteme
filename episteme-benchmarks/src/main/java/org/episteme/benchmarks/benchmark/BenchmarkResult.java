@@ -37,6 +37,7 @@ public record BenchmarkResult(
         String benchmarkName,
         String provider,
         String domain,
+        String status,
         long timestamp,
         long totalTimeMillis,
         long iterations,
@@ -57,7 +58,7 @@ public record BenchmarkResult(
             double operationsPerSecond,
             long memoryUsedBytes,
             Map<String, Object> extraMetrics) {
-        this(benchmarkId, benchmarkName, provider, domain, System.currentTimeMillis(), totalTimeMillis, iterations,
+        this(benchmarkId, benchmarkName, provider, domain, "SUCCESS", System.currentTimeMillis(), totalTimeMillis, iterations,
                 averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes, 
                 generateEnvInfo(), extraMetrics);
     }

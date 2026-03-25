@@ -48,6 +48,14 @@ public final class AlgorithmManager {
                 // Not a test environment
             }
 
+            if (isTest) {
+                service = new TestingAlgorithmService();
+                logger.info("AlgorithmManager initialized in TEST mode (Standard fallback disabled)");
+            } else {
+                service = new StandardAlgorithmService();
+                logger.info("AlgorithmManager initialized in PRODUCTION mode");
+            }
+
             // Trigger benchmark if no results found
             Path path = Paths.get(System.getProperty("user.home"), ".episteme", "benchmarks.json");
             if (!Files.exists(path) && !Boolean.getBoolean("episteme.benchmark.skip") && !isTest) {

@@ -10,6 +10,11 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.AlgorithmService;
+import org.episteme.core.technical.algorithm.TestingAlgorithmService;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
 
 /**
  * Systematic compliance test for all LinearAlgebraProvider implementations.
@@ -159,10 +164,15 @@ public class LinearAlgebraComplianceTest {
                 results.add(res);
                 continue;
             }
+
+            // Strictly isolate the provider under test
+            AlgorithmService oldService = AlgorithmManager.getService();
+            AlgorithmManager.setService(new TestingAlgorithmService(provider));
             
-            res.environment = provider.getEnvironmentInfo();
-            
-            testOperation(res, "Transpose", () -> {
+            try {
+                res.environment = provider.getEnvironmentInfo();
+                
+                testOperation(res, "Transpose", () -> {
                 Random rand = new Random(42);
                 double[][] aData = randomData(SIZE, SIZE, rand);
                 RealDoubleMatrix a = RealDoubleMatrix.of(aData);
@@ -457,6 +467,10 @@ public class LinearAlgebraComplianceTest {
                     assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-5);
                 }
             });
+
+            } finally {
+                AlgorithmManager.setService(oldService);
+            }
 
             results.add(res);
         }

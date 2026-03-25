@@ -13,6 +13,11 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.AlgorithmService;
+import org.episteme.core.technical.algorithm.TestingAlgorithmService;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -69,8 +74,13 @@ public class HighPrecisionComplianceTest {
                 continue;
             }
             res.environment = rawProvider.getEnvironmentInfo();
-
-            MathContext.exact().compute(() -> {
+            
+            // Strictly isolate the provider under test
+            AlgorithmService oldService = AlgorithmManager.getService();
+            AlgorithmManager.setService(new TestingAlgorithmService(rawProvider));
+            
+            try {
+                MathContext.exact().compute(() -> {
                 RealBig rbVal = RealBig.create(BigDecimal.ONE);
                 @SuppressWarnings("unchecked")
                 Ring<RealBig> ring = (Ring<RealBig>) (Object) rbVal.getScalarRing();
@@ -90,7 +100,10 @@ public class HighPrecisionComplianceTest {
                 runComplexTests(res, provider);
             }
 
-            results.add(res);
+                results.add(res);
+            } finally {
+                AlgorithmManager.setService(oldService);
+            }
         }
 
         printMarkdownReport(results);

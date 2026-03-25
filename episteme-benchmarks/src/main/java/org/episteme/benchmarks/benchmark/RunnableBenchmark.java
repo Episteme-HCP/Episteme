@@ -71,6 +71,13 @@ public interface RunnableBenchmark {
     }
 
     /**
+     * @return The actual algorithm provider instance associated with this benchmark, if any.
+     */
+    default org.episteme.core.technical.algorithm.AlgorithmProvider getAlgorithmProviderInstance() {
+        return null;
+    }
+
+    /**
      * Setup method called once before the benchmark runs.
      * Use this to initialize data structures.
      */

@@ -27,6 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.technical.algorithm.ProviderExecutionMode;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import java.util.HashMap;
+import org.episteme.benchmarks.benchmark.BenchmarkResult;
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
 
 
 
@@ -74,55 +79,74 @@ public class BenchmarkRunner {
             }
 
             try {
-                b.setup();
-
-                // Warmup
-                for (int i = 0; i < 3; i++)
-                    b.run();
-
-                // Measurement (Robust 5 trials x ITERS_PER_TRIAL)
-                final int TRIALS = 5;
-                final int ITERS_PER_TRIAL = Math.max(1, b.getSuggestedIterations() / TRIALS);
-                final int totalIterations = TRIALS * ITERS_PER_TRIAL;
+                // Enforce Isolation
+                org.episteme.core.technical.algorithm.AlgorithmService oldService = 
+                    org.episteme.core.technical.algorithm.AlgorithmManager.getService();
+                org.episteme.core.technical.algorithm.AlgorithmProvider providerInstance = b.getAlgorithmProviderInstance();
                 
-                long totalNs = 0;
-                long totalMem = 0;
-
-                for (int t = 0; t < TRIALS; t++) {
-                    long trialStart = System.nanoTime();
-                    long trialStartMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                    
-                    for (int i = 0; i < ITERS_PER_TRIAL; i++) {
-                        b.run();
-                    }
-                    
-                    long trialEnd = System.nanoTime();
-                    long trialEndMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                    
-                    totalNs += (trialEnd - trialStart);
-                    totalMem += Math.max(0, trialEndMem - trialStartMem);
+                if (providerInstance != null) {
+                    org.episteme.core.technical.algorithm.AlgorithmManager.setService(
+                        new org.episteme.core.technical.algorithm.TestingAlgorithmService(providerInstance));
+                } else if (oldService instanceof org.episteme.core.technical.algorithm.StandardAlgorithmService) {
+                     org.episteme.core.technical.algorithm.AlgorithmManager.setService(
+                        new org.episteme.core.technical.algorithm.TestingAlgorithmService());
                 }
 
-                long durationNs = totalNs;
-                int iterations = totalIterations;
-                
-                // Record to Monitor
-                monitor.recordExecution(b.getId(), b.getDomain(), durationNs / iterations);
-                double avgMs = (durationNs / 1_000_000.0) / iterations;
-                double opsSec = (iterations * 1_000_000_000.0) / durationNs;
-                long memUsed = totalMem / TRIALS;
+                try {
+                    b.setup();
 
-                BenchmarkResult res = new BenchmarkResult(
-                        b.getId(), b.getName(), b.getAlgorithmProvider(), b.getDomain(), durationNs / 1_000_000, iterations, avgMs, opsSec, memUsed,
-                        java.util.Collections.emptyMap());
+                    // Warmup
+                    for (int i = 0; i < 3; i++)
+                        b.run();
 
-                results.add(res);
-                System.out.println(res.toSummaryString());
+                    // Measurement (Robust 5 trials x ITERS_PER_TRIAL)
+                    final int TRIALS = 5;
+                    final int ITERS_PER_TRIAL = Math.max(1, b.getSuggestedIterations() / TRIALS);
+                    final int totalIterations = TRIALS * ITERS_PER_TRIAL;
+                    
+                    long totalNs = 0;
+                    long totalMem = 0;
 
-                b.teardown();
+                    for (int t = 0; t < TRIALS; t++) {
+                        long trialStart = System.nanoTime();
+                        long trialStartMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                        
+                        for (int i = 0; i < ITERS_PER_TRIAL; i++) {
+                            b.run();
+                        }
+                        
+                        long trialEnd = System.nanoTime();
+                        long trialEndMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                        
+                        totalNs += (trialEnd - trialStart);
+                        totalMem += Math.max(0, trialEndMem - trialStartMem);
+                    }
 
+                    long durationNs = totalNs;
+                    int iterations = totalIterations;
+                    
+                    // Record to Monitor
+                    monitor.recordExecution(b.getId(), b.getDomain(), durationNs / iterations);
+                    double avgMs = (durationNs / 1_000_000.0) / iterations;
+                    double opsSec = (iterations * 1_000_000_000.0) / durationNs;
+                    long memUsed = totalMem / TRIALS;
+
+                    BenchmarkResult res = new BenchmarkResult(
+                            b.getId(), b.getName(), b.getAlgorithmProvider(), b.getDomain(),
+                            durationNs / 1_000_000L, iterations, avgMs, opsSec, memUsed, new HashMap<>()
+                    );
+
+                    results.add(res);
+                    System.out.println(res.toSummaryString());
+
+                } catch (Exception e) {
+                    System.err.println(I18N.getInstance().get("benchmark.failed", b.getName(), e.getMessage()));
+                } finally {
+                    b.teardown();
+                    org.episteme.core.technical.algorithm.AlgorithmManager.setService(oldService);
+                }
             } catch (Exception e) {
-                System.err.println(I18N.getInstance().get("benchmark.failed", b.getName(), e.getMessage()));
+                System.err.println("Setup failed: " + e.getMessage());
             }
         }
         } finally {

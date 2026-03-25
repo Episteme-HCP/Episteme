@@ -22,12 +22,19 @@ public class TestingAlgorithmService implements AlgorithmService {
     private final List<AlgorithmProvider> allowedProviders;
     private final AlgorithmService delegate = new StandardAlgorithmService();
 
+    private final boolean fallbackAllowed;
+
     public TestingAlgorithmService(AlgorithmProvider... providers) {
-        this.allowedProviders = Arrays.asList(providers);
+        this(Arrays.asList(providers), false);
     }
 
     public TestingAlgorithmService(List<AlgorithmProvider> providers) {
+        this(providers, false);
+    }
+
+    public TestingAlgorithmService(List<AlgorithmProvider> providers, boolean fallbackAllowed) {
         this.allowedProviders = new ArrayList<>(providers);
+        this.fallbackAllowed = fallbackAllowed;
     }
 
     @Override
@@ -42,13 +49,21 @@ public class TestingAlgorithmService implements AlgorithmService {
         return allowedProviders.stream()
                 .filter(providerClass::isInstance)
                 .map(providerClass::cast)
-                .sorted(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed())
                 .collect(Collectors.toList());
     }
 
     @Override
     public <P extends AlgorithmProvider, R> R executeWithFallback(Class<P> providerClass, Function<P, R> operation) {
         List<P> providers = getProviders(providerClass);
+        if (providers.isEmpty()) {
+            throw new NoSuchElementException("No allowed provider found for: " + providerClass.getSimpleName());
+        }
+
+        if (!fallbackAllowed) {
+            // Only try the first provider
+            return operation.apply(providers.get(0));
+        }
+
         UnsupportedOperationException lastError = null;
         for (P provider : providers) {
             try {

@@ -191,6 +191,27 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
     }); }
 
     @SuppressWarnings("unchecked")
+    default Matrix<E> asinh(Matrix<E> a) { return a.map(val -> {
+        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).asinh();
+        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).asinh();
+        throw new UnsupportedOperationException("asinh not supported for " + val.getClass().getSimpleName());
+    }); }
+
+    @SuppressWarnings("unchecked")
+    default Matrix<E> acosh(Matrix<E> a) { return a.map(val -> {
+        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).acosh();
+        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).acosh();
+        throw new UnsupportedOperationException("acosh not supported for " + val.getClass().getSimpleName());
+    }); }
+
+    @SuppressWarnings("unchecked")
+    default Matrix<E> atanh(Matrix<E> a) { return a.map(val -> {
+        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).atanh();
+        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).atanh();
+        throw new UnsupportedOperationException("atanh not supported for " + val.getClass().getSimpleName());
+    }); }
+
+    @SuppressWarnings("unchecked")
     default Matrix<E> pow(Matrix<E> a, E exponent) { return a.map(val -> {
         if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig && exponent instanceof org.episteme.core.mathematics.numbers.real.Real) 
             return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).pow((org.episteme.core.mathematics.numbers.real.Real)exponent);

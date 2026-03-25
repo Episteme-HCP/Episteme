@@ -1,8 +1,9 @@
 package org.episteme.benchmarks.cli;
 
-import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
+import org.episteme.benchmarks.benchmark.BenchmarkResult;
+import org.episteme.benchmarks.benchmark.BenchmarkRunner;
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
-import org.episteme.benchmarks.ui.BenchmarkItem;
+import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -96,9 +97,6 @@ public class BenchmarkCLI {
         List<RunnableBenchmark> benchmarks = new ArrayList<>();
         
         for (RunnableBenchmark b : allBenchmarks) {
-            BenchmarkItem item = new BenchmarkItem(b);
-            String provider = item.providerProperty().get();
-            
             String domain = b.getDomain();
             if (domainFilter != null) {
                 String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "");
@@ -122,9 +120,10 @@ public class BenchmarkCLI {
             }
             
             boolean excluded = false;
+            String providerStr = b.getAlgorithmProvider();
             for (String ex : excludedProviders) {
-                if (provider.toLowerCase().contains(ex.toLowerCase())) {
-                    System.out.println("[FILTER] Provider Exclusion: Skipping benchmark " + item.getName() + " because provider '" + provider + "' matches exclusion '" + ex + "'.");
+                if (providerStr.toLowerCase().contains(ex.toLowerCase())) {
+                    System.out.println("[FILTER] Provider Exclusion: Skipping benchmark " + b.getName() + " because provider '" + providerStr + "' matches exclusion '" + ex + "'.");
                     excluded = true;
                     break;
                 }
@@ -148,38 +147,54 @@ public class BenchmarkCLI {
 
         for (RunnableBenchmark benchmark : benchmarks) {
             benchmark.setDryRun(dryRun);
-            BenchmarkItem item = new BenchmarkItem(benchmark);
             System.out.println("----------------------------------------------------------------");
-            System.out.println("Running: " + item.getName() + " [" + item.getBackend() + "/" + item.getProvider() + "]");
+            System.out.println("Running: " + benchmark.getName() + " [" + benchmark.getDomain() + "]");
             if (dryRun) System.out.println("Mode: DRY RUN (Small Dataset)");
 
             if (!benchmark.isAvailable()) {
                 System.out.println("Status: SKIPPED (Unavailable)");
                 skipped++;
-                results.add(new BenchmarkResult(item, "SKIPPED", 0, 0));
+                results.add(new BenchmarkResult(benchmark.getId(), benchmark.getName(), 
+                    benchmark.getAlgorithmProvider(), benchmark.getDomain(), 0, 0, 0, 0, 0, new java.util.HashMap<>()));
                 continue;
             }
 
             try {
                 // Setup
                 System.out.print("Status: Setup... ");
-                benchmark.setup();
                 
-                // Warmup
-                System.out.print("Warmup... ");
-                long warmupStart = System.nanoTime();
-                while (System.nanoTime() - warmupStart < 500_000_000L) { // 500ms
-                    benchmark.run();
+                // Enforce Isolation for benchmarks
+                org.episteme.core.technical.algorithm.AlgorithmService oldService = 
+                    org.episteme.core.technical.algorithm.AlgorithmManager.getService();
+                org.episteme.core.technical.algorithm.AlgorithmProvider providerInstance = benchmark.getAlgorithmProviderInstance();
+                
+                if (providerInstance != null) {
+                    org.episteme.core.technical.algorithm.AlgorithmManager.setService(
+                        new org.episteme.core.technical.algorithm.TestingAlgorithmService(providerInstance));
+                } else if (oldService instanceof org.episteme.core.technical.algorithm.StandardAlgorithmService) {
+                    // If no explicit provider but was production service, restrict to empty testing service
+                    // This forces all benchmarks to be explicit if they use AlgorithmManager
+                    org.episteme.core.technical.algorithm.AlgorithmManager.setService(
+                        new org.episteme.core.technical.algorithm.TestingAlgorithmService());
                 }
 
-                // Measure
-                System.out.print("Measuring... ");
-                System.gc();
-                try { Thread.sleep(100); } catch (InterruptedException e) {}
-
-                List<Long> iterNanos = new ArrayList<>();
-                long totalStart = System.nanoTime();
                 try {
+                    benchmark.setup();
+                    
+                    // Warmup
+                    System.out.print("Warmup... ");
+                    long warmupStart = System.nanoTime();
+                    while (System.nanoTime() - warmupStart < 500_000_000L) { // 500ms
+                        benchmark.run();
+                    }
+
+                    // Measure
+                    System.out.print("Measuring... ");
+                    System.gc();
+                    try { Thread.sleep(100); } catch (InterruptedException e) {}
+
+                    List<Long> iterNanos = new ArrayList<>();
+                    long totalStart = System.nanoTime();
                     while (System.nanoTime() - totalStart < 2_000_000_000L) { // 2s
                         long iterStart = System.nanoTime();
                         benchmark.run();
@@ -187,9 +202,6 @@ public class BenchmarkCLI {
                     }
                     long totalEnd = System.nanoTime();
 
-                    // Teardown
-                    benchmark.teardown();
-                    
                     // Stats
                     double durationSec = (totalEnd - totalStart) / 1_000_000_000.0;
                     double opsSec = iterNanos.size() / durationSec;
@@ -202,19 +214,28 @@ public class BenchmarkCLI {
                     System.out.println("DONE");
                     System.out.printf(Locale.US, "Result: %.2f ops/s, P99: %.3f ms%n", opsSec, p99Ms);
                     
-                    results.add(new BenchmarkResult(item, "SUCCESS", opsSec, p99Ms));
+                    BenchmarkResult res = new BenchmarkResult(
+                        benchmark.getId(), benchmark.getName(), benchmark.getAlgorithmProvider(), benchmark.getDomain(),
+                        (long)(durationSec * 1000), iterNanos.size(), p99Ms, opsSec, 0, new java.util.HashMap<>()
+                    );
+                    results.add(res);
                     success++;
                 } catch (Throwable t) {
-                    System.out.println("FAILED during measurement");
+                    System.out.println("FAILED during execution");
                     System.out.println("Error: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-                    results.add(new BenchmarkResult(item, "FAILED: " + t.getClass().getSimpleName() + " (" + t.getMessage() + ")", 0, 0));
+                    results.add(new BenchmarkResult(benchmark.getId(), benchmark.getName(), 
+                        benchmark.getAlgorithmProvider(), benchmark.getDomain(), 0, 0, 0, 0, 0, new java.util.HashMap<>()));
                     fail++;
+                } finally {
+                    benchmark.teardown();
+                    org.episteme.core.technical.algorithm.AlgorithmManager.setService(oldService);
                 }
 
             } catch (Throwable t) {
-                System.out.println("FAILED during setup/warmup");
+                System.out.println("FAILED during setup/isolation");
                 System.out.println("Error: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-                results.add(new BenchmarkResult(item, "FAILED AT SETUP: " + t.getClass().getSimpleName() + " (" + t.getMessage() + ")", 0, 0));
+                results.add(new BenchmarkResult(benchmark.getId(), benchmark.getName(), 
+                    benchmark.getAlgorithmProvider(), benchmark.getDomain(), 0, 0, 0, 0, 0, new java.util.HashMap<>()));
                 fail++;
             }
         }
@@ -275,21 +296,19 @@ public class BenchmarkCLI {
                 
                 String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 String resultText;
-                if ("SUCCESS".equals(r.status)) {
-                    if (r.score < 1.0) resultText = String.format(Locale.US, "%.5f ops/s", r.score);
-                    else if (r.score < 100.0) resultText = String.format(Locale.US, "%.3f ops/s", r.score);
-                    else resultText = String.format(Locale.US, "%.2f ops/s", r.score);
+                if ("SUCCESS".equals(r.status())) {
+                    if (r.operationsPerSecond() < 1.0) resultText = String.format(Locale.US, "%.5f ops/s", r.operationsPerSecond());
+                    else if (r.operationsPerSecond() < 100.0) resultText = String.format(Locale.US, "%.3f ops/s", r.operationsPerSecond());
+                    else resultText = String.format(Locale.US, "%.2f ops/s", r.operationsPerSecond());
                 } else {
-                    resultText = r.status;
+                    resultText = r.status();
                 }
                 
                 json.append("    {");
                 json.append(String.format("\"date\":\"%s\",", escape(dateStr)));
-                json.append(String.format("\"name\":\"%s\",", escape(r.item.getName())));
-                json.append(String.format("\"backend\":\"%s\",", escape(r.item.backendProperty().get())));
-                json.append(String.format("\"provider\":\"%s\",", escape(r.item.providerProperty().get())));
-                json.append(String.format("\"library\":\"%s\",", escape(r.item.libraryProperty().get())));
-                json.append(String.format("\"domain\":\"%s\",", escape(r.item.getDomain())));
+                json.append(String.format("\"name\":\"%s\",", escape(r.benchmarkName())));
+                json.append(String.format("\"provider\":\"%s\",", escape(r.provider())));
+                json.append(String.format("\"domain\":\"%s\",", escape(r.domain())));
                 json.append(String.format("\"result\":\"%s\"", escape(resultText)));
                 json.append("}");
                 

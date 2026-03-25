@@ -53,7 +53,8 @@ public final class RealBig extends Real {
         if (other.isInfinite()) {
             return other;
         }
-        return Real.of(value.add(other.bigDecimalValue()).toString());
+        return RealBig.create(value.add(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
@@ -61,7 +62,8 @@ public final class RealBig extends Real {
         if (other.isInfinite()) {
             return other.negate();
         }
-        return Real.of(value.subtract(other.bigDecimalValue()).toString());
+        return RealBig.create(value.subtract(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
@@ -73,7 +75,8 @@ public final class RealBig extends Real {
             // sign(this) * infinity
             return (this.value.signum() > 0) ? other : other.negate();
         }
-        return Real.of(value.multiply(other.bigDecimalValue()).toString());
+        return RealBig.create(value.multiply(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
@@ -81,8 +84,8 @@ public final class RealBig extends Real {
         if (other.isInfinite()) {
             return Real.ZERO; // x / infinity = 0
         }
-        return Real.of(value.divide(other.bigDecimalValue(), 
-            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
+        return RealBig.create(value.divide(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
@@ -97,13 +100,13 @@ public final class RealBig extends Real {
 
     @Override
     public Real inverse() {
-        return Real.of(BigDecimal.ONE.divide(value, 
-            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
+        return RealBig.create(BigDecimal.ONE.divide(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real sqrt() {
-        return Real.of(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
+        return RealBig.create(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
@@ -145,7 +148,7 @@ public final class RealBig extends Real {
     public Real pow(double exponent) {
         BigDecimal res = computeTranscendental("pow", value, BigDecimal.valueOf(exponent));
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.pow(value.doubleValue(), exponent));
+        throw new UnsupportedOperationException("Transcendental 'pow' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
@@ -161,7 +164,7 @@ public final class RealBig extends Real {
         }
         BigDecimal res = computeTranscendental("pow", value, exp.bigDecimalValue());
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.pow(value.doubleValue(), exp.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'pow' failed or was unavailable (no fallback allowed)");
     }
 
     // --- Transcendental Functions ---
@@ -170,129 +173,126 @@ public final class RealBig extends Real {
     public Real exp() {
         BigDecimal res = computeTranscendental("exp", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.exp(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'exp' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real log() {
         BigDecimal res = computeTranscendental("log", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.log(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'log' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real log10() {
         BigDecimal res = computeTranscendental("log10", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.log10(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'log10' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real sin() {
         BigDecimal res = computeTranscendental("sin", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.sin(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'sin' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real cos() {
         BigDecimal res = computeTranscendental("cos", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.cos(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'cos' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real tan() {
         BigDecimal res = computeTranscendental("tan", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.tan(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'tan' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real asin() {
         BigDecimal res = computeTranscendental("asin", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.asin(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'asin' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real acos() {
         BigDecimal res = computeTranscendental("acos", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.acos(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'acos' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real atan() {
         BigDecimal res = computeTranscendental("atan", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.atan(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'atan' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real atan2(Real x) {
         BigDecimal res = computeTranscendental("atan2", value, x.bigDecimalValue());
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.atan2(value.doubleValue(), x.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'atan2' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real sinh() {
         BigDecimal res = computeTranscendental("sinh", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.sinh(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'sinh' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real cosh() {
         BigDecimal res = computeTranscendental("cosh", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.cosh(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'cosh' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real tanh() {
         BigDecimal res = computeTranscendental("tanh", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.tanh(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'tanh' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real asinh() {
         BigDecimal res = computeTranscendental("asinh", value);
         if (res != null) return RealBig.create(res);
-        double d = value.doubleValue();
-        return Real.of(Math.log(d + Math.sqrt(d * d + 1.0)));
+        throw new UnsupportedOperationException("Transcendental 'asinh' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real acosh() {
         BigDecimal res = computeTranscendental("acosh", value);
         if (res != null) return RealBig.create(res);
-        double d = value.doubleValue();
-        return Real.of(Math.log(d + Math.sqrt(d * d - 1.0)));
+        throw new UnsupportedOperationException("Transcendental 'acosh' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real atanh() {
         BigDecimal res = computeTranscendental("atanh", value);
         if (res != null) return RealBig.create(res);
-        double d = value.doubleValue();
-        return Real.of(0.5 * Math.log((1.0 + d) / (1.0 - d)));
+        throw new UnsupportedOperationException("Transcendental 'atanh' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real cbrt() {
         BigDecimal res = computeTranscendental("cbrt", value);
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.cbrt(value.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'cbrt' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
     public Real hypot(Real y) {
         BigDecimal res = computeTranscendental("hypot", value, y.bigDecimalValue());
         if (res != null) return RealBig.create(res);
-        return Real.of(Math.hypot(value.doubleValue(), y.doubleValue()));
+        throw new UnsupportedOperationException("Transcendental 'hypot' failed or was unavailable (no fallback allowed)");
     }
 
     @Override
@@ -312,12 +312,12 @@ public final class RealBig extends Real {
 
     @Override
     public Real toDegrees() {
-        return this.multiply(Real.of("180")).divide(Real.PI);
+        return this.multiply(RealBig.create(BigDecimal.valueOf(180))).divide(Real.PI);
     }
 
     @Override
     public Real toRadians() {
-        return this.multiply(Real.PI).divide(Real.of("180"));
+        return this.multiply(Real.PI).divide(RealBig.create(BigDecimal.valueOf(180)));
     }
 
     @Override

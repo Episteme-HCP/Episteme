@@ -111,6 +111,7 @@ public class BenchmarkRegistry {
             @Override public void teardown() {}
             @Override public int getSuggestedIterations() { return 100; }
             @Override public boolean isAvailable() { return p.isAvailable(); }
+            @Override public org.episteme.core.technical.algorithm.AlgorithmProvider getAlgorithmProviderInstance() { return p; }
         };
     }
 
@@ -196,6 +197,7 @@ public class BenchmarkRegistry {
             @Override public void teardown() { base.teardown(); }
             @Override public int getSuggestedIterations() { return base.getSuggestedIterations(); }
             @Override public boolean isAvailable() { return p.isAvailable(); }
+            @Override public org.episteme.core.technical.algorithm.AlgorithmProvider getAlgorithmProviderInstance() { return p; }
         };
         System.out.println("[DEBUG]     + Added benchmark instance: " + rb.getId() + " [Domain: " + rb.getDomain() + "]");
         list.add(rb);

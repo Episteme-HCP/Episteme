@@ -6,7 +6,6 @@
 package org.episteme.core.mathematics.linearalgebra.matrices.solvers;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.complex.Complex;
@@ -73,18 +72,34 @@ public class GenericEigen {
             E sE = field.multiply(t, cE);
             
             for (int i = 0; i < n; i++) {
-                E api = A[p][i];
-                E aqi = A[q][i];
-                A[p][i] = field.subtract(field.multiply(cE, api), field.multiply(sE, aqi));
-                A[q][i] = field.add(field.multiply(sE, api), field.multiply(cE, aqi));
+                if (i != p && i != q) {
+                    E api = A[p][i];
+                    E aqi = A[q][i];
+                    A[p][i] = field.subtract(field.multiply(cE, api), field.multiply(sE, aqi));
+                    A[q][i] = field.add(field.multiply(sE, api), field.multiply(cE, aqi));
+                    // Symmetry
+                    A[i][p] = A[p][i];
+                    A[i][q] = A[q][i];
+                }
             }
-            // Matrix is symmetric, but for generic we do both or assume symmetry
-            for (int i = 0; i < n; i++) {
-                E aip = A[i][p];
-                E aiq = A[i][q];
-                A[i][p] = field.subtract(field.multiply(cE, aip), field.multiply(sE, aiq));
-                A[i][q] = field.add(field.multiply(sE, aip), field.multiply(cE, aiq));
-            }
+
+            // Update diagonals and off-diagonal
+            // app = c^2*app - 2sc*apq + s^2*aqq
+            // aqq = s^2*app + 2sc*apq + c^2*aqq
+            // apq = 0
+            E c2 = field.multiply(cE, cE);
+            E s2 = field.multiply(sE, sE);
+            E twoSC = field.multiply(field.add(sE, sE), cE);
+            
+            E newApp = field.add(field.subtract(field.multiply(c2, app), field.multiply(twoSC, apq)), field.multiply(s2, aqq));
+            E newAqq = field.add(field.add(field.multiply(s2, app), field.multiply(twoSC, apq)), field.multiply(c2, aqq));
+            
+            A[p][p] = newApp;
+            A[q][q] = newAqq;
+            A[p][q] = field.zero();
+            A[q][p] = field.zero();
+
+            // V = V * J
             for (int i = 0; i < n; i++) {
                 E vip = V[i][p];
                 E viq = V[i][q];

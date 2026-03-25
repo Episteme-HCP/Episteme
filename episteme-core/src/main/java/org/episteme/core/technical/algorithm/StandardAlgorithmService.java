@@ -112,6 +112,7 @@ public class StandardAlgorithmService implements AlgorithmService {
     @Override
     public boolean isFiltered(String name) {
         if (name == null) return false;
+        
         String lowerName = name.trim().toLowerCase();
         if (!GLOBAL_INCLUDES.isEmpty()) {
             boolean matchesInclude = false;
