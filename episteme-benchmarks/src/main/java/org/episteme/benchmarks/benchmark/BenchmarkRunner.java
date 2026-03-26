@@ -25,7 +25,6 @@ package org.episteme.benchmarks.benchmark;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.technical.algorithm.ProviderExecutionMode;
 
@@ -129,7 +128,7 @@ public class BenchmarkRunner {
 
                     BenchmarkResult res = new BenchmarkResult(
                             b.getId(), b.getName(), b.getAlgorithmProvider(), b.getDomain(),
-                            durationNs / 1_000_000L, iterations, avgMs, opsSec, memUsed, new HashMap<>()
+                            durationNs / 1_000_000L, iterations, avgMs, opsSec, memUsed, b.getMetadata()
                     );
 
                     results.add(res);

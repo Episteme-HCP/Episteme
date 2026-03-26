@@ -6,19 +6,14 @@
 package org.episteme.benchmarks.benchmark.benchmarks;
 
 import com.google.auto.service.AutoService;
-import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
-import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.technical.algorithm.AlgorithmManager;
-import org.episteme.core.technical.algorithm.AlgorithmService;
-import org.episteme.core.technical.algorithm.TestingAlgorithmService;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -32,7 +27,7 @@ import java.util.*;
 public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<LinearAlgebraProvider> {
 
     private LinearAlgebraProvider currentProvider;
-    private int matrixSize = 64; 
+    private int matrixSize = 8; // Small default for quick verification (User request)
     private boolean dryRun = false;
     private final Map<String, Object> latestMetrics = new LinkedHashMap<>();
 
@@ -126,12 +121,15 @@ public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<Lin
 
     @Override
     public boolean isAvailable() {
-        if (currentProvider == null) return true; // Available for expansion
+        if (currentProvider == null) return true;
         
-        // Filter to only HP providers (exclude double-only ones)
         String name = currentProvider.getName();
+        // Exclude double-only providers to match HighPrecisionComplianceTest
         if (name.contains("EJML") || name.contains("Colt") || name.contains("Commons Math") || 
-            name.contains("JBlas") || name.contains("ND4J")) return false;
+            name.contains("JBlas") || name.contains("ND4J") || name.contains("CUDA") ||
+            name.contains("OpenCL") || name.contains("SIMD") || name.contains("FFMBLAS") ||
+            name.contains("Native BLAS Provider FFM") || name.contains("Native CPU-BLAS") ||
+            name.contains("Unified")) return false;
             
         return currentProvider.isAvailable();
     }
@@ -159,6 +157,13 @@ public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<Lin
         measure(metrics, "Solvers:Det", () -> p.determinant(Ad));
         measure(metrics, "Solvers:Solve", () -> p.solve(Ad, vd));
         
+        // Sparse Solvers (Corrected names and casting)
+        if (p instanceof SparseLinearAlgebraProvider sp) {
+            measure(metrics, "Sparse:BiCGSTAB", () -> sp.bicgstab(Ad, vd, vd, RealBig.create(new BigDecimal("1e-10")), 100));
+            measure(metrics, "Sparse:ConjGrad", () -> sp.conjugateGradient(Ad, vd, vd, RealBig.create(new BigDecimal("1e-10")), 100));
+            measure(metrics, "Sparse:GMRES", () -> sp.gmres(Ad, vd, vd, RealBig.create(new BigDecimal("1e-10")), 100, 10));
+        }
+        
         measure(metrics, "Decompositions:LU", () -> p.lu(Ad));
         measure(metrics, "Decompositions:QR", () -> p.qr(Ad));
         measure(metrics, "Decompositions:SVD", () -> p.svd(Ad));
@@ -166,13 +171,25 @@ public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<Lin
         measure(metrics, "Decompositions:Eigen", () -> p.eigen(Ad));
         
         RealBig val = RealBig.create(new BigDecimal("0.5"));
-        Matrix<RealBig> M1 = (Matrix<RealBig>)(Matrix<?>)Matrix.of(new RealBig[][]{{val}}, (Ring)val.getScalarRing());
+        Matrix<RealBig> M1 = Matrix.of(new RealBig[][]{{val}}, (org.episteme.core.mathematics.structures.rings.Ring<RealBig>)(Object)val.getScalarRing());
         measure(metrics, "Transcendental:Exp", () -> p.exp(M1));
         measure(metrics, "Transcendental:Log", () -> p.log((Matrix<RealBig>)(Matrix<?>)p.add(M1, M1)));
+        measure(metrics, "Transcendental:Log10", () -> p.log10(M1));
         measure(metrics, "Transcendental:Sin", () -> p.sin(M1));
         measure(metrics, "Transcendental:Cos", () -> p.cos(M1));
         measure(metrics, "Transcendental:Tan", () -> p.tan(M1));
+        measure(metrics, "Transcendental:Asin", () -> p.asin(M1));
+        measure(metrics, "Transcendental:Acos", () -> p.acos(M1));
+        measure(metrics, "Transcendental:Atan", () -> p.atan(M1));
+        measure(metrics, "Transcendental:Sinh", () -> p.sinh(M1));
+        measure(metrics, "Transcendental:Cosh", () -> p.cosh(M1));
+        measure(metrics, "Transcendental:Tanh", () -> p.tanh(M1));
+        measure(metrics, "Transcendental:Asinh", () -> p.asinh(M1));
+        measure(metrics, "Transcendental:Acosh", () -> p.acosh(M1));
+        measure(metrics, "Transcendental:Atanh", () -> p.atanh(M1));
         measure(metrics, "Transcendental:Sqrt", () -> p.sqrt(M1));
+        measure(metrics, "Transcendental:Cbrt", () -> p.cbrt(M1));
+        measure(metrics, "Transcendental:Pow", () -> p.pow(M1, RealBig.create(new BigDecimal("2"))));
     }
 
     private void runComplexAudit(Map<String, Object> metrics, LinearAlgebraProvider<Complex> p) {
@@ -182,13 +199,39 @@ public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<Lin
         measure(metrics, "Complex:Add", () -> p.add(A, B));
         measure(metrics, "Complex:Sub", () -> p.subtract(A, B));
         measure(metrics, "Complex:Mul", () -> p.multiply(A, B));
-        measure(metrics, "Complex:Inv", () -> p.inverse(createInvertibleComplexMatrix(Math.max(8, matrixSize/2))));
+        
+        int decompSize = Math.max(8, matrixSize / 2);
+        Matrix<Complex> Ad = createInvertibleComplexMatrix(decompSize);
+        Vector<Complex> vd = createComplexVector(decompSize);
+        
+        measure(metrics, "Complex:Inv", () -> p.inverse(Ad));
+        measure(metrics, "Complex:Det", () -> p.determinant(Ad));
+        measure(metrics, "Complex:Solve", () -> p.solve(Ad, vd));
+        
+        // Complex Sparse (New)
+        if (p instanceof SparseLinearAlgebraProvider sp) {
+            measure(metrics, "Complex:BiCGSTAB", () -> sp.bicgstab(Ad, vd, vd, Complex.of(1e-10, 0), 100));
+            measure(metrics, "Complex:ConjGrad", () -> sp.conjugateGradient(Ad, vd, vd, Complex.of(1e-10, 0), 100));
+            measure(metrics, "Complex:GMRES", () -> sp.gmres(Ad, vd, vd, Complex.of(1e-10, 0), 100, 10));
+        }
         
         Complex val = Complex.of(0.5, 0.5);
         Matrix<Complex> M1 = Matrix.of(new Complex[][]{{val}}, val.getScalarRing());
         measure(metrics, "Complex:Exp", () -> p.exp(M1));
         measure(metrics, "Complex:Log", () -> p.log(p.add(M1, M1)));
+        measure(metrics, "Complex:Log10", () -> p.log10(M1));
         measure(metrics, "Complex:Sin", () -> p.sin(M1));
+        measure(metrics, "Complex:Cos", () -> p.cos(M1));
+        measure(metrics, "Complex:Tan", () -> p.tan(M1));
+        measure(metrics, "Complex:Asin", () -> p.asin(M1));
+        measure(metrics, "Complex:Acos", () -> p.acos(M1));
+        measure(metrics, "Complex:Atan", () -> p.atan(M1));
+        measure(metrics, "Complex:Sinh", () -> p.sinh(M1));
+        measure(metrics, "Complex:Cosh", () -> p.cosh(M1));
+        measure(metrics, "Complex:Tanh", () -> p.tanh(M1));
+        measure(metrics, "Complex:Sqrt", () -> p.sqrt(M1));
+        measure(metrics, "Complex:Cbrt", () -> p.cbrt(M1));
+        measure(metrics, "Complex:Pow", () -> p.pow(M1, Complex.of(2, 0)));
     }
 
     private void measure(Map<String, Object> metrics, String key, Runnable r) {
@@ -206,7 +249,7 @@ public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<Lin
     private Matrix<RealBig> createRealBigMatrix(int n) {
         RealBig[][] d = new RealBig[n][n];
         for(int i=0; i<n; i++) for(int j=0; j<n; j++) d[i][j] = RealBig.create(new BigDecimal(i+j+1));
-        return (Matrix<RealBig>) (Matrix<?>) Matrix.of(d, (Ring) d[0][0].getScalarRing());
+        return Matrix.of(d, (org.episteme.core.mathematics.structures.rings.Ring<RealBig>)(Object)d[0][0].getScalarRing());
     }
 
     private Matrix<RealBig> createInvertibleRealBigMatrix(int n) {
@@ -217,13 +260,13 @@ public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<Lin
                 else d[i][j] = RealBig.create(new BigDecimal(0.1*(i+j+1)));
             }
         }
-        return (Matrix<RealBig>) (Matrix<?>) Matrix.of(d, (Ring) d[0][0].getScalarRing());
+        return Matrix.of(d, (org.episteme.core.mathematics.structures.rings.Ring<RealBig>)(Object)d[0][0].getScalarRing());
     }
 
     private Vector<RealBig> createRealBigVector(int n) {
         RealBig[] d = new RealBig[n];
         for(int i=0; i<n; i++) d[i] = RealBig.create(new BigDecimal(i+1));
-        return (Vector<RealBig>) (Vector<?>) Vector.of(d, (Ring) d[0].getScalarRing());
+        return Vector.of(java.util.List.of(d), (org.episteme.core.mathematics.structures.rings.Ring<RealBig>)(Object)d[0].getScalarRing());
     }
 
     private Matrix<Complex> createComplexMatrix(int n) {
@@ -241,5 +284,11 @@ public class HighPrecisionOperationsBenchmark implements SystematicBenchmark<Lin
             }
         }
         return Matrix.of(d, Complex.of(0, 0).getScalarRing());
+    }
+
+    private Vector<Complex> createComplexVector(int n) {
+        Complex[] d = new Complex[n];
+        for(int i=0; i<n; i++) d[i] = Complex.of(i+1, 0.1);
+        return Vector.of(d, Complex.of(0, 0).getScalarRing());
     }
 }

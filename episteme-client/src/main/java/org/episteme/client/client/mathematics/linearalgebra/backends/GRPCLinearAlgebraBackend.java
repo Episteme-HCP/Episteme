@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.episteme.client.client.technical.backend.math;
+package org.episteme.client.client.mathematics.linearalgebra.backends;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -749,4 +749,3 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         }
     }
 }
-

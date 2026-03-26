@@ -63,6 +63,16 @@ public record BenchmarkResult(
                 generateEnvInfo(), extraMetrics);
     }
 
+    /**
+     * Convenience constructor for expanded results (e.g. from High-Precision Audit).
+     */
+    public BenchmarkResult(String name, String provider, String domain, double latencyMs) {
+        this(name.toLowerCase().replace(" ", "_"), name, provider, domain, "SUCCESS", 
+             System.currentTimeMillis(), (long)latencyMs, 1, latencyMs, 
+             latencyMs > 0 ? 1000.0 / latencyMs : 0, 0, generateEnvInfo(), 
+             new java.util.HashMap<>());
+    }
+
     private static Map<String, String> generateEnvInfo() {
         Map<String, String> info = new java.util.HashMap<>();
         info.put("os", System.getProperty("os.name"));

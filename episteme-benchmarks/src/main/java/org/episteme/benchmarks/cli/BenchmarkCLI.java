@@ -3,15 +3,14 @@ package org.episteme.benchmarks.cli;
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
+import org.episteme.benchmarks.reporting.BenchmarkReporter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Command Line Interface for running benchmarks without UI.
@@ -62,12 +61,11 @@ public class BenchmarkCLI {
 
         // Default export logic: specialized directory and timestamped filename in docs/
         if (exportFile == null) {
-            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-            // Standardizing to hyphenated directory as requested by user
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String dirPath = "docs/benchmark-results";
             new File(dirPath).mkdirs();
             
-            exportFile = dirPath + "/benchmark-results-" + timestamp + ".json";
+            exportFile = dirPath + "/High-Precision_Benchmark_Result_" + timestamp + ".json";
         } else {
             // If user provided a path, ensure parent directory exists
             File f = new File(exportFile);
@@ -118,20 +116,19 @@ public class BenchmarkCLI {
                 }
             }
             
-            boolean excluded = false;
-            String providerStr = b.getAlgorithmProvider();
-            for (String ex : excludedProviders) {
-                if (providerStr.toLowerCase().contains(ex.toLowerCase())) {
-                    System.out.println("[FILTER] Provider Exclusion: Skipping benchmark " + b.getName() + " because provider '" + providerStr + "' matches exclusion '" + ex + "'.");
-                    excluded = true;
-                    break;
-                }
+            // Provider Filter (only High-Precision for this specialized report)
+            if ("Linear Algebra (High-Precision Audit)".equals(b.getDomain())) {
+                String name = b.getAlgorithmProvider();
+                if (excludedProviders.contains(name)) continue;
+                // Consistent exclusion list from HighPrecisionComplianceTest
+                if (name.contains("EJML") || name.contains("Colt") || name.contains("Commons Math") || 
+                    name.contains("JBlas") || name.contains("ND4J") || name.contains("CUDA") || 
+                    name.contains("OpenCL") || name.contains("SIMD") || name.contains("Unified") || 
+                    name.contains("FFMBLAS") || name.contains("Native BLAS Provider FFM") || 
+                    name.contains("Native CPU-BLAS")) continue;
             }
             
-            if (excluded) {
-                continue;
-            }
-            
+            b.setDryRun(dryRun);
             benchmarks.add(b);
         }
         
@@ -145,7 +142,6 @@ public class BenchmarkCLI {
         int skipped = 0;
 
         for (RunnableBenchmark benchmark : benchmarks) {
-            benchmark.setDryRun(dryRun);
             System.out.println("----------------------------------------------------------------");
             System.out.println("Running: " + benchmark.getName() + " [" + benchmark.getDomain() + "]");
             if (dryRun) System.out.println("Mode: DRY RUN (Small Dataset)");
@@ -246,19 +242,41 @@ public class BenchmarkCLI {
         // Print Performance Report
         System.out.println(org.episteme.core.util.PerformanceLogger.getReport());
 
-        // Export JSON
-        if (exportFile != null) {
-            exportJson(exportFile, results);
+        // Generate Report
+        String reporterTitle = domainFilter != null && domainFilter.contains("High-Precision") ? 
+            "High-Precision Benchmark Result" : "Episteme Performance Audit";
             
-            // Generate PDF if requested
-            if (generatePdf) {
-                String pdfPath = exportFile.replace(".json", ".pdf");
-                if (pdfPath.equals(exportFile)) pdfPath += ".pdf";
-                
-                System.out.println("[INFO] Generating PDF Report: " + pdfPath);
-                org.episteme.benchmarks.reporting.BenchmarkReporter.generateReport(results, pdfPath);
+        BenchmarkReporter reporter = new BenchmarkReporter(reporterTitle);
+        for (BenchmarkResult r : results) {
+            reporter.addResult(r);
+        }
+
+        // Expand high-precision results for JSON export (one entry per operation)
+        List<BenchmarkResult> expandedResults = new ArrayList<>();
+        for (BenchmarkResult r : results) {
+            if (r.domain().contains("High-Precision") && r.extraMetrics() != null && !r.extraMetrics().isEmpty()) {
+                for (java.util.Map.Entry<String, Object> metric : r.extraMetrics().entrySet()) {
+                    expandedResults.add(new BenchmarkResult(
+                        r.benchmarkName() + " (" + metric.getKey() + ")",
+                        r.provider(),
+                        r.domain(),
+                        (Double)metric.getValue()
+                    ));
+                }
+            } else {
+                expandedResults.add(r);
             }
         }
+
+        // Generate Files
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String baseName = "docs/benchmark-results/High-Precision_Benchmark_Result_" + timestamp;
+        
+        if (generatePdf) {
+            System.out.println("[INFO] Generating PDF: " + baseName + ".pdf");
+            reporter.generateReport(baseName + ".pdf");
+        }
+        exportJson(baseName + ".json", expandedResults);
     }
 
     private static void printHelp() {
@@ -308,7 +326,18 @@ public class BenchmarkCLI {
                 json.append(String.format("\"name\":\"%s\",", escape(r.benchmarkName())));
                 json.append(String.format("\"provider\":\"%s\",", escape(r.provider())));
                 json.append(String.format("\"domain\":\"%s\",", escape(r.domain())));
-                json.append(String.format("\"result\":\"%s\"", escape(resultText)));
+                json.append(String.format("\"result\":\"%s\",", escape(resultText)));
+                
+                // Add extra metrics
+                json.append("\"metrics\":{");
+                List<String> mKeys = new ArrayList<>(r.extraMetrics().keySet());
+                for (int j = 0; j < mKeys.size(); j++) {
+                    String k = mKeys.get(j);
+                    Object v = r.extraMetrics().get(k);
+                    json.append(String.format("\"%s\":%s", escape(k), v instanceof Number ? v : "\"" + escape(String.valueOf(v)) + "\""));
+                    if (j < mKeys.size() - 1) json.append(",");
+                }
+                json.append("}");
                 json.append("}");
                 
                 if (i < results.size() - 1) json.append(",");

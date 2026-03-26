@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package org.episteme.client.client.technical.backend.math;
+package org.episteme.client.client.mathematics.linearalgebra.backends;
