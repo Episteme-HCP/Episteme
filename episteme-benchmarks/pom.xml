@@ -356,12 +356,6 @@
                 <configuration>
                     <mainClass>org.episteme.benchmarks.cli.BenchmarkCLI</mainClass>
                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                    <arguments>
-                        <argument>--add-modules</argument>
-                        <argument>jdk.incubator.vector</argument>
-                        <argument>--enable-native-access=ALL-UNNAMED</argument>
-                        <argument>--enable-preview</argument>
-                    </arguments>
                 </configuration>
             </plugin>
         </plugins>

@@ -544,64 +544,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return new GenericMatrix<>(storage, this, f);
     }
 
-    private boolean isSquarePowerOfTwo(Matrix<E> m) {
-        return m.rows() == m.cols() && (m.rows() & (m.rows() - 1)) == 0;
-    }
-
-    private Matrix<E> strassenRecursive(Matrix<E> A, Matrix<E> B) {
-        org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
-        int n = A.rows();
-        if (n <= 512) {
-            return standardMultiply(A, B, (Field<E>) A.getScalarRing(), this);
-        }
-
-        int newSize = n / 2;
-
-        Matrix<E> A11 = A.getSubMatrix(0, newSize, 0, newSize);
-        Matrix<E> A12 = A.getSubMatrix(0, newSize, newSize, n);
-        Matrix<E> A21 = A.getSubMatrix(newSize, n, 0, newSize);
-        Matrix<E> A22 = A.getSubMatrix(newSize, n, newSize, n);
-
-        Matrix<E> B11 = B.getSubMatrix(0, newSize, 0, newSize);
-        Matrix<E> B12 = B.getSubMatrix(0, newSize, newSize, n);
-        Matrix<E> B21 = B.getSubMatrix(newSize, n, 0, newSize);
-        Matrix<E> B22 = B.getSubMatrix(newSize, n, newSize, n);
-
-        Matrix<E> M1 = strassenRecursive(add(A11, A22), add(B11, B22));
-        Matrix<E> M2 = strassenRecursive(add(A21, A22), B11);
-        Matrix<E> M3 = strassenRecursive(A11, subtract(B12, B22));
-        Matrix<E> M4 = strassenRecursive(A22, subtract(B21, B11));
-        Matrix<E> M5 = strassenRecursive(add(A11, A12), B22);
-        Matrix<E> M6 = strassenRecursive(subtract(A21, A11), add(B11, B12));
-        Matrix<E> M7 = strassenRecursive(subtract(A12, A22), add(B21, B22));
-
-        Matrix<E> C11 = add(subtract(add(M1, M4), M5), M7);
-        Matrix<E> C12 = add(M3, M5);
-        Matrix<E> C21 = add(M2, M4);
-        Matrix<E> C22 = add(subtract(add(M1, M3), M2), M6);
-
-        return combineSubMatrices(C11, C12, C21, C22);
-    }
-
-    private Matrix<E> combineSubMatrices(Matrix<E> C11, Matrix<E> C12, Matrix<E> C21, Matrix<E> C22) {
-        int n = C11.rows() * 2;
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(n, n, ((Field<E>) C11.getScalarRing()).zero());
-
-        copySubMatrixToStorage(storage, C11, 0, 0);
-        copySubMatrixToStorage(storage, C12, 0, n / 2);
-        copySubMatrixToStorage(storage, C21, n / 2, 0);
-        copySubMatrixToStorage(storage, C22, n / 2, n / 2);
-
-        return new GenericMatrix<>(storage, this, (Field<E>) C11.getScalarRing());
-    }
-
-    private void copySubMatrixToStorage(DenseMatrixStorage<E> storage, Matrix<E> sub, int rowOffset, int colOffset) {
-        for (int i = 0; i < sub.rows(); i++) {
-            for (int j = 0; j < sub.cols(); j++) {
-                storage.set(rowOffset + i, colOffset + j, sub.get(i, j));
-            }
-        }
-    }
 
     @SuppressWarnings({"unchecked", "restricted"})
     public static <E> Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b, Field<E> field, LinearAlgebraProvider<E> provider) {
@@ -988,31 +930,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing());
     }
 
-    private Matrix<E> pseudoInverse(Matrix<E> a) {
-        SVDResult<E> svd = svd(a);
-        // A+ = V * S+ * UT (using economy dimensions)
-        int m = a.rows();
-        int n = a.cols();
-        int k = svd.S().dimension();
-        
-        // Create S+ (pseudo-inverse of diagonal S) as k x k
-        DenseMatrixStorage<E> sPlusStorage = new DenseMatrixStorage<>(k, k, field.zero());
-        for (int i = 0; i < k; i++) {
-            E sVal = svd.S().get(i);
-            if (absValueDouble(sVal) > 1e-12) {
-                sPlusStorage.set(i, i, field.divide(field.one(), sVal));
-            }
-        }
-        Matrix<E> sPlus = new GenericMatrix<>(sPlusStorage, this, field);
-        
-        // V is n x n, we need first k columns to match sPlus (k x k)
-        Matrix<E> vEco = svd.V().getSubMatrix(0, n, 0, k);
-        
-        // U is m x m, we need first k columns (m x k) so UT is (k x m)
-        Matrix<E> uEco = svd.U().getSubMatrix(0, m, 0, k);
-        
-        return multiply(multiply(vEco, sPlus), transpose(uEco));
-    }
 
     // Decompositions now use the top-level generic solvers imported from org.episteme.core.mathematics.linearalgebra.matrices.solvers
 

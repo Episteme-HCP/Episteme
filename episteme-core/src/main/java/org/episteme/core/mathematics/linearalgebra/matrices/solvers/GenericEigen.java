@@ -30,7 +30,6 @@ public class GenericEigen {
         
         for (int sweep = 0; sweep < maxSweeps; sweep++) {
             int p = 0, q = 0;
-            E maxOff = field.zero();
             double maxOffDouble = -1.0;
 
             for (int i = 0; i < n; i++) {
@@ -38,7 +37,6 @@ public class GenericEigen {
                     double valDouble = absValueDouble(A[i][j], field);
                     if (valDouble > maxOffDouble) {
                         maxOffDouble = valDouble;
-                        maxOff = A[i][j];
                         p = i;
                         q = j;
                     }
@@ -118,6 +116,7 @@ public class GenericEigen {
         );
     }
 
+    @SuppressWarnings("unchecked")
     private static <E> E abs(E element, Field<E> field) {
         if (element instanceof Real) return (E) ((Real) element).abs();
         if (element instanceof Complex) return (E) ((Complex) element).abs();

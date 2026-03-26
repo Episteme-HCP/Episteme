@@ -20,16 +20,12 @@ public class BenchmarkRegistry {
         
         try {
             // 1. Discover explicit benchmarks
-            System.out.println("[DEBUG] Discovery: Loading explicit benchmarks...");
             ServiceLoader<RunnableBenchmark> benchLoader = ServiceLoader.load(RunnableBenchmark.class, loader);
             Iterator<RunnableBenchmark> benchIterator = benchLoader.iterator();
-            int explicitCount = 0;
             while (true) {
                 try {
                     if (!benchIterator.hasNext()) break;
                     RunnableBenchmark b = benchIterator.next();
-                    explicitCount++;
-                    System.out.println("[DEBUG] Found explicit benchmark: " + b.getName() + " (ID: " + b.getId() + ")");
                     if (b instanceof SystematicBenchmark) {
                         expandSystematic((SystematicBenchmark<?>) b, all, loader);
                     } else {
@@ -39,7 +35,6 @@ public class BenchmarkRegistry {
                     System.err.println("[WARN] Skipping bad explicit benchmark: " + e.getMessage());
                 }
             }
-            System.out.println("[DEBUG] Discovery: Found " + explicitCount + " explicit benchmarks candidates.");
 
             // 2. Discover all generic AlgorithmProviders and wrap them
             ServiceLoader<org.episteme.core.technical.algorithm.AlgorithmProvider> providerLoader = 

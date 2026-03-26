@@ -15,11 +15,8 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.context.MathContext;
-import org.episteme.core.technical.backend.Backend;
-import org.episteme.core.technical.backend.BackendDiscovery;
 
 import org.junit.jupiter.api.Test;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -32,8 +29,6 @@ public class NumericalCorrectnessTest {
 
     private static final BigDecimal TOLERANCE_REALBIG = new BigDecimal("1e-25");
     private static final double TOLERANCE_COMPLEX = 1e-8;
-    private static final String REPORT_PATH = "reports/NUMERICAL_CORRECTNESS_REPORT.md";
-    private static final String[] EXCLUDED_PROVIDERS = {"Mock", "Proxy", "Distributed"};
 
     @Test
     public void runNumericalAudit() {
@@ -120,7 +115,17 @@ public class NumericalCorrectnessTest {
             Matrix<RealBig> I = Matrix.identity(3, A.getScalarRing());
             assertMatrixClose(p.multiply(A, inv), I, TOLERANCE_REALBIG, "A * A^-1 = I");
         });
-        // ... abbreviated for brevity in initial fix, will add more back if needed ...
+        testCorrectness(res, "RB:QR", () -> {
+            QRResult<RealBig> qr = p.qr(A);
+            Matrix<RealBig> reconstructed = qr.Q().multiply(qr.R());
+            assertMatrixClose(reconstructed, A, TOLERANCE_REALBIG, "Q * R = A");
+        });
+        testCorrectness(res, "RB:Cholesky", () -> {
+            Matrix<RealBig> posDef = p.multiply(A.transpose(), A);
+            CholeskyResult<RealBig> chol = p.cholesky(posDef);
+            Matrix<RealBig> reconstructed = chol.L().multiply(chol.L().transpose());
+            assertMatrixClose(reconstructed, posDef, TOLERANCE_REALBIG, "L * L^T = A");
+        });
     }
 
     private void runComplexCorrectnessTests(CorrectnessResult res, LinearAlgebraProvider<Complex> p, LinearAlgebraProvider<Complex> mpfr) {
@@ -168,6 +173,7 @@ public class NumericalCorrectnessTest {
         Map<String, String> details = new LinkedHashMap<>();
     }
 
+    @SuppressWarnings("unchecked")
     private List<LinearAlgebraProvider<?>> discoverHPProviders() {
         List<LinearAlgebraProvider<?>> list = new ArrayList<>();
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
@@ -175,6 +181,7 @@ public class NumericalCorrectnessTest {
         return list;
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<RealBig> createInvertibleRealBigMatrix(int n) {
         RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) {

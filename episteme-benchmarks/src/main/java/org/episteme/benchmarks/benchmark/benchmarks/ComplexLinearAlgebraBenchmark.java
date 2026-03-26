@@ -28,7 +28,7 @@ import java.util.Random;
 @AutoService(RunnableBenchmark.class)
 public class ComplexLinearAlgebraBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Complex>> {
 
-    private static final int SIZE = 64; // Complex is slower, smaller size
+    private static final int SIZE = 32; // Complex is slower, smaller size
     private static final int DRY_RUN_SIZE = 8;
     
     private Matrix<Complex> a;
@@ -40,7 +40,7 @@ public class ComplexLinearAlgebraBenchmark implements SystematicBenchmark<Linear
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "linear-algebra-complex-hp"; }
     @Override public String getNameBase() { return "Complex High-Precision Matrix Multiplication"; }
-    @Override public String getDescription() { return "Dense Complex Matrix Multiplication (64x64), High Precision (EXACT)"; }
+    @Override public String getDescription() { return "Dense Complex Matrix Multiplication (32x32), High Precision (EXACT)"; }
     @Override public String getDomain() { return "Linear Algebra (Complex HP)"; }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })

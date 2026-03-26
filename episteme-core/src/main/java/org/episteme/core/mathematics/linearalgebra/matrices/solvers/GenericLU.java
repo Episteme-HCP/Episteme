@@ -81,9 +81,13 @@ public class GenericLU {
         E[] pData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
         for (int i = 0; i < n; i++) {
             if (field.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
-                pData[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(perm[i]));
+                @SuppressWarnings("unchecked")
+                E cVal = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(perm[i]));
+                pData[i] = cVal;
             } else {
-                pData[i] = (E) (Object) Real.of(perm[i]);
+                @SuppressWarnings("unchecked")
+                E rVal = (E) (Object) Real.of(perm[i]);
+                pData[i] = rVal;
             }
         }
         

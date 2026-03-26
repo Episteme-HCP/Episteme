@@ -7,7 +7,6 @@ package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
@@ -16,8 +15,6 @@ import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AlgorithmService;
 import org.episteme.core.technical.algorithm.TestingAlgorithmService;
-import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -638,6 +635,7 @@ public class HighPrecisionComplianceTest {
     }
 
     // --- Matrix/Vector Creation ---
+    @SuppressWarnings("unchecked")
     private Matrix<RealBig> createRealBigMatrix(RealBig val, int n) {
         RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) {
@@ -649,6 +647,7 @@ public class HighPrecisionComplianceTest {
         return Matrix.of(data, ring);
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<RealBig> createInvertibleRealBigMatrix(int n) {
         // Diagonally dominant for invertibility
         RealBig[][] data = new RealBig[n][n];
@@ -665,6 +664,7 @@ public class HighPrecisionComplianceTest {
         return Matrix.of(data, ring);
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<RealBig> createSPDRealBigMatrix(int n) {
         // A^T * A + nI for symmetric positive definite
         RealBig[][] data = new RealBig[n][n];
@@ -682,6 +682,7 @@ public class HighPrecisionComplianceTest {
         return Matrix.of(data, ring);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<RealBig> createRealBigVector(RealBig val, int n) {
         RealBig[] data = new RealBig[n];
         for (int i = 0; i < n; i++) {

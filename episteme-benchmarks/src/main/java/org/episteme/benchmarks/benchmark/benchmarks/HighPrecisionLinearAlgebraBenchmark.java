@@ -27,7 +27,7 @@ import java.util.Random;
 @AutoService(RunnableBenchmark.class)
 public class HighPrecisionLinearAlgebraBenchmark implements SystematicBenchmark<LinearAlgebraProvider<Real>> {
 
-    private static final int SIZE = 128;
+    private static final int SIZE = 64;
     private static final int DRY_RUN_SIZE = 8;
     
     private Matrix<Real> a;
@@ -39,7 +39,7 @@ public class HighPrecisionLinearAlgebraBenchmark implements SystematicBenchmark<
     @Override public String getName() { return getNameBase(); }
     @Override public String getIdPrefix() { return "linear-algebra-hp-systematic"; }
     @Override public String getNameBase() { return "High-Precision Matrix Multiplication"; }
-    @Override public String getDescription() { return "Dense Matrix Multiplication (128x128), High Precision (EXACT)"; }
+    @Override public String getDescription() { return "Dense Matrix Multiplication (64x64), High Precision (EXACT)"; }
     @Override public String getDomain() { return "Linear Algebra (High-Precision)"; }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })

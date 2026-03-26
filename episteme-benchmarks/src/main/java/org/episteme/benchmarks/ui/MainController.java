@@ -19,6 +19,16 @@ import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.technical.algorithm.ProviderExecutionMode;
 import org.episteme.core.technical.algorithm.ProviderExecutionMode.Mode;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.numbers.real.RealBig;
+import org.episteme.core.mathematics.numbers.complex.Complex;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.technical.algorithm.AlgorithmService;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.TestingAlgorithmService;
+import org.episteme.core.technical.algorithm.StandardAlgorithmService;
+import org.episteme.core.technical.algorithm.OperationCancelledException;
+import org.episteme.core.util.PerformanceLogger;
 
 
 import javax.imageio.ImageIO;
@@ -27,9 +37,6 @@ import java.util.*;
 import java.io.IOException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.collections.FXCollections;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class MainController {
 

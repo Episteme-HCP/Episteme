@@ -78,11 +78,13 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> add(Vector<E> a, Vector<E> b) {
         return wrap((Vector<E>) executeOnLocal(a.getScalarRing(), p -> p.add(a, b)));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
         return wrap((Vector<E>) executeOnLocal(a.getScalarRing(), p -> p.subtract(a, b)));
     }
@@ -120,6 +122,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
         if (isLarge && a instanceof TiledMatrix && b instanceof TiledMatrix) {
             try {
                 // Use the MatrixMultiplicationPlanner for best algorithm selection
+                @SuppressWarnings("unchecked")
                 TiledMatrix<E> result = org.episteme.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply((TiledMatrix<E>) a, (TiledMatrix<E>) b);
                 return (Matrix<E>) result;
             } catch (Exception e) {
@@ -128,7 +131,9 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             }
         }
         
-        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.multiply(a, b)));
+        @SuppressWarnings("unchecked")
+        Matrix<E> res = (Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.multiply(a, b));
+        return wrap(res);
     }
 
     @Override
@@ -226,6 +231,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
         return wrap((Vector<E>) executeOnSparseLocal(a.getScalarRing(), p -> p.gmres(a, b, x0, tolerance, maxIterations, restarts)));
     }
     
+    @SuppressWarnings("unchecked")
     private <R> R executeOnSparseLocal(Ring<E> ring, java.util.function.Function<SparseLinearAlgebraProvider<E>, R> operation) {
         return org.episteme.core.technical.algorithm.ProviderSelector.execute(
             SparseLinearAlgebraProvider.class, 

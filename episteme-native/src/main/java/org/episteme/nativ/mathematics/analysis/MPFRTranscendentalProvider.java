@@ -123,8 +123,10 @@ public final class MPFRTranscendentalProvider implements TranscendentalProvider 
 
         try {
             // Reinterpret the raw pointer with enough size to find the null terminator
-            // We use a safe size reflecting the precision requested (+ metadata room)
-            long safeSize = (long)(mc.getPrecision() * 1.5) + 64; 
+            // MPFR precision is in bits. String length in base 10 is roughly bits * 0.301.
+            // We use a safe multiplier and a minimum buffer.
+            long precBits = (long) (mc.getPrecision() * 3.322);
+            long safeSize = (precBits / 3) + 128; 
             MemorySegment safeSeg = strPtr.reinterpret(safeSize);
             
             String digits = safeSeg.getString(0);
@@ -132,6 +134,8 @@ public final class MPFRTranscendentalProvider implements TranscendentalProvider 
                 throw new RuntimeException("mpfr_get_str returned an empty string at 0x" + Long.toHexString(strPtr.address()));
             }
 
+            // mpfr_exp_t is a signed type, usually long on 64-bit but can be int on 32-bit.
+            // Panama JAVA_LONG matches 64-bit long.
             long exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_LONG, 0);
             
             // Format: 0.[digits] * 10^exp

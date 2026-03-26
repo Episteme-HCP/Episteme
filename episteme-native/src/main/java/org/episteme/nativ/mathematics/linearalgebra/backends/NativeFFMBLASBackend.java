@@ -271,14 +271,11 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
                 available = (DGEMM != null && DGEMV != null && DDOT != null);
                 if (available) {
                     logger.info("FFM: Backend initialized successfully. Handles: DGEMM={}, DGESV={}, DGETRI={}", (DGEMM != null), (DGESV != null), (DGETRI != null));
-                    System.out.println("[FFM] Backend initialized successfully."); System.out.flush();
                 } else {
                     logger.warn("FFM: Native library found but essential BLAS handles (DGEMM, DGEMV) are missing.");
-                    System.out.println("[FFM] Native library found but essential handles missing."); System.out.flush();
                 }
             } catch (Throwable t) {
                 logger.warn("FFM: Failed to link native symbols: {}", t.getMessage());
-                System.err.println("[FFM] Failed to link symbols: " + t.getMessage()); System.err.flush();
                 available = false;
             }
         }
@@ -774,7 +771,6 @@ public class NativeFFMBLASBackend implements LinearAlgebraProvider<Real>, Native
         if (k != B.rows()) throw new IllegalArgumentException("Matrix dimensions mismatch");
 
         logger.debug("FFM Multiply: [{}x{}] * [{}x{}]", m, k, k, n);
-        System.out.println("[FFM] Entering multiply " + m + "x" + n); System.out.flush();
 
         try (Arena arena = Arena.ofConfined()) {
             int lenA = m * k;

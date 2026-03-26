@@ -1,9 +1,14 @@
 package org.episteme.benchmarks.cli;
 
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
-import org.episteme.benchmarks.benchmark.BenchmarkRunner;
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
+import org.episteme.core.technical.algorithm.AlgorithmService;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
+import org.episteme.core.technical.algorithm.TestingAlgorithmService;
+import org.episteme.core.technical.algorithm.StandardAlgorithmService;
+import org.episteme.core.util.PerformanceLogger;
 
 import java.io.File;
 import java.io.FileWriter;
