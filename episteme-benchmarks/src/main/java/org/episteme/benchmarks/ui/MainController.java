@@ -14,22 +14,16 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import org.episteme.benchmarks.benchmark.RunnableBenchmark;
-import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
-import org.episteme.core.ui.i18n.I18N;
-import org.episteme.core.technical.algorithm.ProviderExecutionMode;
-import org.episteme.core.technical.algorithm.ProviderExecutionMode.Mode;
-import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.numbers.real.RealBig;
-import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AlgorithmService;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.TestingAlgorithmService;
 import org.episteme.core.technical.algorithm.StandardAlgorithmService;
 import org.episteme.core.technical.algorithm.OperationCancelledException;
-import org.episteme.core.util.PerformanceLogger;
-
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
+import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.technical.algorithm.ProviderExecutionMode;
+import org.episteme.core.technical.algorithm.ProviderExecutionMode.Mode;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -37,6 +31,9 @@ import java.util.*;
 import java.io.IOException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.collections.FXCollections;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class MainController {
 
@@ -90,46 +87,6 @@ public class MainController {
     private final java.util.concurrent.ConcurrentLinkedQueue<BenchmarkItem> benchmarkQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
     private int selectedCount = 0;
     private int completedCount = 0;
-
-    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> createRealBigMatrix(int n) {
-        org.episteme.core.mathematics.numbers.real.RealBig[][] data = new org.episteme.core.mathematics.numbers.real.RealBig[n][n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                data[i][j] = org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal(String.valueOf(i + j + 1)));
-            }
-        }
-        return (org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig>) (org.episteme.core.mathematics.linearalgebra.Matrix<?>) org.episteme.core.mathematics.linearalgebra.Matrix.of(data, org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO).getScalarRing());
-    }
-
-    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> createComplexMatrix(int n) {
-        org.episteme.core.mathematics.numbers.complex.Complex[][] data = new org.episteme.core.mathematics.numbers.complex.Complex[n][n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                data[i][j] = org.episteme.core.mathematics.numbers.complex.Complex.of(i + j + 1, 0.1);
-            }
-        }
-        return org.episteme.core.mathematics.linearalgebra.Matrix.of(data, org.episteme.core.mathematics.numbers.complex.Complex.of(0, 0).getScalarRing());
-    }
-
-    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> createSPDRealBigMatrix(int n) {
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> m = createRealBigMatrix(n);
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> mt = m.transpose();
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> mmt = m.multiply(mt);
-        @SuppressWarnings("unchecked")
-        org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.real.RealBig> ring = (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.real.RealBig>) (Object) org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO).getScalarRing();
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.RealBig> id = org.episteme.core.mathematics.linearalgebra.Matrix.identity(n, ring);
-        return mmt.add(id.scale(org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal(String.valueOf(n)))));
-    }
-
-    private org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> createSPDComplexMatrix(int n) {
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mc = createComplexMatrix(n);
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mct = mc.transpose().map(org.episteme.core.mathematics.numbers.complex.Complex::conjugate);
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mmct = mc.multiply(mct);
-        @SuppressWarnings("unchecked")
-        org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex> ringC = (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(0, 0).getScalarRing();
-        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> idC = org.episteme.core.mathematics.linearalgebra.Matrix.identity(n, ringC);
-        return mmct.add(idC.scale(org.episteme.core.mathematics.numbers.complex.Complex.of(n, 0)));
-    }
     private final Object executionLock = new Object();
     private ResourceBundle resources;
     private Task<Void> mainTask;
@@ -687,16 +644,16 @@ public class MainController {
             if (b == null) return;
             
             // Enforce Isolation
-            org.episteme.core.technical.algorithm.AlgorithmService oldService = 
-                org.episteme.core.technical.algorithm.AlgorithmManager.getService();
+            AlgorithmService oldService = 
+                AlgorithmManager.getService();
             org.episteme.core.technical.algorithm.AlgorithmProvider providerInstance = b.getAlgorithmProviderInstance();
             
             if (providerInstance != null) {
-                org.episteme.core.technical.algorithm.AlgorithmManager.setService(
-                    new org.episteme.core.technical.algorithm.TestingAlgorithmService(providerInstance));
-            } else if (oldService instanceof org.episteme.core.technical.algorithm.StandardAlgorithmService) {
-                 org.episteme.core.technical.algorithm.AlgorithmManager.setService(
-                    new org.episteme.core.technical.algorithm.TestingAlgorithmService());
+                AlgorithmManager.setService(
+                    new TestingAlgorithmService(providerInstance));
+            } else if (oldService instanceof StandardAlgorithmService) {
+                 AlgorithmManager.setService(
+                    new TestingAlgorithmService());
             }
 
             try {
@@ -744,7 +701,7 @@ public class MainController {
                             item.statusProperty().set("Skipped");
                             item.resultProperty().set("Skipped (Lib Missing)");
                          });
-                    } else if (e instanceof org.episteme.core.technical.algorithm.OperationCancelledException || "Canceled".equals(errorMsg)) {
+                    } else if (e instanceof OperationCancelledException || "Canceled".equals(errorMsg)) {
                          Platform.runLater(() -> {
                             item.statusProperty().set("Canceled");
                             item.resultProperty().set("Stopped");
@@ -761,7 +718,7 @@ public class MainController {
                     ProviderExecutionMode.reset();
                 }
             } finally {
-                org.episteme.core.technical.algorithm.AlgorithmManager.setService(oldService);
+                AlgorithmManager.setService(oldService);
             }
         } // End synchronized
     }

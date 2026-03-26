@@ -15,6 +15,8 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
 
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
@@ -41,7 +43,9 @@ public class NumericalCorrectnessTest {
             LinearAlgebraProvider<RealBig> mpfrRef = null;
             for (AlgorithmProvider p : AlgorithmManager.getProviders(AlgorithmProvider.class)) {
                 if (p.getName().contains("MPFR") && (p instanceof LinearAlgebraProvider)) {
-                    mpfrRef = (LinearAlgebraProvider<RealBig>) (Object) p;
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<RealBig> casted = (LinearAlgebraProvider<RealBig>) (Object) p;
+                    mpfrRef = casted;
                     break;
                 }
             }
@@ -93,7 +97,9 @@ public class NumericalCorrectnessTest {
                     LinearAlgebraProvider<Complex> cProvider = (LinearAlgebraProvider<Complex>) providerToTest;
                     LinearAlgebraProvider<Complex> cMpfr = null;
                     if (mpfr.isCompatible(cRing)) {
-                        cMpfr = (LinearAlgebraProvider<Complex>) (Object) mpfr; 
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<Complex> casted = (LinearAlgebraProvider<Complex>) (Object) mpfr;
+                        cMpfr = casted; 
                     }
                     runComplexCorrectnessTests(currentRes, cProvider, cMpfr);
                 }
@@ -176,7 +182,7 @@ public class NumericalCorrectnessTest {
     @SuppressWarnings("unchecked")
     private List<LinearAlgebraProvider<?>> discoverHPProviders() {
         List<LinearAlgebraProvider<?>> list = new ArrayList<>();
-        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
+        ServiceLoader<LinearAlgebraProvider<?>> loader = (ServiceLoader<LinearAlgebraProvider<?>>) (ServiceLoader<?>) ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> p : loader) list.add(p);
         return list;
     }

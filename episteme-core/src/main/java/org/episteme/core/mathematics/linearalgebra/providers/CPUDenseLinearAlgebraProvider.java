@@ -61,7 +61,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     @SuppressWarnings("unchecked")
     public CPUDenseLinearAlgebraProvider(Field<E> field) {
-        this.field = (field != null) ? field : (Field<E>) org.episteme.core.mathematics.sets.Reals.getInstance();
+        this.field = (field != null) ? field : (Field<E>) (Object) org.episteme.core.mathematics.sets.Reals.getInstance();
     }
 
     /**
@@ -820,23 +820,25 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> inverse(Matrix<E> a) {
         if (a.rows() != a.cols()) {
             throw new IllegalArgumentException("Matrix must be square");
         }
         if (isReal(a)) {
-            return (Matrix<E>) JavaLU.inverse((Matrix<Real>) a);
+            return (Matrix<E>) (Object) JavaLU.inverse((Matrix<Real>) (Object) a);
         }
-        return GenericLU.inverse(a, (Field<E>) a.getScalarRing(), this);
+        return GenericLU.inverse(a, (Field<E>) (Object) a.getScalarRing(), this);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
         if (a.rows() != a.cols()) {
             throw new IllegalArgumentException("Matrix must be square");
         }
         if (isReal(a)) {
-            return (E) (Object) JavaLU.determinant((Matrix<Real>) a);
+            return (E) (Object) JavaLU.determinant((Matrix<Real>) (Object) a);
         }
         return GenericLU.determinant(a, (Field<E>) a.getScalarRing());
     }
@@ -933,12 +935,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     // Decompositions now use the top-level generic solvers imported from org.episteme.core.mathematics.linearalgebra.matrices.solvers
 
-    private double absValueDouble(E element) {
-        if (element instanceof Real) return ((Real) element).doubleValue();
-        if (element instanceof Complex) return ((Complex) element).abs().doubleValue();
-        if (element instanceof Number) return ((Number) element).doubleValue();
-        return 0.0;
-    }
 
     @SuppressWarnings("unchecked")
     private E conjugate(E element) {

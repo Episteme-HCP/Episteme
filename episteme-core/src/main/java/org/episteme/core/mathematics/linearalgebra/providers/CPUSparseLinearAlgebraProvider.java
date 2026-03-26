@@ -70,29 +70,26 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     @SuppressWarnings("unchecked")
     public LUResult<E> lu(Matrix<E> a) {
-        return GenericLU.decompose(a, (Field<E>) a.getScalarRing(), this);
+        return GenericLU.decompose(a, (Field<E>) (Object) a.getScalarRing(), this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public QRResult<E> qr(Matrix<E> a) {
-        return GenericQR.decompose(a, (Field<E>) a.getScalarRing(), this);
+        return GenericQR.decompose(a, (Field<E>) (Object) a.getScalarRing(), this);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public CholeskyResult<E> cholesky(Matrix<E> a) {
         return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing());
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public SVDResult<E> svd(Matrix<E> a) {
         return GenericSVD.decompose(a, (Field<E>) a.getScalarRing());
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public EigenResult<E> eigen(Matrix<E> a) {
         return GenericEigen.decompose(a, (Field<E>) a.getScalarRing());
     }
@@ -100,17 +97,15 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        return GenericLU.solve(lu, b, (Field<E>) b.getScalarRing());
+        return GenericLU.solve(lu, b, (Field<E>) (Object) b.getScalarRing());
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
         return GenericQR.solve(qr, b, (Field<E>) b.getScalarRing());
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
         return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing());
     }
@@ -154,7 +149,6 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         LUResult<E> lu = lu(a);
@@ -169,8 +163,8 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     public Matrix<E> inverse(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = a.rows();
-        Field<E> f = (Field<E>) a.getScalarRing();
-        E[] invData = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), n * n);
+        Field<E> f = (Field<E>) (Object) a.getScalarRing();
+        E[] invData = (E[]) (Object) java.lang.reflect.Array.newInstance(f.zero().getClass(), n * n);
         LUResult<E> lu = lu(a);
         for (int j = 0; j < n; j++) {
             E[] e_j = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), n);
@@ -253,6 +247,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         Ring<E> r = a.getScalarRing();
         if (scalar.equals(r.zero())) return wrap(new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(a.rows(), a.cols(), r.zero()), r));
@@ -262,7 +257,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         Object[] values = s.getValues();
         int nnz = s.getNnz();
         Object[] scaledValues = new Object[nnz];
-        for (int i = 0; i < nnz; i++) scaledValues[i] = r.multiply((E) values[i], scalar);
+        for (int i = 0; i < nnz; i++) scaledValues[i] = r.multiply((E) (Object) values[i], scalar);
         return wrap(new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(s.rows(), s.cols(), r.zero(), rowPtrs, colIdxs, scaledValues), r));
     }
 
@@ -321,9 +316,10 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
         E d = dot(a, a);
-        return sqrt(d, (Field<E>) a.getScalarRing());
+        return sqrt(d, (Field<E>) (Object) a.getScalarRing());
     }
 
     @SuppressWarnings("unchecked")

@@ -72,19 +72,17 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
                 if (p == this || (ring != null && !p.isCompatible(ring))) {
                     throw new UnsupportedOperationException("Not suitable");
                 }
-                return operation.apply((LinearAlgebraProvider<E>) p);
+                return operation.apply((LinearAlgebraProvider<E>) (Object) p);
             }
         );
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> add(Vector<E> a, Vector<E> b) {
         return wrap((Vector<E>) executeOnLocal(a.getScalarRing(), p -> p.add(a, b)));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
         return wrap((Vector<E>) executeOnLocal(a.getScalarRing(), p -> p.subtract(a, b)));
     }
@@ -115,6 +113,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         // Check heuristics for distribution
         boolean isLarge = (long)a.rows() * a.cols() * b.cols() > 100_000_000;
@@ -122,17 +121,15 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
         if (isLarge && a instanceof TiledMatrix && b instanceof TiledMatrix) {
             try {
                 // Use the MatrixMultiplicationPlanner for best algorithm selection
-                @SuppressWarnings("unchecked")
-                TiledMatrix<E> result = org.episteme.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply((TiledMatrix<E>) a, (TiledMatrix<E>) b);
-                return (Matrix<E>) result;
+                TiledMatrix<E> result = org.episteme.core.mathematics.linearalgebra.algorithms.MatrixMultiplicationPlanner.multiply((TiledMatrix<E>) (Object) a, (TiledMatrix<E>) (Object) b);
+                return (Matrix<E>) (Object) result;
             } catch (Exception e) {
                // Fallback on error
                 System.err.println("Distributed multiplication failed, falling back to local: " + e.getMessage());
             }
         }
         
-        @SuppressWarnings("unchecked")
-        Matrix<E> res = (Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.multiply(a, b));
+        Matrix<E> res = (Matrix<E>) (Object) executeOnLocal(a.getScalarRing(), p -> p.multiply(a, b));
         return wrap(res);
     }
 
@@ -239,7 +236,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             p -> {
                 if (p == this) throw new UnsupportedOperationException("Not suitable");
                 if (ring != null && !p.isCompatible(ring)) throw new UnsupportedOperationException("Not suitable");
-                return operation.apply((SparseLinearAlgebraProvider<E>) p);
+                return operation.apply((SparseLinearAlgebraProvider<E>) (Object) p);
             }
         );
     }

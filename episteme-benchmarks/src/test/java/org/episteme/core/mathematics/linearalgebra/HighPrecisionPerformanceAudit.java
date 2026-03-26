@@ -49,7 +49,9 @@ public class HighPrecisionPerformanceAudit {
                 @SuppressWarnings("unchecked")
                 Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.create(BigDecimal.ZERO).getScalarRing();
                 if (provider.isCompatible(rbRing)) {
-                    auditRealBig(metrics, (LinearAlgebraProvider<RealBig>) (Object) provider);
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<RealBig> casted = (LinearAlgebraProvider<RealBig>) (Object) provider;
+                    auditRealBig(metrics, casted);
                 }
 
                 String providerType = provider.getClass().getSimpleName();
@@ -90,13 +92,15 @@ public class HighPrecisionPerformanceAudit {
         metrics.put("RB:Inverse", (System.nanoTime() - start) / 1_000_000.0);
     }
 
+    @SuppressWarnings("unchecked")
     private List<LinearAlgebraProvider<?>> discoverHPProviders() {
         List<LinearAlgebraProvider<?>> list = new ArrayList<>();
-        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
+        ServiceLoader<LinearAlgebraProvider<?>> loader = (ServiceLoader<LinearAlgebraProvider<?>>) (Object) ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> p : loader) list.add(p);
         return list;
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<RealBig> createRealBigMatrix(int n) {
         RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++)
