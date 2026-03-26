@@ -15,8 +15,7 @@ import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
 import org.junit.jupiter.api.Test;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -36,15 +35,14 @@ public class HighPrecisionCorrectnessTest {
         "Native CPU-BLAS"
     );
 
-    private String getTimestamp() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-    }
-    
     private String getReportPath() {
+        String customPath = System.getProperty("org.episteme.report.path");
+        if (customPath != null && !customPath.isEmpty()) return customPath;
+
         String userDir = System.getProperty("user.dir");
         java.nio.file.Path rootPath = java.nio.file.Paths.get(userDir);
         if (rootPath.endsWith("episteme-benchmarks")) rootPath = rootPath.getParent();
-        return rootPath.resolve("docs/benchmark-results/benchmark-results-HighPrecision-Correctness-" + getTimestamp() + ".md").toString();
+        return rootPath.resolve("docs/HIGH_PRECISION_CORRECTNESS_REPORT.md").toString();
     }
 
     @Test

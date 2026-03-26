@@ -12,7 +12,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.mathematics.numbers.real.TranscendentalProvider;
+
 import org.episteme.core.technical.algorithm.AlgorithmService;
 import org.episteme.core.technical.algorithm.TestingAlgorithmService;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /**
  * Systematic compliance test for High-Precision LinearAlgebraProvider implementations.
@@ -46,10 +46,13 @@ public class HighPrecisionComplianceTest {
     }
     
     private String getReportPath() {
+        String customPath = System.getProperty("org.episteme.report.path");
+        if (customPath != null && !customPath.isEmpty()) return customPath;
+        
         String userDir = System.getProperty("user.dir");
         java.nio.file.Path rootPath = java.nio.file.Paths.get(userDir);
         if (rootPath.endsWith("episteme-benchmarks")) rootPath = rootPath.getParent();
-        return rootPath.resolve("docs/benchmark-results/benchmark-results-HighPrecision-Compliance-" + getTimestamp() + ".md").toString();
+        return rootPath.resolve("docs/HIGH_PRECISION_COMPLIANCE_REPORT.md").toString();
     }
 
     // Providers to exclude from HP tests (double-only, broken, or unused)

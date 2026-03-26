@@ -21,6 +21,8 @@ import org.episteme.core.technical.algorithm.StandardAlgorithmService;
 import org.episteme.core.technical.algorithm.OperationCancelledException;
 import org.episteme.benchmarks.benchmark.RunnableBenchmark;
 import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
+import org.episteme.benchmarks.ui.BenchmarkItem;
+import org.episteme.benchmarks.ui.BenchmarkRunSummary;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.technical.algorithm.ProviderExecutionMode;
 import org.episteme.core.technical.algorithm.ProviderExecutionMode.Mode;

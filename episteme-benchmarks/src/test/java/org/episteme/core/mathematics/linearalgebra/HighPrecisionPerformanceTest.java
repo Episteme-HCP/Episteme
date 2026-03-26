@@ -34,16 +34,7 @@ public class HighPrecisionPerformanceTest {
         "Native CPU-BLAS"
     );
 
-    private String getTimestamp() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-    }
     
-    private String getReportPath() {
-        String userDir = System.getProperty("user.dir");
-        java.nio.file.Path rootPath = java.nio.file.Paths.get(userDir);
-        if (rootPath.endsWith("episteme-benchmarks")) rootPath = rootPath.getParent();
-        return rootPath.resolve("docs/benchmark-results/benchmark-results-HighPrecision-Performance-" + getTimestamp() + ".md").toString();
-    }
 
     @Test
     public void runPerformanceBenchmark() throws IOException {
@@ -102,7 +93,6 @@ public class HighPrecisionPerformanceTest {
             }
         }
         reporter.generateReport();
-        reporter.exportToRoot(getReportPath());
     }
 
     private void benchmarkRealBig(Map<String, Object> metrics, LinearAlgebraProvider<RealBig> p) {

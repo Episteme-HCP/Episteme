@@ -33,7 +33,7 @@ import static org.episteme.nativ.mathematics.analysis.NativeMPFRNumbers.*;
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@AutoService({LinearAlgebraBackend.class, Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
 public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E>, NativeBackend, CPUBackend {
 
@@ -59,7 +59,20 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
     private static MethodHandle MPFR_NEG;
     private static MethodHandle MPFR_SET_D;
     private static MethodHandle MPFR_EXP;
+    private static MethodHandle MPFR_LOG;
+    private static MethodHandle MPFR_LOG10;
     private static MethodHandle MPFR_SIN;
+    private static MethodHandle MPFR_COS;
+    private static MethodHandle MPFR_TAN;
+    private static MethodHandle MPFR_ASIN;
+    private static MethodHandle MPFR_ACOS;
+    private static MethodHandle MPFR_ATAN;
+    private static MethodHandle MPFR_SINH;
+    private static MethodHandle MPFR_COSH;
+    private static MethodHandle MPFR_TANH;
+    private static MethodHandle MPFR_SQRT;
+    private static MethodHandle MPFR_CBRT;
+    private static MethodHandle MPFR_POW;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -92,7 +105,20 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
                 MPFR_NEG = lookup(mpfr, "mpfr_neg", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT));
                 MPFR_EXP = lookup(mpfr, "mpfr_exp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_LOG = lookup(mpfr, "mpfr_log", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_LOG10 = lookup(mpfr, "mpfr_log10", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SIN = lookup(mpfr, "mpfr_sin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_COS = lookup(mpfr, "mpfr_cos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_TAN = lookup(mpfr, "mpfr_tan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_ASIN = lookup(mpfr, "mpfr_asin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_ACOS = lookup(mpfr, "mpfr_acos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_ATAN = lookup(mpfr, "mpfr_atan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_SINH = lookup(mpfr, "mpfr_sinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_COSH = lookup(mpfr, "mpfr_cosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_TANH = lookup(mpfr, "mpfr_tanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_CBRT = lookup(mpfr, "mpfr_cbrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_POW = lookup(mpfr, "mpfr_pow", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null && MPFR_MUL != null && MPFR_CMP_ABS != null && MPFR_SUB != null && MPFR_SET != null && MPFR_DIV != null && MPFR_SET_UI != null && MPFR_SET_D != null;
                 if (AVAILABLE) {
@@ -171,20 +197,20 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
         );
     }
 
-    @Override public Matrix<E> exp(Matrix<E> a) { return transcendentalOp(a, MPFR_EXP); }
-    @Override public Matrix<E> log(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG); }
-    @Override public Matrix<E> log10(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG10); }
-    @Override public Matrix<E> sin(Matrix<E> a) { return transcendentalOp(a, MPFR_SIN); }
-    @Override public Matrix<E> cos(Matrix<E> a) { return transcendentalOp(a, MPFR_COS); }
-    @Override public Matrix<E> tan(Matrix<E> a) { return transcendentalOp(a, MPFR_TAN); }
-    @Override public Matrix<E> asin(Matrix<E> a) { return transcendentalOp(a, MPFR_ASIN); }
-    @Override public Matrix<E> acos(Matrix<E> a) { return transcendentalOp(a, MPFR_ACOS); }
-    @Override public Matrix<E> atan(Matrix<E> a) { return transcendentalOp(a, MPFR_ATAN); }
-    @Override public Matrix<E> sinh(Matrix<E> a) { return transcendentalOp(a, MPFR_SINH); }
-    @Override public Matrix<E> cosh(Matrix<E> a) { return transcendentalOp(a, MPFR_COSH); }
-    @Override public Matrix<E> tanh(Matrix<E> a) { return transcendentalOp(a, MPFR_TANH); }
-    @Override public Matrix<E> sqrt(Matrix<E> a) { return transcendentalOp(a, MPFR_SQRT); }
-    @Override public Matrix<E> cbrt(Matrix<E> a) { return transcendentalOp(a, MPFR_CBRT); }
+    @Override public Matrix<E> exp(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_EXP); return r != null ? r : LinearAlgebraBackend.super.exp(a); }
+    @Override public Matrix<E> log(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_LOG); return r != null ? r : LinearAlgebraBackend.super.log(a); }
+    @Override public Matrix<E> log10(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_LOG10); return r != null ? r : LinearAlgebraBackend.super.log10(a); }
+    @Override public Matrix<E> sin(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_SIN); return r != null ? r : LinearAlgebraBackend.super.sin(a); }
+    @Override public Matrix<E> cos(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_COS); return r != null ? r : LinearAlgebraBackend.super.cos(a); }
+    @Override public Matrix<E> tan(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_TAN); return r != null ? r : LinearAlgebraBackend.super.tan(a); }
+    @Override public Matrix<E> asin(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_ASIN); return r != null ? r : LinearAlgebraBackend.super.asin(a); }
+    @Override public Matrix<E> acos(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_ACOS); return r != null ? r : LinearAlgebraBackend.super.acos(a); }
+    @Override public Matrix<E> atan(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_ATAN); return r != null ? r : LinearAlgebraBackend.super.atan(a); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_SINH); return r != null ? r : LinearAlgebraBackend.super.sinh(a); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_COSH); return r != null ? r : LinearAlgebraBackend.super.cosh(a); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_TANH); return r != null ? r : LinearAlgebraBackend.super.tanh(a); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_SQRT); return r != null ? r : LinearAlgebraBackend.super.sqrt(a); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_CBRT); return r != null ? r : LinearAlgebraBackend.super.cbrt(a); }
 
     @Override
     public Matrix<E> pow(Matrix<E> a, E exponent) {
@@ -195,7 +221,7 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
     }
 
     private Matrix<E> transcendentalOp(Matrix<E> a, MethodHandle handle) {
-        if (handle == null) return LinearAlgebraBackend.super.exp(a); // Fallback to element-wise if handle missing
+        if (handle == null) return null; // Let the caller decide the fallback
         int m = a.rows();
         int n = a.cols();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;

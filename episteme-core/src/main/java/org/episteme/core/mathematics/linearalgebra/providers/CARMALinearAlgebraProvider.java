@@ -11,6 +11,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix
 import org.episteme.core.mathematics.linearalgebra.algorithms.RealDoubleCARMAAlgorithm;
 import org.episteme.core.mathematics.linearalgebra.algorithms.RealCARMAAlgorithm;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.structures.rings.Ring;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 
@@ -46,25 +47,46 @@ public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider
         }
         
         // Generic path (if E is Real)
-        if (a.get(0, 0) instanceof Real) {
-            org.episteme.core.technical.algorithm.OperationContext ctx = org.episteme.core.technical.algorithm.OperationContext.DEFAULT;
-            if (a.get(0, 0) instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
-                ctx = new org.episteme.core.technical.algorithm.OperationContext.Builder()
-                        .addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION)
-                        .build();
-            }
-
-            LinearAlgebraProvider<Real> leaf = (LinearAlgebraProvider<Real>) org.episteme.core.technical.algorithm.ProviderSelector.select(
-                    LinearAlgebraProvider.class,
-                    ctx,
-                    p -> p != this && !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider)
-                            && p.isCompatible(a.getScalarRing())
-            );
+        if (a.getScalarRing().zero() instanceof Real) {
+            LinearAlgebraProvider<Real> leaf = getLeafProvider((Ring<Real>) a.getScalarRing());
             return wrap((Matrix<E>) (Matrix<?>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf));
         }
 
         return wrap(super.multiply(a, b));
     }
+
+    @SuppressWarnings("unchecked")
+    private LinearAlgebraProvider<Real> getLeafProvider(Ring<Real> ring) {
+        org.episteme.core.technical.algorithm.OperationContext ctx = org.episteme.core.technical.algorithm.OperationContext.DEFAULT;
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
+            ctx = new org.episteme.core.technical.algorithm.OperationContext.Builder()
+                    .addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION)
+                    .build();
+        }
+
+        return (LinearAlgebraProvider<Real>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+                LinearAlgebraProvider.class,
+                ctx,
+                p -> p != this && !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider)
+                        && p.isCompatible(ring)
+        );
+    }
+
+    @Override public Matrix<E> exp(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).exp((Matrix<Real>)a)) : super.exp(a); }
+    @Override public Matrix<E> log(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).log((Matrix<Real>)a)) : super.log(a); }
+    @Override public Matrix<E> log10(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).log10((Matrix<Real>)a)) : super.log10(a); }
+    @Override public Matrix<E> sin(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).sin((Matrix<Real>)a)) : super.sin(a); }
+    @Override public Matrix<E> cos(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).cos((Matrix<Real>)a)) : super.cos(a); }
+    @Override public Matrix<E> tan(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).tan((Matrix<Real>)a)) : super.tan(a); }
+    @Override public Matrix<E> asin(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).asin((Matrix<Real>)a)) : super.asin(a); }
+    @Override public Matrix<E> acos(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).acos((Matrix<Real>)a)) : super.acos(a); }
+    @Override public Matrix<E> atan(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).atan((Matrix<Real>)a)) : super.atan(a); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).sinh((Matrix<Real>)a)) : super.sinh(a); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).cosh((Matrix<Real>)a)) : super.cosh(a); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).tanh((Matrix<Real>)a)) : super.tanh(a); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).sqrt((Matrix<Real>)a)) : super.sqrt(a); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).cbrt((Matrix<Real>)a)) : super.cbrt(a); }
+    @Override public Matrix<E> pow(Matrix<E> a, E exponent) { return (a.getScalarRing().zero() instanceof Real) ? wrap((Matrix<E>)(Matrix<?>)getLeafProvider((Ring<Real>)a.getScalarRing()).pow((Matrix<Real>)a, (Real)exponent)) : super.pow(a, exponent); }
 
     private Matrix<E> wrap(Matrix<E> m) {
         if (m instanceof GenericMatrix) {

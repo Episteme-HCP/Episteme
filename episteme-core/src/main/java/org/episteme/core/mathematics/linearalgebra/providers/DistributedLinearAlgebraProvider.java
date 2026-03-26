@@ -149,6 +149,91 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     }
 
     @Override
+    public Matrix<E> log(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.log(a)));
+    }
+
+    @Override
+    public Matrix<E> log10(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.log10(a)));
+    }
+
+    @Override
+    public Matrix<E> sin(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.sin(a)));
+    }
+
+    @Override
+    public Matrix<E> cos(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.cos(a)));
+    }
+
+    @Override
+    public Matrix<E> tan(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.tan(a)));
+    }
+
+    @Override
+    public Matrix<E> asin(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.asin(a)));
+    }
+
+    @Override
+    public Matrix<E> acos(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.acos(a)));
+    }
+
+    @Override
+    public Matrix<E> atan(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.atan(a)));
+    }
+
+    @Override
+    public Matrix<E> sinh(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.sinh(a)));
+    }
+
+    @Override
+    public Matrix<E> cosh(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.cosh(a)));
+    }
+
+    @Override
+    public Matrix<E> tanh(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.tanh(a)));
+    }
+
+    @Override
+    public Matrix<E> asinh(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.asinh(a)));
+    }
+
+    @Override
+    public Matrix<E> acosh(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.acosh(a)));
+    }
+
+    @Override
+    public Matrix<E> atanh(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.atanh(a)));
+    }
+
+    @Override
+    public Matrix<E> pow(Matrix<E> a, E exponent) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.pow(a, exponent)));
+    }
+
+    @Override
+    public Matrix<E> sqrt(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.sqrt(a)));
+    }
+
+    @Override
+    public Matrix<E> cbrt(Matrix<E> a) {
+        return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.cbrt(a)));
+    }
+
+    @Override
     public Matrix<E> inverse(Matrix<E> a) {
         return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.inverse(a)));
     }
