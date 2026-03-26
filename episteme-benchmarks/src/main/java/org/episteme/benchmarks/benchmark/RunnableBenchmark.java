@@ -104,7 +104,7 @@ public interface RunnableBenchmark {
     /**
      * @return Metadata about the benchmark configuration
      */
-    default java.util.Map<String, String> getMetadata() {
+    default java.util.Map<String, Object> getMetadata() {
         return java.util.Collections.emptyMap();
     }
     /**

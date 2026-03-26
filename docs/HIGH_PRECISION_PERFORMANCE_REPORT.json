@@ -1,0 +1,32 @@
+{
+  "context": {
+    "java_version": "25",
+    "os_name": "Windows 11",
+    "os_arch": "amd64",
+    "processors": 4,
+    "timestamp": "2026-03-26T09:09:21.305133Z"
+  },
+  "runs": [
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Colt (Optimized))","provider":"Colt (Optimized)","domain":"Linear Algebra (High-Precision Audit)","result":"41.445 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Apache Commons Math (Optimized))","provider":"Apache Commons Math (Optimized)","domain":"Linear Algebra (High-Precision Audit)","result":"38.447 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (EJML (Optimized))","provider":"EJML (Optimized)","domain":"Linear Algebra (High-Precision Audit)","result":"95.990 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Episteme CPU (Unified))","provider":"Episteme CPU (Unified)","domain":"Linear Algebra (High-Precision Audit)","result":"1.991 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (JBlas (Optimized))","provider":"JBlas (Optimized)","domain":"Linear Algebra (High-Precision Audit)","result":"86.408 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Episteme (CARMA))","provider":"Episteme (CARMA)","domain":"Linear Algebra (High-Precision Audit)","result":"9.793 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Episteme CPU (Dense))","provider":"Episteme CPU (Dense)","domain":"Linear Algebra (High-Precision Audit)","result":"3.881 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Episteme CPU (Sparse))","provider":"Episteme CPU (Sparse)","domain":"Linear Algebra (High-Precision Audit)","result":"3.417 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Distributed Linear Algebra Provider (LocalDistributedContext))","provider":"Distributed Linear Algebra Provider (LocalDistributedContext)","domain":"Linear Algebra (High-Precision Audit)","result":"65.277 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Episteme (Standard))","provider":"Episteme (Standard)","domain":"Linear Algebra (High-Precision Audit)","result":"9.305 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Episteme (Strassen))","provider":"Episteme (Strassen)","domain":"Linear Algebra (High-Precision Audit)","result":"20.173 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native CPU-BLAS Linear Algebra Backend)","provider":"Native CPU-BLAS Linear Algebra Backend","domain":"Linear Algebra (High-Precision Audit)","result":"108.49 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native CUDA Dense Backend)","provider":"Native CUDA Dense Backend","domain":"Linear Algebra (High-Precision Audit)","result":"0.00000 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (CUDA Sparse Linear Algebra Backend)","provider":"CUDA Sparse Linear Algebra Backend","domain":"Linear Algebra (High-Precision Audit)","result":"0.00000 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native BLAS Provider FFM)","provider":"Native BLAS Provider FFM","domain":"Linear Algebra (High-Precision Audit)","result":"8335725.22 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native MPFR Dense Linear Algebra Backend)","provider":"Native MPFR Dense Linear Algebra Backend","domain":"Linear Algebra (High-Precision Audit)","result":"0.49312 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native MPFR Sparse Linear Algebra Backend)","provider":"Native MPFR Sparse Linear Algebra Backend","domain":"Linear Algebra (High-Precision Audit)","result":"0.46380 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (ND4J (Native Wrapper))","provider":"ND4J (Native Wrapper)","domain":"Linear Algebra (High-Precision Audit)","result":"5449158.00 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native OpenCL Dense Backend)","provider":"Native OpenCL Dense Backend","domain":"Linear Algebra (High-Precision Audit)","result":"0.00000 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native OpenCL Sparse Linear Algebra Backend)","provider":"Native OpenCL Sparse Linear Algebra Backend","domain":"Linear Algebra (High-Precision Audit)","result":"0.00000 ops/s"},
+    {"date":"2026-03-26 10:09:21","name":"High-Precision Comprehensive Audit (Native SIMD Linear Algebra Backend)","provider":"Native SIMD Linear Algebra Backend","domain":"Linear Algebra (High-Precision Audit)","result":"7342724.04 ops/s"}
+  ]
+}

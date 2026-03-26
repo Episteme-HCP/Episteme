@@ -162,8 +162,8 @@ public class NetworkPenaltyBenchmark implements RunnableBenchmark {
     }
 
     @Override
-    public Map<String, String> getMetadata() {
-        Map<String, String> meta = new HashMap<>();
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>();
         meta.put("Matrix Size", String.valueOf(dryRun ? DRY_RUN_SIZE : size));
         meta.put("Mode", useGrpc ? "Remote (gRPC)" : "Local (Panama)");
         return meta;

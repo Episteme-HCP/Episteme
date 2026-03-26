@@ -72,8 +72,8 @@ public abstract class ComparisonBenchmark implements RunnableBenchmark {
     }
 
     @Override
-    public Map<String, String> getMetadata() {
-        Map<String, String> meta = new HashMap<>(RunnableBenchmark.super.getMetadata());
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> meta = new HashMap<>(RunnableBenchmark.super.getMetadata());
         meta.put("implementations", String.join(", ", implementations.keySet()));
         if (activeImplementation != null) {
             meta.putAll(activeImplementation.getMetadata());

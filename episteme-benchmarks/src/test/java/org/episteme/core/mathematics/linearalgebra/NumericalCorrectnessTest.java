@@ -209,9 +209,25 @@ public class NumericalCorrectnessTest {
     }
 
     private void printCorrectnessReport(List<CorrectnessResult> results) {
-        System.out.println("NUMERICAL CORRECTNESS REPORT");
+        StringBuilder sb = new StringBuilder();
+        sb.append("# Numerical Correctness Audit Report\n\n");
+        sb.append("| Provider | Status |\n");
+        sb.append("| --- | --- |\n");
         for (var r : results) {
-            System.out.println(r.providerName + " : " + r.status);
+            sb.append("| ").append(r.providerName).append(" | ").append(r.status).append(" |\n");
+        }
+        sb.append("\n*Generated on ").append(new java.util.Date()).append("*\n");
+        
+        String report = sb.toString();
+        System.out.println(report);
+        
+        try {
+            java.nio.file.Path path = java.nio.file.Paths.get("../docs/NUMERICAL_CORRECTNESS_REPORT.md");
+            java.nio.file.Files.createDirectories(path.getParent());
+            java.nio.file.Files.writeString(path, report);
+            System.out.println("Report saved to: " + path.toAbsolutePath());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
         }
     }
 }

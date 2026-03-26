@@ -215,7 +215,7 @@ public class BenchmarkCLI {
                     
                     BenchmarkResult res = new BenchmarkResult(
                         benchmark.getId(), benchmark.getName(), benchmark.getAlgorithmProvider(), benchmark.getDomain(),
-                        (long)(durationSec * 1000), iterNanos.size(), p99Ms, opsSec, 0, new java.util.HashMap<>()
+                        (long)(durationSec * 1000), iterNanos.size(), p99Ms, opsSec, 0, benchmark.getMetadata()
                     );
                     results.add(res);
                     success++;

@@ -28,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 /**
@@ -154,62 +156,95 @@ public class BenchmarkReporter {
             List<String> sortedDomains = grouped.keySet().stream().sorted().collect(Collectors.toList());
 
             for (String domain : sortedDomains) {
-                // Professional Section Header - Dark Blue, centered
-                Paragraph domainHeader = new Paragraph(domain, sectionFont);
-                domainHeader.setAlignment(Element.ALIGN_CENTER);
-                domainHeader.setSpacingBefore(30);
-                document.add(domainHeader);
+                List<BenchmarkResult> domainResults = grouped.get(domain);
                 
-                document.add(new Paragraph(" "));
+                // Check if this domain contains categorized metrics (e.g. from HP Audit)
+                Set<String> categories = new LinkedHashSet<>();
+                for (BenchmarkResult r : domainResults) {
+                    for (String key : r.extraMetrics().keySet()) {
+                        if (key.contains(":")) {
+                            categories.add(key.split(":")[0]);
+                        }
+                    }
+                }
 
-                JFreeChart chart = createChart(domain, grouped.get(domain));
-                
-                // Optimized dimensions for Landscape A4
-                int width = 750;
-                int height = 400;
-                
-                java.awt.image.BufferedImage bufferedImage = chart.createBufferedImage(width, height);
-                Image pdfImage = Image.getInstance(writer, bufferedImage, 1.0f);
-                pdfImage.setAlignment(Element.ALIGN_CENTER);
-                pdfImage.scaleToFit(700, 400);
-                document.add(pdfImage);
-                
-                document.add(new Paragraph(" "));
+                if (categories.isEmpty()) {
+                    // Standard Single Chart per Domain
+                    addDomainSection(document, writer, sectionFont, domain, domainResults, null);
+                } else {
+                    // Multi-category reporting (e.g. HP Audit)
+                    Paragraph domainHeader = new Paragraph(domain, sectionFont);
+                    domainHeader.setAlignment(Element.ALIGN_CENTER);
+                    domainHeader.setSpacingBefore(30);
+                    document.add(domainHeader);
+
+                    for (String category : categories) {
+                        addDomainSection(document, writer, sectionFont, category, domainResults, category);
+                    }
+                }
             }
-
-            document.close();
-            System.out.println("[SUCCESS] PDF Report generated at: " + pdfPath);
         } catch (Exception e) {
             System.err.println("Error generating PDF report: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static JFreeChart createChart(String domain, List<BenchmarkResult> results) {
+    private static void addDomainSection(Document document, PdfWriter writer, Font sectionFont, String title, List<BenchmarkResult> results, String categoryFilter) throws DocumentException {
+        Paragraph header = new Paragraph(title, sectionFont);
+        header.setAlignment(Element.ALIGN_CENTER);
+        header.setSpacingBefore(20);
+        document.add(header);
+        
+        document.add(new Paragraph(" "));
+
+        JFreeChart chart = createChart(title, results, categoryFilter);
+        int width = 750;
+        int height = 400;
+        
+        java.awt.image.BufferedImage bufferedImage = chart.createBufferedImage(width, height);
+        try {
+            Image pdfImage = Image.getInstance(writer, bufferedImage, 1.0f);
+            pdfImage.setAlignment(Element.ALIGN_CENTER);
+            pdfImage.scaleToFit(700, 400);
+            document.add(pdfImage);
+        } catch (IOException e) {
+            throw new DocumentException(e);
+        }
+        document.add(new Paragraph(" "));
+    }
+
+    private static JFreeChart createChart(String title, List<BenchmarkResult> results, String categoryFilter) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        // Sort results by score descending for better visualization
-        results.sort(Comparator.comparingDouble(BenchmarkResult::operationsPerSecond).reversed());
-
-        for (BenchmarkResult r : results) {
-            String label = r.provider();
-            
-            // Provide a visual cue for failures
-            double scoreValue = r.operationsPerSecond();
-            if (!"SUCCESS".equals(r.status())) {
-                scoreValue = 0.01; // Tiny bar to show it existed but failed
+        if (categoryFilter == null) {
+            // Standard Throughput Chart
+            results.sort(Comparator.comparingDouble(BenchmarkResult::operationsPerSecond).reversed());
+            for (BenchmarkResult r : results) {
+                double val = r.operationsPerSecond();
+                if (!"SUCCESS".equals(r.status())) val = 0.01;
+                dataset.addValue(val, "Throughput", r.provider());
             }
-            
-            dataset.addValue(scoreValue, "Throughput", label);
+        } else {
+            // Detailed Latency Chart for a category
+            for (BenchmarkResult r : results) {
+                for (Map.Entry<String, Object> entry : r.extraMetrics().entrySet()) {
+                    if (entry.getKey().startsWith(categoryFilter + ":")) {
+                        String op = entry.getKey().substring(categoryFilter.length() + 1);
+                        double latency = (double) entry.getValue();
+                        if (latency > 0) dataset.addValue(latency, r.provider(), op);
+                    }
+                }
+            }
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                domain + " | Scaling Performance",
-                null, // Remove "Implementation Architecture" domain axis label
-                "Throughput (Operations per Second)",
+                title + (categoryFilter == null ? " | Scaling Performance" : " | Performance Latency (ms)"),
+                null,
+                categoryFilter == null ? "Throughput (Ops/sec)" : "Latency (ms) - Lower is Better",
                 dataset,
                 PlotOrientation.HORIZONTAL,
-                false, true, false);
+                categoryFilter != null, // Show legend for multi-provider comparison
+                true, false);
 
         chart.setBackgroundPaint(Color.WHITE);
         chart.getTitle().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 16));
