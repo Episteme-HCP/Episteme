@@ -12,11 +12,11 @@ import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.context.MathContext;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
-
 import org.junit.jupiter.api.Test;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -26,6 +26,7 @@ import java.util.*;
  */
 public class HighPrecisionCorrectnessTest {
 
+    private static final int MATRIX_SIZE = 10;
     private static final BigDecimal TOLERANCE_REALBIG = new BigDecimal("1e-25");
     private static final double TOLERANCE_COMPLEX = 1e-8;
     
@@ -35,11 +36,28 @@ public class HighPrecisionCorrectnessTest {
         "Native CPU-BLAS"
     );
 
+    private String getTimestamp() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+    }
+    
+    private String getReportPath() {
+        String userDir = System.getProperty("user.dir");
+        java.nio.file.Path rootPath = java.nio.file.Paths.get(userDir);
+        if (rootPath.endsWith("episteme-benchmarks")) rootPath = rootPath.getParent();
+        return rootPath.resolve("docs/benchmark-results/benchmark-results-HighPrecision-Correctness-" + getTimestamp() + ".md").toString();
+    }
+
     @Test
     public void runNumericalCorrectnessAudit() {
         AlgorithmService oldService = AlgorithmManager.getService();
         List<LinearAlgebraProvider<?>> providers = discoverHPProviders();
         BenchmarkReporter reporter = new BenchmarkReporter("High-Precision Correctness Audit");
+        reporter.setComments(
+            "1. High-precision transcendental operations (Sin/Cos) show consistent failures across several dense providers when fallback is disabled, indicating a need for native HP transcendental implementations.\n" +
+            "2. MPFR Dense provider shows a ClassCastException on Matrix Inversion (RealDouble to RealBig), suggesting a type-safety regression in the JNI bridge.\n" +
+            "3. MPFR Sparse provider lacks implementation for Solve and Inverse operations.\n" +
+            "4. Distributed and gRPC providers show expected connection failures in this local standalone audit."
+        );
         
         reporter.addSection("Methodology", "Verifying numerical correctness and fallback prevention for 68+ operations.");
 
@@ -92,50 +110,19 @@ public class HighPrecisionCorrectnessTest {
             AlgorithmManager.setService(oldService);
         }
         reporter.generateReport();
+        reporter.exportToRoot(getReportPath());
     }
 
     private void auditRealBigCorrectness(Map<String, Object> metrics, LinearAlgebraProvider<RealBig> p) {
-        RealBig val = RealBig.create(new BigDecimal("0.123456789012345678901234567890"));
-        RealBig val2 = RealBig.create(new BigDecimal("2.718281828459045235360287471352"));
-        Matrix<RealBig> A = createInvertibleRealBigMatrix(3);
-        Vector<RealBig> v = createRealBigVector(3);
-
-        test(metrics, "RB:Add", p, () -> {
-            Matrix<RealBig> c = p.add(A, A);
-            assertNoFallback(p, c);
-        });
-        test(metrics, "RB:Inv", p, () -> {
-            Matrix<RealBig> inv = p.inverse(A);
-            assertNoFallback(p, inv);
-            @SuppressWarnings("unchecked")
-            Matrix<RealBig> I = Matrix.identity(3, (Ring<RealBig>)A.getScalarRing());
-            assertMatrixClose(p.multiply(A, inv), I, TOLERANCE_REALBIG, "A * A^-1 = I");
-        });
-        test(metrics, "RB:Solve", p, () -> {
-            Vector<RealBig> x = p.solve(A, v);
-            assertNoFallback(p, x);
-            assertVectorClose(p.multiply(A, x), v, TOLERANCE_REALBIG, "A * x = b");
-        });
-        // Expansion to more transcendental
-        test(metrics, "RB:SinCos", p, () -> {
-            Matrix<RealBig> m = createRealBigMatrix(new BigDecimal("0.5"), 1);
-            Matrix<RealBig> s = p.sin(m);
-            Matrix<RealBig> c = p.cos(m);
-            Matrix<RealBig> res = p.add(p.multiply(s, s), p.multiply(c, c));
-            @SuppressWarnings("unchecked")
-            Matrix<RealBig> I = Matrix.of(new RealBig[][]{{RealBig.create(BigDecimal.ONE)}}, (Ring<RealBig>)m.getScalarRing());
-            assertMatrixClose(res, I, TOLERANCE_REALBIG, "sin^2 + cos^2 = 1");
-        });
+        HighPrecisionAuditOperations.runRealBigAudit(p, MATRIX_SIZE, (op, test) -> test(metrics, op, p, () -> {
+            test.run();
+        }));
     }
 
     private void auditComplexCorrectness(Map<String, Object> metrics, LinearAlgebraProvider<Complex> p) {
-        Matrix<Complex> A = createInvertibleComplexMatrix(3);
-        test(metrics, "C:Inv", p, () -> {
-            Matrix<Complex> inv = p.inverse(A);
-            assertNoFallback(p, inv);
-            Matrix<Complex> I = Matrix.identity(3, A.getScalarRing());
-            assertComplexMatrixClose(p.multiply(A, inv), I, TOLERANCE_COMPLEX, "C: A * A^-1 = I");
-        });
+        HighPrecisionAuditOperations.runComplexAudit(p, MATRIX_SIZE, (op, test) -> test(metrics, op, p, () -> {
+            test.run();
+        }));
     }
 
     private void test(Map<String, Object> metrics, String op, LinearAlgebraProvider<?> prov, Runnable t) {
@@ -187,33 +174,4 @@ public class HighPrecisionCorrectnessTest {
         return list;
     }
 
-    private Matrix<RealBig> createRealBigMatrix(BigDecimal val, int n) {
-        RealBig[][] data = new RealBig[n][n];
-        @SuppressWarnings("unchecked")
-        Ring<RealBig> ring = (Ring<RealBig>)(Object)RealBig.create(BigDecimal.ZERO).getScalarRing();
-        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = RealBig.create(val.add(new BigDecimal(i + j)));
-        return Matrix.of(data, ring);
-    }
-
-    private Matrix<RealBig> createInvertibleRealBigMatrix(int n) {
-        RealBig[][] data = new RealBig[n][n];
-        @SuppressWarnings("unchecked")
-        Ring<RealBig> ring = (Ring<RealBig>)(Object)RealBig.create(BigDecimal.ZERO).getScalarRing();
-        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = RealBig.create(i == j ? new BigDecimal(n + i) : new BigDecimal("0.1"));
-        return Matrix.of(data, ring);
-    }
-
-    private Vector<RealBig> createRealBigVector(int n) {
-        RealBig[] data = new RealBig[n];
-        @SuppressWarnings("unchecked")
-        Ring<RealBig> ring = (Ring<RealBig>)(Object)RealBig.create(BigDecimal.ZERO).getScalarRing();
-        for (int i = 0; i < n; i++) data[i] = RealBig.create(new BigDecimal(i + 1));
-        return Vector.of(data, ring);
-    }
-
-    private Matrix<Complex> createInvertibleComplexMatrix(int n) {
-        Complex[][] data = new Complex[n][n];
-        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = Complex.of(i == j ? n + i : 0.1, 0.05);
-        return Matrix.of(data, Complex.of(0, 0).getScalarRing());
-    }
 }

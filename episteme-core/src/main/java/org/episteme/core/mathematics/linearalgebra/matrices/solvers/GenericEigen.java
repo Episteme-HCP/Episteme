@@ -118,9 +118,14 @@ public class GenericEigen {
 
     @SuppressWarnings("unchecked")
     private static <E> E abs(E element, Field<E> field) {
-        if (element instanceof Real) return (E) ((Real) element).abs();
-        if (element instanceof Complex) return (E) ((Complex) element).abs();
-        return element; // Fallback
+        Real res = null;
+        if (element instanceof Real) res = ((Real) element).abs();
+        else if (element instanceof Complex) res = ((Complex) element).abs();
+        
+        if (res != null && field.zero() instanceof Complex) {
+            return (E) Complex.of(res);
+        }
+        return (E) res;
     }
 
     private static boolean isNegative(Object element, Field<?> field) {
@@ -138,12 +143,21 @@ public class GenericEigen {
 
     @SuppressWarnings("unchecked")
     private static <E> E sqrt(E element, Field<E> field) {
-        if (element instanceof Real) return (E) ((Real) element).sqrt();
-        if (element instanceof Complex) return (E) ((Complex) element).sqrt();
-        try {
-            return (E) element.getClass().getMethod("sqrt").invoke(element);
-        } catch (Exception e) {}
-        return element;
+        Object res = null;
+        if (element instanceof Real) res = ((Real) element).sqrt();
+        else if (element instanceof Complex) res = ((Complex) element).sqrt();
+        else {
+            try {
+                res = element.getClass().getMethod("sqrt").invoke(element);
+            } catch (Exception e) {
+                res = element;
+            }
+        }
+        
+        if (field.zero() instanceof Complex && res instanceof Real) {
+            return (E) Complex.of((Real) res);
+        }
+        return (E) res;
     }
 }
 

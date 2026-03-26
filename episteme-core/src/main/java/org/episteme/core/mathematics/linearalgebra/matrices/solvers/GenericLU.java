@@ -182,16 +182,33 @@ public class GenericLU {
     }
 
     private static double absValue(Object element, Field<?> field) {
-        if (element instanceof Real) return ((Real) element).doubleValue();
-        if (element instanceof Complex) return ((Complex) element).abs().doubleValue();
-        if (element instanceof Number) return ((Number) element).doubleValue();
-        return 0.0;
+        if (element instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
+            // Use doubleValue() for pivot selection is generally fine, but rb.abs() is safer
+            return rb.abs().doubleValue();
+        }
+        if (element instanceof Real r) return r.doubleValue();
+        if (element instanceof Complex c) return c.abs().doubleValue();
+        if (element instanceof Number n) return n.doubleValue();
+        
+        // Fallback for types that might not implement interfaces but have an abs() method
+        try {
+            java.lang.reflect.Method absMethod = element.getClass().getMethod("abs");
+            Object absVal = absMethod.invoke(element);
+            if (absVal instanceof Number n) return n.doubleValue();
+            java.lang.reflect.Method doubleValueMethod = absVal.getClass().getMethod("doubleValue");
+            return (double) doubleValueMethod.invoke(absVal);
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 
     private static int toInt(Object val) {
-        if (val instanceof Real) return (int) ((Real) val).doubleValue();
-        if (val instanceof Complex) return (int) ((Complex) val).getReal().doubleValue();
-        if (val instanceof Number) return ((Number) val).intValue();
+        if (val == null) return 0;
+        if (val instanceof Integer i) return i;
+        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) return rb.bigDecimalValue().intValue();
+        if (val instanceof Real r) return (int) r.doubleValue();
+        if (val instanceof Complex c) return (int) c.getReal().doubleValue();
+        if (val instanceof Number n) return n.intValue();
         return 0;
     }
 }

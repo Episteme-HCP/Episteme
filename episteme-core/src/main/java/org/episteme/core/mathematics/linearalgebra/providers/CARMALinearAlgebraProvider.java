@@ -46,14 +46,21 @@ public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider
         }
         
         // Generic path (if E is Real)
-        if (a.get(0,0) instanceof Real) {
-             LinearAlgebraProvider<Real> leaf = (LinearAlgebraProvider<Real>) org.episteme.core.technical.algorithm.ProviderSelector.select(
-                 LinearAlgebraProvider.class,
-                 org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
-                 p -> p != this && !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider)
-                      && p.isCompatible(a.getScalarRing())
-             );
-             return wrap((Matrix<E>) (Matrix<?>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf));
+        if (a.get(0, 0) instanceof Real) {
+            org.episteme.core.technical.algorithm.OperationContext ctx = org.episteme.core.technical.algorithm.OperationContext.DEFAULT;
+            if (a.get(0, 0) instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
+                ctx = new org.episteme.core.technical.algorithm.OperationContext.Builder()
+                        .addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION)
+                        .build();
+            }
+
+            LinearAlgebraProvider<Real> leaf = (LinearAlgebraProvider<Real>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+                    LinearAlgebraProvider.class,
+                    ctx,
+                    p -> p != this && !(p instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider)
+                            && p.isCompatible(a.getScalarRing())
+            );
+            return wrap((Matrix<E>) (Matrix<?>) RealCARMAAlgorithm.multiply((Matrix<Real>) a, (Matrix<Real>) b, leaf));
         }
 
         return wrap(super.multiply(a, b));

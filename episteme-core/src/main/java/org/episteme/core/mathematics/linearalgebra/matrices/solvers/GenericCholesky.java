@@ -71,8 +71,13 @@ public class GenericCholesky {
 
     @SuppressWarnings("unchecked")
     private static <E> E sqrt(E element, Field<E> field) {
-        if (element instanceof Real) return (E) ((Real) element).sqrt();
-        if (element instanceof Complex) return (E) ((Complex) element).sqrt();
-        return element;
+        Object res = null;
+        if (element instanceof Real) res = ((Real) element).sqrt();
+        else if (element instanceof Complex) res = ((Complex) element).sqrt();
+        
+        if (field.zero() instanceof Complex && res instanceof Real) {
+            return (E) Complex.of((Real) res);
+        }
+        return (E) res;
     }
 }

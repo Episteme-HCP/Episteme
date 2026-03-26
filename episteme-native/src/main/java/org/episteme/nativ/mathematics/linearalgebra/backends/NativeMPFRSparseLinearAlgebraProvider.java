@@ -545,19 +545,22 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
             MemorySegment h_p = allocateVector(n, arena, prec, isComplex);
             MemorySegment h_Ap = allocateVector(n, arena, prec, isComplex);
             
+            int resSize = isComplex ? 2 : 1;
             MemorySegment alpha = arena.allocate(MPFR_LAYOUT);
             MemorySegment beta = arena.allocate(MPFR_LAYOUT);
-            MemorySegment rDotR = arena.allocate(MPFR_LAYOUT);
-            MemorySegment rNextDotRNext = arena.allocate(MPFR_LAYOUT);
-            MemorySegment pDotAp = arena.allocate(MPFR_LAYOUT);
+            MemorySegment rDotR = arena.allocate(MPFR_LAYOUT, resSize);
+            MemorySegment rNextDotRNext = arena.allocate(MPFR_LAYOUT, resSize);
+            MemorySegment pDotAp = arena.allocate(MPFR_LAYOUT, resSize);
             MemorySegment tol = arena.allocate(MPFR_LAYOUT);
             MemorySegment temp = arena.allocate(MPFR_LAYOUT);
 
             NativeSafe.invoke(MPFR_INIT2, alpha, prec);
             NativeSafe.invoke(MPFR_INIT2, beta, prec);
-            NativeSafe.invoke(MPFR_INIT2, rDotR, prec);
-            NativeSafe.invoke(MPFR_INIT2, rNextDotRNext, prec);
-            NativeSafe.invoke(MPFR_INIT2, pDotAp, prec);
+            for (int i=0; i<resSize; i++) {
+                NativeSafe.invoke(MPFR_INIT2, rDotR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, rNextDotRNext.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, pDotAp.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            }
             NativeSafe.invoke(MPFR_INIT2, tol, prec);
             NativeSafe.invoke(MPFR_INIT2, temp, prec);
 
@@ -844,11 +847,17 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment v1 = initVector(a.toMatrix(), arena, prec, isComplex);
-            MemorySegment res = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, res, prec);
+            int resSize = isComplex ? 2 : 1;
+            MemorySegment res = arena.allocate(MPFR_LAYOUT, resSize);
+            for (int i = 0; i < resSize; i++) {
+                NativeSafe.invoke(MPFR_INIT2, res.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            }
             dotProduct(v1, v1, a.dimension(), res, prec, arena, isComplex); // sum squares
-            NativeSafe.invoke(MPFR_SQRT, res, res, 0);
-            return (E) (Object) readMPFR(res, arena.allocate(ValueLayout.JAVA_LONG), arena);
+            
+            // Result is real for a.dot(a)
+            MemorySegment realRes = res.asSlice(0, MPFR_LAYOUT.byteSize());
+            NativeSafe.invoke(MPFR_SQRT, realRes, realRes, 0);
+            return (E) (Object) readMPFR(realRes, arena.allocate(ValueLayout.JAVA_LONG), arena);
         } catch (Throwable t) {
             throw new RuntimeException("Sparse MPFR norm failed", t);
         }

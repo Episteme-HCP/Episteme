@@ -1,8 +1,5 @@
 package org.episteme.benchmarks.cli;
 
-import org.episteme.benchmarks.benchmark.BenchmarkResult;
-import org.episteme.benchmarks.benchmark.RunnableBenchmark;
-import org.episteme.benchmarks.benchmark.BenchmarkRegistry;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
 
 import java.io.File;
@@ -86,14 +83,14 @@ public class BenchmarkCLI {
         System.out.println("Cores: " + Runtime.getRuntime().availableProcessors());
 
         // Discover Benchmarks
-        List<RunnableBenchmark> allBenchmarks = BenchmarkRegistry.discover();
+        List<org.episteme.benchmarks.benchmark.RunnableBenchmark> allBenchmarks = org.episteme.benchmarks.benchmark.BenchmarkRegistry.discover();
         System.out.println("Discovered " + allBenchmarks.size() + " benchmarks. IDs:");
-        for (RunnableBenchmark b : allBenchmarks) {
+        for (org.episteme.benchmarks.benchmark.RunnableBenchmark b : allBenchmarks) {
             System.out.println("  - " + b.getId() + " [Domain: " + b.getDomain() + "]");
         }
-        List<RunnableBenchmark> benchmarks = new ArrayList<>();
+        List<org.episteme.benchmarks.benchmark.RunnableBenchmark> benchmarks = new ArrayList<>();
         
-        for (RunnableBenchmark b : allBenchmarks) {
+        for (org.episteme.benchmarks.benchmark.RunnableBenchmark b : allBenchmarks) {
             String domain = b.getDomain();
             if (domainFilter != null) {
                 String dClean = domain.toLowerCase().replaceAll("[^a-z0-9]", "");
@@ -134,14 +131,14 @@ public class BenchmarkCLI {
         
         System.out.println("Discovered " + allBenchmarks.size() + " benchmarks. Filtered to " + benchmarks.size() + ".");
 
-        List<BenchmarkResult> results = new ArrayList<>();
+        Map<String, org.episteme.benchmarks.benchmark.BenchmarkResult> results = new LinkedHashMap<>();
 
         // Warmup & Run
         int success = 0;
         int fail = 0;
         int skipped = 0;
 
-        for (RunnableBenchmark benchmark : benchmarks) {
+        for (org.episteme.benchmarks.benchmark.RunnableBenchmark benchmark : benchmarks) {
             System.out.println("----------------------------------------------------------------");
             System.out.println("Running: " + benchmark.getName() + " [" + benchmark.getDomain() + "]");
             if (dryRun) System.out.println("Mode: DRY RUN (Small Dataset)");
@@ -149,7 +146,7 @@ public class BenchmarkCLI {
             if (!benchmark.isAvailable()) {
                 System.out.println("Status: SKIPPED (Unavailable)");
                 skipped++;
-                results.add(new BenchmarkResult(benchmark.getId(), benchmark.getName(), 
+                results.put(benchmark.getId(), new org.episteme.benchmarks.benchmark.BenchmarkResult(benchmark.getId(), benchmark.getName(), 
                     benchmark.getAlgorithmProvider(), benchmark.getDomain(), 0, 0, 0, 0, 0, new java.util.HashMap<>()));
                 continue;
             }
@@ -209,16 +206,16 @@ public class BenchmarkCLI {
                     System.out.println("DONE");
                     System.out.printf(Locale.US, "Result: %.2f ops/s, P99: %.3f ms%n", opsSec, p99Ms);
                     
-                    BenchmarkResult res = new BenchmarkResult(
+                    org.episteme.benchmarks.benchmark.BenchmarkResult res = new org.episteme.benchmarks.benchmark.BenchmarkResult(
                         benchmark.getId(), benchmark.getName(), benchmark.getAlgorithmProvider(), benchmark.getDomain(),
                         (long)(durationSec * 1000), iterNanos.size(), p99Ms, opsSec, 0, benchmark.getMetadata()
                     );
-                    results.add(res);
+                    results.put(benchmark.getId(), res);
                     success++;
                 } catch (Throwable t) {
                     System.out.println("FAILED during execution");
                     System.out.println("Error: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-                    results.add(new BenchmarkResult(benchmark.getId(), benchmark.getName(), 
+                    results.put(benchmark.getId(), new org.episteme.benchmarks.benchmark.BenchmarkResult(benchmark.getId(), benchmark.getName(), 
                         benchmark.getAlgorithmProvider(), benchmark.getDomain(), 0, 0, 0, 0, 0, new java.util.HashMap<>()));
                     fail++;
                 } finally {
@@ -229,7 +226,7 @@ public class BenchmarkCLI {
             } catch (Throwable t) {
                 System.out.println("FAILED during setup/isolation");
                 System.out.println("Error: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-                results.add(new BenchmarkResult(benchmark.getId(), benchmark.getName(), 
+                results.put(benchmark.getId(), new org.episteme.benchmarks.benchmark.BenchmarkResult(benchmark.getId(), benchmark.getName(), 
                     benchmark.getAlgorithmProvider(), benchmark.getDomain(), 0, 0, 0, 0, 0, new java.util.HashMap<>()));
                 fail++;
             }
@@ -247,16 +244,16 @@ public class BenchmarkCLI {
             "High-Precision Benchmark Result" : "Episteme Performance Audit";
             
         BenchmarkReporter reporter = new BenchmarkReporter(reporterTitle);
-        for (BenchmarkResult r : results) {
+        for (org.episteme.benchmarks.benchmark.BenchmarkResult r : results.values()) {
             reporter.addResult(r);
         }
 
         // Expand high-precision results for JSON export (one entry per operation)
-        List<BenchmarkResult> expandedResults = new ArrayList<>();
-        for (BenchmarkResult r : results) {
+        List<org.episteme.benchmarks.benchmark.BenchmarkResult> expandedResults = new ArrayList<>();
+        for (org.episteme.benchmarks.benchmark.BenchmarkResult r : results.values()) {
             if (r.domain().contains("High-Precision") && r.extraMetrics() != null && !r.extraMetrics().isEmpty()) {
                 for (java.util.Map.Entry<String, Object> metric : r.extraMetrics().entrySet()) {
-                    expandedResults.add(new BenchmarkResult(
+                    expandedResults.add(new org.episteme.benchmarks.benchmark.BenchmarkResult(
                         r.benchmarkName() + " (" + metric.getKey() + ")",
                         r.provider(),
                         r.domain(),
@@ -292,7 +289,7 @@ public class BenchmarkCLI {
         System.out.println("  --help            Show this message.");
     }
 
-    private static void exportJson(String path, List<BenchmarkResult> results) {
+    private static void exportJson(String path, List<org.episteme.benchmarks.benchmark.BenchmarkResult> results) {
         try {
             StringBuilder json = new StringBuilder();
             json.append("{\n");
@@ -309,7 +306,7 @@ public class BenchmarkCLI {
             // Results -> runs
             json.append("  \"runs\": [\n");
             for (int i = 0; i < results.size(); i++) {
-                BenchmarkResult r = results.get(i);
+                org.episteme.benchmarks.benchmark.BenchmarkResult r = results.get(i);
                 
                 String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 String resultText;

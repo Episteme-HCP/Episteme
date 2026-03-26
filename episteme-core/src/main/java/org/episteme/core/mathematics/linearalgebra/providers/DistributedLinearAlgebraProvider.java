@@ -65,9 +65,14 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
 
     @SuppressWarnings("unchecked")
     private <R> R executeOnLocal(Ring<E> ring, java.util.function.Function<LinearAlgebraProvider<E>, R> operation) {
+        org.episteme.core.technical.algorithm.OperationContext.Builder builder = new org.episteme.core.technical.algorithm.OperationContext.Builder();
+        if (ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex)) {
+            builder.addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION);
+        }
+        
         return org.episteme.core.technical.algorithm.ProviderSelector.execute(
             LinearAlgebraProvider.class, 
-            org.episteme.core.technical.algorithm.OperationContext.DEFAULT, 
+            builder.build(), 
             p -> {
                 if (p == this || (ring != null && !p.isCompatible(ring))) {
                     throw new UnsupportedOperationException("Not suitable");
@@ -230,9 +235,14 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     
     @SuppressWarnings("unchecked")
     private <R> R executeOnSparseLocal(Ring<E> ring, java.util.function.Function<SparseLinearAlgebraProvider<E>, R> operation) {
+        org.episteme.core.technical.algorithm.OperationContext.Builder builder = new org.episteme.core.technical.algorithm.OperationContext.Builder();
+        if (ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex)) {
+            builder.addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION);
+        }
+
         return org.episteme.core.technical.algorithm.ProviderSelector.execute(
             SparseLinearAlgebraProvider.class, 
-            org.episteme.core.technical.algorithm.OperationContext.DEFAULT, 
+            builder.build(), 
             p -> {
                 if (p == this) throw new UnsupportedOperationException("Not suitable");
                 if (ring != null && !p.isCompatible(ring)) throw new UnsupportedOperationException("Not suitable");

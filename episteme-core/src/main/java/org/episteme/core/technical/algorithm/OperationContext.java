@@ -80,7 +80,9 @@ public final class OperationContext {
         /** LU Decomposition */
         MAT_LU,
         /** Eigenvalue Decomposition */
-        MAT_EIGEN
+        MAT_EIGEN,
+        /** High precision required (e.g. for RealBig/Complex) */
+        HIGH_PRECISION
     }
 
     public static final OperationContext DEFAULT = new OperationContext.Builder().build();

@@ -31,9 +31,14 @@ public class BenchmarkReporter {
     private final String title;
     private final java.util.List<BenchmarkResult> results = new ArrayList<>();
     private final Map<String, String> sections = new LinkedHashMap<>();
+    private String comments = "";
 
     public BenchmarkReporter(String title) {
         this.title = title;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
     public void addSection(String name, String content) {
@@ -88,16 +93,33 @@ public class BenchmarkReporter {
     }
 
     public void generateReport() {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String baseDir = "docs/benchmark-results";
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        
+        java.nio.file.Path rootPath = getProjectRoot();
+        String baseDir = rootPath.resolve("docs/benchmark-results").toString();
         new java.io.File(baseDir).mkdirs();
         
-        String cleanTitle = title.replace(" ", "_").replaceAll("[^a-zA-Z0-9_]", "");
-        String baseName = baseDir + "/" + cleanTitle + "_" + timestamp;
+        String cleanTitle = title.replace(" ", "-").replaceAll("[^a-zA-Z0-9-]", "");
+        String baseName = baseDir + "/benchmark-results-" + cleanTitle + "-" + timestamp;
         
         System.out.println("[INFO] Generating standardized reports to: " + baseName);
         exportJson(baseName + ".json");
         generateReport(baseName + ".pdf");
+    }
+
+    public void exportToRoot(String relativePath) {
+        java.nio.file.Path rootPath = getProjectRoot();
+        String absolutePath = rootPath.resolve(relativePath).toString();
+        exportMarkdown(absolutePath);
+    }
+
+    private java.nio.file.Path getProjectRoot() {
+        String userDir = System.getProperty("user.dir");
+        java.nio.file.Path path = Paths.get(userDir);
+        if (path.endsWith("episteme-benchmarks")) {
+            return path.getParent();
+        }
+        return path;
     }
 
     public void exportJson(String path) {
@@ -169,8 +191,14 @@ public class BenchmarkReporter {
             Paragraph subtitle = new Paragraph("Precision Performance Analytics | Generated: " + 
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), subTitleFont);
             subtitle.setAlignment(Element.ALIGN_CENTER);
-            subtitle.setSpacingAfter(30);
             document.add(subtitle);
+
+            if (comments != null && !comments.isEmpty()) {
+                Font commentFont = FontFactory.getFont(FontFactory.HELVETICA, 11, Color.BLACK);
+                Paragraph commentPara = new Paragraph("Analytical Comments:\n" + comments, commentFont);
+                commentPara.setSpacingAfter(20);
+                document.add(commentPara);
+            }
 
             Map<String, java.util.List<BenchmarkResult>> grouped = results.stream()
                 .collect(Collectors.groupingBy(BenchmarkResult::domain));

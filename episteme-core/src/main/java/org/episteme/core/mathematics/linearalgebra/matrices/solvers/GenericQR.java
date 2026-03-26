@@ -109,11 +109,21 @@ public class GenericQR {
     private static <E> E norm(E[] v, Field<E> field) {
         E dot = field.zero();
         for (E e : v) dot = field.add(dot, field.multiply(conjugate(e, field), e));
-        if (dot instanceof Real) return (E) ((Real) dot).sqrt();
-        if (dot instanceof Complex) return (E) ((Complex) dot).sqrt();
-        try {
-            return (E) dot.getClass().getMethod("sqrt").invoke(dot);
-        } catch (Exception e) {}
-        return dot; // Fallback
+        
+        Object res = null;
+        if (dot instanceof Real) res = ((Real) dot).sqrt();
+        else if (dot instanceof Complex) res = ((Complex) dot).sqrt();
+        else {
+            try {
+                res = dot.getClass().getMethod("sqrt").invoke(dot);
+            } catch (Exception e) {
+                res = dot;
+            }
+        }
+        
+        if (field.zero() instanceof Complex && res instanceof Real) {
+            return (E) Complex.of((Real) res);
+        }
+        return (E) res;
     }
 }
